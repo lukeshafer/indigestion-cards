@@ -1,0 +1,17 @@
+{
+  "name": "@lil-indigestion-cards/core",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "sst bind vitest",
+    "typecheck": "tsc -noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "sst": "^2.3.5",
+    "vitest": "^0.29.8"
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
+  }
+}

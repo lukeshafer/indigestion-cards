@@ -1,0 +1,20 @@
+/** @type {import("@types/prettier").Config} */
+module.exports = {
+	pluginSearchDirs: false,
+	useTabs: true,
+	overrides: [
+		{
+			files: '*.astro',
+			options: {
+				parser: 'astro',
+			},
+		},
+	],
+	singleQuote: true,
+	trailingComma: 'es5',
+	tabWidth: 2,
+	useTabs: true,
+	printWidth: 80,
+	bracketSameLine: true,
+	semi: false,
+}

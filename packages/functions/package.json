@@ -1,0 +1,14 @@
+{
+  "name": "@lil-indigestion-cards/functions",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "sst bind vitest",
+    "typecheck": "tsc -noEmit"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.114",
+    "@types/node": "^18.15.11",
+    "sst": "^2.3.5"
+  }
+}
