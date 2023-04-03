@@ -11,6 +11,11 @@ import {
 	TWITCH_HEADERS,
 	getHeaders,
 } from '@lil-indigestion-cards/core/twitch-helpers'
+import {
+	checkIfUserExists,
+	createNewUser,
+	addUnopenedPacks,
+} from '@lil-indigestion-cards/core/user'
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
@@ -49,6 +54,24 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	console.log('Notification received')
 	switch (body.type) {
 		case 'channel.subscription.gift':
+			if (body.event.total < 5) {
+				console.log('Gifted less than 5 subscriptions')
+				return { statusCode: 200 }
+			}
+
+			if (!(await checkIfUserExists(body.event.user_id))) {
+				console.log('User does not exist, creating user')
+				await createNewUser({
+					userId: body.event.user_id,
+					userName: body.event.user_name,
+				})
+			}
+
+			await addUnopenedPacks({
+				userId: body.event.user_id,
+				packCount: body.event.total,
+			})
+
 			console.log(
 				`${body.event.user_name} gifted ${body.event.total} subscriptions`
 			)

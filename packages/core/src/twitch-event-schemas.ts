@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-const user_id = z.string().nullable()
-const user_name = z.string().nullable()
+const user_id = z.string()
+const user_name = z.string()
 const user_login = z.string().nullable()
 const user_input = z.string().nullable()
 const broadcaster_user_id = z.string()
