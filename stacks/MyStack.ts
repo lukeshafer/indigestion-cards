@@ -1,36 +1,55 @@
 import { StackContext, Api, Config, Table, AstroSite } from 'sst/constructs'
 
 export function API({ stack }: StackContext) {
-	const table = new Table(stack, 'table', {
+	const table = new Table(stack, 'db', {
 		fields: {
 			pk: 'string',
 			sk: 'string',
-			entityType: 'string',
-			userId: 'string',
-			userName: 'string',
-			cardTypeId: 'string',
-			cardInstanceId: 'string',
-			cardName: 'string',
-			cardDescription: 'string',
-			cardImage: 'string',
-			totalCardInstances: 'number',
-			cardInstanceNumber: 'number',
-			dateOpened: 'string',
-			dateReleased: 'string',
-			ownerId: 'string',
-			minterId: 'string',
-			unopenedPacks: 'number',
+			gsi1pk: 'string',
+			gsi1sk: 'string',
 		},
 		primaryIndex: {
 			partitionKey: 'pk',
 			sortKey: 'sk',
 		},
 		globalIndexes: {
-			byUserName: {
-				partitionKey: 'userName',
+			gsi1: {
+				partitionKey: 'gsi1pk',
+				sortKey: 'gsi1sk',
 			},
 		},
 	})
+
+	//const table = new Table(stack, 'table', {
+	//fields: {
+	//pk: 'string',
+	//sk: 'string',
+	//entityType: 'string',
+	//userId: 'string',
+	//userName: 'string',
+	//cardTypeId: 'string',
+	//cardInstanceId: 'string',
+	//cardName: 'string',
+	//cardDescription: 'string',
+	//cardImage: 'string',
+	//totalCardInstances: 'number',
+	//cardInstanceNumber: 'number',
+	//dateOpened: 'string',
+	//dateReleased: 'string',
+	//ownerId: 'string',
+	//minterId: 'string',
+	//unopenedPacks: 'number',
+	//},
+	//primaryIndex: {
+	//partitionKey: 'pk',
+	//sortKey: 'sk',
+	//},
+	//globalIndexes: {
+	//byUserName: {
+	//partitionKey: 'userName',
+	//},
+	//},
+	//})
 
 	const adminSite = new AstroSite(stack, 'admin', {
 		path: 'packages/admin-site',

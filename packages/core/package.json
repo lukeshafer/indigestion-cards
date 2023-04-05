@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1348.0",
+    "electrodb": "^2.5.1",
     "zod": "^3.21.4"
   }
 }

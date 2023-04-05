@@ -38,11 +38,13 @@ importers:
     specifiers:
       '@types/node': ^18.15.11
       aws-sdk: ^2.1348.0
+      electrodb: ^2.5.1
       sst: ^2.3.5
       vitest: ^0.29.8
       zod: ^3.21.4
     dependencies:
       aws-sdk: 2.1348.0
+      electrodb: 2.5.1
       zod: 3.21.4
     devDependencies:
       '@types/node': 18.15.11
@@ -1071,6 +1073,18 @@ packages:
       tslib: 2.5.0
     dev: true
 
+  /@aws-sdk/lib-dynamodb/3.306.0:
+    resolution: {integrity: sha512-+PaLFXEgUKnzLQZTHvyYKztHeTFxvZbI+4k+UNVc7T8dkxJ95H0mrCN3ULGBs4pTh60rnW6UmZM7s/zXJhTZEg==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-dynamodb': ^3.0.0
+      '@aws-sdk/smithy-client': ^3.0.0
+      '@aws-sdk/types': ^3.0.0
+    dependencies:
+      '@aws-sdk/util-dynamodb': 3.306.0
+      tslib: 2.5.0
+    dev: false
+
   /@aws-sdk/md5-js/3.303.0:
     resolution: {integrity: sha512-66d5gzquWFa8qYVgQG7e6L9mTgR1BLsN3MAl0cf9y6S3p8u0ETmR12cKO7WUnMqTCN9mCh/+BfmJADMTRD7BFg==}
     dependencies:
@@ -1456,6 +1470,13 @@ packages:
       '@aws-sdk/types': 3.303.0
       tslib: 2.5.0
     dev: true
+
+  /@aws-sdk/util-dynamodb/3.306.0:
+    resolution: {integrity: sha512-Rp/xf36T4tW/EgSB4CziAyymdeySRqLz+xWpkTtJOC4EqbTFE3FLBYlmCVpvBtiyRf0GrfjIiRufHnOYYbirYw==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      tslib: 2.5.0
+    dev: false
 
   /@aws-sdk/util-endpoints/3.303.0:
     resolution: {integrity: sha512-dPg9+l3VY3nclWFiWAVNWek5lQwgdtY8oRYOgCeyntce9FlNrPQgCRTVr36D0iQ0aNCs0GWzfjgL+rIdCF66/w==}
@@ -3588,6 +3609,17 @@ packages:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: true
 
+  /electrodb/2.5.1:
+    resolution: {integrity: sha512-XYoY6VPonMttttsol5wRGC3BAVjjDR5fugvGDHiZ0Jq3FTYmYx+BNTuVFt/FEceBKwSwhf9pkak/YeLOKNC/mg==}
+    dependencies:
+      '@aws-sdk/lib-dynamodb': 3.306.0
+      jsonschema: 1.2.7
+    transitivePeerDependencies:
+      - '@aws-sdk/client-dynamodb'
+      - '@aws-sdk/smithy-client'
+      - '@aws-sdk/types'
+    dev: false
+
   /electron-to-chromium/1.4.347:
     resolution: {integrity: sha512-LNi3+/9nV0vT6Bz1OsSoZ/w7IgNuWdefZ7mjKNjZxyRlI/ag6uMXxsxAy5Etvuixq3Q26exw2fc4bNYvYQqXSw==}
 
@@ -4580,6 +4612,10 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.11
     dev: true
+
+  /jsonschema/1.2.7:
+    resolution: {integrity: sha512-3dFMg9hmI9LdHag/BRIhMefCfbq1hicvYMy8YhZQorAdzOzWz7NjniSpn39yjpzUAMIWtGyyZuH2KNBloH7ZLw==}
+    dev: false
 
   /jsonschema/1.4.1:
     resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
