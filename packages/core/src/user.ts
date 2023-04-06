@@ -1,67 +1,26 @@
-import { Table } from 'sst/node/table'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import { db } from './db'
+import type { EntityRecord, CreateEntityItem } from 'electrodb'
+import { createPack } from './card'
 
-const dynamo = new DocumentClient()
-
-export interface User {
-	userId: string
-	userName: string
-}
+type User = typeof db.entities.users
 
 export async function getUser(userId: string) {
-	const params: DocumentClient.GetItemInput = {
-		TableName: Table.table.tableName,
-		Key: {
-			pk: `u#${userId}`,
-			sk: `u#${userId}`,
-		},
-	}
-	return dynamo
-		.get(params)
-		.promise()
-		.then(({ Item }) => Item)
+	const user = await db.entities.users.query.byUserId({ userId }).go()
+	return user
 }
 
-export async function getUserByUserName(userName: string) {
-	const params: DocumentClient.QueryInput = {
-		TableName: Table.table.tableName,
-		IndexName: 'byUserName',
-		ExpressionAttributeValues: {
-			':userName': userName,
-		},
-		KeyConditionExpression: 'userName = :userName',
-	}
-	return dynamo
-		.query(params)
-		.promise()
-		.then(({ Items }) => Items?.[0])
+export async function getUserByUserName(username: string) {
+	const user = await db.entities.users.query.byUsername({ username }).go()
+	return user
 }
 
-export async function putUser(user: {
-	userId: string
-	userName: string
-	unopenedPacks?: number
-}) {
-	const params: DocumentClient.PutItemInput = {
-		TableName: Table.table.tableName,
-		Item: {
-			pk: `u#${user.userId}`,
-			sk: `u#${user.userId}`,
-			entityType: 'user',
-			userId: user.userId,
-			userName: user.userName,
-			unopenedPacks: user.unopenedPacks ?? 0,
-		},
-	}
-
-	return dynamo.put(params).promise()
+async function putUser(user: CreateEntityItem<User>) {
+	const result = await db.entities.users.create(user).go()
+	return result
 }
 
-export async function createNewUser(user: {
-	userId: string
-	userName: string
-}) {
-	if (await checkIfUsernameExists(user.userName)) {
+export async function createNewUser(user: CreateEntityItem<User>) {
+	if (await checkIfUsernameExists(user.username)) {
 		// TODO: update existing username, as they likely changed their username
 	}
 
@@ -82,39 +41,25 @@ export async function checkIfUsernameExists(
 
 export async function addUnopenedPacks(args: {
 	userId: string
+	username: string
 	packCount: number
 }) {
-	const params: DocumentClient.UpdateItemInput = {
-		TableName: Table.table.tableName,
-		Key: {
-			pk: `u#${args.userId}`,
-			sk: `u#${args.userId}`,
-		},
-		UpdateExpression: 'ADD unopenedPacks :packs',
-		ExpressionAttributeValues: {
-			':packs': args.packCount,
-		},
+	for (let i = 0; i < args.packCount; i++) {
+		await createPack({
+			username: args.username,
+			userId: args.userId,
+			count: getDefaultCardCountInPack(),
+			seriesId: getCurrentSeriesId(),
+		})
 	}
-	return dynamo
-		.update(params)
-		.promise()
-		.then(({ Attributes }) => Attributes)
 }
 
-export async function getAllUsersWithUnopenedPacks() {
-	// search for items with pk starting with u#, sk starting with u#, and unopenedPacks > 0
-	const params: DocumentClient.QueryInput = {
-		TableName: Table.table.tableName,
-		ExpressionAttributeValues: {
-			':pk': 'u#',
-			':sk': 'u#',
-			':unopenedPacks': 0,
-		},
-		KeyConditionExpression: 'pk >= :pk AND sk >= :sk',
-		FilterExpression: 'unopenedPacks > :unopenedPacks',
-	}
-	return dynamo
-		.query(params)
-		.promise()
-		.then(({ Items }) => Items)
+function getDefaultCardCountInPack() {
+	// TODO: implement this properly with database
+	return 5
+}
+
+function getCurrentSeriesId() {
+	// TODO: implement this properly with database
+	return 'base'
 }

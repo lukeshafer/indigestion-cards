@@ -1,4 +1,11 @@
-import { StackContext, Api, Config, Table, AstroSite } from 'sst/constructs'
+import {
+	StackContext,
+	Api,
+	Config,
+	Table,
+	AstroSite,
+	EventBus,
+} from 'sst/constructs'
 
 export function API({ stack }: StackContext) {
 	const table = new Table(stack, 'db', {
@@ -7,6 +14,8 @@ export function API({ stack }: StackContext) {
 			sk: 'string',
 			gsi1pk: 'string',
 			gsi1sk: 'string',
+			gsi2pk: 'string',
+			gsi2sk: 'string',
 		},
 		primaryIndex: {
 			partitionKey: 'pk',
@@ -17,39 +26,34 @@ export function API({ stack }: StackContext) {
 				partitionKey: 'gsi1pk',
 				sortKey: 'gsi1sk',
 			},
+			gsi2: {
+				partitionKey: 'gsi2pk',
+				sortKey: 'gsi2sk',
+			},
 		},
 	})
 
-	//const table = new Table(stack, 'table', {
-	//fields: {
-	//pk: 'string',
-	//sk: 'string',
-	//entityType: 'string',
-	//userId: 'string',
-	//userName: 'string',
-	//cardTypeId: 'string',
-	//cardInstanceId: 'string',
-	//cardName: 'string',
-	//cardDescription: 'string',
-	//cardImage: 'string',
-	//totalCardInstances: 'number',
-	//cardInstanceNumber: 'number',
-	//dateOpened: 'string',
-	//dateReleased: 'string',
-	//ownerId: 'string',
-	//minterId: 'string',
-	//unopenedPacks: 'number',
-	//},
-	//primaryIndex: {
-	//partitionKey: 'pk',
-	//sortKey: 'sk',
-	//},
-	//globalIndexes: {
-	//byUserName: {
-	//partitionKey: 'userName',
-	//},
-	//},
-	//})
+	const eventBus = new EventBus(stack, 'eventBus', {
+		rules: {
+			'give-pack-to-user': {
+				pattern: {
+					source: ['twitch'],
+					detailType: ['give-pack-to-user'],
+				},
+				targets: {
+					// TODO: send to queue instead of function to prevent race conditions
+					'give-pack-to-user': {
+						function: 'packages/functions/src/give-pack-to-user.handler',
+					},
+				},
+			},
+		},
+		defaults: {
+			function: {
+				bind: [table],
+			},
+		},
+	})
 
 	const adminSite = new AstroSite(stack, 'admin', {
 		path: 'packages/admin-site',
@@ -68,10 +72,13 @@ export function API({ stack }: StackContext) {
 					new Config.Secret(stack, 'TWITCH_CLIENT_SECRET'),
 					new Config.Secret(stack, 'TWITCH_ACCESS_TOKEN'),
 					table,
+					eventBus,
 				],
 			},
 		},
 	})
+
+	// TODO: add cron job to check twitch for users who have updated their username
 
 	stack.addOutputs({
 		ApiEndpoint: api.url,

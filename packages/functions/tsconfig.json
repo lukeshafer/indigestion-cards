@@ -1,10 +1,15 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
-  "compilerOptions": {
-    "module": "esnext",
-    "baseUrl": ".",
-    "paths": {
-      "@lil-indigestion-cards/core/*": ["../core/src/*"]
-    }
-  }
+	"extends": "@tsconfig/node16/tsconfig.json",
+	"compilerOptions": {
+		"module": "esnext",
+		"baseUrl": ".",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strict": true,
+		"paths": {
+			"@lil-indigestion-cards/core/*": [
+				"../core/src/*"
+			]
+		}
+	}
 }

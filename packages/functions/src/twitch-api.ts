@@ -1,21 +1,12 @@
-import crypto from 'crypto'
-import {
-	type APIGatewayProxyEventV2,
-	type APIGatewayProxyHandlerV2,
-} from 'aws-lambda'
-import { Config } from 'sst/node/config'
+import { type APIGatewayProxyHandlerV2 } from 'aws-lambda'
+import { EventBus } from 'sst/node/event-bus'
+import { EventBridge } from 'aws-sdk'
 import {
 	verifyDiscordRequest,
 	parseRequestBody,
 	MESSAGE_TYPE,
-	TWITCH_HEADERS,
 	getHeaders,
 } from '@lil-indigestion-cards/core/twitch-helpers'
-import {
-	checkIfUserExists,
-	createNewUser,
-	addUnopenedPacks,
-} from '@lil-indigestion-cards/core/user'
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
@@ -59,22 +50,25 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				return { statusCode: 200 }
 			}
 
-			if (!(await checkIfUserExists(body.event.user_id))) {
-				console.log('User does not exist, creating user')
-				await createNewUser({
-					userId: body.event.user_id,
-					userName: body.event.user_name,
+			const totalPacks = Math.floor(body.event.total / 5)
+
+			const eventBridge = new EventBridge()
+			await eventBridge
+				.putEvents({
+					Entries: [
+						{
+							Source: 'twitch',
+							DetailType: 'give-pack-to-user',
+							Detail: JSON.stringify({
+								userId: body.event.user_id,
+								username: body.event.user_name,
+								packCount: totalPacks,
+							}),
+							EventBusName: EventBus.eventBus.eventBusName,
+						},
+					],
 				})
-			}
-
-			await addUnopenedPacks({
-				userId: body.event.user_id,
-				packCount: body.event.total,
-			})
-
-			console.log(
-				`${body.event.user_name} gifted ${body.event.total} subscriptions`
-			)
+				.promise()
 			break
 		case 'channel.channel_points_custom_reward_redemption.add':
 			body.event

@@ -38,6 +38,9 @@ const cardDesigns = new Entity(
 			releaseDate: {
 				type: 'string',
 			},
+			isComplete: {
+				type: 'boolean',
+			},
 			rarityDetails: {
 				type: 'list',
 				items: {
@@ -57,7 +60,7 @@ const cardDesigns = new Entity(
 		},
 		indexes: {
 			byDesignId: {
-				collection: 'cardsByDesign',
+				collection: 'designsAndCards',
 				pk: {
 					field: 'pk',
 					composite: ['designId'],
@@ -69,7 +72,7 @@ const cardDesigns = new Entity(
 			},
 			bySeriesId: {
 				index: 'gsi1',
-				collection: 'cardsBySeries',
+				collection: 'seriesAndDesigns',
 				pk: {
 					field: 'gsi1pk',
 					composite: ['seriesId'],
@@ -92,6 +95,12 @@ const cardSeries = new Entity(
 			service: 'card-app',
 		},
 		attributes: {
+			entityType: {
+				type: ['cardSeries'] as const,
+				default: 'cardSeries',
+				value: 'cardSeries',
+				required: true,
+			},
 			seriesName: {
 				type: 'string',
 				required: true,
@@ -105,14 +114,25 @@ const cardSeries = new Entity(
 			},
 		},
 		indexes: {
-			bySeriesId: {
-				collection: 'cardsBySeries',
+			allSeries: {
 				pk: {
 					field: 'pk',
-					composite: ['seriesId'],
+					composite: ['entityType'],
 				},
 				sk: {
 					field: 'sk',
+					composite: ['seriesId'],
+				},
+			},
+			bySeriesId: {
+				collection: 'seriesAndDesigns',
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['seriesId'],
+				},
+				sk: {
+					field: 'gsi1sk',
 					composite: [],
 				},
 			},
@@ -145,7 +165,11 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
-			ownerId: {
+			userId: {
+				type: 'string',
+				required: true,
+			},
+			username: {
 				type: 'string',
 				required: true,
 			},
@@ -153,31 +177,46 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
+			packId: {
+				type: 'string',
+			},
 			openedAt: {
 				type: 'string',
 			},
 		},
 		indexes: {
-			byOwnerId: {
-				collection: 'cardsByOwner',
+			byDesignId: {
+				collection: 'designsAndCards',
 				pk: {
 					field: 'pk',
-					composite: ['ownerId'],
+					composite: ['designId'],
 				},
 				sk: {
 					field: 'sk',
 					composite: ['instanceId'],
 				},
 			},
-			byDesignId: {
+			byOwnerId: {
 				index: 'gsi1',
-				collection: 'cardsByDesign',
+				collection: 'cardsByOwnerName',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['designId'],
+					composite: ['username'],
 				},
 				sk: {
 					field: 'gsi1sk',
+					composite: ['instanceId'],
+				},
+			},
+			byPackId: {
+				index: 'gsi2',
+				collection: 'packsAndCards',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['packId'],
+				},
+				sk: {
+					field: 'gsi2sk',
 					composite: ['instanceId'],
 				},
 			},
@@ -220,6 +259,18 @@ const users = new Entity(
 					composite: [],
 				},
 			},
+			byUsername: {
+				index: 'gsi1',
+				collection: 'cardsByOwnerName',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: [],
+				},
+			},
 		},
 	},
 	config
@@ -233,6 +284,12 @@ const packs = new Entity(
 			service: 'card-app',
 		},
 		attributes: {
+			entityType: {
+				type: ['pack'] as const,
+				value: 'pack',
+				default: 'pack',
+				required: true,
+			},
 			packId: {
 				type: 'string',
 				required: true,
@@ -241,7 +298,11 @@ const packs = new Entity(
 				type: 'string',
 				required: true,
 			},
-			ownerId: {
+			username: {
+				type: 'string',
+				required: true,
+			},
+			userId: {
 				type: 'string',
 				required: true,
 			},
@@ -259,25 +320,37 @@ const packs = new Entity(
 			},
 		},
 		indexes: {
-			byOwnerId: {
+			allPacks: {
 				pk: {
 					field: 'pk',
-					composite: ['ownerId'],
+					composite: ['entityType'],
 				},
 				sk: {
 					field: 'sk',
 					composite: ['packId'],
 				},
 			},
-			bySeriesId: {
+			byUsername: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['seriesId'],
+					composite: ['username'],
 				},
 				sk: {
 					field: 'gsi1sk',
 					composite: ['packId'],
+				},
+			},
+			byPackId: {
+				index: 'gsi2',
+				collection: 'packsAndCards',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['packId'],
+				},
+				sk: {
+					field: 'gsi2sk',
+					composite: [''],
 				},
 			},
 		},
@@ -285,18 +358,77 @@ const packs = new Entity(
 	config
 )
 
-const app = new Service(
+export const db = new Service(
 	{
 		cardDesigns,
 		cardSeries,
 		cardInstances,
-		users,
 		packs,
+		users,
 	},
 	config
 )
 
-users.put({
-	userId: 'user1',
-	username: 'user1',
-})
+//const username = 'snailyluke'
+//const seriesId = 'series-1'
+//const designId = 'design-1'
+//const instanceId = 'instance-1'
+//const packId = 'pack-1'
+//const userId = 'user-1'
+
+///*
+//As a user, I need to find all of the CARDS my USER owns
+//As a user, I need to see all of the CARD DESIGNS in a given SERIES
+//As a user, I need to see all of the CARDS and their OWNERS for a given CARD DESIGN
+//As a user, I need to see all of the TRADES made to my USER and other USERS
+//As a user, I need to see all of the SERIES released
+//As a user, I need to find a USER based on their USERNAME
+//As a user, I need to see how many UNOPENED PACKS I (USER) have earned
+//As an admin, I need to see all of the UNOPENED PACKS earned by ALL USERS
+//*/
+
+//// As a user, I need to find all of the CARDS my USER owns
+//const myCards = db.collections
+//.cardsByOwnerName({
+//username,
+//})
+//.go()
+
+//// As a user, I need to see all of the CARD DESIGNS in a given SERIES
+//const designsInSeries = db.collections
+//.seriesAndDesigns({
+//seriesId,
+//})
+//.go()
+
+//// As a user, I need to see all of the CARDS for a given CARD DESIGN
+//const cardsInDesign = db.collections
+//.designsAndCards({
+//designId,
+//})
+//.go()
+
+//// As a user, I need to see all of the TRADES made between my USER and other USERS
+//// TODO: Trades will be added in a future release
+
+//// As a user, I need to see all of the SERIES released
+//const allSeries = db.entities.cardSeries.query
+//.allSeries({ entityType: 'cardSeries' })
+//.go()
+
+//// As a user, I need to find a USER based on their USERNAME
+//const user = db.entities.users.query.byUsername({
+//username,
+//})
+
+//// As a user, I need to see how many UNOPENED PACKS I (USER) have earned
+//const unopenedPacks = db.entities.packs.query
+//.byUsername({
+//username,
+//})
+//.go()
+
+//// As an admin, I need to see all of the UNOPENED PACKS earned by ALL users
+//const allUnopenedPacks = db.entities.packs.query.allPacks({
+//entityType: 'pack',
+//})
