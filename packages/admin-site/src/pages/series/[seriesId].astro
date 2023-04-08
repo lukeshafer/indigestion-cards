@@ -1,0 +1,27 @@
+---
+import Base from '@/layouts/Base.astro'
+import { getSeriesAndDesignsBySeriesId } from '@lil-indigestion-cards/core/card'
+
+const id = Astro.params.seriesId
+
+if (!id) {
+	throw new Error('No series id provided')
+}
+
+const {
+	cardSeries: [series],
+	cardDesigns,
+} = await getSeriesAndDesignsBySeriesId(id)
+---
+
+<Base title="Series">
+	<h1>{series!.seriesName}</h1>
+	<p>{series!.seriesDescription}</p>
+	<ul>
+		{cardDesigns.map((design) => (
+			<li>
+				<a href={`/design/${design.designId}`}>{design.cardName}</a>
+			</li>
+		))}
+	</ul>
+</Base>

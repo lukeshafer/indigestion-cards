@@ -55,15 +55,14 @@ export function API({ stack }: StackContext) {
 		},
 	})
 
-	const adminSite = new AstroSite(stack, 'admin', {
-		path: 'packages/admin-site',
-		bind: [table],
-	})
-
 	const api = new Api(stack, 'api', {
 		routes: {
 			'GET /': 'packages/functions/src/twitch-api.handler',
 			'POST /': 'packages/functions/src/twitch-api.handler',
+			'POST /create-card-series':
+				'packages/functions/src/create-card-series.handler',
+			'POST /create-card-design':
+				'packages/functions/src/create-card-design.handler',
 		},
 		defaults: {
 			function: {
@@ -76,6 +75,11 @@ export function API({ stack }: StackContext) {
 				],
 			},
 		},
+	})
+
+	const adminSite = new AstroSite(stack, 'admin', {
+		path: 'packages/admin-site',
+		bind: [table, api],
 	})
 
 	// TODO: add cron job to check twitch for users who have updated their username

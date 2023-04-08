@@ -10,4 +10,9 @@ export default defineConfig({
 	output: 'server',
 	adapter: aws(),
 	integrations: [tailwind(), solidJs()],
+	vite: {
+		ssr: {
+			external: ['electrodb'],
+		},
+	},
 })

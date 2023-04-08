@@ -1,0 +1,34 @@
+---
+import Base from '@/layouts/Base.astro'
+import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
+
+const id = Astro.params.designId
+
+if (!id) {
+	throw new Error('No design id provided')
+}
+
+const {
+	cardDesigns: [design],
+	cardInstances,
+} = await getCardDesignAndInstancesById(id)
+
+if (!design) {
+	throw new Error(`No design found for id ${id}`)
+}
+---
+
+<Base title="Series">
+	<h1>{design.cardName}</h1>
+	<p>{design.cardDescription}</p>
+	<ul>
+		{
+			cardInstances.map((card) => (
+				<li>
+					<a href={`/card/${card.instanceId}`}>{card.rarityLevel}: </a>
+					<a href={`/user/${card.userId}`}>Owned by {card.username}</a>
+				</li>
+			))
+		}
+	</ul>
+</Base>

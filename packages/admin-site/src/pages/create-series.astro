@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro'
+
+// TODO: Protect the API route
+---
+
+<Base title="Create Card Series">
+	<h1>Create Card Series</h1>
+	<p>Use the form below to create a new card series.</p>
+
+	<form
+		id="create-card-series"
+		method="post"
+		action="https://1jrnx32g8i.execute-api.us-east-2.amazonaws.com/create-card-series">
+		<label for="name">Name</label>
+		<input type="text" name="name" id="name" required />
+		<label for="seriesId">Series ID</label>
+		<input type="text" name="seriesId" id="seriesId" required />
+		<label for="description">Description</label>
+		<input type="text" name="description" id="description" required />
+		<button type="submit">Create</button>
+	</form>
+</Base>
+
+<script>
+	const form = document.querySelector('#create-card-series') as HTMLFormElement
+	const name = form.querySelector('#name') as HTMLInputElement
+	const seriesId = form.querySelector('#seriesId') as HTMLInputElement
+	const errorMessages: Record<number, string> = {
+		409: 'A card series with that ID already exists.',
+	}
+
+	name.addEventListener('change', () => {
+		if (seriesId.value === '')
+			seriesId.value = name.value.toLowerCase().replace(/ /g, '-')
+	})
+
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault()
+
+		const formData = new FormData(form)
+		const data = Object.fromEntries(formData)
+
+		const res = await fetch(form.action, {
+			method: 'POST',
+			body: JSON.stringify(data),
+		})
+
+		if (!res.ok) {
+			alert(errorMessages[res.status] ?? 'An unknown error occurred.')
+		}
+
+		const result = await res.json()
+
+		if (!result.seriesName || !result.seriesId) {
+			alert('An unknown error occurred.')
+			return
+		}
+
+		window.location.href = `/series/${result.seriesId}`
+		return
+	})
+</script>

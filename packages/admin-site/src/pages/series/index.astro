@@ -1,0 +1,19 @@
+---
+import Base from '@/layouts/Base.astro'
+import { getAllSeries } from '@lil-indigestion-cards/core/card'
+
+const series = await getAllSeries()
+---
+
+<Base title="Series">
+	<h1>Series</h1>
+	<ul>
+		{
+			series.map((series) => (
+				<li>
+					<a href={`/series/${series.seriesId}`}>{series.seriesName}</a>
+				</li>
+			))
+		}
+	</ul>
+</Base>

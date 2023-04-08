@@ -1,0 +1,19 @@
+/* TAILWIND */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	a {
+		text-decoration: underline;
+	}
+
+	input {
+		border: 1px solid #ccc;
+	}
+
+	button {
+		border: 1px solid #ccc;
+		background: #fff;
+	}
+}

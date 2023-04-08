@@ -82,6 +82,17 @@ const cardDesigns = new Entity(
 					composite: ['designId'],
 				},
 			},
+			allDesigns: {
+				index: 'gsi2',
+				pk: {
+					field: 'gsi2pk',
+					composite: [],
+				},
+				sk: {
+					field: 'gsi2sk',
+					composite: ['designId'],
+				},
+			},
 		},
 	},
 	config
@@ -95,12 +106,6 @@ const cardSeries = new Entity(
 			service: 'card-app',
 		},
 		attributes: {
-			entityType: {
-				type: ['cardSeries'] as const,
-				default: 'cardSeries',
-				value: 'cardSeries',
-				required: true,
-			},
 			seriesName: {
 				type: 'string',
 				required: true,
@@ -117,7 +122,7 @@ const cardSeries = new Entity(
 			allSeries: {
 				pk: {
 					field: 'pk',
-					composite: ['entityType'],
+					composite: [],
 				},
 				sk: {
 					field: 'sk',
@@ -174,6 +179,10 @@ const cardInstances = new Entity(
 				required: true,
 			},
 			minterId: {
+				type: 'string',
+				required: true,
+			},
+			minterUsername: {
 				type: 'string',
 				required: true,
 			},
@@ -284,12 +293,6 @@ const packs = new Entity(
 			service: 'card-app',
 		},
 		attributes: {
-			entityType: {
-				type: ['pack'] as const,
-				value: 'pack',
-				default: 'pack',
-				required: true,
-			},
 			packId: {
 				type: 'string',
 				required: true,
@@ -323,7 +326,7 @@ const packs = new Entity(
 			allPacks: {
 				pk: {
 					field: 'pk',
-					composite: ['entityType'],
+					composite: [],
 				},
 				sk: {
 					field: 'sk',
@@ -350,7 +353,7 @@ const packs = new Entity(
 				},
 				sk: {
 					field: 'gsi2sk',
-					composite: [''],
+					composite: [],
 				},
 			},
 		},
@@ -376,7 +379,7 @@ export const db = new Service(
 //const packId = 'pack-1'
 //const userId = 'user-1'
 
-///*
+//[>
 //As a user, I need to find all of the CARDS my USER owns
 //As a user, I need to see all of the CARD DESIGNS in a given SERIES
 //As a user, I need to see all of the CARDS and their OWNERS for a given CARD DESIGN
@@ -412,9 +415,7 @@ export const db = new Service(
 //// TODO: Trades will be added in a future release
 
 //// As a user, I need to see all of the SERIES released
-//const allSeries = db.entities.cardSeries.query
-//.allSeries({ entityType: 'cardSeries' })
-//.go()
+//const allSeries = db.entities.cardSeries.query.allSeries({}).go()
 
 //// As a user, I need to find a USER based on their USERNAME
 //const user = db.entities.users.query.byUsername({

@@ -1,5 +1,6 @@
 import { db } from './db'
 import type { EntityItem, CreateEntityItem } from 'electrodb'
+import { ElectroError } from 'electrodb'
 
 type CardDesign = typeof db.entities.cardDesigns
 type Card = typeof db.entities.cardInstances
@@ -76,6 +77,7 @@ export async function generateCard(info: {
 			username: info.username,
 			userId: info.userId,
 			minterId: info.userId,
+			minterUsername: info.username,
 			openedAt: info.packId ? undefined : new Date().toISOString(),
 			packId: info.packId,
 		})
@@ -140,12 +142,107 @@ export async function openCardFromPack(args: {
 	return result.data
 }
 
-export async function createCardDesign(card: CreateEntityItem<CardDesign>) {
-	const result = await db.entities.cardDesigns.create(card).go()
-	return result
+// DESIGN //
+export async function getAllCardDesigns() {
+	const result = await db.entities.cardDesigns.query.allDesigns({}).go()
+	return result.data
 }
 
-export async function createSeries(series: CreateEntityItem<Series>) {
-	const result = await db.entities.cardSeries.create(series).go()
-	return result
+export async function getCardDesignById(id: string) {
+	const result = await db.entities.cardDesigns.query
+		.byDesignId({ designId: id })
+		.go()
+	return result.data[0]
+}
+
+export async function getCardDesignAndInstancesById(id: string) {
+	const result = await db.collections.designsAndCards({ designId: id }).go()
+	return result.data
+}
+
+export async function createCardDesign(
+	card: CreateEntityItem<CardDesign>
+): Promise<
+	| {
+			success: true
+			data: EntityItem<CardDesign>
+	  }
+	| {
+			success: false
+			error: string
+	  }
+> {
+	try {
+		const result = await db.entities.cardDesigns.create({ ...card }).go()
+		return { success: true, data: result.data }
+	} catch (err) {
+		if (!(err instanceof ElectroError))
+			return { success: false, error: `${err}` }
+
+		if (err.code === 4001)
+			// aws error, design already exists
+			return {
+				success: false,
+				error: 'Design already exists',
+			}
+
+		// default
+		return {
+			success: false,
+			error: err.message,
+		}
+	}
+}
+
+// SERIES //
+export async function getAllSeries() {
+	const result = await db.entities.cardSeries.query.allSeries({}).go()
+	return result.data
+}
+
+export async function getOnlySeriesById(id: string) {
+	const result = await db.entities.cardSeries.query
+		.bySeriesId({ seriesId: id })
+		.go()
+	return result.data[0]
+}
+
+export async function getSeriesAndDesignsBySeriesId(id: string) {
+	const result = await db.collections.seriesAndDesigns({ seriesId: id }).go()
+	return result.data
+}
+
+export async function createSeries(series: CreateEntityItem<Series>): Promise<
+	| {
+			success: true
+			data: EntityItem<Series>
+	  }
+	| {
+			success: false
+			error: string
+	  }
+> {
+	try {
+		const result = await db.entities.cardSeries.create({ ...series }).go()
+		return {
+			success: true,
+			data: result.data,
+		}
+	} catch (err) {
+		if (!(err instanceof ElectroError))
+			return { success: false, error: `${err}` }
+
+		if (err.code === 4001)
+			// aws error, series already exists
+			return {
+				success: false,
+				error: 'Series already exists',
+			}
+
+		// default
+		return {
+			success: false,
+			error: err.message,
+		}
+	}
 }
