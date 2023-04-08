@@ -1,18 +1,19 @@
 ---
-import Base from '../layouts/Base.astro'
+import Page from '@/layouts/Page.astro'
 import { getAllSeries } from '@lil-indigestion-cards/core/card'
 import CreateCardForm from '../components/CreateCardForm'
+import { Api } from 'sst/node/api'
 
-/*const series = await getAllSeries()*/
+const url = Api.api.url + '/create-card-design'
+
+const series = await getAllSeries()
 
 // TODO: Protect the API route
 ---
 
-<Base title="Add Card Design">
-	<h1>Add Card Design</h1>
-	<p>Use the form below to add a new card design.</p>
-	<CreateCardForm
-		series={[{ seriesId: 'test', seriesName: 'test' }]}
-		client:load
-	/>
-</Base>
+<Page title="Add Card Design" class="grid justify-center justify-items-center grid-cols-1">
+	<h1 class="text-2xl p-8">Add Card Design</h1>
+	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">
+		<CreateCardForm series={series} url={url} client:load />
+	</div>
+</Page>

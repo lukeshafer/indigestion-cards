@@ -1,26 +1,26 @@
 ---
-import Base from '../layouts/Base.astro'
+import Page from "@/layouts/Page.astro";
 
 // TODO: Protect the API route
 ---
 
-<Base title="Create Card Series">
+<Page title="Create Card Series">
 	<h1>Create Card Series</h1>
 	<p>Use the form below to create a new card series.</p>
 
 	<form
 		id="create-card-series"
 		method="post"
-		action="https://1jrnx32g8i.execute-api.us-east-2.amazonaws.com/create-card-series">
+		action="https://686q4n2vv1.execute-api.us-east-2.amazonaws.com/create-card-series">
 		<label for="name">Name</label>
 		<input type="text" name="name" id="name" required />
 		<label for="seriesId">Series ID</label>
 		<input type="text" name="seriesId" id="seriesId" required />
 		<label for="description">Description</label>
-		<input type="text" name="description" id="description" required />
+		<input type="text" name="description" id="description" />
 		<button type="submit">Create</button>
 	</form>
-</Base>
+</Page>
 
 <script>
 	const form = document.querySelector('#create-card-series') as HTMLFormElement

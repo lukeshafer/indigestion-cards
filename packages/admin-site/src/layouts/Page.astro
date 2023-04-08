@@ -1,0 +1,23 @@
+---
+import Base from './Base.astro'
+
+interface Props {
+	title: string
+	class?: string
+}
+---
+
+<Base title={Astro.props.title}>
+	<header class="bg-sky-200 p-4">
+		<nav class="gap-8 text-xl flex flex-wrap">
+			<a href="/">Home</a>
+			<a href="/create-card-design">Add card design</a>
+			<a href="/create-series">Add series</a>
+			<a href="/series">View series</a>
+			<a href="/design">View designs</a>
+		</nav>
+	</header>
+	<main class={Astro.props.class ?? ''}>
+		<slot />
+	</main>
+</Base>

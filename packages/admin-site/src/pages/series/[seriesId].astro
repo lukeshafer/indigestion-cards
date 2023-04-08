@@ -1,5 +1,5 @@
 ---
-import Base from '@/layouts/Base.astro'
+import Page from '@/layouts/Page.astro'
 import { getSeriesAndDesignsBySeriesId } from '@lil-indigestion-cards/core/card'
 
 const id = Astro.params.seriesId
@@ -14,7 +14,7 @@ const {
 } = await getSeriesAndDesignsBySeriesId(id)
 ---
 
-<Base title="Series">
+<Page title="Series">
 	<h1>{series!.seriesName}</h1>
 	<p>{series!.seriesDescription}</p>
 	<ul>
@@ -24,4 +24,4 @@ const {
 			</li>
 		))}
 	</ul>
-</Base>
+</Page>

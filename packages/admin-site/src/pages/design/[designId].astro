@@ -1,5 +1,5 @@
 ---
-import Base from '@/layouts/Base.astro'
+import Page from '@/layouts/Page.astro'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 
 const id = Astro.params.designId
@@ -18,7 +18,7 @@ if (!design) {
 }
 ---
 
-<Base title="Series">
+<Page title="Series">
 	<h1>{design.cardName}</h1>
 	<p>{design.cardDescription}</p>
 	<ul>
@@ -31,4 +31,4 @@ if (!design) {
 			))
 		}
 	</ul>
-</Base>
+</Page>

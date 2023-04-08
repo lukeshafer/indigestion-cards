@@ -1,11 +1,11 @@
 ---
-import Base from '@/layouts/Base.astro'
+import Page from '@/layouts/Page.astro';
 import { getAllSeries } from '@lil-indigestion-cards/core/card'
 
 const series = await getAllSeries()
 ---
 
-<Base title="Series">
+<Page title="Series">
 	<h1>Series</h1>
 	<ul>
 		{
@@ -16,4 +16,4 @@ const series = await getAllSeries()
 			))
 		}
 	</ul>
-</Base>
+</Page>

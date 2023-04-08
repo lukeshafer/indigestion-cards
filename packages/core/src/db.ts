@@ -3,7 +3,7 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { Entity, Service } from 'electrodb'
 
 const config = {
-	table: Table.db.tableName,
+	table: Table.data.tableName,
 	client: new DocumentClient(),
 }
 
