@@ -1,19 +1,17 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Page from '@/layouts/Page.astro'
+import CardList from '@/components/CardList.astro'
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card'
 
 const designs = await getAllCardDesigns()
+
+console.log(designs)
+
+const message = Astro.url.searchParams.get('message') || ''
 ---
 
 <Page title="All Cards">
+	{message ? <p class="text-xl text-center p-4 bg-green-100">{message}</p> : null}
 	<h1>All Cards</h1>
-	<ul>
-		{
-			designs.map((design) => (
-				<li>
-					<a href={`/design/${design.designId}`}>{design.designId}</a>
-				</li>
-			))
-		}
-	</ul>
+	<CardList cards={designs} />
 </Page>

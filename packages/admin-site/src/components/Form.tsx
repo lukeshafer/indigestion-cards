@@ -22,6 +22,8 @@ export function Form(props: { action: string; method?: 'get' | 'post'; children:
 		console.log(res)
 		const errorMessage =
 			errorMessages[res.status] ?? (await res.text()) ?? 'An unknown error occurred.'
+
+		setSuccessText('')
 		setErrorText(errorMessage)
 		alert(errorMessage)
 	}
@@ -41,6 +43,7 @@ export function Form(props: { action: string; method?: 'get' | 'post'; children:
 				handleError(result)
 				return
 			}
+			setErrorText('')
 			setSuccessText('Success!')
 		} catch {
 			handleError(new Response('', { status: 500 }))
@@ -85,10 +88,20 @@ export function Form(props: { action: string; method?: 'get' | 'post'; children:
 	)
 }
 
+type EnumToObject<T extends readonly string[], R> = {
+	[K in T[number]]: R
+}
+
+interface InputBinding<T extends readonly string[]> {
+	id: T
+	transform: (args: EnumToObject<T, string>) => string
+}
+
 interface BaseInputProps {
 	required?: boolean
 	id: string
 	children: string
+	readOnly?: true | undefined
 }
 interface NumberInputProps extends BaseInputProps {
 	type: 'number'
@@ -100,17 +113,32 @@ interface StringInputProps extends BaseInputProps {
 }
 type InputProps = NumberInputProps | StringInputProps
 
-export function TextInput(props: InputProps) {
+export function TextInput<T extends readonly string[]>(
+	props: InputProps & { bind?: InputBinding<T> }
+) {
 	const [store, setStore] = useContext(FormContext) ?? []
 	if (!store || !setStore) throw new Error('Input must be used within a Form')
 
 	const initialValue = props.defaultValue ?? (props.type === 'number' ? 0 : '')
 	setStore(props.id, initialValue)
 
+	createEffect(() => {
+		if (!props.bind || props.bind.id.length === 0) return
+		const values = {} as EnumToObject<T, string>
+		let id: T[number]
+		for (id of props.bind.id) {
+			values[id] = String(store[id] ?? '')
+		}
+		setStore(props.id, props.bind.transform?.(values))
+	})
+
 	return (
 		<InputBase label={props.children} id={props.id}>
+			{/*@ts-ignore*/}
 			<input
+				readOnly={props.readOnly}
 				class="block w-3/5 px-2 py-1"
+				classList={{ 'bg-gray-100': props.readOnly }}
 				id={props.id}
 				name={props.id}
 				type={props.type ?? 'string'}
@@ -196,7 +224,7 @@ export function DynamicFieldSet<T extends readonly InputProps[]>(props: {
 
 	return (
 		<FieldSetContext.Provider value={[inputList, setInputList, props.id]}>
-			<fieldset class="border border-black p-4 w-full grid gap-8">
+			<fieldset class="border border-gray-300 p-4 w-full grid gap-8">
 				<legend>{props.children}</legend>
 				<button
 					class="p-2"
@@ -219,7 +247,7 @@ function FieldSetItem<T extends readonly InputProps[]>(props: { inputs: T; index
 	if (!list || !setList) throw new Error('FieldSetItem must be used within a DynamicFieldSet')
 
 	return (
-		<div class="grid gap-4 justify-items-end border border-black p-4">
+		<div class="grid gap-4 justify-items-end border border-gray-300 p-4">
 			{props.inputs.map((input) => {
 				const id = `${parentId}-${input.id}-${props.index}`
 				const coerce = (value: string) => (input.type === 'number' ? Number(value) : value)

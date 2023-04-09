@@ -26,7 +26,14 @@ export default function CreateCardForm(props: {
 			<TextInput id="artist" required>
 				Artist
 			</TextInput>
-			<TextInput id="designId" required>
+			<TextInput
+				id="designId"
+				bind={{
+					id: ['seriesId', 'cardName'],
+					transform: ({ seriesId, cardName }) =>
+						`${seriesId}-${cardName?.toLowerCase().replace(/[ ']/g, '-')}`,
+				}}
+				required>
 				Design ID
 			</TextInput>
 			<DynamicFieldSet

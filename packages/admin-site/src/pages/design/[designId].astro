@@ -1,11 +1,12 @@
 ---
 import Page from '@/layouts/Page.astro'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
+import { Api } from 'sst/node/api'
 
 const id = Astro.params.designId
 
 if (!id) {
-	throw new Error('No design id provided')
+	return Astro.redirect('/design?error=No design id provided')
 }
 
 const {
@@ -14,21 +15,47 @@ const {
 } = await getCardDesignAndInstancesById(id)
 
 if (!design) {
-	throw new Error(`No design found for id ${id}`)
+	return Astro.redirect('/design?error=No design found with that id')
 }
 ---
 
-<Page title="Series">
-	<h1>{design.cardName}</h1>
-	<p>{design.cardDescription}</p>
-	<ul>
+<Page title="Series" class="grid gap-4 p-4 justify-center justify-items-center">
+	<h1 class="text-2xl">Card name: {design.cardName}</h1>
+	{design.cardDescription ? <p class="text-lg">Description: {design.cardDescription}</p> : null}
+	<ul class="border border-gray-300 p-4">
+		<h2 class="text-xl">Cards with this design:</h2>
 		{
-			cardInstances.map((card) => (
-				<li>
-					<a href={`/card/${card.instanceId}`}>{card.rarityLevel}: </a>
-					<a href={`/user/${card.userId}`}>Owned by {card.username}</a>
-				</li>
-			))
+			cardInstances.length > 0 ? (
+				cardInstances.map((card) => (
+					<li>
+						<a href={`/card/${card.instanceId}`}>{card.rarityLevel}: </a>
+						<a href={`/user/${card.userId}`}>Owned by {card.username}</a>
+					</li>
+				))
+			) : (
+				<p>No cards with this design yet</p>
+			)
 		}
 	</ul>
+	<form
+		id="delete-design-form"
+		action={`${Api.api.url}/delete-card-design/${id}?redirectUrl=${Astro.url.protocol}${Astro.url.host}/design`}
+		method="post">
+		<button
+			type="submit"
+			class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+			id="delete-design">
+			Delete Design</button
+		>
+	</form>
 </Page>
+
+<script>
+	const form = document.getElementById('delete-design-form') as HTMLFormElement
+
+	form.addEventListener('submit', async (e) => {
+		// prevent default, confirm, then resume
+		const confirmation = confirm('Are you sure you want to delete this design?')
+		if (!confirmation) e.preventDefault()
+	})
+</script>

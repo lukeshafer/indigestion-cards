@@ -2,9 +2,21 @@ import { db } from './db'
 import type { EntityItem, CreateEntityItem } from 'electrodb'
 import { ElectroError } from 'electrodb'
 
+type Result<T> =
+	| {
+		success: true
+		data: T
+	}
+	| {
+		success: false
+		error: string
+	}
+
 type CardDesign = typeof db.entities.cardDesigns
 type Card = typeof db.entities.cardInstances
 type Series = typeof db.entities.cardSeries
+
+export type CardDesignEntity = EntityItem<CardDesign>
 
 export async function generateCard(info: {
 	seriesId: string
@@ -42,8 +54,7 @@ export async function generateCard(info: {
 		.go()
 
 	const rarities = design.rarityDetails.reduce(
-		(acc, { rarityLevel, count }) =>
-			acc.set(rarityLevel, { max: count, count: 0 }),
+		(acc, { rarityLevel, count }) => acc.set(rarityLevel, { max: count, count: 0 }),
 		new Map<string, { max: number; count: number }>()
 	)
 
@@ -64,9 +75,8 @@ export async function generateCard(info: {
 	})
 
 	const rarityLevel = rarityList[Math.floor(Math.random() * rarityList.length)]
-	const instanceId = `${info.seriesId}-${design.designId}-${rarityLevel}-${
-		(rarities.get(rarityLevel)?.count ?? 0) + 1
-	}`
+	const instanceId = `${info.seriesId}-${design.designId}-${rarityLevel}-${(rarities.get(rarityLevel)?.count ?? 0) + 1
+		}`
 
 	const result = await db.entities.cardInstances
 		.create({
@@ -90,15 +100,42 @@ export async function generateCard(info: {
 	return result.data
 }
 
+export async function deleteCardInstanceById(args: { instanceId: string; designId: string }) {
+	const result = await db.entities.cardInstances
+		.delete({ instanceId: args.instanceId, designId: args.designId })
+		.go()
+
+	return result.data
+}
+
+export async function deletePack(args: { packId: string }) {
+	const pack = await db.collections.packsAndCards({ packId: args.packId }).go()
+	const instanceDeleteResult = await Promise.allSettled(
+		pack.data.cardInstances.map((card) => {
+			return db.entities.cardInstances
+				.delete({ instanceId: card.instanceId, designId: card.designId })
+				.go()
+		})
+	)
+
+	if (instanceDeleteResult.some((result) => result.status === 'rejected')) {
+		throw new Error(
+			'Failed to delete card instances - pack not deleted. \
+			Please try again and report this issue if it persists.'
+		)
+	}
+
+	const result = await db.entities.packs.delete({ packId: args.packId }).go()
+	return result.data
+}
+
 export async function createPack(args: {
 	userId: string
 	username: string
 	seriesId: string
 	count: number
 }) {
-	const packId = `pack-${
-		args.userId
-	}-${new Date().toISOString()}-${Math.random()}`
+	const packId = `pack-${args.userId}-${new Date().toISOString()}-${Math.random()}`
 
 	const cards = []
 	for (let i = 0; i < args.count; i++) {
@@ -122,10 +159,7 @@ export async function createPack(args: {
 		.go()
 }
 
-export async function openCardFromPack(args: {
-	instanceId: string
-	designId: string
-}) {
+export async function openCardFromPack(args: { instanceId: string; designId: string }) {
 	const card = await db.entities.cardInstances.query.byDesignId(args).go()
 	if (!card.data || card.data.length === 0) {
 		throw new Error('Card not found')
@@ -149,9 +183,7 @@ export async function getAllCardDesigns() {
 }
 
 export async function getCardDesignById(id: string) {
-	const result = await db.entities.cardDesigns.query
-		.byDesignId({ designId: id })
-		.go()
+	const result = await db.entities.cardDesigns.query.byDesignId({ designId: id }).go()
 	return result.data[0]
 }
 
@@ -160,24 +192,27 @@ export async function getCardDesignAndInstancesById(id: string) {
 	return result.data
 }
 
+export async function deleteCardDesignById(id: string) {
+	const design = await getCardDesignAndInstancesById(id)
+	if (design.cardInstances.length > 0)
+		return {
+			success: false,
+			error: 'Cannot delete design with existing instances',
+		}
+
+	const result = await db.entities.cardDesigns.delete({ designId: id }).go()
+
+	return { success: true, data: result.data }
+}
+
 export async function createCardDesign(
 	card: CreateEntityItem<CardDesign>
-): Promise<
-	| {
-			success: true
-			data: EntityItem<CardDesign>
-	  }
-	| {
-			success: false
-			error: string
-	  }
-> {
+): Promise<Result<CardDesignEntity>> {
 	try {
 		const result = await db.entities.cardDesigns.create({ ...card }).go()
 		return { success: true, data: result.data }
 	} catch (err) {
-		if (!(err instanceof ElectroError))
-			return { success: false, error: `${err}` }
+		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` }
 
 		if (err.code === 4001)
 			// aws error, design already exists
@@ -201,9 +236,7 @@ export async function getAllSeries() {
 }
 
 export async function getOnlySeriesById(id: string) {
-	const result = await db.entities.cardSeries.query
-		.bySeriesId({ seriesId: id })
-		.go()
+	const result = await db.entities.cardSeries.query.bySeriesId({ seriesId: id }).go()
 	return result.data[0]
 }
 
@@ -212,16 +245,21 @@ export async function getSeriesAndDesignsBySeriesId(id: string) {
 	return result.data
 }
 
-export async function createSeries(series: CreateEntityItem<Series>): Promise<
-	| {
-			success: true
-			data: EntityItem<Series>
-	  }
-	| {
-			success: false
-			error: string
-	  }
-> {
+export async function deleteSeriesById(id: string): Promise<Result<EntityItem<Series>>> {
+	const seriesData = await getSeriesAndDesignsBySeriesId(id)
+	if (seriesData.cardDesigns.length > 0)
+		return {
+			success: false,
+			error: 'Cannot delete series with existing designs',
+		}
+
+	const result = await db.entities.cardSeries.delete({ seriesId: id }).go()
+	return { success: true, data: result.data }
+}
+
+export async function createSeries(
+	series: CreateEntityItem<Series>
+): Promise<Result<EntityItem<Series>>> {
 	try {
 		const result = await db.entities.cardSeries.create({ ...series }).go()
 		return {
@@ -229,8 +267,7 @@ export async function createSeries(series: CreateEntityItem<Series>): Promise<
 			data: result.data,
 		}
 	} catch (err) {
-		if (!(err instanceof ElectroError))
-			return { success: false, error: `${err}` }
+		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` }
 
 		if (err.code === 4001)
 			// aws error, series already exists

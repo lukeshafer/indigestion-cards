@@ -1,6 +1,7 @@
 import { Config } from 'sst/node/config'
 import crypto from 'crypto'
 import { bodySchema, type TwitchBody } from './twitch-event-schemas'
+import fetch from 'node-fetch'
 
 export const TWITCH_HEADERS = {
 	MESSAGE_TYPE: 'twitch-eventsub-message-type',
@@ -58,10 +59,7 @@ function getHmacMessage({ headers, body }: TwitchRequest): string {
 }
 
 function getHmac(secret: string, message: string) {
-	return `sha256=${crypto
-		.createHmac('sha256', secret)
-		.update(message)
-		.digest('hex')}`
+	return `sha256=${crypto.createHmac('sha256', secret).update(message).digest('hex')}`
 }
 
 function verifyMessage(hmac: string, verifySignature: string) {
@@ -83,9 +81,7 @@ export function getHeaders(headers: TwitchRequest['headers']) {
 export function handleTwitchEvent(body: TwitchBody) {
 	switch (body.type) {
 		case 'channel.subscription.gift':
-			console.log(
-				`${body.event.user_name} gifted ${body.event.total} subscriptions`
-			)
+			console.log(`${body.event.user_name} gifted ${body.event.total} subscriptions`)
 			break
 		case 'channel.channel_points_custom_reward_redemption.add':
 			body.event
@@ -93,4 +89,27 @@ export function handleTwitchEvent(body: TwitchBody) {
 			break
 	}
 	return { statusCode: 200 }
+}
+
+export async function getUserByLogin(login: string) {
+	const user = await fetch(`https://api.twitch.tv/helix/users?login=${login}`, {
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+		},
+	})
+	const body = await user.json()
+	if (
+		!body ||
+		!(typeof body === 'object') ||
+		!('data' in body) ||
+		!body.data ||
+		!(body.data instanceof Array) ||
+		body.data.length === 0 ||
+		typeof body.data[0].id !== 'string'
+	) {
+		throw new Error('User not found')
+	}
+
+	return body.data[0].id as string
 }

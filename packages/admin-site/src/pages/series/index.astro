@@ -1,17 +1,20 @@
 ---
 import Page from '@/layouts/Page.astro';
+import Box from '@/components/Box.astro';
 import { getAllSeries } from '@lil-indigestion-cards/core/card'
 
 const series = await getAllSeries()
 ---
 
-<Page title="Series">
-	<h1>Series</h1>
-	<ul>
+<Page title="Series" class="mx-auto max-w-5xl p-8 grid gap-8">
+	<h1 class="text-center text-4xl">Series</h1>
+	<ul class="flex flex-wrap gap-4 text-4xl">
 		{
 			series.map((series) => (
 				<li>
-					<a href={`/series/${series.seriesId}`}>{series.seriesName}</a>
+					<Box>
+						<a href={`/series/${series.seriesId}`}>{series.seriesName}</a>
+					</Box>
 				</li>
 			))
 		}

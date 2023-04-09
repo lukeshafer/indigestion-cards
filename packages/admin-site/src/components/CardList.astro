@@ -1,0 +1,21 @@
+---
+import type { CardDesignEntity } from '@lil-indigestion-cards/core/card'
+import Box from './Box.astro'
+
+interface Props {
+	cards: CardDesignEntity[]
+}
+const { props } = Astro
+
+console.log(props.cards)
+---
+
+<ul class="flex flex-wrap gap-4">
+	{
+		props.cards.map((design) => (
+			<a href={`/design/${design.designId}`}>
+				<Box>{design.cardName}</Box>
+			</a>
+		))
+	}
+</ul>

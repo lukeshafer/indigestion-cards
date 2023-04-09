@@ -10,10 +10,11 @@ export function API({ stack }: StackContext) {
 		routes: {
 			'GET /': 'packages/functions/src/twitch-api.handler',
 			'POST /': 'packages/functions/src/twitch-api.handler',
-			'POST /create-card-series':
-				'packages/functions/src/create-card-series.handler',
-			'POST /create-card-design':
-				'packages/functions/src/create-card-design.handler',
+			'POST /give-pack-to-user': 'packages/functions/src/invoke-give-pack-event.handler',
+			'POST /create-card-series': 'packages/functions/src/create-card-series.handler',
+			'POST /create-card-design': 'packages/functions/src/create-card-design.handler',
+			'POST /delete-card-design/{id}': 'packages/functions/src/delete-card-design.handler',
+			'POST /delete-card-series/{id}': 'packages/functions/src/delete-card-series.handler',
 		},
 		defaults: {
 			function: {

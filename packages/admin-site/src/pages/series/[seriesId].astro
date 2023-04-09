@@ -1,4 +1,5 @@
 ---
+import CardList from '@/components/CardList.astro'
 import Page from '@/layouts/Page.astro'
 import { getSeriesAndDesignsBySeriesId } from '@lil-indigestion-cards/core/card'
 
@@ -17,11 +18,5 @@ const {
 <Page title="Series">
 	<h1>{series!.seriesName}</h1>
 	<p>{series!.seriesDescription}</p>
-	<ul>
-		{cardDesigns.map((design) => (
-			<li>
-				<a href={`/design/${design.designId}`}>{design.cardName}</a>
-			</li>
-		))}
-	</ul>
+	<CardList cards={cardDesigns} />
 </Page>
