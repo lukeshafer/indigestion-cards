@@ -1,14 +1,14 @@
 ---
+import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
 import CreateSeriesForm from '@/components/CreateSeriesForm'
-import { Api } from 'sst/node/api'
 
 const url = Api.api.url + '/create-card-series'
 // TODO: Protect the API route
 ---
 
 <Page title="Create Card Series" class="grid justify-center justify-items-center grid-cols-1">
-	<h1 class="text-2xl p-8">Create New Season</h1>
+	<h1 class="text-3xl p-8">Create New Season</h1>
 
 	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">
 		<CreateSeriesForm url={url} client:load />

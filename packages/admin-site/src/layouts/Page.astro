@@ -12,12 +12,12 @@ interface Props {
 		<nav class="gap-8 text-xl flex flex-wrap">
 			<a href="/">Home</a>
 			<a href="/create-card-design">Add card design</a>
+			<a href="/design">View designs</a>
 			<a href="/create-series">Add series</a>
 			<a href="/series">View series</a>
-			<a href="/design">View designs</a>
 		</nav>
 	</header>
-	<main class={Astro.props.class ?? ''}>
+	<main class={( Astro.props.class ?? '' ) + " p-4"}>
 		<slot />
 	</main>
 </Base>

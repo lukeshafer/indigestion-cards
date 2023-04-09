@@ -1,18 +1,16 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { getAllSeries } from '@lil-indigestion-cards/core/card'
-import CreateCardForm from '../components/CreateCardForm'
 import { Api } from 'sst/node/api'
+import Page from '@/layouts/Page.astro'
+import CreateCardForm from '../components/CreateCardForm'
+import { getAllSeries } from '@lil-indigestion-cards/core/card'
 
 const url = Api.api.url + '/create-card-design'
-
 const series = await getAllSeries()
-
 // TODO: Protect the API route
 ---
 
 <Page title="Add Card Design" class="grid justify-center justify-items-center grid-cols-1">
-	<h1 class="text-2xl p-8">Add Card Design</h1>
+	<h1 class="text-3xl p-8">Add Card Design</h1>
 	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">
 		<CreateCardForm series={series} url={url} client:load />
 	</div>

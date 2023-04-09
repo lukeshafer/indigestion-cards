@@ -10,12 +10,16 @@ const { props } = Astro
 console.log(props.cards)
 ---
 
-<ul class="flex flex-wrap gap-4">
+<ul class="flex flex-wrap gap-4 justify-center">
 	{
-		props.cards.map((design) => (
-			<a href={`/design/${design.designId}`}>
-				<Box>{design.cardName}</Box>
-			</a>
-		))
+		props.cards.length > 0 ? (
+			props.cards.map((design) => (
+				<a href={`/design/${design.designId}`}>
+					<Box>{design.cardName}</Box>
+				</a>
+			))
+		) : (
+			<p>No cards found</p>
+		)
 	}
 </ul>

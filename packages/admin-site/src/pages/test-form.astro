@@ -1,0 +1,22 @@
+---
+import Page from '@/layouts/Page.astro'
+import { Api } from 'sst/node/api'
+---
+
+<Page title="Home">
+	<h1>Home</h1>
+	<form action={`${Api.api.url}/test-api`} method="post" enctype="multipart/form-data">
+		<input type="text" name="name" />
+		<input type="file" name="file" />
+		<button type="submit">Submit</button>
+	</form>
+</Page>
+
+<style> 
+	input, button {
+		display: block;
+		margin-bottom: 1rem;
+		outline: 1px solid #ccc;
+		padding: 0.5rem;
+	}
+</style>

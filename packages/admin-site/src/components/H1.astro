@@ -1,0 +1,9 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+type Props = HTMLAttributes<'h1'>
+const { props } = Astro
+---
+
+<h1 {...props} class={`${props.class} text-center text-4xl`}>
+	<slot />
+</h1>

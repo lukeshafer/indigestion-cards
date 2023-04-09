@@ -15,6 +15,7 @@ export function API({ stack }: StackContext) {
 			'POST /create-card-design': 'packages/functions/src/create-card-design.handler',
 			'POST /delete-card-design/{id}': 'packages/functions/src/delete-card-design.handler',
 			'POST /delete-card-series/{id}': 'packages/functions/src/delete-card-series.handler',
+			'POST /test-api': 'packages/functions/src/test-api.handler',
 		},
 		defaults: {
 			function: {

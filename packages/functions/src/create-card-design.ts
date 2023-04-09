@@ -45,6 +45,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	return result.success
 		? { statusCode: 200, body: JSON.stringify(result.data) }
 		: result.error === 'Design already exists'
-		? { statusCode: 409, body: result.error }
-		: { statusCode: 500, body: result.error }
+			? { statusCode: 409, body: result.error }
+			: { statusCode: 500, body: result.error }
 }

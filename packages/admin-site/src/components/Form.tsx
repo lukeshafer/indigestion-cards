@@ -9,7 +9,12 @@ interface FormData {
 
 const FormContext = createContext<[FormData, SetStoreFunction<FormData>]>()
 
-export function Form(props: { action: string; method?: 'get' | 'post'; children: JSX.Element }) {
+export function Form(props: {
+	action: string
+	method?: 'get' | 'post'
+	children: JSX.Element
+	redirect?: string
+}) {
 	const [store, setStore] = createStore<FormData>({})
 	const [isLoading, setIsLoading] = createSignal(false)
 	const [errorText, setErrorText] = createSignal('')
@@ -45,6 +50,10 @@ export function Form(props: { action: string; method?: 'get' | 'post'; children:
 			}
 			setErrorText('')
 			setSuccessText('Success!')
+			if (result.status >= 300 && result.status < 400) {
+				const location = result.headers.get('Location')
+				if (location) window.location.assign(location)
+			}
 		} catch {
 			handleError(new Response('', { status: 500 }))
 		}
