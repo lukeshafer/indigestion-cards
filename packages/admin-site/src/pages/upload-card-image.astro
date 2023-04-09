@@ -1,0 +1,40 @@
+---
+import { Bucket } from 'sst/node/bucket'
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
+import { S3Client } from '@aws-sdk/client-s3'
+import crypto from 'crypto'
+import H1 from '@/components/H1.astro'
+import Page from '@/layouts/Page.astro'
+
+const s3 = new S3Client({ region: 'us-east-2' })
+const presigned = await createPresignedPost(s3, {
+	Bucket: Bucket.CardDesigns.bucketName,
+	Key: crypto.randomBytes(20).toString('hex') + '.png',
+	Fields: {
+		acl: 'public-read',
+		success_action_redirect: Astro.url.origin + '/create-card-design',
+		'x-amz-meta-test': 'test',
+	},
+})
+---
+
+<Page title="Upload Card Image">
+	<H1>Upload Card Image</H1>
+	<form method="post" action={presigned.url} enctype="multipart/form-data">
+		{
+			Object.entries(presigned.fields).map(([key, value]) => (
+				<input type="hidden" name={key} value={value} />
+			))
+		}
+		<label for="file">File</label>
+		<input type="file" name="file" id="file" accept="image/png" />
+		<button type="submit">Upload</button>
+	</form>
+</Page>
+
+<style> 
+	input {
+		display: block;
+		outline: 1px solid #000;
+	}
+</style>

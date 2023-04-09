@@ -1,0 +1,24 @@
+---
+import { getUnmatchedDesignImages } from '@lil-indigestion-cards/core/card'
+import { Bucket } from 'sst/node/bucket'
+const unmatchedImages = await getUnmatchedDesignImages()
+
+const bucket = Bucket.CardDesigns.bucketName
+---
+
+{
+	unmatchedImages.length > 0 ? (
+		<div class="bg-red-200 p-8">
+			<h2 class="text-xl mb-4">Heads up! There are card designs without details!</h2>
+			<ul class="flex flex-wrap gap-4">
+				{unmatchedImages.map((image) => (
+					<li>
+						<a href={`/add-card-design-details?bucket=${bucket}&key=${image.imageId}`}>
+							<img src={image.url} height="300" />
+						</a>
+					</li>
+				))}
+			</ul>
+		</div>
+	) : null
+}

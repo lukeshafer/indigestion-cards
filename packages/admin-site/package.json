@@ -12,6 +12,8 @@
 	"dependencies": {
 		"@astrojs/solid-js": "^2.1.0",
 		"@astrojs/tailwind": "^3.1.1",
+		"@aws-sdk/client-s3": "^3.309.0",
+		"@aws-sdk/s3-presigned-post": "^3.309.0",
 		"astro": "^2.1.9",
 		"astro-sst": "^2.3.6",
 		"aws-sdk": "^2.1348.0",

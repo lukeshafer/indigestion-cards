@@ -3,6 +3,7 @@ import { API } from './stacks/api'
 import { Database } from './stacks/database'
 import { Events } from './stacks/events'
 import { Sites } from './stacks/sites'
+import { DesignBucket } from './stacks/bucket'
 
 export default {
 	config(_input) {
@@ -12,6 +13,6 @@ export default {
 		}
 	},
 	stacks(app) {
-		app.stack(Database).stack(Events).stack(API).stack(Sites)
+		app.stack(Database).stack(Events).stack(API).stack(DesignBucket).stack(Sites)
 	},
 } satisfies SSTConfig

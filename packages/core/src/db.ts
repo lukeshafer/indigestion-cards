@@ -361,6 +361,39 @@ const packs = new Entity(
 	config
 )
 
+const unmatchedImages = new Entity(
+	{
+		model: {
+			entity: 'unmatchedImage',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			imageId: {
+				type: 'string',
+				required: true,
+			},
+			url: {
+				type: 'string',
+				required: true,
+			},
+		},
+		indexes: {
+			allImages: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['imageId'],
+				},
+			},
+		},
+	},
+	config
+)
+
 export const db = new Service(
 	{
 		cardDesigns,
@@ -368,6 +401,7 @@ export const db = new Service(
 		cardInstances,
 		packs,
 		users,
+		unmatchedImages,
 	},
 	config
 )

@@ -4,17 +4,18 @@ import { ElectroError } from 'electrodb'
 
 type Result<T> =
 	| {
-		success: true
-		data: T
-	}
+			success: true
+			data: T
+	  }
 	| {
-		success: false
-		error: string
-	}
+			success: false
+			error: string
+	  }
 
 type CardDesign = typeof db.entities.cardDesigns
 type Card = typeof db.entities.cardInstances
 type Series = typeof db.entities.cardSeries
+type UnmatchedImage = typeof db.entities.unmatchedImages
 
 export type CardDesignEntity = EntityItem<CardDesign>
 
@@ -75,8 +76,9 @@ export async function generateCard(info: {
 	})
 
 	const rarityLevel = rarityList[Math.floor(Math.random() * rarityList.length)]
-	const instanceId = `${info.seriesId}-${design.designId}-${rarityLevel}-${(rarities.get(rarityLevel)?.count ?? 0) + 1
-		}`
+	const instanceId = `${info.seriesId}-${design.designId}-${rarityLevel}-${
+		(rarities.get(rarityLevel)?.count ?? 0) + 1
+	}`
 
 	const result = await db.entities.cardInstances
 		.create({
@@ -227,6 +229,22 @@ export async function createCardDesign(
 			error: err.message,
 		}
 	}
+}
+
+// UNMATCHED DESIGN IMAGES //
+export async function getUnmatchedDesignImages() {
+	const result = await db.entities.unmatchedImages.query.allImages({}).go()
+	return result.data
+}
+
+export async function createUnmatchedDesignImage(image: CreateEntityItem<UnmatchedImage>) {
+	const result = await db.entities.unmatchedImages.create(image).go()
+	return result.data
+}
+
+export async function deleteUnmatchedDesignImage(id: string) {
+	const result = await db.entities.unmatchedImages.delete({ imageId: id }).go()
+	return result.data
 }
 
 // SERIES //
