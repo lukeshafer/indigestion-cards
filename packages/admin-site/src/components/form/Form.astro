@@ -1,0 +1,76 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+type Props = HTMLAttributes<'form'>
+const { class: className, action, method, ...attrs } = Astro.props
+
+export const inputClasses = {
+	input: 'block w-3/5 px-2 py-1',
+	inputWrapper: 'flex gap-3 justify-end w-full',
+	get readOnly() {
+		return inputClasses.input + ' bg-gray-200'
+	},
+	select: 'block w-3/5 bg-white px-2 py-1',
+	fieldset: 'border border-gray-300 p-4 w-full grid gap-8',
+	button: 'bg-sky-100 px-4 py-2 rounded-2xl bg-white w-1/2',
+	get submit() {
+		return inputClasses.button + ' font-bold mt-4'
+	},
+};
+---
+
+<my-form>
+	<div class={`relative p-4 bg-sky-100 rounded-2xl ${className ?? ''}`}>
+		<form
+			method={method ?? 'post'}
+			action={action}
+			{...attrs}
+			class="bg-sky-100 grid grid-cols-1 justify-center justify-items-center gap-4 p-4 text-xl w-full">
+			<slot />
+		</form>
+		<div
+			aria-hidden="true"
+			data-loading-spinner
+			class="absolute inset-0 h-full w-full justify-center items-center"
+			style={{
+				display: 'none',
+			}}>
+			<div class="bg-white w-24 h-24 rounded-full border-8 border-black border-dotted spin"></div>
+			<span class="absolute absolute-center">Loading</span>
+		</div>
+	</div>
+</my-form>
+
+<script>
+	class MyForm extends HTMLElement {
+		constructor() {
+			super()
+		}
+
+		connectedCallback() {
+			const form = this.querySelector('form') as HTMLFormElement
+			const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement
+			form.addEventListener('submit', () => {
+				form.style.opacity = '0.5'
+				loadingSpinner.style.display = 'flex'
+			})
+
+			const idInputs = this.querySelectorAll('[data-id-from]')
+			idInputs.forEach((input) => {
+				if (!(input instanceof HTMLInputElement)) return
+
+				const bindId = input.getAttribute('data-id-from')
+				if (!bindId) return
+
+				const idInput = this.querySelector(`[name="${bindId}"]`) as HTMLInputElement | null
+				if (!idInput) return
+				console.log(idInput)
+
+				idInput.addEventListener('input', () => {
+					input.value = idInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-')
+				})
+			})
+		}
+	}
+
+	customElements.define('my-form', MyForm)
+</script>

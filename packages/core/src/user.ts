@@ -33,9 +33,7 @@ export async function checkIfUserExists(userId: string): Promise<boolean> {
 	return getUser(userId).then((user) => !!user)
 }
 
-export async function checkIfUsernameExists(
-	userName: string
-): Promise<boolean> {
+export async function checkIfUsernameExists(userName: string): Promise<boolean> {
 	return getUserByUserName(userName).then((user) => !!user)
 }
 
@@ -49,7 +47,7 @@ export async function addUnopenedPacks(args: {
 			username: args.username,
 			userId: args.userId,
 			count: getDefaultCardCountInPack(),
-			seriesId: getCurrentSeriesId(),
+			seasonId: getCurrentSeasonId(),
 		})
 	}
 }
@@ -59,7 +57,7 @@ function getDefaultCardCountInPack() {
 	return 5
 }
 
-function getCurrentSeriesId() {
+function getCurrentSeasonId() {
 	// TODO: implement this properly with database
 	return 'base'
 }

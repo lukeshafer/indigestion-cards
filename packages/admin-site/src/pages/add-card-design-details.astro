@@ -12,12 +12,23 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 const url = Api.api.url + '/create-card-design'
 const series = await getAllSeries()
 // TODO: Protect the API route
+
+const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/design`
 ---
 
 <Page title="Add Card Design" class="grid justify-center justify-items-center grid-cols-1">
 	<h1 class="text-3xl p-8">Add Card Design</h1>
-	<img src={imgUrl} class="w-1/2" />
-	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">
-		<CreateCardForm series={series} url={url} client:load />
+	<div class="flex flex-wrap gap-8 justify-center">
+		<div class="flex flex-col gap-4 items-center justify-center">
+			<img src={imgUrl} class="w-44 h-auto object-contain" />
+			<form action={deleteUrl} method="post">
+				<button type="submit" class="bg-red-400 hover:bg-red-500 text-xl p-2 rounded-xl"
+					>Delete</button
+				>
+			</form>
+		</div>
+		<div class="bg-sky-100 p-8 rounded-3xl max-w-xl">
+			<CreateCardForm series={series} url={url} imgUrl={imgUrl} imageKey={key} client:load />
+		</div>
 	</div>
 </Page>

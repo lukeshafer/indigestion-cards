@@ -1,0 +1,23 @@
+---
+import Page from '@/layouts/Page.astro'
+import Box from '@/components/Box.astro'
+import { getAllSeasons } from '@lil-indigestion-cards/core/card'
+import H1 from '@/components/H1.astro'
+
+const seasons = await getAllSeasons()
+---
+
+<Page title="Seasons" class="mx-auto max-w-5xl p-8 grid gap-8">
+	<H1>All Seasons</H1>
+	<ul class="flex flex-wrap gap-4 text-4xl">
+		{
+			seasons.map((season) => (
+				<li>
+					<Box>
+						<a href={`/season/${season.seriesId}`}>{season.seriesName}</a>
+					</Box>
+				</li>
+			))
+		}
+	</ul>
+</Page>

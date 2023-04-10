@@ -13,6 +13,6 @@ export default {
 		}
 	},
 	stacks(app) {
-		app.stack(Database).stack(Events).stack(API).stack(DesignBucket).stack(Sites)
+		app.stack(Database).stack(Events).stack(DesignBucket).stack(API).stack(Sites)
 	},
 } satisfies SSTConfig

@@ -5,19 +5,27 @@ interface Props {
 	title: string
 	class?: string
 }
+
+const alert = Astro.url.searchParams.get('alert')
+const alertType = Astro.url.searchParams.get('alert-type') ?? 'error'
+const alertColor = {
+	success: 'bg-green-200',
+	error: 'bg-red-200',
+}[alertType]
 ---
 
 <Base title={Astro.props.title}>
 	<header class="bg-sky-200 p-4">
+		{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 		<nav class="gap-8 text-xl flex flex-wrap">
 			<a href="/">Home</a>
-			<a href="/upload-card-image">Add card design</a>
-			<a href="/design">View designs</a>
-			<a href="/create-series">Add series</a>
-			<a href="/series">View series</a>
+			<a href="/create-card-design">Add card design</a>
+			<a href="/design">View all designs</a>
+			<a href="/create-season">Add season</a>
+			<a href="/season">View all seasons</a>
 		</nav>
 	</header>
-	<main class={( Astro.props.class ?? '' ) + " p-4"}>
+	<main class={(Astro.props.class ?? '') + ' p-4'}>
 		<slot />
 	</main>
 </Base>

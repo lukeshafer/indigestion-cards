@@ -1,8 +1,17 @@
-import type { APIGatewayProxyHandlerV2 } from 'aws-lambda'
 import { z } from 'zod'
-import { createCardDesign } from '@lil-indigestion-cards/core/card'
+import { createCardDesign, deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
+import { ApiHandler, useFormValue, useHeader, useFormData } from 'sst/node/api'
 
-export const handler: APIGatewayProxyHandlerV2 = async (event) => {
+export const handler = ApiHandler(async (event) => {
+	//const seriesId = useFormValue('seriesId')
+	//const cardName = useFormValue('cardName')
+	//const cardDescription = useFormValue('cardDescription')
+	//const artist = useFormValue('artist')
+	//const designId = useFormValue('designId')
+	//const releaseDate = useFormValue('releaseDate') ?? undefined
+	//const imgUrl = useFormValue('imgUrl')
+	//const imageKey = useFormValue('imageKey')
+
 	const { body: rawBody } = event
 	if (!rawBody) return { statusCode: 400, body: 'Missing body' }
 
@@ -15,6 +24,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 			artist: z.string(),
 			designId: z.string().min(1),
 			releaseDate: z.string().optional(),
+			imgUrl: z.string(),
+			imageKey: z.string(),
 			rarityDetails: z.array(
 				z.object({
 					rarityLevel: z.string(),
@@ -29,22 +40,18 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		return { statusCode: 400, body: JSON.stringify(body.error.format()) }
 	}
 
-	const { seriesId, cardName, cardDescription, artist, designId, releaseDate, rarityDetails } =
-		body.data
+	const result = await createCardDesign(body.data)
 
-	const result = await createCardDesign({
-		seriesId,
-		cardName,
-		cardDescription,
-		artist,
-		designId,
-		releaseDate,
-		rarityDetails,
-	})
+	if (result.success) {
+		await deleteUnmatchedDesignImage(body.data.imageKey)
+	}
+
+	const referer = useHeader('referer') ?? '/'
+	console.log(result)
 
 	return result.success
-		? { statusCode: 200, body: JSON.stringify(result.data) }
+		? { statusCode: 200, headers: { Location: `${referer}/design/${body.data.designId}` } }
 		: result.error === 'Design already exists'
 			? { statusCode: 409, body: result.error }
 			: { statusCode: 500, body: result.error }
-}
+})

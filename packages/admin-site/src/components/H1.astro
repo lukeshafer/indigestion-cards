@@ -2,8 +2,11 @@
 import type { HTMLAttributes } from 'astro/types'
 type Props = HTMLAttributes<'h1'>
 const { props } = Astro
+
+const className = props.class
+delete props.class
 ---
 
-<h1 {...props} class={`${props.class} text-center text-4xl`}>
+<h1 {...props} class={`${className} text-center text-4xl`}>
 	<slot />
 </h1>

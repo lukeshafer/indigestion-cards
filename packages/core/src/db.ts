@@ -41,6 +41,10 @@ const cardDesigns = new Entity(
 			isComplete: {
 				type: 'boolean',
 			},
+			imgUrl: {
+				type: 'string',
+				required: true,
+			},
 			rarityDetails: {
 				type: 'list',
 				items: {
@@ -166,7 +170,7 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
-			rarityLevel: {
+			rarityId: {
 				type: 'string',
 				required: true,
 			},
@@ -387,6 +391,43 @@ const unmatchedImages = new Entity(
 				sk: {
 					field: 'sk',
 					composite: ['imageId'],
+				},
+			},
+		},
+	},
+	config
+)
+
+const rarities = new Entity(
+	{
+		model: {
+			entity: 'rarity',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			rarityId: {
+				type: 'string',
+				required: true,
+			},
+			name: {
+				type: 'string',
+				required: true,
+			},
+			frameUrl: {
+				type: 'string',
+				required: true,
+			},
+		},
+		indexes: {
+			allRarities: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['rarityId'],
 				},
 			},
 		},

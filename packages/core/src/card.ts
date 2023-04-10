@@ -4,23 +4,23 @@ import { ElectroError } from 'electrodb'
 
 type Result<T> =
 	| {
-			success: true
-			data: T
-	  }
+		success: true
+		data: T
+	}
 	| {
-			success: false
-			error: string
-	  }
+		success: false
+		error: string
+	}
 
 type CardDesign = typeof db.entities.cardDesigns
 type Card = typeof db.entities.cardInstances
-type Series = typeof db.entities.cardSeries
+type Season = typeof db.entities.cardSeries
 type UnmatchedImage = typeof db.entities.unmatchedImages
 
 export type CardDesignEntity = EntityItem<CardDesign>
 
 export async function generateCard(info: {
-	seriesId: string
+	seasonId: string
 	userId: string
 	username: string
 	packId: string | undefined
@@ -32,11 +32,11 @@ export async function generateCard(info: {
 	// 4. Generate a unique instanceId for the card
 	// 5. Create the card instance
 
-	const seriesAndDesigns = await db.collections
-		.seriesAndDesigns(info)
+	const seasonsAndDesigns = await db.collections
+		.seriesAndDesigns({ ...info, seriesId: info.seasonId })
 		.where((attr, op) => op.ne(attr.isComplete, true))
 		.go()
-	const cardDesigns = seriesAndDesigns.data.cardDesigns
+	const cardDesigns = seasonsAndDesigns.data.cardDesigns
 
 	if (cardDesigns.length === 0) {
 		throw new Error('No designs found')
@@ -60,7 +60,7 @@ export async function generateCard(info: {
 	)
 
 	existingInstances.data.forEach((instance) => {
-		const rarity = instance.rarityLevel
+		const rarity = instance.rarityId
 		const details = rarities.get(rarity)
 		if (!details) return
 		const newCount = details.count + 1
@@ -76,15 +76,14 @@ export async function generateCard(info: {
 	})
 
 	const rarityLevel = rarityList[Math.floor(Math.random() * rarityList.length)]
-	const instanceId = `${info.seriesId}-${design.designId}-${rarityLevel}-${
-		(rarities.get(rarityLevel)?.count ?? 0) + 1
-	}`
+	const instanceId = `${info.seasonId}-${design.designId}-${rarityLevel}-${(rarities.get(rarityLevel)?.count ?? 0) + 1
+		}`
 
 	const result = await db.entities.cardInstances
 		.create({
-			seriesId: info.seriesId,
+			seriesId: info.seasonId,
 			designId: design.designId,
-			rarityLevel,
+			rarityId: rarityLevel,
 			instanceId,
 			username: info.username,
 			userId: info.userId,
@@ -134,7 +133,7 @@ export async function deletePack(args: { packId: string }) {
 export async function createPack(args: {
 	userId: string
 	username: string
-	seriesId: string
+	seasonId: string
 	count: number
 }) {
 	const packId = `pack-${args.userId}-${new Date().toISOString()}-${Math.random()}`
@@ -142,7 +141,7 @@ export async function createPack(args: {
 	const cards = []
 	for (let i = 0; i < args.count; i++) {
 		const card = await generateCard({
-			seriesId: args.seriesId,
+			seasonId: args.seasonId,
 			userId: args.userId,
 			username: args.username,
 			packId,
@@ -155,7 +154,7 @@ export async function createPack(args: {
 			packId,
 			userId: args.userId,
 			username: args.username,
-			seriesId: args.seriesId,
+			seriesId: args.seasonId,
 			cardDetails: cards.map((card) => ({ instanceId: card.instanceId })),
 		})
 		.go()
@@ -247,39 +246,39 @@ export async function deleteUnmatchedDesignImage(id: string) {
 	return result.data
 }
 
-// SERIES //
-export async function getAllSeries() {
+// SEASONS //
+export async function getAllSeasons() {
 	const result = await db.entities.cardSeries.query.allSeries({}).go()
 	return result.data
 }
 
-export async function getOnlySeriesById(id: string) {
+export async function getSeasonById(id: string) {
 	const result = await db.entities.cardSeries.query.bySeriesId({ seriesId: id }).go()
 	return result.data[0]
 }
 
-export async function getSeriesAndDesignsBySeriesId(id: string) {
+export async function getSeasonAndDesignsBySeasonId(id: string) {
 	const result = await db.collections.seriesAndDesigns({ seriesId: id }).go()
 	return result.data
 }
 
-export async function deleteSeriesById(id: string): Promise<Result<EntityItem<Series>>> {
-	const seriesData = await getSeriesAndDesignsBySeriesId(id)
-	if (seriesData.cardDesigns.length > 0)
+export async function deleteSeasonById(id: string): Promise<Result<EntityItem<Season>>> {
+	const seasonData = await getSeasonAndDesignsBySeasonId(id)
+	if (seasonData.cardDesigns.length > 0)
 		return {
 			success: false,
-			error: 'Cannot delete series with existing designs',
+			error: 'Cannot delete season with existing designs',
 		}
 
 	const result = await db.entities.cardSeries.delete({ seriesId: id }).go()
 	return { success: true, data: result.data }
 }
 
-export async function createSeries(
-	series: CreateEntityItem<Series>
-): Promise<Result<EntityItem<Series>>> {
+export async function createSeason(
+	season: CreateEntityItem<Season>
+): Promise<Result<EntityItem<Season>>> {
 	try {
-		const result = await db.entities.cardSeries.create({ ...series }).go()
+		const result = await db.entities.cardSeries.create({ ...season }).go()
 		return {
 			success: true,
 			data: result.data,
@@ -288,10 +287,10 @@ export async function createSeries(
 		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` }
 
 		if (err.code === 4001)
-			// aws error, series already exists
+			// aws error, season already exists
 			return {
 				success: false,
-				error: 'Series already exists',
+				error: 'Season already exists',
 			}
 
 		// default

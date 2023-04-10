@@ -1,0 +1,13 @@
+---
+interface Props {
+	label?: string
+	id: string
+}
+
+const { props } = Astro
+---
+
+<div class="flex gap-3 justify-end w-full">
+	{props.label ? <label for={props.id}>{props.label}</label> : null}
+	<slot />
+</div>

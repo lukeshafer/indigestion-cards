@@ -1,4 +1,4 @@
-import { Form, TextInput, Select, DynamicFieldSet } from './Form'
+import { Form, TextInput, Select, DynamicFieldSet, HiddenInput } from './Form'
 
 export default function CreateCardForm(props: {
 	series: {
@@ -6,6 +6,8 @@ export default function CreateCardForm(props: {
 		seriesName: string
 	}[]
 	url: string
+	imgUrl: string
+	imageKey: string
 }) {
 	const series = props.series.map(({ seriesId, seriesName }) => ({
 		name: seriesName,
@@ -14,6 +16,8 @@ export default function CreateCardForm(props: {
 
 	return (
 		<Form action={props.url}>
+			<HiddenInput id="imgUrl" value={props.imgUrl} />
+			<HiddenInput id="imageKey" value={props.imageKey} />
 			<Select id="seriesId" required options={series}>
 				Series
 			</Select>

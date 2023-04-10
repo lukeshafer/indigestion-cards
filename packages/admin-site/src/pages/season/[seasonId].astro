@@ -1,0 +1,37 @@
+---
+import CardList from '@/components/CardList.astro'
+import Page from '@/layouts/Page.astro'
+import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/card'
+import H1 from '@/components/H1.astro'
+import { Api } from 'sst/node/api'
+
+const id = Astro.params.seasonId
+
+if (!id) {
+	throw new Error('No season id provided')
+}
+
+const {
+	cardSeries: [season],
+	cardDesigns,
+} = await getSeasonAndDesignsBySeasonId(id)
+---
+
+<Page title="Season" class="grid gap-4 text-center justify-center">
+	<H1>{season!.seriesName}</H1>
+	<p class="text-lg">Description: {season!.seriesDescription}</p>
+	<h2 class="text-xl pt-4">Cards:</h2>
+	<CardList cards={cardDesigns} />
+
+	<form
+		id="delete-season-form"
+		action={`${Api.api.url}/delete-card-season/${id}?redirectUrl=${Astro.url.origin}/season`}
+		method="post">
+		<button
+			type="submit"
+			class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+			id="delete-design">
+			Delete Season</button
+		>
+	</form>
+</Page>

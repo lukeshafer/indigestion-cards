@@ -52,6 +52,7 @@ export function Form(props: {
 			setSuccessText('Success!')
 			if (result.status >= 300 && result.status < 400) {
 				const location = result.headers.get('Location')
+				console.log(location)
 				if (location) window.location.assign(location)
 			}
 		} catch {
@@ -189,6 +190,13 @@ export function Select<T extends { value: string; name: string }[]>(props: {
 			</select>
 		</InputBase>
 	)
+}
+
+export function HiddenInput(props: { id: string; value: string }) {
+	const [store, setStore] = useContext(FormContext) ?? []
+	if (!store || !setStore) throw new Error('Input must be used within a Form')
+	setStore(props.id, props.value)
+	return <input type="hidden" id={props.id} name={props.id} value={props.value} />
 }
 
 function InputBase(props: { label: string; id: string; children: JSX.Element }) {
