@@ -1,5 +1,26 @@
 ---
+import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
+
+const params = Astro.url.searchParams.entries()
+
+console.log(`${Api.api.url}/auth/twitch/authorize`)
 ---
 
-<Page title="index" />
+<Page title="index">
+	<a href={`${Api.api.url}/auth/twitch/authorize`} rel="noreferrer"> Login with Twitch</a>
+	{
+		params && (
+			<div>
+				<h1>Params</h1>
+				<ul>
+					{[...params].map(([key, value]) => (
+						<li>
+							{key}: {value}
+						</li>
+					))}
+				</ul>
+			</div>
+		)
+	}
+</Page>

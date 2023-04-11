@@ -31,7 +31,7 @@ const cardDesigns = new Entity(
 				type: 'string',
 				required: true,
 			},
-			seriesId: {
+			seasonId: {
 				type: 'string',
 				required: true,
 			},
@@ -50,7 +50,15 @@ const cardDesigns = new Entity(
 				items: {
 					type: 'map',
 					properties: {
-						rarityLevel: {
+						rarityId: {
+							type: 'string',
+							required: true,
+						},
+						rarityName: {
+							type: 'string',
+							required: true,
+						},
+						frameUrl: {
 							type: 'string',
 							required: true,
 						},
@@ -63,37 +71,25 @@ const cardDesigns = new Entity(
 			},
 		},
 		indexes: {
-			byDesignId: {
-				collection: 'designsAndCards',
+			allDesigns: {
 				pk: {
 					field: 'pk',
-					composite: ['designId'],
+					composite: [],
 				},
 				sk: {
 					field: 'sk',
-					composite: [],
-				},
-			},
-			bySeriesId: {
-				index: 'gsi1',
-				collection: 'seriesAndDesigns',
-				pk: {
-					field: 'gsi1pk',
-					composite: ['seriesId'],
-				},
-				sk: {
-					field: 'gsi1sk',
 					composite: ['designId'],
 				},
 			},
-			allDesigns: {
-				index: 'gsi2',
+			byDesignId: {
+				collection: ['seasonAndDesigns', 'designAndCards'],
+				index: 'gsi1',
 				pk: {
-					field: 'gsi2pk',
-					composite: [],
+					field: 'gsi1pk',
+					composite: ['seasonId'],
 				},
 				sk: {
-					field: 'gsi2sk',
+					field: 'gsi1sk',
 					composite: ['designId'],
 				},
 			},
@@ -102,43 +98,44 @@ const cardDesigns = new Entity(
 	config
 )
 
-const cardSeries = new Entity(
+const season = new Entity(
 	{
 		model: {
-			entity: 'cardSeries',
+			entity: 'season',
 			version: '1',
 			service: 'card-app',
 		},
 		attributes: {
-			seriesName: {
+			seasonName: {
 				type: 'string',
 				required: true,
 			},
-			seriesDescription: {
+			seasonDescription: {
 				type: 'string',
 			},
-			seriesId: {
+			seasonId: {
 				type: 'string',
 				required: true,
 			},
 		},
 		indexes: {
-			allSeries: {
+			allSeasons: {
+				collection: 'siteConfig',
 				pk: {
 					field: 'pk',
 					composite: [],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['seriesId'],
+					composite: ['seasonId'],
 				},
 			},
-			bySeriesId: {
-				collection: 'seriesAndDesigns',
+			bySeasonId: {
+				collection: 'seasonAndDesigns',
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['seriesId'],
+					composite: ['seasonId'],
 				},
 				sk: {
 					field: 'gsi1sk',
@@ -166,11 +163,19 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
-			seriesId: {
+			seasonId: {
 				type: 'string',
 				required: true,
 			},
 			rarityId: {
+				type: 'string',
+				required: true,
+			},
+			rarityName: {
+				type: 'string',
+				required: true,
+			},
+			frameUrl: {
 				type: 'string',
 				required: true,
 			},
@@ -199,25 +204,26 @@ const cardInstances = new Entity(
 		},
 		indexes: {
 			byDesignId: {
-				collection: 'designsAndCards',
-				pk: {
-					field: 'pk',
-					composite: ['designId'],
-				},
-				sk: {
-					field: 'sk',
-					composite: ['instanceId'],
-				},
-			},
-			byOwnerId: {
+				collection: ['seasonAndDesigns', 'designAndCards'],
 				index: 'gsi1',
-				collection: 'cardsByOwnerName',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['username'],
+					composite: ['seasonId'],
 				},
 				sk: {
 					field: 'gsi1sk',
+					composite: ['designId', 'instanceId'],
+				},
+			},
+			byOwnerId: {
+				collection: 'cardsByOwnerName',
+				index: 'gsi3',
+				pk: {
+					field: 'gsi3pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi3sk',
 					composite: ['instanceId'],
 				},
 			},
@@ -231,6 +237,16 @@ const cardInstances = new Entity(
 				sk: {
 					field: 'gsi2sk',
 					composite: ['instanceId'],
+				},
+			},
+			byId: {
+				pk: {
+					field: 'pk',
+					composite: ['instanceId'],
+				},
+				sk: {
+					field: 'sk',
+					composite: [],
 				},
 			},
 		},
@@ -273,14 +289,14 @@ const users = new Entity(
 				},
 			},
 			byUsername: {
-				index: 'gsi1',
+				index: 'gsi3',
 				collection: 'cardsByOwnerName',
 				pk: {
-					field: 'gsi1pk',
+					field: 'gsi3pk',
 					composite: ['username'],
 				},
 				sk: {
-					field: 'gsi1sk',
+					field: 'gsi3sk',
 					composite: [],
 				},
 			},
@@ -301,7 +317,7 @@ const packs = new Entity(
 				type: 'string',
 				required: true,
 			},
-			seriesId: {
+			seasonId: {
 				type: 'string',
 				required: true,
 			},
@@ -381,6 +397,10 @@ const unmatchedImages = new Entity(
 				type: 'string',
 				required: true,
 			},
+			type: {
+				type: ['cardDesign', 'frame'] as const,
+				required: true,
+			},
 		},
 		indexes: {
 			allImages: {
@@ -390,6 +410,17 @@ const unmatchedImages = new Entity(
 				},
 				sk: {
 					field: 'sk',
+					composite: ['imageId'],
+				},
+			},
+			byType: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['type'],
+				},
+				sk: {
+					field: 'gsi1sk',
 					composite: ['imageId'],
 				},
 			},
@@ -410,7 +441,7 @@ const rarities = new Entity(
 				type: 'string',
 				required: true,
 			},
-			name: {
+			rarityName: {
 				type: 'string',
 				required: true,
 			},
@@ -421,6 +452,7 @@ const rarities = new Entity(
 		},
 		indexes: {
 			allRarities: {
+				collection: 'siteConfig',
 				pk: {
 					field: 'pk',
 					composite: [],
@@ -435,20 +467,52 @@ const rarities = new Entity(
 	config
 )
 
+export const siteConfig = new Entity(
+	{
+		model: {
+			entity: 'siteConfig',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			seasonId: {
+				type: 'string',
+				required: true,
+			},
+		},
+		indexes: {
+			get: {
+				collection: 'siteConfig',
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['seasonId'],
+				},
+			},
+		},
+	},
+	config
+)
+
 export const db = new Service(
 	{
 		cardDesigns,
-		cardSeries,
+		season,
 		cardInstances,
 		packs,
 		users,
 		unmatchedImages,
+		rarities,
+		siteConfig,
 	},
 	config
 )
 
 //const username = 'snailyluke'
-//const seriesId = 'series-1'
+//const seasonId = 'season-1'
 //const designId = 'design-1'
 //const instanceId = 'instance-1'
 //const packId = 'pack-1'
@@ -456,10 +520,10 @@ export const db = new Service(
 
 //[>
 //As a user, I need to find all of the CARDS my USER owns
-//As a user, I need to see all of the CARD DESIGNS in a given SERIES
+//As a user, I need to see all of the CARD DESIGNS in a given SEASON
 //As a user, I need to see all of the CARDS and their OWNERS for a given CARD DESIGN
 //As a user, I need to see all of the TRADES made to my USER and other USERS
-//As a user, I need to see all of the SERIES released
+//As a user, I need to see all of the SEASON released
 //As a user, I need to find a USER based on their USERNAME
 //As a user, I need to see how many UNOPENED PACKS I (USER) have earned
 //As an admin, I need to see all of the UNOPENED PACKS earned by ALL USERS
@@ -472,10 +536,10 @@ export const db = new Service(
 //})
 //.go()
 
-//// As a user, I need to see all of the CARD DESIGNS in a given SERIES
-//const designsInSeries = db.collections
-//.seriesAndDesigns({
-//seriesId,
+//// As a user, I need to see all of the CARD DESIGNS in a given SEASON
+//const designsInSeason = db.collections
+//.s easonAndDesigns({
+//seasonId,
 //})
 //.go()
 
@@ -487,10 +551,10 @@ export const db = new Service(
 //.go()
 
 //// As a user, I need to see all of the TRADES made between my USER and other USERS
-//// TODO: Trades will be added in a future release
+//// TODO Trades will be added in a future release
 
-//// As a user, I need to see all of the SERIES released
-//const allSeries = db.entities.cardSeries.query.allSeries({}).go()
+//// As a user, I need to see all of the SEASONS released
+//const allSeasons = db.entities.season.query.allSeasons({}).go()
 
 //// As a user, I need to find a USER based on their USERNAME
 //const user = db.entities.users.query.byUsername({

@@ -4,6 +4,7 @@ import Page from '@/layouts/Page.astro'
 import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/card'
 import H1 from '@/components/H1.astro'
 import { Api } from 'sst/node/api'
+import PostButton from '@/components/form/PostButton.astro'
 
 const id = Astro.params.seasonId
 
@@ -12,26 +13,30 @@ if (!id) {
 }
 
 const {
-	cardSeries: [season],
+	season: [season],
 	cardDesigns,
 } = await getSeasonAndDesignsBySeasonId(id)
 ---
 
 <Page title="Season" class="grid gap-4 text-center justify-center">
-	<H1>{season!.seriesName}</H1>
-	<p class="text-lg">Description: {season!.seriesDescription}</p>
+	<H1>{season!.seasonName}</H1>
+	<p class="text-lg">Description: {season!.seasonDescription}</p>
 	<h2 class="text-xl pt-4">Cards:</h2>
 	<CardList cards={cardDesigns} />
 
-	<form
-		id="delete-season-form"
-		action={`${Api.api.url}/delete-card-season/${id}?redirectUrl=${Astro.url.origin}/season`}
-		method="post">
-		<button
-			type="submit"
-			class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-			id="delete-design">
-			Delete Season</button
-		>
-	</form>
+	<PostButton
+		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
+		id="delete-season"
+		label="Delete Season"
+		url={`${Api.api.url}/delete-card-season/${id}?redirectUrl=${Astro.url.origin}/season`}
+	/>
 </Page>
+
+<script>
+	const form = document.getElementById('delete-season') as HTMLFormElement
+
+	form.addEventListener('submit', async (e) => {
+		const confirmation = confirm('Are you sure you want to delete this season?')
+		if (!confirmation) e.preventDefault()
+	})
+</script>

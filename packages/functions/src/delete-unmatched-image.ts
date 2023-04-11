@@ -1,4 +1,4 @@
-import { ApiHandler, usePathParam, useQueryParam } from 'sst/node/api'
+import { ApiHandler, usePathParam, useQueryParam, useFormValue } from 'sst/node/api'
 import { Bucket } from 'sst/node/bucket'
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
 import { S3 } from 'aws-sdk'
@@ -12,12 +12,25 @@ export const handler = ApiHandler(async () => {
 			body: 'Missing id',
 		}
 	}
+	const type = useFormValue('type') || 'n/a'
+	const bucketName = {
+		cardDesign: Bucket.CardDesigns.bucketName,
+		frame: Bucket.FrameDesigns.bucketName,
+	}[type]
+
+	if (!bucketName) {
+		return {
+			statusCode: 400,
+			body: 'Missing type',
+		}
+	}
+
 	const s3 = new S3()
 	try {
 		const dbResult = deleteUnmatchedDesignImage(id)
 		const s3result = s3
 			.deleteObject({
-				Bucket: Bucket.CardDesigns.bucketName,
+				Bucket: bucketName,
 				Key: id,
 			})
 			.promise()

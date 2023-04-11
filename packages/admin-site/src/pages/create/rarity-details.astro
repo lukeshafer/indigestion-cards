@@ -1,0 +1,53 @@
+---
+import { Api } from 'sst/node/api'
+import Page from '@/layouts/Page.astro'
+import Form, { inputClasses } from '@/components/form/Form.astro'
+import InputBase from '@/components/form/InputBase.astro'
+
+const bucket = Astro.url.searchParams.get('bucket')
+const key = Astro.url.searchParams.get('key')
+
+if (!bucket || !key) {
+	return Astro.redirect('/?alert=Please upload an image first')
+}
+
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+
+const url = Api.api.url + '/create-rarity'
+const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/rarities`
+---
+
+<Page title="Add Rarity Details" class="grid justify-center justify-items-center grid-cols-1">
+	<h1 class="text-3xl p-8">Add Rarity</h1>
+	<div class="flex flex-wrap gap-8 justify-center">
+		<div class="flex flex-col gap-4 items-center justify-center">
+			<img src={imgUrl} class="w-44 h-auto object-contain" />
+			<form action={deleteUrl} method="post">
+				<input type="hidden" name="type" value="frame" />
+				<button type="submit" class="bg-red-400 hover:bg-red-500 text-xl p-2 rounded-xl"
+					>Delete</button
+				>
+			</form>
+		</div>
+		<div class="bg-sky-100 p-8 rounded-3xl max-w-xl">
+			<Form action={url} method="post" class="grid gap-4">
+				<input type="hidden" name="imgUrl" value={imgUrl} />
+				<input type="hidden" name="imageKey" value={key} />
+				<InputBase label="Rarity Name" id="rarityName">
+					<input id="rarityName" name="rarityName" type="text" class={inputClasses.input} />
+				</InputBase>
+				<InputBase label="Rarity ID" id="rarityId">
+					<input
+						id="rarityId"
+						name="rarityId"
+						type="text"
+						data-id-from="rarityName"
+						class={inputClasses.input}
+						pattern="[a-z0-9-]+"
+					/>
+				</InputBase>
+				<button type="submit" class={inputClasses.submit}> Submit Rarity</button>
+			</Form>
+		</div>
+	</div>
+</Page>

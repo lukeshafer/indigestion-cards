@@ -1,0 +1,18 @@
+---
+interface Props {
+	url: string
+	id: string
+	label: string
+	class?: string
+}
+---
+
+<form id={Astro.props.id} action={Astro.props.url} method="post">
+	<button
+		type="submit"
+		class="font-bold py-2 px-4 rounded"
+		class:list={[Astro.props.class || 'bg-sky-500 hover:bg-sky-700 text-black hover:text-white']}
+		id="delete-design">
+		{Astro.props.label}
+	</button>
+</form>

@@ -11,7 +11,7 @@ export const handler: S3Handler = async (event) => {
 		await createUnmatchedDesignImage({
 			url: `https://${record.s3.bucket.name}.s3.amazonaws.com/${key}`,
 			imageId: key,
-			type: 'cardDesign',
+			type: 'frame',
 		})
 	})
 }

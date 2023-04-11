@@ -1,0 +1,88 @@
+---
+import { Api } from 'sst/node/api'
+import Page from '@/layouts/Page.astro'
+import Form, { inputClasses } from '@/components/form/Form.astro'
+import InputBase from '@/components/form/InputBase.astro'
+import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
+
+const { select, input, submit, fieldset } = inputClasses
+
+const bucket = Astro.url.searchParams.get('bucket')
+const key = Astro.url.searchParams.get('key')
+
+if (!bucket || !key) {
+	return Astro.redirect('/?alert=Please upload an image first')
+}
+
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+
+const url = Api.api.url + '/create-card-design'
+const seasons = await getAllSeasons()
+const rarities = await getAllRarities()
+// TODO: Protect the API route
+
+const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/design`
+---
+
+<Page title="Add Card Design" class="grid justify-center justify-items-center grid-cols-1">
+	<h1 class="text-3xl p-8">Add Card Design</h1>
+	<div class="flex flex-wrap gap-8 justify-center">
+		<div class="flex flex-col gap-4 items-center justify-center">
+			<img src={imgUrl} class="w-44 h-auto object-contain" />
+			<form action={deleteUrl} method="post">
+				<input type="hidden" name="type" value="cardDesign" />
+				<button type="submit" class="bg-red-400 hover:bg-red-500 text-xl p-2 rounded-xl"
+					>Delete</button
+				>
+			</form>
+		</div>
+		<div class="bg-sky-200 p-8 rounded-3xl max-w-xl">
+			<Form action={url}>
+				<input type="hidden" name="imgUrl" value={imgUrl} />
+				<input type="hidden" name="imageKey" value={key} />
+				<InputBase id="seasonId" label="Season">
+					<select class={select} name="seasonId" required>
+						{
+							seasons.map(({ seasonId, seasonName }) => (
+								<option value={seasonId}>{seasonName}</option>
+							))
+						}
+					</select>
+				</InputBase>
+				<InputBase id="cardName" label="Card Name">
+					<input name="cardName" required class={input} />
+				</InputBase>
+				<InputBase id="cardDescription" label="Description">
+					<input name="cardDescription" required class={input} />
+				</InputBase>
+				<InputBase id="artist" label="Artist">
+					<input name="artist" required class={input} />
+				</InputBase>
+				<InputBase id="designId" label="Design ID">
+					<input data-id-from="cardName" name="designId" required class={input} />
+				</InputBase>
+				<fieldset>
+					<legend class="text-xl mx-auto py-4">Rarity Details</legend>
+					{
+						rarities.map(({ rarityId, rarityName }) => (
+							<fieldset class={fieldset}>
+								<legend class="m-auto">{rarityName}</legend>
+								<InputBase label="Count" id={`rarity-${rarityId}-count`}>
+									<input
+										class={input}
+										style="width: 6rem"
+										name={`rarity-${rarityId}-count`}
+										type="number"
+										required
+										value="0"
+									/>
+								</InputBase>
+							</fieldset>
+						))
+					}
+				</fieldset>
+				<button class={submit} type="submit">Create</button>
+			</Form>
+		</div>
+	</div>
+</Page>

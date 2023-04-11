@@ -7,17 +7,20 @@ import H1 from '@/components/H1.astro'
 const seasons = await getAllSeasons()
 ---
 
-<Page title="Seasons" class="mx-auto max-w-5xl p-8 grid gap-8">
+<Page title="Seasons" class="mx-auto max-w-5xl p-8 grid gap-8 grid-cols-1 justify-items-center">
 	<H1>All Seasons</H1>
-	<ul class="flex flex-wrap gap-4 text-4xl">
+	<ul class="flex flex-wrap gap-4 text-2xl">
 		{
 			seasons.map((season) => (
 				<li>
 					<Box>
-						<a href={`/season/${season.seriesId}`}>{season.seriesName}</a>
+						<a href={`/season/${season.seasonId}`}>{season.seasonName}</a>
 					</Box>
 				</li>
 			))
 		}
 	</ul>
+	<a href="/create/season" class="text-lg bg-pink-200 p-4 rounded-xl text-center w-max"
+		>Create New Season</a
+	>
 </Page>

@@ -16,9 +16,9 @@ export const handler = ApiHandler(async (e) => {
 	if (errorMessage) return { statusCode: 400, body: 'Error: ' + errorMessage }
 
 	const result = await createSeason({
-		seriesId: seasonId!,
-		seriesName: seasonName!,
-		seriesDescription: description,
+		seasonId: seasonId!,
+		seasonName: seasonName!,
+		seasonDescription: description,
 	})
 
 	const redirect = (useHeader('referer') ?? '/') + `season/${seasonId}`
@@ -26,6 +26,6 @@ export const handler = ApiHandler(async (e) => {
 	return result.success
 		? { statusCode: 307, headers: { Location: redirect } }
 		: result.error === 'Season already exists'
-			? { statusCode: 409, body: 'Error: ' + result.error }
-			: { statusCode: 500, body: 'Error: ' + result.error }
+		? { statusCode: 409, body: 'Error: ' + result.error }
+		: { statusCode: 500, body: 'Error: ' + result.error }
 })

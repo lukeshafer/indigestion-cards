@@ -1,20 +1,19 @@
 ---
 import Page from '@/layouts/Page.astro'
 import CardList from '@/components/CardList.astro'
-import UnmatchedCardList from '@/components/UnmatchedCardList.astro'
+import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card'
 import H1 from '@/components/H1.astro'
 
 const designs = await getAllCardDesigns()
-
-console.log(designs)
 
 const message = Astro.url.searchParams.get('message') || ''
 ---
 
 <Page title="All Cards" class="grid gap-4 justify-center">
 	{message ? <p class="text-xl text-center p-4 bg-green-100">{message}</p> : null}
-	<UnmatchedCardList />
-	<H1>All Cards</H1>
+	<UnmatchedImageList type="cardDesign" />
+	<H1>All Card Designs</H1>
 	<CardList cards={designs} />
+	<a href="/create/card-design" class="text-lg bg-pink-200 p-4 rounded-xl text-center w-max justify-self-center">Create New Design</a>
 </Page>

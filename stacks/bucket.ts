@@ -4,7 +4,7 @@ import { Database } from './database'
 export function DesignBucket({ stack }: StackContext) {
 	const db = use(Database)
 
-	const bucket = new Bucket(stack, 'CardDesigns', {
+	const cardDesignBucket = new Bucket(stack, 'CardDesigns', {
 		notifications: {
 			fileUploaded: {
 				function: 'packages/functions/src/handle-image-upload.handler',
@@ -17,5 +17,18 @@ export function DesignBucket({ stack }: StackContext) {
 		},
 	})
 
-	return bucket
+	const frameBucket = new Bucket(stack, 'FrameDesigns', {
+		notifications: {
+			fileUploaded: {
+				function: 'packages/functions/src/handle-frame-upload.handler',
+			},
+		},
+		defaults: {
+			function: {
+				bind: [db],
+			},
+		},
+	})
+
+	return { cardDesignBucket, frameBucket }
 }

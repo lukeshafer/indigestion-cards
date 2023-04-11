@@ -11,20 +11,20 @@ export const inputClasses = {
 	},
 	select: 'block w-3/5 bg-white px-2 py-1',
 	fieldset: 'border border-gray-300 p-4 w-full grid gap-8',
-	button: 'bg-sky-100 px-4 py-2 rounded-2xl bg-white w-1/2',
+	button: 'bg-sky-100 px-4 py-2  bg-white w-1/2',
 	get submit() {
 		return inputClasses.button + ' font-bold mt-4'
 	},
-};
+}
 ---
 
 <my-form>
-	<div class={`relative p-4 bg-sky-100 rounded-2xl ${className ?? ''}`}>
+	<div class={`relative p-4 bg-sky-200 rounded-2xl ${className ?? ''}`}>
 		<form
 			method={method ?? 'post'}
 			action={action}
 			{...attrs}
-			class="bg-sky-100 grid grid-cols-1 justify-center justify-items-center gap-4 p-4 text-xl w-full">
+			class="bg-sky-200 grid grid-cols-1 justify-center justify-items-center gap-8 p-4 text-xl w-full">
 			<slot />
 		</form>
 		<div
@@ -47,6 +47,14 @@ export const inputClasses = {
 		}
 
 		connectedCallback() {
+			const url = new URL(window.location.href)
+			const params = new URLSearchParams(url.search)
+			params.forEach((value, key) => {
+				const input = this.querySelector(`input[name="${key}"]`) as HTMLInputElement | null
+				if (!input) return
+				input.value = value
+			})
+
 			const form = this.querySelector('form') as HTMLFormElement
 			const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement
 			form.addEventListener('submit', () => {

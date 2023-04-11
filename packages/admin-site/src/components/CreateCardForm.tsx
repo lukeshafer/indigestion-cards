@@ -1,25 +1,25 @@
 import { Form, TextInput, Select, DynamicFieldSet, HiddenInput } from './Form'
 
 export default function CreateCardForm(props: {
-	series: {
-		seriesId: string
-		seriesName: string
+	seasons: {
+		seasonId: string
+		seasonName: string
 	}[]
 	url: string
 	imgUrl: string
 	imageKey: string
 }) {
-	const series = props.series.map(({ seriesId, seriesName }) => ({
-		name: seriesName,
-		value: seriesId,
+	const season = props.seasons.map(({ seasonId, seasonName }) => ({
+		name: seasonName,
+		value: seasonId,
 	}))
 
 	return (
 		<Form action={props.url}>
 			<HiddenInput id="imgUrl" value={props.imgUrl} />
 			<HiddenInput id="imageKey" value={props.imageKey} />
-			<Select id="seriesId" required options={series}>
-				Series
+			<Select id="seasonId" required options={season}>
+				Season
 			</Select>
 			<TextInput id="cardName" required>
 				Card Name
@@ -33,9 +33,9 @@ export default function CreateCardForm(props: {
 			<TextInput
 				id="designId"
 				bind={{
-					id: ['seriesId', 'cardName'],
-					transform: ({ seriesId, cardName }) =>
-						`${seriesId}-${cardName?.toLowerCase().replace(/[ ']/g, '-')}`,
+					id: ['seasonId', 'cardName'],
+					transform: ({ seasonId, cardName }) =>
+						`${seasonId}-${cardName?.toLowerCase().replace(/[ ']/g, '-')}`,
 				}}
 				required>
 				Design ID

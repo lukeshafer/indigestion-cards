@@ -1,18 +1,25 @@
 ---
+import PostButton from '@/components/form/PostButton.astro'
 import Page from '@/layouts/Page.astro'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { Api } from 'sst/node/api'
 
-const id = Astro.params.designId
+const slug = Astro.params.slug
 
-if (!id) {
+if (!slug) {
 	return Astro.redirect('/design?error=No design id provided')
+}
+
+const [seasonId, designId] = slug.split('/')
+
+if (!seasonId || !designId) {
+	return Astro.redirect(`/design?alert=Invalid design id provided: ${slug}`)
 }
 
 const {
 	cardDesigns: [design],
 	cardInstances,
-} = await getCardDesignAndInstancesById(id)
+} = await getCardDesignAndInstancesById({ designId, seasonId })
 
 if (!design) {
 	return Astro.redirect('/design?error=No design found with that id')
@@ -28,7 +35,7 @@ if (!design) {
 			cardInstances.length > 0 ? (
 				cardInstances.map((card) => (
 					<li>
-						<a href={`/card/${card.instanceId}`}>{card.rarityLevel}: </a>
+						<a href={`/card/${card.instanceId}`}>{card.rarityId}: </a>
 						<a href={`/user/${card.userId}`}>Owned by {card.username}</a>
 					</li>
 				))
@@ -37,17 +44,12 @@ if (!design) {
 			)
 		}
 	</ul>
-	<form
+	<PostButton
+		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
 		id="delete-design-form"
-		action={`${Api.api.url}/delete-card-design/${id}?redirectUrl=${Astro.url.protocol}${Astro.url.host}/design`}
-		method="post">
-		<button
-			type="submit"
-			class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-			id="delete-design">
-			Delete Design</button
-		>
-	</form>
+		url={`${Api.api.url}/delete-card-design/${seasonId}/${designId}?redirectUrl=${Astro.url.protocol}${Astro.url.host}/design`}
+		label="Delete Design"
+	/>
 </Page>
 
 <script>

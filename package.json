@@ -12,7 +12,8 @@
 		"typecheck": "tsc --noEmit",
 		"admin:add": "pnpm --filter admin-site run astro add",
 		"admin:dev": "pnpm --filter admin-site run dev",
-		"admin:build": "pnpm --filter admin-site run build"
+		"admin:build": "pnpm --filter admin-site run build",
+		"admin:astro": "pnpm --filter admin-site run astro"
 	},
 	"devDependencies": {
 		"sst": "^2.3.5",
