@@ -5,8 +5,16 @@ import {
 } from '@lil-indigestion-cards/core/card'
 import { parseS3Url } from '@lil-indigestion-cards/core/utils'
 import { ApiHandler, useFormValue, useHeader, useFormData } from 'sst/node/api'
+import { useSession } from 'sst/node/future/auth'
 
-export const handler = ApiHandler(async (event) => {
+export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	const rarities = await getAllRarities()
 
 	const imgUrl = useFormValue('imgUrl')

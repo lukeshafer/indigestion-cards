@@ -1,16 +1,20 @@
 ---
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config'
 import { getAllSeasons } from '@lil-indigestion-cards/core/card'
+import { useSession } from '@/session'
 import Page from '@/layouts/Page.astro'
 import H1 from '@/components/H1.astro'
 import Form from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
 
-const { season, rarities, siteConfig } = await getSiteConfig()
+const user = useSession(Astro.cookies)
+if (!user) return Astro.redirect('/')
+
+const { season } = await getSiteConfig()
 const seasons = await getAllSeasons()
 ---
 
-<Page title="Site Settings" class="grid gap-4 justify-center">
+<Page title="Site Settings" class="grid gap-4 justify-center" session={user}>
 	<H1>Site Settings</H1>
 	<Form>
 		<InputBase id="seasonId" label="Current Season">

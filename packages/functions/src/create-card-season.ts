@@ -1,7 +1,15 @@
 import { createSeason } from '@lil-indigestion-cards/core/card'
 import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
+import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async (e) => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	console.log(e)
 
 	const seasonName = useFormValue('name')
@@ -26,6 +34,6 @@ export const handler = ApiHandler(async (e) => {
 	return result.success
 		? { statusCode: 307, headers: { Location: redirect } }
 		: result.error === 'Season already exists'
-		? { statusCode: 409, body: 'Error: ' + result.error }
-		: { statusCode: 500, body: 'Error: ' + result.error }
+			? { statusCode: 409, body: 'Error: ' + result.error }
+			: { statusCode: 500, body: 'Error: ' + result.error }
 })

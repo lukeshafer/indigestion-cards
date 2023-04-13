@@ -3,14 +3,14 @@ import { Database } from './database'
 import { Events } from './events'
 import { DesignBucket } from './bucket'
 import { ConfigStack } from './config'
-import { AuthStack } from './auth'
+import { Auth } from './auth'
 
 export function API({ stack }: StackContext) {
 	const table = use(Database)
 	const eventBus = use(Events)
 	const { frameBucket, cardDesignBucket } = use(DesignBucket)
 	const secrets = use(ConfigStack)
-	const auth = use(AuthStack)
+	const auth = use(Auth)
 
 	const api = new Api(stack, 'api', {
 		routes: {
@@ -36,18 +36,11 @@ export function API({ stack }: StackContext) {
 					eventBus,
 					frameBucket,
 					cardDesignBucket,
+					auth,
 				],
 			},
 		},
-		cors: {
-			allowCredentials: true,
-			allowHeaders: ['content-type'],
-			allowMethods: ['ANY'],
-			allowOrigins: ['http://localhost:3000', 'https://lilindigestion.com'],
-		},
 	})
-
-	auth.attach(stack, { api })
 
 	stack.addOutputs({
 		ApiEndpoint: api.url,

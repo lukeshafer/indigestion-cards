@@ -2,8 +2,16 @@ import { deleteRarityById } from '@lil-indigestion-cards/core/card'
 import { usePathParam, ApiHandler, useHeader } from 'sst/node/api'
 import { deleteS3ObjectByUrl } from '@lil-indigestion-cards/core/utils'
 import { useQueryParam } from 'sst/node/api'
+import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	const rarityId = usePathParam('id')
 
 	if (!rarityId) return { statusCode: 400, body: 'Missing rarity id' }

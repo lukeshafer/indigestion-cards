@@ -1,26 +1,22 @@
 ---
-import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
 
-const params = Astro.url.searchParams.entries()
+const user = useUser(Astro.cookies)
 
-console.log(`${Api.api.url}/auth/twitch/authorize`)
+console.log(user)
 ---
 
-<Page title="index">
-	<a href={`${Api.api.url}/auth/twitch/authorize`} rel="noreferrer"> Login with Twitch</a>
+<Page title="index" session={user}>
 	{
-		params && (
-			<div>
-				<h1>Params</h1>
-				<ul>
-					{[...params].map(([key, value]) => (
-						<li>
-							{key}: {value}
-						</li>
-					))}
-				</ul>
-			</div>
+		user ? (
+			<a href="/auth/logout" rel="noreferrer">
+				Logout
+			</a>
+		) : (
+			<a href="/auth/login" rel="noreferrer">
+				Login
+			</a>
 		)
 	}
 </Page>

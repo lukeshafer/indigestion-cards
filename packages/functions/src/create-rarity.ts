@@ -1,8 +1,14 @@
 import { createRarity, deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
 import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
+import { useSession } from 'sst/node/future/auth'
 
-export const handler = ApiHandler(async (e) => {
-	console.log(e)
+export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
 
 	const imgUrl = useFormValue('imgUrl')
 	const imageKey = useFormValue('imageKey')

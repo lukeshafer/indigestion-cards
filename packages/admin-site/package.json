@@ -12,12 +12,14 @@
 	"dependencies": {
 		"@astrojs/solid-js": "^2.1.0",
 		"@astrojs/tailwind": "^3.1.1",
-		"@aws-sdk/client-s3": "^3.309.0",
-		"@aws-sdk/s3-presigned-post": "^3.309.0",
-		"astro": "^2.1.9",
-		"astro-sst": "^2.3.6",
-		"aws-sdk": "^2.1348.0",
-		"solid-js": "^1.4.3",
-		"tailwindcss": "^3.0.24"
+		"@aws-sdk/client-s3": "^3.312.0",
+		"@aws-sdk/s3-presigned-post": "^3.312.0",
+		"astro": "^2.2.3",
+		"astro-sst": "2.5.2",
+		"aws-sdk": "^2.1357.0",
+		"solid-js": "^1.7.3",
+		"tailwindcss": "^3.3.1",
+		"sst": "2.5.2",
+		"electrodb": "^2.5.1"
 	}
 }

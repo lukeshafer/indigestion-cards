@@ -278,7 +278,6 @@ function FieldSetItem<T extends readonly InputProps[]>(props: { inputs: T; index
 							value={list[props.index]?.[input.id]!}
 							onInput={(e) => {
 								const current = list[props.index]
-								console.log(props.index)
 								setList(props.index, {
 									...current,
 									[input.id]: coerce(e.currentTarget.value),

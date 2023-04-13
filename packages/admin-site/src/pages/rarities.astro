@@ -1,16 +1,20 @@
 ---
 import { Api } from 'sst/node/api'
 import { getAllRarities } from '@lil-indigestion-cards/core/card'
+import { useUser } from '@/session'
 import H1 from '@/components/H1.astro'
 import Box from '@/components/Box.astro'
 import Page from '@/layouts/Page.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import PostButton from '@/components/form/PostButton.astro'
 
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
+
 const rarities = await getAllRarities()
 ---
 
-<Page title="Rarities" class="grid p-8 gap-8 justify-center justify-items-center">
+<Page title="Rarities" class="grid p-8 gap-8 justify-center justify-items-center" session={user}>
 	<UnmatchedImageList type="frame" />
 	<H1>Rarities</H1>
 	<ul id="rarity-list">

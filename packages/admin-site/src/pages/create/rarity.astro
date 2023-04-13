@@ -6,6 +6,10 @@ import Form from '@/components/form/Form.astro'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Bucket } from 'sst/node/bucket'
 import crypto from 'crypto'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 const s3 = new S3Client({ region: 'us-east-2' })
 const presigned = await createPresignedPost(s3, {
@@ -19,7 +23,7 @@ const presigned = await createPresignedPost(s3, {
 })
 ---
 
-<Page title="Create new rarity" class="grid gap-4 justify-center">
+<Page title="Create new rarity" class="grid gap-4 justify-center" session={user}>
 	<H1>Create new rarity</H1>
 	<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
 		{

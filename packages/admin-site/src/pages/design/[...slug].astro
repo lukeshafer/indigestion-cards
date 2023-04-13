@@ -1,10 +1,14 @@
 ---
 import PostButton from '@/components/form/PostButton.astro'
 import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { Api } from 'sst/node/api'
 
 const slug = Astro.params.slug
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 if (!slug) {
 	return Astro.redirect('/design?error=No design id provided')
@@ -26,7 +30,10 @@ if (!design) {
 }
 ---
 
-<Page title="Designs" class="grid gap-4 p-4 justify-center justify-items-center">
+<Page
+	title="Designs"
+	class="grid gap-4 p-4 justify-center justify-items-center"
+	session={user}>
 	<h1 class="text-2xl">Card name: {design.cardName}</h1>
 	{design.cardDescription ? <p class="text-lg">Description: {design.cardDescription}</p> : null}
 	<ul class="border border-gray-300 p-4">

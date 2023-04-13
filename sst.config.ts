@@ -5,7 +5,7 @@ import { Database } from './stacks/database'
 import { Events } from './stacks/events'
 import { Sites } from './stacks/sites'
 import { DesignBucket } from './stacks/bucket'
-import { AuthStack } from './stacks/auth'
+import { Auth } from './stacks/auth'
 
 export default {
 	config(_input) {
@@ -18,7 +18,7 @@ export default {
 		app
 			.stack(ConfigStack)
 			.stack(Database)
-			.stack(AuthStack)
+			.stack(Auth)
 			.stack(Events)
 			.stack(DesignBucket)
 			.stack(API)

@@ -3,12 +3,19 @@ import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
 import Form, { inputClasses } from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 const url = Api.api.url + '/create-card-season'
 // TODO: Protect the API route
 ---
 
-<Page title="Create New Season" class="grid justify-center justify-items-center grid-cols-1">
+<Page
+	title="Create New Season"
+	class="grid justify-center justify-items-center grid-cols-1"
+	session={user}>
 	<h1 class="text-3xl p-8">Create New Season</h1>
 
 	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">

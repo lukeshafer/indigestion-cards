@@ -3,11 +3,18 @@ import Page from '@/layouts/Page.astro'
 import Box from '@/components/Box.astro'
 import { getAllSeasons } from '@lil-indigestion-cards/core/card'
 import H1 from '@/components/H1.astro'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 const seasons = await getAllSeasons()
 ---
 
-<Page title="Seasons" class="mx-auto max-w-5xl p-8 grid gap-8 grid-cols-1 justify-items-center">
+<Page
+	title="Seasons"
+	class="mx-auto max-w-5xl p-8 grid gap-8 grid-cols-1 justify-items-center"
+	session={user}>
 	<H1>All Seasons</H1>
 	<ul class="flex flex-wrap gap-4 text-2xl">
 		{

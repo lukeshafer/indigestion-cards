@@ -2,8 +2,16 @@ import { ApiHandler, usePathParam, useQueryParam, useFormValue } from 'sst/node/
 import { Bucket } from 'sst/node/bucket'
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
 import { S3 } from 'aws-sdk'
+import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	const id = usePathParam('id')
 
 	if (!id) {

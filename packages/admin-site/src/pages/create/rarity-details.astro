@@ -3,6 +3,10 @@ import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
 import Form, { inputClasses } from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 const bucket = Astro.url.searchParams.get('bucket')
 const key = Astro.url.searchParams.get('key')
@@ -17,7 +21,10 @@ const url = Api.api.url + '/create-rarity'
 const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/rarities`
 ---
 
-<Page title="Add Rarity Details" class="grid justify-center justify-items-center grid-cols-1">
+<Page
+	title="Add Rarity Details"
+	class="grid justify-center justify-items-center grid-cols-1"
+	session={user}>
 	<h1 class="text-3xl p-8">Add Rarity</h1>
 	<div class="flex flex-wrap gap-8 justify-center">
 		<div class="flex flex-col gap-4 items-center justify-center">

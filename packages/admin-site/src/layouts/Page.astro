@@ -1,9 +1,11 @@
 ---
 import Base from './Base.astro'
+import type { Session } from "@/session"
 
-interface Props {
+export interface Props {
 	title: string
 	class?: string
+	session: Session
 }
 
 const alert = Astro.url.searchParams.get('alert')
@@ -18,11 +20,15 @@ const alertColor = {
 	<header class="bg-sky-200 p-4">
 		{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 		<nav class="gap-8 text-xl flex flex-wrap">
-			<a href="/">Home</a>
-			<a href="/config">Site Config</a>
-			<a href="/rarities">Rarities</a>
-			<a href="/design">Card Designs</a>
-			<a href="/season">Seasons</a>
+			{ Astro.props.session?.type === 'user' ? (
+				<a href="/">Home</a>
+				<a href="/config">Site Config</a>
+				<a href="/rarities">Rarities</a>
+				<a href="/design">Card Designs</a>
+				<a href="/season">Seasons</a>
+			) : (
+					<a href="/auth/login">Login with Twitch</a>
+			)}
 		</nav>
 	</header>
 	<main class={(Astro.props.class ?? '') + ' p-4'}>

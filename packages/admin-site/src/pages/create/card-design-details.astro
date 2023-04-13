@@ -4,6 +4,10 @@ import Page from '@/layouts/Page.astro'
 import Form, { inputClasses } from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/')
 
 const { select, input, submit, fieldset } = inputClasses
 
@@ -24,7 +28,10 @@ const rarities = await getAllRarities()
 const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/design`
 ---
 
-<Page title="Add Card Design" class="grid justify-center justify-items-center grid-cols-1">
+<Page
+	title="Add Card Design"
+	class="grid justify-center justify-items-center grid-cols-1"
+	session={user}>
 	<h1 class="text-3xl p-8">Add Card Design</h1>
 	<div class="flex flex-wrap gap-8 justify-center">
 		<div class="flex flex-col gap-4 items-center justify-center">

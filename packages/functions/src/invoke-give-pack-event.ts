@@ -2,8 +2,16 @@ import { ApiHandler, useQueryParams } from 'sst/node/api'
 import { EventBus } from 'sst/node/event-bus'
 import { EventBridge } from 'aws-sdk'
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
+import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (!session)
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	const eventBridge = new EventBridge()
 
 	const { userName, userId: paramUserId, count: rawCount } = useQueryParams()
