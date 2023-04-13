@@ -3,6 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+	font-family: 'Rabbid Highway Sign II';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignII.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Rabbid Highway Sign II';
+	font-style: oblique;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignIIObl.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Mont';
+	font-style: normal;
+	font-weight: 200;
+	font-display: swap;
+	src: url('/fonts/mont/Mont-ExtraLightDEMO.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Mont';
+	font-style: normal;
+	font-weight: 800;
+	font-display: swap;
+	src: url('/fonts/mont/Mont-HeavyDEMO.otf') format('opentype');
+}
+
 @layer base {
 	a {
 		text-decoration: underline;
