@@ -1,8 +1,11 @@
 ---
 import '../global.css'
+import '@fontsource/montserrat/variable.css'
+import type { Session } from '@/session'
 
 interface Props {
 	title: string
+	session: Session
 }
 ---
 
@@ -15,6 +18,12 @@ interface Props {
 		<title>{Astro.props.title}</title>
 	</head>
 	<body>
-		<slot />
+		{
+			Astro.props.session?.type !== 'user' ? (
+				<script> window.location.href = '/public' </script>
+			) : (
+				<slot />
+			)
+		}
 	</body>
 </html>

@@ -6,13 +6,14 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				display: ['Rabbid Highway Sign II', ...fontFamily.sans],
-				heading: ['Mont', ...fontFamily.sans],
+				display: ['var(--font-display)', ...fontFamily.sans],
+				heading: ['var(--font-heading)', ...fontFamily.sans],
 			},
 			colors: {
 				brand: {
 					main: '#fd94e6',
 					secondary: '#f66efa',
+					tertiary: '#EF6DD9',
 				},
 			},
 		},

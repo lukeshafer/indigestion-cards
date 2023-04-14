@@ -19,25 +19,32 @@
 	src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignIIObl.otf') format('opentype');
 }
 
-@font-face {
-	font-family: 'Mont';
-	font-style: normal;
-	font-weight: 200;
-	font-display: swap;
-	src: url('/fonts/mont/Mont-ExtraLightDEMO.otf') format('opentype');
-}
+/*@font-face {*/
+	/*font-family: 'Mont';*/
+	/*font-style: normal;*/
+	/*font-weight: 200;*/
+	/*font-display: swap;*/
+	/*src: url('/fonts/mont/Mont-ExtraLightDEMO.otf') format('opentype');*/
+/*}*/
 
-@font-face {
-	font-family: 'Mont';
-	font-style: normal;
-	font-weight: 800;
-	font-display: swap;
-	src: url('/fonts/mont/Mont-HeavyDEMO.otf') format('opentype');
-}
+/*@font-face {*/
+	/*font-family: 'Mont';*/
+	/*font-style: normal;*/
+	/*font-weight: 800;*/
+	/*font-display: swap;*/
+	/*src: url('/fonts/mont/Mont-HeavyDEMO.otf') format('opentype');*/
+/*}*/
 
 @layer base {
-	a {
-		text-decoration: underline;
+	html {
+		--color-main: #fd94e6;
+		--color-secondary: #f66efa;
+		--color-tertiary: #ef6dd9;
+
+		--base-font-sans: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+		--base-font-serif: font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
+		--font-heading: 'MontserratVariable', var(--base-font-sans);
 	}
 
 	input {
@@ -62,6 +69,18 @@
 	}
 }
 
+@keyframes shine {
+	0% {
+		
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
 @layer utilities {
 	.absolute-center {
 		position: absolute;
@@ -73,4 +92,33 @@
 	.spin {
 		animation: spin 3s linear infinite;
 	}
+
+	.shine {
+		position: relative;
+	}
+
+	.shine::after {
+		content: '';
+		width: 100%;
+		height: 100%;
+		display: block;
+		border-radius: inherit;
+		background-repeat: no-repeat;
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(135deg,#fff0 25%,rgba(255,255,255,.2) 50%,#fff0 75%);
+		background-size: 300%;
+		background-position: 120%;
+	}
+
+	.shine:hover::after {
+		transition: background-position 0.3s ease-out;
+		background-position: 0;
+		opacity: 1;
+	}
+
+	.text-shadow {
+		text-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+	}
+
 }

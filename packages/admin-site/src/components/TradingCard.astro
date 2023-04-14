@@ -1,0 +1,129 @@
+---
+interface Props {
+	shiny?: boolean
+}
+---
+
+<trading-card>
+	<div class="outer w-max relative text-3xl">
+		<div
+			class="inner bg-gray-900 relative text-white text-center flex items-center justify-center"
+			class:list={{
+				'inner-shiny': Astro.props.shiny,
+			}}>
+			<slot />
+		</div>
+	</div>
+</trading-card>
+
+<style>
+	.outer {
+		transform-style: preserve-3d;
+		transition: transform 0.3s, scale 0.3s;
+		perspective: 900px;
+		transform: rotate3d(0, 0, 0, 0deg);
+
+		--shine-opacity: 0.2;
+		--shine-position: 50%;
+		--shine-after-opacity: 0;
+	}
+
+	.outer:hover {
+		scale: 1.1;
+		z-index: 10;
+	}
+
+	.inner::after {
+		--shine-level: calc(0.2 * var(--shine-opacity));
+		transform: translateZ(200px);
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		content: '';
+		display: block;
+		background-image: radial-gradient(
+			ellipse at center,
+			rgba(255, 255, 255, var(--shine-level)) 0%,
+			#fff0 100%
+		);
+		background-size: 200% 200%;
+		background-position: var(--shine-position) 0%;
+		opacity: var(--shine-after-opacity);
+		transition: opacity 0.5s;
+	}
+
+	.inner-shiny::before {
+		--shine-level: calc(0.8 * var(--shine-opacity));
+		transform: translateZ(200px);
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		content: '';
+		display: block;
+		background-image: linear-gradient(
+			110deg,
+			#fff0 30%,
+			rgba(255, 255, 255, var(--shine-level)) 60%,
+			#fff3 100%
+		);
+		background-size: 300% 110%;
+		background-position: var(--shine-position) 0;
+		opacity: var(--shine-after-opacity);
+		transition: opacity 0.5s;
+		background-repeat: no-repeat;
+	}
+</style>
+
+<script>
+	class TradingCard extends HTMLElement {
+		outer: HTMLDivElement | null = null
+		inner: HTMLDivElement | null = null
+		constructor() {
+			super()
+		}
+
+		connectedCallback() {
+			this.outer = this.querySelector('.outer')!
+			this.inner = this.querySelector('.inner')!
+
+			this.outer.addEventListener('mouseenter', this.handleEnter)
+			this.outer.addEventListener('mousemove', this.handleHover)
+			this.outer.addEventListener('mouseleave', this.handleLeave)
+		}
+
+		handleEnter = () => {
+			this.inner!.style.setProperty('--shine-after-opacity', '1')
+			setTimeout(() => (this.inner!.style.transition = 'transform 0.0s'), 100)
+		}
+
+		handleHover = (e: MouseEvent) => {
+			const { clientX, clientY } = e
+			const { left, top, width, height } = this.outer!.getBoundingClientRect()
+
+			const x = (clientX - left) / width - 0.5
+			const y = (clientY - top) / height - 0.5
+			const angle = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) * 70
+
+			this.inner!.style.transform = `rotate3d(${y}, ${-x}, 0, ${angle}deg)`
+			this.inner!.style.setProperty(
+				'--shine-position',
+				`${60 - (-x + 0.5) * 60 + (40 - (-y + 0.5) * 40)}%`
+			)
+			this.inner!.style.setProperty('--shine-opacity', `${y + 0.2 + (x + 0.2)}`)
+		}
+
+		handleLeave = () => {
+			this.inner!.style.transition = 'transform 0.5s'
+			this.inner!.style.setProperty('--shine-position', '50%')
+			this.inner!.style.setProperty('--shine-after-opacity', '0')
+			this.inner!.style.transform = 'rotate3d(0, 0, 0, 0deg)'
+			setTimeout(() => {
+				this.outer!.style.setProperty('--shine-opacity', '0.2')
+			}, 1000)
+		}
+	}
+
+	customElements.define('trading-card', TradingCard)
+</script>

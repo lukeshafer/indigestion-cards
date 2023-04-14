@@ -1,6 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
+import TradingCard from '@/components/TradingCard.astro'
 
 const user = useUser(Astro.cookies)
 
@@ -8,16 +9,46 @@ console.log(user)
 ---
 
 <Page title="index" session={user}>
-	<h1 class="text-3xl font-heading font-bold uppercase text-brand-secondary">lil indigestion</h1>
 	{
 		user ? (
-			<a href="/auth/logout" rel="noreferrer">
+			<a href="/auth/logout" rel="noreferrer" class="shine">
 				Logout
 			</a>
 		) : (
-			<a href="/auth/login" rel="noreferrer">
+			<a href="/auth/login" rel="noreferrer" class="shine">
 				Login
 			</a>
 		)
 	}
+	<div class="flex flex-wrap gap-8 justify-center">
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+		<TradingCard />
+		<TradingCard shiny />
+	</div>
 </Page>
+
+<style> 
+	a {
+		display: block;
+		padding: 1rem;
+		background: #f88;
+		margin: 1rem;
+		width: max-content;
+		transition: background 0.2s;
+	}
+
+	a:hover {
+		background: #e66;
+	}
+</style>

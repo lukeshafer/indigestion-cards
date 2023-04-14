@@ -13,14 +13,14 @@ const designs = await getAllCardDesigns()
 const message = Astro.url.searchParams.get('message') || ''
 ---
 
-<Page title="All Cards" class="grid gap-4 justify-center" session={user}>
-	{message ? <p class="text-xl text-center p-4 bg-green-100">{message}</p> : null}
+<Page title="All Cards" class="flex flex-col gap-4" session={user}>
+	{message ? <p class="text-xl text-center p-4 bg-green-200">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<H1>All Card Designs</H1>
-	<CardList cards={designs} />
 	<a
 		href="/create/card-design"
-		class="text-lg bg-pink-200 p-4 rounded-xl text-center w-max justify-self-center"
-		>Create New Design</a
-	>
+		class="text-lg bg-brand-tertiary p-1 px-4 rounded-xl text-center w-max self-center font-display lowercase italic shine pt-2 text-shadow text-white">
+		New Design
+	</a>
+	<CardList cards={designs} />
 </Page>

@@ -1,6 +1,6 @@
 ---
 import Base from './Base.astro'
-import type { Session } from "@/session"
+import type { Session } from '@/session'
 
 export interface Props {
 	title: string
@@ -10,28 +10,85 @@ export interface Props {
 
 const alert = Astro.url.searchParams.get('alert')
 const alertType = Astro.url.searchParams.get('alertType') ?? 'error'
-const alertColor = {
-	success: 'bg-green-200',
-	error: 'bg-red-200',
-}[alertType] ?? 'bg-red-200'
+const alertColor =
+	{
+		success: 'bg-green-200',
+		error: 'bg-red-200',
+	}[alertType] ?? 'bg-red-200'
+
+const adminLinks = [
+	{ href: '/', title: 'Users' },
+	{ href: '/design', title: 'Designs' },
+	{ href: '/season', title: 'Seasons' },
+	{ href: '/rarities', title: 'Rarities' },
+]
+
+const currentPage = Astro.url.pathname
 ---
 
-<Base title={Astro.props.title}>
-	<header class="bg-sky-200 p-4">
-		{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
-		<nav class="gap-8 text-xl flex flex-wrap">
-			{ Astro.props.session?.type === 'user' ? (
-				<a href="/">Home</a>
-				<a href="/config">Site Config</a>
-				<a href="/rarities">Rarities</a>
-				<a href="/design">Card Designs</a>
-				<a href="/season">Seasons</a>
-			) : (
-					<a href="/auth/login">Login with Twitch</a>
-			)}
+<Base title={Astro.props.title} session={Astro.props.session}>
+	<div class="page-layout grid h-screen">
+		<nav class="py-4 flex flex-col gap-8 text-white overflow-y-scroll h-screen max-h-max">
+			<button class="bg-transparent font-extrabold self-end text-shadow px-4">{'<'}</button>
+			<a
+				href="/"
+				title="Home"
+				class="flex flex-col text-center font-display text-white text-shadow">
+				<span class="italic text-3xl">indigestion</span>
+				<span class="text-2xl -mt-1">card studio</span>
+			</a>
+			<div class="flex-1 self-center">
+				<a
+					href="/open-packs"
+					title="Open Packs"
+					class="open-packs my-10 text-4xl uppercase w-min text-center bg-brand-tertiary px-4 py-2 font-heading font-extrabold rounded-3xl relative text-shadow shine block">
+					Open Packs
+				</a>
+			</div>
+			<div class="pb-8">
+				<h2 class="text-2xl font-heading text-[#a23791] font-medium my-3 p-1 px-6">
+					Administration
+				</h2>
+				{
+					adminLinks.map(({ href, title }) =>
+						currentPage === href ? (
+							<a
+								href={href}
+								title={title}
+								class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
+								{title}
+							</a>
+						) : (
+							<a
+								href={href}
+								title={title}
+								class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
+								{title}
+							</a>
+						)
+					)
+				}
+			</div>
 		</nav>
-	</header>
-	<main class={(Astro.props.class ?? '') + ' p-4'}>
-		<slot />
-	</main>
+		<main class={(Astro.props.class ?? '') + ' p-6 col-start-2 overflow-y-scroll'}>
+			{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
+			<slot />
+		</main>
+	</div>
 </Base>
+
+<style>
+	.page-layout {
+		grid-template-columns: minmax(auto, 16rem) 1fr;
+	}
+
+	nav {
+		/* to bottom right */
+		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
+	}
+
+	.open-packs:hover {
+		transition: scale;
+		scale: 1.05;
+	}
+</style>
