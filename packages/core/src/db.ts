@@ -467,6 +467,37 @@ const rarities = new Entity(
 	config
 )
 
+export const admins = new Entity({
+	model: {
+		entity: 'admin',
+		version: '1',
+		service: 'card-app',
+	},
+	attributes: {
+		userId: {
+			type: 'string',
+			required: true,
+		},
+		username: {
+			type: 'string',
+			required: true,
+		},
+	},
+	indexes: {
+		allAdmins: {
+			collection: 'siteConfig',
+			pk: {
+				field: 'pk',
+				composite: [],
+			},
+			sk: {
+				field: 'sk',
+				composite: ['userId'],
+			},
+		},
+	},
+})
+
 export const siteConfig = new Entity(
 	{
 		model: {
@@ -507,6 +538,7 @@ export const db = new Service(
 		unmatchedImages,
 		rarities,
 		siteConfig,
+		admins,
 	},
 	config
 )

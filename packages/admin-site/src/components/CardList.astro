@@ -8,7 +8,7 @@ interface Props {
 const { props } = Astro
 ---
 
-<ul class="grid justify-start w-full px-8">
+<ul class="grid justify-start w-full md:px-8 px-3">
 	{
 		props.cards.length > 0 ? (
 			props.cards.map(({ designId, seasonId, cardName, imgUrl, cardDescription }, index) => (

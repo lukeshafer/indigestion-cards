@@ -4,11 +4,9 @@ import { useUser } from '@/session'
 import TradingCard from '@/components/TradingCard.astro'
 
 const user = useUser(Astro.cookies)
-
-console.log(user)
 ---
 
-<Page title="index" session={user}>
+<Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]}>
 	{
 		user ? (
 			<a href="/auth/logout" rel="noreferrer" class="shine">
@@ -21,24 +19,22 @@ console.log(user)
 		)
 	}
 	<div class="flex flex-wrap gap-8 justify-center">
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
-		<TradingCard />
-		<TradingCard shiny />
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard><div class="w-52 h-72"></div></TradingCard>
+		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
 	</div>
 </Page>
 
-<style> 
+<style>
 	a {
 		display: block;
 		padding: 1rem;

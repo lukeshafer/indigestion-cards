@@ -25,6 +25,7 @@ export function API({ stack }: StackContext) {
 			'POST /delete-card-season/{id}': 'packages/functions/src/delete-card-season.handler',
 			'POST /delete-unmatched-image/{id}': 'packages/functions/src/delete-unmatched-image.handler',
 			'POST /delete-rarity/{id}': 'packages/functions/src/delete-rarity.handler',
+			'POST /create-admin-user': 'packages/functions/src/create-admin-user.handler',
 		},
 		defaults: {
 			function: {

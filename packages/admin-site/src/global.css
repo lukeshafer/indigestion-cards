@@ -40,11 +40,22 @@
 		--color-main: #fd94e6;
 		--color-secondary: #f66efa;
 		--color-tertiary: #ef6dd9;
+		--color-main-dark: #a23791;
+
+		--accent-main: #31FFD6;
+		--accent-secondary: ##1fdeb8;
+		--accent-tertiary: #08fccc;
+		--accent-main-dark: #1eb395;
 
 		--base-font-sans: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
 		--base-font-serif: font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
 		--font-heading: 'MontserratVariable', var(--base-font-sans);
+	}
+
+	*::selection {
+		background: var(--accent-tertiary);
+		color: #000;
 	}
 
 	input {
@@ -119,6 +130,19 @@
 
 	.text-shadow {
 		text-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+	}
+
+	.brand-shadow {
+		filter: drop-shadow(0.08rem 0.08rem 0 rgb(0 0 0 / 18%));
+	}
+
+	.visually-hidden {
+		clip: rect(1px, 1px, 1px, 1px);
+		height: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
 	}
 
 }

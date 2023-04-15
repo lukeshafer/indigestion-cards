@@ -50,7 +50,10 @@ export const inputClasses = {
 			const url = new URL(window.location.href)
 			const params = new URLSearchParams(url.search)
 			params.forEach((value, key) => {
-				const input = this.querySelector(`input[name="${key}"]`) as HTMLInputElement | null
+				// if key is 'form-xxx', we want to query for 'input[name="xxx"]'
+				const inputName = key === 'form' ? 'form' : key.replace(/^form-/, '')
+				if (!inputName) return
+				const input = this.querySelector(`input[name="${inputName}"]`) as HTMLInputElement | null
 				if (!input) return
 				input.value = value
 			})
@@ -71,7 +74,6 @@ export const inputClasses = {
 
 				const idInput = this.querySelector(`[name="${bindId}"]`) as HTMLInputElement | null
 				if (!idInput) return
-				console.log(idInput)
 
 				idInput.addEventListener('input', () => {
 					input.value = idInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-')

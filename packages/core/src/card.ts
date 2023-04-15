@@ -96,7 +96,7 @@ export async function generateCard(info: {
 		})
 		.go()
 		.catch((err) => {
-			console.log(err)
+			console.error(err)
 			throw err
 		})
 
@@ -105,6 +105,11 @@ export async function generateCard(info: {
 
 export async function deleteCardInstanceById(args: { instanceId: string }) {
 	const result = await db.entities.cardInstances.delete({ instanceId: args.instanceId }).go()
+	return result.data
+}
+
+export async function getAllPacks() {
+	const result = await db.entities.packs.query.allPacks({}).go()
 	return result.data
 }
 
@@ -190,7 +195,7 @@ export async function getCardDesignById(args: { designId: string; seasonId: stri
 }
 
 export async function getCardDesignAndInstancesById(args: { designId: string; seasonId: string }) {
-	const result = await db.collections.designAndCards(args).go()
+	const result = await db.collections.seasonAndDesigns(args).go()
 	return result.data
 }
 
@@ -248,7 +253,6 @@ export async function createUnmatchedDesignImage(image: CreateEntityItem<Unmatch
 }
 
 export async function deleteUnmatchedDesignImage(id: string) {
-	console.log('deleting unmatched image', id)
 	const result = await db.entities.unmatchedImages.delete({ imageId: id }).go()
 	return result.data
 }

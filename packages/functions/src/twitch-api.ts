@@ -10,13 +10,12 @@ import {
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
-		console.log('Message not verified')
+		console.error('Message not verified')
 		return { statusCode: 403 }
 	}
 
 	const { messageType } = getHeaders(event.headers)
 	const unsafeBody = JSON.parse(event.body) as unknown
-	console.log('unsafeBody', unsafeBody)
 
 	if (messageType === MESSAGE_TYPE.VERIFICATION) {
 		if (
@@ -25,7 +24,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 			!('challenge' in unsafeBody) ||
 			typeof unsafeBody.challenge !== 'string'
 		) {
-			console.log('Invalid verification request')
+			console.error('Invalid verification request')
 			return { statusCode: 400 }
 		}
 
@@ -36,17 +35,16 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	}
 
 	if (messageType !== MESSAGE_TYPE.NOTIFICATION) {
-		console.log('Invalid message type')
+		console.error('Invalid message type')
 		return { statusCode: 400 }
 	}
 
 	const body = parseRequestBody(unsafeBody)
 
-	console.log('Notification received')
 	switch (body.type) {
 		case 'channel.subscription.gift':
 			if (body.event.total < 5) {
-				console.log('Gifted less than 5 subscriptions')
+				// gifted less than 5 subs, ignore
 				return { statusCode: 200 }
 			}
 
@@ -71,8 +69,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				.promise()
 			break
 		case 'channel.channel_points_custom_reward_redemption.add':
+			// Redeemed channel points
 			body.event
-			console.log('Redeemed channel points')
 			break
 	}
 	return { statusCode: 200 }

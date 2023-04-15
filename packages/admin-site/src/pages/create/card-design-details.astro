@@ -7,7 +7,7 @@ import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 
 const { select, input, submit, fieldset } = inputClasses
 

@@ -6,7 +6,7 @@ import InputBase from '@/components/form/InputBase.astro'
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 
 const bucket = Astro.url.searchParams.get('bucket')
 const key = Astro.url.searchParams.get('key')

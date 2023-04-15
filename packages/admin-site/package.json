@@ -4,6 +4,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "sst bind astro dev",
+		"dev:host": "sst bind 'astro dev --host'",
 		"start": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",

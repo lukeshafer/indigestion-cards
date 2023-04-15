@@ -7,6 +7,8 @@ interface Props {
 	title: string
 	session: Session
 }
+
+console.log(Astro.props.session)
 ---
 
 <html lang="en">
@@ -15,12 +17,14 @@ interface Props {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#fd94e6" />
 		<title>{Astro.props.title}</title>
 	</head>
 	<body>
+		<slot />
 		{
 			Astro.props.session?.type !== 'user' ? (
-				<script> window.location.href = '/public' </script>
+				<script> /*window.location.href = '/public' */ </script>
 			) : (
 				<slot />
 			)

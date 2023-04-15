@@ -8,7 +8,7 @@ import Form from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
 
 const user = useSession(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 
 const { season } = await getSiteConfig()
 const seasons = await getAllSeasons()

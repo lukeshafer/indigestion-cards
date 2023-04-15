@@ -46,7 +46,6 @@ export const handler = ApiHandler(async () => {
 		await Promise.all([dbResult, s3result])
 
 		const redirect = useQueryParam('redirectUrl')
-		console.log('redirect', redirect)
 
 		return {
 			statusCode: 307,

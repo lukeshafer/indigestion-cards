@@ -16,7 +16,7 @@ export const handler = ApiHandler(async () => {
 
 	const { userName, userId: paramUserId, count: rawCount } = useQueryParams()
 	if (!userName) return { statusCode: 400, body: 'Missing user id or user name' }
-	const userId = paramUserId ?? (await getUserByLogin(userName))
+	const userId = paramUserId ?? (await getUserByLogin(userName)).id
 
 	const count = Number(rawCount) || 1
 

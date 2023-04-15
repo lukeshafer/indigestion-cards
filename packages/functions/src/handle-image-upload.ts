@@ -2,7 +2,6 @@ import { S3Handler } from 'aws-lambda'
 import { createUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
 
 export const handler: S3Handler = async (event) => {
-	console.log('File uploaded to S3')
 	event.Records.forEach(async (record) => {
 		if (record.eventName !== 'ObjectCreated:Post' && record.eventName !== 'ObjectCreated:Put')
 			return

@@ -2,15 +2,13 @@ import { createSeason } from '@lil-indigestion-cards/core/card'
 import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
 import { useSession } from 'sst/node/future/auth'
 
-export const handler = ApiHandler(async (e) => {
+export const handler = ApiHandler(async () => {
 	const session = useSession()
 	if (!session)
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
 		}
-
-	console.log(e)
 
 	const seasonName = useFormValue('name')
 	const seasonId = useFormValue('seasonId')

@@ -2,6 +2,7 @@ import { Config } from 'sst/node/config'
 import crypto from 'crypto'
 import { bodySchema, type TwitchBody } from './twitch-event-schemas'
 import fetch from 'node-fetch'
+import { z } from 'zod'
 
 export const TWITCH_HEADERS = {
 	MESSAGE_TYPE: 'twitch-eventsub-message-type',
@@ -81,11 +82,11 @@ export function getHeaders(headers: TwitchRequest['headers']) {
 export function handleTwitchEvent(body: TwitchBody) {
 	switch (body.type) {
 		case 'channel.subscription.gift':
-			console.log(`${body.event.user_name} gifted ${body.event.total} subscriptions`)
+			//
 			break
 		case 'channel.channel_points_custom_reward_redemption.add':
 			body.event
-			console.log('Redeemed channel points')
+			//
 			break
 	}
 	return { statusCode: 200 }
@@ -99,17 +100,25 @@ export async function getUserByLogin(login: string) {
 		},
 	})
 	const body = await user.json()
-	if (
-		!body ||
-		!(typeof body === 'object') ||
-		!('data' in body) ||
-		!body.data ||
-		!(body.data instanceof Array) ||
-		body.data.length === 0 ||
-		typeof body.data[0].id !== 'string'
-	) {
+
+	console.log(body)
+
+	const schema = z.object({
+		data: z.array(
+			z.object({
+				id: z.string(),
+				login: z.string(),
+				display_name: z.string(),
+				profile_image_url: z.string(),
+			})
+		),
+	})
+
+	const result = schema.safeParse(body)
+
+	if (!result.success) {
 		throw new Error('User not found')
 	}
 
-	return body.data[0].id as string
+	return result.data.data[0]
 }

@@ -9,7 +9,7 @@ import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import PostButton from '@/components/form/PostButton.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 
 const rarities = await getAllRarities()
 ---

@@ -2,12 +2,13 @@ import { Config } from 'sst/node/config'
 import { Issuer } from 'openid-client'
 //import { AuthHandler, Session, TwitchAdapter } from 'sst/node/auth'
 import { AuthHandler as FutureAuthHandler, OauthAdapter } from 'sst/node/future/auth'
-import { useQueryParam, useResponse } from 'sst/node/api'
+import { getAdminUserById } from '@lil-indigestion-cards/core/user'
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
 		user: {
 			userId: string
+			username: string
 		}
 	}
 }
@@ -24,27 +25,22 @@ export const handler = FutureAuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onAuthorize() {
-		const ref = useQueryParam('ref')
-		if (ref) {
-			useResponse().cookie({
-				key: 'ref',
-				value: ref,
-				httpOnly: true,
-				secure: true,
-				maxAge: 60 * 10,
-				sameSite: 'None',
-			})
-		}
-	},
 	async onSuccess(input) {
 		if (input.provider === 'twitch') {
 			const claims = input.tokenset.claims()
 
+			const adminUser = await getAdminUserById(claims.sub)
+			if (!adminUser)
+				return {
+					type: 'public',
+					properties: {},
+				}
+
 			return {
 				type: 'user',
 				properties: {
-					userId: claims.sub,
+					userId: adminUser.userId,
+					username: adminUser.username,
 				},
 			}
 		}

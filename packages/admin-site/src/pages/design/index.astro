@@ -7,13 +7,18 @@ import H1 from '@/components/H1.astro'
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 const designs = await getAllCardDesigns()
 
 const message = Astro.url.searchParams.get('message') || ''
+
+const breadcrumbs = [
+	{ label: 'Home', href: '/' },
+	{ label: 'All Cards', href: '/all-cards' },
+]
 ---
 
-<Page title="All Cards" class="flex flex-col gap-4" session={user}>
+<Page title="All Cards" class="flex flex-col gap-4" session={user} breadcrumbs={breadcrumbs}>
 	{message ? <p class="text-xl text-center p-4 bg-green-200">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<H1>All Card Designs</H1>

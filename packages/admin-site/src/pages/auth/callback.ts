@@ -2,7 +2,6 @@ import type { APIContext } from 'astro'
 import { Auth } from 'sst/node/future/auth'
 
 export async function get(ctx: APIContext) {
-	console.log('get called')
 	const code = ctx.url.searchParams.get('code')
 	if (!code) {
 		throw new Error('Code missing')
@@ -16,10 +15,8 @@ export async function get(ctx: APIContext) {
 			redirect_uri: `${ctx.url.origin}${ctx.url.pathname}`,
 		}),
 	}).then((r) => {
-		console.log(r)
 		return r.json()
 	})
-	console.log(response)
 
 	if (!response.access_token) {
 		throw new Error('No access token')
@@ -29,5 +26,6 @@ export async function get(ctx: APIContext) {
 		maxAge: 60 * 60 * 24 * 30,
 		path: '/',
 	})
+
 	return ctx.redirect('/', 302)
 }

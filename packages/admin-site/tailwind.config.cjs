@@ -14,6 +14,13 @@ module.exports = {
 					main: '#fd94e6',
 					secondary: '#f66efa',
 					tertiary: '#EF6DD9',
+					dark: '#a23791',
+				},
+				accent: {
+					main: '#31FFD6',
+					secondary: '#1fdeb8',
+					tertiary: '#08fccc',
+					dark: '#1eb395',
 				},
 			},
 		},

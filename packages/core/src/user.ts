@@ -1,5 +1,5 @@
 import { db } from './db'
-import type { EntityRecord, CreateEntityItem } from 'electrodb'
+import { EntityRecord, CreateEntityItem, ElectroError } from 'electrodb'
 import { createPack } from './card'
 
 type User = typeof db.entities.users
@@ -24,9 +24,7 @@ export async function createNewUser(user: CreateEntityItem<User>) {
 		// TODO: update existing username, as they likely changed their username
 	}
 
-	console.log('creating user', user)
 	const result = await putUser(user)
-	console.log('created user', result)
 }
 
 export async function checkIfUserExists(userId: string): Promise<boolean> {
@@ -49,6 +47,37 @@ export async function addUnopenedPacks(args: {
 			count: getDefaultCardCountInPack(),
 			seasonId: getCurrentSeasonId(),
 		})
+	}
+}
+
+export async function createAdminUser(args: { userId: string; username: string }) {
+	try {
+		const result = await db.entities.admins.create(args).go()
+		return { success: true, data: result.data }
+	} catch (err) {
+		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` }
+
+		if (err.code === 4001)
+			// aws error, User already exists
+			return {
+				success: false,
+				error: 'User already exists',
+			}
+
+		// default
+		return {
+			success: false,
+			error: err.message,
+		}
+	}
+}
+
+export async function getAdminUserById(userId: string) {
+	try {
+		const result = await db.entities.admins.query.allAdmins({ userId }).go()
+		return result.data[0]
+	} catch {
+		return null
 	}
 }
 

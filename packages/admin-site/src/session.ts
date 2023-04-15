@@ -5,6 +5,7 @@ declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
 		user: {
 			userId: string
+			username: string
 		}
 	}
 }

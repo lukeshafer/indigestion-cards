@@ -1,21 +1,28 @@
 ---
 import Base from './Base.astro'
 import type { Session } from '@/session'
+import Hamburger from '@/components/Hamburger.astro'
+import { getAllPacks } from '@lil-indigestion-cards/core/card'
+import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro'
+import { Icon } from 'astro-icon'
 
 export interface Props {
 	title: string
 	class?: string
 	session: Session
+	breadcrumbs?: Path[]
 }
 
 const alert = Astro.url.searchParams.get('alert')
-const alertType = Astro.url.searchParams.get('alertType') ?? 'error'
+const alertType =
+	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error'
 const alertColor =
 	{
 		success: 'bg-green-200',
 		error: 'bg-red-200',
 	}[alertType] ?? 'bg-red-200'
 
+const currentPage = Astro.url.pathname
 const adminLinks = [
 	{ href: '/', title: 'Users' },
 	{ href: '/design', title: 'Designs' },
@@ -23,63 +30,146 @@ const adminLinks = [
 	{ href: '/rarities', title: 'Rarities' },
 ]
 
-const currentPage = Astro.url.pathname
+const packs = await getAllPacks()
 ---
 
 <Base title={Astro.props.title} session={Astro.props.session}>
-	<div class="page-layout grid h-screen">
-		<nav class="py-4 flex flex-col gap-8 text-white overflow-y-scroll h-screen max-h-max">
-			<button class="bg-transparent font-extrabold self-end text-shadow px-4">{'<'}</button>
-			<a
-				href="/"
-				title="Home"
-				class="flex flex-col text-center font-display text-white text-shadow">
-				<span class="italic text-3xl">indigestion</span>
-				<span class="text-2xl -mt-1">card studio</span>
-			</a>
-			<div class="flex-1 self-center">
+	<div class="page-layout grid h-[100svh]">
+		<side-nav>
+			<div class="toggle-btn self-end text-lg brand-shadow px-2 py-2">
+				<Hamburger />
+			</div>
+			<nav class="max-w-[16rem] pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
 				<a
-					href="/open-packs"
-					title="Open Packs"
-					class="open-packs my-10 text-4xl uppercase w-min text-center bg-brand-tertiary px-4 py-2 font-heading font-extrabold rounded-3xl relative text-shadow shine block">
-					Open Packs
+					href="/"
+					title="Home"
+					class="flex flex-col text-center font-display text-white text-shadow">
+					<span class="italic text-3xl">indigestion</span>
+					<span class="text-2xl -mt-1">card studio</span>
 				</a>
-			</div>
-			<div class="pb-8">
-				<h2 class="text-2xl font-heading text-[#a23791] font-medium my-3 p-1 px-6">
-					Administration
-				</h2>
-				{
-					adminLinks.map(({ href, title }) =>
-						currentPage === href ? (
-							<a
-								href={href}
-								title={title}
-								class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
-								{title}
-							</a>
-						) : (
-							<a
-								href={href}
-								title={title}
-								class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
-								{title}
-							</a>
+				<div class="flex-1 self-center">
+					<a
+						href="/open-packs"
+						title="Open Packs"
+						class="open-packs my-10 text-4xl uppercase w-min text-center bg-brand-tertiary px-4 py-2 font-heading font-extrabold rounded-3xl relative text-shadow shine block">
+						{
+							packs.length ? (
+								<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black">
+									{packs.length}
+								</span>
+							) : null
+						}
+						Open Packs
+					</a>
+				</div>
+				<div class="pb">
+					<h2 class="text-2xl font-heading text-[#a23791] font-medium my-3 p-1 px-6">
+						Administration
+					</h2>
+					{
+						adminLinks.map(({ href, title }) =>
+							currentPage === href ? (
+								<a
+									href={href}
+									title={title}
+									class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
+									{title}
+								</a>
+							) : (
+								<a
+									href={href}
+									title={title}
+									class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
+									{title}
+								</a>
+							)
 						)
-					)
-				}
-			</div>
-		</nav>
-		<main class={(Astro.props.class ?? '') + ' p-6 col-start-2 overflow-y-scroll'}>
-			{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
-			<slot />
-		</main>
+					}
+				</div>
+				<div class="px-4 py-2 flex items-center gap-3">
+					<a href="/config" title="Settings" class="w-max group brand-shadow">
+						<span class="visually-hidden">Settings</span>
+						<Icon
+							name="mdi:gear"
+							class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+						/>
+					</a>
+					<a
+						class="text-shadow font-display lowercase italic"
+						href="#"
+						title={Astro.props.session?.properties?.username}>
+						{Astro.props.session?.properties?.username}
+					</a>
+				</div>
+			</nav>
+		</side-nav>
+
+		<div>
+			<Breadcrumbs path={Astro.props.breadcrumbs ?? []} />
+			<main class={(Astro.props.class ?? '') + ' p-6 col-start-2 overflow-y-scroll'}>
+				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
+				<slot />
+			</main>
+		</div>
 	</div>
 </Base>
 
 <style>
 	.page-layout {
-		grid-template-columns: minmax(auto, 16rem) 1fr;
+		grid-template-columns: 16rem 1fr;
+	}
+
+	@media (max-width: 768px) {
+		.page-layout {
+			grid-template-columns: 1fr;
+		}
+
+		side-nav {
+			position: absolute !important;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			z-index: 1;
+			--isClosed: 1;
+			transform: translateX(calc(var(--isClosed) * -100%));
+			transition: transform 0.3s ease-in-out;
+		}
+
+		side-nav .toggle-btn {
+			--color: black;
+			--open-color: white;
+			--spacing: 0.3em;
+			--thickness: 0.3em;
+			--size: 1rem;
+			--width: 2em;
+			display: block;
+			transform: translateX(calc(var(--isClosed) * 100%));
+		}
+	}
+
+	main {
+		z-index: 0;
+	}
+
+	side-nav {
+		position: relative;
+	}
+
+	nav::-webkit-scrollbar {
+		display: none;
+	}
+
+	.toggle-btn {
+		display: none;
+		--text-value: calc(255 - 255 * var(--isClosed));
+		color: rgb(var(--text-value), var(--text-value), var(--text-value));
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 1;
+		background: transparent;
+		font-weight: 900;
+		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
 	}
 
 	nav {
@@ -87,8 +177,33 @@ const currentPage = Astro.url.pathname
 		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
 	}
 
+	.open-packs {
+		transition: scale 50ms ease-in-out;
+	}
+
 	.open-packs:hover {
-		transition: scale;
 		scale: 1.05;
 	}
 </style>
+
+<script>
+	class SideNav extends HTMLElement {
+		isClosed = true
+		constructor() {
+			super()
+		}
+
+		connectedCallback() {
+			const hamburgerButton = this.querySelector('.toggle-btn button') as HTMLButtonElement
+			const nav = this.querySelector('nav') as HTMLDivElement
+			hamburgerButton.addEventListener('click', () => {
+				this.isClosed = !this.isClosed
+				this.style.setProperty('--isClosed', `${+this.isClosed}`)
+				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`)
+				nav.setAttribute('aria-expanded', `${this.isClosed}`)
+			})
+		}
+	}
+
+	customElements.define('side-nav', SideNav)
+</script>

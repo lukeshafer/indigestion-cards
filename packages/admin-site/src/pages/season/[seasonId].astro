@@ -8,21 +8,31 @@ import { Api } from 'sst/node/api'
 import PostButton from '@/components/form/PostButton.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/')
+if (!user) return Astro.redirect('/public')
 
 const id = Astro.params.seasonId
 
 if (!id) {
-	throw new Error('No season id provided')
+	return Astro.redirect(`/season?alert=Season ID is required`)
 }
 
 const {
 	season: [season],
 	cardDesigns,
 } = await getSeasonAndDesignsBySeasonId(id)
+
+const breadcrumbs = [
+	{ label: 'Home', href: '/' },
+	{ label: 'Seasons', href: '/season' },
+	{ label: season!.seasonName, href: `/season/${id}` },
+]
 ---
 
-<Page title="Season" class="grid gap-4 text-center justify-center" session={user}>
+<Page
+	title={season!.seasonName}
+	class="grid gap-4 text-center justify-center"
+	session={user}
+	breadcrumbs={breadcrumbs}>
 	<H1>{season!.seasonName}</H1>
 	<p class="text-lg">Description: {season!.seasonDescription}</p>
 	<h2 class="text-xl pt-4">Cards:</h2>
