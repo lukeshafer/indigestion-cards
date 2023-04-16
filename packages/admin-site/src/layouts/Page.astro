@@ -34,7 +34,7 @@ const packs = await getAllPacks()
 ---
 
 <Base title={Astro.props.title} session={Astro.props.session}>
-	<div class="page-layout grid h-[100svh]">
+	<div class="page-layout grid h-[100svh] overflow-hidden">
 		<side-nav>
 			<nav class="max-w-[16rem] pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
 				<a
@@ -83,7 +83,7 @@ const packs = await getAllPacks()
 						)
 					}
 				</div>
-				<div class="px-4 py-2 flex items-center gap-3">
+				<div class="px-4 py-2 flex items-center gap-3 relative">
 					<a href="/config" title="Settings" class="w-max group brand-shadow">
 						<span class="visually-hidden">Settings</span>
 						<Icon
@@ -91,16 +91,20 @@ const packs = await getAllPacks()
 							class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
 						/>
 					</a>
-					<a
-						class="text-shadow font-display lowercase italic"
-						href="#"
+					<div class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
+						<a href="/auth/logout" title="Logout" class="block hover:bg-gray-100 p-3">
+							Logout
+						</a>
+					</div>
+					<button
+						class="user-button text-shadow font-display lowercase italic"
 						title={Astro.props.session?.properties?.username}>
 						{Astro.props.session?.properties?.username}
-					</a>
+					</button>
 				</div>
 			</nav>
 		</side-nav>
-		<div>
+		<div class="md:col-start-2 overflow-y-scroll">
 			<header class="text-white text-shadow flex relative">
 				<div data-for-side-nav class="toggle-btn text-lg brand-shadow px-2 py-2">
 					<Hamburger />
@@ -207,6 +211,12 @@ const packs = await getAllPacks()
 				this.style.setProperty('--isClosed', `${+this.isClosed}`)
 				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`)
 				nav.setAttribute('aria-expanded', `${this.isClosed}`)
+			})
+
+			const userMenu = this.querySelector('.user-menu') as HTMLDivElement
+			const userButton = this.querySelector('.user-button') as HTMLButtonElement
+			userButton.addEventListener('click', () => {
+				userMenu.classList.toggle('hidden')
 			})
 		}
 	}

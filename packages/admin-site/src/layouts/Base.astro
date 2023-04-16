@@ -21,7 +21,7 @@ interface Props {
 	<body>
 		{
 			Astro.props.session?.type !== 'user' ? (
-				<script> /*window.location.href = '/public' */ </script>
+				<script> window.location.href = '/public' </script>
 			) : (
 				<slot />
 			)

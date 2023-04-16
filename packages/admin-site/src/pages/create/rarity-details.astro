@@ -19,14 +19,14 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 
 const url = Api.api.url + '/create-rarity'
-const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/rarities`
+const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/rarity`
 ---
 
 <Page
 	title="Add Rarity Details"
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: '/rarities' },
+		{ label: 'Rarities', href: '/rarity' },
 		{ label: 'New Rarity', href: '/create/rarity' },
 		{ label: 'Details', href: '/create/rarity-details' },
 	]}

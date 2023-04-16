@@ -21,19 +21,19 @@ export const handler = ApiHandler(async () => {
 	if (result.success && result.data?.frameUrl) deleteS3ObjectByUrl(result.data.frameUrl)
 
 	const redirectUrl = (message: string) =>
-		(useHeader('referer') + 'rarities/' || '/') + '?alert=' + message
+		(useHeader('referer') + 'rarity' || '/') + '?alert=' + message
 
 	const name = useQueryParam('name') ?? rarityId
 
 	return result.success
 		? {
-			statusCode: 307,
-			headers: {
-				Location: redirectUrl(`Successfully deleted rarity ${name}&alertType=success`),
-			},
-		}
+				statusCode: 307,
+				headers: {
+					Location: redirectUrl(`Successfully deleted rarity ${name}&alertType=success`),
+				},
+		  }
 		: {
-			statusCode: 307,
-			headers: { Location: redirectUrl(result.error ?? '') },
-		}
+				statusCode: 307,
+				headers: { Location: redirectUrl(result.error ?? '') },
+		  }
 })
