@@ -1,0 +1,64 @@
+---
+import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
+import { getRarityById } from '@lil-indigestion-cards/core/card'
+import { Api } from 'sst/node/api'
+import PostButton from '@/components/form/PostButton.astro'
+import TradingCard from '@/components/TradingCard.astro'
+
+const user = useUser(Astro.cookies)
+if (!user) return Astro.redirect('/public')
+
+const { rarityId } = Astro.params
+
+if (!rarityId) {
+	return Astro.redirect(`/rarity?alert=Rarity Id is required`)
+}
+
+const rarity = await getRarityById({ rarityId })
+
+if (!rarity) {
+	return Astro.redirect(`/rarity?alert=Rarity Id is invalid`)
+}
+---
+
+<Page
+	title={rarity.rarityName}
+	class="grid gap-4 text-center justify-center"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Rarities', href: '/rarity' },
+		{ label: rarity.rarityName, href: `/rarity/${rarity.rarityId}` },
+	]}>
+	<h1 data-id={rarityId} class="page-heading">{rarity.rarityName}</h1>
+	<TradingCard>
+		<img src={rarity.frameUrl} width="200" alt="" />{' '}
+	</TradingCard>
+	<p class="text-lg">Default count: {rarity.defaultCount}</p>
+
+	<div class="flex flex-wrap gap-4">
+		<a
+			class="flex-1 font-bold py-2 px-4 shine transition-colors text-shadow uppercase bg-teal-200 cursor-pointer"
+			href="#">
+			Edit
+		</a>
+		<PostButton
+			class="flex-1"
+			url={`${Api.api.url}/delete-rarity/${rarity.rarityId}?name=${rarity.rarityName}`}
+			id={`delete-rarity-${rarityId}`}
+			label="Delete"
+			type="delete"
+		/>
+	</div>
+</Page>
+
+<script>
+	const rarityId = document.querySelector('h1')!.dataset.id
+	const form = document.getElementById(`delete-rarity-${rarityId}`) as HTMLFormElement
+
+	form.addEventListener('submit', async (e) => {
+		const confirmation = confirm('Are you sure you want to delete this rarity?')
+		if (!confirmation) e.preventDefault()
+	})
+</script>

@@ -18,12 +18,19 @@ const presigned = await createPresignedPost(s3, {
 	Fields: {
 		acl: 'public-read',
 		success_action_redirect: Astro.url.origin + '/create/rarity-details',
-		'x-amz-meta-test': 'test',
 	},
 })
 ---
 
-<Page title="Create new rarity" class="grid gap-4 justify-center" session={user}>
+<Page
+	title="Create new rarity"
+	class="grid gap-4"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Rarities', href: '/rarities' },
+		{ label: 'New Rarity', href: '/create/rarity' },
+	]}>
 	<H1>Create new rarity</H1>
 	<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
 		{
@@ -31,8 +38,10 @@ const presigned = await createPresignedPost(s3, {
 				<input type="hidden" name={key} value={value} />
 			))
 		}
-		<label for="file">Rarity Frame</label>
-		<input class="p-4 text-center" type="file" name="file" id="file" accept="image/png" />
-		<button class="bg-white p-4 mt-4 font-bold" type="submit">Upload</button>
+		<div class="input-group">
+			<label for="file">Please upload frame image for rarity</label>
+			<input type="file" name="file" id="file" accept="image/png" required />
+		</div>
+		<button type="submit">Upload</button>
 	</Form>
 </Page>

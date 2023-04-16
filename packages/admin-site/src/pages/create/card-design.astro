@@ -23,23 +23,33 @@ const presigned = await createPresignedPost(s3, {
 })
 ---
 
-<Page title="Create New Card" class="grid gap-4 justify-center" session={user}>
+<Page
+	title="Create New Card"
+	class="grid gap-4"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Designs', href: '/design' },
+		{ label: 'New Card', href: '/create/card-design' },
+	]}>
 	<H1>Create New Card</H1>
-	<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
+	<Form method="post" action={presigned.url} enctype="multipart/form-data">
 		{
 			Object.entries(presigned.fields).map(([key, value]) => (
 				<input type="hidden" name={key} value={value} />
 			))
 		}
-		<label for="file">Card Image</label>
-		<input class="p-4 text-center" type="file" name="file" id="file" accept="image/jpeg" />
-		<button class="bg-white p-4 mt-4 font-bold" type="submit">Upload</button>
+		<div class="input-group">
+			<label data-for="file" for="file">Please upload the card image</label>
+			<input type="file" name="file" id="file" accept="image/jpeg" required />
+		</div>
+		<button type="submit">Upload</button>
 	</Form>
 </Page>
 
 <style>
-	input {
-		display: block;
-		outline: 1px solid #000;
-	}
+	/*input {*/
+		/*display: block;*/
+		/*outline: 1px solid #000;*/
+	/*}*/
 </style>

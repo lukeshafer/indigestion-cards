@@ -14,18 +14,20 @@ const message = Astro.url.searchParams.get('message') || ''
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'All Cards', href: '/all-cards' },
+	{ label: 'Designs', href: '/all-cards' },
 ]
 ---
 
 <Page title="All Cards" class="flex flex-col gap-4" session={user} breadcrumbs={breadcrumbs}>
 	{message ? <p class="text-xl text-center p-4 bg-green-200">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
-	<H1>All Card Designs</H1>
-	<a
-		href="/create/card-design"
-		class="text-lg bg-brand-tertiary p-1 px-4 rounded-xl text-center w-max self-center font-display lowercase italic shine pt-2 text-shadow text-white">
-		New Design
-	</a>
+	<div class="flex flex-wrap gap-8">
+		<H1>All Card Designs</H1>
+		<a
+			href="/create/card-design"
+			class="text-xl bg-brand-tertiary p-3 px-4 text-center w-max font-display lowercase italic shine pt-4 text-shadow text-white">
+			Create New Design
+		</a>
+	</div>
 	<CardList cards={designs} />
 </Page>

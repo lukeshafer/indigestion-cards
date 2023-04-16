@@ -27,7 +27,7 @@ const adminLinks = [
 	{ href: '/', title: 'Users' },
 	{ href: '/design', title: 'Designs' },
 	{ href: '/season', title: 'Seasons' },
-	{ href: '/rarities', title: 'Rarities' },
+	{ href: '/rarity', title: 'Rarities' },
 ]
 
 const packs = await getAllPacks()
@@ -36,9 +36,6 @@ const packs = await getAllPacks()
 <Base title={Astro.props.title} session={Astro.props.session}>
 	<div class="page-layout grid h-[100svh]">
 		<side-nav>
-			<div class="toggle-btn self-end text-lg brand-shadow px-2 py-2">
-				<Hamburger />
-			</div>
 			<nav class="max-w-[16rem] pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
 				<a
 					href="/"
@@ -103,9 +100,13 @@ const packs = await getAllPacks()
 				</div>
 			</nav>
 		</side-nav>
-
 		<div>
-			<Breadcrumbs path={Astro.props.breadcrumbs ?? []} />
+			<header class="text-white text-shadow flex relative">
+				<div data-for-side-nav class="toggle-btn text-lg brand-shadow px-2 py-2">
+					<Hamburger />
+				</div>
+				<Breadcrumbs path={Astro.props.breadcrumbs ?? []} />
+			</header>
 			<main class={(Astro.props.class ?? '') + ' p-6 col-start-2 overflow-y-scroll'}>
 				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 				<slot />
@@ -119,32 +120,26 @@ const packs = await getAllPacks()
 		grid-template-columns: 16rem 1fr;
 	}
 
-	@media (max-width: 768px) {
-		.page-layout {
-			grid-template-columns: 1fr;
-		}
+	header {
+		background-color: var(--color-main-dark);
+	}
 
-		side-nav {
-			position: absolute !important;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			z-index: 1;
-			--isClosed: 1;
-			transform: translateX(calc(var(--isClosed) * -100%));
-			transition: transform 0.3s ease-in-out;
-		}
-
-		side-nav .toggle-btn {
-			--color: black;
-			--open-color: white;
-			--spacing: 0.3em;
-			--thickness: 0.3em;
-			--size: 1rem;
-			--width: 2em;
-			display: block;
-			transform: translateX(calc(var(--isClosed) * 100%));
-		}
+	.toggle-btn {
+		display: none;
+		--color: white;
+		--open-color: white;
+		--spacing: 0.34em;
+		--thickness: 0.16em;
+		--size: 1rem;
+		--width: 1.3em;
+		--text-value: calc(255 - 255 * var(--isClosed));
+		padding-left: 1rem;
+		color: rgb(var(--text-value), var(--text-value), var(--text-value));
+		z-index: 1;
+		background: transparent;
+		font-weight: 900;
+		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+		align-self: center;
 	}
 
 	main {
@@ -159,19 +154,6 @@ const packs = await getAllPacks()
 		display: none;
 	}
 
-	.toggle-btn {
-		display: none;
-		--text-value: calc(255 - 255 * var(--isClosed));
-		color: rgb(var(--text-value), var(--text-value), var(--text-value));
-		position: absolute;
-		top: 0;
-		right: 0;
-		z-index: 1;
-		background: transparent;
-		font-weight: 900;
-		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
-	}
-
 	nav {
 		/* to bottom right */
 		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
@@ -184,6 +166,28 @@ const packs = await getAllPacks()
 	.open-packs:hover {
 		scale: 1.05;
 	}
+
+	@media (max-width: 768px) {
+		.page-layout {
+			grid-template-columns: 1fr;
+		}
+
+		side-nav {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			z-index: 1;
+			--isClosed: 1;
+			transform: translateX(calc(var(--isClosed) * -100%));
+			transition: transform 0.3s ease-in-out;
+		}
+
+		.toggle-btn {
+			display: block;
+			transform: translateX(calc(var(--isClosed) * 100%));
+		}
+	}
 </style>
 
 <script>
@@ -194,7 +198,9 @@ const packs = await getAllPacks()
 		}
 
 		connectedCallback() {
-			const hamburgerButton = this.querySelector('.toggle-btn button') as HTMLButtonElement
+			const hamburgerButton = document.querySelector(
+				'[data-for-side-nav] button'
+			) as HTMLButtonElement
 			const nav = this.querySelector('nav') as HTMLDivElement
 			hamburgerButton.addEventListener('click', () => {
 				this.isClosed = !this.isClosed

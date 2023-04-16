@@ -449,6 +449,10 @@ const rarities = new Entity(
 				type: 'string',
 				required: true,
 			},
+			defaultCount: {
+				type: 'number',
+				required: true,
+			},
 		},
 		indexes: {
 			allRarities: {

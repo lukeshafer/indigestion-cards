@@ -7,8 +7,6 @@ interface Props {
 	title: string
 	session: Session
 }
-
-console.log(Astro.props.session)
 ---
 
 <html lang="en">
@@ -21,7 +19,6 @@ console.log(Astro.props.session)
 		<title>{Astro.props.title}</title>
 	</head>
 	<body>
-		<slot />
 		{
 			Astro.props.session?.type !== 'user' ? (
 				<script> /*window.location.href = '/public' */ </script>

@@ -4,15 +4,27 @@ interface Props {
 	id: string
 	label: string
 	class?: string
+	type?: 'submit' | 'delete'
+	hiddenProperties?: {
+		name: string
+		value: string
+	}[]
 }
+
+const { url, id, label, class: className, type = 'submit', hiddenProperties = [] } = Astro.props
 ---
 
-<form id={Astro.props.id} action={Astro.props.url} method="post">
+<form id={id} action={url} method="post">
+	{hiddenProperties.map(({ name, value }) => <input type="hidden" name={name} value={value} />)}
 	<button
 		type="submit"
-		class="font-bold py-2 px-4"
-		class:list={[Astro.props.class || 'bg-sky-500 hover:bg-sky-700 text-black hover:text-white']}
+		class="font-bold py-2 px-4 shine transition-colors text-shadow uppercase"
+		class:list={{
+			[className ?? '']: true,
+			'bg-red-500 hover:bg-red-700 text-white': type === 'delete',
+			'bg-brand-tertiary hover:bg-brand-secondary text-white': type === 'submit',
+		}}
 		id="delete-design">
-		{Astro.props.label}
+		{label}
 	</button>
 </form>

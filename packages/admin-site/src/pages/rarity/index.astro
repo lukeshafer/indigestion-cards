@@ -1,10 +1,8 @@
 ---
-import { Api } from 'sst/node/api'
 import { getAllRarities } from '@lil-indigestion-cards/core/card'
 import { useUser } from '@/session'
 import Page from '@/layouts/Page.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
-import PostButton from '@/components/form/PostButton.astro'
 import TradingCard from '@/components/TradingCard.astro'
 
 const user = useUser(Astro.cookies)
@@ -13,7 +11,14 @@ if (!user) return Astro.redirect('/public')
 const rarities = await getAllRarities()
 ---
 
-<Page title="Rarities" class="flex flex-col gap-4" session={user}>
+<Page
+	title="Rarities"
+	class="flex flex-col gap-4"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Rarities', href: '/rarity' },
+	]}>
 	<UnmatchedImageList type="frame" />
 	<div class="flex flex-wrap gap-8">
 		<h1 class="page-heading">Rarities</h1>
@@ -23,22 +28,13 @@ const rarities = await getAllRarities()
 		{
 			rarities.map(({ rarityName, rarityId, frameUrl, defaultCount }) => (
 				<li class="flex gap-4 flex-col items-center w-max">
-					<TradingCard>
-						<img src={frameUrl} width="200" alt="" />{' '}
-					</TradingCard>
-					<h2 class="mt-4 font-display font-bold italic text-2xl">{rarityName}</h2>
+					<a href={`/rarity/${rarityId}`} class="text-center">
+						<TradingCard>
+							<img src={frameUrl} width="200" alt="" />{' '}
+						</TradingCard>
+						<h2 class="mt-4 font-display font-bold italic text-2xl">{rarityName}</h2>
+					</a>
 					<p>Default Count: {defaultCount}</p>
-					<div class="flex flex-wrap gap-4">
-						<a class="font-bold py-2 px-4 shine transition-colors text-shadow uppercase bg-teal-200 cursor-pointer" href="#">
-							Edit
-						</a>
-						<PostButton
-							url={`${Api.api.url}/delete-rarity/${rarityId}?name=${rarityName}`}
-							id={`delete-rarity-${rarityId}`}
-							label="Delete"
-							type="delete"
-						/>
-					</div>
 				</li>
 			))
 		}

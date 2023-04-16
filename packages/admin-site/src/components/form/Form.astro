@@ -4,41 +4,196 @@ type Props = HTMLAttributes<'form'>
 const { class: className, action, method, ...attrs } = Astro.props
 
 export const inputClasses = {
-	input: 'block w-3/5 px-2 py-1',
-	inputWrapper: 'flex gap-3 justify-end w-full',
-	get readOnly() {
-		return inputClasses.input + ' bg-gray-200'
-	},
-	select: 'block w-3/5 bg-white px-2 py-1',
-	fieldset: 'border border-gray-300 p-4 w-full grid gap-8',
-	button: 'bg-sky-100 px-4 py-2  bg-white w-1/2',
-	get submit() {
-		return inputClasses.button + ' font-bold mt-4'
-	},
+	input: '',
+	inputWrapper: '',
+	readOnly: '',
+	select: '',
+	fieldset: '',
+	button: '',
+	submit: '',
 }
 ---
 
-<my-form>
-	<div class={`relative p-4 bg-sky-200 rounded-2xl ${className ?? ''}`}>
-		<form
-			method={method ?? 'post'}
-			action={action}
-			{...attrs}
-			class="bg-sky-200 grid grid-cols-1 justify-center justify-items-center gap-8 p-4 text-xl w-full">
-			<slot />
-		</form>
-		<div
-			aria-hidden="true"
-			data-loading-spinner
-			class="absolute inset-0 h-full w-full justify-center items-center"
-			style={{
-				display: 'none',
-			}}>
-			<div class="bg-white w-24 h-24 rounded-full border-8 border-black border-dotted spin"></div>
-			<span class="absolute absolute-center">Loading</span>
-		</div>
+<my-form class={`relative w-full ${className ?? ''}`}>
+	<form
+		method={method ?? 'post'}
+		action={action}
+		{...attrs}
+		class="flex flex-col items-start gap-6 text-xl w-full">
+		<slot />
+	</form>
+	<div
+		aria-hidden="true"
+		data-loading-spinner
+		class="absolute flex flex-col inset-0 h-full w-full justify-center items-center"
+		style={{
+			display: 'none',
+		}}>
+		<img src="/lilindPB.gif" />
+		<span class="loading-text text-left">Saving</span>
 	</div>
 </my-form>
+
+<style is:global>
+	@keyframes loading-elipses {
+		0% {
+			content: '';
+		}
+		25% {
+			content: '.';
+		}
+		50% {
+			content: '..';
+		}
+		75% {
+			content: '...';
+		}
+		100% {
+			content: '';
+		}
+	}
+
+	.loading-text::after {
+		position: absolute;
+		animation: loading-elipses 3s infinite;
+		content: '';
+	}
+
+	my-form input,
+	my-form textarea,
+	my-form select {
+		display: block;
+		width: 100%;
+		padding: 0.5rem 0.5rem;
+		background-color: #fff;
+	}
+
+	my-form input[readonly] {
+		background-color: #eee;
+	}
+
+	my-form div button.edit-button {
+		position: absolute;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: none;
+		border: none;
+		opacity: 0.5;
+		color: black;
+	}
+
+	my-form div button.edit-button:hover {
+		background: none;
+		opacity: 1;
+	}
+
+	my-form textarea {
+		height: 100px;
+	}
+
+	my-form
+		:where(
+			input[type='text'],
+			input[type='email'],
+			input[type='password'],
+			input[type='number'],
+			select,
+			textarea,
+			input:not(input[type])
+		) {
+		outline: 1px solid #ccc;
+	}
+
+	my-form label {
+		display: block;
+		font-weight: 600;
+		font-family: var(--font-heading);
+	}
+
+	my-form fieldset label {
+		display: inline-block;
+		font-size: 0.9em;
+		font-weight: 500;
+	}
+
+	my-form input[type='file'] {
+		display: flex;
+		flex-direction: column;
+		font-family: var(--font-heading);
+		padding-inline: 0;
+	}
+
+	my-form input[type='file'] + img.preview {
+		max-width: 20rem;
+		object-fit: contain;
+		margin: 0;
+	}
+
+	my-form input::file-selector-button {
+		@apply shine font-medium font-heading p-2 text-shadow;
+		margin-bottom: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+		content: 'Choose a file';
+	}
+
+	my-form input::file-selector-button:hover {
+		background: var(--color-secondary);
+	}
+
+	my-form .input-group {
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+		width: 100%;
+	}
+
+	my-form :is(button, input[type='button'], input[type='submit']) {
+		@apply shine font-medium font-heading p-2 text-shadow;
+		margin-bottom: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+	}
+
+	my-form
+		:is(
+			button:hover,
+			input[type='button']:hover,
+			input[type='submit']:hover,
+			button[type='submit']:hover
+		) {
+		background-color: var(--color-secondary);
+	}
+
+	my-form :is(button[type='submit'], input[type='submit']) {
+		font-weight: 700;
+		text-transform: uppercase;
+		background-color: var(--color-tertiary);
+	}
+
+	my-form fieldset {
+		/*fieldset: 'border border-gray-300 p-4 w-full grid gap-8',*/
+		border: 1px solid #ccc;
+		padding: 1rem;
+		width: 100%;
+		display: grid;
+		gap: 1rem;
+	}
+
+	my-form legend {
+		font-weight: 600;
+		font-size: 1.2rem;
+	}
+</style>
 
 <script>
 	class MyForm extends HTMLElement {
@@ -75,9 +230,54 @@ export const inputClasses = {
 				const idInput = this.querySelector(`[name="${bindId}"]`) as HTMLInputElement | null
 				if (!idInput) return
 
-				idInput.addEventListener('input', () => {
+				idInput.addEventListener('change', () => {
 					input.value = idInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-')
 				})
+			})
+
+			const fileInputs = this.querySelectorAll('input[type="file"]')
+			fileInputs.forEach((input) => {
+				if (!(input instanceof HTMLInputElement)) return
+				const preview = document.createElement('img')
+				preview.classList.add('preview')
+				input.after(preview)
+
+				const addPreview = () => {
+					const file = input.files?.[0]
+					if (!file || !file.type.startsWith('image/')) {
+						preview.src = ''
+						return
+					}
+					preview.src = URL.createObjectURL(file)
+				}
+
+				addPreview()
+				input.addEventListener('change', addPreview)
+			})
+
+			const readonlyWithEditButton = this.querySelectorAll('[data-edit-button]')
+
+			readonlyWithEditButton.forEach((input) => {
+				if (!(input instanceof HTMLInputElement)) return
+
+				const wrapper = document.createElement('div')
+				wrapper.style.position = 'relative'
+				wrapper.style.width = '100%'
+				input.after(wrapper)
+				wrapper.append(input)
+
+				const editButton = document.createElement('button')
+				editButton.textContent = 'Edit'
+				editButton.classList.add('edit-button')
+
+				editButton.addEventListener('click', (e) => {
+					e.preventDefault()
+					if (!input.readOnly) return
+					input.readOnly = false
+					input.focus()
+					editButton.style.display = 'none'
+				})
+				wrapper.append(editButton)
 			})
 		}
 	}
