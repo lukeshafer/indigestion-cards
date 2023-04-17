@@ -1,38 +1,93 @@
 import { db } from './db'
-import { EntityRecord, CreateEntityItem, ElectroError } from 'electrodb'
+import { EntityRecord, CreateEntityItem, ElectroError, EntityItem } from 'electrodb'
 import { createPack } from './card'
+import { getUserByLogin } from './twitch-helpers'
 
 type User = typeof db.entities.users
 
 export async function getUser(userId: string) {
-	const user = await db.entities.users.query.byUserId({ userId }).go()
-	return user
+	const user = await db.entities.users.get({ userId }).go()
+	return user.data
 }
 
 export async function getUserByUserName(username: string) {
-	const user = await db.entities.users.query.byUsername({ username }).go()
-	return user
+	try {
+		const user = await db.entities.users.query.byUsername({ username }).go()
+		return user.data[0] ?? null
+	} catch {
+		return null
+	}
 }
 
-async function putUser(user: CreateEntityItem<User>) {
-	const result = await db.entities.users.create(user).go()
-	return result
+export async function getAllUsers() {
+	try {
+		const users = await db.entities.users.query.byId({}).go()
+		return users.data ?? []
+	} catch {
+		return []
+	}
 }
 
-export async function createNewUser(user: CreateEntityItem<User>) {
-	if (await checkIfUsernameExists(user.username)) {
-		// TODO: update existing username, as they likely changed their username
+export async function createNewUser(args: CreateEntityItem<User>) {
+	const existingUser = await getUserByUserName(args.username)
+	if (existingUser && existingUser.username === args.username) {
+		const twitchData = await getUserByLogin(args.username)
+		if (twitchData.login === args.username) {
+			// we cannot update the username, as it is still taken
+			throw new Error(`Username ${args.username} is taken`)
+		}
+		const result = await updateUsername({
+			userId: existingUser.userId,
+			newUsername: twitchData.login,
+			oldUsername: existingUser.username,
+		})
 	}
 
-	const result = await putUser(user)
+	const result = await db.entities.users.create(args).go()
+	return result.data
+}
+
+export async function updateUsername(
+	args: { userId: string; newUsername: string; oldUsername: string },
+	iteration = 0
+) {
+	if (iteration > 10) throw new Error('Too many iterations')
+	console.log(
+		`Updating username for ${args.userId} to ${args.newUsername} from ${args.oldUsername}`
+	)
+	const existingUser = await getUserByUserName(args.newUsername)
+	if (existingUser && existingUser.username === args.newUsername) {
+		console.log(`Username ${args.newUsername} is taken, updating`)
+		// username is taken in our database, and is likely out of date
+		const twitchData = await getUserByLogin(args.newUsername)
+		if (twitchData.login === args.newUsername) {
+			// we cannot update the username, as it is still taken
+			throw new Error(`Username ${args.newUsername} is still taken`)
+		}
+		// we can update the username, as it is no longer taken
+		const result = await updateUsername(
+			{
+				userId: existingUser.userId,
+				newUsername: twitchData.login,
+				oldUsername: existingUser.username,
+			},
+			iteration + 1
+		)
+	}
+
+	const result = await db.entities.users
+		.patch({ userId: args.userId })
+		.set({ username: args.newUsername })
+		.go()
+	return result.data
 }
 
 export async function checkIfUserExists(userId: string): Promise<boolean> {
 	return getUser(userId).then((user) => !!user)
 }
 
-export async function checkIfUsernameExists(userName: string): Promise<boolean> {
-	return getUserByUserName(userName).then((user) => !!user)
+export async function checkIfUsernameExists(userName: string) {
+	return getUserByUserName(userName)
 }
 
 export async function addUnopenedPacks(args: {
@@ -40,6 +95,7 @@ export async function addUnopenedPacks(args: {
 	username: string
 	packCount: number
 }) {
+	console.log('addUnopenedPacks', args)
 	for (let i = 0; i < args.packCount; i++) {
 		await createPack({
 			username: args.username,
@@ -88,5 +144,5 @@ function getDefaultCardCountInPack() {
 
 function getCurrentSeasonId() {
 	// TODO: implement this properly with database
-	return 'base'
+	return 'season-1'
 }

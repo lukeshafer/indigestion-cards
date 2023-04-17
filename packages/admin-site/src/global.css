@@ -112,6 +112,10 @@
 		text-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
 	}
 
+	.no-text-shadow {
+		text-shadow: none;
+	}
+
 	.brand-shadow {
 		filter: drop-shadow(0.08rem 0.08rem 0 rgb(0 0 0 / 18%));
 	}

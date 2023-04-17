@@ -14,31 +14,35 @@ const url = Api.api.url + '/create-card-season'
 
 <Page
 	title="Create New Season"
-	class="grid justify-center justify-items-center grid-cols-1"
-	session={user}>
-	<h1 class="text-3xl p-8">Create New Season</h1>
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Seasons', href: '/season' },
+		{ label: 'New Season', href: '/create/season' },
+	]}>
+	<h1 class="page-heading">Create New Season</h1>
 
-	<div class="bg-sky-100 p-8 rounded-3xl w-full max-w-xl">
-		<Form action={url}>
-			<InputBase label="Season Name" id="name">
-				<input id="name" name="name" type="text" class={inputClasses.input} />
-			</InputBase>
-			<InputBase label="Season ID" id="seasonId">
-				<input
-					id="seasonId"
-					name="seasonId"
-					type="text"
-					data-id-from="name"
-					class={inputClasses.input}
-					pattern="[a-z0-9-]+"
-				/>
-			</InputBase>
-			<InputBase label="Description" id="description">
-				<input type="text" id="description" name="description" class={inputClasses.input} />
-			</InputBase>
-			<button class={inputClasses.submit}>Create</button>
-		</Form>
-	</div>
+	<Form action={url}>
+		<InputBase label="Season Name" id="name">
+			<input id="name" name="name" type="text" class={inputClasses.input} />
+		</InputBase>
+		<InputBase label="Season ID" id="seasonId">
+			<input
+				id="seasonId"
+				name="seasonId"
+				type="text"
+				data-id-from="name"
+				data-edit-button
+				readonly
+				class={inputClasses.input}
+				pattern="[a-z0-9-]+"
+			/>
+		</InputBase>
+		<InputBase label="Description" id="description">
+			<input type="text" id="description" name="description" class={inputClasses.input} />
+		</InputBase>
+		<button class={inputClasses.submit}>Create</button>
+	</Form>
 </Page>
 
 <script></script>

@@ -16,7 +16,7 @@ const { props } = Astro
 					href={`/design/${seasonId}/${designId}`}
 					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
 					class:list={{ 'bg-gray-200': index % 2 === 0, 'bg-white': index % 2 === 1 }}>
-					<TradingCard shiny={index % 2 === 0}>
+					<TradingCard>
 						<img src={imgUrl} width="300" alt={`${cardName} image`} />
 					</TradingCard>
 					<h2 class="mt-4 font-display font-bold italic text-2xl">{cardName}</h2>

@@ -1,0 +1,30 @@
+---
+import Form from '@/components/form/Form.astro'
+import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
+import { Api } from 'sst/node/api'
+
+const user = useUser(Astro.cookies)
+if (!user) {
+	Astro.redirect('/public')
+}
+
+const apiUrl = Api.api.url + '/give-pack-to-user'
+---
+
+<Page
+	title="Give Pack"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Give Pack', href: '/give-pack' },
+	]}>
+	<h1 class="page-heading">Give Pack</h1>
+	<Form action={apiUrl}>
+		<div class="input-group">
+			<label for="username">Username</label>
+			<input type="text" name="username" id="username" required />
+		</div>
+		<button type="submit">Give</button>
+	</Form>
+</Page>

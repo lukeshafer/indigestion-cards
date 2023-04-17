@@ -1,4 +1,4 @@
-import { ApiHandler, useQueryParams } from 'sst/node/api'
+import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
 import { EventBus } from 'sst/node/event-bus'
 import { EventBridge } from 'aws-sdk'
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
@@ -14,9 +14,11 @@ export const handler = ApiHandler(async () => {
 
 	const eventBridge = new EventBridge()
 
-	const { userName, userId: paramUserId, count: rawCount } = useQueryParams()
-	if (!userName) return { statusCode: 400, body: 'Missing user id or user name' }
-	const userId = paramUserId ?? (await getUserByLogin(userName)).id
+	const username = useFormValue('username')
+	const rawCount = useFormValue('count')
+	const paramUserId = useFormValue('userId')
+	if (!username) return { statusCode: 400, body: 'Missing user id or user name' }
+	const userId = paramUserId ?? (await getUserByLogin(username)).id
 
 	const count = Number(rawCount) || 1
 
@@ -29,7 +31,7 @@ export const handler = ApiHandler(async () => {
 						DetailType: 'give-pack-to-user',
 						Detail: JSON.stringify({
 							userId: userId,
-							username: userName,
+							username,
 							packCount: count,
 						}),
 						EventBusName: EventBus.eventBus.eventBusName,
@@ -40,4 +42,7 @@ export const handler = ApiHandler(async () => {
 	} catch (error) {
 		return { statusCode: 500, body: error?.message }
 	}
+
+	const redirectUrl = useHeader('referer') + '?alert=success'
+	return { statusCode: 302, headers: { Location: redirectUrl } }
 })

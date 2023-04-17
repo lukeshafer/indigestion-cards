@@ -37,11 +37,11 @@ export const handler = ApiHandler(async () => {
 		await deleteUnmatchedDesignImage(imageKey!)
 	}
 
-	const redirect = (useHeader('referer') ?? '/') + `rarities`
+	const redirect = (useHeader('referer') ?? '/') + `rarity`
 
 	return result.success
 		? { statusCode: 307, headers: { Location: redirect } }
 		: result.error === 'Rarity already exists'
-			? { statusCode: 409, body: 'Error: ' + result.error }
-			: { statusCode: 500, body: 'Error: ' + result.error }
+		? { statusCode: 409, body: 'Error: ' + result.error }
+		: { statusCode: 500, body: 'Error: ' + result.error }
 })

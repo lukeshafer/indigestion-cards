@@ -24,19 +24,25 @@ const alertColor =
 
 const currentPage = Astro.url.pathname
 const adminLinks = [
-	{ href: '/', title: 'Users' },
+	{ href: '/user', title: 'Users' },
 	{ href: '/design', title: 'Designs' },
 	{ href: '/season', title: 'Seasons' },
 	{ href: '/rarity', title: 'Rarities' },
 ]
 
 const packs = await getAllPacks()
+
+const actionLinks = [
+	{ href: '/open-packs', title: 'Open Packs', id: 'open-packs', count: packs.length },
+	{ href: '/give-pack', title: 'Give Pack', id: 'give-pack' },
+	{ href: '/give-card', title: 'Give Card', id: 'give-card' },
+]
 ---
 
 <Base title={Astro.props.title} session={Astro.props.session}>
 	<div class="page-layout grid h-[100svh] overflow-hidden">
-		<side-nav>
-			<nav class="max-w-[16rem] pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
+		<side-nav class="overflow-y-scroll">
+			<nav class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
 				<a
 					href="/"
 					title="Home"
@@ -44,23 +50,25 @@ const packs = await getAllPacks()
 					<span class="italic text-3xl">indigestion</span>
 					<span class="text-2xl -mt-1">card studio</span>
 				</a>
-				<div class="flex-1 self-center">
-					<a
-						href="/open-packs"
-						title="Open Packs"
-						class="open-packs my-10 text-4xl uppercase w-min text-center bg-brand-tertiary px-4 py-2 font-heading font-extrabold rounded-3xl relative text-shadow shine block">
-						{
-							packs.length ? (
-								<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black">
-									{packs.length}
-								</span>
-							) : null
-						}
-						Open Packs
-					</a>
+				<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
+					{
+						actionLinks.map((actionLink) => (
+							<a
+								href={actionLink.href}
+								title={actionLink.title}
+								class="action-link shine text-shadow">
+								{actionLink.count ? (
+									<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
+										{packs.length}
+									</span>
+								) : null}
+								{actionLink.title}
+							</a>
+						))
+					}
 				</div>
 				<div class="pb">
-					<h2 class="text-2xl font-heading text-[#a23791] font-medium my-3 p-1 px-6">
+					<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
 						Administration
 					</h2>
 					{
@@ -91,10 +99,9 @@ const packs = await getAllPacks()
 							class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
 						/>
 					</a>
-					<div class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
-						<a href="/auth/logout" title="Logout" class="block hover:bg-gray-100 p-3">
-							Logout
-						</a>
+					<div
+						class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
+						<a href="/auth/logout" title="Logout" class="block hover:bg-gray-100 p-3"> Logout</a>
 					</div>
 					<button
 						class="user-button text-shadow font-display lowercase italic"
@@ -104,14 +111,14 @@ const packs = await getAllPacks()
 				</div>
 			</nav>
 		</side-nav>
-		<div class="md:col-start-2 overflow-y-scroll">
-			<header class="text-white text-shadow flex relative">
-				<div data-for-side-nav class="toggle-btn text-lg brand-shadow px-2 py-2">
+		<div class="md:col-start-2 overflow-y-scroll relative">
+			<header class="text-white text-shadow flex sticky top-0 z-10 h-14">
+				<div data-for-side-nav class="toggle-btn text-lg brand-shadow px-2 py-2 z-100">
 					<Hamburger />
 				</div>
 				<Breadcrumbs path={Astro.props.breadcrumbs ?? []} />
 			</header>
-			<main class={(Astro.props.class ?? '') + ' p-6 col-start-2 overflow-y-scroll'}>
+			<main class={(Astro.props.class ?? '') + ' p-6 col-start-2'}>
 				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 				<slot />
 			</main>
@@ -163,11 +170,22 @@ const packs = await getAllPacks()
 		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
 	}
 
-	.open-packs {
+	.action-link {
+		font-size: 2.25rem /* 36px */;
+		line-height: 2.5rem /* 40px */;
+		text-transform: uppercase;
+		display: block;
+		text-align: center;
+		background-color: var(--color-tertiary);
+		padding: 0.5rem 1rem;
+		font-family: var(--font-heading);
+		font-weight: 800;
+		border-radius: 1rem;
+		position: relative;
 		transition: scale 50ms ease-in-out;
 	}
 
-	.open-packs:hover {
+	.action-link:hover {
 		scale: 1.05;
 	}
 

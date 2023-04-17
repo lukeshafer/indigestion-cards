@@ -275,17 +275,26 @@ const users = new Entity(
 				type: 'string',
 				required: true,
 			},
+			cardCount: {
+				type: 'number',
+				required: true,
+				default: 0,
+			},
+			packCount: {
+				type: 'number',
+				required: true,
+				default: 0,
+			},
 		},
 		indexes: {
-			byUserId: {
-				collection: 'cardsByOwner',
+			byId: {
 				pk: {
 					field: 'pk',
-					composite: ['userId'],
+					composite: [],
 				},
 				sk: {
 					field: 'sk',
-					composite: [],
+					composite: ['userId'],
 				},
 			},
 			byUsername: {

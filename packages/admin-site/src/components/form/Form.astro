@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
 type Props = HTMLAttributes<'form'>
-const { class: className, action, method, ...attrs } = Astro.props
+const { class: className = "", action, method, ...attrs } = Astro.props
 
 export const inputClasses = {
 	input: '',
@@ -14,23 +14,24 @@ export const inputClasses = {
 }
 ---
 
-<my-form class={`relative w-full ${className ?? ''}`}>
-	<form
-		method={method ?? 'post'}
-		action={action}
-		{...attrs}
-		class="flex flex-col items-start gap-6 text-xl w-full">
+<my-form class={className}>
+	<div class="relative">
+		<form
+			method={method ?? 'post'}
+			action={action}
+			{...attrs}
+			class="flex flex-col items-start gap-6 text-xl w-full">
 		<slot />
-	</form>
-	<div
-		aria-hidden="true"
-		data-loading-spinner
-		class="absolute flex flex-col inset-0 h-full w-full justify-center items-center"
-		style={{
+		</form>
+		<div
+			aria-hidden="true"
+			data-loading-spinner
+			style={{
 			display: 'none',
-		}}>
-		<img src="/lilindPB.gif" />
-		<span class="loading-text text-left">Saving</span>
+			}}>
+			<img src="/lilindPB.gif" />
+			<span class="loading-text text-left">Saving</span>
+		</div>
 	</div>
 </my-form>
 
@@ -53,10 +54,20 @@ export const inputClasses = {
 		}
 	}
 
-	.loading-text::after {
+	my-form .loading-text::after {
 		position: absolute;
 		animation: loading-elipses 3s infinite;
 		content: '';
+	}
+
+	my-form [data-loading-spinner] {
+		position: absolute;
+		flex-direction: column;
+		inset: 0;
+		height: 100%;
+		width: 100%;
+		justify-content: center;
+		align-items: center;
 	}
 
 	my-form input,
@@ -131,7 +142,7 @@ export const inputClasses = {
 	}
 
 	my-form input::file-selector-button {
-		@apply shine font-medium font-heading p-2 text-shadow;
+		@apply font-medium font-heading p-2 text-shadow;
 		margin-bottom: 0.5rem;
 		display: block;
 		border: 1px solid #ccc;
@@ -154,7 +165,7 @@ export const inputClasses = {
 	}
 
 	my-form :is(button, input[type='button'], input[type='submit']) {
-		@apply shine font-medium font-heading p-2 text-shadow;
+		@apply font-medium font-heading p-2 text-shadow;
 		margin-bottom: 0.5rem;
 		display: block;
 		border: 1px solid #ccc;
