@@ -163,6 +163,18 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
+			cardName: {
+				type: 'string',
+				required: true,
+			},
+			cardDescription: {
+				type: 'string',
+				required: true,
+			},
+			imgUrl: {
+				type: 'string',
+				required: true,
+			},
 			seasonId: {
 				type: 'string',
 				required: true,
@@ -340,12 +352,42 @@ const packs = new Entity(
 			},
 			cardDetails: {
 				type: 'list',
+				required: true,
 				items: {
 					type: 'map',
 					properties: {
 						instanceId: {
 							type: 'string',
 							required: true,
+						},
+						cardName: {
+							type: 'string',
+							required: true,
+						},
+						cardDescription: {
+							type: 'string',
+							required: true,
+						},
+						imgUrl: {
+							type: 'string',
+							required: true,
+						},
+						rarityId: {
+							type: 'string',
+							required: true,
+						},
+						rarityName: {
+							type: 'string',
+							required: true,
+						},
+						frameUrl: {
+							type: 'string',
+							required: true,
+						},
+						opened: {
+							type: 'boolean',
+							required: true,
+							default: false,
 						},
 					},
 				},

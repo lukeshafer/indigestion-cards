@@ -3,7 +3,6 @@ import CardList from '@/components/CardList.astro'
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/card'
-import H1 from '@/components/H1.astro'
 import { Api } from 'sst/node/api'
 import PostButton from '@/components/form/PostButton.astro'
 
@@ -33,7 +32,7 @@ const breadcrumbs = [
 	class="grid gap-4 text-center justify-center"
 	session={user}
 	breadcrumbs={breadcrumbs}>
-	<H1>{season!.seasonName}</H1>
+	<h1 class="page-heading">{season!.seasonName}</h1>
 	<p class="text-lg">Description: {season!.seasonDescription}</p>
 	<h2 class="text-xl pt-4">Cards:</h2>
 	<CardList cards={cardDesigns} />

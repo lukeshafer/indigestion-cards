@@ -28,6 +28,16 @@ export async function getAllUsers() {
 	}
 }
 
+export async function getUserAndCardInstances(args: { username: string }) {
+	try {
+		const data = await db.collections.cardsByOwnerName({ username: args.username }).go()
+		return data.data
+	} catch {
+		console.log('Error while retrieving user and card instance data for user', args.username)
+		return null
+	}
+}
+
 export async function createNewUser(args: CreateEntityItem<User>) {
 	const existingUser = await getUserByUserName(args.username)
 	if (existingUser && existingUser.username === args.username) {

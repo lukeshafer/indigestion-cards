@@ -1,9 +1,14 @@
 ---
-import type { CardDesignEntity } from '@lil-indigestion-cards/core/card'
 import TradingCard from './TradingCard.astro'
 
 interface Props {
-	cards: CardDesignEntity[]
+	cards: {
+		designId: string;
+		seasonId: string;
+		cardName: string;
+		imgUrl: string;
+		cardDescription: string;
+	}[]
 }
 const { props } = Astro
 ---

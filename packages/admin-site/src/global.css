@@ -37,6 +37,7 @@
 		--base-font-serif: font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
 		--font-heading: var(--base-font-sans);
+		--card-aspect-ratio: 312 / 265;
 
 		font-family: var(--base-font-sans);
 	}

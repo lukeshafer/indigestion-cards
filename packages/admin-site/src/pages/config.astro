@@ -14,7 +14,11 @@ const { season } = await getSiteConfig()
 const seasons = await getAllSeasons()
 ---
 
-<Page title="Site Settings" class="grid gap-4 justify-center" session={user}>
+<Page
+	title="Site Settings"
+	class="grid gap-4 justify-center"
+	session={user}
+	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Settings' }]}>
 	<H1>Site Settings</H1>
 	<Form>
 		<InputBase id="seasonId" label="Current Season">

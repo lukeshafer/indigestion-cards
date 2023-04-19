@@ -1,0 +1,70 @@
+---
+import CardList from '@/components/CardList.astro'
+import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
+import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user'
+import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
+import PostButton from '@/components/form/PostButton.astro'
+import { Api } from 'sst/node/api'
+
+const session = useUser(Astro.cookies)
+if (!session) return Astro.redirect('/public')
+const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0
+if (redirectCount > 3) return Astro.redirect('/user?alert=Username not found')
+
+const id = Astro.params.username
+
+if (!id) {
+	return Astro.redirect(`/user?alert=Username is required`)
+}
+
+let data = await getUserAndCardInstances({ username: id })
+
+const twitchData = await getUserByLogin(id)
+if (!data) {
+	if (twitchData) {
+		const newUser = await createNewUser({
+			username: twitchData.display_name,
+			userId: twitchData.id,
+		})
+		data = {
+			users: [newUser],
+			cardInstances: [],
+		}
+		return Astro.redirect(`/user/${id}?redirect=${redirectCount + 1}`)
+	}
+	return Astro.redirect(`/user?alert=Username not found`)
+}
+
+const { users, cardInstances } = data
+const user = users[0]!
+
+const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt)
+
+const breadcrumbs = [
+	{ label: 'Home', href: '/' },
+	{ label: 'Users', href: '/user' },
+	{ label: user.username, href: `/user/${id}` },
+]
+---
+
+<Page title={user.username} class="flex flex-col gap-4" session={session} breadcrumbs={breadcrumbs}>
+	<h1 class="page-heading">{user.username}</h1>
+	<img src={twitchData?.profile_image_url} width="200" class="rounded-full" />
+	<div>
+		<h2 class="text-xl pt-4">Cards:</h2>
+		<CardList cards={cardsNotInPack} />
+	</div>
+	<div>
+		<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
+		<PostButton
+			id="revoke-pack"
+			url={Api.api.url + '/revoke-pack'}
+			label="Revoke Pack"
+			hiddenProperties={[
+				{ name: 'userId', value: user.userId },
+				{ name: 'username', value: user.username },
+			]}
+		/>
+	</div>
+</Page>

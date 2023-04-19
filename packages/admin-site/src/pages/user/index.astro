@@ -3,6 +3,7 @@ import Page from '@/layouts/Page.astro'
 import { Icon } from 'astro-icon'
 import { useUser } from '@/session'
 import { getAllUsers } from '@lil-indigestion-cards/core/user'
+import Form from '@/components/form/Form.astro'
 
 const user = useUser(Astro.cookies)
 if (!user) {
@@ -13,8 +14,19 @@ const users = await getAllUsers()
 ---
 
 <Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]} session={user}>
-	<h1 class="page-heading">Users</h1>
 	<user-table>
+		<header class="flex justify-between flex-wrap mb-4">
+			<h1 class="page-heading">Users</h1>
+			<Form method="get" action="/api/search">
+				<input
+					name="username"
+					data-user-search
+					type="text"
+					placeholder="Search"
+					required
+				/>
+			</Form>
+		</header>
 		<table>
 			<thead>
 				<tr>
@@ -25,18 +37,18 @@ const users = await getAllUsers()
 			</thead>
 			<tbody>
 				{
-					users.map((user) => (
+					users.map(({ username, cardCount, packCount }) => (
 						<tr>
 							<td>
-								<a href={`/user/${user.userId}`}>{user.username}</a>
+								<a href={`/user/${username}`}>{username}</a>
 							</td>
 							<td>
 								<Icon name="mdi:cards" aria-hidden="true" />
-								<span>{user.cardCount}</span>
+								<span>{cardCount}</span>
 							</td>
 							<td>
 								<Icon name="mdi:gift" aria-hidden="true" />
-								<span>{user.packCount}</span>
+								<span>{packCount}</span>
 							</td>
 						</tr>
 					))
@@ -47,6 +59,11 @@ const users = await getAllUsers()
 </Page>
 
 <style>
+	user-table {
+		max-width: 60rem;
+		display: block;
+	}
+
 	table {
 		table-layout: fixed;
 		text-align: center;
@@ -143,6 +160,43 @@ const users = await getAllUsers()
 						body.appendChild(row)
 					})
 				})
+			})
+
+			const searchInput = this.querySelector('[data-user-search]') as HTMLInputElement
+			const doSearch = () => {
+				const search = searchInput.value.toLowerCase()
+				if (!search) {
+					originalRows.forEach((row) => {
+						body.appendChild(row)
+					})
+					return
+				}
+
+				for (const row of rows) {
+					const username = row.children[0]!.textContent!.toLowerCase()
+					if (!username.includes(search)) {
+						if (row.parentElement) row.parentElement.removeChild(row)
+						continue
+					}
+					body.appendChild(row)
+				}
+			}
+
+			searchInput.addEventListener('input', doSearch)
+			searchInput.addEventListener('load', doSearch)
+			searchInput.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') {
+					e.preventDefault()
+					console.log('enter pressed')
+					const currentRows = body.querySelectorAll('tr')
+					if (currentRows.length === 1) {
+						const username = currentRows.item(0).children[0]!.textContent!
+						console.log(username)
+						if (!username) return
+
+						window.location.href = `/user/${username}`
+					}
+				}
 			})
 		}
 	}

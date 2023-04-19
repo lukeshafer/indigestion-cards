@@ -40,9 +40,13 @@ export const handler = ApiHandler(async () => {
 			})
 			.promise()
 	} catch (error) {
-		return { statusCode: 500, body: error?.message }
+		if (error instanceof Error) return { statusCode: 500, body: error?.message }
+		return { statusCode: 500, body: 'Unknown error' }
 	}
 
-	const redirectUrl = useHeader('referer') + '?alert=success'
-	return { statusCode: 302, headers: { Location: redirectUrl } }
+	const redirectUrl = new URL(useHeader('referer') ?? 'http://localhost:3000')
+	redirectUrl.pathname = '/give-pack'
+	redirectUrl.searchParams.set('alert', `Gave ${count} pack${count > 1 ? 's' : ''} to ${username}`)
+	redirectUrl.searchParams.set('alertType', 'success')
+	return { statusCode: 302, headers: { Location: redirectUrl.toString() } }
 })

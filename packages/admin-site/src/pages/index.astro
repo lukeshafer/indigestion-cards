@@ -7,31 +7,6 @@ const user = useUser(Astro.cookies)
 ---
 
 <Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]}>
-	{
-		user ? (
-			<a href="/auth/logout" rel="noreferrer" class="shine">
-				Logout
-			</a>
-		) : (
-			<a href="/auth/login" rel="noreferrer" class="shine">
-				Login
-			</a>
-		)
-	}
-	<div class="flex flex-wrap gap-8 justify-center">
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard><div class="w-52 h-72"></div></TradingCard>
-		<TradingCard shiny><div class="w-52 h-72"></div></TradingCard>
-	</div>
 </Page>
 
 <style>

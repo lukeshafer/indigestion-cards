@@ -26,6 +26,8 @@ export function API({ stack }: StackContext) {
 			'POST /delete-unmatched-image/{id}': 'packages/functions/src/delete-unmatched-image.handler',
 			'POST /delete-rarity/{id}': 'packages/functions/src/delete-rarity.handler',
 			'POST /create-admin-user': 'packages/functions/src/create-admin-user.handler',
+			'POST /revoke-pack': 'packages/functions/src/revoke-pack.handler',
+			'POST /open-card': 'packages/functions/src/open-card.handler',
 		},
 		defaults: {
 			function: {

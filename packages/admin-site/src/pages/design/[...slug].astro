@@ -3,9 +3,7 @@ import PostButton from '@/components/form/PostButton.astro'
 import Page from '@/layouts/Page.astro'
 import TradingCard from '@/components/TradingCard.astro'
 import { useUser } from '@/session'
-import {
-	getCardDesignAndInstancesById,
-} from '@lil-indigestion-cards/core/card'
+import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { Api } from 'sst/node/api'
 
 const user = useUser(Astro.cookies)
@@ -15,6 +13,8 @@ const slug = Astro.params.slug
 if (!slug) {
 	return Astro.redirect('/design?error=No design id provided')
 }
+
+const from = new URL(Astro.request.headers.get('referer') ?? '/').pathname.split('/')[1]
 
 const [seasonId, designId] = slug.split('/')
 
@@ -31,21 +31,30 @@ const {
 	cardDesigns: [design],
 	cardInstances,
 } = await getCardDesignAndInstancesById({ designId, seasonId })
+const openedCards = cardInstances.filter((card) => card.packId === undefined)
 
 if (!design) {
 	return Astro.redirect('/design?error=No design found with that id')
 }
 
-const breadcrumbs = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Seasons', href: '/season' },
-	{ label: season.seasonName, href: `/season/${season.seasonId}` },
-	{ label: design.cardName, href: `/design/${slug}` },
-]
+const breadcrumbs = [{ label: 'Home', href: '/' }]
+
+if (from === 'design') {
+	breadcrumbs.push(
+		{ label: 'Designs', href: `/design` },
+		{ label: design.cardName, href: `/design/${slug}` }
+	)
+} else {
+	breadcrumbs.push(
+		{ label: 'Seasons', href: `/season` },
+		{ label: season!.seasonName, href: `/season/${season!.seasonId}` },
+		{ label: design.cardName, href: `/design/${slug}` }
+	)
+}
 ---
 
 <Page
-	title={`${design.cardName} - ${season.seasonName}`}
+	title={`${design.cardName} - ${season!.seasonName}`}
 	class="flex flex-col gap-4 p-4 items-center content-center"
 	session={user}
 	breadcrumbs={breadcrumbs}>
@@ -60,8 +69,8 @@ const breadcrumbs = [
 	}
 	<ul class="border border-gray-300 p-4">
 		{
-			cardInstances.length > 0 ? (
-				cardInstances.map((card) => (
+			openedCards.length > 0 ? (
+				openedCards.map((card) => (
 					<li>
 						<a href={`/card/${card.instanceId}`}>{card.rarityId}: </a>
 						<a href={`/user/${card.userId}`}>Owned by {card.username}</a>

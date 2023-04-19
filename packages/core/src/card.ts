@@ -89,6 +89,9 @@ export async function generateCard(info: {
 				rarityId: assignedRarityId,
 				rarityName: assignedRarity.rarityName,
 				frameUrl: assignedRarity.frameUrl,
+				imgUrl: design.imgUrl,
+				cardName: design.cardName,
+				cardDescription: design.cardDescription,
 				instanceId,
 				username: info.username,
 				userId: info.userId,
@@ -118,6 +121,9 @@ export async function generateCard(info: {
 					rarityId: assignedRarityId,
 					rarityName: assignedRarity.rarityName,
 					frameUrl: assignedRarity.frameUrl,
+					imgUrl: design.imgUrl,
+					cardName: design.cardName,
+					cardDescription: design.cardDescription,
 					instanceId,
 					username: info.username,
 					userId: info.userId,
@@ -155,6 +161,62 @@ export async function deleteCardInstanceById(args: { instanceId: string }) {
 export async function getAllPacks() {
 	const result = await db.entities.packs.query.allPacks({}).go()
 	return result.data
+}
+
+export async function getPackById(args: { packId: string }) {
+	const result = await db.entities.packs.query.byPackId(args).go()
+	return result.data[0]
+}
+
+export async function findPackForUser(args: { userId: string }) {
+	const result = await db.entities.packs.find({ userId: args.userId }).go()
+	return result.data[0]
+}
+
+export async function deleteFirstPackForUser(args: {
+	userId: string
+}): Promise<Result<EntityItem<Pack> | null>> {
+	try {
+		const pack = await findPackForUser(args)
+		//if (pack.cardDetails && pack.cardDetails.length > 0) {
+		//const result = await db.entities.cardInstances.delete(pack.cardDetails).go()
+		//if (result.unprocessed.length > 0) throw new Error('Failed to delete card instances')
+		//}
+
+		const user = await getUser(pack.userId)
+		const result = await db.transaction
+			.write(({ users, cardInstances, packs }) => [
+				packs.delete({ packId: pack.packId }).commit(),
+				users
+					.patch({ userId: pack.userId })
+					// if packCount is null OR 0, set it to 0, otherwise subtract 1
+					.set({ packCount: (user?.packCount || 1) - 1 })
+					.commit(),
+				...(pack.cardDetails?.map((card) =>
+					cardInstances.delete({ instanceId: card.instanceId }).commit()
+				) ?? []),
+			])
+			.go()
+
+		if (result.canceled) throw new Error('Canceled transaction')
+
+		return {
+			success: true,
+			data: result.data[0].item,
+		}
+	} catch (err) {
+		console.error(err)
+		if (err instanceof Error)
+			return {
+				success: false,
+				error: err.message,
+			}
+
+		return {
+			success: false,
+			error: 'Unknown error',
+		}
+	}
 }
 
 export async function deletePack(args: { packId: string }) {
@@ -221,43 +283,63 @@ export async function createPack(args: {
 					userId: args.userId,
 					username: args.username,
 					seasonId: args.seasonId,
-					cardDetails: cards.map((card) => ({ instanceId: card.instanceId })),
+					cardDetails: cards.map((card) => ({
+						instanceId: card.instanceId,
+						cardName: card.cardName,
+						cardDescription: card.cardDescription,
+						imgUrl: card.imgUrl,
+						rarityId: card.rarityId,
+						rarityName: card.rarityName,
+						frameUrl: card.frameUrl,
+					})),
 				})
 				.commit(),
 		])
 		.go()
 }
 
-export async function openCardFromPack(args: {
-	instanceId: string
-	designId: string
-	seasonId: string
-}) {
-	const card = await db.entities.cardInstances.query.byDesignId(args).go()
+export async function openCardFromPack(args: { instanceId: string }) {
+	const card = await db.entities.cardInstances.query.byId(args).go()
 	if (!card.data || card.data.length === 0) {
 		throw new Error('Card not found')
 	}
-	if (card.data[0].openedAt && card.data[0].packId) {
+	if (card.data[0].openedAt || !card.data[0].packId) {
 		throw new Error('Card already opened')
 	}
 
+	const packId = card.data[0].packId
+	const pack = await getPackById({ packId: packId })
 	const user = await getUser(card.data[0].userId)
 	if (!user) throw new Error('User not found')
 
+	const newCardDetails = pack.cardDetails?.map((c) =>
+		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
+	)
+	const deletePack = newCardDetails.every((c) => c.opened)
+
 	const result = await db.transaction
-		.write(({ cardInstances, users }) => [
+		.write(({ cardInstances, users, packs }) => [
 			cardInstances
 				.patch({ instanceId: args.instanceId })
 				.set({ openedAt: new Date().toISOString(), packId: undefined })
 				.commit(),
 			users
 				.patch({ userId: card.data[0].userId })
-				.set({ cardCount: (user.cardCount ?? 0) + 1 })
+				.set({
+					cardCount: (user.cardCount ?? 0) + 1,
+					packCount: deletePack ? (user.packCount ?? 1) - 1 : user.packCount,
+				})
 				.commit(),
+			deletePack
+				? packs.delete({ packId: packId }).commit()
+				: packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
 		])
 		.go()
 
-	return result.data
+	return {
+		success: true,
+		data: result.data[0].item,
+	}
 }
 
 // DESIGN //
