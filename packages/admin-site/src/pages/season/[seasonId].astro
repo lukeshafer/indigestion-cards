@@ -7,7 +7,7 @@ import { Api } from 'sst/node/api'
 import PostButton from '@/components/form/PostButton.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const id = Astro.params.seasonId
 
@@ -29,7 +29,7 @@ const breadcrumbs = [
 
 <Page
 	title={season!.seasonName}
-	class="grid gap-4 text-center justify-center"
+	class="flex flex-col gap-4"
 	session={user}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="page-heading">{season!.seasonName}</h1>

@@ -6,24 +6,29 @@ import type { Session } from '@/session'
 interface Props {
 	title: string
 	session: Session
+	pageType?: 'public' | 'private'
 }
+
+export type BaseProps = Props
+
+const { title, session, pageType = 'private' } = Astro.props
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#fd94e6" />
-		<title>{Astro.props.title}</title>
+		<title>{title}</title>
 	</head>
 	<body>
 		{
-			Astro.props.session?.type !== 'user' ? (
-				<script> window.location.href = '/public' </script>
-			) : (
+			session?.type === 'user' || pageType === 'public' ? (
 				<slot />
+			) : (
+				<script> window.location.href = '/' </script>
 			)
 		}
 	</body>

@@ -4,9 +4,7 @@ import { useUser } from '@/session'
 
 export const get: APIRoute = async (ctx) => {
 	const session = useUser(ctx.cookies)
-	if (!session) {
-		return ctx.redirect('/public')
-	}
+	if (session?.type !== 'user') return ctx.redirect('/')
 
 	const username = ctx.url.searchParams.get('username')
 

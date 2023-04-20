@@ -30,6 +30,7 @@ export const handler = FutureAuthHandler({
 			const claims = input.tokenset.claims()
 
 			const adminUser = await getAdminUserById(claims.sub)
+			console.log('adminUser', adminUser)
 			if (!adminUser)
 				return {
 					type: 'public',

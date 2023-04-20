@@ -8,7 +8,7 @@ import PostButton from '@/components/form/PostButton.astro'
 import { Api } from 'sst/node/api'
 
 const session = useUser(Astro.cookies)
-if (!session) return Astro.redirect('/public')
+
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0
 if (redirectCount > 3) return Astro.redirect('/user?alert=Username not found')
 
@@ -43,28 +43,37 @@ const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt)
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Users', href: '/user' },
+	{ label: 'Users', href: session?.type === 'user' ? '/user' : undefined },
 	{ label: user.username, href: `/user/${id}` },
 ]
 ---
 
-<Page title={user.username} class="flex flex-col gap-4" session={session} breadcrumbs={breadcrumbs}>
+<Page
+	title={user.username}
+	class="flex flex-col gap-4"
+	session={session}
+	breadcrumbs={breadcrumbs}
+	pageType="public">
 	<h1 class="page-heading">{user.username}</h1>
 	<img src={twitchData?.profile_image_url} width="200" class="rounded-full" />
 	<div>
 		<h2 class="text-xl pt-4">Cards:</h2>
 		<CardList cards={cardsNotInPack} />
 	</div>
-	<div>
-		<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
-		<PostButton
-			id="revoke-pack"
-			url={Api.api.url + '/revoke-pack'}
-			label="Revoke Pack"
-			hiddenProperties={[
-				{ name: 'userId', value: user.userId },
-				{ name: 'username', value: user.username },
-			]}
-		/>
-	</div>
+	{
+		session?.type === 'user' ? (
+			<div>
+				<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
+				<PostButton
+					id="revoke-pack"
+					url={Api.api.url + '/revoke-pack'}
+					label="Revoke Pack"
+					hiddenProperties={[
+						{ name: 'userId', value: user.userId },
+						{ name: 'username', value: user.username },
+					]}
+				/>
+			</div>
+		) : null
+	}
 </Page>

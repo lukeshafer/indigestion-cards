@@ -14,20 +14,22 @@ export function API({ stack }: StackContext) {
 
 	const api = new Api(stack, 'api', {
 		routes: {
-			'GET /': 'packages/functions/src/twitch-api.handler',
-			'POST /': 'packages/functions/src/twitch-api.handler',
-			'POST /give-pack-to-user': 'packages/functions/src/invoke-give-pack-event.handler',
-			'POST /create-card-season': 'packages/functions/src/create-card-season.handler',
-			'POST /create-card-design': 'packages/functions/src/create-card-design.handler',
-			'POST /create-rarity': 'packages/functions/src/create-rarity.handler',
+			'ANY /': 'packages/functions/src/twitch-api.handler',
+			'POST /give-pack-to-user': 'packages/functions/src/admin-api/invoke-give-pack-event.handler',
+			'POST /create-card-season': 'packages/functions/src/admin-api/create-card-season.handler',
+			'POST /create-card-design': 'packages/functions/src/admin-api/create-card-design.handler',
+			'POST /create-rarity': 'packages/functions/src/admin-api/create-rarity.handler',
 			'POST /delete-card-design/{seasonId}/{designId}':
-				'packages/functions/src/delete-card-design.handler',
-			'POST /delete-card-season/{id}': 'packages/functions/src/delete-card-season.handler',
-			'POST /delete-unmatched-image/{id}': 'packages/functions/src/delete-unmatched-image.handler',
-			'POST /delete-rarity/{id}': 'packages/functions/src/delete-rarity.handler',
-			'POST /create-admin-user': 'packages/functions/src/create-admin-user.handler',
-			'POST /revoke-pack': 'packages/functions/src/revoke-pack.handler',
-			'POST /open-card': 'packages/functions/src/open-card.handler',
+				'packages/functions/src/admin-api/delete-card-design.handler',
+			'POST /delete-card-season/{id}':
+				'packages/functions/src/admin-api/delete-card-season.handler',
+			'POST /delete-unmatched-image/{id}':
+				'packages/functions/admin-src/api/delete-unmatched-image.handler',
+			'POST /delete-rarity/{id}': 'packages/functions/src/admin-api/delete-rarity.handler',
+			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
+			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
+			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
+			'POST /get-all-usernames': 'packages/functions/src/admin-api/get-all-usernames.handler',
 		},
 		defaults: {
 			function: {

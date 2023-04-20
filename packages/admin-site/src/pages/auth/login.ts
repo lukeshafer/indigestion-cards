@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro'
 
 export const get: APIRoute = async (ctx) => {
 	const user = useUser(ctx.cookies)
-	if (user) return ctx.redirect('/')
+	if (user?.type === 'user') return ctx.redirect('/')
 
 	const authParams = new URLSearchParams({
 		client_id: 'local',

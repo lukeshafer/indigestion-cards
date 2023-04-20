@@ -30,7 +30,7 @@ const urlByType = {
 			<ul class="flex flex-wrap gap-4">
 				{unmatchedImages.map((image) => (
 					<li>
-						<a href={`${urlByType[image.type]}${image.imageId}`}>
+						<a rel="prefetch" href={`${urlByType[image.type]}${image.imageId}`}>
 							<img src={image.url} width="300" class="object-contain max-h-64 max-w-64" />
 						</a>
 					</li>

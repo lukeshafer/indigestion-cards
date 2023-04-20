@@ -5,7 +5,7 @@ import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (!session)
+	if (session.type !== 'user')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
@@ -26,16 +26,16 @@ export const handler = ApiHandler(async () => {
 
 	return result.success
 		? {
-			statusCode: 307,
-			headers: {
-				Location: redirectUrl(`Successfully deleted card '${result.data?.cardName ?? designId}'`),
-			},
-		}
+				statusCode: 307,
+				headers: {
+					Location: redirectUrl(`Successfully deleted card '${result.data?.cardName ?? designId}'`),
+				},
+		  }
 		: result.error === 'Cannot delete design with existing instances'
-			? { statusCode: 400, body: result.error, headers: { Location: redirectUrl(result.error) } }
-			: {
+		? { statusCode: 400, body: result.error, headers: { Location: redirectUrl(result.error) } }
+		: {
 				statusCode: 500,
 				body: result.error,
 				headers: { Location: redirectUrl(result.error ?? '') },
-			}
+		  }
 })

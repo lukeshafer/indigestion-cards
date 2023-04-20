@@ -1,7 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
-type Props = HTMLAttributes<'form'>
-const { class: className = "", action, method, ...attrs } = Astro.props
+type Props = HTMLAttributes<'form'> & {
+	loadingText?: string
+}
+const { class: className = '', action, method, loadingText, ...attrs } = Astro.props
 
 export const inputClasses = {
 	input: '',
@@ -21,16 +23,16 @@ export const inputClasses = {
 			action={action}
 			{...attrs}
 			class="flex flex-col items-start gap-6 text-xl w-full">
-		<slot />
+			<slot />
 		</form>
 		<div
 			aria-hidden="true"
 			data-loading-spinner
 			style={{
-			display: 'none',
+				display: 'none',
 			}}>
 			<img src="/lilindPB.gif" />
-			<span class="loading-text text-left">Saving</span>
+			<span class="loading-text text-left">{loadingText || "Saving"}</span>
 		</div>
 	</div>
 </my-form>
@@ -75,8 +77,9 @@ export const inputClasses = {
 	my-form select {
 		display: block;
 		width: 100%;
-		padding: 0.5rem 0.5rem;
+		padding: 0.3rem 0.5rem;
 		background-color: #fff;
+		color: black;
 	}
 
 	my-form input[readonly] {

@@ -2,10 +2,14 @@
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 
+if (Astro.url.pathname !== '/404') {
+	return Astro.redirect('/404')
+}
+
 const user = useUser(Astro.cookies)
 ---
 
-<Page session={user} title="Page not found" class="flex flex-col items-center">
+<Page session={user} title="Page not found" class="flex flex-col items-center" pageType="public">
 	<h1 class="text-7xl font-display italic text-red-500 my-5">404</h1>
 	<img
 		src="/lilindOHNO.gif"
@@ -13,7 +17,6 @@ const user = useUser(Astro.cookies)
 		alt="lilindOHNO twitch emote"
 		class="OHNO text-4xl text-center font-mono w-40 h-40"
 	/>
-	<p class="my-2 text-3xl font-display italic text-brand-secondary ">OH NO</p>
+	<p class="my-2 text-3xl font-display italic text-brand-secondary">OH NO</p>
 	<p class="mt-12 text-center text-3xl font-mono">The page you're looking for doesn't exist!!</p>
 </Page>
-

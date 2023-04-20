@@ -6,11 +6,13 @@ import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (!session)
+	if (session.type !== 'user') {
+		console.log(session)
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
 		}
+	}
 
 	const eventBridge = new EventBridge()
 

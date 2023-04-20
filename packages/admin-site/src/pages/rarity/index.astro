@@ -6,7 +6,7 @@ import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import TradingCard from '@/components/TradingCard.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const rarities = await getAllRarities()
 ---

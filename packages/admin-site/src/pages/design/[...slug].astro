@@ -7,7 +7,7 @@ import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { Api } from 'sst/node/api'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const slug = Astro.params.slug
 if (!slug) {
@@ -15,7 +15,6 @@ if (!slug) {
 }
 
 const from = new URL(Astro.request.headers.get('referer') ?? '/').pathname.split('/')[1]
-
 const [seasonId, designId] = slug.split('/')
 
 if (!seasonId) {
@@ -55,19 +54,15 @@ if (from === 'design') {
 
 <Page
 	title={`${design.cardName} - ${season!.seasonName}`}
-	class="flex flex-col gap-4 p-4 items-center content-center"
+	class="flex flex-col gap-4"
 	session={user}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
 	<TradingCard>
 		<img src={design.imgUrl} width="300" class="max-w-full" />
 	</TradingCard>
-	{
-		design.cardDescription ? (
-			<p class="text-lg text-center max-w-sm">{design.cardDescription}</p>
-		) : null
-	}
-	<ul class="border border-gray-300 p-4">
+	{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
+	<ul class="border border-gray-300 p-4 max-w-4xl">
 		{
 			openedCards.length > 0 ? (
 				openedCards.map((card) => (
@@ -85,7 +80,7 @@ if (from === 'design') {
 		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
 		id="delete-design-form"
 		url={`${Api.api.url}/delete-card-design/${seasonId}/${designId}?redirectUrl=${Astro.url.protocol}${Astro.url.host}/design`}
-		label="DELETE"
+		label="Delete Card"
 	/>
 </Page>
 

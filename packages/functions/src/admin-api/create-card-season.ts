@@ -4,7 +4,7 @@ import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (!session)
+	if (session.type !== 'user')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
@@ -32,6 +32,6 @@ export const handler = ApiHandler(async () => {
 	return result.success
 		? { statusCode: 307, headers: { Location: redirect } }
 		: result.error === 'Season already exists'
-			? { statusCode: 409, body: 'Error: ' + result.error }
-			: { statusCode: 500, body: 'Error: ' + result.error }
+		? { statusCode: 409, body: 'Error: ' + result.error }
+		: { statusCode: 500, body: 'Error: ' + result.error }
 })

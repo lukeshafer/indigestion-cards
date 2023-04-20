@@ -6,9 +6,7 @@ import { getAllUsers } from '@lil-indigestion-cards/core/user'
 import Form from '@/components/form/Form.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) {
-	Astro.redirect('/public')
-}
+if (user?.type !== 'user') return Astro.redirect(`/?${Astro.url.searchParams.toString()}`)
 
 const users = await getAllUsers()
 ---
@@ -18,13 +16,7 @@ const users = await getAllUsers()
 		<header class="flex justify-between flex-wrap mb-4">
 			<h1 class="page-heading">Users</h1>
 			<Form method="get" action="/api/search">
-				<input
-					name="username"
-					data-user-search
-					type="text"
-					placeholder="Search"
-					required
-				/>
+				<input name="username" data-user-search type="text" placeholder="Search" required />
 			</Form>
 		</header>
 		<table>

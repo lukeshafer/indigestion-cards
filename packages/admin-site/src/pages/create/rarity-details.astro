@@ -2,12 +2,11 @@
 import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
 import Form from '@/components/form/Form.astro'
-import InputBase from '@/components/form/InputBase.astro'
 import { useUser } from '@/session'
 import PostButton from '@/components/form/PostButton.astro'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const bucket = Astro.url.searchParams.get('bucket')
 const key = Astro.url.searchParams.get('key')

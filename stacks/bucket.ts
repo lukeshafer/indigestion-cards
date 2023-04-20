@@ -7,7 +7,7 @@ export function DesignBucket({ stack }: StackContext) {
 	const cardDesignBucket = new Bucket(stack, 'CardDesigns', {
 		notifications: {
 			fileUploaded: {
-				function: 'packages/functions/src/handle-image-upload.handler',
+				function: 'packages/functions/src/s3/handle-image-upload.handler',
 			},
 		},
 		defaults: {
@@ -20,7 +20,7 @@ export function DesignBucket({ stack }: StackContext) {
 	const frameBucket = new Bucket(stack, 'FrameDesigns', {
 		notifications: {
 			fileUploaded: {
-				function: 'packages/functions/src/handle-frame-upload.handler',
+				function: 'packages/functions/src/s3/handle-frame-upload.handler',
 			},
 		},
 		defaults: {

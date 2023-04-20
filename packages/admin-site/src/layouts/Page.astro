@@ -1,17 +1,17 @@
 ---
-import Base from './Base.astro'
-import type { Session } from '@/session'
+import Base, { type BaseProps } from './Base.astro'
 import Hamburger from '@/components/Hamburger.astro'
 import { getAllPacks } from '@lil-indigestion-cards/core/card'
 import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro'
 import { Icon } from 'astro-icon'
+import UserSearch from '@/components/UserSearch.astro'
 
-export interface Props {
-	title: string
+export interface Props extends BaseProps {
 	class?: string
-	session: Session
 	breadcrumbs?: Path[]
 }
+
+const { class: className, breadcrumbs, ...baseProps } = Astro.props
 
 const alert = Astro.url.searchParams.get('alert')
 const alertType =
@@ -39,86 +39,107 @@ const actionLinks = [
 ]
 ---
 
-<Base title={Astro.props.title} session={Astro.props.session}>
+<Base {...baseProps}>
 	<div class="page-layout grid h-[100svh] overflow-hidden">
-		<side-nav class="overflow-y-scroll">
-			<nav class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
+		{
+			Astro.props.session?.type === 'user' ? (
+				<side-nav class="overflow-y-scroll">
+					<nav class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
+						<div class="flex flex-col text-center font-display text-white text-shadow lowercase">
+							<span class="italic text-3xl">Indigestion</span>
+							<span class="text-2xl -mt-1">Dashboard</span>
+						</div>
+						<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
+							{actionLinks.map((actionLink) => (
+								<a
+									rel="prefetch"
+									href={actionLink.href}
+									title={actionLink.title}
+									class="action-link shine text-shadow">
+									{actionLink.count ? (
+										<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
+											{packs.length}
+										</span>
+									) : null}
+									{actionLink.title}
+								</a>
+							))}
+						</div>
+						<div class="pb">
+							<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
+								Administration
+							</h2>
+							{adminLinks.map(({ href, title }) =>
+								currentPage === href ? (
+									<a
+										rel="prefetch"
+										href={href}
+										title={title}
+										class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
+										{title}
+									</a>
+								) : (
+									<a
+										rel="prefetch"
+										href={href}
+										title={title}
+										class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
+										{title}
+									</a>
+								)
+							)}
+						</div>
+						<div class="px-4 py-2 flex items-center gap-3 relative">
+							<a rel="prefetch" href="/config" title="Settings" class="w-max group brand-shadow">
+								<span class="visually-hidden">Settings</span>
+								<Icon
+									name="mdi:gear"
+									class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+								/>
+							</a>
+							<div class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
+								<a
+									rel="prefetch"
+									href="/auth/logout"
+									title="Logout"
+									class="block hover:bg-gray-100 p-3">
+									Logout
+								</a>
+							</div>
+							<button
+								class="user-button text-shadow font-display lowercase italic"
+								title={Astro.props.session?.properties?.username}>
+								{Astro.props.session?.properties?.username}
+							</button>
+						</div>
+					</nav>
+				</side-nav>
+			) : null
+		}
+		<div class="md:col-start-2 overflow-y-scroll relative">
+			<header
+				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4">
+				{
+					Astro.props.session?.type === 'user' ? (
+						<div data-for-side-nav class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
+							<Hamburger />
+						</div>
+					) : null
+				}
 				<a
+					rel="prefetch"
 					href="/"
 					title="Home"
-					class="flex flex-col text-center font-display text-white text-shadow">
-					<span class="italic text-3xl">indigestion</span>
-					<span class="text-2xl -mt-1">card studio</span>
+					class="flex-col font-display text-white text-shadow hidden md:flex flex-1">
+					<span class="italic text-2xl mt-1">indigestion</span>
+					<span class="text-lg -mt-2">cards</span>
 				</a>
-				<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
-					{
-						actionLinks.map((actionLink) => (
-							<a
-								href={actionLink.href}
-								title={actionLink.title}
-								class="action-link shine text-shadow">
-								{actionLink.count ? (
-									<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
-										{packs.length}
-									</span>
-								) : null}
-								{actionLink.title}
-							</a>
-						))
-					}
-				</div>
-				<div class="pb">
-					<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
-						Administration
-					</h2>
-					{
-						adminLinks.map(({ href, title }) =>
-							currentPage === href ? (
-								<a
-									href={href}
-									title={title}
-									class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
-									{title}
-								</a>
-							) : (
-								<a
-									href={href}
-									title={title}
-									class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
-									{title}
-								</a>
-							)
-						)
-					}
-				</div>
-				<div class="px-4 py-2 flex items-center gap-3 relative">
-					<a href="/config" title="Settings" class="w-max group brand-shadow">
-						<span class="visually-hidden">Settings</span>
-						<Icon
-							name="mdi:gear"
-							class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
-						/>
-					</a>
-					<div
-						class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
-						<a href="/auth/logout" title="Logout" class="block hover:bg-gray-100 p-3"> Logout</a>
-					</div>
-					<button
-						class="user-button text-shadow font-display lowercase italic"
-						title={Astro.props.session?.properties?.username}>
-						{Astro.props.session?.properties?.username}
-					</button>
-				</div>
-			</nav>
-		</side-nav>
-		<div class="md:col-start-2 overflow-y-scroll relative">
-			<header class="text-white text-shadow flex sticky top-0 z-10 h-14">
-				<div data-for-side-nav class="toggle-btn text-lg brand-shadow px-2 py-2 z-100">
-					<Hamburger />
-				</div>
-				<Breadcrumbs path={Astro.props.breadcrumbs ?? []} />
+				<UserSearch />
 			</header>
-			<main class={(Astro.props.class ?? '') + ' p-6 col-start-2'}>
+			<div class="flex-1">
+				<Breadcrumbs path={breadcrumbs ?? []} />
+			</div>
+			<main class={(className ?? '') + ' p-6 col-start-2'}>
 				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 				<slot />
 			</main>
@@ -128,11 +149,12 @@ const actionLinks = [
 
 <style>
 	.page-layout {
-		grid-template-columns: 16rem 1fr;
+		grid-template-columns: max-content 1fr;
 	}
 
 	header {
-		background-color: var(--color-main-dark);
+		background-color: var(--dark-main);
+		background-image: linear-gradient(35deg, var(--dark-secondary) 0%, var(--dark-main) 100%);
 	}
 
 	.toggle-btn {

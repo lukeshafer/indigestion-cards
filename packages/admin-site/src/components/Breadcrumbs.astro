@@ -1,7 +1,7 @@
 ---
 export interface Path {
 	label: string
-	href?: string
+	href?: string | undefined
 }
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 				<p class="block font-heading font-bold">{label}</p>
 			) : href ? (
 				<>
-					<a class="underline font-heading" href={href}>
+					<a rel="prefetch" class="underline font-heading" href={href}>
 						{label}
 					</a>
 					<p class="block font-heading">/</p>

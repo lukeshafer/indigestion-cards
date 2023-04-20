@@ -1,25 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
-import TradingCard from '@/components/TradingCard.astro'
 
 const user = useUser(Astro.cookies)
 ---
 
-<Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]}>
+<Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
+	<!-- TODO: Add FAQ -->
 </Page>
-
-<style>
-	a {
-		display: block;
-		padding: 1rem;
-		background: #f88;
-		margin: 1rem;
-		width: max-content;
-		transition: background 0.2s;
-	}
-
-	a:hover {
-		background: #e66;
-	}
-</style>

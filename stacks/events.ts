@@ -8,7 +8,7 @@ export function Events({ stack }: StackContext) {
 		consumer: {
 			function: {
 				bind: [table],
-				handler: 'packages/functions/src/give-pack-to-user.handler',
+				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 			},
 			cdk: {
 				eventSource: {

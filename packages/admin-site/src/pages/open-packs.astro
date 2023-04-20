@@ -8,7 +8,7 @@ import { Api } from 'sst/node/api'
 const user = useUser(Astro.cookies)
 
 if (!user) {
-	return Astro.redirect('/public')
+	return Astro.redirect('/404')
 }
 
 const packs = await getAllPacks()

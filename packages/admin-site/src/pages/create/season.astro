@@ -6,7 +6,7 @@ import InputBase from '@/components/form/InputBase.astro'
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const url = Api.api.url + '/create-card-season'
 // TODO: Protect the API route

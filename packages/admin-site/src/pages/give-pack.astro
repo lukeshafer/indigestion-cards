@@ -5,9 +5,7 @@ import { useUser } from '@/session'
 import { Api } from 'sst/node/api'
 
 const user = useUser(Astro.cookies)
-if (!user) {
-	Astro.redirect('/public')
-}
+if (user?.type !== 'user') return Astro.redirect('/404')
 
 const apiUrl = Api.api.url + '/give-pack-to-user'
 ---

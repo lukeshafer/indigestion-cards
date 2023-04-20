@@ -18,6 +18,7 @@ const { props } = Astro
 		props.cards.length > 0 ? (
 			props.cards.map(({ designId, seasonId, cardName, imgUrl, cardDescription }, index) => (
 				<a
+					rel="prefetch" 
 					href={`/design/${seasonId}/${designId}`}
 					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
 					class:list={{ 'bg-gray-200': index % 2 === 0, 'bg-white': index % 2 === 1 }}>

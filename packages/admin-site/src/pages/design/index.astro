@@ -7,7 +7,7 @@ import H1 from '@/components/H1.astro'
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (!user) return Astro.redirect('/public')
+if (user?.type !== 'user') return Astro.redirect('/404')
 const designs = await getAllCardDesigns()
 
 const message = Astro.url.searchParams.get('message') || ''
