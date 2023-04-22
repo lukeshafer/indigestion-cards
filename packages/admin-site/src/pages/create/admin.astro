@@ -12,7 +12,7 @@ if (user?.type !== 'user') return Astro.redirect('/404')
 const url = Api.api.url + '/create-admin-user'
 ---
 
-<Page title="Add admin user" class="grid gap-4 justify-center" session={user}>
+<Page title="Add admin user" class="max-w-xl" session={user}>
 	<H1>Add admin user</H1>
 	<Form class="w-max" method="post" action={url}>
 		<InputBase id="username" label="Twitch Username">

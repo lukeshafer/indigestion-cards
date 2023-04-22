@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { bodySchema, type TwitchBody } from './twitch-event-schemas'
 import fetch from 'node-fetch'
 import { z } from 'zod'
+import { Api } from 'sst/node/api'
 
 export const TWITCH_HEADERS = {
 	MESSAGE_TYPE: 'twitch-eventsub-message-type',
@@ -121,4 +122,82 @@ export async function getUserByLogin(login: string) {
 	}
 
 	return result.data.data[0]
+}
+
+const subscriptionsUrl = 'https://api.twitch.tv/helix/eventsub/subscriptions'
+
+interface ChannelSubscriptionGiftEvent {
+	type: 'channel.subscription.gift'
+	condition: {
+		broadcaster_user_id: string
+	}
+	callback: string
+}
+
+interface ChannelPointsCustomRewardRedemptionEvent {
+	type: 'channel.channel_points_custom_reward_redemption.add'
+	condition: {
+		broadcaster_user_id: string
+		reward_id: string
+	}
+	callback: string
+}
+
+type TwitchEvent = ChannelSubscriptionGiftEvent | ChannelPointsCustomRewardRedemptionEvent
+
+export async function subscribeToTwitchEvent(event: TwitchEvent) {
+	const res = await fetch(subscriptionsUrl, {
+		method: 'POST',
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			type: event.type,
+			version: '1',
+			condition: event.condition,
+			transport: {
+				method: 'webhook',
+				callback: event.callback,
+				secret: Config.TWITCH_CLIENT_SECRET,
+			},
+		}),
+	})
+
+	if (!res.ok) {
+		return { success: false, statusCode: res.status, body: await res.text() }
+	}
+
+	const body = await res.json()
+
+	const bodySchema = z.object({
+		data: z.array(
+			z.object({
+				id: z.string(),
+				status: z.string(),
+				type: z.string(),
+				version: z.string(),
+				condition: z.record(z.any()),
+				created_at: z.string(),
+				transport: z.object({
+					method: z.string(),
+					callback: z.string(),
+				}),
+				cost: z.number(),
+			})
+		),
+		total: z.number(),
+		total_cost: z.number(),
+		max_total_cost: z.number(),
+	})
+
+	const result = bodySchema.safeParse(body)
+
+	if (!result.success) {
+		console.log(result.error)
+		return { success: false, statusCode: res.status, body: body }
+	}
+
+	return { success: true, statusCode: res.status, body: result.data }
 }

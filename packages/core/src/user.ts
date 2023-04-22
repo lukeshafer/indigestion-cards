@@ -138,6 +138,15 @@ export async function createAdminUser(args: { userId: string; username: string }
 	}
 }
 
+export async function getAllAdminUsers() {
+	try {
+		const result = await db.entities.admins.query.allAdmins({}).go()
+		return result.data
+	} catch {
+		return []
+	}
+}
+
 export async function getAdminUserById(userId: string) {
 	try {
 		const result = await db.entities.admins.query.allAdmins({ userId }).go()

@@ -3,15 +3,6 @@ import { Issuer } from 'openid-client'
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth'
 import { getAdminUserById } from '@lil-indigestion-cards/core/user'
 
-declare module 'sst/node/future/auth' {
-	export interface SessionTypes {
-		user: {
-			userId: string
-			username: string
-		}
-	}
-}
-
 export const handler = AuthHandler({
 	clients: async () => ({
 		local: 'http://localhost:3001',
@@ -21,7 +12,7 @@ export const handler = AuthHandler({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),
 			clientID: Config.TWITCH_CLIENT_ID,
 			clientSecret: Config.TWITCH_CLIENT_SECRET,
-			scope: 'openid',
+			scope: 'openid channel:manage:redemptions channel:read:subscriptions',
 		}),
 	},
 	async onSuccess(input) {
@@ -29,12 +20,7 @@ export const handler = AuthHandler({
 			const claims = input.tokenset.claims()
 
 			const adminUser = await getAdminUserById(claims.sub)
-			console.log('adminUser', adminUser)
-			if (!adminUser)
-				return {
-					type: 'public',
-					properties: {},
-				}
+			if (!adminUser || !adminUser.isStreamer) return { type: 'public', properties: {} }
 
 			return {
 				type: 'user',

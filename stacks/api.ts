@@ -12,9 +12,25 @@ export function API({ stack }: StackContext) {
 	const secrets = use(ConfigStack)
 	const auth = use(Auth)
 
-	const api = new Api(stack, 'api', {
+	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
 			'ANY /': 'packages/functions/src/twitch-api.handler',
+		},
+		defaults: {
+			function: {
+				bind: [
+					secrets.TWITCH_CLIENT_ID,
+					secrets.TWITCH_CLIENT_SECRET,
+					secrets.TWITCH_ACCESS_TOKEN,
+					table,
+					eventBus,
+				],
+			},
+		},
+	})
+
+	const api = new Api(stack, 'api', {
+		routes: {
 			'POST /give-pack-to-user': 'packages/functions/src/admin-api/invoke-give-pack-event.handler',
 			'POST /create-card-season': 'packages/functions/src/admin-api/create-card-season.handler',
 			'POST /create-card-design': 'packages/functions/src/admin-api/create-card-design.handler',
@@ -49,6 +65,7 @@ export function API({ stack }: StackContext) {
 
 	stack.addOutputs({
 		ApiEndpoint: api.url,
+		TwitchApiEndpoint: twitchApi.url,
 	})
 
 	return api

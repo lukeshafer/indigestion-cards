@@ -537,6 +537,11 @@ export const admins = new Entity({
 			type: 'string',
 			required: true,
 		},
+		isStreamer: {
+			type: 'boolean',
+			required: true,
+			default: false,
+		},
 	},
 	indexes: {
 		allAdmins: {

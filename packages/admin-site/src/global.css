@@ -21,6 +21,16 @@
 
 @layer base {
 	html {
+		--bg-color-light: #fcfcfd;
+		--bg-color-dark: #08050a;
+		--bg-color: var(--bg-color-light);
+		background-color: var(--bg-color);
+
+		--text-light: #090b0e;
+		--text-dark: #f7f7fd;
+		--text-color: var(--text-light);
+		color: var(--text-color);
+
 		--color-main: #fd94e6;
 		--color-secondary: #f66efa;
 		--color-tertiary: #ef6dd9;
@@ -28,7 +38,7 @@
 		--color-main-light: #f9b7eb;
 
 		--dark-main: #ce008a;
-		--dark-secondary: #9200c4;
+		--dark-secondary: #7F19F8;
 
 		--accent-main: #31FFD6;
 		--accent-secondary: ##1fdeb8;
@@ -48,6 +58,13 @@
 	*::selection {
 		background: var(--accent-main-light, default);
 		color: #000;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		html {
+			/*--bg-color: var(--bg-color-dark);*/
+			/*--text-color: var(--text-dark);*/
+		}
 	}
 }
 
