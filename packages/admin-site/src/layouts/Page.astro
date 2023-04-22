@@ -5,6 +5,7 @@ import { getAllPacks } from '@lil-indigestion-cards/core/card'
 import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro'
 import { Icon } from 'astro-icon'
 import UserSearch from '@/components/UserSearch.astro'
+import { routes } from '@/constants'
 
 export interface Props extends BaseProps {
 	class?: string
@@ -24,19 +25,19 @@ const alertColor =
 
 const currentPage = Astro.url.pathname
 const adminLinks = [
-	{ href: '/user', title: 'Users' },
-	{ href: '/design', title: 'Designs' },
-	{ href: '/season', title: 'Seasons' },
-	{ href: '/rarity', title: 'Rarities' },
-	{ href: '/admin-users', title: 'Admins' },
-]
+	{ href: routes.USERS, title: 'Users' },
+	{ href: routes.DESIGNS, title: 'Designs' },
+	{ href: routes.SEASONS, title: 'Seasons' },
+	{ href: routes.RARITIES, title: 'Rarities' },
+	{ href: routes.ADMIN_USERS, title: 'Admins' },
+] satisfies { href: string; title: string }[]
 
 const packs = await getAllPacks()
 
 const actionLinks = [
-	{ href: '/open-packs', title: 'Open Packs', id: 'open-packs', count: packs.length },
-	{ href: '/give-pack', title: 'Give Pack', id: 'give-pack' },
-	{ href: '/give-card', title: 'Give Card', id: 'give-card' },
+	{ href: routes.ADMIN.OPEN_PACKS, title: 'Open Packs', id: 'open-packs', count: packs.length },
+	{ href: routes.ADMIN.GIVE_PACK, title: 'Give Pack', id: 'give-pack' },
+	{ href: routes.ADMIN.GIVE_CARD, title: 'Give Card', id: 'give-card' },
 ]
 ---
 
@@ -90,15 +91,8 @@ const actionLinks = [
 								)
 							)}
 						</div>
-						<div class="px-4 py-2 flex items-center gap-3 relative">
-							<a rel="prefetch" href="/config" title="Settings" class="w-max group brand-shadow">
-								<span class="visually-hidden">Settings</span>
-								<Icon
-									name="mdi:gear"
-									class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
-								/>
-							</a>
-							<div class="user-menu absolute bottom-full right-0 bg-white text-black w-11/12 p-1 hidden">
+						<div class="px-4 py-2 items-center gap-3 relative">
+							<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
 								<a
 									rel="prefetch"
 									href="/auth/logout"
@@ -108,8 +102,12 @@ const actionLinks = [
 								</a>
 							</div>
 							<button
-								class="user-button text-shadow font-display lowercase italic"
+								class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
 								title={Astro.props.session?.properties?.username}>
+								<Icon
+									name="mdi:gear"
+									class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+								/>
 								{Astro.props.session?.properties?.username}
 							</button>
 						</div>

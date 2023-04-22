@@ -6,16 +6,17 @@ import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/c
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
 import PostButton from '@/components/form/PostButton.astro'
 import { Api } from 'sst/node/api'
+import { routes } from '@/constants'
 
 const session = useUser(Astro.cookies)
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0
-if (redirectCount > 3) return Astro.redirect('/user?alert=Username not found')
+if (redirectCount > 3) return Astro.redirect(`${routes.USERS}?alert=Username not found`)
 
 const id = Astro.params.username
 
 if (!id) {
-	return Astro.redirect(`/user?alert=Username is required`)
+	return Astro.redirect(`${routes.USERS}?alert=Username is required`)
 }
 
 let data = await getUserAndCardInstances({ username: id })

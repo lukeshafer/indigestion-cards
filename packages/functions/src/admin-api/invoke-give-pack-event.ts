@@ -1,4 +1,4 @@
-import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
+import { ApiHandler, useFormValue } from 'sst/node/api'
 import { EventBus } from 'sst/node/event-bus'
 import { EventBridge } from 'aws-sdk'
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
@@ -46,9 +46,8 @@ export const handler = ApiHandler(async () => {
 		return { statusCode: 500, body: 'Unknown error' }
 	}
 
-	const redirectUrl = new URL(useHeader('referer') ?? 'http://localhost:3000')
-	redirectUrl.pathname = '/give-pack'
-	redirectUrl.searchParams.set('alert', `Gave ${count} pack${count > 1 ? 's' : ''} to ${username}`)
-	redirectUrl.searchParams.set('alertType', 'success')
-	return { statusCode: 302, headers: { Location: redirectUrl.toString() } }
+	return {
+		statusCode: 200,
+		body: JSON.stringify({ message: `Gave ${count} pack${count > 1 ? 's' : ''} to ${username}` }),
+	}
 })

@@ -1,29 +1,29 @@
 {
-	"name": "lil-indigestion-cards",
-	"version": "0.0.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "sst dev",
-		"build": "sst build",
-		"deploy": "sst deploy",
-		"remove": "sst remove",
-		"console": "sst console",
-		"typecheck": "tsc --noEmit",
-		"admin:add": "pnpm --filter admin-site run astro add",
-		"admin:dev": "pnpm --filter admin-site run dev",
-		"admin:dev:host": "pnpm --filter admin-site run dev:host",
-		"admin:build": "pnpm --filter admin-site run build",
-		"admin:astro": "pnpm --filter admin-site run astro"
-	},
-	"devDependencies": {
-		"sst": "2.5.2",
-		"aws-cdk-lib": "2.72.1",
-		"constructs": "10.1.156",
-		"typescript": "^5.0.3",
-		"@tsconfig/node16": "^1.0.3"
-	},
-	"workspaces": [
-		"packages/*"
-	]
+  "name": "lil-indigestion-cards",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit",
+    "admin:add": "pnpm --filter admin-site run astro add",
+    "admin:dev": "pnpm --filter admin-site run dev",
+    "admin:dev:host": "pnpm --filter admin-site run dev:host",
+    "admin:build": "pnpm --filter admin-site run build",
+    "admin:astro": "pnpm --filter admin-site run astro"
+  },
+  "devDependencies": {
+    "sst": "2.5.8",
+    "aws-cdk-lib": "2.72.1",
+    "constructs": "10.1.156",
+    "typescript": "^5.0.3",
+    "@tsconfig/node16": "^1.0.3"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

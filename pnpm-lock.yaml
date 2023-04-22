@@ -14,8 +14,8 @@ importers:
         specifier: 10.1.156
         version: 10.1.156
       sst:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.5.8
+        version: 2.5.8
       typescript:
         specifier: ^5.0.3
         version: 5.0.3
@@ -47,8 +47,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       astro-sst:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.5.8
+        version: 2.5.8
       aws-sdk:
         specifier: ^2.1357.0
         version: 2.1357.0
@@ -59,8 +59,8 @@ importers:
         specifier: ^1.7.3
         version: 1.7.3
       sst:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.5.8
+        version: 2.5.8
       tailwindcss:
         specifier: ^3.3.1
         version: 3.3.1(postcss@8.4.21)
@@ -84,8 +84,8 @@ importers:
         specifier: ^18.15.11
         version: 18.15.11
       sst:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.5.8
+        version: 2.5.8
       vitest:
         specifier: ^0.29.8
         version: 0.29.8
@@ -112,8 +112,8 @@ importers:
         specifier: ^2.1348.0
         version: 2.1348.0
       sst:
-        specifier: 2.5.2
-        version: 2.5.2
+        specifier: 2.5.8
+        version: 2.5.8
 
 packages:
 
@@ -3276,8 +3276,8 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /astro-sst@2.5.2:
-    resolution: {integrity: sha512-DvZxbMh1B2dWiALvB/dubRJP0vz7S7QV8yqJkEOuKabQl9FgwSrE6+l9WUJO6Z3Zbs+AhzYJOJ0e+KtbQtMFwQ==}
+  /astro-sst@2.5.8:
+    resolution: {integrity: sha512-Elvz8Lnczw0zVcS5pOyAjIIdovWKcGBbSRLFrmGbARAverIdH4Lbztr4srqTq15iHLZ9MivdSfNCYJkWaZClJw==}
     dependencies:
       '@astrojs/webapi': 2.1.0
     dev: false
@@ -7090,8 +7090,8 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.5.2:
-    resolution: {integrity: sha512-cHufGLSeXGHABoE1nUF/QH92f+kEOC8ZTGl2n91T/K2+d2qTnQSpkmmLJLB/strDJm9adlig+tqAO3jsrkFf2g==}
+  /sst@2.5.8:
+    resolution: {integrity: sha512-vz8n7Cn7rEkDjmUzIS+S1xZacdzTy5K78OPCEcs6pH4Qkhk4LrO0MTOayAManW8EyzwKQHMaoT1A/cfIrnzB1g==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0
@@ -7155,6 +7155,7 @@ packages:
       react: 18.2.0
       remeda: 1.9.4
       sst-aws-cdk: 2.62.2-3
+      tree-kill: 1.2.2
       undici: 5.21.2
       uuid: 9.0.0
       ws: 8.13.0
@@ -7500,6 +7501,10 @@ packages:
 
   /traverse@0.3.9:
     resolution: {integrity: sha512-iawgk0hLP3SxGKDfnDJf8wTz4p2qImnyihM5Hh/sGvQ3K37dPi/w8sRhdNIxYA1TwFwc5mDhIJq+O0RsvXBKdQ==}
+
+  /tree-kill@1.2.2:
+    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
 
   /trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}

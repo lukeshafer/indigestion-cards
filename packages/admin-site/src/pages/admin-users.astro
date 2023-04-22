@@ -4,7 +4,7 @@ import { useUser } from '@/session'
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user'
 
 const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect(`/?${Astro.url.searchParams.toString()}`)
+if (user?.type !== 'user') return Astro.redirect(`/404`)
 
 const users = await getAllAdminUsers()
 ---

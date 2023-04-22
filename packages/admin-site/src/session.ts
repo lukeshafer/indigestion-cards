@@ -11,7 +11,7 @@ declare module 'sst/node/future/auth' {
 }
 
 export function useSession(cookies: AstroCookies) {
-	const cookie = cookies.get('session')
+	const cookie = cookies.get('sst_auth_token')
 	if (!cookie.value) return
 	const session = Session.verify(cookie.value)
 	if (!session) return
