@@ -1,12 +1,12 @@
 ---
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
 import Page from '@/layouts/Page.astro'
-import H1 from '@/components/H1.astro'
 import Form from '@/components/form/Form.astro'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Bucket } from 'sst/node/bucket'
 import crypto from 'crypto'
 import { useUser } from '@/session'
+import { routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -17,7 +17,7 @@ const presigned = await createPresignedPost(s3, {
 	Key: crypto.randomBytes(20).toString('hex') + '.png',
 	Fields: {
 		acl: 'public-read',
-		success_action_redirect: Astro.url.origin + '/create/rarity-details',
+		success_action_redirect: Astro.url.origin + routes.ADMIN.CREATE.RARITY_DETAILS,
 	},
 })
 ---
@@ -28,10 +28,10 @@ const presigned = await createPresignedPost(s3, {
 	session={user}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: '/rarities' },
-		{ label: 'New Rarity', href: '/create/rarity' },
+		{ label: 'Rarities', href: routes.RARITIES },
+		{ label: 'New Rarity', href: routes.ADMIN.CREATE.RARITY },
 	]}>
-	<H1>Create new rarity</H1>
+	<h1 class="page-heading">Create new rarity</h1>
 	<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
 		{
 			Object.entries(presigned.fields).map(([key, value]) => (

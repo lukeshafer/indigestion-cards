@@ -4,6 +4,7 @@ import { useUser } from '@/session'
 import Page from '@/layouts/Page.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import TradingCard from '@/components/TradingCard.astro'
+import { routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -17,18 +18,18 @@ const rarities = await getAllRarities()
 	session={user}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: '/rarity' },
+		{ label: 'Rarities', href: routes.RARITIES },
 	]}>
 	<UnmatchedImageList type="frame" />
 	<div class="flex flex-wrap gap-8">
 		<h1 class="page-heading">Rarities</h1>
-		<a href="/create/rarity" class="button-link">Create New Rarity</a>
+		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
 	</div>
 	<ul id="rarity-list flex flex-wrap gap-8">
 		{
 			rarities.map(({ rarityName, rarityId, frameUrl, defaultCount }) => (
 				<li class="flex gap-4 flex-col items-center w-max">
-					<a href={`/rarity/${rarityId}`} class="text-center">
+					<a href={`${routes.RARITIES}/${rarityId}`} class="text-center">
 						<TradingCard>
 							<img src={frameUrl} width="200" alt="" />{' '}
 						</TradingCard>

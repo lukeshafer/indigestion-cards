@@ -1,6 +1,7 @@
 ---
 import { getUnmatchedDesignImages } from '@lil-indigestion-cards/core/card'
 import { Bucket } from 'sst/node/bucket'
+import { routes } from '@/constants'
 
 type UnmatchedImageType = NonNullable<Parameters<typeof getUnmatchedDesignImages>[0]>
 interface Props {
@@ -18,9 +19,9 @@ const entityNames = {
 const name = entityNames[Astro.props.type ?? 'default']
 
 const urlByType = {
-	frame: `/create/rarity-details?bucket=${Bucket.FrameDesigns.bucketName}&key=`,
-	cardDesign: `/create/card-design-details?bucket=${Bucket.CardDesigns.bucketName}&key=`,
-} satisfies Record<UnmatchedImageType, string>
+	frame: `${routes.ADMIN.CREATE.RARITY_DETAILS}?bucket=${Bucket.FrameDesigns.bucketName}&key=`,
+	cardDesign: `${routes.ADMIN.CREATE.CARD_DESIGN_DETAILS}?bucket=${Bucket.CardDesigns.bucketName}&key=`,
+} as const satisfies Record<UnmatchedImageType, string>
 ---
 
 {

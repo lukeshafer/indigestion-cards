@@ -1,5 +1,6 @@
 import type { AstroCookies } from 'astro'
 import { Session } from 'sst/node/future/auth'
+import { AUTH_TOKEN } from './constants'
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -11,7 +12,7 @@ declare module 'sst/node/future/auth' {
 }
 
 export function useSession(cookies: AstroCookies) {
-	const cookie = cookies.get('sst_auth_token')
+	const cookie = cookies.get(AUTH_TOKEN)
 	if (!cookie.value) return
 	const session = Session.verify(cookie.value)
 	if (!session) return

@@ -3,8 +3,8 @@ import CardList from '@/components/CardList.astro'
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/card'
-import { Api } from 'sst/node/api'
 import PostButton from '@/components/form/PostButton.astro'
+import { api, routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -12,7 +12,7 @@ if (user?.type !== 'user') return Astro.redirect('/404')
 const id = Astro.params.seasonId
 
 if (!id) {
-	return Astro.redirect(`/season?alert=Season ID is required`)
+	return Astro.redirect(`${routes.SEASONS}?alert=Season ID is required`)
 }
 
 const {
@@ -20,20 +20,24 @@ const {
 	cardDesigns,
 } = await getSeasonAndDesignsBySeasonId(id)
 
+if (!season) {
+	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist`)
+}
+
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Seasons', href: '/season' },
-	{ label: season!.seasonName, href: `/season/${id}` },
+	{ label: 'Seasons', href: routes.SEASONS },
+	{ label: season.seasonName, href: `${routes.SEASONS}/${id}` },
 ]
 ---
 
 <Page
-	title={season!.seasonName}
+	title={season.seasonName}
 	class="flex flex-col gap-4"
 	session={user}
 	breadcrumbs={breadcrumbs}>
-	<h1 class="page-heading">{season!.seasonName}</h1>
-	<p class="text-lg">Description: {season!.seasonDescription}</p>
+	<h1 class="page-heading">{season.seasonName}</h1>
+	<p class="text-lg">Description: {season.seasonDescription}</p>
 	<h2 class="text-xl pt-4">Cards:</h2>
 	<CardList cards={cardDesigns} />
 
@@ -41,7 +45,7 @@ const breadcrumbs = [
 		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
 		id="delete-season"
 		label="Delete Season"
-		url={`${Api.api.url}/delete-card-season/${id}?redirectUrl=${Astro.url.origin}/season`}
+		url={`${api.DELETE_CARD_SEASON}/${id}?redirect=${routes.SEASONS}`}
 	/>
 </Page>
 

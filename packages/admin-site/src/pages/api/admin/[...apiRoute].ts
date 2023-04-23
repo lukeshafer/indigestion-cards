@@ -1,38 +1,53 @@
+import { AUTH_TOKEN } from '@/constants'
 import { useUser } from '@/session'
 import type { APIRoute } from 'astro'
 import { Api } from 'sst/node/api'
 
 export const all: APIRoute = async (ctx) => {
 	const body = await ctx.request.text()
-	const slug = ctx.params.slug
-	if (!slug) {
+	const apiRoute = ctx.params.apiRoute
+	if (!apiRoute) {
 		return ctx.redirect('/404')
 	}
 
 	const session = useUser(ctx.cookies)
-	const token = ctx.cookies.get('sst_auth_token')
+	const token = ctx.cookies.get(AUTH_TOKEN)
 	if (!token || !session) {
 		return new Response('Unauthorized', { status: 401 })
 	}
 
 	console.log('redirect', ctx.url.origin + (ctx.url.searchParams.get('redirect') ?? '/'))
 	const redirectUrl = new URL(ctx.url.origin + (ctx.url.searchParams.get('redirect') ?? '/'))
-	const errorMessage = ctx.url.searchParams.get('errorMessage') ?? 'An error occurred.'
 
-	const response = await fetch(`${Api.api.url}/${slug}`, {
+	const response = await fetch(`${Api.api.url}/${apiRoute}`, {
 		method: ctx.request.method,
 		headers: {
 			'Content-Type':
 				ctx.request.headers.get('Content-Type') ?? 'application/x-www-form-urlencoded',
-			authorization: `Bearer ${ctx.cookies.get('sst_auth_token').value ?? ''}`,
+			authorization: `Bearer ${ctx.cookies.get(AUTH_TOKEN).value ?? ''}`,
 		},
 		body: body,
 	})
 
 	const responseBody = await response.text()
+	let message: string
+	let params: URLSearchParams | null = null
+	try {
+		const jsonBody = JSON.parse(responseBody)
+		message = jsonBody.message
+		if (jsonBody.redirectPath) {
+			redirectUrl.pathname = jsonBody.redirectPath
+		}
+		params = new URLSearchParams(jsonBody.params)
+		params.forEach((value, key) => {
+			redirectUrl.searchParams.set(key, value)
+		})
+	} catch (e) {
+		message = responseBody
+	}
 
 	if (response.status === 401) {
-		ctx.cookies.delete('sst_auth_token', { path: '/' })
+		ctx.cookies.delete(AUTH_TOKEN, { path: '/' })
 		redirectUrl.searchParams.set('alert', "Unauthorized. You've been logged out.")
 		return ctx.redirect(redirectUrl.toString(), 302)
 	}
@@ -42,20 +57,17 @@ export const all: APIRoute = async (ctx) => {
 	}
 
 	if (!response.ok) {
-		redirectUrl.searchParams.set('alert', errorMessage)
+		redirectUrl.searchParams.set(
+			'alert',
+			message || ctx.url.searchParams.get('errorMessage') || 'An error occurred.'
+		)
 		return ctx.redirect(redirectUrl.toString(), 302)
 	}
 
-	let successMessage: string
-	try {
-		const jsonBody = JSON.parse(responseBody)
-		successMessage = jsonBody.message
-	} catch (e) {
-		successMessage = responseBody
-	}
-	successMessage ||= ctx.url.searchParams.get('successMessage') || 'Success!'
-
-	redirectUrl.searchParams.set('alert', successMessage)
+	redirectUrl.searchParams.set(
+		'alert',
+		message || ctx.url.searchParams.get('successMessage') || 'Success!'
+	)
 	redirectUrl.searchParams.set('alertType', 'success')
 	return ctx.redirect(redirectUrl.toString(), 302)
 }

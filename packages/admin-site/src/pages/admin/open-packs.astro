@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 import { getAllPacks } from '@lil-indigestion-cards/core/card'
 import TradingCard from '@/components/TradingCard.astro'
-import { Api } from 'sst/node/api'
+import { api } from '@/constants'
 
 const user = useUser(Astro.cookies)
 
@@ -12,8 +12,6 @@ if (!user) {
 }
 
 const packs = await getAllPacks()
-const openUrl = new URL(Api.api.url)
-openUrl.pathname = '/open-card'
 ---
 
 <Page
@@ -35,7 +33,7 @@ openUrl.pathname = '/open-card'
 			}
 		</ul>
 	</section>
-	<open-showcase data-open-url={openUrl.toString()}>
+	<open-showcase data-open-url={api.OPEN_CARD}>
 		<ul class="cards"></ul>
 	</open-showcase>
 </Page>

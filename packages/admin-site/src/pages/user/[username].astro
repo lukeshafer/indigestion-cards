@@ -5,8 +5,7 @@ import { useUser } from '@/session'
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user'
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
 import PostButton from '@/components/form/PostButton.astro'
-import { Api } from 'sst/node/api'
-import { routes } from '@/constants'
+import { api, routes } from '@/constants'
 
 const session = useUser(Astro.cookies)
 
@@ -32,9 +31,9 @@ if (!data) {
 			users: [newUser],
 			cardInstances: [],
 		}
-		return Astro.redirect(`/user/${id}?redirect=${redirectCount + 1}`)
+		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`)
 	}
-	return Astro.redirect(`/user?alert=Username not found`)
+	return Astro.redirect(`${routes.USERS}?alert=Username not found`)
 }
 
 const { users, cardInstances } = data
@@ -44,8 +43,8 @@ const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt)
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Users', href: session?.type === 'user' ? '/user' : undefined },
-	{ label: user.username, href: `/user/${id}` },
+	{ label: 'Users', href: session?.type === 'user' ? routes.USERS : undefined },
+	{ label: user.username },
 ]
 ---
 
@@ -67,7 +66,7 @@ const breadcrumbs = [
 				<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
 				<PostButton
 					id="revoke-pack"
-					url={Api.api.url + '/revoke-pack'}
+					url={api.REVOKE_PACK}
 					label="Revoke Pack"
 					hiddenProperties={[
 						{ name: 'userId', value: user.userId },

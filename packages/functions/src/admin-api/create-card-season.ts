@@ -1,5 +1,5 @@
 import { createSeason } from '@lil-indigestion-cards/core/card'
-import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
+import { ApiHandler, useFormValue } from 'sst/node/api'
 import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
@@ -27,11 +27,25 @@ export const handler = ApiHandler(async () => {
 		seasonDescription: description,
 	})
 
-	const redirect = (useHeader('referer') ?? '/') + `season/${seasonId}`
-
 	return result.success
-		? { statusCode: 307, headers: { Location: redirect } }
+		? {
+			statusCode: 200,
+			body: JSON.stringify({
+				message: 'Season created!',
+				redirectPath: `/season/${seasonId}`,
+			}),
+		}
 		: result.error === 'Season already exists'
-		? { statusCode: 409, body: 'Error: ' + result.error }
-		: { statusCode: 500, body: 'Error: ' + result.error }
+			? {
+				statusCode: 409,
+				body: JSON.stringify({
+					message: 'Error: ' + result.error,
+					params: new URLSearchParams({
+						'form-name': seasonName!,
+						'form-seasonId': seasonId!,
+						'form-description': description ?? '',
+					}).toString(),
+				}),
+			}
+			: { statusCode: 500, body: 'Error: ' + result.error }
 })

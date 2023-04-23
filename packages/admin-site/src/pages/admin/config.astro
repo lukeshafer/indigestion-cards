@@ -3,7 +3,6 @@ import { getSiteConfig } from '@lil-indigestion-cards/core/site-config'
 import { getAllSeasons } from '@lil-indigestion-cards/core/card'
 import { useSession } from '@/session'
 import Page from '@/layouts/Page.astro'
-import H1 from '@/components/H1.astro'
 import Form from '@/components/form/Form.astro'
 import InputBase from '@/components/form/InputBase.astro'
 
@@ -19,7 +18,7 @@ const seasons = await getAllSeasons()
 	class="grid gap-4 justify-center"
 	session={user}
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Settings' }]}>
-	<H1>Site Settings</H1>
+	<h1 class="page-heading">Site Settings</h1>
 	<Form>
 		<InputBase id="seasonId" label="Current Season">
 			<select class="p-4 bg-gray-50" value={season[0]?.seasonId ?? ''}>

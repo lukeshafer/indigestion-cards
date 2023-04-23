@@ -1,20 +1,20 @@
 ---
 import Page from '@/layouts/Page.astro'
-import H1 from '@/components/H1.astro'
 import Form, { inputClasses } from '@/components/form/Form.astro'
-import { Api } from 'sst/node/api'
 import { useUser } from '@/session'
 import InputBase from '@/components/form/InputBase.astro'
+import { api, routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
-
-const url = Api.api.url + '/create-admin-user'
 ---
 
 <Page title="Add admin user" class="max-w-xl" session={user}>
-	<H1>Add admin user</H1>
-	<Form class="w-max" method="post" action={url}>
+	<h1 class="page-heading">Add admin user</h1>
+	<Form
+		class="w-max"
+		method="post"
+		action={`${api.CREATE_ADMIN_USER}?redirect=${routes.ADMIN.CREATE.ADMIN}`}>
 		<InputBase id="username" label="Twitch Username">
 			<input class={inputClasses.input} type="text" name="username" id="username" />
 		</InputBase>

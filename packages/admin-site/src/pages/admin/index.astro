@@ -2,10 +2,11 @@
 import { useUser } from '@/session'
 
 const user = useUser(Astro.cookies)
-if (user?.type === "user") return Astro.redirect("/")
+if (user?.type === 'user') return Astro.redirect('/')
 
 import { Icon } from 'astro-icon'
-import '../global.css'
+import '../../global.css'
+import { authApi } from '@/constants'
 ---
 
 <html lang="en">
@@ -18,7 +19,7 @@ import '../global.css'
 	</head>
 	<body>
 		<main>
-			<a class="shine" href="/auth/login">
+			<a class="shine" href={authApi.LOGIN}>
 				<Icon name="mdi:twitch" width="50" />
 				<span>Log in with Twitch</span>
 			</a>

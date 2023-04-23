@@ -1,5 +1,5 @@
 import { deleteSeasonById } from '@lil-indigestion-cards/core/card'
-import { usePathParam, ApiHandler, useQueryParam, useHeader } from 'sst/node/api'
+import { usePathParam, ApiHandler } from 'sst/node/api'
 import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
@@ -11,23 +11,29 @@ export const handler = ApiHandler(async () => {
 		}
 
 	const id = usePathParam('id')
-	if (!id) return { statusCode: 400, body: 'Missing season id' }
+	if (!id)
+		return {
+			statusCode: 400,
+			body: JSON.stringify({ message: 'Missing season id', redirectPath: `/season/${id}` }),
+		}
 
 	const result = await deleteSeasonById(id)
 
-	const redirectUrl = useQueryParam('redirectUrl') || '/'
-	const errorRedirect = `${useHeader('referer') || '/'}season/${id}?alert=`
-
 	return result.success
-		? { statusCode: 307, headers: { Location: redirectUrl } }
+		? { statusCode: 200, body: `Successfully deleted season '${result.data?.seasonName ?? id}'` }
 		: result.error === 'Cannot delete season with existing designs'
-		? {
-				statusCode: 307,
-				body: result.error,
-				headers: {
-					Location:
-						errorRedirect + 'Cannot delete season with existing cards. Delete card designs first',
-				},
-		  }
-		: { statusCode: 307, body: result.error, headers: { Location: errorRedirect + result.error } }
+			? {
+				statusCode: 400,
+				body: JSON.stringify({
+					message: 'Cannot delete season with existing designs. Delete card designs first',
+					redirectPath: `/season/${id}`,
+				}),
+			}
+			: {
+				statusCode: 500,
+				body: JSON.stringify({
+					message: result.error,
+					redirectPath: `/season/${id}`,
+				}),
+			}
 })

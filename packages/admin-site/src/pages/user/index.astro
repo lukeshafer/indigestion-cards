@@ -4,7 +4,7 @@ import { Icon } from 'astro-icon'
 import { useUser } from '@/session'
 import { getAllUsers } from '@lil-indigestion-cards/core/user'
 import Form from '@/components/form/Form.astro'
-import { publicApi } from '@/constants'
+import { publicApi, routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect(`/?${Astro.url.searchParams.toString()}`)
@@ -33,7 +33,7 @@ const users = await getAllUsers()
 					users.map(({ username, cardCount, packCount }) => (
 						<tr>
 							<td>
-								<a href={`/user/${username}`}>{username}</a>
+								<a href={`${routes.USERS}/${username}`}>{username}</a>
 							</td>
 							<td>
 								<Icon name="mdi:cards" aria-hidden="true" />

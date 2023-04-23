@@ -4,7 +4,7 @@ import {
 	getAllRarities,
 } from '@lil-indigestion-cards/core/card'
 import { parseS3Url } from '@lil-indigestion-cards/core/utils'
-import { ApiHandler, useFormValue, useHeader, useFormData } from 'sst/node/api'
+import { ApiHandler, useFormValue, useFormData } from 'sst/node/api'
 import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
@@ -19,7 +19,7 @@ export const handler = ApiHandler(async () => {
 
 	const imgUrl = useFormValue('imgUrl')
 	const imageKey = useFormValue('imageKey')
-	const seasonId = useFormValue('seasonId')
+	const season = useFormValue('season')
 	const cardName = useFormValue('cardName')
 	const cardDescription = useFormValue('cardDescription')
 	const artist = useFormValue('artist')
@@ -38,7 +38,7 @@ export const handler = ApiHandler(async () => {
 	const errors = []
 	if (!imgUrl) errors.push('Image URL is required')
 	if (!imageKey) errors.push('Image key is required')
-	if (!seasonId) errors.push('Season ID is required')
+	if (!season) errors.push('Season is required')
 	if (!cardName) errors.push('Card name is required')
 	if (!cardDescription) errors.push('Card description is required')
 	if (!artist) errors.push('Artist is required')
@@ -48,8 +48,11 @@ export const handler = ApiHandler(async () => {
 		return { statusCode: 400, body: errors.join(', ') }
 	}
 
+	const { seasonId, seasonName } = JSON.parse(season!)
+
 	const result = await createCardDesign({
 		seasonId: seasonId!,
+		seasonName: seasonName!,
 		cardName: cardName!,
 		cardDescription: cardDescription!,
 		artist: artist!,
@@ -62,19 +65,13 @@ export const handler = ApiHandler(async () => {
 		await deleteUnmatchedDesignImage(imageKey!)
 	}
 
-	const referer = useHeader('referer') ?? '/'
 	const { Bucket, Key } = parseS3Url(imgUrl!)
 
 	if (result.success) {
-		const url = new URL(referer)
-		url.searchParams.set('alert', 'Successfully created.')
-		url.searchParams.set('type', 'success')
-		url.pathname = `/design/${seasonId}/${designId}`
 		return {
-			statusCode: 307,
-			headers: {
-				Location: url.toString(),
-			},
+			statusCode: 200,
+			body: `Successfully created card design '${cardName}'`,
+			redirectPath: `/design/${seasonId}/${designId}`,
 		}
 	}
 
@@ -83,19 +80,18 @@ export const handler = ApiHandler(async () => {
 			? `Card design with id '${designId}' already exists. Please choose a different id.`
 			: result.error
 
-	const url = new URL(referer)
-	url.searchParams.set('alert', errorMessage)
-	url.searchParams.set('type', 'error')
-	url.pathname = `/create/card-design-details`
-	url.searchParams.set('bucket', Bucket)
-	url.searchParams.set('key', Key)
+	const params = new URLSearchParams({
+		bucket: Bucket,
+		key: Key,
+	})
 	useFormData()?.forEach((value, key) => {
-		url.searchParams.set(key, value)
+		params.set(key, value)
 	})
 	return {
-		statusCode: 307,
-		headers: {
-			Location: url.toString(),
-		},
+		statusCode: 400,
+		body: JSON.stringify({
+			message: errorMessage,
+			params,
+		}),
 	}
 })

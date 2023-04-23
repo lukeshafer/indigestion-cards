@@ -2,9 +2,9 @@
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 import { getRarityById } from '@lil-indigestion-cards/core/card'
-import { Api } from 'sst/node/api'
 import PostButton from '@/components/form/PostButton.astro'
 import TradingCard from '@/components/TradingCard.astro'
+import { routes, api } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -12,13 +12,13 @@ if (user?.type !== 'user') return Astro.redirect('/404')
 const { rarityId } = Astro.params
 
 if (!rarityId) {
-	return Astro.redirect(`/rarity?alert=Rarity Id is required`)
+	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is required`)
 }
 
 const rarity = await getRarityById({ rarityId })
 
 if (!rarity) {
-	return Astro.redirect(`/rarity?alert=Rarity Id is invalid`)
+	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is invalid`)
 }
 ---
 
@@ -28,8 +28,8 @@ if (!rarity) {
 	session={user}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: '/rarity' },
-		{ label: rarity.rarityName, href: `/rarity/${rarity.rarityId}` },
+		{ label: 'Rarities', href: routes.RARITIES },
+		{ label: rarity.rarityName, href: `${routes.RARITIES}/${rarity.rarityId}` },
 	]}>
 	<h1 data-id={rarityId} class="page-heading">{rarity.rarityName}</h1>
 	<TradingCard>
@@ -45,7 +45,7 @@ if (!rarity) {
 		</a>
 		<PostButton
 			class="flex-1"
-			url={`${Api.api.url}/delete-rarity/${rarity.rarityId}?name=${rarity.rarityName}`}
+			url={`${api.DELETE_RARITY}/${rarity.rarityId}?name=${rarity.rarityName}&redirect=${routes.RARITIES}`}
 			id={`delete-rarity-${rarityId}`}
 			label="Delete"
 			type="delete"

@@ -1,10 +1,10 @@
 ---
-import { Api } from 'sst/node/api'
 import Page from '@/layouts/Page.astro'
 import Form from '@/components/form/Form.astro'
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
 import { useUser } from '@/session'
 import PostButton from '@/components/form/PostButton.astro'
+import { api, routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -18,20 +18,19 @@ if (!bucket || !key) {
 
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 
-const url = Api.api.url + '/create-card-design'
 const seasons = await getAllSeasons()
 const rarities = await getAllRarities()
 
-const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${Astro.url.origin}/design`
+const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGNS}`
 ---
 
 <Page
 	title="Add Card Design"
 	breadcrumbs={[
 		{ href: '/', label: 'Home' },
-		{ href: '/design', label: 'Designs' },
-		{ href: '/create/card-design', label: 'New Card' },
-		{ href: '', label: 'Details' },
+		{ href: routes.DESIGNS, label: 'Designs' },
+		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
+		{ label: 'Details' },
 	]}
 	session={user}>
 	<h1 class="page-heading">Add Card Design</h1>
@@ -48,15 +47,15 @@ const deleteUrl = `${Api.api.url}/delete-unmatched-image/${key}?redirectUrl=${As
 			/>
 		</div>
 
-		<Form action={url}>
+		<Form action={`${api.CREATE_CARD_DESIGN}?redirect=${routes.ADMIN.CREATE.CARD_DESIGN_DETAILS}`}>
 			<input type="hidden" name="imgUrl" value={imgUrl} />
 			<input type="hidden" name="imageKey" value={key} />
 			<div class="input-group">
-				<label for="seasonId">Season</label>
-				<select name="seasonId" required>
+				<label for="season">Season</label>
+				<select name="season" required>
 					{
 						seasons.map(({ seasonId, seasonName }) => (
-							<option value={seasonId}>{seasonName}</option>
+							<option value={JSON.stringify({ seasonId, seasonName })}>{seasonName}</option>
 						))
 					}
 				</select>

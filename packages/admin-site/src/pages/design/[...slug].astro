@@ -4,56 +4,56 @@ import Page from '@/layouts/Page.astro'
 import TradingCard from '@/components/TradingCard.astro'
 import { useUser } from '@/session'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
-import { Api } from 'sst/node/api'
+import { routes, api } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
 
 const slug = Astro.params.slug
 if (!slug) {
-	return Astro.redirect('/design?error=No design id provided')
+	return Astro.redirect(`${routes.DESIGNS}?error=No design id provided`)
 }
 
 const from = new URL(Astro.request.headers.get('referer') ?? '/').pathname.split('/')[1]
 const [seasonId, designId] = slug.split('/')
+console.log({ seasonId, designId, slug, from })
 
 if (!seasonId) {
-	return Astro.redirect(`/design?alert=No season id provided: ${slug}`)
+	return Astro.redirect(`${routes.DESIGNS}?alert=No season id provided: ${slug}`)
 }
 
 if (!designId) {
-	return Astro.redirect(`/season/${seasonId}`)
+	return Astro.redirect(`${routes.SEASONS}/${seasonId}`)
 }
 
 const {
-	season: [season],
 	cardDesigns: [design],
 	cardInstances,
 } = await getCardDesignAndInstancesById({ designId, seasonId })
-const openedCards = cardInstances.filter((card) => card.packId === undefined)
+const openedCards = cardInstances.filter((card) => card.openedAt !== undefined)
 
 if (!design) {
-	return Astro.redirect('/design?error=No design found with that id')
+	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`)
 }
 
 const breadcrumbs = [{ label: 'Home', href: '/' }]
 
 if (from === 'design') {
 	breadcrumbs.push(
-		{ label: 'Designs', href: `/design` },
-		{ label: design.cardName, href: `/design/${slug}` }
+		{ label: 'Designs', href: routes.DESIGNS },
+		{ label: design.cardName, href: `${routes.DESIGNS}/${slug}` }
 	)
 } else {
 	breadcrumbs.push(
-		{ label: 'Seasons', href: `/season` },
-		{ label: season!.seasonName, href: `/season/${season!.seasonId}` },
-		{ label: design.cardName, href: `/design/${slug}` }
+		{ label: 'Seasons', href: routes.SEASONS },
+		{ label: design.seasonName, href: `${routes.SEASONS}/${design.seasonId}` },
+		{ label: design.cardName, href: `${routes.DESIGNS}/${slug}` }
 	)
 }
 ---
 
 <Page
-	title={`${design.cardName} - ${season!.seasonName}`}
+	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-4"
 	session={user}
 	breadcrumbs={breadcrumbs}>
@@ -67,8 +67,8 @@ if (from === 'design') {
 			openedCards.length > 0 ? (
 				openedCards.map((card) => (
 					<li>
-						<a href={`/card/${card.instanceId}`}>{card.rarityId}: </a>
-						<a href={`/user/${card.userId}`}>Owned by {card.username}</a>
+						<a href="#">{card.rarityId}: </a>
+						<a href={`${routes.USERS}/${card.username}`}>Owned by {card.username}</a>
 					</li>
 				))
 			) : (
@@ -79,7 +79,7 @@ if (from === 'design') {
 	<PostButton
 		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
 		id="delete-design-form"
-		url={`${Api.api.url}/delete-card-design/${seasonId}/${designId}?redirectUrl=${Astro.url.protocol}${Astro.url.host}/design`}
+		url={`${api.DELETE_CARD_DESIGN}/${seasonId}/${designId}?redirect=${routes.DESIGNS}`}
 		label="Delete Card"
 	/>
 </Page>

@@ -1,5 +1,15 @@
 export const api = {
 	GIVE_PACK_TO_USER: '/api/admin/give-pack-to-user',
+	CREATE_CARD_SEASON: '/api/admin/create-card-season',
+	CREATE_CARD_DESIGN: '/api/admin/create-card-design',
+	CREATE_RARITY: '/api/admin/create-rarity',
+	DELETE_CARD_DESIGN: '/api/admin/delete-card-design',
+	DELETE_CARD_SEASON: '/api/admin/delete-card-season',
+	DELETE_UNMATCHED_IMAGE: '/api/admin/delete-unmatched-image',
+	DELETE_RARITY: '/api/admin/delete-rarity',
+	CREATE_ADMIN_USER: '/api/admin/create-admin-user',
+	REVOKE_PACK: '/api/admin/revoke-pack',
+	OPEN_CARD: '/api/admin/open-card',
 } as const
 
 export const publicApi = {
@@ -20,7 +30,7 @@ export const routes = {
 	RARITIES: '/rarity',
 	ADMIN_USERS: '/admin-users',
 	ADMIN: {
-		LOGIN: '/admin/login',
+		LOGIN: '/admin',
 		CONFIG: '/admin/config',
 		GIVE_CARD: '/admin/give-card',
 		GIVE_PACK: '/admin/give-pack',
@@ -35,3 +45,5 @@ export const routes = {
 		},
 	},
 } as const
+
+export const AUTH_TOKEN = 'sst_auth_token'

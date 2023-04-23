@@ -1,10 +1,11 @@
 ---
-import { Api } from 'sst/node/api'
+import { publicApi } from '@/constants'
+
 import Form from './form/Form.astro'
 ---
 
-<user-search data-api-route={Api.api.url + '/get-all-usernames'}>
-	<Form method="get" action="/api/search" loadingText="Searching" autocomplete="off">
+<user-search data-api-route={publicApi.GET_ALL_USERNAMES}>
+	<Form method="get" action={publicApi.SEARCH} loadingText="Searching" autocomplete="off">
 		<input name="username" data-user-search type="text" placeholder="Twitch Username" required />
 		<ul data-results class="brand-shadow no-text-shadow"></ul>
 	</Form>
@@ -45,7 +46,7 @@ import Form from './form/Form.astro'
 		async fetchUsernames() {
 			if (this.users.length > 0 || this.isfetching) return
 			this.isfetching = true
-			const response = await fetch('/api/get-all-usernames')
+			const response = await fetch(this.dataset.apiRoute!)
 			const usernames = await response.json()
 			if (!Array.isArray(usernames)) throw new Error('Invalid response from server')
 			this.users = usernames

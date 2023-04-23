@@ -1,3 +1,4 @@
+import { AUTH_TOKEN } from '@/constants'
 import type { APIContext } from 'astro'
 import { Auth } from 'sst/node/future/auth'
 
@@ -22,7 +23,7 @@ export async function get(ctx: APIContext) {
 		throw new Error('No access token')
 	}
 
-	ctx.cookies.set('sst_auth_token', response.access_token, {
+	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
 		maxAge: 60 * 60 * 24 * 30,
 		path: '/',
 	})

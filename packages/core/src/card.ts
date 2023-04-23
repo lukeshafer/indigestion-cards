@@ -354,7 +354,7 @@ export async function getCardDesignById(args: { designId: string; seasonId: stri
 }
 
 export async function getCardDesignAndInstancesById(args: { designId: string; seasonId: string }) {
-	const result = await db.collections.seasonAndDesigns(args).go()
+	const result = await db.collections.designAndCards(args).go()
 	return result.data
 }
 

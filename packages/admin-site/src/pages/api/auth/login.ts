@@ -1,6 +1,7 @@
 import { Auth } from 'sst/node/future/auth'
 import { useUser } from '@/session'
 import type { APIRoute } from 'astro'
+import { authApi } from '@/constants'
 
 export const get: APIRoute = async (ctx) => {
 	const user = useUser(ctx.cookies)
@@ -8,7 +9,7 @@ export const get: APIRoute = async (ctx) => {
 
 	const authParams = new URLSearchParams({
 		client_id: 'local',
-		redirect_uri: ctx.url.origin + '/auth/callback',
+		redirect_uri: ctx.url.origin + authApi.CALLBACK,
 		response_type: 'code',
 		provider: 'twitch',
 	}).toString()

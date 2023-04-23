@@ -45,7 +45,6 @@ export function API({ stack }: StackContext) {
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
 			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
-			'POST /get-all-usernames': 'packages/functions/src/admin-api/get-all-usernames.handler',
 		},
 		defaults: {
 			function: {

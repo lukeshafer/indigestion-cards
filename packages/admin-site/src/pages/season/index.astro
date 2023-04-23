@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro'
 import { getAllSeasons } from '@lil-indigestion-cards/core/card'
 import { useUser } from '@/session'
+import { routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -10,7 +11,7 @@ const seasons = await getAllSeasons()
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Seasons', href: '/seasons' },
+	{ label: 'Seasons', href: routes.SEASONS },
 ]
 ---
 
@@ -22,7 +23,7 @@ const breadcrumbs = [
 	<div class="flex flex-wrap gap-8">
 		<h1 class="page-heading">All Seasons</h1>
 		<a
-			href="/create/season"
+			href={routes.ADMIN.CREATE.SEASON}
 			class="text-xl bg-brand-tertiary p-3 pt-4 px-4 text-center w-max font-display lowercase italic shine text-shadow text-white">
 			Create New Season
 		</a>
@@ -37,7 +38,7 @@ const breadcrumbs = [
 							'bg-accent-secondary': index % 2 === 0,
 							'bg-accent-primary': index % 2 === 1,
 						}}
-						href={`/season/${season.seasonId}`}>
+						href={`${routes.SEASONS}/${season.seasonId}`}>
 						{season.seasonName}
 					</a>
 				</li>

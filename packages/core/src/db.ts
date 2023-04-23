@@ -35,6 +35,10 @@ const cardDesigns = new Entity(
 				type: 'string',
 				required: true,
 			},
+			seasonName: {
+				type: 'string',
+				required: true,
+			},
 			releaseDate: {
 				type: 'string',
 			},
@@ -522,7 +526,7 @@ const rarities = new Entity(
 	config
 )
 
-export const admins = new Entity({
+const admins = new Entity({
 	model: {
 		entity: 'admin',
 		version: '1',
@@ -558,7 +562,47 @@ export const admins = new Entity({
 	},
 })
 
-export const siteConfig = new Entity(
+const packTypes = new Entity({
+	model: {
+		entity: 'packType',
+		version: '1',
+		service: 'card-app',
+	},
+	attributes: {
+		packTypeId: {
+			type: 'string',
+			required: true,
+		},
+		packTypeName: {
+			type: 'string',
+			required: true,
+		},
+		seasonId: {
+			type: 'string',
+		},
+		designIds: {
+			type: 'list',
+			items: {
+				type: 'string',
+			},
+		},
+	},
+	indexes: {
+		allPackTypes: {
+			collection: 'siteConfig',
+			pk: {
+				field: 'pk',
+				composite: [],
+			},
+			sk: {
+				field: 'sk',
+				composite: ['packTypeId'],
+			},
+		},
+	},
+})
+
+const siteConfig = new Entity(
 	{
 		model: {
 			entity: 'siteConfig',

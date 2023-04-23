@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
 import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user'
 import { useUser } from '@/session'
+import { routes } from '@/constants'
 
 export const get: APIRoute = async (ctx) => {
 	const session = useUser(ctx.cookies)
@@ -24,7 +25,7 @@ export const get: APIRoute = async (ctx) => {
 		return new Response(null, {
 			status: 302,
 			headers: {
-				Location: `/user/${user.username}`,
+				Location: `${routes.USERS}/${user.username}`,
 			},
 		})
 	}
@@ -35,7 +36,7 @@ export const get: APIRoute = async (ctx) => {
 		return new Response(null, {
 			status: 302,
 			headers: {
-				Location: `/user/${similarUsers[0]!.username}`,
+				Location: `${routes.USERS}/${similarUsers[0]!.username}`,
 			},
 		})
 	}
