@@ -1,0 +1,54 @@
+---
+import Page from '@/layouts/Page.astro'
+import { Icon } from 'astro-icon'
+import { useUser } from '@/session'
+import { getAllPackTypes } from '@lil-indigestion-cards/core/card'
+import { routes } from '@/constants'
+import SortTable from '@/components/SortTable.astro'
+
+const user = useUser(Astro.cookies)
+if (user?.type !== 'user') return Astro.redirect(`/?${Astro.url.searchParams.toString()}`)
+
+const packTypes = await getAllPackTypes()
+---
+
+<Page
+	title="Pack Types"
+	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Pack Types' }]}
+	session={user}>
+	<SortTable>
+		<header slot="header" class="flex justify-between flex-wrap mb-4">
+			<h1 class="page-heading">Pack Types</h1>
+			<a
+				href={routes.ADMIN.CREATE.PACK_TYPE}
+				class="text-xl bg-brand-tertiary p-3 px-4 text-center w-max font-display lowercase italic shine pt-4 text-shadow text-white">
+				Create New Pack Type
+			</a>
+		</header>
+		<thead>
+			<tr>
+				<th class="w-1/2">Pack Name</th>
+				<th>Card Pool</th>
+				<th>Cards</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				packTypes.map(({ cardCount, packTypeName, packTypeId, packTypeCategory, seasonName }) => (
+					<tr>
+						<td>
+							<a href={`${routes.PACK_TYPES}/${packTypeId}`}>{packTypeName}</a>
+						</td>
+						<td>
+							<span>{packTypeCategory === 'season' ? seasonName : packTypeCategory}</span>
+						</td>
+						<td>
+							<Icon name="mdi:cards" aria-hidden="true" />
+							<span>{cardCount}</span>
+						</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</SortTable>
+</Page>

@@ -66,8 +66,10 @@ const breadcrumbs = [
 				<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
 				<PostButton
 					id="revoke-pack"
-					url={api.REVOKE_PACK}
+					url={`${api.REVOKE_PACK}?redirect=${routes.USERS}/${user.username}`}
 					label="Revoke Pack"
+					type="delete"
+					confirm
 					hiddenProperties={[
 						{ name: 'userId', value: user.userId },
 						{ name: 'username', value: user.username },

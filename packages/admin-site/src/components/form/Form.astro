@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'astro/types'
 type Props = HTMLAttributes<'form'> & {
 	loadingText?: string
 }
+export type FormProps = Props
 const { class: className = '', action, method, loadingText, ...attrs } = Astro.props
 
 export const inputClasses = {
@@ -32,7 +33,7 @@ export const inputClasses = {
 				display: 'none',
 			}}>
 			<img src="/lilindPB.gif" />
-			<span class="loading-text text-left">{loadingText || "Saving"}</span>
+			<span class="loading-text text-left">{loadingText || 'Saving'}</span>
 		</div>
 	</div>
 </my-form>
@@ -123,6 +124,21 @@ export const inputClasses = {
 		display: block;
 		font-weight: 600;
 		font-family: var(--font-heading);
+	}
+
+	my-form label.required::after {
+		content: ' *';
+		color: red;
+	}
+
+	my-form input[type='checkbox'] {
+		display: inline-block;
+		width: auto;
+	}
+
+	my-form input[type='checkbox'] + label {
+		display: inline-block;
+		font-weight: 400;
 	}
 
 	my-form fieldset label {
@@ -229,7 +245,8 @@ export const inputClasses = {
 
 			const form = this.querySelector('form') as HTMLFormElement
 			const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement
-			form.addEventListener('submit', () => {
+			form.addEventListener('submit', (e) => {
+				if (e.defaultPrevented) return
 				form.style.opacity = '0.5'
 				loadingSpinner.style.display = 'flex'
 			})
@@ -292,6 +309,18 @@ export const inputClasses = {
 					editButton.style.display = 'none'
 				})
 				wrapper.append(editButton)
+			})
+
+			this.querySelectorAll('.input-group').forEach((group) => {
+				const label = group.querySelector<HTMLLabelElement>('label')
+				const inputs = group.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+					'input, textarea, select'
+				)
+				inputs.forEach((input) => {
+					if (input.required) {
+						label?.classList.add('required')
+					}
+				})
 			})
 		}
 	}

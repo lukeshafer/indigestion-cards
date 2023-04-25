@@ -1,71 +1,44 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useUser } from '@/session'
-import { getAllAdminUsers } from '@lil-indigestion-cards/core/user'
-import { routes } from '@/constants'
-import SortTable from '@/components/SortTable.astro'
+import type { HTMLAttributes } from 'astro/types'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect(`/404`)
-
-const users = await getAllAdminUsers()
+type Props = HTMLAttributes<'table'>
 ---
 
-<Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]} session={user}>
-	<SortTable>
-		<header slot="header" class="flex justify-between flex-wrap mb-4">
-			<h1 class="page-heading">Admin Users</h1>
-			<a
-				href={routes.ADMIN.CREATE.ADMIN}
-				class="text-xl bg-brand-tertiary p-3 pt-4 px-4 text-center w-max font-display lowercase italic shine text-shadow text-white">
-				Add Admin
-			</a>
-		</header>
-		<thead>
-			<tr>
-				<th>Username</th>
-			</tr>
-		</thead>
-		<tbody>
-			{
-				users.map(({ username }) => (
-					<tr>
-						<td>{username}</td>
-					</tr>
-				))
-			}
-		</tbody>
-	</SortTable>
-</Page>
+<sort-table>
+	<slot name="header" />
+	<table {...Astro.props}>
+		<slot />
+	</table>
+</sort-table>
 
-<style>
-	user-table {
+<style is:global>
+	sort-table {
 		max-width: 60rem;
 		display: block;
 	}
 
-	table {
+	sort-table table {
 		table-layout: fixed;
+		text-align: center;
 		width: 100%;
 		max-width: 60rem;
-		text-align: center;
 	}
 
-	th {
+	sort-table th {
 		cursor: pointer;
 	}
 
-	tbody td {
+	sort-table tbody td {
 		font-weight: 500;
 		padding: 1.5rem;
 		position: relative;
 	}
 
-	tbody td span {
+	sort-table tbody td span {
 		position: relative;
 	}
 
-	tbody td [astro-icon] {
+	sort-table tbody td [astro-icon] {
 		width: 3rem;
 		color: white;
 		position: absolute;
@@ -74,29 +47,29 @@ const users = await getAllAdminUsers()
 		transform: translate(-50%, -50%);
 	}
 
-	tbody tr:nth-child(even) [astro-icon] {
+	sort-table tbody tr:nth-child(even) [astro-icon] {
 		color: lightgray;
 	}
 
-	tbody tr:nth-child(even) {
+	sort-table tbody tr:nth-child(even) {
 		@apply bg-gray-50;
 	}
 
-	tbody tr:nth-child(odd) {
+	sort-table tbody tr:nth-child(odd) {
 		@apply bg-gray-200;
 	}
 
-	th[data-mode='ascending']::after {
+	sort-table th[data-mode='ascending']::after {
 		content: '▲';
 	}
 
-	th[data-mode='descending']::after {
+	sort-table th[data-mode='descending']::after {
 		content: '▼';
 	}
 </style>
 
 <script>
-	class UserTable extends HTMLElement {
+	class SortTable extends HTMLElement {
 		constructor() {
 			super()
 		}
@@ -144,5 +117,5 @@ const users = await getAllAdminUsers()
 		}
 	}
 
-	customElements.define('user-table', UserTable)
+	customElements.define('sort-table', SortTable)
 </script>

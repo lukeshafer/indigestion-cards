@@ -35,6 +35,7 @@ export function API({ stack }: StackContext) {
 			'POST /create-card-season': 'packages/functions/src/admin-api/create-card-season.handler',
 			'POST /create-card-design': 'packages/functions/src/admin-api/create-card-design.handler',
 			'POST /create-rarity': 'packages/functions/src/admin-api/create-rarity.handler',
+			'POST /create-pack-type': 'packages/functions/src/admin-api/create-pack-type.handler',
 			'POST /delete-card-design/{seasonId}/{designId}':
 				'packages/functions/src/admin-api/delete-card-design.handler',
 			'POST /delete-card-season/{id}':

@@ -30,6 +30,7 @@ const adminLinks = [
 	{ href: routes.SEASONS, title: 'Seasons' },
 	{ href: routes.RARITIES, title: 'Rarities' },
 	{ href: routes.ADMIN_USERS, title: 'Admins' },
+	{ href: routes.PACK_TYPES, title: 'Pack Types' },
 ] satisfies { href: string; title: string }[]
 
 const packs = await getAllPacks()
@@ -71,7 +72,7 @@ const actionLinks = [
 								Administration
 							</h2>
 							{adminLinks.map(({ href, title }) =>
-								currentPage === href ? (
+								currentPage === href || currentPage.startsWith(href) ? (
 									<a
 										rel="prefetch"
 										href={href}
@@ -94,7 +95,7 @@ const actionLinks = [
 							<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
 								<a
 									rel="prefetch"
-									href="/auth/logout"
+									href="/api/auth/logout"
 									title="Logout"
 									class="block hover:bg-gray-100 p-3">
 									Logout
@@ -137,7 +138,7 @@ const actionLinks = [
 			<div class="flex-1">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
-			<main class={(className ?? '') + ' p-6 col-start-2'}>
+			<main class={(className ?? '') + ' p-2 md:p-4 col-start-2'}>
 				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
 				<slot />
 			</main>

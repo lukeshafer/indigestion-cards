@@ -2,7 +2,7 @@
 import Form from '@/components/form/Form.astro'
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
-import { api } from '@/constants'
+import { api, routes } from '@/constants'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -18,7 +18,7 @@ const apiUrl = api.GIVE_PACK_TO_USER
 		{ label: 'Give Pack', href: '/give-pack' },
 	]}>
 	<h1 class="page-heading">Give Pack</h1>
-	<Form action={apiUrl + '?redirect=/give-pack'}>
+	<Form action={apiUrl + `?redirect=${routes.ADMIN.GIVE_PACK}`}>
 		<div class="input-group">
 			<label for="username">Username</label>
 			<input type="text" name="username" id="username" required />

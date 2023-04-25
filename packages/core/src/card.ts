@@ -5,13 +5,13 @@ import { createNewUser, getUser } from './user'
 
 type Result<T> =
 	| {
-		success: true
-		data: T
-	}
+			success: true
+			data: T
+	  }
 	| {
-		success: false
-		error: string
-	}
+			success: false
+			error: string
+	  }
 
 type CardDesign = typeof db.entities.cardDesigns
 type Card = typeof db.entities.cardInstances
@@ -19,6 +19,7 @@ type Season = typeof db.entities.season
 type UnmatchedImage = typeof db.entities.unmatchedImages
 type Pack = typeof db.entities.packs
 type Rarity = typeof db.entities.rarities
+type PackType = typeof db.entities.packTypes
 
 export type CardDesignEntity = EntityItem<CardDesign>
 
@@ -76,8 +77,9 @@ export async function generateCard(info: {
 	})
 
 	const assignedRarityId = rarityList[Math.floor(Math.random() * rarityList.length)]
-	const instanceId = `${info.seasonId}-${design.designId}-${assignedRarityId}-${(rarityMap.get(assignedRarityId)?.count ?? 0) + 1
-		}`
+	const instanceId = `${info.seasonId}-${design.designId}-${assignedRarityId}-${
+		(rarityMap.get(assignedRarityId)?.count ?? 0) + 1
+	}`
 
 	const assignedRarity = rarityMap.get(assignedRarityId)!
 
@@ -170,6 +172,7 @@ export async function getPackById(args: { packId: string }) {
 
 export async function findPackForUser(args: { userId: string }) {
 	const result = await db.entities.packs.find({ userId: args.userId }).go()
+	if (result.data.length === 0) return null
 	return result.data[0]
 }
 
@@ -178,12 +181,9 @@ export async function deleteFirstPackForUser(args: {
 }): Promise<Result<EntityItem<Pack> | null>> {
 	try {
 		const pack = await findPackForUser(args)
-		//if (pack.cardDetails && pack.cardDetails.length > 0) {
-		//const result = await db.entities.cardInstances.delete(pack.cardDetails).go()
-		//if (result.unprocessed.length > 0) throw new Error('Failed to delete card instances')
-		//}
+		if (!pack) return { success: false, error: 'User has no pack to delete!' }
 
-		const user = await getUser(pack.userId)
+		const user = await getUser(args.userId)
 		const result = await db.transaction
 			.write(({ users, cardInstances, packs }) => [
 				packs.delete({ packId: pack.packId }).commit(),
@@ -339,6 +339,35 @@ export async function openCardFromPack(args: { instanceId: string }) {
 	return {
 		success: true,
 		data: result.data[0].item,
+	}
+}
+
+// PACK TYPE //
+
+export async function getAllPackTypes() {
+	const result = await db.entities.packTypes.query.allPackTypes({}).go()
+	return result.data
+}
+
+export async function createPackType(args: CreateEntityItem<PackType>) {
+	try {
+		const result = await db.entities.packTypes.create({ ...args }).go()
+		return { success: true, data: result.data }
+	} catch (err) {
+		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` }
+
+		if (err.code === 4001)
+			// aws error, design already exists
+			return {
+				success: false,
+				error: 'Pack already exists',
+			}
+
+		// default
+		return {
+			success: false,
+			error: err.message,
+		}
 	}
 }
 

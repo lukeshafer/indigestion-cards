@@ -6,6 +6,7 @@ import Form from './form/Form.astro'
 
 <user-search data-api-route={publicApi.GET_ALL_USERNAMES}>
 	<Form method="get" action={publicApi.SEARCH} loadingText="Searching" autocomplete="off">
+		<label class="visually-hidden" for="username">Twitch Username</label>
 		<input name="username" data-user-search type="text" placeholder="Twitch Username" required />
 		<ul data-results class="brand-shadow no-text-shadow"></ul>
 	</Form>
@@ -51,6 +52,7 @@ import Form from './form/Form.astro'
 			if (!Array.isArray(usernames)) throw new Error('Invalid response from server')
 			this.users = usernames
 			this.isfetching = false
+			console.log('fetched usernames')
 		}
 
 		doSearch() {
@@ -66,14 +68,12 @@ import Form from './form/Form.astro'
 				if (!username.toLowerCase().includes(search.toLowerCase())) {
 					if (tempResults.includes(username)) {
 						tempResults.splice(this.searchResults.indexOf(username), 1)
-						console.log('removed', username)
 					}
 					continue
 				}
 
 				if (!tempResults.includes(username)) {
 					tempResults.push(username)
-					console.log('added', username)
 				}
 			}
 
@@ -113,7 +113,7 @@ import Form from './form/Form.astro'
 			const form = this.querySelector('form') as HTMLFormElement
 			this.results = this.querySelector('[data-results]') as HTMLUListElement
 
-			searchInput.addEventListener('hover', this.fetchUsernames.bind(this))
+			searchInput.addEventListener('mouseover', this.fetchUsernames.bind(this))
 			searchInput.addEventListener('focus', this.fetchUsernames.bind(this))
 			searchInput.addEventListener('click', this.fetchUsernames.bind(this))
 

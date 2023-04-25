@@ -1,4 +1,4 @@
-import { ApiHandler, useFormValue, useHeader } from 'sst/node/api'
+import { ApiHandler, useFormValue } from 'sst/node/api'
 import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card'
 import { useSession } from 'sst/node/future/auth'
 
@@ -15,16 +15,15 @@ export const handler = ApiHandler(async () => {
 	if (!userId) return { statusCode: 400, body: 'Missing userId' }
 	if (!username) return { statusCode: 400, body: 'Missing username' }
 
+	console.log('Revoking pack for', username, userId)
 	const result = await deleteFirstPackForUser({ userId })
 
-	const redirectUrl = new URL(useHeader('referer') ?? 'http://localhost:3000')
-	redirectUrl.pathname = `/user/${username}`
 	if (!result.success) {
-		redirectUrl.searchParams.set('alert', result.error)
-		return { statusCode: 302, headers: { Location: redirectUrl.toString() } }
+		return { statusCode: 400, body: result.error }
 	}
 
-	redirectUrl.searchParams.set('alert', `Revoked 1 pack for ${username}`)
-	redirectUrl.searchParams.set('alertType', 'success')
-	return { statusCode: 302, headers: { Location: redirectUrl.toString() } }
+	return {
+		statusCode: 200,
+		body: `Revoked 1 pack for ${username}`,
+	}
 })

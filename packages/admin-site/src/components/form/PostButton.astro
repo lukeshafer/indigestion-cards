@@ -9,22 +9,56 @@ interface Props {
 		name: string
 		value: string
 	}[]
+	confirm?: boolean
 }
 
-const { url, id, label, class: className, type = 'submit', hiddenProperties = [] } = Astro.props
+const {
+	url,
+	id,
+	label,
+	class: className,
+	type = 'submit',
+	hiddenProperties = [],
+	confirm = false,
+} = Astro.props
 ---
 
-<form id={id} action={url} method="post">
-	{hiddenProperties.map(({ name, value }) => <input type="hidden" name={name} value={value} />)}
-	<button
-		type="submit"
-		class="font-bold py-2 px-4 shine transition-colors text-shadow uppercase"
-		class:list={{
-			[className ?? '']: true,
-			'bg-red-500 hover:bg-red-700 text-white': type === 'delete',
-			'bg-brand-tertiary hover:bg-brand-secondary text-white': type === 'submit',
-		}}
-		id="delete-design">
-		{label}
-	</button>
-</form>
+<post-button>
+	<form id={id} action={url} method="post" data-confirm={confirm}>
+		{hiddenProperties.map(({ name, value }) => <input type="hidden" name={name} value={value} />)}
+		<button
+			type="submit"
+			class="font-bold py-2 px-4 shine transition-colors text-shadow uppercase"
+			class:list={{
+				[className ?? '']: true,
+				'bg-red-500 hover:bg-red-700 text-white': type === 'delete',
+				'bg-brand-tertiary hover:bg-brand-secondary text-white': type === 'submit',
+			}}
+			id="delete-design">
+			{label}
+		</button>
+	</form>
+</post-button>
+
+<script>
+	class PostButton extends HTMLElement {
+		constructor() {
+			super()
+		}
+
+		connectedCallback() {
+			const form = this.querySelector('form')!
+
+			console.log(form.dataset.confirm)
+
+			if (form.dataset.confirm !== undefined) {
+				form.addEventListener('submit', (e) => {
+					const result = confirm('Are you sure?')
+					if (!result) e.preventDefault()
+				})
+			}
+		}
+	}
+
+	customElements.define('post-button', PostButton)
+</script>

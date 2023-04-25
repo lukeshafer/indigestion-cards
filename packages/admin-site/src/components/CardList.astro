@@ -1,8 +1,10 @@
 ---
 import { routes } from '@/constants'
+import type { Session } from '@/session'
 import TradingCard from './TradingCard.astro'
 
 interface Props {
+	session: Session | null
 	cards: {
 		designId: string
 		seasonId: string
@@ -12,23 +14,25 @@ interface Props {
 	}[]
 }
 const { props } = Astro
+
+const Element = props.session?.type === 'user' ? 'a' : 'div'
 ---
 
 <ul class="grid justify-start w-full px-3">
 	{
 		props.cards.length > 0 ? (
 			props.cards.map(({ designId, seasonId, cardName, imgUrl, cardDescription }, index) => (
-				<a
+				<Element
 					rel="prefetch"
 					href={`${routes.DESIGNS}/${seasonId}/${designId}`}
 					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
 					class:list={{ 'bg-gray-200': index % 2 === 0, 'bg-white': index % 2 === 1 }}>
-					<TradingCard>
+					<TradingCard shiny={index % 2 === 0}>
 						<img src={imgUrl} width="300" alt={`${cardName} image`} />
 					</TradingCard>
 					<h2 class="mt-4 font-display font-bold italic text-2xl">{cardName}</h2>
 					<p>{cardDescription}</p>
-				</a>
+				</Element>
 			))
 		) : (
 			<p>No cards found</p>

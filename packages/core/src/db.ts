@@ -577,13 +577,41 @@ const packTypes = new Entity({
 			type: 'string',
 			required: true,
 		},
+		packTypeDescription: {
+			type: 'string',
+		},
+		packTypeCategory: {
+			type: ['season', 'custom'] as const,
+			required: true,
+		},
+		cardCount: {
+			type: 'number',
+			required: true,
+		},
 		seasonId: {
 			type: 'string',
 		},
-		designIds: {
+		seasonName: {
+			type: 'string',
+		},
+		designs: {
 			type: 'list',
 			items: {
-				type: 'string',
+				type: 'map',
+				properties: {
+					designId: {
+						type: 'string',
+						required: true,
+					},
+					cardName: {
+						type: 'string',
+						required: true,
+					},
+					imgUrl: {
+						type: 'string',
+						required: true,
+					},
+				},
 			},
 		},
 	},
@@ -638,6 +666,7 @@ export const db = new Service(
 		season,
 		cardInstances,
 		packs,
+		packTypes,
 		users,
 		unmatchedImages,
 		rarities,
