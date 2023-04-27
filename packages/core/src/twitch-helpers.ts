@@ -102,8 +102,6 @@ export async function getUserByLogin(login: string) {
 	})
 	const body = await user.json()
 
-	console.log(body)
-
 	const schema = z.object({
 		data: z.array(
 			z.object({
@@ -195,7 +193,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 	const result = bodySchema.safeParse(body)
 
 	if (!result.success) {
-		console.log(result.error)
+		console.error(result.error)
 		return { success: false, statusCode: res.status, body: body }
 	}
 

@@ -49,8 +49,6 @@ const {
 		connectedCallback() {
 			const form = this.querySelector('form')!
 
-			console.log(form.dataset.confirm)
-
 			if (form.dataset.confirm !== undefined) {
 				form.addEventListener('submit', (e) => {
 					const result = confirm('Are you sure?')

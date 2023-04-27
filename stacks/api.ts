@@ -10,7 +10,7 @@ export function API({ stack }: StackContext) {
 	const eventBus = use(Events)
 	const { frameBucket, cardDesignBucket } = use(DesignBucket)
 	const secrets = use(ConfigStack)
-	const auth = use(Auth)
+	const { siteAuth } = use(Auth)
 
 	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
@@ -46,6 +46,8 @@ export function API({ stack }: StackContext) {
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
 			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
+			'GET /authorize-twitch': 'packages/functions/src/authorize-twitch.handler',
+			'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 		},
 		defaults: {
 			function: {
@@ -57,7 +59,7 @@ export function API({ stack }: StackContext) {
 					eventBus,
 					frameBucket,
 					cardDesignBucket,
-					auth,
+					siteAuth,
 				],
 			},
 		},

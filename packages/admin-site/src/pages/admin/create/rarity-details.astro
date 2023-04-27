@@ -1,9 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro'
-import Form from '@/components/form/Form.astro'
 import { useUser } from '@/session'
 import PostButton from '@/components/form/PostButton.astro'
 import { api, routes } from '@/constants'
+import RarityForm from '@/components/entity-forms/RarityForm.astro'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -40,30 +40,10 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 			/>
 		</div>
 
-		<Form action={api.CREATE_RARITY} method="post">
-			<input type="hidden" name="imgUrl" value={imgUrl} />
-			<input type="hidden" name="imageKey" value={key} />
-			<div class="input-group">
-				<label for="rarityName">Rarity Name</label>
-				<input id="rarityName" name="rarityName" type="text" />
-			</div>
-			<div class="input-group">
-				<label for="rarityId">Rarity ID</label>
-				<input
-					id="rarityId"
-					name="rarityId"
-					type="text"
-					readonly
-					data-edit-button
-					data-id-from="rarityName"
-					pattern="[a-z0-9-]+"
-				/>
-			</div>
-			<div class="input-group">
-				<label for="defaultCount">Default number per card</label>
-				<input id="defaultCount" name="defaultCount" type="number" value="0" />
-			</div>
-			<button type="submit">Save</button>
-		</Form>
+		<RarityForm
+			action={`${api.CREATE_RARITY}?redirect=${Astro.url.pathname}`}
+			bucket={bucket}
+			key={key}
+		/>
 	</div>
 </Page>

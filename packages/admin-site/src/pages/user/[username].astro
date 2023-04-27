@@ -6,6 +6,8 @@ import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/c
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
 import PostButton from '@/components/form/PostButton.astro'
 import { api, routes } from '@/constants'
+import Form from '@/components/form/Form.astro'
+import AdminOnly from '@/components/AdminOnly.astro'
 
 const session = useUser(Astro.cookies)
 
@@ -54,28 +56,121 @@ const breadcrumbs = [
 	session={session}
 	breadcrumbs={breadcrumbs}
 	pageType="public">
-	<h1 class="page-heading">{user.username}</h1>
-	<img src={twitchData?.profile_image_url} width="200" class="rounded-full" />
+	<header>
+		<h1 class="page-heading col-start-2">{user.username}</h1>
+		<img
+			src={twitchData?.profile_image_url}
+			width="200"
+			class="rounded-full col-start-1 row-span-full"
+		/>
+		<AdminOnly session={session}>
+			<Form
+				class="col-start-2"
+				action={`${api.GIVE_PACK_TO_USER}?redirect=${routes.USERS}/${user.username}`}>
+				<div class="w-full flex flex-wrap items-center gap-2">
+					<input type="hidden" name="userId" value={user.userId} />
+					<input type="hidden" name="username" value={user.username} />
+
+					<select
+						name="packType"
+						data-api-url={api.GET_ALL_PACK_TYPES}
+						class="w-40 h-full"
+						required>
+						<option value="">--</option>
+					</select>
+
+					<button type="submit">Give Pack</button>
+				</div>
+			</Form>
+		</AdminOnly>
+	</header>
+	<AdminOnly session={session}>
+		<div>
+			<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
+			<PostButton
+				id="revoke-pack"
+				url={`${api.REVOKE_PACK}?redirect=${routes.USERS}/${user.username}`}
+				label="Revoke Pack"
+				type="delete"
+				confirm
+				hiddenProperties={[
+					{ name: 'userId', value: user.userId },
+					{ name: 'username', value: user.username },
+				]}
+			/>
+		</div>
+	</AdminOnly>
 	<div>
 		<h2 class="text-xl pt-4">Cards:</h2>
-		<CardList cards={cardsNotInPack} />
+		<CardList cards={cardsNotInPack} session={session} />
 	</div>
-	{
-		session?.type === 'user' ? (
-			<div>
-				<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
-				<PostButton
-					id="revoke-pack"
-					url={`${api.REVOKE_PACK}?redirect=${routes.USERS}/${user.username}`}
-					label="Revoke Pack"
-					type="delete"
-					confirm
-					hiddenProperties={[
-						{ name: 'userId', value: user.userId },
-						{ name: 'username', value: user.username },
-					]}
-				/>
-			</div>
-		) : null
-	}
 </Page>
+
+<style>
+	header {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-template-rows: auto 1fr;
+		grid-auto-flow: dense;
+		gap: 3rem;
+		padding: 1rem;
+	}
+</style>
+
+<script>
+	const packTypeSelector = document.querySelector('select[name="packType"]') as HTMLSelectElement
+	const apiURL = packTypeSelector.dataset.apiUrl!
+
+	const initialInnerHTML = packTypeSelector.innerHTML
+
+	packTypeSelector.addEventListener('mouseenter', loadPackTypes)
+	packTypeSelector.addEventListener('focus', loadPackTypes)
+	packTypeSelector.addEventListener('click', loadPackTypes)
+	packTypeSelector.addEventListener('touchstart', loadPackTypes)
+
+	let loaded = false
+	async function loadPackTypes() {
+		if (loaded) return
+		loaded = true
+		try {
+			const packTypes = await fetchPackTypes()
+			if (packTypes.length === 0) return
+
+			if (packTypeSelector.innerHTML !== initialInnerHTML)
+				packTypeSelector.innerHTML = initialInnerHTML
+
+			packTypes.forEach((packType) => {
+				const option = document.createElement('option')
+				option.value = packType.packTypeId
+				option.innerText = packType.packTypeName
+				packTypeSelector.appendChild(option)
+			})
+		} catch {
+			if (packTypeSelector.innerHTML !== initialInnerHTML)
+				packTypeSelector.innerHTML = initialInnerHTML
+			loaded = false
+		}
+	}
+
+	async function fetchPackTypes(): Promise<
+		{
+			packTypeName: string
+			packTypeId: string
+		}[]
+	> {
+		const response = await fetch(apiURL)
+		const data = (await response.json()) as unknown
+
+		if (!data || !Array.isArray(data)) return []
+
+		return data.filter(
+			(el: { packTypeName: string; packTypeId: string }) =>
+				el &&
+				typeof el === 'object' &&
+				'packTypeName' in el &&
+				'packTypeId' in el &&
+				typeof el.packTypeName === 'string' &&
+				typeof el.packTypeId === 'string'
+		)
+	}
+</script>

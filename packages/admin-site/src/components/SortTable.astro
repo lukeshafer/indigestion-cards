@@ -24,7 +24,7 @@ type Props = HTMLAttributes<'table'>
 		max-width: 60rem;
 	}
 
-	sort-table th {
+	sort-table th:not([data-no-sort]) {
 		cursor: pointer;
 	}
 
@@ -79,8 +79,14 @@ type Props = HTMLAttributes<'table'>
 			const body = this.querySelector('tbody')!
 			const rows = Array.from(body.querySelectorAll('tr'))
 			const originalRows = rows.slice()
+			let currentHeading: HTMLTableCellElement | null = null
 			headings.forEach((th, index) => {
+				if (th.dataset.noSort === '') return
 				th.addEventListener('click', () => {
+					if (currentHeading && currentHeading !== th) {
+						currentHeading.dataset.mode = 'none'
+					}
+					currentHeading = th
 					const currentMode = th.dataset.mode || 'none'
 					const newMode =
 						currentMode === 'none'
@@ -97,10 +103,14 @@ type Props = HTMLAttributes<'table'>
 						return
 					}
 
+					const dataType = th.dataset.type || 'string'
 					const isAscending = newMode === 'ascending'
 					const sortedRows = rows.sort((a, b) => {
 						const aVal = a.children[index]!.textContent!
 						const bVal = b.children[index]!.textContent!
+						if (dataType === 'number') {
+							return isAscending ? Number(aVal) - Number(bVal) : Number(bVal) - Number(aVal)
+						}
 						if (aVal < bVal) {
 							return isAscending ? -1 : 1
 						}

@@ -9,12 +9,21 @@ export function Sites({ stack }: StackContext) {
 	const table = use(Database)
 	const api = use(API)
 	const { frameBucket, cardDesignBucket } = use(DesignBucket)
-	const auth = use(Auth)
+	const { siteAuth, streamerAuth } = use(Auth)
 	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN } = use(ConfigStack)
 
 	const adminSite = new AstroSite(stack, 'admin', {
 		path: 'packages/admin-site',
-		bind: [table, api, frameBucket, cardDesignBucket, auth, TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN],
+		bind: [
+			table,
+			api,
+			frameBucket,
+			cardDesignBucket,
+			siteAuth,
+			streamerAuth,
+			TWITCH_CLIENT_ID,
+			TWITCH_ACCESS_TOKEN,
+		],
 	})
 
 	// TODO: add cron job to check twitch for users who have updated their username

@@ -1,0 +1,13 @@
+---
+import type { Session } from '@/session'
+
+interface Props {
+	session: Session
+}
+
+const { session } = Astro.props
+
+const isAdmin = session?.type === 'user'
+---
+
+{isAdmin ? <slot /> : null}

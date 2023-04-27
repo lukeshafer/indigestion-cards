@@ -3,8 +3,9 @@ import { getAllRarities } from '@lil-indigestion-cards/core/card'
 import { useUser } from '@/session'
 import Page from '@/layouts/Page.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
-import TradingCard from '@/components/TradingCard.astro'
-import { routes } from '@/constants'
+import { api, routes } from '@/constants'
+import SortTable from '@/components/SortTable.astro'
+import PostButton from '@/components/form/PostButton.astro'
 
 const user = useUser(Astro.cookies)
 if (user?.type !== 'user') return Astro.redirect('/404')
@@ -25,21 +26,34 @@ const rarities = await getAllRarities()
 		<h1 class="page-heading">Rarities</h1>
 		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
 	</div>
-	<ul id="rarity-list flex flex-wrap gap-8">
-		{
-			rarities.map(({ rarityName, rarityId, frameUrl, defaultCount }) => (
-				<li class="flex gap-4 flex-col items-center w-max">
-					<a href={`${routes.RARITIES}/${rarityId}`} class="text-center">
-						<TradingCard>
-							<img src={frameUrl} width="200" alt="" />{' '}
-						</TradingCard>
-						<h2 class="mt-4 font-display font-bold italic text-2xl">{rarityName}</h2>
-					</a>
-					<p>Default Count: {defaultCount}</p>
-				</li>
-			))
-		}
-	</ul>
+	<SortTable>
+		<thead>
+			<tr>
+				<th class="w-1/2">Name</th>
+				<th data-type="number">Default Count</th>
+				<th data-no-sort>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				rarities.map(({ rarityName, rarityId, defaultCount }) => (
+					<tr>
+						<td>{rarityName}</td>
+						<td>{defaultCount}</td>
+						<td>
+							<a href={`${routes.ADMIN.EDIT?.RARITY}/${rarityId}`}>Edit</a>
+							<PostButton
+								url={`${api.DELETE_RARITY}/${rarityId}`}
+								confirm
+								id={`delete-rarity-${rarityId}`}
+								label="Delete"
+							/>
+						</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</SortTable>
 </Page>
 
 <script>

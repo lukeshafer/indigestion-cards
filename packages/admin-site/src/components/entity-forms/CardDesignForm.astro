@@ -1,0 +1,100 @@
+---
+import Form from '@/components/form/Form.astro'
+
+interface Props {
+	action: string
+	seasons: {
+		seasonId: string
+		seasonName: string
+	}[]
+	rarities: {
+		rarityId: string
+		rarityName: string
+		defaultCount: number
+	}[]
+	bucket: string
+	key: string
+	season?: string
+	cardName?: string
+	designId?: string
+	cardDescription?: string
+	artist?: string
+	raritiesCount?: {
+		[key: string]: number
+	}
+}
+
+const search = Astro.url.searchParams
+
+const {
+	action,
+	seasons,
+	rarities,
+	bucket,
+	key,
+	season = search.get('form-season') || '',
+	cardName = search.get('form-cardName') || '',
+	designId = search.get('form-designId') || '',
+	cardDescription = search.get('form-cardDescription') || '',
+	artist = search.get('form-artist') || '',
+	raritiesCount = {},
+} = Astro.props
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+---
+
+<Form action={action}>
+	<input type="hidden" name="imgUrl" value={imgUrl} />
+	<input type="hidden" name="imageKey" value={key} />
+	<div class="input-group">
+		<label for="season">Season</label>
+		<select name="season" required value={season}>
+			{
+				seasons.map(({ seasonId, seasonName }) => (
+					<option value={JSON.stringify({ seasonId, seasonName })}>{seasonName}</option>
+				))
+			}
+		</select>
+	</div>
+	<div class="input-group">
+		<label for="cardName">Card Name</label>
+		<input name="cardName" id="cardName" value={cardName} required />
+	</div>
+	<div class="input-group">
+		<label for="designId">Id</label>
+		<input
+			data-id-from="cardName"
+			data-edit-button
+			name="designId"
+			id="designId"
+			value={designId}
+			required
+			readonly
+		/>
+	</div>
+	<div class="input-group">
+		<label for="cardDescription">Description</label>
+		<textarea name="cardDescription" required value={cardDescription}></textarea>
+	</div>
+	<div class="input-group">
+		<label for="artist">Artist</label>
+		<input name="artist" required value={artist} />
+	</div>
+	<fieldset>
+		<legend>Rarity Details</legend>
+		{
+			rarities.map(({ rarityId, rarityName, defaultCount }) => (
+				<div class="input-group">
+					<label for={`rarity-${rarityId}-count`}>{rarityName}</label>
+					<input
+						title={rarityName + ' Count'}
+						name={`rarity-${rarityId}-count`}
+						type="number"
+						required
+						value={raritiesCount[rarityId] || defaultCount}
+					/>
+				</div>
+			))
+		}
+	</fieldset>
+	<button type="submit">Save</button>
+</Form>

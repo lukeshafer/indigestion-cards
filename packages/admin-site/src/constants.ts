@@ -11,6 +11,7 @@ export const api = {
 	CREATE_ADMIN_USER: '/api/admin/create-admin-user',
 	REVOKE_PACK: '/api/admin/revoke-pack',
 	OPEN_CARD: '/api/admin/open-card',
+	GET_ALL_PACK_TYPES: '/api/get-all-pack-types',
 } as const
 
 export const publicApi = {

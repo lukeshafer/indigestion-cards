@@ -253,7 +253,7 @@ const packs = await getAllPacks()
 				)
 
 				if (pack.info.cardDetails[index]!.opened) {
-					console.log('Card already opened')
+					console.error('Card already opened')
 					return
 				}
 				pack.info.cardDetails[index]!.opened = true

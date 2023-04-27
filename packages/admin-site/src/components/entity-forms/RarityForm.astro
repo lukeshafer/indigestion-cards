@@ -1,0 +1,40 @@
+---
+import Form from '@/components/form/Form.astro'
+
+interface Props {
+	bucket: string
+	key: string
+	action: string
+}
+
+const { key, bucket, action } = Astro.props
+
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+---
+
+<Form action={action} method="post">
+	<input type="hidden" name="imgUrl" value={imgUrl} />
+	<input type="hidden" name="imageKey" value={key} />
+	<input type="hidden" name="bucket" value={bucket} />
+	<div class="input-group">
+		<label for="rarityName">Rarity Name</label>
+		<input id="rarityName" name="rarityName" type="text" />
+	</div>
+	<div class="input-group">
+		<label for="rarityId">Rarity ID</label>
+		<input
+			id="rarityId"
+			name="rarityId"
+			type="text"
+			readonly
+			data-edit-button
+			data-id-from="rarityName"
+			pattern="[a-z0-9-]+"
+		/>
+	</div>
+	<div class="input-group">
+		<label for="defaultCount">Default number per card</label>
+		<input id="defaultCount" name="defaultCount" type="number" value="0" />
+	</div>
+	<button type="submit">Save</button>
+</Form>

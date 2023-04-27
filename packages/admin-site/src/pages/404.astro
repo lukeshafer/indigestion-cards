@@ -2,9 +2,9 @@
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
 
-if (Astro.url.pathname !== '/404') {
-	return Astro.redirect('/404')
-}
+/*if (Astro.url.pathname !== '/404') {*/
+	/*return Astro.redirect('/404')*/
+/*}*/
 
 const user = useUser(Astro.cookies)
 ---

@@ -10,7 +10,7 @@
     "@types/aws-lambda": "^8.10.114",
     "@types/node": "^18.15.11",
     "aws-sdk": "^2.1348.0",
-    "sst": "2.5.8"
+    "sst": "2.7.2"
   },
   "dependencies": {
     "openid-client": "^5.4.0",

@@ -86,11 +86,9 @@ const {
 			searchInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') {
 					e.preventDefault()
-					console.log('enter pressed')
 					const currentRows = body.querySelectorAll('tr')
 					if (currentRows.length === 1) {
 						const username = currentRows.item(0).children[0]!.textContent!
-						console.log(username)
 						if (!username) return
 
 						window.location.href = `/user/${username}`

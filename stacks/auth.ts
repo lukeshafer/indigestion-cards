@@ -7,16 +7,34 @@ export function Auth({ stack }: StackContext) {
 	const secrets = use(ConfigStack)
 	const db = use(Database)
 
-	const auth = new SSTAuth(stack, 'AdminSiteAuth', {
+	const siteAuth = new SSTAuth(stack, 'AdminSiteAuth', {
 		authenticator: {
 			handler: 'packages/functions/src/auth.handler',
 			bind: [secrets.TWITCH_CLIENT_ID, secrets.TWITCH_CLIENT_SECRET, db],
 		},
 	})
 
-	stack.addOutputs({
-		authEndpoint: auth.url,
+	const streamerAuth = new SSTAuth(stack, 'StreamerAuth', {
+		authenticator: {
+			handler: 'packages/functions/src/streamer-auth.handler',
+			bind: [
+				secrets.TWITCH_CLIENT_ID,
+				secrets.TWITCH_CLIENT_SECRET,
+				secrets.STREAMER_ACCESS_TOKEN_NAME,
+				secrets.STREAMER_REFRESH_TOKEN_NAME,
+				db,
+			],
+			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+		},
 	})
 
-	return auth
+	stack.addOutputs({
+		authEndpoint: siteAuth.url,
+		streamerAuthEndpoint: streamerAuth.url,
+	})
+
+	return {
+		siteAuth,
+		streamerAuth,
+	}
 }

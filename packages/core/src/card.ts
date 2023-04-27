@@ -76,6 +76,10 @@ export async function generateCard(info: {
 		}
 	})
 
+	if (!rarityList || rarityList.length === 0) {
+		throw new Error('No rarities found')
+	}
+
 	const assignedRarityId = rarityList[Math.floor(Math.random() * rarityList.length)]
 	const instanceId = `${info.seasonId}-${design.designId}-${assignedRarityId}-${
 		(rarityMap.get(assignedRarityId)?.count ?? 0) + 1
@@ -508,7 +512,7 @@ export async function getRarityById(args: { rarityId: string }) {
 
 export async function getAllRarities() {
 	const result = await db.entities.rarities.query.allRarities({}).go()
-	return result.data
+	return result.data.sort((a, b) => b.defaultCount - a.defaultCount)
 }
 
 export async function createRarity(

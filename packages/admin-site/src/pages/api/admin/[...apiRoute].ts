@@ -16,7 +16,6 @@ export const all: APIRoute = async (ctx) => {
 		return new Response('Unauthorized', { status: 401 })
 	}
 
-	console.log('redirect', ctx.url.origin + (ctx.url.searchParams.get('redirect') ?? '/'))
 	const redirectUrl = new URL(ctx.url.origin + (ctx.url.searchParams.get('redirect') ?? '/'))
 
 	const response = await fetch(`${Api.api.url}/${apiRoute}`, {

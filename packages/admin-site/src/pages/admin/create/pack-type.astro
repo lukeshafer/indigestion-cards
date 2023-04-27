@@ -126,7 +126,6 @@ const cardDesigns = await getAllCardDesigns()
 	}
 
 	form.addEventListener('submit', (e) => {
-		console.log('submitting')
 		if (category.value !== 'custom') return
 		const selectedDesigns = cardDesignList.querySelector('input:checked') as HTMLInputElement
 		if (!selectedDesigns) {

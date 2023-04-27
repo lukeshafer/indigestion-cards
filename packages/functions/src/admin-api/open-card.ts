@@ -3,12 +3,15 @@ import { openCardFromPack } from '@lil-indigestion-cards/core/card'
 import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
+	console.log('open-card')
 	const session = useSession()
-	if (session.type !== 'user')
+	if (session.type !== 'user') {
+		console.log('unauthorized')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
 		}
+	}
 
 	const { instanceId } = useJsonBody()
 	if (!instanceId) return { statusCode: 400, body: 'Missing instanceId.' }

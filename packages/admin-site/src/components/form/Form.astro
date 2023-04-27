@@ -75,15 +75,19 @@ export const inputClasses = {
 
 	my-form input,
 	my-form textarea,
-	my-form select {
+	my-form select,
+	.my-form-input,
+	.my-form-textarea,
+	.my-form-select {
 		display: block;
 		width: 100%;
-		padding: 0.3rem 0.5rem;
+		padding: 0.5rem;
 		background-color: #fff;
 		color: black;
 	}
 
-	my-form input[readonly] {
+	my-form input[readonly],
+	.my-form-input[readonly] {
 		background-color: #eee;
 	}
 
@@ -103,7 +107,8 @@ export const inputClasses = {
 		opacity: 1;
 	}
 
-	my-form textarea {
+	my-form textarea,
+	.my-form-textarea {
 		height: 100px;
 	}
 
@@ -116,7 +121,10 @@ export const inputClasses = {
 			select,
 			textarea,
 			input:not(input[type])
-		) {
+		),
+	.my-form-input,
+	.my-form-textarea,
+	.my-form-select {
 		outline: 1px solid #ccc;
 	}
 
@@ -184,8 +192,9 @@ export const inputClasses = {
 	}
 
 	my-form :is(button, input[type='button'], input[type='submit']) {
-		@apply font-medium font-heading p-2 text-shadow;
-		margin-bottom: 0.5rem;
+		@apply text-shadow shine;
+		font-family: var(--font-heading);
+		padding: 0.5rem;
 		display: block;
 		border: 1px solid #ccc;
 		background: var(--color-tertiary);
