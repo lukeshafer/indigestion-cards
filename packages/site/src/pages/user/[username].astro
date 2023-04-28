@@ -45,7 +45,7 @@ const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt)
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Users', href: session?.type === 'user' ? routes.USERS : undefined },
+	{ label: 'Users', href: routes.USERS },
 	{ label: user.username },
 ]
 ---

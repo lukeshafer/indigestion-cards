@@ -1,15 +1,16 @@
 ---
 interface Props {
 	shiny?: boolean
+	border?: string
 }
 ---
 
-<trading-card>
+<trading-card data-border={Astro.props.border}>
 	<div class="outer w-max relative text-3xl">
 		<div
 			class="inner bg-gray-900 relative text-white text-center flex items-center justify-center"
 			class:list={{
-				'inner-shiny': Astro.props.shiny,
+				'inner-shiny': Astro.props.shiny ?? true,
 			}}>
 			<slot />
 		</div>
@@ -34,6 +35,9 @@ interface Props {
 	}
 
 	.inner::after {
+		border-color: var(--border, transparent);
+		border-width: 5px;
+		border-style: solid;
 		--shine-level: clamp(0.05, calc(0.1 * var(--shine-opacity)), 1);
 		transform: translateZ(200px);
 		position: absolute;
@@ -90,7 +94,20 @@ interface Props {
 			super()
 		}
 
+		static get observedAttributes() {
+			return ['data-border']
+		}
+
+		attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+			if (name === 'data-border' && oldValue !== newValue) {
+				this.style.setProperty('--border', newValue)
+			}
+		}
+
 		connectedCallback() {
+			const border = this.getAttribute('data-border')
+			if (border) this.style.setProperty('--border', border)
+
 			this.outer = this.querySelector('.outer')!
 			this.inner = this.querySelector('.inner')!
 

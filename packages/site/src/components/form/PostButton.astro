@@ -28,11 +28,10 @@ const {
 		{hiddenProperties.map(({ name, value }) => <input type="hidden" name={name} value={value} />)}
 		<button
 			type="submit"
-			class="font-bold py-2 px-4 shine transition-colors text-shadow uppercase"
+			class="post-button"
+			data-type={type}
 			class:list={{
 				[className ?? '']: true,
-				'bg-red-500 hover:bg-red-700 text-white': type === 'delete',
-				'bg-brand-tertiary hover:bg-brand-secondary text-white': type === 'submit',
 			}}
 			id="delete-design">
 			{label}

@@ -6,5 +6,6 @@ const user = useUser(Astro.cookies)
 ---
 
 <Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
+	<a href="/user" class="button-link">Users</a>
 	<!-- TODO: Add FAQ -->
 </Page>

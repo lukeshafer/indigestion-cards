@@ -41,7 +41,7 @@ export function API({ stack }: StackContext) {
 			'POST /delete-card-season/{id}':
 				'packages/functions/src/admin-api/delete-card-season.handler',
 			'POST /delete-unmatched-image/{id}':
-				'packages/functions/admin-src/api/delete-unmatched-image.handler',
+				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			'POST /delete-rarity/{id}': 'packages/functions/src/admin-api/delete-rarity.handler',
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',

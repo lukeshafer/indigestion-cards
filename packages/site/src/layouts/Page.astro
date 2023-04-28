@@ -25,12 +25,12 @@ const alertColor =
 
 const currentPage = Astro.url.pathname
 const adminLinks = [
-	{ href: routes.USERS, title: 'Users' },
-	{ href: routes.DESIGNS, title: 'Designs' },
-	{ href: routes.SEASONS, title: 'Seasons' },
-	{ href: routes.RARITIES, title: 'Rarities' },
 	{ href: routes.ADMIN_USERS, title: 'Admins' },
+	{ href: routes.DESIGNS, title: 'Designs' },
 	{ href: routes.PACK_TYPES, title: 'Pack Types' },
+	{ href: routes.RARITIES, title: 'Rarities' },
+	{ href: routes.SEASONS, title: 'Seasons' },
+	{ href: routes.USERS, title: 'Users' },
 ] satisfies { href: string; title: string }[]
 
 const packs = await getAllPacks()

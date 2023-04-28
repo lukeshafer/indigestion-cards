@@ -40,10 +40,16 @@ const rarities = await getAllRarities()
 					<tr>
 						<td>{rarityName}</td>
 						<td>{defaultCount}</td>
-						<td>
-							<a href={`${routes.ADMIN.EDIT?.RARITY}/${rarityId}`}>Edit</a>
+						<td class="flex flex-row gap-2 text-sm justify-center">
+							<a
+								class="post-button"
+								data-type="submit"
+								href={`${routes.ADMIN.EDIT?.RARITY}/${rarityId}`}>
+								Edit
+							</a>
 							<PostButton
 								url={`${api.DELETE_RARITY}/${rarityId}`}
+								type="delete"
 								confirm
 								id={`delete-rarity-${rarityId}`}
 								label="Delete"

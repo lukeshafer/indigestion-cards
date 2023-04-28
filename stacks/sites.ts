@@ -13,7 +13,7 @@ export function Sites({ stack }: StackContext) {
 	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN } = use(ConfigStack)
 
 	const adminSite = new AstroSite(stack, 'admin', {
-		path: 'packages/admin-site',
+		path: 'packages/site',
 		bind: [
 			table,
 			api,
