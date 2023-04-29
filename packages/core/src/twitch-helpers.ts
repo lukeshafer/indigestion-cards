@@ -278,12 +278,5 @@ export async function putTokenSecrets(args: { access_token: string; refresh_toke
 		})
 		.promise()
 
-	const putStatePromise = secretsManager
-		.putSecretValue({
-			SecretId: Config.STREAMER_AUTH_STATE_ARN,
-			SecretString: '-',
-		})
-		.promise()
-
-	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise, putStatePromise])
+	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise])
 }

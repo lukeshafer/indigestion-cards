@@ -15,8 +15,6 @@ export function API({ stack }: StackContext) {
 	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
 			'ANY /': 'packages/functions/src/twitch-api.handler',
-			'ANY /twitch/authorize': 'packages/functions/src/twitch/authorize.handler',
-			'ANY /twitch/callback': 'packages/functions/src/twitch/callback.handler',
 		},
 		defaults: {
 			function: {
@@ -24,13 +22,9 @@ export function API({ stack }: StackContext) {
 					secrets.TWITCH_CLIENT_ID,
 					secrets.TWITCH_CLIENT_SECRET,
 					secrets.TWITCH_ACCESS_TOKEN,
-					secrets.STREAMER_AUTH_STATE_ARN,
-					secrets.STREAMER_ACCESS_TOKEN_ARN,
-					secrets.STREAMER_REFRESH_TOKEN_ARN,
 					table,
 					eventBus,
 				],
-				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	})
@@ -53,6 +47,9 @@ export function API({ stack }: StackContext) {
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
 			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
 			'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+			'GET /get-all-channel-point-rewards':
+				'packages/functions/src/admin-api/get-all-channel-point-rewards.handler',
+			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 		},
 		defaults: {
 			function: {
@@ -60,12 +57,16 @@ export function API({ stack }: StackContext) {
 					secrets.TWITCH_CLIENT_ID,
 					secrets.TWITCH_CLIENT_SECRET,
 					secrets.TWITCH_ACCESS_TOKEN,
+					secrets.STREAMER_ACCESS_TOKEN_ARN,
+					secrets.STREAMER_REFRESH_TOKEN_ARN,
+					secrets.STREAMER_USER_ID,
 					table,
 					eventBus,
 					frameBucket,
 					cardDesignBucket,
 					siteAuth,
 				],
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	})

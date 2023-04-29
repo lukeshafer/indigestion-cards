@@ -1,14 +1,52 @@
 ---
-import SortTable from '@/components/SortTable.astro'
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
+import SortTable from '@/components/SortTable.astro';
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
 
-const user = useAdmin(Astro.cookies)
+const user = useAdmin(Astro.cookies);
 if (!user) {
-	return Astro.redirect('/404')
+	return Astro.redirect('/404');
 }
 
-/*const rewards = await getAllChannelPointRewards({ })*/
+const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
+
+// this is a sample of the data returned from the api
+const rawRewards = [
+	{
+		id: '92af127c-7326-4483-a52b-b0da0be61c01',
+		image: null,
+		background_color: '#00E5CB',
+		is_enabled: true,
+		cost: 50000,
+		title: 'Redeem 1 Pack',
+	},
+	{
+		id: '92af127c-7326-4483-a52b-b0da0be61c02',
+		image: null,
+		background_color: '#00E5CB',
+		is_enabled: true,
+		cost: 50000,
+		title: 'Give the dogs a treat.',
+	},
+];
+
+const rewards = rawRewards.map((reward) => {
+	const dbEvent = twitchEvents.data.find((event) => event.eventId === reward.id);
+
+	return {
+		...reward,
+		packType: JSON.stringify(
+			dbEvent?.packTypeId && dbEvent?.packTypeName
+				? {
+						packTypeId: dbEvent?.packTypeId || '',
+						packTypeName: dbEvent?.packTypeName || '',
+				  }
+				: undefined
+		),
+	};
+});
 ---
 
 <Page
@@ -17,15 +55,134 @@ if (!user) {
 	title="Site Config">
 	<h1 class="page-heading">Site Config</h1>
 	<section>
-		<h2 class="sub-heading">Twitch Channel Point Rewards</h2>
+		<header class="flex gap-x-10 gap-y-2 items-center flex-wrap">
+			<h2 class="sub-heading py-4">Twitch Channel Point Rewards</h2>
+			<button class="post-button" data-type="submit" data-save hidden>Save</button>
+		</header>
 		<SortTable class="mt-4">
 			<thead>
 				<tr>
-					<th class="w-2/5">Event</th>
-					<th>Enabled</th>
-					<th class="w-2/5">Pack Type</th>
+					<th class="w-2/3">Event</th>
+					<th>Pack Type</th>
 				</tr>
 			</thead>
+			<tbody>
+				{
+					rewards.map((reward) => (
+						<tr>
+							<td>{reward.title}</td>
+							<td>
+								<select
+									data-pack-type-select
+									data-id={reward.id}
+									data-title={reward.title}
+									data-cost={reward.cost}
+									data-value={reward.packType}
+									class="my-form-select">
+									<option value="">None</option>
+									{packTypes.map(({ packTypeId, packTypeName }) => (
+										<option
+											value={JSON.stringify({ packTypeId, packTypeName })}>
+											{packTypeName}
+										</option>
+									))}
+								</select>
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
 		</SortTable>
 	</section>
 </Page>
+
+<script>
+	const saveButton = document.querySelector('[data-save]') as HTMLButtonElement;
+	const packTypeSelects = document.querySelectorAll<HTMLSelectElement>('[data-pack-type-select]');
+
+	interface PackType {
+		packTypeId: string;
+		packTypeName: string;
+		twitchEventId: string;
+		twitchEventName: string;
+		cost?: number | undefined;
+	}
+
+	packTypeSelects.forEach((select) => {
+		if (select.dataset.value) select.value = select.dataset.value;
+		select.addEventListener('change', () => {
+			const eventId = select.dataset.id!;
+			const eventName = select.dataset.title!;
+			const cost = parseInt(select.dataset.cost!) || undefined;
+
+			try {
+				const packType = JSON.parse(select.value) as PackType;
+				stateUpdates.channelPointRewards.set(select.dataset.id!, {
+					...packType,
+					twitchEventId: eventId,
+					twitchEventName: eventName,
+					cost,
+				});
+			} catch {
+				stateUpdates.channelPointRewards.set(select.dataset.id!, {
+					packTypeId: '',
+					packTypeName: '',
+					twitchEventId: eventId,
+					twitchEventName: eventName,
+					cost,
+				});
+			}
+		});
+	});
+
+	const stateUpdates = {
+		channelPointRewards: {
+			set(rewardId: string, packType: PackType) {
+				this.__state.set(rewardId, packType);
+				stateUpdates.update();
+			},
+			__state: new Map<string, PackType>(),
+		},
+		update() {
+			if (this.channelPointRewards.__state.size > 0) {
+				saveButton.hidden = false;
+			}
+		},
+		get state() {
+			return {
+				channelPointRewards: [...this.channelPointRewards.__state.values()],
+			};
+		},
+	};
+
+	saveButton.addEventListener('click', async () => {
+		saveButton.innerText = 'Saving...';
+		saveButton.disabled = true;
+
+		const response = await fetch('/api/admin/save-config?fetch=true', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(stateUpdates.state),
+		});
+
+		if (response.ok) {
+			saveButton.innerText = 'Saved!';
+			saveButton.dataset.type = 'success';
+			setTimeout(() => {
+				saveButton.innerText = 'Save';
+				saveButton.dataset.type = 'submit';
+				saveButton.disabled = false;
+			}, 1000);
+		} else {
+			saveButton.innerText = 'Error!';
+			saveButton.dataset.type = 'error';
+			setTimeout(() => {
+				saveButton.innerText = 'Save';
+				saveButton.dataset.type = 'submit';
+				saveButton.disabled = false;
+			}, 1000);
+		}
+	});
+</script>

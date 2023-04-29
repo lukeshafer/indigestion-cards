@@ -10,7 +10,15 @@ export function Auth({ stack }: StackContext) {
 	const siteAuth = new SSTAuth(stack, 'AdminSiteAuth', {
 		authenticator: {
 			handler: 'packages/functions/src/auth.handler',
-			bind: [secrets.TWITCH_CLIENT_ID, secrets.TWITCH_CLIENT_SECRET, db],
+			bind: [
+				secrets.TWITCH_CLIENT_ID,
+				secrets.TWITCH_CLIENT_SECRET,
+				db,
+				secrets.STREAMER_USER_ID,
+				secrets.STREAMER_ACCESS_TOKEN_ARN,
+				secrets.STREAMER_REFRESH_TOKEN_ARN,
+			],
+			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 		},
 	})
 

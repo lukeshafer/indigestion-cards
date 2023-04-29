@@ -5,12 +5,11 @@ import { Config } from 'sst/constructs'
 export function ConfigStack({ stack }: StackContext) {
 	const streamerAccessToken = new Secret(stack, 'StreamerAccessToken')
 	const streamerRefreshToken = new Secret(stack, 'StreamerRefreshToken')
-	const streamerAuthState = new Secret(stack, 'StreamerAuthState')
 
 	const params = Config.Parameter.create(stack, {
-		STREAMER_AUTH_STATE_ARN: streamerAuthState.secretArn,
 		STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
 		STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
+		STREAMER_USER_ID: '144313393',
 	})
 
 	const secrets = Config.Secret.create(

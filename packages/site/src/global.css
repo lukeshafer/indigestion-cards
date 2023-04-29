@@ -259,12 +259,23 @@
 		background-color: var(--color-secondary);
 	}
 
-	.post-button[data-type="delete"] {
+	.post-button[data-type="delete"],
+	.post-button[data-type="error"] {
 		background-color: var(--red-6);
 		color: #fff;
 	}
 
-	.post-button[data-type="delete"]:hover {
+	.post-button[data-type="delete"]:hover,
+	.post-button[data-type="error"]:hover {
 		background-color: var(--red-9);
+	}
+
+	.post-button[data-type="success"] {
+		background-color: var(--teal-6);
+		color: #fff;
+	}
+
+	.post-button[data-type="success"]:hover {
+		background-color: var(--teal-9);
 	}
 }
