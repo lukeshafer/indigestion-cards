@@ -1,10 +1,10 @@
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card'
 import type { APIRoute } from 'astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 
 export const get: APIRoute = async (ctx) => {
-	const session = useUser(ctx.cookies)
-	if (session?.type !== 'user') return ctx.redirect('/')
+	const session = useAdmin(ctx.cookies)
+	if (!session) return ctx.redirect('/')
 	const packTypes = await getAllPackTypes()
 
 	return {

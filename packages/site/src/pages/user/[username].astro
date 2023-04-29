@@ -1,7 +1,7 @@
 ---
 import CardList from '@/components/CardList.astro'
 import Page from '@/layouts/Page.astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user'
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
 import PostButton from '@/components/form/PostButton.astro'
@@ -9,7 +9,7 @@ import { api, routes } from '@/constants'
 import Form from '@/components/form/Form.astro'
 import AdminOnly from '@/components/AdminOnly.astro'
 
-const session = useUser(Astro.cookies)
+const session = useAdmin(Astro.cookies)
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0
 if (redirectCount > 3) return Astro.redirect(`${routes.USERS}?alert=Username not found`)

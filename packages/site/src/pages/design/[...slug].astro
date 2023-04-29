@@ -2,12 +2,12 @@
 import PostButton from '@/components/form/PostButton.astro'
 import Page from '@/layouts/Page.astro'
 import TradingCard from '@/components/TradingCard.astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { routes, api } from '@/constants'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect('/404')
+const admin = useAdmin(Astro.cookies)
+if (!admin) return Astro.redirect('/404')
 
 const slug = Astro.params.slug
 if (!slug) {
@@ -55,7 +55,7 @@ if (from === 'design') {
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-4"
-	session={user}
+	session={admin}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
 	<TradingCard>

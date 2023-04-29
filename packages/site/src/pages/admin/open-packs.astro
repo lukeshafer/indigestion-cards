@@ -1,11 +1,11 @@
 ---
 import Page from '@/layouts/Page.astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { getAllPacks } from '@lil-indigestion-cards/core/card'
 import TradingCard from '@/components/TradingCard.astro'
 import { api } from '@/constants'
 
-const user = useUser(Astro.cookies)
+const user = useAdmin(Astro.cookies)
 
 if (!user) {
 	return Astro.redirect('/404')

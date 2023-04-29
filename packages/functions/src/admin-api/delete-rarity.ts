@@ -6,7 +6,7 @@ import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (session.type !== 'user')
+	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
@@ -27,13 +27,13 @@ export const handler = ApiHandler(async () => {
 
 	return result.success
 		? {
-				statusCode: 307,
-				headers: {
-					Location: redirectUrl(`Successfully deleted rarity ${name}&alertType=success`),
-				},
-		  }
+			statusCode: 307,
+			headers: {
+				Location: redirectUrl(`Successfully deleted rarity ${name}&alertType=success`),
+			},
+		}
 		: {
-				statusCode: 307,
-				headers: { Location: redirectUrl(result.error ?? '') },
-		  }
+			statusCode: 307,
+			headers: { Location: redirectUrl(result.error ?? '') },
+		}
 })

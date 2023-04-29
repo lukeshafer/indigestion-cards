@@ -125,6 +125,27 @@ export async function getUserByLogin(login: string) {
 	return result.data.data[0]
 }
 
+export async function getAllChannelPointRewards(args: { userId: string }) {
+	const { access_token, refresh_token } = await retrieveTokenSecrets()
+
+	if (!access_token || !refresh_token) {
+		throw new Error('Missing token secrets')
+	}
+
+	const url = new URL('https://api.twitch.tv/helix/channel_points/custom_rewards')
+	url.searchParams.set('broadcaster_id', args.userId)
+	const rewards = await fetch(url.toString(), {
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${access_token}`,
+		},
+	})
+
+	const body = await rewards.json()
+	console.log(body)
+	return body
+}
+
 const subscriptionsUrl = 'https://api.twitch.tv/helix/eventsub/subscriptions'
 
 interface ChannelSubscriptionGiftEvent {
@@ -216,6 +237,30 @@ export async function getUserAccessToken(args: { code: string; redirect_uri: str
 			redirect_uri: args.redirect_uri,
 		}).toString(),
 	})
+}
+
+export async function retrieveTokenSecrets() {
+	const getAccessTokenPromise = secretsManager
+		.getSecretValue({
+			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
+		})
+		.promise()
+
+	const getRefreshTokenPromise = secretsManager
+		.getSecretValue({
+			SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
+		})
+		.promise()
+
+	const [accessToken, refreshToken] = await Promise.all([
+		getAccessTokenPromise,
+		getRefreshTokenPromise,
+	])
+
+	return {
+		access_token: accessToken.SecretString,
+		refresh_token: refreshToken.SecretString,
+	}
 }
 
 export async function putTokenSecrets(args: { access_token: string; refresh_token: string }) {

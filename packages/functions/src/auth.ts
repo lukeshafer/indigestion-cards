@@ -9,6 +9,10 @@ declare module 'sst/node/future/auth' {
 			userId: string
 			username: string
 		}
+		admin: {
+			userId: string
+			username: string
+		}
 	}
 }
 
@@ -36,7 +40,7 @@ export const handler = AuthHandler({
 				}
 
 			return {
-				type: 'user',
+				type: 'admin',
 				properties: {
 					userId: adminUser.userId,
 					username: adminUser.username,

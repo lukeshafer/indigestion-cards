@@ -1,5 +1,5 @@
 import { AUTH_TOKEN } from '@/constants'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import type { APIRoute } from 'astro'
 import { Api } from 'sst/node/api'
 
@@ -10,7 +10,7 @@ export const all: APIRoute = async (ctx) => {
 		return ctx.redirect('/404')
 	}
 
-	const session = useUser(ctx.cookies)
+	const session = useAdmin(ctx.cookies)
 	const token = ctx.cookies.get(AUTH_TOKEN)
 	if (!token || !session) {
 		return new Response('Unauthorized', { status: 401 })

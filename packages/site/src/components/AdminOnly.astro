@@ -7,7 +7,7 @@ interface Props {
 
 const { session } = Astro.props
 
-const isAdmin = session?.type === 'user'
+const isAdmin = session?.type === 'admin'
 ---
 
 {isAdmin ? <slot /> : null}

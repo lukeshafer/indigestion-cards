@@ -1,11 +1,11 @@
 ---
 import Page from '@/layouts/Page.astro'
 import { getAllSeasons } from '@lil-indigestion-cards/core/card'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { routes } from '@/constants'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect('/404')
+const admin = useAdmin(Astro.cookies)
+if (!admin) return Astro.redirect('/404')
 
 const seasons = await getAllSeasons()
 
@@ -19,7 +19,7 @@ const breadcrumbs = [
 	title="All Seasons"
 	class="max-w-5xl grid gap-4 grid-cols-1"
 	breadcrumbs={breadcrumbs}
-	session={user}>
+	session={admin}>
 	<div class="flex flex-wrap gap-8">
 		<h1 class="page-heading">All Seasons</h1>
 		<a

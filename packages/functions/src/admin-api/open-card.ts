@@ -5,8 +5,7 @@ import { useSession } from 'sst/node/future/auth'
 export const handler = ApiHandler(async () => {
 	console.log('open-card')
 	const session = useSession()
-	if (session.type !== 'user') {
-		console.log('unauthorized')
+	if (session.type !== 'admin') {
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',

@@ -1,15 +1,15 @@
 ---
 import Page from '@/layouts/Page.astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 
 /*if (Astro.url.pathname !== '/404') {*/
 	/*return Astro.redirect('/404')*/
 /*}*/
 
-const user = useUser(Astro.cookies)
+const session = useAdmin(Astro.cookies)
 ---
 
-<Page session={user} title="Page not found" class="flex flex-col items-center" pageType="public">
+<Page session={session} title="Page not found" class="flex flex-col items-center" pageType="public">
 	<h1 class="text-7xl font-display italic text-red-500 my-5">404</h1>
 	<img
 		src="/lilindOHNO.gif"

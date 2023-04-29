@@ -3,8 +3,16 @@ import {
 	createTwitchEvent,
 	checkIsValidTwitchEventType,
 } from '@lil-indigestion-cards/core/site-config'
+import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
+	const session = useSession()
+	if (session.type !== 'admin')
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		}
+
 	const eventId = useFormValue('event_id')
 	const eventName = useFormValue('event_name')
 	const eventType = useFormValue('event_type')

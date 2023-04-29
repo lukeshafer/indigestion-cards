@@ -3,11 +3,11 @@ import Page from '@/layouts/Page.astro'
 import CardList from '@/components/CardList.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { routes } from '@/constants'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect('/404')
+const admin = useAdmin(Astro.cookies)
+if (!admin) return Astro.redirect('/404')
 const designs = await getAllCardDesigns()
 
 const message = Astro.url.searchParams.get('message') || ''
@@ -18,7 +18,7 @@ const breadcrumbs = [
 ]
 ---
 
-<Page title="All Cards" class="flex flex-col gap-4" session={user} breadcrumbs={breadcrumbs}>
+<Page title="All Cards" class="flex flex-col gap-4" session={admin} breadcrumbs={breadcrumbs}>
 	{message ? <p class="text-xl text-center p-4 bg-green-200">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<div class="flex flex-wrap gap-8">
@@ -29,5 +29,5 @@ const breadcrumbs = [
 			Create New Design
 		</a>
 	</div>
-	<CardList cards={designs} session={user} />
+	<CardList cards={designs} session={admin} />
 </Page>

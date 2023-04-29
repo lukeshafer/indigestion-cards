@@ -8,6 +8,10 @@ declare module 'sst/node/future/auth' {
 			userId: string
 			username: string
 		}
+		admin: {
+			userId: string
+			username: string
+		}
 	}
 }
 
@@ -22,8 +26,27 @@ export function useSession(cookies: AstroCookies) {
 export function useUser(cookies: AstroCookies) {
 	const session = useSession(cookies)
 	if (!session) return
-	if (session.type !== 'user') return
-	return session
+	if (session.type !== 'user' && session.type !== 'admin') return
+	return session as {
+		type: 'user' | 'admin'
+		properties: {
+			userId: string
+			username: string
+		}
+	}
+}
+
+export function useAdmin(cookies: AstroCookies) {
+	const session = useSession(cookies)
+	if (!session) return
+	if (session.type !== 'admin') return
+	return session as {
+		type: 'admin'
+		properties: {
+			userId: string
+			username: string
+		}
+	}
 }
 
 export type Session = ReturnType<typeof useSession>

@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro'
 import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { routes } from '@/constants'
 
 export const get: APIRoute = async (ctx) => {
-	const session = useUser(ctx.cookies)
-	if (session?.type !== 'user') return ctx.redirect('/')
+	const session = useAdmin(ctx.cookies)
+	if (!session) return ctx.redirect('/')
 
 	const username = ctx.url.searchParams.get('username')
 

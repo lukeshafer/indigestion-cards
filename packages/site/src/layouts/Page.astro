@@ -6,6 +6,7 @@ import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro'
 import { Icon } from 'astro-icon'
 import UserSearch from '@/components/UserSearch.astro'
 import { routes } from '@/constants'
+import AdminOnly from '@/components/AdminOnly.astro'
 
 export interface Props extends BaseProps {
 	class?: string
@@ -44,16 +45,17 @@ const actionLinks = [
 
 <Base {...baseProps}>
 	<div class="page-layout grid h-[100svh] overflow-hidden">
-		{
-			Astro.props.session?.type === 'user' ? (
-				<side-nav class="overflow-y-scroll">
-					<nav class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
-						<div class="flex flex-col text-center font-display text-white text-shadow lowercase">
-							<span class="italic text-3xl">Indigestion</span>
-							<span class="text-2xl -mt-1">Dashboard</span>
-						</div>
-						<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
-							{actionLinks.map((actionLink) => (
+		<AdminOnly session={Astro.props.session}>
+			<side-nav class="overflow-y-scroll">
+				<nav
+					class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
+					<div class="flex flex-col text-center font-display text-white text-shadow lowercase">
+						<span class="italic text-3xl">Indigestion</span>
+						<span class="text-2xl -mt-1">Dashboard</span>
+					</div>
+					<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
+						{
+							actionLinks.map((actionLink) => (
 								<a
 									rel="prefetch"
 									href={actionLink.href}
@@ -66,13 +68,15 @@ const actionLinks = [
 									) : null}
 									{actionLink.title}
 								</a>
-							))}
-						</div>
-						<div class="pb">
-							<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
-								Administration
-							</h2>
-							{adminLinks.map(({ href, title }) =>
+							))
+						}
+					</div>
+					<div class="pb">
+						<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
+							Administration
+						</h2>
+						{
+							adminLinks.map(({ href, title }) =>
 								currentPage === href || currentPage.startsWith(href) ? (
 									<a
 										rel="prefetch"
@@ -90,42 +94,40 @@ const actionLinks = [
 										{title}
 									</a>
 								)
-							)}
+							)
+						}
+					</div>
+					<div class="px-4 py-2 items-center gap-3 relative">
+						<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
+							<a
+								rel="prefetch"
+								href="/api/auth/logout"
+								title="Logout"
+								class="block hover:bg-gray-100 p-3">
+								Logout
+							</a>
 						</div>
-						<div class="px-4 py-2 items-center gap-3 relative">
-							<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
-								<a
-									rel="prefetch"
-									href="/api/auth/logout"
-									title="Logout"
-									class="block hover:bg-gray-100 p-3">
-									Logout
-								</a>
-							</div>
-							<button
-								class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
-								title={Astro.props.session?.properties?.username}>
-								<Icon
-									name="mdi:gear"
-									class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
-								/>
-								{Astro.props.session?.properties?.username}
-							</button>
-						</div>
-					</nav>
-				</side-nav>
-			) : null
-		}
+						<button
+							class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
+							title={Astro.props.session?.properties?.username}>
+							<Icon
+								name="mdi:gear"
+								class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+							/>
+							{Astro.props.session?.properties?.username}
+						</button>
+					</div>
+				</nav>
+			</side-nav>
+		</AdminOnly>
 		<div class="md:col-start-2 overflow-y-scroll relative">
 			<header
 				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4">
-				{
-					Astro.props.session?.type === 'user' ? (
-						<div data-for-side-nav class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
-							<Hamburger />
-						</div>
-					) : null
-				}
+				<AdminOnly session={Astro.props.session}>
+					<div data-for-side-nav class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
+						<Hamburger />
+					</div>
+				</AdminOnly>
 				<a
 					rel="prefetch"
 					href="/"

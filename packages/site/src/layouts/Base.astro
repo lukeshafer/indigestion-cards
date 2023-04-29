@@ -26,7 +26,7 @@ const { title, session, pageType = 'private' } = Astro.props
 	</head>
 	<body>
 		{
-			session?.type === 'user' || pageType === 'public' ? (
+			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
 			) : (
 				<script> window.location.href = '/' </script>

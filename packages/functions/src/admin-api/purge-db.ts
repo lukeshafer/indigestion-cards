@@ -1,12 +1,10 @@
-import { ApiHandler, useFormValue, useHeader, useHeaders } from 'sst/node/api'
+import { ApiHandler, useFormValue } from 'sst/node/api'
 import { useSession } from 'sst/node/future/auth'
 import { db } from '@lil-indigestion-cards/core/db'
-import { warn } from 'console'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (session.type !== 'user') {
-		console.log('Invalid session')
+	if (session.type !== 'admin') {
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',

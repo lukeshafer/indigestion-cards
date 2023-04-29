@@ -4,7 +4,7 @@ import { useSession } from 'sst/node/future/auth'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (session.type !== 'user')
+	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
@@ -41,26 +41,26 @@ export const handler = ApiHandler(async () => {
 
 	return result.success
 		? {
-				statusCode: 200,
-				body: JSON.stringify({
-					message: `Rarity ${rarityName} created!`,
-					redirectPath: '/rarity',
-				}),
-		  }
+			statusCode: 200,
+			body: JSON.stringify({
+				message: `Rarity ${rarityName} created!`,
+				redirectPath: '/rarity',
+			}),
+		}
 		: {
-				statusCode: result.error === 'Rarity already exists' ? 409 : 500,
-				body: JSON.stringify({
-					message:
-						result.error === 'Rarity already exists'
-							? `Rarity with id ${rarityId} already exists!`
-							: result.error,
-					params: new URLSearchParams({
-						'form-rarityName': rarityName!,
-						'form-rarityId': rarityId!,
-						'form-defaultCount': defaultCount!,
-						bucket: bucket!,
-						key: imageKey!,
-					}).toString(),
-				}),
-		  }
+			statusCode: result.error === 'Rarity already exists' ? 409 : 500,
+			body: JSON.stringify({
+				message:
+					result.error === 'Rarity already exists'
+						? `Rarity with id ${rarityId} already exists!`
+						: result.error,
+				params: new URLSearchParams({
+					'form-rarityName': rarityName!,
+					'form-rarityId': rarityId!,
+					'form-defaultCount': defaultCount!,
+					bucket: bucket!,
+					key: imageKey!,
+				}).toString(),
+			}),
+		}
 })

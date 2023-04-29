@@ -1,14 +1,14 @@
 ---
 import { getAllRarities } from '@lil-indigestion-cards/core/card'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import Page from '@/layouts/Page.astro'
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
 import { api, routes } from '@/constants'
 import SortTable from '@/components/SortTable.astro'
 import PostButton from '@/components/form/PostButton.astro'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect('/404')
+const admin = useAdmin(Astro.cookies)
+if (!admin) return Astro.redirect('/404')
 
 const rarities = await getAllRarities()
 ---
@@ -16,7 +16,7 @@ const rarities = await getAllRarities()
 <Page
 	title="Rarities"
 	class="flex flex-col gap-4"
-	session={user}
+	session={admin}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Rarities', href: routes.RARITIES },

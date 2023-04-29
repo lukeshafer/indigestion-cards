@@ -15,7 +15,7 @@ interface Props {
 }
 const { props } = Astro
 
-const Element = props.session?.type === 'user' ? 'a' : 'div'
+const Element = props.session?.type === 'admin' ? 'a' : 'div'
 ---
 
 <ul class="grid justify-start w-full px-3">

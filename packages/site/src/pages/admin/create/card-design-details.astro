@@ -1,13 +1,13 @@
 ---
 import Page from '@/layouts/Page.astro'
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import PostButton from '@/components/form/PostButton.astro'
 import { api, routes } from '@/constants'
 import CardDesignForm from '@/components/entity-forms/CardDesignForm.astro'
 
-const user = useUser(Astro.cookies)
-if (user?.type !== 'user') return Astro.redirect('/404')
+const user = useAdmin(Astro.cookies)
+if (!user) return Astro.redirect('/404')
 
 const bucket = Astro.url.searchParams.get('bucket')
 const key = Astro.url.searchParams.get('key')

@@ -1,20 +1,23 @@
 ---
+import AdminOnly from '@/components/AdminOnly.astro'
 import { authApi } from '@/constants'
 import Page from '@/layouts/Page.astro'
-import { useUser } from '@/session'
+import { useAdmin } from '@/session'
 import { Icon } from 'astro-icon'
 import { Api } from 'sst/node/api'
 
-const user = useUser(Astro.cookies)
+const admin = useAdmin(Astro.cookies)
 ---
 
-<Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
+<Page title="index" session={admin} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
 	<a href={authApi.LOGIN} class="button-link">Login</a>
-	<a class="post-button twitch-login" href={Api.twitchApi.url + '/twitch/authorize'}>
-		<Icon name="mdi:twitch" width="50" />
-		<span>Log in with Twitch</span>
-	</a>
+	<AdminOnly session={admin}>
+		<a class="post-button twitch-login" href={Api.twitchApi.url + '/twitch/authorize'}>
+			<Icon name="mdi:twitch" width="50" />
+			<span>Log in with Twitch</span>
+		</a>
+	</AdminOnly>
 	<!-- TODO: Add FAQ -->
 </Page>
 

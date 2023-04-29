@@ -5,7 +5,7 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers'
 
 export const handler = ApiHandler(async () => {
 	const session = useSession()
-	if (session.type !== 'user')
+	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
