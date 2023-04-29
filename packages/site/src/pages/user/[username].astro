@@ -57,49 +57,50 @@ const breadcrumbs = [
 	breadcrumbs={breadcrumbs}
 	pageType="public">
 	<header>
-		<h1 class="page-heading col-start-2">{user.username}</h1>
 		<img
 			src={twitchData?.profile_image_url}
 			width="200"
 			class="rounded-full col-start-1 row-span-full"
 		/>
 		<AdminOnly session={session}>
-			<Form
-				class="col-start-2"
-				action={`${api.GIVE_PACK_TO_USER}?redirect=${routes.USERS}/${user.username}`}>
-				<div class="w-full flex flex-wrap items-center gap-2">
-					<input type="hidden" name="userId" value={user.userId} />
-					<input type="hidden" name="username" value={user.username} />
+			<section class="flex flex-col gap-2">
+				<h1 class="page-heading col-start-2">{user.username}</h1>
+				<p class="-mt-5">User Id: {user.userId}</p>
+				<Form
+					class="col-start-2"
+					action={`${api.GIVE_PACK_TO_USER}?redirect=${routes.USERS}/${user.username}`}>
+					<div class="w-full flex flex-wrap items-center gap-2">
+						<input type="hidden" name="userId" value={user.userId} />
+						<input type="hidden" name="username" value={user.username} />
 
-					<select
-						name="packType"
-						data-api-url={api.GET_ALL_PACK_TYPES}
-						class="w-40 h-full"
-						required>
-						<option value="">--</option>
-					</select>
+						<select
+							name="packType"
+							data-api-url={api.GET_ALL_PACK_TYPES}
+							class="w-40 h-full"
+							required>
+							<option value="">--</option>
+						</select>
 
-					<button type="submit">Give Pack</button>
+						<button type="submit" class="post-button">Give Pack</button>
+					</div>
+				</Form>
+				<div>
+					<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
+					<PostButton
+						id="revoke-pack"
+						url={`${api.REVOKE_PACK}?redirect=${routes.USERS}/${user.username}`}
+						label="Revoke Pack"
+						type="delete"
+						confirm
+						hiddenProperties={[
+							{ name: 'userId', value: user.userId },
+							{ name: 'username', value: user.username },
+						]}
+					/>
 				</div>
-			</Form>
+			</section>
 		</AdminOnly>
 	</header>
-	<AdminOnly session={session}>
-		<div>
-			<h2 class="text-xl pt-4">Unopened Packs: {user.packCount}</h2>
-			<PostButton
-				id="revoke-pack"
-				url={`${api.REVOKE_PACK}?redirect=${routes.USERS}/${user.username}`}
-				label="Revoke Pack"
-				type="delete"
-				confirm
-				hiddenProperties={[
-					{ name: 'userId', value: user.userId },
-					{ name: 'username', value: user.username },
-				]}
-			/>
-		</div>
-	</AdminOnly>
 	<div>
 		<h2 class="text-xl pt-4">Cards:</h2>
 		<CardList cards={cardsNotInPack} session={session} />
@@ -108,10 +109,8 @@ const breadcrumbs = [
 
 <style>
 	header {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		grid-template-rows: auto 1fr;
-		grid-auto-flow: dense;
+		display: flex;
+		align-items: flex-start;
 		gap: 3rem;
 		padding: 1rem;
 	}

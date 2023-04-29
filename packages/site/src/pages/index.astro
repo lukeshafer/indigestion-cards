@@ -1,11 +1,30 @@
 ---
+import { authApi } from '@/constants'
 import Page from '@/layouts/Page.astro'
 import { useUser } from '@/session'
+import { Icon } from 'astro-icon'
+import { Api } from 'sst/node/api'
 
 const user = useUser(Astro.cookies)
 ---
 
 <Page title="index" session={user} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
+	<a href={authApi.LOGIN} class="button-link">Login</a>
+	<a class="post-button twitch-login" href={Api.twitchApi.url + '/twitch/authorize'}>
+		<Icon name="mdi:twitch" width="50" />
+		<span>Log in with Twitch</span>
+	</a>
 	<!-- TODO: Add FAQ -->
 </Page>
+
+<style>
+	.twitch-login {
+		margin-top: 20px;
+		display: flex;
+		width: max-content;
+		align-items: center;
+		background-color: #9146ff;
+		color: white;
+	}
+</style>

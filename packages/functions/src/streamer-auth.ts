@@ -5,19 +5,21 @@ import { getAdminUserById } from '@lil-indigestion-cards/core/user'
 
 export const handler = AuthHandler({
 	clients: async () => ({
-		local: 'http://localhost:3001',
+		local: 'http://localhost:3000',
 	}),
 	providers: {
 		twitch: OauthAdapter({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),
 			clientID: Config.TWITCH_CLIENT_ID,
 			clientSecret: Config.TWITCH_CLIENT_SECRET,
-			scope: 'openid channel:manage:redemptions channel:read:subscriptions',
+			scope: 'openid channel:read:redemptions channel:read:subscriptions',
 		}),
 	},
 	async onSuccess(input) {
 		if (input.provider === 'twitch') {
 			const claims = input.tokenset.claims()
+			console.log('input', input)
+			console.log('claims', claims)
 
 			const adminUser = await getAdminUserById(claims.sub)
 			if (!adminUser || !adminUser.isStreamer) return { type: 'public', properties: {} }

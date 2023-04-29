@@ -34,10 +34,10 @@ export const routes = {
 	PACK_TYPES: '/pack-type',
 	ADMIN: {
 		LOGIN: '/admin',
-		CONFIG: '/admin/config',
 		GIVE_CARD: '/admin/give-card',
 		GIVE_PACK: '/admin/give-pack',
 		OPEN_PACKS: '/admin/open-packs',
+		SITE_CONFIG: '/admin/site-config',
 		CREATE: {
 			ADMIN: '/admin/create/admin',
 			CARD_DESIGN: '/admin/create/card-design',

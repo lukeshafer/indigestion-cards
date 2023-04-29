@@ -7,9 +7,9 @@ import { ConfigStack } from './config'
 
 export function Sites({ stack }: StackContext) {
 	const table = use(Database)
-	const api = use(API)
+	const { api, twitchApi } = use(API)
 	const { frameBucket, cardDesignBucket } = use(DesignBucket)
-	const { siteAuth, streamerAuth } = use(Auth)
+	const { siteAuth } = use(Auth)
 	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN } = use(ConfigStack)
 
 	const adminSite = new AstroSite(stack, 'admin', {
@@ -17,10 +17,10 @@ export function Sites({ stack }: StackContext) {
 		bind: [
 			table,
 			api,
+			twitchApi,
 			frameBucket,
 			cardDesignBucket,
 			siteAuth,
-			streamerAuth,
 			TWITCH_CLIENT_ID,
 			TWITCH_ACCESS_TOKEN,
 		],

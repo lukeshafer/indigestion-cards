@@ -14,27 +14,11 @@ export function Auth({ stack }: StackContext) {
 		},
 	})
 
-	const streamerAuth = new SSTAuth(stack, 'StreamerAuth', {
-		authenticator: {
-			handler: 'packages/functions/src/streamer-auth.handler',
-			bind: [
-				secrets.TWITCH_CLIENT_ID,
-				secrets.TWITCH_CLIENT_SECRET,
-				secrets.STREAMER_ACCESS_TOKEN_NAME,
-				secrets.STREAMER_REFRESH_TOKEN_NAME,
-				db,
-			],
-			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
-		},
-	})
-
 	stack.addOutputs({
 		authEndpoint: siteAuth.url,
-		streamerAuthEndpoint: streamerAuth.url,
 	})
 
 	return {
 		siteAuth,
-		streamerAuth,
 	}
 }

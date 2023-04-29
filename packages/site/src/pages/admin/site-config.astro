@@ -1,0 +1,16 @@
+---
+import Page from '@/layouts/Page.astro'
+import { useUser } from '@/session'
+
+const user = useUser(Astro.cookies)
+if (user?.type !== 'user') {
+	return Astro.redirect('/404')
+}
+---
+
+<Page
+	session={user}
+	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]}
+	title="Site Config">
+	<h1 class="page-heading">Site Config</h1>
+</Page>

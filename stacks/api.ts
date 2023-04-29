@@ -15,6 +15,8 @@ export function API({ stack }: StackContext) {
 	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
 			'ANY /': 'packages/functions/src/twitch-api.handler',
+			'ANY /twitch/authorize': 'packages/functions/src/twitch/authorize.handler',
+			'ANY /twitch/callback': 'packages/functions/src/twitch/callback.handler',
 		},
 		defaults: {
 			function: {
@@ -22,9 +24,13 @@ export function API({ stack }: StackContext) {
 					secrets.TWITCH_CLIENT_ID,
 					secrets.TWITCH_CLIENT_SECRET,
 					secrets.TWITCH_ACCESS_TOKEN,
+					secrets.STREAMER_AUTH_STATE_ARN,
+					secrets.STREAMER_ACCESS_TOKEN_ARN,
+					secrets.STREAMER_REFRESH_TOKEN_ARN,
 					table,
 					eventBus,
 				],
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	})
@@ -46,7 +52,6 @@ export function API({ stack }: StackContext) {
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
 			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
-			'GET /authorize-twitch': 'packages/functions/src/authorize-twitch.handler',
 			'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 		},
 		defaults: {
@@ -70,5 +75,5 @@ export function API({ stack }: StackContext) {
 		TwitchApiEndpoint: twitchApi.url,
 	})
 
-	return api
+	return { api, twitchApi }
 }

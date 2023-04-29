@@ -630,6 +630,56 @@ const packTypes = new Entity({
 	},
 })
 
+export const twitchEventTypes = [
+	'channel.channel_points_custom_reward_redemption.add',
+	'channel.subscription.gift',
+] as const
+
+const twitchEvents = new Entity({
+	model: {
+		entity: 'twitchEvents',
+		version: '1',
+		service: 'card-app',
+	},
+	attributes: {
+		eventId: {
+			type: 'string',
+			required: true,
+		},
+		eventName: {
+			type: 'string',
+			required: true,
+		},
+		eventType: {
+			type: twitchEventTypes,
+			required: true,
+		},
+		packTypeId: {
+			type: 'string',
+			required: true,
+		},
+		packTypeName: {
+			type: 'string',
+			required: true,
+		},
+		cost: {
+			type: 'number',
+		},
+	},
+	indexes: {
+		allTwitchEvents: {
+			pk: {
+				field: 'pk',
+				composite: [],
+			},
+			sk: {
+				field: 'sk',
+				composite: ['eventId'],
+			},
+		},
+	},
+})
+
 const siteConfig = new Entity(
 	{
 		model: {
@@ -672,6 +722,7 @@ export const db = new Service(
 		rarities,
 		siteConfig,
 		admins,
+		twitchEvents,
 	},
 	config
 )

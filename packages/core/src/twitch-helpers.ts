@@ -2,8 +2,11 @@ import { Config } from 'sst/node/config'
 import crypto from 'crypto'
 import { bodySchema, type TwitchBody } from './twitch-event-schemas'
 import fetch from 'node-fetch'
+import { SecretsManager } from 'aws-sdk'
 import { z } from 'zod'
 import { Api } from 'sst/node/api'
+
+const secretsManager = new SecretsManager()
 
 export const TWITCH_HEADERS = {
 	MESSAGE_TYPE: 'twitch-eventsub-message-type',
@@ -136,7 +139,6 @@ interface ChannelPointsCustomRewardRedemptionEvent {
 	type: 'channel.channel_points_custom_reward_redemption.add'
 	condition: {
 		broadcaster_user_id: string
-		reward_id: string
 	}
 	callback: string
 }
@@ -198,4 +200,45 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 	}
 
 	return { success: true, statusCode: res.status, body: result.data }
+}
+
+export async function getUserAccessToken(args: { code: string; redirect_uri: string }) {
+	return fetch('https://id.twitch.tv/oauth2/token', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: new URLSearchParams({
+			client_id: Config.TWITCH_CLIENT_ID,
+			client_secret: Config.TWITCH_CLIENT_SECRET,
+			code: args.code,
+			grant_type: 'authorization_code',
+			redirect_uri: args.redirect_uri,
+		}).toString(),
+	})
+}
+
+export async function putTokenSecrets(args: { access_token: string; refresh_token: string }) {
+	const putAccessTokenPromise = secretsManager
+		.putSecretValue({
+			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
+			SecretString: args.access_token,
+		})
+		.promise()
+
+	const putRefreshTokenPromise = secretsManager
+		.putSecretValue({
+			SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
+			SecretString: args.refresh_token,
+		})
+		.promise()
+
+	const putStatePromise = secretsManager
+		.putSecretValue({
+			SecretId: Config.STREAMER_AUTH_STATE_ARN,
+			SecretString: '-',
+		})
+		.promise()
+
+	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise, putStatePromise])
 }
