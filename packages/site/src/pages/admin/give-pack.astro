@@ -30,8 +30,8 @@ const packTypes = await getAllPackTypes()
 			<select name="packType" id="packType" required>
 				<option value="">--</option>
 				{
-				packTypes.map(({ packTypeId, packTypeName }) => (
-					<option value={packTypeId}>{packTypeName}</option>
+				packTypes.map((packType) => (
+					<option value={JSON.stringify(packType)}>{packType.packTypeName}</option>
 				))
 				}
 			</select>

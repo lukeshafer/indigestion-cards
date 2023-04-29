@@ -1,16 +1,16 @@
 ---
-import { getAllRarities } from '@lil-indigestion-cards/core/card'
-import { useAdmin } from '@/session'
-import Page from '@/layouts/Page.astro'
-import UnmatchedImageList from '@/components/UnmatchedImageList.astro'
-import { api, routes } from '@/constants'
-import SortTable from '@/components/SortTable.astro'
-import PostButton from '@/components/form/PostButton.astro'
+import { getAllRarities } from '@lil-indigestion-cards/core/card';
+import { useAdmin } from '@/session';
+import Page from '@/layouts/Page.astro';
+import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
+import { api, routes } from '@/constants';
+import SortTable from '@/components/SortTable.astro';
+import PostButton from '@/components/form/PostButton.astro';
 
-const admin = useAdmin(Astro.cookies)
-if (!admin) return Astro.redirect('/404')
+const admin = useAdmin(Astro.cookies);
+if (!admin) return Astro.redirect('/404');
 
-const rarities = await getAllRarities()
+const rarities = await getAllRarities();
 ---
 
 <Page
@@ -22,11 +22,11 @@ const rarities = await getAllRarities()
 		{ label: 'Rarities', href: routes.RARITIES },
 	]}>
 	<UnmatchedImageList type="frame" />
-	<div class="flex flex-wrap gap-8">
-		<h1 class="page-heading">Rarities</h1>
-		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
-	</div>
 	<SortTable>
+		<header class="flex flex-wrap justify-between mb-4" slot="header">
+			<h1 class="page-heading">Rarities</h1>
+			<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
+		</header>
 		<thead>
 			<tr>
 				<th class="w-1/2">Name</th>
@@ -63,12 +63,12 @@ const rarities = await getAllRarities()
 </Page>
 
 <script>
-	const forms = document.querySelectorAll('#rarity-list form') as NodeListOf<HTMLFormElement>
+	const forms = document.querySelectorAll('#rarity-list form') as NodeListOf<HTMLFormElement>;
 
 	forms.forEach((form) =>
 		form.addEventListener('submit', async (e) => {
-			const confirmation = confirm('Are you sure you want to delete this rarity?')
-			if (!confirmation) e.preventDefault()
+			const confirmation = confirm('Are you sure you want to delete this rarity?');
+			if (!confirmation) e.preventDefault();
 		})
-	)
+	);
 </script>

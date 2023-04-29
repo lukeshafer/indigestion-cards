@@ -1,10 +1,10 @@
 ---
-import { authApi } from '@/constants'
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import { Icon } from 'astro-icon'
+import { authApi } from '@/constants';
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import { Icon } from 'astro-icon';
 
-const admin = useAdmin(Astro.cookies)
+const admin = useAdmin(Astro.cookies);
 ---
 
 <Page title="index" session={admin} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">

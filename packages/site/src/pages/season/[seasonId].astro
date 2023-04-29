@@ -39,7 +39,7 @@ const breadcrumbs = [
 	<h1 class="page-heading">{season.seasonName}</h1>
 	<p class="text-lg">Description: {season.seasonDescription}</p>
 	<h2 class="text-xl pt-4">Cards:</h2>
-	<CardList cards={cardDesigns} />
+	<CardList cards={cardDesigns} session={admin} />
 
 	<PostButton
 		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"

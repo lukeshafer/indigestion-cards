@@ -1,11 +1,11 @@
-import { Table } from 'sst/node/table'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-import { Entity, Service } from 'electrodb'
+import { Table } from 'sst/node/table';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { Entity, Service } from 'electrodb';
 
 const config = {
 	table: Table.data.tableName,
 	client: new DocumentClient(),
-}
+};
 
 const cardDesigns = new Entity(
 	{
@@ -76,17 +76,18 @@ const cardDesigns = new Entity(
 		},
 		indexes: {
 			allDesigns: {
+				collection: 'designAndCards',
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['designId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['designId'],
+					composite: [],
 				},
 			},
 			byDesignId: {
-				collection: ['seasonAndDesigns', 'designAndCards'],
+				collection: ['seasonAndDesigns', 'designAndCards2'],
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
@@ -100,7 +101,7 @@ const cardDesigns = new Entity(
 		},
 	},
 	config
-)
+);
 
 const season = new Entity(
 	{
@@ -149,7 +150,7 @@ const season = new Entity(
 		},
 	},
 	config
-)
+);
 
 const cardInstances = new Entity(
 	{
@@ -220,7 +221,7 @@ const cardInstances = new Entity(
 		},
 		indexes: {
 			byDesignId: {
-				collection: ['seasonAndDesigns', 'designAndCards'],
+				collection: ['seasonAndDesigns', 'designAndCards2'],
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
@@ -256,19 +257,20 @@ const cardInstances = new Entity(
 				},
 			},
 			byId: {
+				collection: 'designAndCards',
 				pk: {
 					field: 'pk',
-					composite: ['instanceId'],
+					composite: ['designId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: [],
+					composite: ['instanceId'],
 				},
 			},
 		},
 	},
 	config
-)
+);
 
 const users = new Entity(
 	{
@@ -328,7 +330,7 @@ const users = new Entity(
 		},
 	},
 	config
-)
+);
 
 const packs = new Entity(
 	{
@@ -342,9 +344,16 @@ const packs = new Entity(
 				type: 'string',
 				required: true,
 			},
-			seasonId: {
+			packTypeId: {
 				type: 'string',
 				required: true,
+			},
+			packTypeName: {
+				type: 'string',
+				required: true,
+			},
+			seasonId: {
+				type: 'string',
 			},
 			username: {
 				type: 'string',
@@ -361,6 +370,10 @@ const packs = new Entity(
 					type: 'map',
 					properties: {
 						instanceId: {
+							type: 'string',
+							required: true,
+						},
+						designId: {
 							type: 'string',
 							required: true,
 						},
@@ -434,7 +447,7 @@ const packs = new Entity(
 		},
 	},
 	config
-)
+);
 
 const unmatchedImages = new Entity(
 	{
@@ -482,7 +495,7 @@ const unmatchedImages = new Entity(
 		},
 	},
 	config
-)
+);
 
 const rarities = new Entity(
 	{
@@ -524,7 +537,7 @@ const rarities = new Entity(
 		},
 	},
 	config
-)
+);
 
 const admins = new Entity({
 	model: {
@@ -560,7 +573,7 @@ const admins = new Entity({
 			},
 		},
 	},
-})
+});
 
 const packTypes = new Entity({
 	model: {
@@ -628,12 +641,12 @@ const packTypes = new Entity({
 			},
 		},
 	},
-})
+});
 
 export const twitchEventTypes = [
 	'channel.channel_points_custom_reward_redemption.add',
 	'channel.subscription.gift',
-] as const
+] as const;
 
 const twitchEvents = new Entity({
 	model: {
@@ -678,7 +691,7 @@ const twitchEvents = new Entity({
 			},
 		},
 	},
-})
+});
 
 const siteConfig = new Entity(
 	{
@@ -708,7 +721,7 @@ const siteConfig = new Entity(
 		},
 	},
 	config
-)
+);
 
 export const db = new Service(
 	{
@@ -725,7 +738,7 @@ export const db = new Service(
 		twitchEvents,
 	},
 	config
-)
+);
 
 //const username = 'snailyluke'
 //const seasonId = 'season-1'

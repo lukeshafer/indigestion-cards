@@ -1,16 +1,16 @@
-import { StackContext, Api, use } from 'sst/constructs'
-import { Database } from './database'
-import { Events } from './events'
-import { DesignBucket } from './bucket'
-import { ConfigStack } from './config'
-import { Auth } from './auth'
+import { StackContext, Api, use } from 'sst/constructs';
+import { Database } from './database';
+import { Events } from './events';
+import { DesignBucket } from './bucket';
+import { ConfigStack } from './config';
+import { Auth } from './auth';
 
 export function API({ stack }: StackContext) {
-	const table = use(Database)
-	const eventBus = use(Events)
-	const { frameBucket, cardDesignBucket } = use(DesignBucket)
-	const secrets = use(ConfigStack)
-	const { siteAuth } = use(Auth)
+	const table = use(Database);
+	const eventBus = use(Events);
+	const { frameBucket, cardDesignBucket } = use(DesignBucket);
+	const secrets = use(ConfigStack);
+	const { siteAuth } = use(Auth);
 
 	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
@@ -27,13 +27,18 @@ export function API({ stack }: StackContext) {
 				],
 			},
 		},
-	})
+	});
 
 	const api = new Api(stack, 'api', {
 		routes: {
-			'POST /give-pack-to-user': 'packages/functions/src/admin-api/invoke-give-pack-event.handler',
-			'POST /create-card-season': 'packages/functions/src/admin-api/create-card-season.handler',
-			'POST /create-card-design': 'packages/functions/src/admin-api/create-card-design.handler',
+			'POST /add-new-pack-to-queue':
+				'packages/functions/src/admin-api/invoke-give-pack-event.handler',
+			'POST /give-pack-to-user':
+				'packages/functions/src/admin-api/give-pack-to-user-api.handler',
+			'POST /create-card-season':
+				'packages/functions/src/admin-api/create-card-season.handler',
+			'POST /create-card-design':
+				'packages/functions/src/admin-api/create-card-design.handler',
 			'POST /create-rarity': 'packages/functions/src/admin-api/create-rarity.handler',
 			'POST /create-pack-type': 'packages/functions/src/admin-api/create-pack-type.handler',
 			'POST /delete-card-design/{seasonId}/{designId}':
@@ -69,12 +74,12 @@ export function API({ stack }: StackContext) {
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
-	})
+	});
 
 	stack.addOutputs({
 		ApiEndpoint: api.url,
 		TwitchApiEndpoint: twitchApi.url,
-	})
+	});
 
-	return { api, twitchApi }
+	return { api, twitchApi };
 }
