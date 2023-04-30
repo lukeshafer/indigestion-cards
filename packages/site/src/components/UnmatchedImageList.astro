@@ -5,7 +5,7 @@ import { routes } from '@/constants'
 
 type UnmatchedImageType = NonNullable<Parameters<typeof getUnmatchedDesignImages>[0]>
 interface Props {
-	type?: UnmatchedImageType
+	type: UnmatchedImageType
 }
 
 const unmatchedImages = await getUnmatchedDesignImages(Astro.props.type)

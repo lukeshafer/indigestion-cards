@@ -34,7 +34,7 @@ export async function batchTwitchEvents(options: { events: CreateEntityItem<Twit
 }
 
 export async function getTwitchEvents() {
-	return await db.entities.twitchEvents.query.allTwitchEvents({}).go();
+	return await db.entities.twitchEvents.query.byEventId({}).go();
 }
 
 export function checkIsValidTwitchEventType(

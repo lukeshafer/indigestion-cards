@@ -75,7 +75,7 @@ const cardDesigns = new Entity(
 			},
 		},
 		indexes: {
-			allDesigns: {
+			byDesignId: {
 				collection: 'designAndCards',
 				pk: {
 					field: 'pk',
@@ -86,8 +86,8 @@ const cardDesigns = new Entity(
 					composite: [],
 				},
 			},
-			byDesignId: {
-				collection: ['seasonAndDesigns', 'designAndCards2'],
+			bySeasonId: {
+				collection: 'seasonAndDesigns',
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
@@ -125,7 +125,6 @@ const season = new Entity(
 		},
 		indexes: {
 			allSeasons: {
-				collection: 'siteConfig',
 				pk: {
 					field: 'pk',
 					composite: [],
@@ -228,16 +227,15 @@ const cardInstances = new Entity(
 			},
 		},
 		indexes: {
-			byDesignId: {
-				collection: ['seasonAndDesigns', 'designAndCards2'],
-				index: 'gsi1',
+			byId: {
+				collection: 'designAndCards',
 				pk: {
-					field: 'gsi1pk',
-					composite: ['seasonId'],
+					field: 'pk',
+					composite: ['designId'],
 				},
 				sk: {
-					field: 'gsi1sk',
-					composite: ['designId', 'instanceId'],
+					field: 'sk',
+					composite: ['instanceId'],
 				},
 			},
 			byOwnerId: {
@@ -261,17 +259,6 @@ const cardInstances = new Entity(
 				},
 				sk: {
 					field: 'gsi2sk',
-					composite: ['instanceId'],
-				},
-			},
-			byId: {
-				collection: 'designAndCards',
-				pk: {
-					field: 'pk',
-					composite: ['designId'],
-				},
-				sk: {
-					field: 'sk',
 					composite: ['instanceId'],
 				},
 			},
@@ -316,11 +303,11 @@ const users = new Entity(
 			byId: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['userId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['userId'],
+					composite: [],
 				},
 			},
 			byUsername: {
@@ -477,24 +464,13 @@ const unmatchedImages = new Entity(
 			},
 		},
 		indexes: {
-			allImages: {
+			byType: {
 				pk: {
 					field: 'pk',
-					composite: [],
-				},
-				sk: {
-					field: 'sk',
-					composite: ['imageId'],
-				},
-			},
-			byType: {
-				index: 'gsi1',
-				pk: {
-					field: 'gsi1pk',
 					composite: ['type'],
 				},
 				sk: {
-					field: 'gsi1sk',
+					field: 'sk',
 					composite: ['imageId'],
 				},
 			},
@@ -686,7 +662,7 @@ const twitchEvents = new Entity({
 		},
 	},
 	indexes: {
-		allTwitchEvents: {
+		byEventId: {
 			pk: {
 				field: 'pk',
 				composite: [],
@@ -699,36 +675,6 @@ const twitchEvents = new Entity({
 	},
 });
 
-const siteConfig = new Entity(
-	{
-		model: {
-			entity: 'siteConfig',
-			version: '1',
-			service: 'card-app',
-		},
-		attributes: {
-			seasonId: {
-				type: 'string',
-				required: true,
-			},
-		},
-		indexes: {
-			get: {
-				collection: 'siteConfig',
-				pk: {
-					field: 'pk',
-					composite: [],
-				},
-				sk: {
-					field: 'sk',
-					composite: ['seasonId'],
-				},
-			},
-		},
-	},
-	config
-);
-
 export const db = new Service(
 	{
 		cardDesigns,
@@ -739,7 +685,6 @@ export const db = new Service(
 		users,
 		unmatchedImages,
 		rarities,
-		siteConfig,
 		admins,
 		twitchEvents,
 	},

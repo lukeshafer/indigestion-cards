@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-		success: true;
-		data: T;
-	}
+			success: true;
+			data: T;
+	  }
 	| {
-		success: false;
-		error: string;
-	};
+			success: false;
+			error: string;
+	  };
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -203,12 +203,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-					]
+							users
+								.patch({ userId: pack.userId })
+								// if packCount is null OR 0, set it to 0, otherwise subtract 1
+								.set({ packCount: (user?.packCount || 1) - 1 })
+								.commit(),
+					  ]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -253,12 +253,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-					users
-						.patch({ userId: pack.userId })
-						// if packCount is null OR 0, set it to 0, otherwise subtract 1
-						.set({ packCount: (user?.packCount || 1) - 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+				  ]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -407,16 +407,16 @@ export async function createPackType(args: CreateEntityItem<PackType>) {
 
 // DESIGN //
 export async function getAllCardDesigns() {
-	const result = await db.entities.cardDesigns.scan.go();
+	const result = await db.entities.cardDesigns.find({}).go();
 	return result.data;
 }
 
-export async function getCardDesignById(args: { designId: string; seasonId: string }) {
+export async function getCardDesignById(args: { designId: string }) {
 	const result = await db.entities.cardDesigns.query.byDesignId(args).go();
 	return result.data[0];
 }
 
-export async function getCardDesignAndInstancesById(args: { designId: string; seasonId: string }) {
+export async function getCardDesignAndInstancesById(args: { designId: string }) {
 	const result = await db.collections.designAndCards(args).go();
 	return result.data;
 }
@@ -459,13 +459,8 @@ export async function createCardDesign(
 }
 
 // UNMATCHED DESIGN IMAGES //
-export async function getUnmatchedDesignImages(type?: EntityItem<UnmatchedImage>['type']) {
-	if (type) {
-		const result = await db.entities.unmatchedImages.query.byType({ type }).go();
-		return result.data;
-	}
-
-	const result = await db.entities.unmatchedImages.query.allImages({}).go();
+export async function getUnmatchedDesignImages(type: EntityItem<UnmatchedImage>['type']) {
+	const result = await db.entities.unmatchedImages.query.byType({ type }).go();
 	return result.data;
 }
 
