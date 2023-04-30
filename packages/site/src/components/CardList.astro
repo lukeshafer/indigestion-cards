@@ -1,37 +1,47 @@
 ---
-import { routes } from '@/constants'
-import type { Session } from '@/session'
-import TradingCard from './TradingCard.astro'
+import { routes } from '@/constants';
+import type { Session } from '@/session';
+import TradingCard from './TradingCard.astro';
 
 interface Props {
-	session: Session | null
+	session: Session | null;
 	cards: {
-		designId: string
-		seasonId: string
-		cardName: string
-		imgUrl: string
-		cardDescription: string
-	}[]
+		designId: string;
+		seasonId: string;
+		cardName: string;
+		imgUrl: string;
+		cardDescription: string;
+		cardNumber: number;
+		totalOfType: number;
+		rarityName: string;
+	}[];
 }
-const { props } = Astro
+const { props } = Astro;
 
-const Element = props.session?.type === 'admin' ? 'a' : 'div'
+const Element = props.session?.type === 'admin' ? 'a' : 'div';
 ---
 
 <ul class="grid justify-start w-full px-3">
 	{
 		props.cards.length > 0 ? (
-			props.cards.map(({ designId, seasonId, cardName, imgUrl, cardDescription }, index) => (
+			props.cards.map((card, index) => (
 				<Element
 					rel="prefetch"
-					href={`${routes.DESIGNS}/${seasonId}/${designId}`}
+					href={`${routes.DESIGNS}/${card.seasonId}/${card.designId}`}
 					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
-					class:list={{ 'bg-gray-200': index % 2 === 0, 'bg-white': index % 2 === 1 }}>
-					<TradingCard shiny={index % 2 === 0}>
-						<img src={imgUrl} width="300" alt={`${cardName} image`} />
+					class:list={{
+						'bg-gray-200': index % 2 === 0,
+						'bg-white': index % 2 === 1,
+					}}>
+					<TradingCard
+						border={card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName}>
+						<img src={card.imgUrl} width="300" alt={`${card.cardName} image`} />
 					</TradingCard>
-					<h2 class="mt-4 font-display font-bold italic text-2xl">{cardName}</h2>
-					<p>{cardDescription}</p>
+					<h2 class="mt-4 font-display font-bold italic text-2xl">{card.cardName}</h2>
+					<p>{card.cardDescription}</p>
+					<p>
+						{card.rarityName}, {card.cardNumber} / {card.totalOfType}
+					</p>
 				</Element>
 			))
 		) : (

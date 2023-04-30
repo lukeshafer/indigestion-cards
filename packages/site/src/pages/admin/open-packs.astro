@@ -1,17 +1,18 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import { getAllPacks } from '@lil-indigestion-cards/core/card'
-import TradingCard from '@/components/TradingCard.astro'
-import { api } from '@/constants'
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import TradingCard from '@/components/TradingCard.astro';
+import { api } from '@/constants';
 
-const user = useAdmin(Astro.cookies)
+const user = useAdmin(Astro.cookies);
 
 if (!user) {
-	return Astro.redirect('/404')
+	return Astro.redirect('/404');
 }
 
-const packs = await getAllPacks()
+const allPacks = await getAllPacks();
+const packs = allPacks.filter((pack) => pack.userId && pack.username);
 ---
 
 <Page
@@ -210,214 +211,218 @@ const packs = await getAllPacks()
 </style>
 
 <script>
-	import type { getAllPacks } from '@lil-indigestion-cards/core/card'
-	type PackInfo = Awaited<ReturnType<typeof getAllPacks>>[number]
+	import type { getAllPacks } from '@lil-indigestion-cards/core/card';
+	type PackInfo = Awaited<ReturnType<typeof getAllPacks>>[number];
 	type Pack = {
-		element: HTMLLIElement
-		info: PackInfo
-	}
-	type Card = NonNullable<PackInfo['cardDetails']>[number]
+		element: HTMLLIElement;
+		info: PackInfo;
+	};
+	type Card = NonNullable<PackInfo['cardDetails']>[number];
 
-	const packList = document.querySelector<HTMLUListElement>('#pack-list ul')!
-	const packEls = document.querySelectorAll<HTMLLIElement>('#pack-list li')
-	const showcase = document.querySelector('open-showcase') as OpenShowcase
-	const openCardUrl = showcase.dataset.openUrl as string
+	const packList = document.querySelector<HTMLUListElement>('#pack-list ul')!;
+	const packEls = document.querySelectorAll<HTMLLIElement>('#pack-list li');
+	const showcase = document.querySelector('open-showcase') as OpenShowcase;
+	const openCardUrl = showcase.dataset.openUrl as string;
 
-	const packs = new Map<string, Pack>()
-	let mouseUp = () => {}
-	let currentDraggedPack: HTMLLIElement | null = null
+	const packs = new Map<string, Pack>();
+	let mouseUp = () => {};
+	let currentDraggedPack: HTMLLIElement | null = null;
 
 	for (const pack of packEls) {
-		const packInfo = JSON.parse(pack.dataset.packInfo!) as PackInfo
+		const packInfo = JSON.parse(pack.dataset.packInfo!) as PackInfo;
 
-		let pressed = false
-		let dragging = false
-		let dragTimeout: number
-		const button = pack.querySelector('button')!
+		let pressed = false;
+		let dragging = false;
+		let dragTimeout: number;
+		const button = pack.querySelector('button')!;
 
 		button.addEventListener('mousedown', (e) => {
-			pressed = true
+			pressed = true;
 			dragTimeout = window.setTimeout(() => {
-				e.preventDefault()
-				startDrag()
-			}, 200)
-		})
+				e.preventDefault();
+				startDrag();
+			}, 200);
+		});
 		button.addEventListener('click', () => {
 			if (dragging) {
-				return
+				return;
 			}
-			showcase.currentPack = packs.get(packInfo.packId)!
-		})
+			showcase.currentPack = packs.get(packInfo.packId)!;
+		});
 
 		function startDrag() {
-			if (!pressed) return
-			currentDraggedPack = pack
-			dragging = true
+			if (!pressed) return;
+			currentDraggedPack = pack;
+			dragging = true;
 			mouseUp = () => {
-				if (!pressed) return
-				currentDraggedPack = null
-				pressed = false
-				dragging = false
-				pack.classList.remove('dragging')
-			}
-			pack.classList.add('dragging')
+				if (!pressed) return;
+				currentDraggedPack = null;
+				pressed = false;
+				dragging = false;
+				pack.classList.remove('dragging');
+			};
+			pack.classList.add('dragging');
 		}
 
 		packs.set(packInfo.packId, {
 			element: pack,
 			info: packInfo,
-		})
+		});
 	}
 
 	document.addEventListener('mouseup', () => {
-		mouseUp()
-	})
+		mouseUp();
+	});
 
 	window.addEventListener('mousemove', (e) => {
-		const packListTop = packList.getBoundingClientRect().top
-		const y = e.clientY - packListTop
-		document.documentElement.style.setProperty('--mouse-y', `${y - 30}px`)
+		const packListTop = packList.getBoundingClientRect().top;
+		const y = e.clientY - packListTop;
+		document.documentElement.style.setProperty('--mouse-y', `${y - 30}px`);
 
-		if (!currentDraggedPack) return
+		if (!currentDraggedPack) return;
 
 		packEls.forEach((pack) => {
-			if (pack === currentDraggedPack || !currentDraggedPack) return
-			const rect = pack.getBoundingClientRect()
+			if (pack === currentDraggedPack || !currentDraggedPack) return;
+			const rect = pack.getBoundingClientRect();
 			if (e.clientY > rect.top && e.clientY < rect.bottom) {
-				packList.insertBefore(currentDraggedPack, pack)
+				packList.insertBefore(currentDraggedPack, pack);
 			}
-		})
-	})
+		});
+	});
 
 	class OpenShowcase extends HTMLElement {
-		#currentPack: Pack | null = null
-		list: HTMLUListElement | null = null
-		h2: HTMLHeadingElement | null = null
-		username: HTMLSpanElement | null = null
+		#currentPack: Pack | null = null;
+		list: HTMLUListElement | null = null;
+		h2: HTMLHeadingElement | null = null;
+		username: HTMLSpanElement | null = null;
 		constructor() {
-			super()
+			super();
 		}
 
 		connectedCallback() {
-			this.list = this.querySelector('ul')!
-			this.h2 = this.querySelector('h2')!
-			this.username = this.querySelector('.username')!
+			this.list = this.querySelector('ul')!;
+			this.h2 = this.querySelector('h2')!;
+			this.username = this.querySelector('.username')!;
 		}
 
 		set currentPack(pack: Pack | null) {
 			if (this.#currentPack) {
-				this.#currentPack.element.hidden = false
+				this.#currentPack.element.hidden = false;
 			}
-			this.#currentPack = pack
-			this.username!.innerText = pack ? pack.info.username : ''
-			this.list!.innerHTML = ''
+			this.#currentPack = pack;
+			this.username!.innerText = pack ? pack.info.username ?? '' : '';
+			this.list!.innerHTML = '';
 			if (!pack) {
-				this.h2!.style.display = 'none'
-				return
+				this.h2!.style.display = 'none';
+				return;
 			}
-			this.h2!.style.display = 'block'
+			this.h2!.style.display = 'block';
 
-			pack.element.hidden = true
+			pack.element.hidden = true;
 			pack.info.cardDetails.forEach((card) => {
-				const li = document.createElement('li')
-				const cardData = JSON.stringify(card)
+				const li = document.createElement('li');
+				const cardData = JSON.stringify(card);
 				li.innerHTML = `
 					<reveal-card 
 						packId=${pack.info.packId}
 						cardData='${cardData}'>
-					</reveal-card>`
-				this.list!.appendChild(li)
-			})
+					</reveal-card>`;
+				this.list!.appendChild(li);
+			});
 		}
 
 		get currentPack() {
-			return this.#currentPack
+			return this.#currentPack;
 		}
 	}
 
-	const revealCardTemplate = document.getElementById('reveal-card-template') as HTMLTemplateElement
+	const revealCardTemplate = document.getElementById(
+		'reveal-card-template'
+	) as HTMLTemplateElement;
 
 	class RevealCard extends HTMLElement {
-		#cardData: Card | null = null
-		#cardBack: HTMLButtonElement | null = null
-		#cardFront: HTMLDivElement | null = null
-		packId = ''
+		#cardData: Card | null = null;
+		#cardBack: HTMLButtonElement | null = null;
+		#cardFront: HTMLDivElement | null = null;
+		packId = '';
 		constructor() {
-			super()
+			super();
 		}
 
 		set cardData(card: Card | null) {
-			this.#cardData = card
+			this.#cardData = card;
 			if (card?.opened) {
-				this.setAttribute('flipped', '')
+				this.setAttribute('flipped', '');
 			}
-			if (!this.#cardData || !this.#cardBack || !this.#cardFront) return
-			this.#cardFront.querySelector<HTMLImageElement>('[data-art]')!.src = this.#cardData.imgUrl
+			if (!this.#cardData || !this.#cardBack || !this.#cardFront) return;
+			this.#cardFront.querySelector<HTMLImageElement>('[data-art]')!.src =
+				this.#cardData.imgUrl;
 		}
 
 		get cardData() {
-			return this.#cardData
+			return this.#cardData;
 		}
 
 		connectedCallback() {
-			const template = revealCardTemplate.content.cloneNode(true) as DocumentFragment
-			this.appendChild(template)
-			this.packId = this.getAttribute('packId') as string
-			this.#cardBack = this.querySelector('[data-card="back"]') as HTMLButtonElement
-			this.#cardFront = this.querySelector('[data-card="front"]') as HTMLDivElement
+			const template = revealCardTemplate.content.cloneNode(true) as DocumentFragment;
+			this.appendChild(template);
+			this.packId = this.getAttribute('packId') as string;
+			this.#cardBack = this.querySelector('[data-card="back"]') as HTMLButtonElement;
+			this.#cardFront = this.querySelector('[data-card="front"]') as HTMLDivElement;
 
-			this.cardData = JSON.parse(this.getAttribute('cardData')!) as Card
+			this.cardData = JSON.parse(this.getAttribute('cardData')!) as Card;
 
-			const tradingCard = this.querySelector<HTMLElement>('trading-card')
-			if (tradingCard) tradingCard.dataset.border = this.cardData.rarityName.toLowerCase()
+			const tradingCard = this.querySelector<HTMLElement>('trading-card');
+			if (tradingCard) tradingCard.dataset.border = this.cardData.rarityName.toLowerCase();
 
 			this.#cardBack.addEventListener('click', () => {
-				this.setAttribute('flipped', '')
-			})
+				this.setAttribute('flipped', '');
+			});
 		}
 
 		static get observedAttributes() {
-			return ['flipped']
+			return ['flipped'];
 		}
 
 		attributeChangedCallback(name: string, oldValue: string, newValue: string) {
 			if (name === 'flipped' && oldValue !== newValue) {
-				const pack = packs.get(this.packId)
+				const pack = packs.get(this.packId);
 				if (!pack) {
-					console.error('Pack not found')
-					return
+					console.error('Pack not found');
+					return;
 				}
 
 				const index = pack.info.cardDetails.findIndex(
 					(card) => card.instanceId === this.#cardData!.instanceId
-				)
+				);
 
 				if (pack.info.cardDetails[index]!.opened) {
-					return
+					return;
 				}
-				pack.info.cardDetails[index]!.opened = true
+				pack.info.cardDetails[index]!.opened = true;
 
 				if (pack.info.cardDetails.every((card) => card.opened)) {
-					pack.element.remove()
-					packs.delete(pack.info.packId)
+					pack.element.remove();
+					packs.delete(pack.info.packId);
 				} else {
-					packs.set(pack.info.packId, pack)
+					packs.set(pack.info.packId, pack);
 				}
 				fetch(openCardUrl, {
 					method: 'POST',
 					body: JSON.stringify({
 						instanceId: this.#cardData!.instanceId,
+						designId: this.#cardData!.designId,
 					}),
 				}).then((res) => {
-					if (res.ok) return
-					const errorText = this.querySelector<HTMLParagraphElement>('p.error-text')!
-					errorText.hidden = false
-					errorText.textContent = res.statusText
-				})
+					if (res.ok) return;
+					const errorText = this.querySelector<HTMLParagraphElement>('p.error-text')!;
+					errorText.hidden = false;
+					errorText.textContent = res.statusText;
+				});
 			}
 		}
 	}
 
-	customElements.define('open-showcase', OpenShowcase)
-	customElements.define('reveal-card', RevealCard)
+	customElements.define('open-showcase', OpenShowcase);
+	customElements.define('reveal-card', RevealCard);
 </script>

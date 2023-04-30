@@ -218,6 +218,14 @@ const cardInstances = new Entity(
 			openedAt: {
 				type: 'string',
 			},
+			cardNumber: {
+				type: 'number',
+				required: true,
+			},
+			totalOfType: {
+				type: 'number',
+				required: true,
+			},
 		},
 		indexes: {
 			byDesignId: {

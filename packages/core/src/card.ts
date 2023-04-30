@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -75,11 +75,23 @@ export async function generateCard(info: {
 	}
 
 	const assignedRarityId = rarityList[Math.floor(Math.random() * rarityList.length)];
-	const instanceId = `${design.seasonId}-${design.designId}-${assignedRarityId}-${
-		(rarityMap.get(assignedRarityId)?.count ?? 0) + 1
-	}`;
-
 	const assignedRarity = rarityMap.get(assignedRarityId)!;
+
+	const existingInstancesOfRarity = existingInstances
+		.filter((instance) => instance.rarityId === assignedRarityId)
+		.map((instance) => instance.cardNumber);
+
+	const possibleCardNumbers = Array.from({ length: assignedRarity.max }, (_, i) => i + 1).filter(
+		(cardNumber) => !existingInstancesOfRarity.includes(cardNumber)
+	);
+
+	if (possibleCardNumbers.length === 0) {
+		throw new Error('No card numbers found');
+	}
+
+	const cardNumber = possibleCardNumbers[Math.floor(Math.random() * possibleCardNumbers.length)];
+	const totalOfType = assignedRarity.max;
+	const instanceId = `${design.seasonId}-${design.designId}-${assignedRarityId}-${cardNumber}`;
 
 	if (info.packId) {
 		const result = await db.entities.cardInstances
@@ -99,6 +111,8 @@ export async function generateCard(info: {
 				minterUsername: info.username,
 				openedAt: info.packId ? undefined : new Date().toISOString(),
 				packId: info.packId,
+				cardNumber,
+				totalOfType,
 			})
 			.go();
 		return result.data;
@@ -131,6 +145,8 @@ export async function generateCard(info: {
 					minterUsername: info.username,
 					openedAt: info.packId ? undefined : new Date().toISOString(),
 					packId: info.packId,
+					cardNumber,
+					totalOfType,
 				})
 				.commit(),
 		])
@@ -187,12 +203,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({ packCount: (user?.packCount || 1) - 1 })
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -229,16 +245,21 @@ export async function deletePack(args: { packId: string }) {
 			packs: [pack],
 		},
 	} = await db.collections.packsAndCards({ packId: args.packId }).go();
-	const user = await getUser(pack.userId);
+
+	const user = pack.userId ? await getUser(pack.userId) : null;
 
 	const result = await db.transaction
 		.write(({ users, cardInstances, packs }) => [
 			packs.delete({ packId: args.packId }).commit(),
-			users
-				.patch({ userId: pack.userId })
-				// if packCount is null OR 0, set it to 0, otherwise subtract 1
-				.set({ packCount: (user?.packCount || 1) - 1 })
-				.commit(),
+			...(pack.userId && user
+				? [
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({ packCount: (user?.packCount || 1) - 1 })
+						.commit(),
+				]
+				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
 					.delete({ designId: card.designId, instanceId: card.instanceId })
@@ -311,6 +332,7 @@ export async function createPack(args: {
 }
 
 export async function openCardFromPack(args: { designId: string; instanceId: string }) {
+	console.log('openCardFromPack', args);
 	const card = await db.entities.cardInstances.query.byId(args).go();
 	if (!card.data || card.data.length === 0) {
 		throw new Error('Card not found');

@@ -6,6 +6,7 @@ export const handler = ApiHandler(async () => {
 	console.log('open-card');
 	const session = useSession();
 	if (session.type !== 'admin') {
+		console.log('Unauthorized');
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
