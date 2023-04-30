@@ -357,11 +357,9 @@ const packs = new Entity(
 			},
 			username: {
 				type: 'string',
-				required: true,
 			},
 			userId: {
 				type: 'string',
-				required: true,
 			},
 			cardDetails: {
 				type: 'list',

@@ -185,11 +185,15 @@ export async function deleteFirstPackForUser(args: {
 		const result = await db.transaction
 			.write(({ users, cardInstances, packs }) => [
 				packs.delete({ packId: pack.packId }).commit(),
-				users
-					.patch({ userId: pack.userId })
-					// if packCount is null OR 0, set it to 0, otherwise subtract 1
-					.set({ packCount: (user?.packCount || 1) - 1 })
-					.commit(),
+				...(pack.userId && user
+					? [
+							users
+								.patch({ userId: pack.userId })
+								// if packCount is null OR 0, set it to 0, otherwise subtract 1
+								.set({ packCount: (user?.packCount || 1) - 1 })
+								.commit(),
+					  ]
+					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
 						.delete({ designId: card.designId, instanceId: card.instanceId })
