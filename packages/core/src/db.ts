@@ -262,6 +262,18 @@ const cardInstances = new Entity(
 					composite: ['instanceId'],
 				},
 			},
+			bySeasonId: {
+				collection: 'seasonAndDesigns',
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['seasonId'],
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['designId', 'instanceId'],
+				},
+			},
 		},
 	},
 	config
@@ -442,6 +454,7 @@ const packs = new Entity(
 	config
 );
 
+export type UnmatchedImageType = 'cardDesign' | 'frame';
 const unmatchedImages = new Entity(
 	{
 		model: {

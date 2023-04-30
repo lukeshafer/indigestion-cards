@@ -11,9 +11,9 @@ interface Props {
 		cardName: string;
 		imgUrl: string;
 		cardDescription: string;
-		cardNumber: number;
-		totalOfType: number;
-		rarityName: string;
+		cardNumber?: number;
+		totalOfType?: number;
+		rarityName?: string;
 	}[];
 }
 const { props } = Astro;
@@ -34,14 +34,18 @@ const Element = props.session?.type === 'admin' ? 'a' : 'div';
 						'bg-white': index % 2 === 1,
 					}}>
 					<TradingCard
-						border={card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName}>
+						border={
+							card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName ?? ''
+						}>
 						<img src={card.imgUrl} width="300" alt={`${card.cardName} image`} />
 					</TradingCard>
 					<h2 class="mt-4 font-display font-bold italic text-2xl">{card.cardName}</h2>
 					<p>{card.cardDescription}</p>
-					<p>
-						{card.rarityName}, {card.cardNumber} / {card.totalOfType}
-					</p>
+					{card.rarityName && card.cardNumber && card.totalOfType ? (
+						<p>
+							{card.rarityName}, {card.cardNumber} / {card.totalOfType}
+						</p>
+					) : null}
 				</Element>
 			))
 		) : (

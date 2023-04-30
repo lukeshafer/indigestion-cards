@@ -22,7 +22,7 @@ export async function getUserByUserName(username: string) {
 
 export async function getAllUsers() {
 	try {
-		const users = await db.entities.users.query.byId({}).go();
+		const users = await db.entities.users.find({}).go();
 		return users.data ?? [];
 	} catch {
 		return [];

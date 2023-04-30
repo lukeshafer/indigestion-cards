@@ -1,4 +1,4 @@
-import { db } from './db';
+import { UnmatchedImageType, db } from './db';
 import type { EntityItem, CreateEntityItem, Entity } from 'electrodb';
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -203,12 +203,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({ packCount: (user?.packCount || 1) - 1 })
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -253,12 +253,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({ packCount: (user?.packCount || 1) - 1 })
+						.commit(),
+				]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -291,6 +291,7 @@ export async function createPack(args: {
 		(await createNewUser({ userId: args.userId, username: args.username }));
 
 	const cards: EntityItem<Card>[] = [];
+	const cardPool = args.cardPool;
 	for (let i = 0; i < args.count; i++) {
 		const card = await generateCard({
 			userId: args.userId,
@@ -298,6 +299,7 @@ export async function createPack(args: {
 			packId,
 			cardPool: args.cardPool,
 		});
+		cardPool.cardInstances.push(card);
 		cards.push(card);
 	}
 
@@ -469,8 +471,11 @@ export async function createUnmatchedDesignImage(image: CreateEntityItem<Unmatch
 	return result.data;
 }
 
-export async function deleteUnmatchedDesignImage(id: string) {
-	const result = await db.entities.unmatchedImages.delete({ imageId: id }).go();
+export async function deleteUnmatchedDesignImage(args: {
+	imageId: string;
+	type: UnmatchedImageType;
+}) {
+	const result = await db.entities.unmatchedImages.delete(args).go();
 	return result.data;
 }
 

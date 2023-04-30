@@ -1,21 +1,21 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import PostButton from '@/components/form/PostButton.astro'
-import { api, routes } from '@/constants'
-import RarityForm from '@/components/entity-forms/RarityForm.astro'
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import PostButton from '@/components/form/PostButton.astro';
+import { api, routes } from '@/constants';
+import RarityForm from '@/components/entity-forms/RarityForm.astro';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
+const user = useAdmin(Astro.cookies);
+if (!user) return Astro.redirect('/404');
 
-const bucket = Astro.url.searchParams.get('bucket')
-const key = Astro.url.searchParams.get('key')
+const bucket = Astro.url.searchParams.get('bucket');
+const key = Astro.url.searchParams.get('key');
 
 if (!bucket || !key) {
-	return Astro.redirect('/?alert=Please upload an image first')
+	return Astro.redirect('/?alert=Please upload an image first');
 }
 
-const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 ---
 
 <Page
@@ -41,7 +41,7 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 		</div>
 
 		<RarityForm
-			action={`${api.CREATE_RARITY}?redirect=${Astro.url.pathname}`}
+			action={`${api.CREATE_RARITY}?redirect=${routes.RARITIES}`}
 			bucket={bucket}
 			key={key}
 		/>
