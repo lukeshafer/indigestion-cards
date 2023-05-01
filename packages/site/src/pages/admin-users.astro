@@ -1,17 +1,28 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import { getAllAdminUsers } from '@lil-indigestion-cards/core/user'
-import { routes } from '@/constants'
-import SortTable from '@/components/SortTable.astro'
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
+import { api, routes } from '@/constants';
+import SortTable from '@/components/SortTable.astro';
+import PostButton from '@/components/form/PostButton.astro';
 
-const admin = useAdmin(Astro.cookies)
-if (!admin) return Astro.redirect(`/404`)
+const admin = useAdmin(Astro.cookies);
+if (!admin) return Astro.redirect(`/404`);
 
-const users = await getAllAdminUsers()
+const unsortedUsers = await getAllAdminUsers();
+
+const currentUser = admin.properties.userId;
+const users = unsortedUsers.sort((a, b) => {
+	if (a.userId === currentUser) return -1;
+	if (b.userId === currentUser) return 1;
+	return 0;
+});
 ---
 
-<Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]} session={admin}>
+<Page
+	title="Users"
+	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
+	session={admin}>
 	<SortTable>
 		<header slot="header" class="flex justify-between flex-wrap mb-4">
 			<h1 class="page-heading">Admin Users</h1>
@@ -23,14 +34,26 @@ const users = await getAllAdminUsers()
 		</header>
 		<thead>
 			<tr>
-				<th>Username</th>
+				<th class="w-3/4">Username</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			{
-				users.map(({ username }) => (
+				users.map(({ username, userId }) => (
 					<tr>
 						<td>{username}</td>
+						<td>
+							{username !== admin.properties.username && (
+								<PostButton
+									id="delete-admin-user"
+									label="Delete"
+									type="delete"
+									url={`${api.DELETE_ADMIN_USER}?redirect=${routes.ADMIN_USERS}`}
+									hiddenProperties={[{ name: 'userId', value: userId }]}
+								/>
+							)}
+						</td>
 					</tr>
 				))
 			}
@@ -98,51 +121,51 @@ const users = await getAllAdminUsers()
 <script>
 	class UserTable extends HTMLElement {
 		constructor() {
-			super()
+			super();
 		}
 
 		connectedCallback() {
-			const headings = Array.from(this.querySelectorAll('th'))
-			const body = this.querySelector('tbody')!
-			const rows = Array.from(body.querySelectorAll('tr'))
-			const originalRows = rows.slice()
+			const headings = Array.from(this.querySelectorAll('th'));
+			const body = this.querySelector('tbody')!;
+			const rows = Array.from(body.querySelectorAll('tr'));
+			const originalRows = rows.slice();
 			headings.forEach((th, index) => {
 				th.addEventListener('click', () => {
-					const currentMode = th.dataset.mode || 'none'
+					const currentMode = th.dataset.mode || 'none';
 					const newMode =
 						currentMode === 'none'
 							? 'ascending'
 							: currentMode === 'ascending'
 							? 'descending'
-							: 'none'
+							: 'none';
 
-					th.dataset.mode = newMode
+					th.dataset.mode = newMode;
 					if (newMode === 'none') {
 						originalRows.forEach((row) => {
-							body.appendChild(row)
-						})
-						return
+							body.appendChild(row);
+						});
+						return;
 					}
 
-					const isAscending = newMode === 'ascending'
+					const isAscending = newMode === 'ascending';
 					const sortedRows = rows.sort((a, b) => {
-						const aVal = a.children[index]!.textContent!
-						const bVal = b.children[index]!.textContent!
+						const aVal = a.children[index]!.textContent!;
+						const bVal = b.children[index]!.textContent!;
 						if (aVal < bVal) {
-							return isAscending ? -1 : 1
+							return isAscending ? -1 : 1;
 						}
 						if (aVal > bVal) {
-							return isAscending ? 1 : -1
+							return isAscending ? 1 : -1;
 						}
-						return 0
-					})
+						return 0;
+					});
 					sortedRows.forEach((row) => {
-						body.appendChild(row)
-					})
-				})
-			})
+						body.appendChild(row);
+					});
+				});
+			});
 		}
 	}
 
-	customElements.define('user-table', UserTable)
+	customElements.define('user-table', UserTable);
 </script>

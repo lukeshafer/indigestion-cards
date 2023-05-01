@@ -49,12 +49,14 @@ export function API({ stack }: StackContext) {
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			'POST /delete-rarity/{id}': 'packages/functions/src/admin-api/delete-rarity.handler',
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
+			'POST /delete-admin-user': 'packages/functions/src/admin-api/delete-admin-user.handler',
 			'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
 			'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
 			'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 			'GET /get-all-channel-point-rewards':
 				'packages/functions/src/admin-api/get-all-channel-point-rewards.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
+			'POST /update-rarity': 'packages/functions/src/admin-api/update-rarity.handler',
 		},
 		defaults: {
 			function: {
@@ -73,6 +75,12 @@ export function API({ stack }: StackContext) {
 				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
+		},
+		cors: {
+			allowCredentials: true,
+			allowHeaders: ['content-type'],
+			allowMethods: ['ANY'],
+			allowOrigins: ['http://localhost:3000'],
 		},
 	});
 

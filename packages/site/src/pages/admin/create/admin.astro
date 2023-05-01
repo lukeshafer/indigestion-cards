@@ -10,5 +10,5 @@ if (!user) return Astro.redirect('/404')
 
 <Page title="Add admin user" class="max-w-xl" session={user}>
 	<h1 class="page-heading">Add admin user</h1>
-	<AdminUserForm action={`${api.CREATE_ADMIN_USER}?redirect=${routes.ADMIN.CREATE.ADMIN}`} />
+	<AdminUserForm action={`${api.CREATE_ADMIN_USER}?redirect=${routes.ADMIN_USERS}`} />
 </Page>

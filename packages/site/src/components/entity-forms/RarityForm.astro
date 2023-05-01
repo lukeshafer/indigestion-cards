@@ -1,24 +1,26 @@
 ---
-import Form from '@/components/form/Form.astro'
+import Form from '@/components/form/Form.astro';
+import type { RarityEntity } from '@lil-indigestion-cards/core/card';
 
 interface Props {
-	bucket: string
-	key: string
-	action: string
+	bucket?: string;
+	key?: string;
+	action: string;
+	rarity?: RarityEntity;
 }
 
-const { key, bucket, action } = Astro.props
+const { key, bucket, action, rarity } = Astro.props;
 
-const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 ---
 
 <Form action={action} method="post">
-	<input type="hidden" name="imgUrl" value={imgUrl} />
-	<input type="hidden" name="imageKey" value={key} />
-	<input type="hidden" name="bucket" value={bucket} />
+	{bucket && key ? <input type="hidden" name="imgUrl" value={imgUrl} /> : null}
+	{key ? <input type="hidden" name="imageKey" value={key} /> : null}
+	{bucket ? <input type="hidden" name="bucket" value={bucket} /> : null}
 	<div class="input-group">
 		<label for="rarityName">Rarity Name</label>
-		<input id="rarityName" name="rarityName" type="text" />
+		<input id="rarityName" name="rarityName" type="text" value={rarity?.rarityName ?? ''} />
 	</div>
 	<div class="input-group">
 		<label for="rarityId">Rarity ID</label>
@@ -30,11 +32,12 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 			data-edit-button
 			data-id-from="rarityName"
 			pattern="[a-z0-9-]+"
+			value={rarity?.rarityId ?? ''}
 		/>
 	</div>
 	<div class="input-group">
 		<label for="defaultCount">Default number per card</label>
-		<input id="defaultCount" name="defaultCount" type="number" value="0" />
+		<input id="defaultCount" name="defaultCount" type="number" value={rarity?.defaultCount ?? '0'} />
 	</div>
 	<button type="submit">Save</button>
 </Form>

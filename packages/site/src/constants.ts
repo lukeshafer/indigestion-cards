@@ -9,21 +9,23 @@ export const api = {
 	DELETE_UNMATCHED_IMAGE: '/api/admin/delete-unmatched-image',
 	DELETE_RARITY: '/api/admin/delete-rarity',
 	CREATE_ADMIN_USER: '/api/admin/create-admin-user',
+	DELETE_ADMIN_USER: '/api/admin/delete-admin-user',
 	REVOKE_PACK: '/api/admin/revoke-pack',
 	OPEN_CARD: '/api/admin/open-card',
 	GET_ALL_PACK_TYPES: '/api/get-all-pack-types',
-} as const
+	UPDATE_RARITY: '/api/admin/update-rarity',
+} as const;
 
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',
 	SEARCH: '/api/search',
-} as const
+} as const;
 
 export const authApi = {
 	CALLBACK: '/api/auth/callback',
 	LOGIN: '/api/auth/login',
 	LOGOUT: '/api/auth/logout',
-} as const
+} as const;
 
 export const routes = {
 	USERS: '/user',
@@ -47,7 +49,14 @@ export const routes = {
 			RARITY_DETAILS: '/admin/create/rarity-details',
 			PACK_TYPE: '/admin/create/pack-type',
 		},
+		EDIT: {
+			ADMIN: '/admin/edit/admin',
+			CARD_DESIGN: '/admin/edit/card-design',
+			SEASON: '/admin/edit/season',
+			RARITY: '/admin/edit/rarity',
+			PACK_TYPE: '/admin/edit/pack-type',
+		},
 	},
-} as const
+} as const;
 
-export const AUTH_TOKEN = 'sst_auth_token'
+export const AUTH_TOKEN = 'sst_auth_token';

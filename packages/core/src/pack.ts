@@ -60,7 +60,7 @@ export type CardPool = {
 	cardInstances: EntityItem<Card>[];
 };
 
-async function getCardPoolFromType(packType: PackDetails['packType']): Promise<CardPool> {
+export async function getCardPoolFromType(packType: PackDetails['packType']): Promise<CardPool> {
 	if (packType.packTypeCategory === 'season') {
 		const seasonId = packType.seasonId;
 		if (!seasonId) throw new Error('SeasonId is required for season packs');

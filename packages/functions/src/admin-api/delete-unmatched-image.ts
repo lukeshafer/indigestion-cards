@@ -1,4 +1,4 @@
-import { ApiHandler, usePathParam, useQueryParam, useFormValue } from 'sst/node/api';
+import { ApiHandler, usePathParam, useFormValue } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
 import { S3 } from 'aws-sdk';
@@ -45,13 +45,9 @@ export const handler = ApiHandler(async () => {
 
 		await Promise.all([dbResult, s3result]);
 
-		const redirect = useQueryParam('redirectUrl');
-
 		return {
-			statusCode: 307,
-			headers: {
-				Location: `${redirect}?message=Successfully deleted unused image` || '/',
-			},
+			statusCode: 200,
+			body: 'Successfully deleted unused image',
 		};
 	} catch (error) {
 		return {

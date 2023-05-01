@@ -1,5 +1,4 @@
 ---
-import SortTable from '@/components/SortTable.astro';
 import Page from '@/layouts/Page.astro';
 import { useAdmin } from '@/session';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
@@ -59,40 +58,45 @@ const rewards = rawRewards.map((reward) => {
 			<h2 class="sub-heading py-4">Twitch Channel Point Rewards</h2>
 			<button class="post-button" data-type="submit" data-save hidden>Save</button>
 		</header>
-		<SortTable class="mt-4">
-			<thead>
-				<tr>
-					<th class="w-2/3">Event</th>
-					<th>Pack Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					rewards.map((reward) => (
-						<tr>
-							<td>{reward.title}</td>
-							<td>
-								<select
-									data-pack-type-select
-									data-id={reward.id}
-									data-title={reward.title}
-									data-cost={reward.cost}
-									data-value={reward.packType}
-									class="my-form-select">
-									<option value="">None</option>
-									{packTypes.map(({ packTypeId, packTypeName }) => (
-										<option
-											value={JSON.stringify({ packTypeId, packTypeName })}>
-											{packTypeName}
-										</option>
-									))}
-								</select>
-							</td>
-						</tr>
-					))
-				}
-			</tbody>
-		</SortTable>
+		<sort-table>
+			<table class="mt-4">
+				<thead>
+					<tr>
+						<th class="w-2/3">Event</th>
+						<th>Pack Type</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						rewards.map((reward) => (
+							<tr>
+								<td>{reward.title}</td>
+								<td>
+									<select
+										data-pack-type-select
+										data-id={reward.id}
+										data-title={reward.title}
+										data-cost={reward.cost}
+										data-value={reward.packType}
+										class="my-form-select">
+										<option value="">None</option>
+										{packTypes.map(({ packTypeId, packTypeName }) => (
+											<option
+												value={JSON.stringify({
+													packTypeId,
+													packTypeName,
+												})}>
+												{packTypeName}
+											</option>
+										))}
+									</select>
+								</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</sort-table>
 	</section>
 </Page>
 

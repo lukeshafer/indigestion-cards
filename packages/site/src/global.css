@@ -149,6 +149,63 @@
 	}
 }
 
+@layer components {
+	sort-table {
+		max-width: 60rem;
+		display: block;
+	}
+
+	sort-table table {
+		table-layout: fixed;
+		text-align: center;
+		width: 100%;
+		max-width: 60rem;
+	}
+
+	sort-table th:not([data-no-sort]) {
+		cursor: pointer;
+	}
+
+	sort-table tbody td {
+		font-weight: 500;
+		padding: 1.5rem;
+		position: relative;
+	}
+
+	sort-table tbody td span {
+		position: relative;
+	}
+
+	sort-table tbody td [astro-icon] {
+		width: 3rem;
+		color: white;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	sort-table tbody tr:nth-child(even) [astro-icon] {
+		color: lightgray;
+	}
+
+	sort-table tbody tr:nth-child(even) {
+		@apply bg-gray-50;
+	}
+
+	sort-table tbody tr:nth-child(odd) {
+		@apply bg-gray-200;
+	}
+
+	sort-table th[data-mode='ascending']::after {
+		content: '▲';
+	}
+
+	sort-table th[data-mode='descending']::after {
+		content: '▼';
+	}
+}
+
 @layer utilities {
 	.absolute-center {
 		position: absolute;

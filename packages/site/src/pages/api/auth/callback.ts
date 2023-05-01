@@ -1,11 +1,11 @@
-import { AUTH_TOKEN } from '@/constants'
-import type { APIContext } from 'astro'
-import { Auth } from 'sst/node/future/auth'
+import { AUTH_TOKEN } from '@/constants';
+import type { APIContext } from 'astro';
+import { Auth } from 'sst/node/future/auth';
 
 export async function get(ctx: APIContext) {
-	const code = ctx.url.searchParams.get('code')
+	const code = ctx.url.searchParams.get('code');
 	if (!code) {
-		throw new Error('Code missing')
+		throw new Error('Code missing');
 	}
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
 		method: 'POST',
@@ -16,17 +16,18 @@ export async function get(ctx: APIContext) {
 			redirect_uri: `${ctx.url.origin}${ctx.url.pathname}`,
 		}),
 	}).then((r) => {
-		return r.json()
-	})
+		return r.json();
+	});
 
 	if (!response.access_token) {
-		throw new Error('No access token')
+		throw new Error('No access token');
 	}
 
 	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
 		maxAge: 60 * 60 * 24 * 30,
+		httpOnly: true,
 		path: '/',
-	})
+	});
 
-	return ctx.redirect('/', 302)
+	return ctx.redirect('/', 302);
 }

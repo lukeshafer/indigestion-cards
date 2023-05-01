@@ -1,19 +1,19 @@
-import { Config } from 'sst/node/config'
-import { Issuer } from 'openid-client'
-import { AuthHandler, OauthAdapter } from 'sst/node/future/auth'
-import { getAdminUserById } from '@lil-indigestion-cards/core/user'
-import { putTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers'
+import { Config } from 'sst/node/config';
+import { Issuer } from 'openid-client';
+import { AuthHandler, OauthAdapter, Session } from 'sst/node/future/auth';
+import { getAdminUserById } from '@lil-indigestion-cards/core/user';
+import { putTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
 		user: {
-			userId: string
-			username: string
-		}
+			userId: string;
+			username: string;
+		};
 		admin: {
-			userId: string
-			username: string
-		}
+			userId: string;
+			username: string;
+		};
 	}
 }
 
@@ -35,17 +35,20 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
+	async onAuthorize(event) {
+		console.log(event.rawQueryString);
+	},
 	async onSuccess(input) {
 		if (input.provider === 'twitchUser') {
 			//console.log(input.tokenset)
-			const claims = input.tokenset.claims()
+			const claims = input.tokenset.claims();
 
-			const adminUser = await getAdminUserById(claims.sub)
+			const adminUser = await getAdminUserById(claims.sub);
 			if (!adminUser)
 				return {
 					type: 'public',
 					properties: {},
-				}
+				};
 
 			return {
 				type: 'admin',
@@ -53,24 +56,24 @@ export const handler = AuthHandler({
 					userId: adminUser.userId,
 					username: adminUser.username,
 				},
-			}
+			};
 		}
 
 		if (input.provider === 'twitchStreamer') {
-			const claims = input.tokenset.claims()
+			const claims = input.tokenset.claims();
 
-			const adminUser = await getAdminUserById(claims.sub)
+			const adminUser = await getAdminUserById(claims.sub);
 			if (!adminUser || claims.sub !== Config.STREAMER_USER_ID)
 				return {
 					type: 'public',
 					properties: {},
-				}
+				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
 				putTokenSecrets({
 					access_token: input.tokenset.access_token,
 					refresh_token: input.tokenset.refresh_token,
-				})
+				});
 			}
 
 			return {
@@ -79,10 +82,10 @@ export const handler = AuthHandler({
 					userId: adminUser.userId,
 					username: adminUser.username,
 				},
-			}
+			};
 		}
 
-		throw new Error('Unknown provider')
+		throw new Error('Unknown provider');
 	},
 	async onError() {
 		return {
@@ -91,6 +94,6 @@ export const handler = AuthHandler({
 				'Content-Type': 'text/plain',
 			},
 			body: 'Auth failed',
-		}
+		};
 	},
-})
+});

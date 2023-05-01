@@ -1,18 +1,18 @@
 ---
-import '../global.css'
-import '@fontsource/montserrat/variable.css'
-import "open-props/colors"
-import type { Session } from '@/session'
+import '../global.css';
+import '@fontsource/montserrat/variable.css';
+import 'open-props/colors';
+import type { Session } from '@/session';
 
 interface Props {
-	title: string
-	session: Session
-	pageType?: 'public' | 'private'
+	title: string;
+	session: Session;
+	pageType?: 'public' | 'private';
 }
 
-export type BaseProps = Props
+export type BaseProps = Props;
 
-const { title, session, pageType = 'private' } = Astro.props
+const { title, session, pageType = 'private' } = Astro.props;
 ---
 
 <html lang="en">
@@ -22,6 +22,7 @@ const { title, session, pageType = 'private' } = Astro.props
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#fd94e6" />
+		<script src="../elements/sort-table.ts"></script>
 		<title>{title}</title>
 	</head>
 	<body>

@@ -1,5 +1,5 @@
 import { UnmatchedImageType, db } from './db';
-import type { EntityItem, CreateEntityItem, Entity } from 'electrodb';
+import type { EntityItem, CreateEntityItem, Entity, UpdateEntityItem } from 'electrodb';
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
 import { CardPool } from './pack';
@@ -23,6 +23,7 @@ type Rarity = typeof db.entities.rarities;
 type PackType = typeof db.entities.packTypes;
 
 export type CardDesignEntity = EntityItem<CardDesign>;
+export type RarityEntity = EntityItem<Rarity>;
 
 export async function generateCard(info: {
 	userId: string;
@@ -385,6 +386,11 @@ export async function getAllPackTypes() {
 	return result.data;
 }
 
+export async function getPackTypeById(args: { packTypeId: string }) {
+	const result = await db.entities.packTypes.query.allPackTypes(args).go();
+	return result.data[0];
+}
+
 export async function createPackType(args: CreateEntityItem<PackType>) {
 	try {
 		const result = await db.entities.packTypes.create({ ...args }).go();
@@ -567,6 +573,12 @@ export async function createRarity(
 			error: err.message,
 		};
 	}
+}
+
+export async function updateRarity(args: UpdateEntityItem<Rarity> & { rarityId: string }) {
+	const { rarityId, ...rest } = args;
+	const result = await db.entities.rarities.update({ rarityId: args.rarityId }).set(rest).go();
+	return result.data;
 }
 
 export async function deleteRarityById(id: string): Promise<Result<EntityItem<Rarity>>> {
