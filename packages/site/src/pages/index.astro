@@ -10,7 +10,7 @@ const admin = useAdmin(Astro.cookies);
 <Page title="index" session={admin} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
 	<a
-		class="post-button twitch-login"
+		class="post-button mt-5 flex w-max items-center bg-[#9146ff] text-white"
 		href={authApi.LOGIN + (admin?.type === 'admin' ? '?streamer=true' : '')}>
 		<Icon name="mdi:twitch" width="50" />
 		<span>
@@ -19,14 +19,3 @@ const admin = useAdmin(Astro.cookies);
 	</a>
 	<!-- TODO: Add FAQ -->
 </Page>
-
-<style>
-	.twitch-login {
-		margin-top: 20px;
-		display: flex;
-		width: max-content;
-		align-items: center;
-		background-color: #9146ff;
-		color: white;
-	}
-</style>

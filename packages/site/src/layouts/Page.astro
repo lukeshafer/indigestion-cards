@@ -1,30 +1,30 @@
 ---
-import Base, { type BaseProps } from './Base.astro'
-import Hamburger from '@/components/Hamburger.astro'
-import { getAllPacks } from '@lil-indigestion-cards/core/card'
-import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro'
-import { Icon } from 'astro-icon'
-import UserSearch from '@/components/UserSearch.astro'
-import { routes } from '@/constants'
-import AdminOnly from '@/components/AdminOnly.astro'
+import Base, { type BaseProps } from './Base.astro';
+import Hamburger from '@/components/Hamburger.astro';
+import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
+import { Icon } from 'astro-icon';
+import UserSearch from '@/components/UserSearch.astro';
+import { routes } from '@/constants';
+import AdminOnly from '@/components/AdminOnly.astro';
 
 export interface Props extends BaseProps {
-	class?: string
-	breadcrumbs?: Path[]
+	class?: string;
+	breadcrumbs?: Path[];
 }
 
-const { class: className, breadcrumbs, ...baseProps } = Astro.props
+const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 
-const alert = Astro.url.searchParams.get('alert')
+const alert = Astro.url.searchParams.get('alert');
 const alertType =
-	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error'
+	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error';
 const alertColor =
 	{
 		success: 'bg-green-200',
 		error: 'bg-red-200',
-	}[alertType] ?? 'bg-red-200'
+	}[alertType] ?? 'bg-red-200';
 
-const currentPage = Astro.url.pathname
+const currentPage = Astro.url.pathname;
 const adminLinks = [
 	{ href: routes.ADMIN_USERS, title: 'Admins' },
 	{ href: routes.DESIGNS, title: 'Designs' },
@@ -33,14 +33,14 @@ const adminLinks = [
 	{ href: routes.SEASONS, title: 'Seasons' },
 	{ href: routes.ADMIN.SITE_CONFIG, title: 'Site Config' },
 	{ href: routes.USERS, title: 'Users' },
-] satisfies { href: string; title: string }[]
+] satisfies { href: string; title: string }[];
 
-const packs = await getAllPacks()
+const packs = await getAllPacks();
 
 const actionLinks = [
 	{ href: routes.ADMIN.OPEN_PACKS, title: 'Open Packs', id: 'open-packs', count: packs.length },
 	{ href: routes.ADMIN.GIVE_PACK, title: 'Give Pack', id: 'give-pack' },
-]
+];
 ---
 
 <Base {...baseProps}>
@@ -94,7 +94,8 @@ const actionLinks = [
 						}
 					</div>
 					<div class="px-4 py-2 items-center gap-3 relative">
-						<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
+						<div
+							class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
 							<a
 								rel="prefetch"
 								href="/api/auth/logout"
@@ -120,7 +121,9 @@ const actionLinks = [
 			<header
 				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4">
 				<AdminOnly session={Astro.props.session}>
-					<div data-for-side-nav class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
+					<div
+						data-for-side-nav
+						class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
 						<Hamburger />
 					</div>
 				</AdminOnly>
@@ -234,30 +237,30 @@ const actionLinks = [
 
 <script>
 	class SideNav extends HTMLElement {
-		isClosed = true
+		isClosed = true;
 		constructor() {
-			super()
+			super();
 		}
 
 		connectedCallback() {
 			const hamburgerButton = document.querySelector(
 				'[data-for-side-nav] button'
-			) as HTMLButtonElement
-			const nav = this.querySelector('nav') as HTMLDivElement
+			) as HTMLButtonElement;
+			const nav = this.querySelector('nav') as HTMLDivElement;
 			hamburgerButton.addEventListener('click', () => {
-				this.isClosed = !this.isClosed
-				this.style.setProperty('--isClosed', `${+this.isClosed}`)
-				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`)
-				nav.setAttribute('aria-expanded', `${this.isClosed}`)
-			})
+				this.isClosed = !this.isClosed;
+				this.style.setProperty('--isClosed', `${+this.isClosed}`);
+				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`);
+				nav.setAttribute('aria-expanded', `${this.isClosed}`);
+			});
 
-			const userMenu = this.querySelector('.user-menu') as HTMLDivElement
-			const userButton = this.querySelector('.user-button') as HTMLButtonElement
+			const userMenu = this.querySelector('.user-menu') as HTMLDivElement;
+			const userButton = this.querySelector('.user-button') as HTMLButtonElement;
 			userButton.addEventListener('click', () => {
-				userMenu.classList.toggle('hidden')
-			})
+				userMenu.classList.toggle('hidden');
+			});
 		}
 	}
 
-	customElements.define('side-nav', SideNav)
+	customElements.define('side-nav', SideNav);
 </script>

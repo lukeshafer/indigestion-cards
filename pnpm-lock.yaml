@@ -150,6 +150,9 @@ importers:
       electrodb:
         specifier: ^2.5.1
         version: 2.5.1(@aws-sdk/client-dynamodb@3.312.0)(@aws-sdk/smithy-client@3.310.0)(@aws-sdk/types@3.310.0)
+      htmx.org:
+        specifier: ^1.9.2
+        version: 1.9.2
       open-props:
         specifier: ^1.5.8
         version: 1.5.8
@@ -5083,6 +5086,10 @@ packages:
 
   /html-void-elements@2.0.1:
     resolution: {integrity: sha512-0quDb7s97CfemeJAnW9wC0hw78MtW7NU3hqtCD75g2vFlDLt36llsYD7uB7SUzojLMP24N5IatXf7ylGXiGG9A==}
+    dev: false
+
+  /htmx.org@1.9.2:
+    resolution: {integrity: sha512-ZGbucKcalQyXdGUl+4Zt3xdRDPmNy70yNhMyDG1eDYUm/ImxmSo2rhIBDa53XitrAVhA+/CGgry+wJ1SO77wrA==}
     dev: false
 
   /http-errors@2.0.0:
