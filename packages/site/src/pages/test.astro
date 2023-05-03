@@ -1,0 +1,16 @@
+---
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+
+const session = useAdmin(Astro.cookies);
+if (!session) return Astro.redirect('/404');
+---
+
+<Page title="test" session={session}>
+	<button
+		class="post-button"
+		data-type="submit"
+		hx-get="/api/html/get-pack-to-open?packId=pack-144313393-2023-05-02T01:59:29.555Z-0.9256536575617695"
+		hx-swap="afterend">Click Me</button
+	>
+</Page>

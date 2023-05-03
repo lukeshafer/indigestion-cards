@@ -1,0 +1,31 @@
+---
+import { useAdmin } from '@/session';
+import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card';
+
+const session = useAdmin(Astro.cookies);
+if (!session) return new Response('Unauthorized', { status: 401 });
+const method = Astro.request.method.toUpperCase();
+const body = await Astro.request.text();
+const params = new URLSearchParams(body);
+let errorStr = '';
+
+if (method === 'DELETE') {
+	const userId = params.get('userId');
+	const username = params.get('username');
+	if (!userId || !username) return new Response('Missing parameters', { status: 400 });
+	const result = await deleteFirstPackForUser({ userId });
+	console.log(result);
+	if (!result) return new Response('Failed to revoke pack', { status: 500 });
+	if (!result.success) errorStr = result.error;
+}
+---
+
+{
+	method === 'DELETE' ? (
+		errorStr ? (
+			<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
+		) : (
+			<p class="p-4 mb-4 bg-green-200">Revoked 1 pack for {params.get('username')}</p>
+		)
+	) : null
+}

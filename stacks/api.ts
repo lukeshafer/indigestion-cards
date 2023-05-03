@@ -57,6 +57,7 @@ export function API({ stack }: StackContext) {
 				'packages/functions/src/admin-api/get-all-channel-point-rewards.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			'POST /update-rarity': 'packages/functions/src/admin-api/update-rarity.handler',
+			'ANY /{proxy+}': 'packages/functions/src/admin-api.handler',
 		},
 		defaults: {
 			function: {

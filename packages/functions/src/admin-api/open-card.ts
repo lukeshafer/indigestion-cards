@@ -1,18 +1,7 @@
-import { ApiHandler, useJsonBody } from 'sst/node/api';
+import { useJsonBody } from 'sst/node/api';
 import { openCardFromPack } from '@lil-indigestion-cards/core/card';
-import { useSession } from 'sst/node/future/auth';
 
-export const handler = ApiHandler(async () => {
-	console.log('open-card');
-	const session = useSession();
-	if (session.type !== 'admin') {
-		console.log('Unauthorized');
-		return {
-			statusCode: 401,
-			body: 'Unauthorized',
-		};
-	}
-
+export async function PATCH() {
 	const { instanceId, designId } = useJsonBody();
 	if (!instanceId || typeof instanceId !== 'string')
 		return { statusCode: 400, body: 'Missing instanceId.' };
@@ -32,4 +21,4 @@ export const handler = ApiHandler(async () => {
 		statusCode: 200,
 		body: JSON.stringify(result.data),
 	};
-});
+}

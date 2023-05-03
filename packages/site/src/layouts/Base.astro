@@ -23,6 +23,7 @@ const { title, session, pageType = 'private' } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#fd94e6" />
 		<script src="../elements/sort-table.ts"></script>
+		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<title>{title}</title>
 	</head>
 	<body hx-ext="head-support" hx-boost="true">
@@ -38,6 +39,7 @@ const { title, session, pageType = 'private' } = Astro.props;
 		import htmx from 'htmx.org';
 		// @ts-ignore
 		window.htmx = htmx;
+		// @ts-ignore
 		import('htmx.org/dist/ext/head-support');
 	</script>
 </html>

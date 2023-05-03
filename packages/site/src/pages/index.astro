@@ -10,6 +10,7 @@ const admin = useAdmin(Astro.cookies);
 <Page title="index" session={admin} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
 	<a
+		hx-disable
 		class="post-button mt-5 flex w-max items-center bg-[#9146ff] text-white"
 		href={authApi.LOGIN + (admin?.type === 'admin' ? '?streamer=true' : '')}>
 		<Icon name="mdi:twitch" width="50" />

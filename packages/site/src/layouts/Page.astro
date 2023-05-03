@@ -141,7 +141,9 @@ const actionLinks = [
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main class={(className ?? '') + ' p-2 md:p-4 col-start-2'}>
-				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
+				<div id="alert-wrapper">
+					{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
+				</div>
 				<slot />
 			</main>
 		</div>
