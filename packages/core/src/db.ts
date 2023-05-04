@@ -635,6 +635,17 @@ const packTypes = new Entity({
 				composite: ['packTypeId'],
 			},
 		},
+		bySeasonId: {
+			index: 'gsi1',
+			pk: {
+				field: 'gsi1pk',
+				composite: ['seasonId'],
+			},
+			sk: {
+				field: 'gsi1sk',
+				composite: ['packTypeId'],
+			},
+		},
 	},
 });
 

@@ -1,34 +1,66 @@
 ---
-import CardList from '@/components/CardList.astro'
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/card'
-import PostButton from '@/components/form/PostButton.astro'
-import { api, routes } from '@/constants'
+import CardList from '@/components/CardList.astro';
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import {
+	getPackTypesBySeasonId,
+	getSeasonAndDesignsBySeasonId,
+} from '@lil-indigestion-cards/core/card';
+import PostButton from '@/components/form/PostButton.astro';
+import { api, routes } from '@/constants';
 
-const admin = useAdmin(Astro.cookies)
-if (!admin) return Astro.redirect('/404')
+console.log('test');
+const admin = useAdmin(Astro.cookies);
+if (!admin) return Astro.redirect('/404');
 
-const id = Astro.params.seasonId
+const id = Astro.params.seasonId;
 
 if (!id) {
-	return Astro.redirect(`${routes.SEASONS}?alert=Season ID is required`)
+	return Astro.redirect(`${routes.SEASONS}?alert=Season ID is required`);
 }
 
 const {
 	season: [season],
 	cardDesigns,
-} = await getSeasonAndDesignsBySeasonId(id)
+	cardInstances,
+} = await getSeasonAndDesignsBySeasonId(id);
 
 if (!season) {
-	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist`)
+	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist`);
 }
+
+const totalPossibleCards = cardDesigns.reduce((acc, card) => {
+	return (
+		acc +
+		(card.rarityDetails?.reduce((acc, rarity) => {
+			return acc + rarity.count;
+		}, 0) ?? 0)
+	);
+}, 0);
+
+const ownedCards = cardInstances.length;
+const remainingCards = totalPossibleCards - ownedCards;
+
+const packTypes = await getPackTypesBySeasonId({ seasonId: id });
+const packTypesWithCardPools = await Promise.all(
+	packTypes.map(async (packType) => {
+		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
+		const openedPacks = ownedCards / packType.cardCount;
+		const remainingPacks = Math.floor(remainingCards / packType.cardCount);
+		return {
+			...packType,
+			totalPossiblePacks,
+			openedPacks,
+			remainingPacks,
+		};
+	})
+);
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
 	{ label: 'Seasons', href: routes.SEASONS },
 	{ label: season.seasonName, href: `${routes.SEASONS}/${id}` },
-]
+];
 ---
 
 <Page
@@ -37,23 +69,49 @@ const breadcrumbs = [
 	session={admin}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="page-heading">{season.seasonName}</h1>
-	<p class="text-lg">Description: {season.seasonDescription}</p>
-	<h2 class="text-xl pt-4">Cards:</h2>
+	{
+		season.seasonDescription ? (
+			<p class="text-lg">Description: {season.seasonDescription}</p>
+		) : null
+	}
+
+	<section class="text-lg">
+		<h2 class="sub-heading">Stats:</h2>
+		<p>Total cards in season: {totalPossibleCards}</p>
+		<p>Cards distributed: {ownedCards}</p>
+		<p>Card remaining to distribute: {remainingCards}</p>
+
+		<h3 class="sub-heading text-xl mt-4">Pack Types:</h3>
+		<ul>
+			{
+				packTypesWithCardPools.map(async (packType) => (
+					<li>
+						<b>{packType.packTypeName}</b>: {packType.totalPossiblePacks} total
+						{packType.totalPossiblePacks === 1 ? 'pack' : 'packs'},{' '}
+						{packType.remainingPacks}
+						{packType.remainingPacks === 1 ? 'pack' : 'packs'} remaining to be opened
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<h2 class="sub-heading">Cards:</h2>
 	<CardList cards={cardDesigns} session={admin} />
 
 	<PostButton
-		class="bg-red-500 hover:bg-red-700 text-black hover:text-white"
 		id="delete-season"
+		type="delete"
 		label="Delete Season"
 		url={`${api.DELETE_CARD_SEASON}/${id}?redirect=${routes.SEASONS}`}
 	/>
 </Page>
 
 <script>
-	const form = document.getElementById('delete-season') as HTMLFormElement
+	const form = document.getElementById('delete-season') as HTMLFormElement;
 
 	form.addEventListener('submit', async (e) => {
-		const confirmation = confirm('Are you sure you want to delete this season?')
-		if (!confirmation) e.preventDefault()
-	})
+		const confirmation = confirm('Are you sure you want to delete this season?');
+		if (!confirmation) e.preventDefault();
+	});
 </script>

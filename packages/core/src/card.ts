@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-		success: true;
-		data: T;
-	}
+			success: true;
+			data: T;
+	  }
 	| {
-		success: false;
-		error: string;
-	};
+			success: false;
+			error: string;
+	  };
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -204,12 +204,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-					]
+							users
+								.patch({ userId: pack.userId })
+								// if packCount is null OR 0, set it to 0, otherwise subtract 1
+								.set({ packCount: (user?.packCount || 1) - 1 })
+								.commit(),
+					  ]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -254,12 +254,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-					users
-						.patch({ userId: pack.userId })
-						// if packCount is null OR 0, set it to 0, otherwise subtract 1
-						.set({ packCount: (user?.packCount || 1) - 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+				  ]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -391,6 +391,11 @@ export async function getPackTypeById(args: { packTypeId: string }) {
 	return result.data[0];
 }
 
+export async function getPackTypesBySeasonId(args: { seasonId: string }) {
+	const result = await db.entities.packTypes.query.bySeasonId(args).go();
+	return result.data;
+}
+
 export async function createPackType(args: CreateEntityItem<PackType>) {
 	try {
 		const result = await db.entities.packTypes.create({ ...args }).go();
@@ -411,6 +416,11 @@ export async function createPackType(args: CreateEntityItem<PackType>) {
 			error: err.message,
 		};
 	}
+}
+
+export async function deletePackTypeById(args: { packTypeId: string }) {
+	const result = await db.entities.packTypes.delete(args).go();
+	return { success: true, data: result.data };
 }
 
 // DESIGN //

@@ -1,0 +1,38 @@
+---
+import { useAdmin } from '@/session';
+import { deletePackTypeById } from '@lil-indigestion-cards/core/card';
+const session = useAdmin(Astro.cookies);
+if (!session) return new Response('Unauthorized', { status: 401 });
+
+const method = Astro.request.method.toUpperCase();
+const body = await Astro.request.text();
+const params = new URLSearchParams(body);
+let errorStr = '';
+
+if (method === 'DELETE') {
+	const packTypeId = params.get('packTypeId');
+	if (!packTypeId) return new Response('Missing packTypeId', { status: 400 });
+	const result = await deletePackTypeById({ packTypeId });
+	console.log(result);
+	if (!result) return new Response('Failed to delete pack type', { status: 500 });
+	return new Response(null, {
+		headers: {
+			'HX-Redirect': `/pack-type?alert=${
+				result.success
+					? 'Successfully deleted pack type&type=success'
+					: 'Failed to delete pack type'
+			}`,
+		},
+	});
+}
+---
+
+{
+	method === 'DELETE' ? (
+		errorStr ? (
+			<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
+		) : (
+			<p class="p-4 mb-4 bg-green-200">Successfully deleted pack type</p>
+		)
+	) : null
+}

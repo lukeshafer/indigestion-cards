@@ -27,6 +27,16 @@ const cardPool = await getCardPoolFromType(packType);
 		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
 	]}>
 	<h1 class="page-heading">{packType.packTypeName}</h1>
+	<button
+		class="post-button shine"
+		data-type="delete"
+		hx-delete="/api/html/pack-type"
+		hx-vals={JSON.stringify({
+			packTypeId: packType.packTypeId,
+		})}>
+		Delete Pack Type
+		<div class="htmx-indicator">Deleting</div>
+	</button>
 	<section aria-label="Card Pool" class="flex flex-col gap-4 mt-4">
 		<h2 class="sub-heading">Card Pool</h2>
 		<SortTable>

@@ -27,7 +27,7 @@ const Element = props.session?.type === 'admin' ? 'a' : 'div';
 			props.cards.map((card, index) => (
 				<Element
 					rel="prefetch"
-					href={`${routes.DESIGNS}/${card.seasonId}/${card.designId}`}
+					href={`${routes.DESIGNS}/${card.designId}`}
 					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
 					class:list={{
 						'bg-gray-200': index % 2 === 0,
@@ -37,7 +37,7 @@ const Element = props.session?.type === 'admin' ? 'a' : 'div';
 						border={
 							card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName ?? ''
 						}>
-						<img src={card.imgUrl} width="300" alt={`${card.cardName} image`} />
+						<img src={card.imgUrl} width="250" alt={`${card.cardName} image`} />
 					</TradingCard>
 					<h2 class="mt-4 font-display font-bold italic text-2xl">{card.cardName}</h2>
 					<p>{card.cardDescription}</p>
