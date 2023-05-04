@@ -1,0 +1,49 @@
+---
+import { updatePackUser } from '@lil-indigestion-cards/core/pack';
+import { useAdmin } from '@/session';
+import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
+import { getUserByUserName } from '@lil-indigestion-cards/core/user';
+
+const session = useAdmin(Astro.cookies);
+if (!session) return Astro.redirect('/');
+
+console.log(Astro.url.search);
+
+const packId = Astro.url.searchParams.get('packId');
+const username = Astro.url.searchParams.get('username');
+const id = Astro.url.searchParams.get('id');
+
+if (!packId) {
+	console.error('Missing packId');
+	return new Response('Missing packId', { status: 400 });
+}
+if (!username) {
+	console.error('Missing username');
+	return new Response('Missing username', { status: 400 });
+}
+if (!id) {
+	console.error('Missing id');
+	return new Response('Missing id', { status: 400 });
+}
+
+const userId = (await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
+if (!userId) return new Response('User not found', { status: 404 });
+
+await updatePackUser({ packId, username, userId });
+---
+
+<span {id} hx-swap-oob="true">{username}</span>
+<button
+	_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
+	class="post-button edit-button"
+	data-type="success"
+	hx-select=".save-button"
+	hx-swap="outerHTML"
+	hx-vals={JSON.stringify({
+		id,
+		username,
+		packId,
+	})}
+	hx-get={`/api/html/pack/start-edit`}>
+	Saved
+</button>

@@ -29,7 +29,8 @@ const rarities = await getAllRarities();
 		</header>
 		<thead>
 			<tr>
-				<th class="w-1/2">Name</th>
+				<th>Name</th>
+				<th>Id</th>
 				<th data-type="number">Default Count</th>
 				<th data-no-sort>Actions</th>
 			</tr>
@@ -37,23 +38,35 @@ const rarities = await getAllRarities();
 		<tbody>
 			{
 				rarities.map(({ rarityName, rarityId, defaultCount }) => (
-					<tr>
-						<td>{rarityName}</td>
-						<td>{defaultCount}</td>
+					<tr class="text-center">
+						<td>
+							<span id={`rarityName-${rarityId}`}>{rarityName}</span>
+						</td>
+						<td>
+							<span id={`rarityId-${rarityId}`}>{rarityId}</span>
+						</td>
+						<td>
+							<span id={`defaultCount-${rarityId}`}>{defaultCount}</span>
+						</td>
 						<td class="flex flex-row gap-2 text-sm justify-center">
-							<a
-								class="post-button"
+							<button
+								class="post-button edit-button"
 								data-type="submit"
-								href={`${routes.ADMIN.EDIT?.RARITY}/${rarityId}`}>
+								hx-select=".save-button"
+								hx-swap="outerHTML"
+								hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
+								hx-get={`/api/html/rarity/start-edit`}>
 								Edit
-							</a>
-							<PostButton
-								url={`${api.DELETE_RARITY}/${rarityId}`}
-								type="delete"
-								confirm
-								id={`delete-rarity-${rarityId}`}
-								label="Delete"
-							/>
+							</button>
+							<div hx-disable>
+								<PostButton
+									url={`${api.DELETE_RARITY}/${rarityId}`}
+									type="delete"
+									confirm
+									id={`delete-rarity-${rarityId}`}
+									label="Delete"
+								/>
+							</div>
 						</td>
 					</tr>
 				))

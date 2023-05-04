@@ -1,17 +1,17 @@
 ---
-import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
-import Page from '@/layouts/Page.astro'
-import Form from '@/components/form/Form.astro'
-import { S3Client } from '@aws-sdk/client-s3'
-import { Bucket } from 'sst/node/bucket'
-import crypto from 'crypto'
-import { useAdmin } from '@/session'
-import { routes } from '@/constants'
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
+import Page from '@/layouts/Page.astro';
+import Form from '@/components/form/Form.astro';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Bucket } from 'sst/node/bucket';
+import crypto from 'crypto';
+import { useAdmin } from '@/session';
+import { routes } from '@/constants';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
+const user = useAdmin(Astro.cookies);
+if (!user) return Astro.redirect('/404');
 
-const s3 = new S3Client({ region: 'us-east-2' })
+const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {
 	Bucket: Bucket.FrameDesigns.bucketName,
 	Key: crypto.randomBytes(20).toString('hex') + '.png',
@@ -19,7 +19,7 @@ const presigned = await createPresignedPost(s3, {
 		acl: 'public-read',
 		success_action_redirect: Astro.url.origin + routes.ADMIN.CREATE.RARITY_DETAILS,
 	},
-})
+});
 ---
 
 <Page
@@ -32,16 +32,18 @@ const presigned = await createPresignedPost(s3, {
 		{ label: 'New Rarity', href: routes.ADMIN.CREATE.RARITY },
 	]}>
 	<h1 class="page-heading">Create new rarity</h1>
-	<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
-		{
-			Object.entries(presigned.fields).map(([key, value]) => (
-				<input type="hidden" name={key} value={value} />
-			))
-		}
-		<div class="input-group">
-			<label for="file">Please upload frame image for rarity</label>
-			<input type="file" name="file" id="file" accept="image/png" required />
-		</div>
-		<button type="submit">Upload</button>
-	</Form>
+	<div hx-disable>
+		<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
+			{
+				Object.entries(presigned.fields).map(([key, value]) => (
+					<input type="hidden" name={key} value={value} />
+				))
+			}
+			<div class="input-group">
+				<label for="file">Please upload frame image for rarity</label>
+				<input type="file" name="file" id="file" accept="image/png" required />
+			</div>
+			<button type="submit">Upload</button>
+		</Form>
+	</div>
 </Page>

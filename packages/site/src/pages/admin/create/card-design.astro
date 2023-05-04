@@ -1,17 +1,17 @@
 ---
-import { Bucket } from 'sst/node/bucket'
-import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
-import { S3Client } from '@aws-sdk/client-s3'
-import crypto from 'crypto'
-import Page from '@/layouts/Page.astro'
-import Form from '@/components/form/Form.astro'
-import { useAdmin } from '@/session'
-import { routes } from '@/constants'
+import { Bucket } from 'sst/node/bucket';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
+import { S3Client } from '@aws-sdk/client-s3';
+import crypto from 'crypto';
+import Page from '@/layouts/Page.astro';
+import Form from '@/components/form/Form.astro';
+import { useAdmin } from '@/session';
+import { routes } from '@/constants';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
+const user = useAdmin(Astro.cookies);
+if (!user) return Astro.redirect('/404');
 
-const s3 = new S3Client({ region: 'us-east-2' })
+const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {
 	Bucket: Bucket.CardDesigns.bucketName,
 	Key: crypto.randomBytes(20).toString('hex') + '.jpg',
@@ -20,7 +20,7 @@ const presigned = await createPresignedPost(s3, {
 		success_action_redirect: Astro.url.origin + routes.ADMIN.CREATE.CARD_DESIGN_DETAILS,
 		'x-amz-meta-test': 'test',
 	},
-})
+});
 ---
 
 <Page
@@ -33,23 +33,18 @@ const presigned = await createPresignedPost(s3, {
 		{ label: 'New Card', href: routes.ADMIN.CREATE.CARD_DESIGN },
 	]}>
 	<h1 class="page-heading">Create New Card</h1>
-	<Form method="post" action={presigned.url} enctype="multipart/form-data">
-		{
-			Object.entries(presigned.fields).map(([key, value]) => (
-				<input type="hidden" name={key} value={value} />
-			))
-		}
-		<div class="input-group">
-			<label data-for="file" for="file">Please upload the card image</label>
-			<input type="file" name="file" id="file" accept="image/jpeg" required />
-		</div>
-		<button type="submit">Upload</button>
-	</Form>
+	<div hx-disable>
+		<Form method="post" action={presigned.url} enctype="multipart/form-data">
+			{
+				Object.entries(presigned.fields).map(([key, value]) => (
+					<input type="hidden" name={key} value={value} />
+				))
+			}
+			<div class="input-group">
+				<label data-for="file" for="file">Please upload the card image</label>
+				<input type="file" name="file" id="file" accept="image/jpeg" required />
+			</div>
+			<button type="submit">Upload</button>
+		</Form>
+	</div>
 </Page>
-
-<style>
-	/*input {*/
-	/*display: block;*/
-	/*outline: 1px solid #000;*/
-	/*}*/
-</style>

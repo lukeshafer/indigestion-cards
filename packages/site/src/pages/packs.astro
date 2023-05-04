@@ -1,0 +1,60 @@
+---
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+
+const session = useAdmin(Astro.cookies);
+if (!session) return Astro.redirect('/404');
+import { getAllPacks } from '@lil-indigestion-cards/core/card';
+
+const packs = await getAllPacks();
+---
+
+<Page title="All Packs" session={session}>
+	<h1 class="page-heading">All Packs</h1>
+	<sort-table>
+		<table class="max-w-lg">
+			<thead>
+				<tr>
+					<th class="w-1/2">Owner</th>
+					<th>Pack Type</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					packs.map((pack) => {
+						const id = pack.packId.replace(/[^\w\d]/g, '') + '-username';
+						return (
+							<tr>
+								{pack.username ? (
+									<td>
+										<span {id}>
+											{pack.username}
+										</span>
+									</td>
+								) : (
+									<td class="text-gray-600">None</td>
+								)}
+								<td>{pack.packTypeName}</td>
+								<td>
+									<button
+										class="post-button"
+										data-type="submit"
+										hx-swap="outerHTML"
+										hx-vals={JSON.stringify({
+											id,
+											username: pack.username,
+											packId: pack.packId,
+										})}
+										hx-get={`/api/html/pack/start-edit`}>
+										Edit
+									</button>
+								</td>
+							</tr>
+						);
+					})
+				}
+			</tbody>
+		</table>
+	</sort-table>
+</Page>

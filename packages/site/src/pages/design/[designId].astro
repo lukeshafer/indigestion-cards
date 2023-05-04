@@ -50,7 +50,7 @@ const instancesByRarity = cardInstances.reduce((acc, instance) => {
 	const rarityId = instance.rarityId;
 	if (!acc[rarityId])
 		acc[rarityId] = new Array<CardInstance | null>(instance.totalOfType).fill(null);
-	acc[rarityId]![instance.cardNumber] = instance;
+	acc[rarityId]![instance.cardNumber - 1] = instance;
 	return acc;
 }, {} as Record<string, Array<CardInstance | null>>);
 ---
@@ -61,9 +61,11 @@ const instancesByRarity = cardInstances.reduce((acc, instance) => {
 	session={admin}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
-	<TradingCard>
-		<img src={design.imgUrl} width="300" class="max-w-full" />
-	</TradingCard>
+	<div class="mx-4">
+		<TradingCard>
+			<img src={design.imgUrl} width="300" class="max-w-full" />
+		</TradingCard>
+	</div>
 	{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
 	<section class="text-lg">
 		<h2 class="sub-heading">Stats:</h2>
@@ -79,10 +81,13 @@ const instancesByRarity = cardInstances.reduce((acc, instance) => {
 									{instance === null ? (
 										<span class="text-gray-400">Not owned</span>
 									) : (
-										<a
-											class="font-semibold"
-											href={`${routes.USERS}/${instance.username}`}>
-											{instance.username}
+										<a href={`${routes.USERS}/${instance.username}`}>
+											<span class="font-semibold">{instance.username}</span>
+											{instance.openedAt
+												? ` - ${new Date(
+														instance.openedAt
+												  ).toLocaleDateString()}`
+												: ' - Unopened'}
 										</a>
 									)}
 								</li>

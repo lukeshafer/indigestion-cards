@@ -197,19 +197,15 @@ const cardInstances = new Entity(
 			},
 			userId: {
 				type: 'string',
-				required: true,
 			},
 			username: {
 				type: 'string',
-				required: true,
 			},
 			minterId: {
 				type: 'string',
-				required: true,
 			},
 			minterUsername: {
 				type: 'string',
-				required: true,
 			},
 			packId: {
 				type: 'string',

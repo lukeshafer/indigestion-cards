@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { db } from './db';
-import { checkIfUserExists, createNewUser } from './user';
+import { checkIfUserExists, createNewUser, getUser, getUserByUserName } from './user';
 import { EntityItem } from 'electrodb';
-import type { Card, CardDesign } from './card';
+import { Card, CardDesign, getPackById } from './card';
 import { createPack } from './card';
 
 export const packSchema = z.object({
@@ -27,8 +27,25 @@ export const packSchema = z.object({
 		seasonName: z.string().optional(),
 	}),
 });
+export const packSchemaWithoutUser = packSchema.omit({ userId: true, username: true });
 
 export type PackDetails = z.infer<typeof packSchema>;
+export type PackDetailsWithoutUser = z.infer<typeof packSchemaWithoutUser>;
+
+export async function createPackForNoUser(packDetails: PackDetailsWithoutUser) {
+	const cardPool = await getCardPoolFromType(packDetails.packType);
+
+	for (let i = 0; i < packDetails.packCount; i++) {
+		await createPack({
+			count: packDetails.packType.cardCount,
+			cardPool: cardPool,
+			packType: {
+				packTypeId: packDetails.packType.packTypeId,
+				packTypeName: packDetails.packType.packTypeName,
+			},
+		});
+	}
+}
 
 export async function givePackToUser(packDetails: PackDetails) {
 	if (!(await checkIfUserExists(packDetails.userId))) {
@@ -92,4 +109,45 @@ export async function getCardPoolFromType(packType: PackDetails['packType']): Pr
 	}
 
 	throw new Error('Invalid packTypeCategory');
+}
+
+export async function updatePackUser(options: {
+	packId: string;
+	username: string;
+	userId: string;
+}) {
+	const user =
+		(await getUser(options.userId)) ??
+		(await createNewUser({ userId: options.userId, username: options.username }));
+
+	const pack = await getPackById({ packId: options.packId });
+
+	const oldUser = pack.userId ? await getUser(pack.userId) : null;
+
+	const oldUserList = oldUser ? [oldUser] : [];
+
+	const result = await db.transaction
+		.write(({ packs, cardInstances, users }) => [
+			packs
+				.update({ packId: pack.packId })
+				.set({ userId: user.userId, username: user.username })
+				.commit(),
+			...pack.cardDetails.map((card) =>
+				cardInstances
+					.update({ instanceId: card.instanceId, designId: card.designId })
+					.set({ userId: user.userId, username: user.username })
+					.commit()
+			),
+			users
+				.update({ userId: user.userId })
+				.set({ packCount: (user.packCount || 0) + 1 })
+				.commit(),
+			...oldUserList.map((oldUser) =>
+				users
+					.update({ userId: oldUser.userId })
+					.set({ packCount: (oldUser.packCount || 1) - 1 })
+					.commit()
+			),
+		])
+		.go();
 }

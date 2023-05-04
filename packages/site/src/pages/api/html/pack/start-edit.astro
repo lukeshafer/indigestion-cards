@@ -1,0 +1,28 @@
+---
+const username = Astro.url.searchParams.get('username') || '';
+const id = Astro.url.searchParams.get('id');
+const packId = Astro.url.searchParams.get('packId');
+
+if (!id) return new Response('No packId provided', { status: 400 });
+---
+
+<button
+	class="post-button save-button"
+	data-type="submit"
+	hx-select=".edit-button"
+	hx-swap="outerHTML"
+	hx-include="[data-username]"
+	hx-vals={JSON.stringify({ packId, id })}
+	hx-get={`/api/html/pack/update-pack-user`}>
+	Save
+</button>
+<input
+	class="my-form-input"
+	data-username
+	name="username"
+	id={id}
+	type="text"
+	value={username}
+	hx-swap-oob="true"
+	_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+/>

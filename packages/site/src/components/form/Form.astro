@@ -1,10 +1,10 @@
 ---
-import type { HTMLAttributes } from 'astro/types'
+import type { HTMLAttributes } from 'astro/types';
 type Props = HTMLAttributes<'form'> & {
-	loadingText?: string
-}
-export type FormProps = Props
-const { class: className = '', action, method, loadingText, ...attrs } = Astro.props
+	loadingText?: string;
+};
+export type FormProps = Props;
+const { class: className = '', action, method, loadingText, ...attrs } = Astro.props;
 
 export const inputClasses = {
 	input: '',
@@ -14,7 +14,7 @@ export const inputClasses = {
 	fieldset: '',
 	button: '',
 	submit: '',
-}
+};
 ---
 
 <my-form class={className}>
@@ -169,7 +169,10 @@ export const inputClasses = {
 	}
 
 	my-form input::file-selector-button {
-		@apply font-medium font-heading p-2 text-shadow;
+		@apply text-shadow;
+		font-family: var(--font-heading);
+		padding: 0.5rem;
+		font-weight: 500;
 		margin-bottom: 0.5rem;
 		display: block;
 		border: 1px solid #ccc;
@@ -237,102 +240,105 @@ export const inputClasses = {
 <script>
 	class MyForm extends HTMLElement {
 		constructor() {
-			super()
+			super();
 		}
 
 		connectedCallback() {
-			const url = new URL(window.location.href)
-			const params = new URLSearchParams(url.search)
+			const url = new URL(window.location.href);
+			const params = new URLSearchParams(url.search);
 			params.forEach((value, key) => {
 				// if key is 'form-xxx', we want to query for 'input[name="xxx"]'
-				const inputName = key === 'form' ? 'form' : key.replace(/^form-/, '')
-				if (!inputName) return
-				const input = this.querySelector(`input[name="${inputName}"]`) as HTMLInputElement | null
-				if (!input) return
-				input.value = value
-			})
+				const inputName = key === 'form' ? 'form' : key.replace(/^form-/, '');
+				if (!inputName) return;
+				const input = this.querySelector(
+					`input[name="${inputName}"]`
+				) as HTMLInputElement | null;
+				if (!input) return;
+				input.value = value;
+			});
 
-			const form = this.querySelector('form') as HTMLFormElement
-			const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement
+			const form = this.querySelector('form') as HTMLFormElement;
+			const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement;
 			form.addEventListener('submit', (e) => {
-				if (e.defaultPrevented) return
-				form.style.opacity = '0.5'
-				loadingSpinner.style.display = 'flex'
-			})
+				if (e.defaultPrevented) return;
+				form.style.opacity = '0.5';
+				loadingSpinner.style.display = 'flex';
+			});
 
-			const idInputs = this.querySelectorAll('[data-id-from]')
+			const idInputs = this.querySelectorAll('[data-id-from]');
 			idInputs.forEach((input) => {
-				if (!(input instanceof HTMLInputElement)) return
+				if (!(input instanceof HTMLInputElement)) return;
 
-				const bindId = input.getAttribute('data-id-from')
-				if (!bindId) return
+				const bindId = input.getAttribute('data-id-from');
+				if (!bindId) return;
 
-				const idInput = this.querySelector(`[name="${bindId}"]`) as HTMLInputElement | null
-				if (!idInput) return
+				const idInput = this.querySelector(`[name="${bindId}"]`) as HTMLInputElement | null;
+				if (!idInput) return;
 
 				idInput.addEventListener('change', () => {
-					input.value = idInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-')
-				})
-			})
+					input.value = idInput.value.toLowerCase().replace(/[^a-z0-9]/g, '-');
+				});
+			});
 
-			const fileInputs = this.querySelectorAll('input[type="file"]')
+			const fileInputs = this.querySelectorAll('input[type="file"]');
 			fileInputs.forEach((input) => {
-				if (!(input instanceof HTMLInputElement)) return
-				const preview = document.createElement('img')
-				preview.classList.add('preview')
-				input.after(preview)
+				if (!(input instanceof HTMLInputElement)) return;
+				const preview = document.createElement('img');
+				preview.classList.add('preview');
+				input.after(preview);
 
 				const addPreview = () => {
-					const file = input.files?.[0]
+					const file = input.files?.[0];
 					if (!file || !file.type.startsWith('image/')) {
-						preview.src = ''
-						return
+						preview.src = '';
+						return;
 					}
-					preview.src = URL.createObjectURL(file)
-				}
+					preview.src = URL.createObjectURL(file);
+				};
 
-				addPreview()
-				input.addEventListener('change', addPreview)
-			})
+				addPreview();
+				input.addEventListener('change', addPreview);
+			});
 
-			const readonlyWithEditButton = this.querySelectorAll('[data-edit-button]')
+			const readonlyWithEditButton = this.querySelectorAll('[data-edit-button]');
 
 			readonlyWithEditButton.forEach((input) => {
-				if (!(input instanceof HTMLInputElement)) return
+				if (!(input instanceof HTMLInputElement)) return;
 
-				const wrapper = document.createElement('div')
-				wrapper.style.position = 'relative'
-				wrapper.style.width = '100%'
-				input.after(wrapper)
-				wrapper.append(input)
+				const wrapper = document.createElement('div');
+				wrapper.style.position = 'relative';
+				wrapper.style.width = '100%';
+				input.after(wrapper);
+				wrapper.append(input);
 
-				const editButton = document.createElement('button')
-				editButton.textContent = 'Edit'
-				editButton.classList.add('edit-button')
+				const editButton = document.createElement('button');
+				editButton.type = 'button';
+				editButton.textContent = 'Edit';
+				editButton.classList.add('edit-button');
 
 				editButton.addEventListener('click', (e) => {
-					e.preventDefault()
-					if (!input.readOnly) return
-					input.readOnly = false
-					input.focus()
-					editButton.style.display = 'none'
-				})
-				wrapper.append(editButton)
-			})
+					e.preventDefault();
+					if (!input.readOnly) return;
+					input.readOnly = false;
+					input.focus();
+					editButton.style.display = 'none';
+				});
+				wrapper.append(editButton);
+			});
 
 			this.querySelectorAll('.input-group').forEach((group) => {
-				const label = group.querySelector<HTMLLabelElement>('label')
+				const label = group.querySelector<HTMLLabelElement>('label');
 				const inputs = group.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
 					'input, textarea, select'
-				)
+				);
 				inputs.forEach((input) => {
 					if (input.required) {
-						label?.classList.add('required')
+						label?.classList.add('required');
 					}
-				})
-			})
+				});
+			});
 		}
 	}
 
-	customElements.define('my-form', MyForm)
+	customElements.define('my-form', MyForm);
 </script>

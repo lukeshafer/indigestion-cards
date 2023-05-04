@@ -109,6 +109,8 @@
 		--card-aspect-ratio: 312 / 265;
 
 		font-family: var(--base-font-sans);
+
+		--brand-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
 	}
 
 	*::selection {
@@ -251,7 +253,8 @@
 	}
 
 	.button-link {
-		@apply shine text-shadow;
+		@apply shine;
+		text-shadow: var(--brand-shadow);
 		font-size: 1.25rem/* 20px */;
 		line-height: 1.75rem/* 28px */;
 		background-color: var(--color-tertiary);
@@ -265,7 +268,8 @@
 	}
 
 	.post-button {
-		@apply shine text-shadow;
+		@apply shine;
+		text-shadow: var(--brand-shadow);
 		font-weight: 700;
 		padding: 0.5rem 1rem;
 		transition: background-color 0.3s ease-out;
@@ -361,7 +365,7 @@
 	}
 
 	.text-shadow {
-		text-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+		text-shadow: var(--brand-shadow);
 	}
 
 	.no-text-shadow {
@@ -369,11 +373,11 @@
 	}
 
 	.brand-shadow {
-		filter: drop-shadow(0.08rem 0.08rem 0 rgb(0 0 0 / 18%));
+		filter: drop-shadow(var(--brand-shadow));
 	}
 
 	.brand-box-shadow {
-		box-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+		box-shadow: var(--brand-shadow);
 	}
 
 	.preserve-3d {

@@ -1,13 +1,18 @@
 ---
-import { publicApi } from '@/constants'
-
-import Form from './form/Form.astro'
+import { publicApi } from '@/constants';
+import Form from './form/Form.astro';
 ---
 
 <user-search data-api-route={publicApi.GET_ALL_USERNAMES}>
 	<Form method="get" action={publicApi.SEARCH} loadingText="Searching" autocomplete="off">
 		<label class="visually-hidden" for="username">Twitch Username</label>
-		<input name="username" data-user-search type="text" placeholder="Twitch Username" required />
+		<input
+			name="username"
+			data-user-search
+			type="text"
+			placeholder="Twitch Username"
+			required
+		/>
 		<ul data-results class="brand-shadow no-text-shadow"></ul>
 	</Form>
 </user-search>
@@ -35,147 +40,147 @@ import Form from './form/Form.astro'
 
 <script>
 	class UserSearch extends HTMLElement {
-		searchInput = this.querySelector('[data-user-search]') as HTMLInputElement
-		results = this.querySelector('[data-results]') as HTMLUListElement
-		users: string[] = []
-		#searchResults: string[] = []
-		isfetching = false
+		searchInput = this.querySelector('[data-user-search]') as HTMLInputElement;
+		results = this.querySelector('[data-results]') as HTMLUListElement;
+		users: string[] = [];
+		#searchResults: string[] = [];
+		isfetching = false;
 		constructor() {
-			super()
+			super();
 		}
 
 		async fetchUsernames() {
-			if (this.users.length > 0 || this.isfetching) return
-			this.isfetching = true
-			const response = await fetch(this.dataset.apiRoute!)
-			const usernames = await response.json()
-			if (!Array.isArray(usernames)) throw new Error('Invalid response from server')
-			this.users = usernames
-			this.isfetching = false
+			if (this.users.length > 0 || this.isfetching) return;
+			this.isfetching = true;
+			const response = await fetch(this.dataset.apiRoute!);
+			const usernames = await response.json();
+			if (!Array.isArray(usernames)) throw new Error('Invalid response from server');
+			this.users = usernames;
+			this.isfetching = false;
 		}
 
 		doSearch() {
-			const search = this.searchInput.value.toLowerCase()
+			const search = this.searchInput.value.toLowerCase();
 			if (!search) {
-				this.searchResults = []
-				return
+				this.searchResults = [];
+				return;
 			}
 
-			const tempResults = [...this.searchResults]
+			const tempResults = [...this.searchResults];
 
 			for (const username of this.users) {
 				if (!username.toLowerCase().includes(search.toLowerCase())) {
 					if (tempResults.includes(username)) {
-						tempResults.splice(this.searchResults.indexOf(username), 1)
+						tempResults.splice(this.searchResults.indexOf(username), 1);
 					}
-					continue
+					continue;
 				}
 
 				if (!tempResults.includes(username)) {
-					tempResults.push(username)
+					tempResults.push(username);
 				}
 			}
 
 			tempResults.sort((a, b) => {
-				if (a === search) return -1
-				if (b === search) return 1
-				if (a.startsWith(search) && !b.startsWith(search)) return -1
-				if (!a.startsWith(search) && b.startsWith(search)) return 1
-				return 0
-			})
+				if (a === search) return -1;
+				if (b === search) return 1;
+				if (a.startsWith(search) && !b.startsWith(search)) return -1;
+				if (!a.startsWith(search) && b.startsWith(search)) return 1;
+				return 0;
+			});
 
-			this.searchResults = tempResults
+			this.searchResults = tempResults;
 		}
 
 		get searchResults(): string[] {
-			return this.#searchResults
+			return this.#searchResults;
 		}
 
 		set searchResults(value: string[]) {
-			this.#searchResults = value
+			this.#searchResults = value;
 			if (value.length === 0) {
-				this.results.style.display = 'none'
-				return
+				this.results.style.display = 'none';
+				return;
 			}
-			this.results.style.display = 'block'
-			this.results.innerHTML = ''
+			this.results.style.display = 'block';
+			this.results.innerHTML = '';
 			for (const username of this.searchResults) {
-				const result = document.createElement('li')
+				const result = document.createElement('li');
 				result.innerHTML = `
-					<a href="/user/${username}">${username}</a>`
-				this.results.appendChild(result)
+					<a href="/user/${username}">${username}</a>`;
+				this.results.appendChild(result);
 			}
 		}
 
 		connectedCallback() {
-			const searchInput = this.querySelector('[data-user-search]') as HTMLInputElement
-			const form = this.querySelector('form') as HTMLFormElement
-			this.results = this.querySelector('[data-results]') as HTMLUListElement
+			const searchInput = this.querySelector('[data-user-search]') as HTMLInputElement;
+			const form = this.querySelector('form') as HTMLFormElement;
+			this.results = this.querySelector('[data-results]') as HTMLUListElement;
 
-			searchInput.addEventListener('mouseover', this.fetchUsernames.bind(this))
-			searchInput.addEventListener('focus', this.fetchUsernames.bind(this))
-			searchInput.addEventListener('click', this.fetchUsernames.bind(this))
+			searchInput.addEventListener('mouseover', this.fetchUsernames.bind(this));
+			searchInput.addEventListener('focus', this.fetchUsernames.bind(this));
+			searchInput.addEventListener('click', this.fetchUsernames.bind(this));
 
 			form.addEventListener('submit', (e) => {
-				e.preventDefault()
-			})
-			searchInput.addEventListener('input', () => this.doSearch())
+				e.preventDefault();
+			});
+			searchInput.addEventListener('input', () => this.doSearch());
 			searchInput.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') {
-					e.preventDefault()
-					const selected = this.results.querySelector<HTMLLIElement>('.selected')
+					e.preventDefault();
+					const selected = this.results.querySelector<HTMLLIElement>('.selected');
 					if (selected) {
-						const link = selected.querySelector<HTMLAnchorElement>('a')
+						const link = selected.querySelector<HTMLAnchorElement>('a');
 						if (link) {
-							link.click()
+							link.click();
 						}
 					} else {
-						const first = this.results.querySelector('li')
+						const first = this.results.querySelector('li');
 						if (first) {
-							const link = first.querySelector<HTMLAnchorElement>('a')
+							const link = first.querySelector<HTMLAnchorElement>('a');
 							if (link) {
-								link.click()
+								link.click();
 							}
 						}
 					}
 				}
 
 				if (e.key === 'Down' || e.key === 'ArrowDown') {
-					e.preventDefault()
-					const selected = this.results.querySelector<HTMLLIElement>('.selected')
+					e.preventDefault();
+					const selected = this.results.querySelector<HTMLLIElement>('.selected');
 					if (selected) {
-						const next = selected.nextElementSibling as HTMLLIElement
+						const next = selected.nextElementSibling as HTMLLIElement;
 						if (next) {
-							selected.classList.remove('selected')
-							next.classList.add('selected')
+							selected.classList.remove('selected');
+							next.classList.add('selected');
 						}
 					} else {
-						const first = this.results.querySelector('li')
+						const first = this.results.querySelector('li');
 						if (first) {
-							first.classList.add('selected')
+							first.classList.add('selected');
 						}
 					}
 				}
 
 				if (e.key === 'Up' || e.key === 'ArrowUp') {
-					e.preventDefault()
-					const selected = this.results.querySelector<HTMLLIElement>('.selected')
+					e.preventDefault();
+					const selected = this.results.querySelector<HTMLLIElement>('.selected');
 					if (selected) {
-						const prev = selected.previousElementSibling as HTMLLIElement
+						const prev = selected.previousElementSibling as HTMLLIElement;
 						if (prev) {
-							selected.classList.remove('selected')
-							prev.classList.add('selected')
+							selected.classList.remove('selected');
+							prev.classList.add('selected');
 						}
 					} else {
-						const last = this.results.querySelector('li:last-child')
+						const last = this.results.querySelector('li:last-child');
 						if (last) {
-							last.classList.add('selected')
+							last.classList.add('selected');
 						}
 					}
 				}
-			})
+			});
 		}
 	}
 
-	customElements.define('user-search', UserSearch)
+	customElements.define('user-search', UserSearch);
 </script>

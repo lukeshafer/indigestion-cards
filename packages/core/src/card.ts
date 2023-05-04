@@ -26,8 +26,8 @@ export type CardDesignEntity = EntityItem<CardDesign>;
 export type RarityEntity = EntityItem<Rarity>;
 
 export async function generateCard(info: {
-	userId: string;
-	username: string;
+	userId?: string;
+	username?: string;
 	packId: string | undefined;
 	cardPool: CardPool;
 }) {
@@ -120,15 +120,21 @@ export async function generateCard(info: {
 	}
 
 	const user =
-		(await getUser(info.userId)) ??
-		(await createNewUser({ userId: info.userId, username: info.username }));
+		info.userId && info.username
+			? (await getUser(info.userId)) ??
+			  (await createNewUser({ userId: info.userId, username: info.username }))
+			: null;
 
 	const result = await db.transaction
 		.write(({ users, cardInstances }) => [
-			users
-				.patch({ userId: info.userId })
-				.set({ cardCount: (user.cardCount ?? 0) + 1 })
-				.commit(),
+			...(user && info.userId && info.username
+				? [
+						users
+							.patch({ userId: info.userId })
+							.set({ cardCount: (user.cardCount ?? 0) + 1 })
+							.commit(),
+				  ]
+				: []),
 			cardInstances
 				.create({
 					seasonId: design.seasonId,
@@ -185,13 +191,14 @@ export async function getPackById(args: { packId: string }) {
 	return result.data[0];
 }
 
-export async function findPackForUser(args: { userId: string }) {
-	const result = await db.entities.packs.find({ userId: args.userId }).go();
+export async function findPackForUser(args: { username: string }) {
+	const result = await db.entities.packs.query.byUsername({ username: args.username }).go();
 	if (result.data.length === 0) return null;
 	return result.data[0];
 }
 
 export async function deleteFirstPackForUser(args: {
+	username: string;
 	userId: string;
 }): Promise<Result<EntityItem<Pack> | null>> {
 	try {
@@ -275,8 +282,8 @@ export async function deletePack(args: { packId: string }) {
 }
 
 export async function createPack(args: {
-	userId: string;
-	username: string;
+	userId?: string;
+	username?: string;
 	count: number;
 	cardPool: CardPool;
 	seasonId?: string;
@@ -285,11 +292,13 @@ export async function createPack(args: {
 		packTypeName: string;
 	};
 }) {
-	const packId = `pack-${args.userId}-${new Date().toISOString()}-${Math.random() % 99}`;
+	const packId = `pack-${args.userId}-${Date.now()}`;
 
 	const user =
-		(await getUser(args.userId)) ??
-		(await createNewUser({ userId: args.userId, username: args.username }));
+		args.userId && args.username
+			? (await getUser(args.userId)) ??
+			  (await createNewUser({ userId: args.userId, username: args.username }))
+			: null;
 
 	const cards: EntityItem<Card>[] = [];
 	const cardPool = args.cardPool;
@@ -306,10 +315,14 @@ export async function createPack(args: {
 
 	const result = await db.transaction
 		.write(({ users, packs }) => [
-			users
-				.patch({ userId: args.userId })
-				.set({ packCount: (user.packCount ?? 0) + 1 })
-				.commit(),
+			...(user && args.userId && args.username
+				? [
+						users
+							.patch({ userId: args.userId })
+							.set({ packCount: (user.packCount ?? 0) + 1 })
+							.commit(),
+				  ]
+				: []),
 			packs
 				.create({
 					packId,
