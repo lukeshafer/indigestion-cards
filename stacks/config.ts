@@ -2,14 +2,14 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import type { StackContext } from 'sst/constructs';
 import { Config } from 'sst/constructs';
 
-export function ConfigStack({ stack, app }: StackContext) {
+export function ConfigStack({ stack }: StackContext) {
 	const streamerAccessToken = new Secret(stack, 'StreamerAccessToken');
 	const streamerRefreshToken = new Secret(stack, 'StreamerRefreshToken');
 
 	const params = Config.Parameter.create(stack, {
 		STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
 		STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
-		STREAMER_USER_ID: '144313393',
+		STREAMER_USER_ID: '227134852',
 	});
 
 	const secrets = Config.Secret.create(
