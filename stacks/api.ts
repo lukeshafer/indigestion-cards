@@ -4,13 +4,16 @@ import { Events } from './events';
 import { DesignBucket } from './bucket';
 import { ConfigStack } from './config';
 import { Auth } from './auth';
+import { API_VERSION, HOSTED_ZONE, getDomainName } from './constants';
 
-export function API({ stack }: StackContext) {
+export function API({ app, stack }: StackContext) {
 	const table = use(Database);
 	const eventBus = use(Events);
 	const { frameBucket, cardDesignBucket } = use(DesignBucket);
-	const secrets = use(ConfigStack);
+	const config = use(ConfigStack);
 	const { siteAuth } = use(Auth);
+
+	const baseDomain = getDomainName(app.stage);
 
 	const twitchApi = new Api(stack, 'twitchApi', {
 		routes: {
@@ -19,9 +22,9 @@ export function API({ stack }: StackContext) {
 		defaults: {
 			function: {
 				bind: [
-					secrets.TWITCH_CLIENT_ID,
-					secrets.TWITCH_CLIENT_SECRET,
-					secrets.TWITCH_ACCESS_TOKEN,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_ACCESS_TOKEN,
 					table,
 					eventBus,
 				],
@@ -62,12 +65,12 @@ export function API({ stack }: StackContext) {
 		defaults: {
 			function: {
 				bind: [
-					secrets.TWITCH_CLIENT_ID,
-					secrets.TWITCH_CLIENT_SECRET,
-					secrets.TWITCH_ACCESS_TOKEN,
-					secrets.STREAMER_ACCESS_TOKEN_ARN,
-					secrets.STREAMER_REFRESH_TOKEN_ARN,
-					secrets.STREAMER_USER_ID,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_ACCESS_TOKEN,
+					config.STREAMER_ACCESS_TOKEN_ARN,
+					config.STREAMER_REFRESH_TOKEN_ARN,
+					config.STREAMER_USER_ID,
 					table,
 					eventBus,
 					frameBucket,
@@ -81,7 +84,12 @@ export function API({ stack }: StackContext) {
 			allowCredentials: true,
 			allowHeaders: ['content-type'],
 			allowMethods: ['ANY'],
-			allowOrigins: ['http://localhost:3000'],
+			allowOrigins: ['http://localhost:3000', `https://${baseDomain}`],
+		},
+		customDomain: {
+			domainName: `api.${baseDomain}`,
+			path: API_VERSION,
+			hostedZone: HOSTED_ZONE,
 		},
 	});
 
