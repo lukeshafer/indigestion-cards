@@ -142,7 +142,6 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 	})
 
 	const body = await rewards.json()
-	console.log(body)
 	return body
 }
 

@@ -210,11 +210,11 @@
 	}
 
 	sort-table tbody tr:nth-child(even) {
-		@apply bg-gray-50;
+		background-color: var(--gray-1)
 	}
 
 	sort-table tbody tr:nth-child(odd) {
-		@apply bg-gray-200;
+		background-color: var(--gray-3)
 	}
 
 	sort-table th[data-mode='ascending']::after {
@@ -253,7 +253,6 @@
 	}
 
 	.button-link {
-		@apply shine;
 		text-shadow: var(--brand-shadow);
 		font-size: 1.25rem/* 20px */;
 		line-height: 1.75rem/* 28px */;
@@ -268,7 +267,6 @@
 	}
 
 	.post-button {
-		@apply shine;
 		text-shadow: var(--brand-shadow);
 		font-weight: 700;
 		padding: 0.5rem 1rem;

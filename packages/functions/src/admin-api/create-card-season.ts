@@ -4,10 +4,8 @@ import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
-	console.log('session', session);
 
 	const cookies = useCookies();
-	console.log('cookies', cookies);
 	if (session.type !== 'admin')
 		return {
 			statusCode: 401,

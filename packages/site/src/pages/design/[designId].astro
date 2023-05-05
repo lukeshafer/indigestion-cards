@@ -12,18 +12,15 @@ if (!admin) return Astro.redirect('/404');
 const designId = Astro.params.designId;
 
 const from = Astro.request.headers.get('referer');
-console.log({ designId, from });
 
 if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
 
-console.log('test');
 const {
 	cardDesigns: [design],
 	cardInstances,
 } = await getCardDesignAndInstancesById({ designId });
-const openedCards = cardInstances.filter((card) => card.openedAt !== undefined);
 
 type CardInstance = (typeof cardInstances)[number];
 

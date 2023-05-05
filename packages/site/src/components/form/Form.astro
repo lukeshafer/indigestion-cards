@@ -169,7 +169,7 @@ export const inputClasses = {
 	}
 
 	my-form input::file-selector-button {
-		@apply text-shadow;
+		text-shadow: var(--brand-shadow);
 		font-family: var(--font-heading);
 		padding: 0.5rem;
 		font-weight: 500;
@@ -195,7 +195,6 @@ export const inputClasses = {
 	}
 
 	my-form :is(button, input[type='button'], input[type='submit']) {
-		@apply text-shadow shine;
 		font-family: var(--font-heading);
 		padding: 0.5rem;
 		display: block;
@@ -204,6 +203,7 @@ export const inputClasses = {
 		cursor: pointer;
 		color: white;
 		transition: background 0.2s ease;
+		text-shadow: var(--brand-shadow);
 	}
 
 	my-form

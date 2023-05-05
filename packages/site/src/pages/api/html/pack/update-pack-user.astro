@@ -7,8 +7,6 @@ import { getUserByUserName } from '@lil-indigestion-cards/core/user';
 const session = useAdmin(Astro.cookies);
 if (!session) return Astro.redirect('/');
 
-console.log(Astro.url.search);
-
 const packId = Astro.url.searchParams.get('packId');
 const username = Astro.url.searchParams.get('username');
 const id = Astro.url.searchParams.get('id');

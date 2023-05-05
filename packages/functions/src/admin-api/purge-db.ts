@@ -18,7 +18,7 @@ export const handler = ApiHandler(async () => {
 	const code2 = "I'm SURE!!";
 
 	if (firstInput !== code1 || secondInput !== code2) {
-		console.log('Invalid code');
+		console.error('Invalid code');
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',

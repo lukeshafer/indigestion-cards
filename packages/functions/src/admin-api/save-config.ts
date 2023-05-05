@@ -42,7 +42,6 @@ export const handler = ApiHandler(async () => {
 	}
 
 	const body = parseResult.data;
-	console.log('success', body);
 
 	await batchTwitchEvents({
 		events: body.channelPointRewards.map((event) => ({

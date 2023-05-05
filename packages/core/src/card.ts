@@ -348,7 +348,6 @@ export async function createPack(args: {
 }
 
 export async function openCardFromPack(args: { designId: string; instanceId: string }) {
-	console.log('openCardFromPack', args);
 	const card = await db.entities.cardInstances.query.byId(args).go();
 	if (!card.data || card.data.length === 0) {
 		throw new Error('Card not found');

@@ -42,7 +42,6 @@ export const all: APIRoute = async (ctx) => {
 		if (jsonBody.redirectPath) {
 			redirectUrl.pathname = jsonBody.redirectPath;
 		}
-		console.log(jsonBody.redirectPath);
 		params = new URLSearchParams(jsonBody.params);
 		params.forEach((value, key) => {
 			redirectUrl.searchParams.set(key, value);

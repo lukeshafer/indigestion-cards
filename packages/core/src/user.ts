@@ -34,7 +34,7 @@ export async function getUserAndCardInstances(args: { username: string }) {
 		const data = await db.collections.cardsByOwnerName({ username: args.username }).go();
 		return data.data;
 	} catch {
-		console.log('Error while retrieving user and card instance data for user', args.username);
+		console.error('Error while retrieving user and card instance data for user', args.username);
 		return null;
 	}
 }
@@ -63,12 +63,8 @@ export async function updateUsername(
 	iteration = 0
 ) {
 	if (iteration > 10) throw new Error('Too many iterations');
-	console.log(
-		`Updating username for ${args.userId} to ${args.newUsername} from ${args.oldUsername}`
-	);
 	const existingUser = await getUserByUserName(args.newUsername);
 	if (existingUser && existingUser.username === args.newUsername) {
-		console.log(`Username ${args.newUsername} is taken, updating`);
 		// username is taken in our database, and is likely out of date
 		const twitchData = await getUserByLogin(args.newUsername);
 		if (twitchData.login === args.newUsername) {

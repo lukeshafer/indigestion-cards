@@ -9,7 +9,6 @@ import {
 import PostButton from '@/components/form/PostButton.astro';
 import { api, routes } from '@/constants';
 
-console.log('test');
 const admin = useAdmin(Astro.cookies);
 if (!admin) return Astro.redirect('/404');
 

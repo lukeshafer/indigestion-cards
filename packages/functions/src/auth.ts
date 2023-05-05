@@ -35,12 +35,8 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onAuthorize(event) {
-		console.log(event.rawQueryString);
-	},
 	async onSuccess(input) {
 		if (input.provider === 'twitchUser') {
-			//console.log(input.tokenset)
 			const claims = input.tokenset.claims();
 
 			const adminUser = await getAdminUserById(claims.sub);

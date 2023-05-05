@@ -20,7 +20,6 @@ export const all: APIRoute = async (ctx) => {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
-	console.log(`${Api.api.url}/${apiRoute}${query}`)
 	return fetch(`${Api.api.url}/${apiRoute}${query}`, {
 		method: ctx.request.method,
 		headers: {

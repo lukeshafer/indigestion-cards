@@ -69,7 +69,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				.promise()
 			break
 		case 'channel.channel_points_custom_reward_redemption.add':
-			console.log('Redeemed channel points')
+			//onsole.log('Redeemed channel points')
 			break
 	}
 	return { statusCode: 200 }

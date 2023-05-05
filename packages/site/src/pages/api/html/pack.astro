@@ -55,9 +55,7 @@ if (method === 'DELETE') {
 	const userId = params.get('userId');
 	const username = params.get('username');
 	if (!userId || !username) return new Response('Missing parameters', { status: 400 });
-	console.log({ userId, username });
 	const result = await deleteFirstPackForUser({ username, userId });
-	console.log(result);
 	if (!result) return new Response('Failed to revoke pack', { status: 500 });
 	if (!result.success) errorStr = result.error;
 	else successStr = `Revoked 1 pack for ${username}`;

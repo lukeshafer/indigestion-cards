@@ -12,7 +12,6 @@ export const handler = ApiHandler(async () => {
 		}
 
 	const rewards = await getAllChannelPointRewards({ userId: Config.STREAMER_USER_ID })
-	console.log('rewards', rewards)
 
 	return {
 		statusCode: 200,
