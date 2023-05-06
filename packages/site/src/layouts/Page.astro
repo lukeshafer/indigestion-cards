@@ -8,6 +8,13 @@ import UserSearch from '@/components/UserSearch.astro';
 import { routes } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 
+Astro.cookies.set('lilind_code', 'pants', {
+	path: '/',
+	httpOnly: true,
+	maxAge: 60 * 60 * 24 * 30,
+	sameSite: 'lax',
+});
+
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
@@ -42,9 +49,12 @@ const actionLinks = [
 	{ href: routes.ADMIN.OPEN_PACKS, title: 'Open Packs', id: 'open-packs', count: packs.length },
 	{ href: routes.ADMIN.GIVE_PACK, title: 'Give Pack', id: 'give-pack' },
 ];
+
+const title = Astro.locals.title;
 ---
 
 <Base {...baseProps}>
+	{!!title && <p class="text-2xl text-center p-8">{title}</p>}
 	<div class="page-layout grid h-[100svh] overflow-hidden">
 		<AdminOnly session={Astro.props.session}>
 			<side-nav class="overflow-y-scroll">

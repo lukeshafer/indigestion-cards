@@ -1,3 +1,5 @@
+export const publicRoutes = ['/', '/user', '/user/*'];
+
 export const api = {
 	GIVE_PACK_TO_USER: '/api/admin/give-pack-to-user',
 	CREATE_CARD_SEASON: '/api/admin/create-card-season',
