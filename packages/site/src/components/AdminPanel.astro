@@ -62,7 +62,7 @@ const actionLinks = [
 							rel="prefetch"
 							href={href}
 							title={title}
-							class="font-heading font-medium block bg-white text-black px-6 py-1 my-1">
+							class="font-heading font-medium block bg-white text-black px-6 py-1">
 							{title}
 						</a>
 					) : (
@@ -70,7 +70,7 @@ const actionLinks = [
 							rel="prefetch"
 							href={href}
 							title={title}
-							class="font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
+							class="font-heading font-medium block text-shadow px-6 py-1 hover:bg-gray-900/20">
 							{title}
 						</a>
 					)
@@ -80,6 +80,7 @@ const actionLinks = [
 		<div class="px-4 py-2 items-center gap-3 relative">
 			<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
 				<a
+					hx-disable
 					rel="prefetch"
 					href="/api/auth/logout"
 					title="Logout"
