@@ -9,10 +9,12 @@ import { getAllPacks } from '@lil-indigestion-cards/core/card';
 const packs = await getAllPacks();
 ---
 
-<Page title="All Packs" session={session}>
-	<h1 class="page-heading">All Packs</h1>
+<Page title="All Packs" session={session} breadcrumbs={[{label: "Home", href: "/" }, {label: "Packs"}]}>
+	<header class="page-header">
+		<h1 class="page-heading">All Packs</h1>
+	</header>
 	<sort-table>
-		<table class="max-w-lg">
+		<table>
 			<thead>
 				<tr>
 					<th class="w-1/2">Owner</th>

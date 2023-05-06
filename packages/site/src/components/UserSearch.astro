@@ -5,14 +5,8 @@ import Form from './form/Form.astro';
 
 <user-search data-api-route={publicApi.GET_ALL_USERNAMES}>
 	<Form method="get" action={publicApi.SEARCH} loadingText="Searching" autocomplete="off">
-		<label class="visually-hidden" for="username">Twitch Username</label>
-		<input
-			name="username"
-			data-user-search
-			type="text"
-			placeholder="Twitch Username"
-			required
-		/>
+		<label class="visually-hidden" for="username">Search Twitch Username</label>
+		<input name="username" data-user-search type="text" placeholder="Search Users" required />
 		<ul data-results class="brand-shadow no-text-shadow"></ul>
 	</Form>
 </user-search>
@@ -31,9 +25,9 @@ import Form from './form/Form.astro';
 		display: block;
 	}
 
-	li a:hover,
-	li a:focus,
-	li.selected a {
+	user-search li a:hover,
+	user-search li a:focus,
+	user-search li.selected a {
 		background: #f0f0f0;
 	}
 </style>

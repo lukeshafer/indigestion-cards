@@ -3,8 +3,6 @@ import Page from '@/layouts/Page.astro';
 import { useAdmin } from '@/session';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
-import CardList from '@/components/CardList.astro';
-import SortTable from '@/components/SortTable.astro';
 
 const session = useAdmin(Astro.cookies);
 if (!session) return Astro.redirect('/404');
@@ -39,23 +37,25 @@ const cardPool = await getCardPoolFromType(packType);
 	</button>
 	<section aria-label="Card Pool" class="flex flex-col gap-4 mt-4">
 		<h2 class="sub-heading">Card Pool</h2>
-		<SortTable>
-			<thead>
-				<tr>
-					<th class="w-3/4">Card Name</th>
-					<th>Card Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					cardPool.cardDesigns.map((card) => (
-						<tr>
-							<td>{card.cardName}</td>
-							<td>{card.seasonName}</td>
-						</tr>
-					))
-				}
-			</tbody>
-		</SortTable>
+		<sort-table>
+			<table>
+				<thead>
+					<tr>
+						<th class="w-3/4">Card Name</th>
+						<th>Card Type</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						cardPool.cardDesigns.map((card) => (
+							<tr>
+								<td>{card.cardName}</td>
+								<td>{card.seasonName}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</sort-table>
 	</section>
 </Page>

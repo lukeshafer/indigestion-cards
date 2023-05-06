@@ -3,7 +3,6 @@ import Page from '@/layouts/Page.astro';
 import { useAdmin } from '@/session';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
 import { api, routes } from '@/constants';
-import SortTable from '@/components/SortTable.astro';
 import PostButton from '@/components/form/PostButton.astro';
 
 const admin = useAdmin(Astro.cookies);
@@ -24,13 +23,9 @@ const users = unsortedUsers.sort((a, b) => {
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
 	session={admin}>
 	<sort-table>
-		<header slot="header" class="flex justify-between flex-wrap mb-4">
+		<header slot="header" class="page-header">
 			<h1 class="page-heading">Admin Users</h1>
-			<a
-				href={routes.ADMIN.CREATE.ADMIN}
-				class="text-xl bg-brand-tertiary p-3 pt-4 px-4 text-center w-max font-display lowercase italic shine text-shadow text-white">
-				Add Admin
-			</a>
+			<a href={routes.ADMIN.CREATE.ADMIN} class="button-link"> Add Admin</a>
 		</header>
 		<table>
 			<thead>
@@ -62,4 +57,3 @@ const users = unsortedUsers.sort((a, b) => {
 		</table>
 	</sort-table>
 </Page>
-

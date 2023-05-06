@@ -4,7 +4,6 @@ import { useAdmin } from '@/session';
 import Page from '@/layouts/Page.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { api, routes } from '@/constants';
-import SortTable from '@/components/SortTable.astro';
 import PostButton from '@/components/form/PostButton.astro';
 
 const admin = useAdmin(Astro.cookies);
@@ -22,57 +21,59 @@ const rarities = await getAllRarities();
 		{ label: 'Rarities', href: routes.RARITIES },
 	]}>
 	<UnmatchedImageList type="frame" />
-	<SortTable>
-		<header class="flex flex-wrap justify-between mb-4" slot="header">
+	<sort-table>
+		<header class="page-header">
 			<h1 class="page-heading">Rarities</h1>
 			<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
 		</header>
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Id</th>
-				<th data-type="number">Default Count</th>
-				<th data-no-sort>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{
-				rarities.map(({ rarityName, rarityId, defaultCount }) => (
-					<tr class="text-center">
-						<td>
-							<span id={`rarityName-${rarityId}`}>{rarityName}</span>
-						</td>
-						<td>
-							<span id={`rarityId-${rarityId}`}>{rarityId}</span>
-						</td>
-						<td>
-							<span id={`defaultCount-${rarityId}`}>{defaultCount}</span>
-						</td>
-						<td class="flex flex-row gap-2 text-sm justify-center">
-							<button
-								class="post-button edit-button"
-								data-type="submit"
-								hx-select=".save-button"
-								hx-swap="outerHTML"
-								hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-								hx-get={`/api/html/rarity/start-edit`}>
-								Edit
-							</button>
-							<div hx-disable>
-								<PostButton
-									url={`${api.DELETE_RARITY}/${rarityId}`}
-									type="delete"
-									confirm
-									id={`delete-rarity-${rarityId}`}
-									label="Delete"
-								/>
-							</div>
-						</td>
-					</tr>
-				))
-			}
-		</tbody>
-	</SortTable>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Id</th>
+					<th data-type="number">Default Count</th>
+					<th data-no-sort>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					rarities.map(({ rarityName, rarityId, defaultCount }) => (
+						<tr class="text-center">
+							<td>
+								<span id={`rarityName-${rarityId}`}>{rarityName}</span>
+							</td>
+							<td>
+								<span id={`rarityId-${rarityId}`}>{rarityId}</span>
+							</td>
+							<td>
+								<span id={`defaultCount-${rarityId}`}>{defaultCount}</span>
+							</td>
+							<td class="flex flex-row gap-2 text-sm justify-center">
+								<button
+									class="post-button edit-button"
+									data-type="submit"
+									hx-select=".save-button"
+									hx-swap="outerHTML"
+									hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
+									hx-get={`/api/html/rarity/start-edit`}>
+									Edit
+								</button>
+								<div hx-disable>
+									<PostButton
+										url={`${api.DELETE_RARITY}/${rarityId}`}
+										type="delete"
+										confirm
+										id={`delete-rarity-${rarityId}`}
+										label="Delete"
+									/>
+								</div>
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</sort-table>
 </Page>
 
 <script>

@@ -1,15 +1,14 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { Icon } from 'astro-icon'
-import { useAdmin } from '@/session'
-import { getAllUsers } from '@lil-indigestion-cards/core/user'
-import SortTable from '@/components/SortTable.astro'
-import TableSearch from '@/components/TableSearch.astro'
-import { publicApi, routes } from '@/constants'
+import Page from '@/layouts/Page.astro';
+import { Icon } from 'astro-icon';
+import { useAdmin } from '@/session';
+import { getAllUsers } from '@lil-indigestion-cards/core/user';
+import TableSearch from '@/components/TableSearch.astro';
+import { publicApi, routes } from '@/constants';
 
-const admin = useAdmin(Astro.cookies)
+const admin = useAdmin(Astro.cookies);
 
-const users = await getAllUsers()
+const users = await getAllUsers();
 ---
 
 <Page
@@ -17,8 +16,8 @@ const users = await getAllUsers()
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
 	session={admin}
 	pageType="public">
-	<SortTable id="user-table">
-		<header class="flex justify-between flex-wrap mb-4" slot="header">
+	<sort-table>
+		<header class="page-header">
 			<h1 class="page-heading">Users</h1>
 			<TableSearch
 				tableId="user-table"
@@ -27,31 +26,33 @@ const users = await getAllUsers()
 				action={publicApi.SEARCH}
 			/>
 		</header>
-		<thead>
-			<tr>
-				<th class="w-3/4">Username</th>
-				<th data-type="number">Cards</th>
-				<th data-type="number">Packs</th>
-			</tr>
-		</thead>
-		<tbody>
-			{
-				users.map(({ username, cardCount, packCount }) => (
-					<tr>
-						<td>
-							<a href={`${routes.USERS}/${username}`}>{username}</a>
-						</td>
-						<td>
-							<Icon name="mdi:cards" aria-hidden="true" />
-							<span>{cardCount}</span>
-						</td>
-						<td>
-							<Icon name="mdi:gift" aria-hidden="true" />
-							<span>{packCount}</span>
-						</td>
-					</tr>
-				))
-			}
-		</tbody>
-	</SortTable>
+		<table id="user-table">
+			<thead>
+				<tr>
+					<th class="w-3/4">Username</th>
+					<th data-type="number">Cards</th>
+					<th data-type="number">Packs</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					users.map(({ username, cardCount, packCount }) => (
+						<tr>
+							<td>
+								<a href={`${routes.USERS}/${username}`}>{username}</a>
+							</td>
+							<td>
+								<Icon name="mdi:cards" aria-hidden="true" />
+								<span>{cardCount}</span>
+							</td>
+							<td>
+								<Icon name="mdi:gift" aria-hidden="true" />
+								<span>{packCount}</span>
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</sort-table>
 </Page>
