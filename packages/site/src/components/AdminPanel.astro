@@ -2,11 +2,9 @@
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import { Icon } from 'astro-icon';
 import { routes } from '@/constants';
-import type { Session } from '@/session';
 
 export interface Props {
 	class?: string;
-	session: Session;
 }
 
 const currentPage = Astro.url.pathname;
@@ -92,12 +90,12 @@ const actionLinks = [
 			</div>
 			<button
 				class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
-				title={Astro.props.session?.properties?.username}>
+				title={Astro.locals.admin?.properties.username}>
 				<Icon
 					name="mdi:gear"
 					class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
 				/>
-				{Astro.props.session?.properties?.username}
+				{Astro.locals.admin?.properties.username}
 			</button>
 		</div>
 	</nav>

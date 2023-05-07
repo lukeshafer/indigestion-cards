@@ -1,16 +1,12 @@
 ---
 import CardList from '@/components/CardList.astro';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import {
 	getPackTypesBySeasonId,
 	getSeasonAndDesignsBySeasonId,
 } from '@lil-indigestion-cards/core/card';
 import PostButton from '@/components/form/PostButton.astro';
 import { api, routes } from '@/constants';
-
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect('/404');
 
 const id = Astro.params.seasonId;
 
@@ -62,11 +58,7 @@ const breadcrumbs = [
 ];
 ---
 
-<Page
-	title={season.seasonName}
-	class="flex flex-col gap-4"
-	session={admin}
-	breadcrumbs={breadcrumbs}>
+<Page title={season.seasonName} class="flex flex-col gap-4" breadcrumbs={breadcrumbs}>
 	<h1 class="page-heading">{season.seasonName}</h1>
 	{
 		season.seasonDescription ? (
@@ -96,7 +88,7 @@ const breadcrumbs = [
 	</section>
 
 	<h2 class="sub-heading">Cards:</h2>
-	<CardList cards={cardDesigns} session={admin} />
+	<CardList cards={cardDesigns} />
 
 	<PostButton
 		id="delete-season"

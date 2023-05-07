@@ -1,16 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
-import { routes } from '@/constants';
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
 
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect(`/404`);
-
 const unsortedUsers = await getAllAdminUsers();
-
-const currentUser = admin.properties.userId;
+const currentUser = Astro.locals.session?.properties?.userId;
 const users = unsortedUsers.sort((a, b) => {
 	if (a.userId === currentUser) return -1;
 	if (b.userId === currentUser) return 1;
@@ -18,10 +12,7 @@ const users = unsortedUsers.sort((a, b) => {
 });
 ---
 
-<Page
-	title="Users"
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
-	session={admin}>
+<Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}>
 	<sort-table>
 		<header slot="header" class="page-header">
 			<h1 class="page-heading">Admin Users</h1>

@@ -1,31 +1,26 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import { getRarityById } from '@lil-indigestion-cards/core/card'
-import PostButton from '@/components/form/PostButton.astro'
-import TradingCard from '@/components/TradingCard.astro'
-import { routes, api } from '@/constants'
+import Page from '@/layouts/Page.astro';
+import { getRarityById } from '@lil-indigestion-cards/core/card';
+import PostButton from '@/components/form/PostButton.astro';
+import TradingCard from '@/components/TradingCard.astro';
+import { routes, api } from '@/constants';
 
-const admin = useAdmin(Astro.cookies)
-if (!admin) return Astro.redirect('/404')
-
-const { rarityId } = Astro.params
+const { rarityId } = Astro.params;
 
 if (!rarityId) {
-	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is required`)
+	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is required`);
 }
 
-const rarity = await getRarityById({ rarityId })
+const rarity = await getRarityById({ rarityId });
 
 if (!rarity) {
-	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is invalid`)
+	return Astro.redirect(`${routes.RARITIES}?alert=Rarity Id is invalid`);
 }
 ---
 
 <Page
 	title={rarity.rarityName}
 	class="grid gap-4 text-center justify-center"
-	session={admin}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Rarities', href: routes.RARITIES },
@@ -54,11 +49,11 @@ if (!rarity) {
 </Page>
 
 <script>
-	const rarityId = document.querySelector('h1')!.dataset.id
-	const form = document.getElementById(`delete-rarity-${rarityId}`) as HTMLFormElement
+	const rarityId = document.querySelector('h1')!.dataset.id;
+	const form = document.getElementById(`delete-rarity-${rarityId}`) as HTMLFormElement;
 
 	form.addEventListener('submit', async (e) => {
-		const confirmation = confirm('Are you sure you want to delete this rarity?')
-		if (!confirmation) e.preventDefault()
-	})
+		const confirmation = confirm('Are you sure you want to delete this rarity?');
+		if (!confirmation) e.preventDefault();
+	});
 </script>

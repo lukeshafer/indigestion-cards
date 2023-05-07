@@ -1,20 +1,13 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { Icon } from 'astro-icon';
-import { useAdmin } from '@/session';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { routes } from '@/constants';
-
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect(`/?${Astro.url.searchParams.toString()}`);
 
 const packTypes = await getAllPackTypes();
 ---
 
-<Page
-	title="Pack Types"
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Pack Types' }]}
-	session={admin}>
+<Page title="Pack Types" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Pack Types' }]}>
 	<sort-table>
 		<header class="page-header">
 			<h1 class="page-heading">Pack Types</h1>

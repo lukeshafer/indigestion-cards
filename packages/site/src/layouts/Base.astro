@@ -6,13 +6,14 @@ import type { Session } from '@/session';
 
 interface Props {
 	title: string;
-	session: Session;
 	pageType?: 'public' | 'private';
 }
 
 export type BaseProps = Props;
 
-const { title, session, pageType = 'private' } = Astro.props;
+const { title, pageType = 'private' } = Astro.props;
+
+const session = Astro.locals.session;
 ---
 
 <html lang="en">

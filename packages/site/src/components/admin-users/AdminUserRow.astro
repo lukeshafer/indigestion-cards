@@ -1,14 +1,13 @@
 ---
-import { api, routes } from '@/constants';
-import PostButton from '../form/PostButton.astro';
-
 interface Props {
-	currentUser: string;
 	username: string;
 	userId: string;
 }
 
-const { username, userId, currentUser } = Astro.props;
+const { username, userId } = Astro.props;
+
+const isCurrentUser =
+	Astro.locals.session?.type === 'admin' && Astro.locals.session?.properties.userId === userId;
 ---
 
 <tr>
@@ -16,11 +15,14 @@ const { username, userId, currentUser } = Astro.props;
 	<td>
 		<button
 			class="post-button"
+			class:list={{ 'opacity-0': isCurrentUser }}
+			disabled={isCurrentUser}
 			data-type="delete"
 			hx-post="/api/html/admin/delete-admin"
 			hx-vals={JSON.stringify({ userId, username })}
 			hx-swap="outerHTML transition:false"
-			hx-target="closest tr">Delete</button
-		>
+			hx-target="closest tr">
+			Delete
+		</button>
 	</td>
 </tr>

@@ -1,14 +1,11 @@
 ---
 import CardList from '@/components/CardList.astro';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { api, routes } from '@/constants';
 import Form from '@/components/form/Form.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
-
-const session = useAdmin(Astro.cookies);
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) return Astro.redirect(`${routes.USERS}?alert=Username not found`);
@@ -49,19 +46,17 @@ const breadcrumbs = [
 ];
 ---
 
-<Page
-	title={user.username}
-	class="flex flex-col gap-4"
-	session={session}
-	breadcrumbs={breadcrumbs}
-	pageType="public">
+<Page title={user.username} class="flex flex-col gap-4" breadcrumbs={breadcrumbs} pageType="public">
 	<header class="flex items-start gap-12 p-4">
 		<img
 			src={twitchData?.profile_image_url}
 			width="200"
 			class="rounded-full col-start-1 row-span-full"
 		/>
-		<AdminOnly session={session}>
+		<AdminOnly>
+			<section class="flex flex-col gap-2" slot="fallback">
+				<h1 class="page-heading col-start-2">{user.username}</h1>
+			</section>
 			<section class="flex flex-col gap-2">
 				<h1 class="page-heading col-start-2">{user.username}</h1>
 				<p class="-mt-5">User Id: {user.userId}</p>
@@ -116,6 +111,6 @@ const breadcrumbs = [
 	</header>
 	<div>
 		<h2 class="text-xl pt-4">Cards:</h2>
-		<CardList cards={cardsNotInPack} session={session} />
+		<CardList cards={cardsNotInPack} />
 	</div>
 </Page>

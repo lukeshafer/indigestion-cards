@@ -1,4 +1,5 @@
-export const publicRoutes = ['/', '/user', '/user/*'];
+/** Only routes that are accessible without logging in */
+export const PUBLIC_ROUTES = ['/', '/user', '/user/*', '/404', '/admin', '/api/auth/login'] as const;
 
 export const api = {
 	GIVE_PACK_TO_USER: '/api/admin/give-pack-to-user',
@@ -63,5 +64,4 @@ export const routes = {
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
-
 export const HTML_API_PATH = '/api/html';

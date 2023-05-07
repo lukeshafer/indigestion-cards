@@ -32,14 +32,14 @@ const alertColor =
 
 <Base {...baseProps}>
 	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="morphdom transition:true">
-		<AdminOnly session={Astro.props.session}>
-			<AdminPanel session={Astro.props.session} />
+		<AdminOnly>
+			<AdminPanel />
 		</AdminOnly>
 		<div class="md:col-start-2 overflow-y-scroll relative">
 			<header
 				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
 				hx-disable>
-				<AdminOnly session={Astro.props.session}>
+				<AdminOnly>
 					<div
 						data-for-admin-panel
 						class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">

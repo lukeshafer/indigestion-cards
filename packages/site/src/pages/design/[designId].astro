@@ -2,12 +2,8 @@
 import PostButton from '@/components/form/PostButton.astro';
 import Page from '@/layouts/Page.astro';
 import TradingCard from '@/components/TradingCard.astro';
-import { useAdmin } from '@/session';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { routes, api } from '@/constants';
-
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect('/404');
 
 const designId = Astro.params.designId;
 
@@ -55,7 +51,6 @@ const instancesByRarity = cardInstances.reduce((acc, instance) => {
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-4"
-	session={admin}
 	breadcrumbs={breadcrumbs}>
 	<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
 	<div class="mx-4">
