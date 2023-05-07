@@ -3,12 +3,14 @@ import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { useAdmin } from '@/session';
 
 const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/');
+if (!session) return new Response('Unauthorized', { status: 401 });
 const packTypes = await getAllPackTypes();
 ---
 
-{
-	packTypes.map((packType) => (
-		<option value={JSON.stringify(packType)}>{packType.packTypeName}</option>
-	))
-}
+<body>
+	{
+		packTypes.map((packType) => (
+			<option value={JSON.stringify(packType)}>{packType.packTypeName}</option>
+		))
+	}
+</body>

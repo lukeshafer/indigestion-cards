@@ -26,12 +26,14 @@ if (method === 'DELETE') {
 }
 ---
 
-{
-	method === 'DELETE' ? (
-		errorStr ? (
-			<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
-		) : (
-			<p class="p-4 mb-4 bg-green-200">Successfully deleted pack type</p>
-		)
-	) : null
-}
+<body>
+	{
+		method === 'DELETE' ? (
+			errorStr ? (
+				<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
+			) : (
+				<p class="p-4 mb-4 bg-green-200">Successfully deleted pack type</p>
+			)
+		) : null
+	}
+</body>

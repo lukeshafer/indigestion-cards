@@ -1,0 +1,26 @@
+---
+import { api, routes } from '@/constants';
+import PostButton from '../form/PostButton.astro';
+
+interface Props {
+	currentUser: string;
+	username: string;
+	userId: string;
+}
+
+const { username, userId, currentUser } = Astro.props;
+---
+
+<tr>
+	<td>{username}</td>
+	<td>
+		<button
+			class="post-button"
+			data-type="delete"
+			hx-post="/api/html/admin/delete-admin"
+			hx-vals={JSON.stringify({ userId, username })}
+			hx-swap="outerHTML transition:false"
+			hx-target="closest tr">Delete</button
+		>
+	</td>
+</tr>

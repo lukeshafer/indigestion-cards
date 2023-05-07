@@ -1,14 +1,21 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-import AdminUserForm from '@/components/entity-forms/AdminUserForm.astro'
-import { api, routes } from '@/constants'
+import Page from '@/layouts/Page.astro';
+import { useAdmin } from '@/session';
+import AdminUserForm from '@/components/entity-forms/AdminUserForm.astro';
+import { api, routes } from '@/constants';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
+const user = useAdmin(Astro.cookies);
+if (!user) return Astro.redirect('/404');
 ---
 
-<Page title="Add admin user" class="max-w-xl" session={user}>
+<Page
+	title="Add admin user"
+	session={user}
+	breadcrumbs={[
+		{ label: 'Home', href: '/' },
+		{ label: 'Admins', href: '/admin-users' },
+		{ label: 'Add Admin User' },
+	]}>
 	<h1 class="page-heading">Add admin user</h1>
 	<AdminUserForm action={`${api.CREATE_ADMIN_USER}?redirect=${routes.ADMIN_USERS}`} />
 </Page>

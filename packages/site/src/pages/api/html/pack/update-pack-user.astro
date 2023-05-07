@@ -30,18 +30,20 @@ if (!userId) return new Response('User not found', { status: 404 });
 await updatePackUser({ packId, username, userId });
 ---
 
-<span {id} hx-swap-oob="true">{username}</span>
-<button
-	_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
-	class="post-button edit-button"
-	data-type="success"
-	hx-select=".save-button"
-	hx-swap="outerHTML"
-	hx-vals={JSON.stringify({
-		id,
-		username,
-		packId,
-	})}
-	hx-get={`/api/html/pack/start-edit`}>
-	Saved
-</button>
+<body>
+	<span {id} hx-swap-oob="true">{username}</span>
+	<button
+		_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
+		class="post-button edit-button"
+		data-type="success"
+		hx-select=".save-button"
+		hx-swap="outerHTML"
+		hx-vals={JSON.stringify({
+			id,
+			username,
+			packId,
+		})}
+		hx-get={`/api/html/pack/start-edit`}>
+		Saved
+	</button>
+</body>

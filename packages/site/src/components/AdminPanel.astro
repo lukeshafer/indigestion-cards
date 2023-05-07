@@ -60,6 +60,7 @@ const actionLinks = [
 					currentPage === href || currentPage.startsWith(href) ? (
 						<a
 							preload="mouseover"
+							preload-images="true"
 							href={href}
 							title={title}
 							class="font-heading font-medium block bg-white text-black px-6 py-1">
@@ -68,6 +69,7 @@ const actionLinks = [
 					) : (
 						<a
 							preload="mouseover"
+							preload-images="true"
 							href={href}
 							title={title}
 							class="font-heading font-medium block text-shadow px-6 py-1 hover:bg-gray-900/20">

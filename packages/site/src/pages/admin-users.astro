@@ -2,8 +2,8 @@
 import Page from '@/layouts/Page.astro';
 import { useAdmin } from '@/session';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
-import { api, routes } from '@/constants';
-import PostButton from '@/components/form/PostButton.astro';
+import { routes } from '@/constants';
+import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
 
 const admin = useAdmin(Astro.cookies);
 if (!admin) return Astro.redirect(`/404`);
@@ -25,32 +25,25 @@ const users = unsortedUsers.sort((a, b) => {
 	<sort-table>
 		<header slot="header" class="page-header">
 			<h1 class="page-heading">Admin Users</h1>
-			<a href={routes.ADMIN.CREATE.ADMIN} class="button-link"> Add Admin</a>
+			<button
+				class="button-link"
+				id="new-admin-user"
+				hx-get="/api/html/admin/new-admin-form"
+				hx-target="next tbody"
+				hx-swap="beforeend">Add Admin</button
+			>
 		</header>
-		<table>
+		<table id="#admin-users-table">
 			<thead>
 				<tr>
 					<th class="w-3/4">Username</th>
-					<th></th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{
 					users.map(({ username, userId }) => (
-						<tr>
-							<td>{username}</td>
-							<td>
-								{username !== admin.properties.username && (
-									<PostButton
-										id="delete-admin-user"
-										label="Delete"
-										type="delete"
-										url={`${api.DELETE_ADMIN_USER}?redirect=${routes.ADMIN_USERS}`}
-										hiddenProperties={[{ name: 'userId', value: userId }]}
-									/>
-								)}
-							</td>
-						</tr>
+						<AdminUserRow {username} {userId} {currentUser} />
 					))
 				}
 			</tbody>

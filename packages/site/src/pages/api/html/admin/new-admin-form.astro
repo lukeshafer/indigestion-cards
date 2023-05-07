@@ -1,0 +1,33 @@
+---
+import { useAdmin } from '@/session';
+import crypto from 'crypto';
+
+const session = useAdmin(Astro.cookies);
+if (!session) return new Response('Unauthorized', { status: 401 });
+const token = 'a' + crypto.randomBytes(2).toString('hex');
+---
+
+<body>
+	<tr id={token}>
+		<td>
+			<input
+				id={`${token}-username`}
+				type="text"
+				name="username"
+				_="on input if my value's length is greater than 0 send setSave to <button/> else send setCancel to <button/>"
+			/>
+		</td>
+		<td>
+			<button
+				_="on setCancel set my innerHTML to 'Cancel' on setSave set my innerHTML to 'Save'"
+				class="post-button text-center"
+				data-type="submit"
+				hx-post="/api/html/admin/create-admin"
+				hx-target={`#${token}`}
+				hx-swap="outerHTML"
+				hx-include={`#${token}-username`}>
+				Cancel</button
+			>
+		</td>
+	</tr>
+</body>

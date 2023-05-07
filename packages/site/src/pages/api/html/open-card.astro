@@ -17,7 +17,7 @@ if (!instanceId || !designId) {
 	};
 }
 
-//const result = { success: false, error: 'Not implemented' }; // for testing 
+//const result = { success: false, error: 'Not implemented' }; // for testing
 const result = await openCardFromPack({ instanceId, designId });
 
 if (result.success) {
@@ -25,4 +25,6 @@ if (result.success) {
 }
 ---
 
-<p class="text-red-500 font-bold text-center">An error occurred.</p>
+<body>
+	<p class="text-red-500 font-bold text-center">An error occurred.</p>
+</body>

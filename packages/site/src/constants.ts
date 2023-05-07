@@ -63,3 +63,5 @@ export const routes = {
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
+
+export const HTML_API_PATH = '/api/html';

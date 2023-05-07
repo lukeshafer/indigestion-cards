@@ -36,10 +36,11 @@ const { title, session, pageType = 'private' } = Astro.props;
 		}
 	</body>
 	<script>
+		// @ts-nocheck
 		import htmx from 'htmx.org';
-		// @ts-ignore
+
 		window.htmx = htmx;
-		// @ts-ignore
+
 		import('htmx.org/dist/ext/head-support');
 		import('htmx.org/dist/ext/preload');
 	</script>

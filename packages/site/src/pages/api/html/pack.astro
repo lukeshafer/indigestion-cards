@@ -62,10 +62,12 @@ if (method === 'DELETE') {
 }
 ---
 
-{
-	errorStr ? (
-		<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
-	) : (
-		<p class="p-4 mb-4 bg-green-200">{successStr}</p>
-	)
-}
+<body>
+	{
+		errorStr ? (
+			<p class="p-4 mb-4 bg-red-200">{errorStr}</p>
+		) : (
+			<p class="p-4 mb-4 bg-green-200">{successStr}</p>
+		)
+	}
+</body>

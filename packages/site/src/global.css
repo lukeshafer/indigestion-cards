@@ -362,6 +362,22 @@
 		width: 100%;
 		margin-bottom: 1rem;
 	}
+
+	.alert-text-box {
+		padding: 1rem;
+		background-color: var(--red-2);
+		color: var(--red-12);
+	}
+
+	.alert-text-box[data-type="error"] {
+		background-color: var(--red-2);
+		color: var(--red-12);
+	}
+
+	.alert-text-box[data-type="success"] {
+		background-color: var(--teal-2);
+		color: var(--teal-12);
+	}
 }
 
 @layer utilities {

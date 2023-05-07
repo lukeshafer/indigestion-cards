@@ -31,7 +31,7 @@ const alertColor =
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="innerHTML transition:true">
+	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="morphdom transition:true">
 		<AdminOnly session={Astro.props.session}>
 			<AdminPanel session={Astro.props.session} />
 		</AdminOnly>
@@ -47,7 +47,6 @@ const alertColor =
 					</div>
 				</AdminOnly>
 				<a
-					rel="prefetch"
 					href="/"
 					title="Home"
 					class="flex-col font-display text-white text-shadow hidden md:flex flex-1">
@@ -114,3 +113,17 @@ const alertColor =
 		}
 	}
 </style>
+
+<script>
+	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
+	document.body.addEventListener('displayAlert', (e) => {
+		const text = e.detail.message;
+		const type = e.detail.type ?? 'error';
+
+		const alert = document.createElement('p');
+		alert.classList.add('alert-text-box');
+		alert.dataset.type = type;
+		alert.textContent = text;
+		alertWrapper.replaceChildren(alert);
+	});
+</script>
