@@ -2,7 +2,6 @@
 import Page from '@/layouts/Page.astro';
 import { useAdmin } from '@/session';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
-import { api } from '@/constants';
 import TradingCard from '@/components/TradingCard.astro';
 
 const user = useAdmin(Astro.cookies);
@@ -17,43 +16,41 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 
 <Page
 	title="Open Packs"
-	class="open-pack-page"
 	session={user}
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Open Packs' }]}>
-	<h1 class="page-heading">Open Packs</h1>
-	<section class="my-8 bg-[#dde] p-3 col-start-1" id="pack-list">
-		<h2 class="font-semibold text-xl mb-2">Unopened packs:</h2>
-		<ul class="packs overflow-y-scroll flex flex-col gap-6 relative pb-2 min-h-[20rem]">
-			{
-				packs.map((pack) => (
-					<li data-pack-info={JSON.stringify(pack)} id={pack.packId}>
-						<div
-							data-pack-main
-							class="pack-main flex justify-center gap-2 w-60 bg-brand-main p-2">
-							<button
-								class="text-shadow shine bg-brand-main font-display italic text-white text-xl w-full mx-auto text-center"
-								hx-get={`/api/html/get-pack-to-open?packId=${pack.packId}`}
-								hx-target="#open-showcase">
-								<h3 class="p-2 pb-1 text-center bg-brand-dark">{pack.username}</h3>
-							</button>
-						</div>
-						<div data-pack-placeholder class="pack-drag-placeholder" />
-					</li>
-				))
-			}
-		</ul>
-	</section>
-	<div id="open-showcase"></div>
-	<TradingCard isTemplateOnly />
+	<div class="grid grid-cols-[auto_1fr]">
+		<h1 class="page-heading">Open Packs</h1>
+		<section class="my-8 bg-[#dde] p-3 col-start-1" id="pack-list">
+			<h2 class="font-semibold text-xl mb-2">Unopened packs:</h2>
+			<ul class="packs overflow-y-scroll flex flex-col gap-6 relative pb-2 min-h-[20rem]">
+				{
+					packs.map((pack) => (
+						<li data-pack-info={JSON.stringify(pack)} id={pack.packId}>
+							<div
+								data-pack-main
+								class="pack-main flex justify-center gap-2 w-60 bg-brand-main p-2">
+								<button
+									class="text-shadow shine bg-brand-main font-display italic text-white text-xl w-full mx-auto text-center"
+									hx-get={`/api/html/get-pack-to-open?packId=${pack.packId}`}
+									hx-swap="innerHTML transition:true"
+									hx-target="#open-showcase">
+									<h3 class="p-2 pb-1 text-center bg-brand-dark">
+										{pack.username}
+									</h3>
+								</button>
+							</div>
+							<div data-pack-placeholder class="pack-drag-placeholder" />
+						</li>
+					))
+				}
+			</ul>
+		</section>
+		<div id="open-showcase" class="slide-it"></div>
+		<TradingCard isTemplateOnly />
+	</div>
 </Page>
 
 <style>
-	:global(.open-pack-page) {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		grid-auto-rows: auto;
-	}
-
 	#pack-list ul {
 		scrollbar-width: auto;
 		--scrollbar-color: var(--color-main);

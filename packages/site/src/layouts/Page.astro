@@ -31,13 +31,14 @@ const alertColor =
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden">
+	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="innerHTML transition:true">
 		<AdminOnly session={Astro.props.session}>
 			<AdminPanel session={Astro.props.session} />
 		</AdminOnly>
 		<div class="md:col-start-2 overflow-y-scroll relative">
 			<header
-				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4">
+				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
+				hx-disable>
 				<AdminOnly session={Astro.props.session}>
 					<div
 						data-for-admin-panel
@@ -59,9 +60,11 @@ const alertColor =
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<div id="alert-wrapper">
-				{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
+				{alert ? <div class={`p-4 ${alertColor}`}>{alert}</div> : null}
 			</div>
-			<main class={(className ?? '') + ' p-4 md:p-6 lg:p-8 xl:p-10 col-start-2 max-w-6xl'}>
+			<main
+				class={(className ?? '') +
+					' p-4 md:p-6 lg:p-8 xl:p-10 col-start-2 max-w-6xl slide-it'}>
 				<slot />
 			</main>
 		</div>

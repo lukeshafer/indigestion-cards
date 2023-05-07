@@ -26,7 +26,7 @@ const { title, session, pageType = 'private' } = Astro.props;
 		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<title>{title}</title>
 	</head>
-	<body hx-ext="head-support" hx-boost="true">
+	<body hx-ext="head-support, preload" hx-boost="true">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
@@ -41,5 +41,6 @@ const { title, session, pageType = 'private' } = Astro.props;
 		window.htmx = htmx;
 		// @ts-ignore
 		import('htmx.org/dist/ext/head-support');
+		import('htmx.org/dist/ext/preload');
 	</script>
 </html>

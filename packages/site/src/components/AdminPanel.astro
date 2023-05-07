@@ -35,7 +35,7 @@ const actionLinks = [
 			{
 				actionLinks.map((actionLink) => (
 					<a
-						rel="prefetch"
+						preload="mouseover"
 						href={actionLink.href}
 						title={actionLink.title}
 						class="text-3xl uppercase block text-center bg-brand-tertiary px-2 py-1 
@@ -59,7 +59,7 @@ const actionLinks = [
 				adminLinks.map(({ href, title }) =>
 					currentPage === href || currentPage.startsWith(href) ? (
 						<a
-							rel="prefetch"
+							preload="mouseover"
 							href={href}
 							title={title}
 							class="font-heading font-medium block bg-white text-black px-6 py-1">
@@ -67,7 +67,7 @@ const actionLinks = [
 						</a>
 					) : (
 						<a
-							rel="prefetch"
+							preload="mouseover"
 							href={href}
 							title={title}
 							class="font-heading font-medium block text-shadow px-6 py-1 hover:bg-gray-900/20">
