@@ -5,22 +5,18 @@ import { useAdmin } from '@/session';
 import { api, routes } from '@/constants';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 
-const user = useAdmin(Astro.cookies);
-if (!user) return Astro.redirect('/404');
-
 const apiUrl = api.GIVE_PACK_TO_USER;
 const packTypes = await getAllPackTypes();
 ---
 
 <Page
 	title="Give Pack"
-	session={user}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Give Pack', href: '/give-pack' },
 	]}>
 	<h1 class="page-heading">Give Pack</h1>
-	<Form action={apiUrl + `?redirect=${routes.ADMIN.GIVE_PACK}`}>
+	<Form action="/api/html/pack/create-pack" hx-swap="none">
 		<div class="input-group">
 			<label for="username">Username</label>
 			<p>Leave blank for no user</p>
@@ -37,6 +33,6 @@ const packTypes = await getAllPackTypes();
 				}
 			</select>
 		</div>
-		<button type="submit">Give</button>
+		<button type="submit">Save</button>
 	</Form>
 </Page>

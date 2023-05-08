@@ -3,6 +3,7 @@ import { updatePackUser } from '@lil-indigestion-cards/core/pack';
 import { useAdmin } from '@/session';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { getUserByUserName } from '@lil-indigestion-cards/core/user';
+import { getPackById } from '@lil-indigestion-cards/core/card';
 
 const session = useAdmin(Astro.cookies);
 if (!session) return Astro.redirect('/');
@@ -24,10 +25,19 @@ if (!id) {
 	return new Response('Missing id', { status: 400 });
 }
 
-const userId = (await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
-if (!userId) return new Response('User not found', { status: 404 });
+const pack = await getPackById({ packId });
 
-await updatePackUser({ packId, username, userId });
+if (!pack) {
+	console.error('Pack not found');
+	return new Response('Pack not found', { status: 404 });
+}
+
+if (pack.username !== username) {
+	const userId =
+		(await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
+	if (!userId) return new Response('User not found', { status: 404 });
+	await updatePackUser({ packId, username, userId });
+}
 ---
 
 <body>

@@ -39,24 +39,6 @@ export const inputClasses = {
 </my-form>
 
 <style is:global>
-	@keyframes loading-elipses {
-		0% {
-			content: '';
-		}
-		25% {
-			content: '.';
-		}
-		50% {
-			content: '..';
-		}
-		75% {
-			content: '...';
-		}
-		100% {
-			content: '';
-		}
-	}
-
 	my-form .loading-text::after {
 		position: absolute;
 		animation: loading-elipses 3s infinite;
@@ -71,169 +53,6 @@ export const inputClasses = {
 		width: 100%;
 		justify-content: center;
 		align-items: center;
-	}
-
-	my-form input,
-	my-form textarea,
-	my-form select,
-	.my-form-input,
-	.my-form-textarea,
-	.my-form-select {
-		display: block;
-		width: 100%;
-		padding: 0.25rem;
-		background-color: #fff;
-		color: black;
-	}
-
-	my-form input[readonly],
-	.my-form-input[readonly] {
-		background-color: #eee;
-	}
-
-	my-form div button.edit-button {
-		position: absolute;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		background: none;
-		border: none;
-		opacity: 0.5;
-		color: black;
-	}
-
-	my-form div button.edit-button:hover {
-		background: none;
-		opacity: 1;
-	}
-
-	my-form textarea,
-	.my-form-textarea {
-		height: 100px;
-	}
-
-	my-form
-		:where(
-			input[type='text'],
-			input[type='email'],
-			input[type='password'],
-			input[type='number'],
-			select,
-			textarea,
-			input:not(input[type])
-		),
-	.my-form-input,
-	.my-form-textarea,
-	.my-form-select {
-		outline: 1px solid #ccc;
-	}
-
-	my-form label {
-		display: block;
-		font-weight: 600;
-		font-family: var(--font-heading);
-	}
-
-	my-form label.required::after {
-		content: ' *';
-		color: red;
-	}
-
-	my-form input[type='checkbox'] {
-		display: inline-block;
-		width: auto;
-	}
-
-	my-form input[type='checkbox'] + label {
-		display: inline-block;
-		font-weight: 400;
-	}
-
-	my-form fieldset label {
-		display: inline-block;
-		font-size: 0.9em;
-		font-weight: 500;
-	}
-
-	my-form input[type='file'] {
-		display: flex;
-		flex-direction: column;
-		font-family: var(--font-heading);
-		padding-inline: 0;
-	}
-
-	my-form input[type='file'] + img.preview {
-		max-width: 20rem;
-		object-fit: contain;
-		margin: 0;
-	}
-
-	my-form input::file-selector-button {
-		text-shadow: var(--brand-shadow);
-		font-family: var(--font-heading);
-		padding: 0.5rem;
-		font-weight: 500;
-		margin-bottom: 0.5rem;
-		display: block;
-		border: 1px solid #ccc;
-		background: var(--color-tertiary);
-		cursor: pointer;
-		color: white;
-		transition: background 0.2s ease;
-		content: 'Choose a file';
-	}
-
-	my-form input::file-selector-button:hover {
-		background: var(--color-secondary);
-	}
-
-	my-form .input-group {
-		display: flex;
-		flex-flow: column;
-		align-items: flex-start;
-		width: 100%;
-	}
-
-	my-form :is(button, input[type='button'], input[type='submit']) {
-		font-family: var(--font-heading);
-		padding: 0.5rem;
-		display: block;
-		border: 1px solid #ccc;
-		background: var(--color-tertiary);
-		cursor: pointer;
-		color: white;
-		transition: background 0.2s ease;
-		text-shadow: var(--brand-shadow);
-	}
-
-	my-form
-		:is(
-			button:hover,
-			input[type='button']:hover,
-			input[type='submit']:hover,
-			button[type='submit']:hover
-		) {
-		background-color: var(--color-secondary);
-	}
-
-	my-form :is(button[type='submit'], input[type='submit']) {
-		font-weight: 700;
-		text-transform: uppercase;
-		background-color: var(--color-tertiary);
-	}
-
-	my-form fieldset {
-		/*fieldset: 'border border-gray-300 p-4 w-full grid gap-8',*/
-		border: 1px solid #ccc;
-		padding: 1rem;
-		width: 100%;
-		display: grid;
-		gap: 1rem;
-	}
-
-	my-form legend {
-		font-weight: 600;
-		font-size: 1rem;
 	}
 </style>
 
@@ -314,7 +133,7 @@ export const inputClasses = {
 				const editButton = document.createElement('button');
 				editButton.type = 'button';
 				editButton.textContent = 'Edit';
-				editButton.classList.add('edit-button');
+				editButton.classList.add('edit-readonly');
 
 				editButton.addEventListener('click', (e) => {
 					e.preventDefault();

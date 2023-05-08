@@ -1,17 +1,12 @@
 ---
-import Page from '@/layouts/Page.astro'
-import Form, { inputClasses } from '@/components/form/Form.astro'
-import InputBase from '@/components/form/InputBase.astro'
-import { useAdmin } from '@/session'
-import { api, routes } from '@/constants'
-
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
+import Page from '@/layouts/Page.astro';
+import Form from '@/components/form/Form.astro';
+import InputBase from '@/components/form/InputBase.astro';
+import { api, routes } from '@/constants';
 ---
 
 <Page
 	title="Create New Season"
-	session={user}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Seasons', href: routes.SEASONS },
@@ -21,7 +16,7 @@ if (!user) return Astro.redirect('/404')
 
 	<Form action={`${api.CREATE_CARD_SEASON}?redirect=${routes.ADMIN.CREATE.SEASON}`}>
 		<InputBase label="Season Name" id="name">
-			<input id="name" name="name" type="text" class={inputClasses.input} />
+			<input id="name" name="name" type="text" class="form-input" />
 		</InputBase>
 		<InputBase label="Season ID" id="seasonId">
 			<input
@@ -31,14 +26,14 @@ if (!user) return Astro.redirect('/404')
 				data-id-from="name"
 				data-edit-button
 				readonly
-				class={inputClasses.input}
+				class="form-input"
 				pattern="[a-z0-9-]+"
 			/>
 		</InputBase>
 		<InputBase label="Description" id="description">
-			<input type="text" id="description" name="description" class={inputClasses.input} />
+			<input type="text" id="description" name="description" class="form-input" />
 		</InputBase>
-		<button class={inputClasses.submit}>Create</button>
+		<button class="form-button" type="submit">Create</button>
 	</Form>
 </Page>
 

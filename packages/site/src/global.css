@@ -118,11 +118,146 @@
 		color: #000;
 	}
 
-	@media (prefers-color-scheme: dark) {
-		html {
-			/*--bg-color: var(--bg-color-dark);*/
-			/*--text-color: var(--text-dark);*/
-		}
+	form input, 
+	form textarea, 
+	form select, 
+	form option,
+	.my-form-input {
+		display: block;
+		width: 100%;
+		padding: 0.25rem;
+		background-color: #fff;
+		color: black;
+	}
+
+	form input[readonly], .my-form-input[readonly] {
+		background-color: var(--gray-2)
+	}
+
+	form input:not([type="file"]), form select, form textarea, .my-form-input {
+		outline: 1px solid #ccc;
+	}
+
+	button.edit-readonly {
+		position: absolute;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: none;
+		border: none;
+		opacity: 0.5;
+		color: black;
+		line-height: 1;
+	}
+
+	button.edit-readonly:hover {
+		opacity: 1;
+	}
+
+	form label {
+		display: block;
+		font-weight: 600;
+		font-family: var(--font-heading);
+	}
+
+	form label.required::after {
+		content: ' *';
+		color: var(--red-9);
+	}
+
+	form input[type='checkbox'] {
+		display: inline-block;
+		width: auto;
+	}
+
+	form input[type='checkbox'] + label {
+		display: inline-block;
+		font-weight: 400;
+	}
+
+	form fieldset label {
+		display: inline-block;
+		font-size: 0.9em;
+		font-weight: 500;
+	}
+
+	form input[type='file'] {
+		display: flex;
+		flex-direction: column;
+		font-family: var(--font-heading);
+		padding-inline: 0;
+	}
+
+	form input[type='file'] + img.preview {
+		max-width: 20rem;
+		object-fit: contain;
+		margin: 0;
+	}
+
+	form input::file-selector-button {
+		text-shadow: var(--brand-shadow);
+		font-family: var(--font-heading);
+		padding: 0.5rem;
+		font-weight: 500;
+		margin-bottom: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+		content: 'Choose a file';
+	}
+
+	form input::file-selector-button:hover {
+		background: var(--color-secondary);
+	}
+
+	.input-group {
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+		width: 100%;
+	}
+
+	form button {
+		font-family: var(--font-heading);
+		padding: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+		text-shadow: var(--brand-shadow);
+	}
+
+	textareaform input {
+		height: 100px;
+	}
+
+	form button:hover {
+		background-color: var(--color-secondary);
+	}
+
+	form button[type='submit'] {
+		font-weight: 700;
+		text-transform: uppercase;
+		background-color: var(--color-tertiary);
+	}
+
+	form fieldset {
+		/*fieldset: 'border border-gray-300 p-4 w-full grid gap-8',*/
+		border: 1px solid #ccc;
+		padding: 1rem;
+		width: 100%;
+		display: grid;
+		gap: 1rem;
+	}
+
+	form legend {
+		font-weight: 600;
+		font-size: 1rem;
 	}
 }
 
@@ -378,6 +513,7 @@
 		background-color: var(--teal-2);
 		color: var(--teal-12);
 	}
+
 }
 
 @layer utilities {

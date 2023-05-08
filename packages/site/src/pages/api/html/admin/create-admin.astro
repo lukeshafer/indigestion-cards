@@ -1,5 +1,6 @@
 ---
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
+import { html } from '@/lib/api';
 import { useAdmin } from '@/session';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { createAdminUser } from '@lil-indigestion-cards/core/user';
@@ -10,7 +11,7 @@ if (!session) return new Response('Unauthorized', { status: 401 });
 const body = await Astro.request.text();
 
 const username = new URLSearchParams(body).get('username');
-if (!username) return new Response('Missing username', { status: 400 });
+if (!username) return html`<body></body>`;
 
 const user = await getUserByLogin(username);
 if (!user) return new Response('User not found', { status: 404 });
