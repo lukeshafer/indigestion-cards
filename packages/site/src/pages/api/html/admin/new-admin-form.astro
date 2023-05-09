@@ -1,9 +1,5 @@
 ---
-import { useAdmin } from '@/session';
 import crypto from 'crypto';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 const token = 'a' + crypto.randomBytes(2).toString('hex');
 ---
 

@@ -1,12 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { api, routes } from '@/constants';
 import RarityForm from '@/components/entity-forms/RarityForm.astro';
 import { getRarityById } from '@lil-indigestion-cards/core/card';
-
-const user = useAdmin(Astro.cookies);
-if (!user) return Astro.redirect('/404');
 
 const rarityId = Astro.params.rarityId;
 
@@ -27,8 +23,7 @@ if (!rarity) {
 		{ label: 'Home', href: '/' },
 		{ label: 'Rarities', href: '/rarity' },
 		{ label: 'Edit', href: `/admin/edit/rarity/${rarityId}` },
-	]}
-	session={user}>
+	]}>
 	<h1 class="page-heading">Add Rarity</h1>
 	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
 		<div>

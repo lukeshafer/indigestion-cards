@@ -1,9 +1,5 @@
 ---
 import { updateRarity } from '@lil-indigestion-cards/core/card';
-import { useAdmin } from '@/session';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const rarityId = Astro.url.searchParams.get('rarityId');
 const rarityName = Astro.url.searchParams.get('rarityName');

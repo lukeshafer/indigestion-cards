@@ -1,16 +1,12 @@
 ---
-import { useAdmin } from '@/session';
 import { deleteAdminUser } from '@lil-indigestion-cards/core/user';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const body = await Astro.request.text();
 const userId = new URLSearchParams(body).get('userId');
 const username = new URLSearchParams(body).get('username');
 if (!userId) return new Response('Missing userId', { status: 400 });
 
-if (userId === session.properties.userId)
+if (userId === Astro.locals.session?.properties.userId)
 	return new Response(null, {
 		status: 400,
 		headers: {

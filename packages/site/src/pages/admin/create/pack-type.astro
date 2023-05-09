@@ -1,21 +1,14 @@
 ---
-import { useAdmin } from '@/session';
 import Page from '@/layouts/Page.astro';
 import Form from '@/components/form/Form.astro';
 import { api } from '@/constants';
 import { getAllSeasons, getAllCardDesigns } from '@lil-indigestion-cards/core/card';
-
-const user = useAdmin(Astro.cookies);
-if (!user) {
-	return Astro.redirect('/404');
-}
 
 const seasons = await getAllSeasons();
 const cardDesigns = await getAllCardDesigns();
 ---
 
 <Page
-	session={user}
 	title="Create Pack Type"
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
@@ -96,16 +89,6 @@ const cardDesigns = await getAllCardDesigns();
 					</div>
 				))
 			}
-			<div>
-				<input
-					id="cardDesignTest"
-					name="cardDesigns"
-					type="checkbox"
-					value="test"
-					title="test"
-				/>
-				<label class="checkbox-label" for="cardDesignTest"> test</label>
-			</div>
 		</fieldset>
 		<button type="submit">Save</button>
 	</Form>

@@ -1,6 +1,4 @@
 ---
-import Form from '@/components/form/Form.astro'
-
 interface Props {
 	action: string
 	seasons: {
@@ -42,7 +40,7 @@ const {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 ---
 
-<Form action={action}>
+<my-form action={action}>
 	<input type="hidden" name="imgUrl" value={imgUrl} />
 	<input type="hidden" name="imageKey" value={key} />
 	<div class="input-group">
@@ -97,4 +95,4 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
 		}
 	</fieldset>
 	<button type="submit">Save</button>
-</Form>
+</my-form>

@@ -1,8 +1,5 @@
 ---
-import { useAdmin } from '@/session';
 import { deletePackTypeById } from '@lil-indigestion-cards/core/card';
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const method = Astro.request.method.toUpperCase();
 const body = await Astro.request.text();

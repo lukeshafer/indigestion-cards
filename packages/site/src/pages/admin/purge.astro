@@ -1,19 +1,13 @@
 ---
-import Form from '@/components/form/Form.astro'
-import Page from '@/layouts/Page.astro'
-import { useAdmin } from '@/session'
-
-const user = useAdmin(Astro.cookies)
-if (!user) {
-	return Astro.redirect('/404')
-}
+import Form from '@/components/form/Form.astro';
+import Page from '@/layouts/Page.astro';
 
 if (Astro.url.hostname !== 'localhost') {
-	return Astro.redirect('/?alert=Cannot purge database on production. Must be running locally')
+	return Astro.redirect('/?alert=Cannot purge database on production. Must be running locally');
 }
 ---
 
-<Page title="WARNING WARNING WARNING" session={user}>
+<Page title="WARNING WARNING WARNING">
 	<h1 class="text-3xl font-bold text-red-600">WARNING: This page purges the database</h1>
 	<p class="mt-4 text-lg">
 		You are about to purge the database. This will delete <b>ALL</b> data in the database. This action
@@ -38,8 +32,9 @@ if (Astro.url.hostname !== 'localhost') {
 		<div data-second>
 			<p class="mt-4 text-lg">
 				To confirm, type
-				<code class="px-2 py-1 text-sm font-mono bg-gray-100 rounded-md" data-second-code-text
-					>I'm SURE!!</code
+				<code
+					class="px-2 py-1 text-sm font-mono bg-gray-100 rounded-md"
+					data-second-code-text>I'm SURE!!</code
 				>
 				in the box below.
 				<input
@@ -75,38 +70,38 @@ if (Astro.url.hostname !== 'localhost') {
 </style>
 
 <script>
-	const firstInput = document.querySelector<HTMLInputElement>('[data-first-input]')
-	const code = document.querySelector<HTMLElement>('[data-first-code-text]')?.innerText
+	const firstInput = document.querySelector<HTMLInputElement>('[data-first-input]');
+	const code = document.querySelector<HTMLElement>('[data-first-code-text]')?.innerText;
 
-	const secondInput = document.querySelector<HTMLInputElement>('[data-second-input]')
-	const secondCode = document.querySelector<HTMLElement>('[data-second-code-text]')?.innerText
-	const dataSecond = document.querySelector<HTMLDivElement>('[data-second]')
+	const secondInput = document.querySelector<HTMLInputElement>('[data-second-input]');
+	const secondCode = document.querySelector<HTMLElement>('[data-second-code-text]')?.innerText;
+	const dataSecond = document.querySelector<HTMLDivElement>('[data-second]');
 
 	firstInput?.addEventListener('input', () => {
 		if (firstInput.value === code) {
-			firstInput.style.border = '1px solid #10b981'
-			dataSecond!.style.opacity = '1'
+			firstInput.style.border = '1px solid #10b981';
+			dataSecond!.style.opacity = '1';
 		} else {
-			firstInput.style.border = '1px solid #ef4444'
-			dataSecond!.style.opacity = '0'
-			secondInput!.value = ''
+			firstInput.style.border = '1px solid #ef4444';
+			dataSecond!.style.opacity = '0';
+			secondInput!.value = '';
 		}
-	})
+	});
 
 	secondInput?.addEventListener('input', () => {
 		if (secondInput.value === secondCode) {
-			secondInput.style.border = '1px solid #10b981'
+			secondInput.style.border = '1px solid #10b981';
 		} else {
-			secondInput.style.border = '1px solid #ef4444'
+			secondInput.style.border = '1px solid #ef4444';
 		}
-	})
+	});
 
-	const form = document.querySelector<HTMLFormElement>('#purge-form')
+	const form = document.querySelector<HTMLFormElement>('#purge-form');
 
 	form?.addEventListener('submit', (e) => {
-		e.preventDefault()
+		e.preventDefault();
 		if (firstInput?.value === code && secondInput?.value === secondCode) {
-			form.submit()
+			form.submit();
 		}
-	})
+	});
 </script>

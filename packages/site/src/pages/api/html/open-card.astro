@@ -1,11 +1,7 @@
 ---
-import { useAdmin } from '@/session';
 import { openCardFromPack } from '@lil-indigestion-cards/core/card';
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
 
 if (Astro.request.method !== 'PATCH') return new Response('Method not allowed', { status: 405 });
-
 const params = new URLSearchParams(await Astro.request.text());
 const instanceId = params.get('instanceId');
 const designId = params.get('designId');

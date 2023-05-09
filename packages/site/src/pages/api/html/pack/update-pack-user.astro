@@ -1,12 +1,8 @@
 ---
 import { updatePackUser } from '@lil-indigestion-cards/core/pack';
-import { useAdmin } from '@/session';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { getUserByUserName } from '@lil-indigestion-cards/core/user';
 import { getPackById } from '@lil-indigestion-cards/core/card';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/');
 
 const packId = Astro.url.searchParams.get('packId');
 const username = Astro.url.searchParams.get('username');
@@ -35,7 +31,17 @@ if (!pack) {
 if (pack.username !== username) {
 	const userId =
 		(await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
-	if (!userId) return new Response('User not found', { status: 404 });
+	if (!userId)
+		return new Response('User not found', {
+			status: 404,
+			headers: {
+				'HX-Trigger': JSON.stringify({
+					displayAlert: {
+						message: `Twitch user '${username}' not found`,
+					},
+				}),
+			},
+		});
 	await updatePackUser({ packId, username, userId });
 }
 ---

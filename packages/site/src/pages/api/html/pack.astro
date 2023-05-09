@@ -1,5 +1,4 @@
 ---
-import { useAdmin } from '@/session';
 import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card';
 import {
 	createPackForNoUser,
@@ -9,8 +8,6 @@ import {
 } from '@lil-indigestion-cards/core/pack';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 const method = Astro.request.method.toUpperCase();
 const body = await Astro.request.text();
 const params = new URLSearchParams(body);

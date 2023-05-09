@@ -1,12 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import PostButton from '@/components/form/PostButton.astro';
 import { api, routes } from '@/constants';
 import RarityForm from '@/components/entity-forms/RarityForm.astro';
-
-const user = useAdmin(Astro.cookies);
-if (!user) return Astro.redirect('/404');
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -25,8 +21,7 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 		{ label: 'Rarities', href: '/rarity' },
 		{ label: 'New Rarity', href: '/admin/create/rarity' },
 		{ label: 'Details', href: '/admin/create/rarity-details' },
-	]}
-	session={user}>
+	]}>
 	<h1 class="page-heading">Add Rarity</h1>
 	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
 		<div>

@@ -1,25 +1,21 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
-import { useAdmin } from '@/session'
-import PostButton from '@/components/form/PostButton.astro'
-import { api, routes } from '@/constants'
-import CardDesignForm from '@/components/entity-forms/CardDesignForm.astro'
+import Page from '@/layouts/Page.astro';
+import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
+import PostButton from '@/components/form/PostButton.astro';
+import { api, routes } from '@/constants';
+import CardDesignForm from '@/components/entity-forms/CardDesignForm.astro';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
-
-const bucket = Astro.url.searchParams.get('bucket')
-const key = Astro.url.searchParams.get('key')
+const bucket = Astro.url.searchParams.get('bucket');
+const key = Astro.url.searchParams.get('key');
 
 if (!bucket || !key) {
-	return Astro.redirect('/?alert=Please upload an image first')
+	return Astro.redirect('/?alert=Please upload an image first');
 }
 
-const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
-const seasons = await getAllSeasons()
-const rarities = await getAllRarities()
-const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGNS}`
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
+const seasons = await getAllSeasons();
+const rarities = await getAllRarities();
+const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGNS}`;
 ---
 
 <Page
@@ -29,8 +25,7 @@ const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGN
 		{ href: routes.DESIGNS, label: 'Designs' },
 		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
 		{ label: 'Details' },
-	]}
-	session={user}>
+	]}>
 	<h1 class="page-heading">Add Card Design</h1>
 	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
 		<div>

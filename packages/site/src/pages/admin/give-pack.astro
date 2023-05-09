@@ -1,11 +1,8 @@
 ---
 import Form from '@/components/form/Form.astro';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
-import { api, routes } from '@/constants';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 
-const apiUrl = api.GIVE_PACK_TO_USER;
 const packTypes = await getAllPackTypes();
 ---
 

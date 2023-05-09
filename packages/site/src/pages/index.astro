@@ -1,21 +1,20 @@
 ---
 import { authApi } from '@/constants';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { Icon } from 'astro-icon';
 
-const admin = useAdmin(Astro.cookies);
+const session = Astro.locals.session;
 ---
 
-<Page title="index" session={admin} breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
+<Page title="index" breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
 	<a
 		hx-disable
 		class="post-button mt-5 flex w-fit items-center bg-[#9146ff] text-white gap-2"
-		href={authApi.LOGIN + (admin?.type === 'admin' ? '?streamer=true' : '')}>
+		href={authApi.LOGIN + (session?.type === 'admin' ? '?streamer=true' : '')}>
 		<Icon name="mdi:twitch" width="50" />
 		<span>
-			{admin?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
+			{session?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
 		</span>
 	</a>
 	<!-- TODO: Add FAQ -->

@@ -1,12 +1,8 @@
 ---
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
 import { html } from '@/lib/api';
-import { useAdmin } from '@/session';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { createAdminUser } from '@lil-indigestion-cards/core/user';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const body = await Astro.request.text();
 
@@ -23,5 +19,9 @@ if (!result.success) return new Response(result.error, { status: 400 });
 ---
 
 <body>
-	<AdminUserRow username={display_name} userId={id} currentUser={session.properties.username} />
+	<AdminUserRow
+		username={display_name}
+		userId={id}
+		currentUser={Astro.locals.session?.properties.username}
+	/>
 </body>

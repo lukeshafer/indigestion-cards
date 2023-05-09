@@ -1,13 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
-
-const user = useAdmin(Astro.cookies);
-if (!user) {
-	return Astro.redirect('/404');
-}
 
 const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
 
@@ -49,7 +43,6 @@ const rewards = rawRewards.map((reward) => {
 ---
 
 <Page
-	session={user}
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]}
 	title="Site Config">
 	<h1 class="page-heading">Site Config</h1>
@@ -78,7 +71,7 @@ const rewards = rawRewards.map((reward) => {
 										data-title={reward.title}
 										data-cost={reward.cost}
 										data-value={reward.packType}
-										class="my-form-select">
+										class="my-form-input">
 										<option value="">None</option>
 										{packTypes.map(({ packTypeId, packTypeName }) => (
 											<option

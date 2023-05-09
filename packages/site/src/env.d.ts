@@ -13,7 +13,10 @@ declare type Session = UserSession | AdminSession | PublicSession;
 
 interface PublicSession {
 	type: 'public';
-	properties: {};
+	properties: {
+		userId?: null | undefined;
+		username?: null | undefined;
+	};
 }
 
 interface UserSession {
@@ -32,4 +35,4 @@ interface AdminSession {
 	};
 }
 
-export { };
+export {};

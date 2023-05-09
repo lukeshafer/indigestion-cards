@@ -2,7 +2,6 @@
 import '../global.css';
 import '@fontsource/montserrat/variable.css';
 import 'open-props/colors';
-import type { Session } from '@/session';
 
 interface Props {
 	title: string;
@@ -24,6 +23,8 @@ const session = Astro.locals.session;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#fd94e6" />
 		<script src="../elements/sort-table.ts"></script>
+		<script src="../elements/my-form.ts"></script>
+		<script src="../elements/form-indicator.ts"></script>
 		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<title>{title}</title>
 	</head>
