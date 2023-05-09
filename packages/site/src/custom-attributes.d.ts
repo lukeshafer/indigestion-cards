@@ -3,4 +3,7 @@ declare namespace astroHTML.JSX {
 		_?: string;
 		preload?: string | boolean;
 	}
+	interface HTMLButtonAttributes {
+		'data-type'?: 'success' | 'submit' | 'delete';
+	}
 }

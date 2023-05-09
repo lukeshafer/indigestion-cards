@@ -119,6 +119,14 @@ const alertType =
 </style>
 
 <script>
+	window.onload = () => {
+		// remove alert and alertType from url search params
+		const url = new URL(window.location.href);
+		url.searchParams.delete('alert');
+		url.searchParams.delete('alertType');
+		window.history.replaceState({}, '', url);
+	};
+
 	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
 	document.body.addEventListener('clearAlert', () => {
 		alertWrapper.replaceChildren();

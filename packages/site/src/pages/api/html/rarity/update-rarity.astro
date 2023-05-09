@@ -21,7 +21,7 @@ await updateRarity({
 	<span id={`defaultCount-${rarityId}`} hx-swap-oob="true">{defaultCount}</span>
 	<button
 		_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
-		class="post-button edit-button"
+		class="post-button edit-button w-24"
 		data-type="success"
 		hx-select=".save-button"
 		hx-swap="outerHTML"

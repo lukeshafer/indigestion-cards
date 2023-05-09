@@ -1,0 +1,70 @@
+---
+import { AUTH_TOKEN } from '@/constants';
+import { Api } from 'sst/node/api';
+
+const params = new URLSearchParams(await Astro.request.text());
+
+const key = params.get('key');
+const type = params.get('type');
+
+if (!key)
+	return new Response('Missing key', {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: 'Missing image key',
+				},
+			}),
+		},
+	});
+
+if (type !== 'frame' && type !== 'cardDesign')
+	return new Response('Invalid type', {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: 'Invalid image type',
+				},
+			}),
+		},
+	});
+
+const result = await fetch(Api.api.url + '/delete-unmatched-image', {
+	method: 'POST',
+	headers: {
+		authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value ?? ''}`,
+		'Content-Type': 'application/json',
+	},
+	body: JSON.stringify({
+		key,
+		type,
+	}),
+});
+
+if (!result.ok) {
+	console.error(result);
+	return new Response('Error deleting image', {
+		status: 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: 'Error deleting image',
+				},
+			}),
+		},
+	});
+}
+Astro.response.headers.set(
+	'HX-Redirect',
+	(type === 'frame' ? '/rarity' : '/design') + '?alert=Image+deleted&alertType=success'
+);
+Astro.response.headers.set('MY-ALERT', 'Image deleted.');
+Astro.response.headers.set('MY-ALERT-TYPE', 'success');
+---
+
+<body></body>

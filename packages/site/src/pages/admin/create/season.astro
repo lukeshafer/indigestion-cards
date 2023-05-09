@@ -1,7 +1,5 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Form from '@/components/form/Form.astro';
-import InputBase from '@/components/form/InputBase.astro';
 import { api, routes } from '@/constants';
 ---
 
@@ -14,27 +12,31 @@ import { api, routes } from '@/constants';
 	]}>
 	<h1 class="page-heading">Create New Season</h1>
 
-	<Form action={`${api.CREATE_CARD_SEASON}?redirect=${routes.ADMIN.CREATE.SEASON}`}>
-		<InputBase label="Season Name" id="name">
-			<input id="name" name="name" type="text" class="form-input" />
-		</InputBase>
-		<InputBase label="Season ID" id="seasonId">
-			<input
-				id="seasonId"
-				name="seasonId"
-				type="text"
-				data-id-from="name"
-				data-edit-button
-				readonly
-				class="form-input"
-				pattern="[a-z0-9-]+"
-			/>
-		</InputBase>
-		<InputBase label="Description" id="description">
-			<input type="text" id="description" name="description" class="form-input" />
-		</InputBase>
-		<button class="form-button" type="submit">Create</button>
-	</Form>
+	<my-form>
+		<form action={`${api.SEASON.CREATE}`} hx-swap="none" method="post">
+			<div class="input-group">
+				<label for="seasonName">Season Name</label>
+				<input id="seasonName" name="seasonName" type="text" />
+			</div>
+			<div class="input-group">
+				<label for="seasonId">Season ID</label>
+				<input
+					id="seasonId"
+					name="seasonId"
+					type="text"
+					data-id-from="seasonName"
+					data-edit-button
+					readonly
+					pattern="[a-z0-9-]+"
+				/>
+			</div>
+			<div class="input-group">
+				<label for="seasonDescription">Description</label>
+				<input type="text" id="seasonDescription" name="seasonDescription" />
+			</div>
+			<button type="submit">Create</button>
+		</form>
+	</my-form>
 </Page>
 
 <script></script>

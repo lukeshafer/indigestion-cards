@@ -18,8 +18,9 @@ const isCurrentUser =
 		<button
 			class="post-button"
 			class:list={{ 'opacity-0': isCurrentUser }}
-			disabled={isCurrentUser}
 			data-type="delete"
+			disabled={isCurrentUser}
+			hx-confirm="Are you sure you want to delete this user?"
 			hx-post={api.ADMIN.DELETE}
 			hx-vals={JSON.stringify({ userId, username })}
 			hx-swap="outerHTML transition:false"

@@ -1,4 +1,4 @@
-import { ApiHandler, usePathParam, useFormValue } from 'sst/node/api';
+import { ApiHandler, useJsonBody } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
 import { S3 } from 'aws-sdk';
@@ -12,34 +12,24 @@ export const handler = ApiHandler(async () => {
 			body: 'Unauthorized',
 		};
 
-	const id = usePathParam('id');
+	const data = useJsonBody() as unknown;
 
-	if (!id) {
-		return {
-			statusCode: 400,
-			body: 'Missing id',
-		};
-	}
-	const type = useFormValue('type') as 'cardDesign' | 'frame';
-	const bucketName = {
-		cardDesign: Bucket.CardDesigns.bucketName,
-		frame: Bucket.FrameDesigns.bucketName,
-	}[type];
+	if (!data || typeof data !== 'object') return { statusCode: 400, body: 'Missing body' };
+	if (!('key' in data) || typeof data.key !== 'string')
+		return { statusCode: 400, body: 'Missing key' };
+	if (!('type' in data) || (data.type !== 'cardDesign' && data.type !== 'frame'))
+		return { statusCode: 400, body: 'Missing or invalid type' };
 
-	if (!bucketName) {
-		return {
-			statusCode: 400,
-			body: 'Missing type',
-		};
-	}
+	const bucketName =
+		data.type === 'cardDesign' ? Bucket.CardDesigns.bucketName : Bucket.FrameDesigns.bucketName;
 
 	const s3 = new S3();
 	try {
-		const dbResult = deleteUnmatchedDesignImage({ imageId: id, type });
+		const dbResult = deleteUnmatchedDesignImage({ imageId: data.key, type: data.type });
 		const s3result = s3
 			.deleteObject({
 				Bucket: bucketName,
-				Key: id,
+				Key: data.key,
 			})
 			.promise();
 
@@ -50,6 +40,7 @@ export const handler = ApiHandler(async () => {
 			body: 'Successfully deleted unused image',
 		};
 	} catch (error) {
+		console.error(error);
 		return {
 			statusCode: 500,
 			body: JSON.stringify(error),

@@ -1,11 +1,10 @@
 import { createSeason } from '@lil-indigestion-cards/core/card';
-import { ApiHandler, useFormValue, useCookies } from 'sst/node/api';
+import { ApiHandler, useFormValue } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
 
-	const cookies = useCookies();
 	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
