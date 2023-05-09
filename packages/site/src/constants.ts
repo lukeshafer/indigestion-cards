@@ -12,7 +12,9 @@ export const PUBLIC_ROUTES = [
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
 	OPEN_CARD: '/api/html/open-card',
-	DELETE_UNMATCHED_IMAGE: '/api/html/delete-unmatched-image',
+	IMAGE: {
+		DELETE: '/api/html/image/delete-unmatched-image',
+	},
 	RARITY: {
 		START_EDIT: '/api/html/rarity/start-edit',
 		UPDATE: '/api/html/rarity/update-rarity',
