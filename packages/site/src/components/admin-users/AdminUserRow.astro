@@ -1,4 +1,6 @@
 ---
+import { api } from '@/constants';
+
 interface Props {
 	username: string;
 	userId: string;
@@ -18,7 +20,7 @@ const isCurrentUser =
 			class:list={{ 'opacity-0': isCurrentUser }}
 			disabled={isCurrentUser}
 			data-type="delete"
-			hx-post="/api/html/admin/delete-admin"
+			hx-post={api.ADMIN.DELETE}
 			hx-vals={JSON.stringify({ userId, username })}
 			hx-swap="outerHTML transition:false"
 			hx-target="closest tr">

@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
+import { api } from '@/constants';
 
 const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
@@ -19,7 +20,7 @@ const users = unsortedUsers.sort((a, b) => {
 			<button
 				class="button-link"
 				id="new-admin-user"
-				hx-get="/api/html/admin/new-admin-form"
+				hx-get={api.ADMIN.NEW_ADMIN_FORM}
 				hx-target="next tbody"
 				hx-swap="beforeend">Add Admin</button
 			>
@@ -32,11 +33,7 @@ const users = unsortedUsers.sort((a, b) => {
 				</tr>
 			</thead>
 			<tbody>
-				{
-					users.map(({ username, userId }) => (
-						<AdminUserRow {username} {userId} {currentUser} />
-					))
-				}
+				{users.map(({ username, userId }) => <AdminUserRow {username} {userId} />)}
 			</tbody>
 		</table>
 	</sort-table>

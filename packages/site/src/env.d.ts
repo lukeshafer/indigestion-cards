@@ -35,4 +35,4 @@ interface AdminSession {
 	};
 }
 
-export {};
+export { };

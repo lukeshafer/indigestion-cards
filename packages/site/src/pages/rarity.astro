@@ -50,7 +50,7 @@ const rarities = await getAllRarities();
 									hx-select=".save-button"
 									hx-swap="outerHTML"
 									hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-									hx-get={`/api/html/rarity/start-edit`}>
+									hx-get={api.RARITY.START_EDIT}>
 									Edit
 								</button>
 								<div hx-disable>

@@ -4,8 +4,8 @@ import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { api, routes } from '@/constants';
-import Form from '@/components/form/Form.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) return Astro.redirect(`${routes.USERS}?alert=Username not found`);
@@ -44,6 +44,8 @@ const breadcrumbs = [
 	{ label: 'Users', href: routes.USERS },
 	{ label: user.username },
 ];
+
+const packTypes = await getAllPackTypes();
 ---
 
 <Page title={user.username} class="flex flex-col gap-4" breadcrumbs={breadcrumbs} pageType="public">
@@ -60,44 +62,53 @@ const breadcrumbs = [
 			<section class="flex flex-col gap-2">
 				<h1 class="page-heading col-start-2">{user.username}</h1>
 				<p class="-mt-5">User Id: {user.userId}</p>
-				<Form
-					class="col-start-2"
-					action={`${api.GIVE_PACK_TO_USER}?redirect=${routes.USERS}/${user.username}`}>
-					<div class="w-full flex flex-wrap items-center gap-2">
-						<input type="hidden" name="userId" value={user.userId} />
-						<input type="hidden" name="username" value={user.username} />
+				<div class="w-full flex flex-wrap items-center gap-2 col-start-2">
+					<input type="hidden" name="userId" value={user.userId} />
+					<input type="hidden" name="username" value={user.username} />
 
-						<select
-							name="packType"
-							class="w-40 h-full"
-							hx-get="/api/html/get-all-pack-types"
-							hx-trigger="mouseenter once"
-							hx-swap="beforeend"
-							required>
-							<option value="">Choose Pack</option>
-						</select>
+					<select
+						id="packTypeSelect"
+						name="packType"
+						class="w-40 h-full my-form-input"
+						required>
+						<option value="">Choose Pack</option>
+						{
+							packTypes.map((packType) => (
+								<option value={JSON.stringify(packType)}>
+									{packType.packTypeName}
+								</option>
+							))
+						}
+					</select>
 
-						<button type="submit" class="post-button">Give Pack</button>
-					</div>
-				</Form>
+					<button
+						class="post-button"
+						data-type="submit"
+						hx-post={api.PACK.CREATE}
+						hx-include="[name=packType]"
+						hx-swap="none"
+						hx-vals={JSON.stringify({
+							userId: user.userId,
+							username: user.username,
+						})}>Give Pack</button
+					>
+				</div>
+
 				<div class="flex flex-wrap items-center gap-2 w-full">
 					<h2 class="text-lg">
 						Unopened Packs: <span
-							data-value={user.packCount}
-							id="user-pack-count"
-							_="on htmx:load set @data-value to innerHTML
-							on refreshCount 
-								decrement @data-value unless @data-value is 0 
-								then set my innerHTML to @data-value"
-							>{user.packCount}</span
+							hx-get={api.PACK.GET_PACK_COUNT_FOR_USER}
+							hx-trigger="refreshCount from:body"
+							hx-vals={JSON.stringify({ userId: user.userId })}
+							hx-swap="innerHTML transition:false"
+							data-value={user.packCount}>{user.packCount}</span
 						>
 					</h2>
 					<button
-						data-script="on every htmx:afterOnLoad send refreshCount to #user-pack-count"
 						class="post-button shine"
 						data-type="delete"
-						hx-delete="/api/html/pack"
-						hx-target="#alert-wrapper"
+						hx-delete={api.PACK.DELETE}
+						hx-swap="none"
 						hx-vals={JSON.stringify({
 							userId: user.userId,
 							username: user.username,

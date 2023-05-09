@@ -1,0 +1,19 @@
+---
+import { getUser } from '@lil-indigestion-cards/core/user';
+console.log('get pack count');
+
+const userId = Astro.url.searchParams.get('userId');
+
+if (!userId)
+	return new Response('No user id provided', {
+		status: 400,
+	});
+
+const user = await getUser(userId);
+
+console.log('user', user);
+---
+
+<body>
+	<span>{Number(user?.packCount) || 0}</span>
+</body>

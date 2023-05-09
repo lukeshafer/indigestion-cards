@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import TradingCard from '@/components/TradingCard.astro';
+import { api } from '@/constants';
 
 const allPacks = await getAllPacks();
 const packs = allPacks.filter((pack) => pack.userId && pack.username);
@@ -19,7 +20,8 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 							<div class="pack-main flex justify-center gap-2 w-60 bg-brand-main p-2">
 								<button
 									class="text-shadow shine bg-brand-main font-display italic text-white text-xl w-full mx-auto text-center"
-									hx-get={`/api/html/get-pack-to-open?packId=${pack.packId}`}
+									hx-get={api.GET_PACK_TO_OPEN}
+									hx-vals={JSON.stringify({ packId: pack.packId })}
 									hx-swap="innerHTML"
 									hx-target="#open-showcase">
 									<h3 class="p-2 pb-1 text-center bg-brand-dark">

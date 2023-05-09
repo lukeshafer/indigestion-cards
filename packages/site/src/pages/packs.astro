@@ -1,4 +1,5 @@
 ---
+import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 
@@ -44,7 +45,7 @@ const packs = await getAllPacks();
 											username: pack.username,
 											packId: pack.packId,
 										})}
-										hx-get={`/api/html/pack/start-edit`}>
+										hx-get={api.PACK.START_EDIT}>
 										Edit
 									</button>
 								</td>

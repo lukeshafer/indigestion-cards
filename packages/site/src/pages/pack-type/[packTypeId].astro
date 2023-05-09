@@ -1,4 +1,5 @@
 ---
+import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
@@ -23,7 +24,8 @@ const cardPool = await getCardPoolFromType(packType);
 	<button
 		class="post-button shine"
 		data-type="delete"
-		hx-delete="/api/html/pack-type"
+		hx-delete={api.PACK_TYPE.DELETE}
+		hx-swap="false"
 		hx-vals={JSON.stringify({
 			packTypeId: packType.packTypeId,
 		})}>

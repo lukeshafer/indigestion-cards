@@ -10,20 +10,29 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 if (Astro.request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
 const body = await Astro.request.text();
+console.log('body', body);
 const formData = new URLSearchParams(body);
+console.log('formData', formData);
 
 const username = formData.get('username');
 const rawCount = formData.get('count');
 const paramUserId = formData.get('userId');
 const packTypeString = formData.get('packType');
 
+console.log('username', username);
+console.log('rawCount', rawCount);
+console.log('paramUserId', paramUserId);
+console.log('packTypeString', packTypeString);
+
 if (!username) return new Response('Missing username', { status: 400 });
 if (!packTypeString) return new Response('Missing pack type', { status: 400 });
 const userId = username ? paramUserId ?? (await getUserByLogin(username))?.id ?? null : null;
 
 const count = Number(rawCount) || 1;
+console.log('count', count);
 
 try {
+	console.log('packTypeString', packTypeString);
 	const packTypeUnparsed = JSON.parse(packTypeString);
 	console.log(packTypeUnparsed);
 
@@ -55,6 +64,7 @@ Astro.response.headers.set(
 			type: 'success',
 			message: username ? `Pack created for ${username}!` : `Pack created!`,
 		},
+		refreshCount: 'true',
 	})
 );
 ---

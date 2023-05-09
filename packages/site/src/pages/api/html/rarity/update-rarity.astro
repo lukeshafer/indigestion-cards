@@ -1,4 +1,5 @@
 ---
+import { api } from '@/constants';
 import { updateRarity } from '@lil-indigestion-cards/core/card';
 
 const rarityId = Astro.url.searchParams.get('rarityId');
@@ -25,7 +26,7 @@ await updateRarity({
 		hx-select=".save-button"
 		hx-swap="outerHTML"
 		hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-		hx-get={`/api/html/rarity/start-edit`}>
+		hx-get={api.RARITY.START_EDIT}>
 		Saved
 	</button>
 </body>

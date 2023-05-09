@@ -1,7 +1,7 @@
 ---
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import { Icon } from 'astro-icon';
-import { routes } from '@/constants';
+import { api, routes } from '@/constants';
 
 export interface Props {
 	class?: string;
@@ -40,7 +40,11 @@ const actionLinks = [
 							font-heading font-extrabold rounded-2xl relative transition-transform 
 							hover:scale-105 shine text-shadow">
 						{actionLink.count ? (
-							<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
+							<span
+								class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow"
+								hx-get={api.PACK.GET_TOTAL_PACK_COUNT}
+								hx-trigger="refreshCount from:body"
+								hx-swap="innerHTML transition:false">
 								{packs.length}
 							</span>
 						) : null}

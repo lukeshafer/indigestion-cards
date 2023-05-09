@@ -32,6 +32,7 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 };
 
 const appendText: MiddlewareResponseHandler = async (ctx, next) => {
+	// only run this middleware if the request is for an HTML Endpoint
 	if (!ctx.url.pathname.startsWith(HTML_API_PATH)) return next();
 	const response = await next();
 	if (response.headers.get('content-type') !== 'text/html') return response;

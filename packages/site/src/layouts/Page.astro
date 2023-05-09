@@ -20,14 +20,12 @@ export interface Props extends BaseProps {
 
 const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 
-const alert = Astro.url.searchParams.get('alert');
+const alert = Astro.url.searchParams.get('alert') || Astro.request.headers.get('MY-ALERT');
 const alertType =
-	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error';
-const alertColor =
-	{
-		success: 'bg-green-200',
-		error: 'bg-red-200',
-	}[alertType] ?? 'bg-red-200';
+	Astro.url.searchParams.get('alertType') ??
+	Astro.url.searchParams.get('type') ??
+	Astro.request.headers.get('MY-ALERT-TYPE') ??
+	'error';
 ---
 
 <Base {...baseProps}>
@@ -59,7 +57,13 @@ const alertColor =
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<div id="alert-wrapper">
-				{alert ? <div class={`p-4 ${alertColor}`}>{alert}</div> : null}
+				{
+					alert ? (
+						<p class="alert-text-box" data-type={alertType}>
+							{alert}
+						</p>
+					) : null
+				}
 			</div>
 			<main
 				class={(className ?? '') +
@@ -116,8 +120,14 @@ const alertColor =
 
 <script>
 	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
+	document.body.addEventListener('clearAlert', () => {
+		alertWrapper.replaceChildren();
+	});
+
 	document.body.addEventListener('displayAlert', (e) => {
+		// @ts-expect-error - this does exist
 		const text = e.detail.message;
+		// @ts-expect-error - this one too
 		const type = e.detail.type ?? 'error';
 
 		const alert = document.createElement('p');

@@ -3,6 +3,7 @@ import { updatePackUser } from '@lil-indigestion-cards/core/pack';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { getUserByUserName } from '@lil-indigestion-cards/core/user';
 import { getPackById } from '@lil-indigestion-cards/core/card';
+import { api } from '@/constants';
 
 const packId = Astro.url.searchParams.get('packId');
 const username = Astro.url.searchParams.get('username');
@@ -59,7 +60,7 @@ if (pack.username !== username) {
 			username,
 			packId,
 		})}
-		hx-get={`/api/html/pack/start-edit`}>
+		hx-get={api.PACK.START_EDIT}>
 		Saved
 	</button>
 </body>
