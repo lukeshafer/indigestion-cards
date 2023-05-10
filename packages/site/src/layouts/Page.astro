@@ -33,7 +33,7 @@ const alertType =
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
-		<div class="md:col-start-2 overflow-y-scroll relative">
+		<div class="md:col-start-2 overflow-y-scroll relative" id="page-scroll-wrapper">
 			<header
 				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
 				hx-disable>
@@ -53,10 +53,7 @@ const alertType =
 				</a>
 				<UserSearch />
 			</header>
-			<div class="flex-1">
-				<Breadcrumbs path={breadcrumbs ?? []} />
-			</div>
-			<div id="alert-wrapper">
+			<div id="alert-wrapper" class="sticky top-0">
 				{
 					alert ? (
 						<p class="alert-text-box" data-type={alertType}>
@@ -64,6 +61,9 @@ const alertType =
 						</p>
 					) : null
 				}
+			</div>
+			<div class="flex-1">
+				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
 				class={(className ?? '') +
@@ -142,6 +142,15 @@ const alertType =
 		alert.classList.add('alert-text-box');
 		alert.dataset.type = type;
 		alert.textContent = text;
+		const closeBtn = document.createElement('button');
+		closeBtn.textContent = 'x';
+		closeBtn.addEventListener('click', () => {
+			alertWrapper.replaceChildren();
+		});
+		alert.appendChild(closeBtn);
 		alertWrapper.replaceChildren(alert);
+
+		// scroll to top
+		document.getElementById('page-scroll-wrapper')?.scrollTo(0, 0);
 	});
 </script>

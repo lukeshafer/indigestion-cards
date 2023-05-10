@@ -502,6 +502,13 @@
 		padding: 1rem;
 		background-color: var(--red-2);
 		color: var(--red-12);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.alert-text-box button {
+		font-size: 1.2em;
 	}
 
 	.alert-text-box[data-type="error"] {

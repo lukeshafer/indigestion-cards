@@ -1,0 +1,75 @@
+---
+import { api } from '@/constants';
+const seasonId = Astro.url.searchParams.get('seasonId');
+const seasonName = Astro.url.searchParams.get('seasonName');
+const seasonDescription = Astro.url.searchParams.get('seasonDescription');
+
+if (!seasonId)
+	return new Response('No seasonId provided', {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					message: 'No seasonId provided',
+					type: 'error',
+				},
+			}),
+		},
+	});
+if (!seasonName)
+	return new Response('No seasonName provided', {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					message: 'No seasonName provided',
+					type: 'error',
+				},
+			}),
+		},
+	});
+if (!seasonDescription)
+	return new Response('No seasonDescription provided', {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					message: 'No seasonDescription provided',
+					type: 'error',
+				},
+			}),
+		},
+	});
+---
+
+<body>
+	<button
+		class="post-button"
+		data-type="submit"
+		hx-include="[data-season-info]"
+		hx-swap="outerHTML transition:false"
+		hx-vals={JSON.stringify({ seasonId })}
+		hx-patch={api.SEASON.UPDATE}>
+		Save
+	</button>
+	<input
+		class="my-form-input w-max page-heading"
+		id="season-name"
+		data-season-info
+		name="seasonName"
+		type="text"
+		value={seasonName}
+		hx-swap-oob="true"
+		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+	/>
+	<input
+		class="my-form-input text-lg"
+		id="season-description"
+		data-season-info
+		name="seasonDescription"
+		type="text"
+		value={seasonDescription}
+		hx-swap-oob="true"
+		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+	/>
+</body>

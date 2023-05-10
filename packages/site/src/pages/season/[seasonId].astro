@@ -5,7 +5,6 @@ import {
 	getPackTypesBySeasonId,
 	getSeasonAndDesignsBySeasonId,
 } from '@lil-indigestion-cards/core/card';
-import PostButton from '@/components/form/PostButton.astro';
 import { api, routes } from '@/constants';
 
 const id = Astro.params.seasonId;
@@ -59,12 +58,19 @@ const breadcrumbs = [
 ---
 
 <Page title={season.seasonName} class="flex flex-col gap-4" breadcrumbs={breadcrumbs}>
-	<h1 class="page-heading">{season.seasonName}</h1>
-	{
-		season.seasonDescription ? (
-			<p class="text-lg">Description: {season.seasonDescription}</p>
-		) : null
-	}
+	<header>
+		<div class="page-header">
+			<h1 class="page-heading" id="season-name">{season.seasonName}</h1>
+			<button
+				class="post-button"
+				data-type="submit"
+				hx-swap="outerHTML transition:false"
+				hx-get={api.SEASON.START_EDIT}
+				hx-vals={JSON.stringify(season)}>Edit</button
+			>
+		</div>
+		<p class="text-lg" id="season-description">{season.seasonDescription || ''}</p>
+	</header>
 
 	<section class="text-lg">
 		<h2 class="sub-heading">Stats:</h2>
@@ -90,12 +96,13 @@ const breadcrumbs = [
 	<h2 class="sub-heading">Cards:</h2>
 	<CardList cards={cardDesigns} />
 
-	<PostButton
-		id="delete-season"
-		type="delete"
-		label="Delete Season"
-		url={`${api.DELETE_CARD_SEASON}/${id}?redirect=${routes.SEASONS}`}
-	/>
+	<button
+		class="post-button z-10 w-max"
+		hx-delete={api.SEASON.DELETE}
+		hx-swap="none"
+		hx-vals={JSON.stringify(season)}
+		data-type="delete">Delete Season<form-indicator></form-indicator></button
+	>
 </Page>
 
 <script>
