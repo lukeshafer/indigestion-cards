@@ -48,7 +48,7 @@ export function API({ app, stack }: StackContext) {
 				'packages/functions/src/admin-api/delete-card-design.handler',
 			'POST /delete-card-season/{id}':
 				'packages/functions/src/admin-api/delete-card-season.handler',
-			'POST /delete-unmatched-image':
+			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			'POST /delete-rarity/{id}': 'packages/functions/src/admin-api/delete-rarity.handler',
 			'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
@@ -60,6 +60,8 @@ export function API({ app, stack }: StackContext) {
 				'packages/functions/src/admin-api/get-all-channel-point-rewards.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			'POST /update-rarity': 'packages/functions/src/admin-api/update-rarity.handler',
+			'DELETE /delete-rarity-frame':
+				'packages/functions/src/admin-api/delete-rarity-frame.handler',
 		},
 		defaults: {
 			function: {

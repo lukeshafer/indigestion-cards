@@ -29,7 +29,7 @@ const alertType =
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="morphdom transition:true">
+	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="true transition:true">
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -53,15 +53,7 @@ const alertType =
 				</a>
 				<UserSearch />
 			</header>
-			<div id="alert-wrapper" class="sticky top-0">
-				{
-					alert ? (
-						<p class="alert-text-box" data-type={alertType}>
-							{alert}
-						</p>
-					) : null
-				}
-			</div>
+			<div id="alert-wrapper" class="sticky top-0"></div>
 			<div class="flex-1">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
@@ -120,8 +112,24 @@ const alertType =
 
 <script>
 	window.onload = () => {
-		// remove alert and alertType from url search params
 		const url = new URL(window.location.href);
+
+		// Check for alert in url search params
+		const alert = url.searchParams.get('alert');
+		const alertType = url.searchParams.get('alertType') ?? url.searchParams.get('type');
+		// call displayAlert event if alert exists
+		if (alert) {
+			document.body.dispatchEvent(
+				new CustomEvent('displayAlert', {
+					detail: {
+						message: alert,
+						type: alertType,
+					},
+				})
+			);
+		}
+
+		// remove alert and alertType from url search params
 		url.searchParams.delete('alert');
 		url.searchParams.delete('alertType');
 		window.history.replaceState({}, '', url);

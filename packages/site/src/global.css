@@ -320,6 +320,15 @@
 	to { transform: translateX(-90px); }
 }
 
+@keyframes grow {
+	from { transform: scaleY(0); }
+	to { transform: scaleY(1); }
+}
+
+@keyframes shrink {
+	from { transform: scaleY(1); }
+	to { transform: scaleY(0); }
+}
 
 @layer components {
 	.slide-it {
@@ -505,6 +514,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+
+		view-transition-name: alert-grow-shrink;
 	}
 
 	.alert-text-box button {
@@ -521,6 +532,14 @@
 		color: var(--teal-12);
 	}
 
+	::view-transition-old(alert-grow-shrink) {
+		transform-origin: top;
+		animation: 500ms cubic-bezier(0.4, 0, 1, 1) both shrink;
+	}
+	::view-transition-new(alert-grow-shrink) {
+		transform-origin: top;
+		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both grow;
+	}
 }
 
 @layer utilities {

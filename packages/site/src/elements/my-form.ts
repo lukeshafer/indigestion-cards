@@ -44,14 +44,6 @@ class MyForm extends HTMLElement {
 			input.value = value;
 		});
 
-		const form = this.querySelector('form') as HTMLFormElement;
-		const loadingSpinner = this.querySelector('[data-loading-spinner]') as HTMLDivElement;
-		form.addEventListener('submit', (e) => {
-			if (e.defaultPrevented) return;
-			form.style.opacity = '0.5';
-			loadingSpinner.style.display = 'flex';
-		});
-
 		const idInputs = this.querySelectorAll('[data-id-from]');
 		idInputs.forEach((input) => {
 			if (!(input instanceof HTMLInputElement)) return;

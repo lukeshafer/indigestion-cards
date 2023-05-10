@@ -34,7 +34,7 @@ if (type !== 'frame' && type !== 'cardDesign')
 	});
 
 const result = await fetch(Api.api.url + '/delete-unmatched-image', {
-	method: 'POST',
+	method: 'DELETE',
 	headers: {
 		authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value ?? ''}`,
 		'Content-Type': 'application/json',

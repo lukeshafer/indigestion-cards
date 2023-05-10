@@ -45,6 +45,8 @@ if (pack.username !== username) {
 		});
 	await updatePackUser({ packId, username, userId });
 }
+
+Astro.response.headers.set('HX-Trigger', 'clearAlert');
 ---
 
 <body>

@@ -17,9 +17,10 @@ if (!id) return new Response('No packId provided', { status: 400 });
 		hx-vals={JSON.stringify({ packId, id })}
 		hx-get={api.PACK.UPDATE_USER}>
 		Save
+		<form-indicator></form-indicator>
 	</button>
 	<input
-		class="my-form-input"
+		class="my-form-input text-center w-max mx-auto"
 		data-username
 		name="username"
 		id={id}
