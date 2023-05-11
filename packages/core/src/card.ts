@@ -451,7 +451,7 @@ export async function getCardDesignAndInstancesById(args: { designId: string }) 
 	return result.data;
 }
 
-export async function deleteCardDesignById(args: { designId: string; seasonId: string }) {
+export async function deleteCardDesignById(args: { designId: string }) {
 	const design = await getCardDesignAndInstancesById(args);
 	if (design.cardInstances.length > 0)
 		return {

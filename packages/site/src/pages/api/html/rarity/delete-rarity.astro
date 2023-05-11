@@ -24,7 +24,6 @@ const deleteFrameResult = await fetch(deleteFrameUrl, {
 	},
 });
 if (!deleteFrameResult.ok) {
-	console.log('deleteFrameUrl', deleteFrameUrl);
 	console.error(deleteFrameResult);
 	return new Response('Failed to delete frame', {
 		status: 500,
@@ -47,7 +46,7 @@ if (!result || !result.success)
 			'HX-Trigger': JSON.stringify({
 				displayAlert: {
 					type: 'error',
-					message: result.error || 'Failed to delete season',
+					message: result.error || 'Failed to delete rarity',
 				},
 			}),
 		},

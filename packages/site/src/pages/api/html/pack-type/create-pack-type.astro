@@ -39,6 +39,7 @@ if (!contents.success)
 
 const { season, designs } = contents;
 
+// @ts-expect-error - it doesn't like description being undefined
 const result = await createPackType({
 	packTypeName: packTypeName!,
 	packTypeId: packTypeId!,
@@ -56,7 +57,7 @@ if (!result.success)
 		headers: { 'HX-Trigger': JSON.stringify({ displayAlert: { message: result.error } }) },
 	});
 
-Astro.response.headers.set('HX-Redirect', `/packType/?alert=Pack%20created!&alertType=success`);
+Astro.response.headers.set('HX-Redirect', `/pack-type/?alert=Pack%20created!&alertType=success`);
 ---
 
 <body></body>

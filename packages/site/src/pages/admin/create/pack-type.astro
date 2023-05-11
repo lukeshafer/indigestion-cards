@@ -1,6 +1,5 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Form from '@/components/form/Form.astro';
 import { api } from '@/constants';
 import { getAllSeasons, getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 
@@ -16,82 +15,87 @@ const cardDesigns = await getAllCardDesigns();
 		{ label: 'Create Pack Type' },
 	]}>
 	<h1 class="page-heading">Create New Pack Type</h1>
-	<Form
-		method="post"
-		action={`${api.CREATE_PACK_TYPE}?redirect=/pack-type`}
-		id="new-pack-type-form">
-		<div class="input-group">
-			<label for="packTypeName">Name</label>
-			<input id="packTypeName" name="packTypeName" type="text" required />
-		</div>
-		<div class="input-group">
-			<label for="packTypeId">Pack Type ID</label>
-			<input
-				id="packTypeId"
-				name="packTypeId"
-				type="text"
-				readonly
-				required
-				data-edit-button
-				data-id-from="packTypeName"
-				pattern="[a-z0-9-]+"
-			/>
-		</div>
-		<div class="input-group">
-			<label for="description">Description</label>
-			<input id="description" name="description" type="text" />
-		</div>
-		<div class="input-group">
-			<label for="cardCountPerPack">Number of cards per pack</label>
-			<input id="cardCountPerPack" name="cardCountPerPack" type="number" required value="5" />
-		</div>
-		<div class="input-group">
-			<label for="category">Card pool</label>
-			<select id="category" name="category" required>
-				<option value="season">Season</option>
-				<option value="custom">Custom</option>
-			</select>
-		</div>
-		<div class="input-group season-input-group">
-			<label for="season" class="required">Season</label>
-			<select id="season" name="season">
-				<option value="">--</option>
+	<my-form>
+		<form method="post" action={api.PACK_TYPE.CREATE} id="new-pack-type-form" hx-swap="none">
+			<div class="input-group">
+				<label for="packTypeName">Name</label>
+				<input id="packTypeName" name="packTypeName" type="text" required />
+			</div>
+			<div class="input-group">
+				<label for="packTypeId">Pack Type ID</label>
+				<input
+					id="packTypeId"
+					name="packTypeId"
+					type="text"
+					readonly
+					required
+					data-edit-button
+					data-id-from="packTypeName"
+					pattern="[a-z0-9-]+"
+				/>
+			</div>
+			<div class="input-group">
+				<label for="description">Description</label>
+				<input id="description" name="description" type="text" />
+			</div>
+			<div class="input-group">
+				<label for="cardCountPerPack">Number of cards per pack</label>
+				<input
+					id="cardCountPerPack"
+					name="cardCountPerPack"
+					type="number"
+					required
+					value="5"
+				/>
+			</div>
+			<div class="input-group">
+				<label for="category">Card pool</label>
+				<select id="category" name="category" required>
+					<option value="season">Season</option>
+					<option value="custom">Custom</option>
+				</select>
+			</div>
+			<div class="input-group season-input-group">
+				<label for="season" class="required">Season</label>
+				<select id="season" name="season">
+					<option value="">--</option>
+					{
+						seasons.map((season) => (
+							<option
+								value={JSON.stringify({
+									seasonId: season.seasonId,
+									seasonName: season.seasonName,
+								})}>
+								{season.seasonName}
+							</option>
+						))
+					}
+				</select>
+			</div>
+			<fieldset class="card-input-group" hidden>
+				<input name="cardDesigns" type="hidden" value="[]" />
+				<legend>Cards</legend>
 				{
-					seasons.map((season) => (
-						<option
-							value={JSON.stringify({
-								seasonId: season.seasonId,
-								seasonName: season.seasonName,
-							})}>
-							{season.seasonName}
-						</option>
+					cardDesigns.map((cardDesign) => (
+						<div>
+							<input
+								id={cardDesign.designId}
+								name={cardDesign.designId}
+								type="checkbox"
+								value={cardDesign.designId}
+								title={cardDesign.cardName}
+								data-src={cardDesign.imgUrl}
+							/>
+							<label class="checkbox-label" for={cardDesign.designId}>
+								{cardDesign.cardName}
+							</label>
+						</div>
 					))
 				}
-			</select>
-		</div>
-		<fieldset class="card-input-group" hidden>
-			<input name="cardDesigns" type="hidden" value="[]" />
-			<legend>Cards</legend>
-			{
-				cardDesigns.map((cardDesign) => (
-					<div>
-						<input
-							id={cardDesign.designId}
-							name={cardDesign.designId}
-							type="checkbox"
-							value={cardDesign.designId}
-							title={cardDesign.cardName}
-							data-src={cardDesign.imgUrl}
-						/>
-						<label class="checkbox-label" for={cardDesign.designId}>
-							{cardDesign.cardName}
-						</label>
-					</div>
-				))
-			}
-		</fieldset>
-		<button type="submit">Save</button>
-	</Form>
+			</fieldset>
+			<button type="submit">Save</button>
+		</form>
+	</my-form>
 </Page>
 
 <script>

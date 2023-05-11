@@ -19,13 +19,6 @@ export interface Props extends BaseProps {
 }
 
 const { class: className, breadcrumbs, ...baseProps } = Astro.props;
-
-const alert = Astro.url.searchParams.get('alert') || Astro.request.headers.get('MY-ALERT');
-const alertType =
-	Astro.url.searchParams.get('alertType') ??
-	Astro.url.searchParams.get('type') ??
-	Astro.request.headers.get('MY-ALERT-TYPE') ??
-	'error';
 ---
 
 <Base {...baseProps}>

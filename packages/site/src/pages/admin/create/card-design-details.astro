@@ -2,7 +2,6 @@
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
 import { api, routes } from '@/constants';
-import CardDesignForm from '@/components/entity-forms/CardDesignForm.astro';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -37,12 +36,64 @@ const rarities = await getAllRarities();
 			>
 		</div>
 
-		<CardDesignForm
-			rarities={rarities}
-			seasons={seasons}
-			key={key}
-			bucket={bucket}
-			action={`${api.CREATE_CARD_DESIGN}?redirect=${routes.DESIGNS}`}
-		/>
+		<my-form>
+			<form action={api.DESIGN.CREATE} method="post" hx-swap="none">
+				<input type="hidden" name="imgUrl" value={imgUrl} />
+				<input type="hidden" name="imageKey" value={key} />
+				<div class="input-group">
+					<label for="season">Season</label>
+					<select name="season" required>
+						{
+							seasons.map(({ seasonId, seasonName }) => (
+								<option value={JSON.stringify({ seasonId, seasonName })}>
+									{seasonName}
+								</option>
+							))
+						}
+					</select>
+				</div>
+				<div class="input-group">
+					<label for="cardName">Card Name</label>
+					<input name="cardName" id="cardName" required />
+				</div>
+				<div class="input-group">
+					<label for="designId">Id</label>
+					<input
+						data-id-from="cardName"
+						data-edit-button
+						name="designId"
+						id="designId"
+						required
+						readonly
+					/>
+				</div>
+				<div class="input-group">
+					<label for="cardDescription">Description</label>
+					<textarea name="cardDescription" required></textarea>
+				</div>
+				<div class="input-group">
+					<label for="artist">Artist</label>
+					<input name="artist" required />
+				</div>
+				<fieldset>
+					<legend>Rarity Details</legend>
+					{
+						rarities.map(({ rarityId, rarityName, defaultCount }) => (
+							<div class="input-group">
+								<label for={`rarity-${rarityId}-count`}>{rarityName}</label>
+								<input
+									title={rarityName + ' Count'}
+									name={`rarity-${rarityId}-count`}
+									type="number"
+									required
+									value={defaultCount}
+								/>
+							</div>
+						))
+					}
+				</fieldset>
+				<button type="submit">Save</button>
+			</form>
+		</my-form>
 	</div>
 </Page>

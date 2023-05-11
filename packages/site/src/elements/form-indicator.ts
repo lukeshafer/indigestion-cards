@@ -19,6 +19,11 @@ stylesheet.replaceSync(css`
 		align-items: center;
 		color: black;
 	}
+
+	.loading-text {
+		text-align: center;
+		width: max-content;
+	}
 `);
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
@@ -32,7 +37,8 @@ export class FormIndicator extends HTMLElement {
 		this.ariaHidden = 'true';
 
 		this.classList.add('htmx-indicator');
-		const loadingText = this.getAttribute('loadingText') || 'Saving';
+		const loadingText = this.textContent || this.getAttribute('loadingText') || 'Saving';
+		this.textContent = '';
 		const templateClone = template.content.cloneNode(true) as DocumentFragment;
 		templateClone.querySelector('.loading-text')!.textContent = loadingText;
 		this.append(templateClone);

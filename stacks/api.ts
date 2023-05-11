@@ -62,6 +62,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /update-rarity': 'packages/functions/src/admin-api/update-rarity.handler',
 			'DELETE /delete-rarity-frame':
 				'packages/functions/src/admin-api/delete-rarity-frame.handler',
+			'DELETE /delete-card-image':
+				'packages/functions/src/admin-api/delete-card-image.handler',
 		},
 		defaults: {
 			function: {

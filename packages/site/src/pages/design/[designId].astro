@@ -1,5 +1,4 @@
 ---
-import PostButton from '@/components/form/PostButton.astro';
 import Page from '@/layouts/Page.astro';
 import TradingCard from '@/components/TradingCard.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
@@ -90,12 +89,18 @@ const instancesByRarity = cardInstances.reduce((acc, instance) => {
 			}
 		</ul>
 	</section>
-	<PostButton
-		type="delete"
-		id="delete-design-form"
-		url={`${api.DELETE_CARD_DESIGN}/${designId}?redirect=${routes.DESIGNS}`}
-		label="Delete Card"
-	/>
+	<button
+		class="post-button w-max"
+		data-type="delete"
+		hx-delete={api.DESIGN.DELETE}
+		hx-vals={JSON.stringify({
+			designId: design.designId,
+			imgUrl: design.imgUrl,
+			cardName: design.cardName,
+		})}>
+		Delete Card
+		<form-indicator>Deleting</form-indicator>
+	</button>
 </Page>
 
 <script>
