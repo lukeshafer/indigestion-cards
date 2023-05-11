@@ -11,7 +11,7 @@ export function Sites({ stack }: StackContext) {
 	const { api, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
-	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN } = use(ConfigStack);
+	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN, STREAMER_USER_ID } = use(ConfigStack);
 
 	const baseDomain = getDomainName(stack.stage);
 

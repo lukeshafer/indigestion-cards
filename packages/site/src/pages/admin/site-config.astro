@@ -2,8 +2,18 @@
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { Api } from 'sst/node/api';
+import { AUTH_TOKEN } from '@/constants';
 
 const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
+
+const channelPointResponse = await fetch(`${Api.api.url}/get-all-channel-point-rewards`, {
+	headers: {
+		Authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value || ''}`,
+	},
+});
+console.log(channelPointResponse);
+console.log(await channelPointResponse.text());
 
 // this is a sample of the data returned from the api
 const rawRewards = [
