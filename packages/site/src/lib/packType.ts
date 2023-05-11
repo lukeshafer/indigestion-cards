@@ -18,34 +18,10 @@ const cardDesignsSchema = z.array(
 	})
 );
 
-export function validatePackType(
-	options: {
-		packTypeName: string | null;
-		packTypeId: string | null;
-		description: string | null;
-		cardCountPerPack: string | null;
-		category: string | null;
-		season: string | null;
-		cardDesigns: string | null;
-	},
-	errorList: string[]
-) {
-	if (!options.packTypeName) errorList.push('Missing packTypeName.');
-	if (!options.packTypeId) errorList.push('Missing packTypeId.');
-	if (!options.cardCountPerPack || !Number(options.cardCountPerPack))
-		errorList.push('Missing cardCountPerPack.');
-	if (!options.category) errorList.push('Missing category.');
-	if (options.category === 'season' && !options.season) errorList.push('Missing season.');
-	if (options.category === 'custom' && !options.cardDesigns)
-		errorList.push('Missing cardDesigns.');
-	if (errorList.length) return false;
-	return true;
-}
-
 export function getPackTypeContents(options: {
 	category: string;
-	season?: string;
-	cardDesigns?: string;
+	season?: string | null;
+	cardDesigns?: string | null;
 }):
 	| { success: false; error: string }
 	| { success: true; season?: Season; designs?: CardDesignElement[] } {

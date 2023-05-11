@@ -1,7 +1,6 @@
 ---
-import { z } from 'astro/zod';
 import { createPackType } from '@lil-indigestion-cards/core/card';
-import { type Category, getPackTypeContents, validatePackType } from '@/lib/packType';
+import { type Category, getPackTypeContents } from '@/lib/packType';
 
 const params = new URLSearchParams(await Astro.request.text());
 
@@ -10,11 +9,52 @@ const packTypeId = params.get('packTypeId');
 const description = params.get('description');
 const cardCountPerPack = params.get('cardCountPerPack');
 const category = params.get('category') as Category;
-const season = params.get('season');
+const seasonString = params.get('season');
 const cardDesigns = params.get('cardDesigns');
 
 const errorList: string[] = [];
 
+if (!packTypeName) errorList.push('Missing packTypeName.');
+if (!packTypeId) errorList.push('Missing packTypeId.');
+if (!cardCountPerPack || !Number(cardCountPerPack)) errorList.push('Missing cardCountPerPack.');
+if (!category) errorList.push('Missing category.');
+if (category === 'season' && !seasonString) errorList.push('Missing season.');
+if (category === 'custom' && !cardDesigns) errorList.push('Missing cardDesigns.');
+if (errorList.length)
+	return new Response(errorList.join(' '), {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: { message: errorList.join(' ') },
+			}),
+		},
+	});
+
+const contents = getPackTypeContents({ category, season: seasonString, cardDesigns });
+if (!contents.success)
+	return new Response(contents.error, {
+		status: 400,
+		headers: { 'HX-Trigger': JSON.stringify({ displayAlert: { message: contents.error } }) },
+	});
+
+const { season, designs } = contents;
+
+const result = await createPackType({
+	packTypeName: packTypeName!,
+	packTypeId: packTypeId!,
+	packTypeDescription: description || undefined,
+	cardCount: Number(cardCountPerPack!),
+	packTypeCategory: category!,
+	seasonId: season?.seasonId,
+	seasonName: season?.seasonName,
+	designs: designs || undefined,
+});
+
+if (!result.success)
+	return new Response(result.error, {
+		status: 400,
+		headers: { 'HX-Trigger': JSON.stringify({ displayAlert: { message: result.error } }) },
+	});
 
 Astro.response.headers.set('HX-Redirect', `/packType/?alert=Pack%20created!&alertType=success`);
 ---
