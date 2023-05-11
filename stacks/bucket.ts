@@ -1,10 +1,11 @@
-import { StackContext, Bucket, use } from 'sst/constructs'
-import { Database } from './database'
+import { StackContext, Bucket, use } from 'sst/constructs';
+import { Database } from './database';
 
 export function DesignBucket({ stack }: StackContext) {
-	const db = use(Database)
+	const db = use(Database);
 
 	const cardDesignBucket = new Bucket(stack, 'CardDesigns', {
+		blockPublicACLs: true,
 		notifications: {
 			fileUploaded: {
 				function: 'packages/functions/src/s3/handle-image-upload.handler',
@@ -15,9 +16,10 @@ export function DesignBucket({ stack }: StackContext) {
 				bind: [db],
 			},
 		},
-	})
+	});
 
 	const frameBucket = new Bucket(stack, 'FrameDesigns', {
+		blockPublicACLs: true,
 		notifications: {
 			fileUploaded: {
 				function: 'packages/functions/src/s3/handle-frame-upload.handler',
@@ -28,7 +30,7 @@ export function DesignBucket({ stack }: StackContext) {
 				bind: [db],
 			},
 		},
-	})
+	});
 
-	return { cardDesignBucket, frameBucket }
+	return { cardDesignBucket, frameBucket };
 }
