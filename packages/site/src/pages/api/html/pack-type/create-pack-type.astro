@@ -1,0 +1,22 @@
+---
+import { z } from 'astro/zod';
+import { createPackType } from '@lil-indigestion-cards/core/card';
+import { type Category, getPackTypeContents, validatePackType } from '@/lib/packType';
+
+const params = new URLSearchParams(await Astro.request.text());
+
+const packTypeName = params.get('packTypeName');
+const packTypeId = params.get('packTypeId');
+const description = params.get('description');
+const cardCountPerPack = params.get('cardCountPerPack');
+const category = params.get('category') as Category;
+const season = params.get('season');
+const cardDesigns = params.get('cardDesigns');
+
+const errorList: string[] = [];
+
+
+Astro.response.headers.set('HX-Redirect', `/packType/?alert=Pack%20created!&alertType=success`);
+---
+
+<body></body>
