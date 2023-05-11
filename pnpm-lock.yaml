@@ -14,8 +14,8 @@ importers:
         specifier: 10.1.156
         version: 10.1.156
       sst:
-        specifier: 2.7.2
-        version: 2.7.2
+        specifier: 2.8.17
+        version: 2.8.17
       typescript:
         specifier: ^5.0.3
         version: 5.0.3
@@ -39,8 +39,8 @@ importers:
         specifier: ^18.15.11
         version: 18.15.11
       sst:
-        specifier: 2.7.2
-        version: 2.7.2
+        specifier: 2.8.17
+        version: 2.8.17
       vitest:
         specifier: ^0.29.8
         version: 0.29.8
@@ -67,8 +67,8 @@ importers:
         specifier: ^2.1348.0
         version: 2.1348.0
       sst:
-        specifier: 2.7.2
-        version: 2.7.2
+        specifier: 2.8.17
+        version: 2.8.17
 
   packages/site:
     dependencies:
@@ -97,8 +97,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       astro-sst:
-        specifier: 2.7.2
-        version: 2.7.2
+        specifier: 2.8.17
+        version: 2.8.17
       aws-sdk:
         specifier: ^2.1357.0
         version: 2.1357.0
@@ -121,8 +121,8 @@ importers:
         specifier: ^1.7.3
         version: 1.7.3
       sst:
-        specifier: 2.7.2
-        version: 2.7.2
+        specifier: 2.8.17
+        version: 2.8.17
       tailwindcss:
         specifier: ^3.3.1
         version: 3.3.1(postcss@8.4.23)
@@ -239,12 +239,6 @@ packages:
       which-pm-runs: 1.1.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /@astrojs/webapi@2.1.0:
-    resolution: {integrity: sha512-sbF44s/uU33jAdefzKzXZaENPeXR0sR3ptLs+1xp9xf5zIBhedH2AfaFB5qTEv9q5udUVoKxubZGT3G1nWs6rA==}
-    dependencies:
-      undici: 5.20.0
     dev: false
 
   /@astrojs/webapi@2.1.1:
@@ -3391,10 +3385,10 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /astro-sst@2.7.2:
-    resolution: {integrity: sha512-yl5I34RphhL27w6tl5dwDtkB67UgXMckcDsLA3sBSAPKqxwcQMZ2YQov7tgt1eti8tGho4trLa1in2W6QoZnpg==}
+  /astro-sst@2.8.17:
+    resolution: {integrity: sha512-b1rPkDyf2ed+0oSy2gvxzQ6ORkTIT7LonTVSNkg97HBQF75g5h7SK2WjRGlJmbQ1QL3+AN6LNoahk1c+snpffQ==}
     dependencies:
-      '@astrojs/webapi': 2.1.0
+      '@astrojs/webapi': 2.1.1
     dev: false
 
   /astro@2.4.4:
@@ -5431,8 +5425,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /kysely-codegen@0.9.0(kysely@0.23.5):
-    resolution: {integrity: sha512-VCkrEY0WPwObvT4LGJkwLn29DXmvwG2oAv94qa+yAXDPAWtYTfO8NQSqyeEiNHEWmuKI+Sl+ANSn63by2Xn1tw==}
+  /kysely-codegen@0.10.0(kysely@0.23.5):
+    resolution: {integrity: sha512-EV2v9yr9N9WrUPrURvFl5FPTtz39npsi1p1tLpJwEcFeOAKAPJruBpAASvnZWdqu5Pw/aaTssStE3qcI2sfxMQ==}
     hasBin: true
     peerDependencies:
       better-sqlite3: '>=7.6.2'
@@ -5453,8 +5447,8 @@ packages:
       micromatch: 4.0.5
       minimist: 1.2.8
 
-  /kysely-data-api@0.2.0(@aws-sdk/client-rds-data@3.303.0)(kysely@0.23.5):
-    resolution: {integrity: sha512-Jkuqoxs8XInYeUnKDFKraA1lmuW8flY5hse59EmFIKbWDv0diRjkthCrc21egEwpfqVmLYq0/zj+SWWrH8a0hw==}
+  /kysely-data-api@0.2.1(@aws-sdk/client-rds-data@3.303.0)(kysely@0.23.5):
+    resolution: {integrity: sha512-KmASvF1gmjVqyU9WOUXhCQlv29ofR+xc2DhjaIomz1+Bjd/VtR2/3g4ZuXwG1L4lWGKxMuo5iOvK3XyPbB4LdQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': 3.x
       kysely: 0.x
@@ -7295,8 +7289,8 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.7.2:
-    resolution: {integrity: sha512-T7v7lvMUWy6G2o98H77JD8EWvAgvrDE5docIGKLbDdxzhjdYeTG8Cni2xKWc4FzFB1BsuPEJ4GlZb3CeglHlMQ==}
+  /sst@2.8.17:
+    resolution: {integrity: sha512-WP4fiWVQ1GMRqV3h7trbNfEBP0zwQn0lJCgKZrEVtPGfZT+Zj3fPzKrhV4PVHRklkj8H5qneATGjwvx8qGlJ/g==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0
@@ -7352,8 +7346,8 @@ packages:
       ink: 4.1.0(react@18.2.0)
       ink-spinner: 5.0.0(ink@4.1.0)(react@18.2.0)
       kysely: 0.23.5
-      kysely-codegen: 0.9.0(kysely@0.23.5)
-      kysely-data-api: 0.2.0(@aws-sdk/client-rds-data@3.303.0)(kysely@0.23.5)
+      kysely-codegen: 0.10.0(kysely@0.23.5)
+      kysely-data-api: 0.2.1(@aws-sdk/client-rds-data@3.303.0)(kysely@0.23.5)
       minimatch: 6.2.0
       openid-client: 5.4.0
       ora: 6.3.0
@@ -7361,7 +7355,7 @@ packages:
       remeda: 1.9.4
       sst-aws-cdk: 2.62.2-3
       tree-kill: 1.2.2
-      undici: 5.21.2
+      undici: 5.22.0
       uuid: 9.0.0
       ws: 8.13.0
       yargs: 17.7.1
@@ -7803,25 +7797,11 @@ packages:
   /ultron@1.1.1:
     resolution: {integrity: sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og==}
 
-  /undici@5.20.0:
-    resolution: {integrity: sha512-J3j60dYzuo6Eevbawwp1sdg16k5Tf768bxYK4TUJRH7cBM4kFCbf3mOnM/0E3vQYXvpxITbbWmBafaDbxLDz3g==}
-    engines: {node: '>=12.18'}
-    dependencies:
-      busboy: 1.6.0
-    dev: false
-
-  /undici@5.21.2:
-    resolution: {integrity: sha512-f6pTQ9RF4DQtwoWSaC42P/NKlUjvezVvd9r155ohqkwFNRyBKM3f3pcty3ouusefNRyM25XhIQEbeQ46sZDJfQ==}
-    engines: {node: '>=12.18'}
-    dependencies:
-      busboy: 1.6.0
-
   /undici@5.22.0:
     resolution: {integrity: sha512-fR9RXCc+6Dxav4P9VV/sp5w3eFiSdOjJYsbtWfd4s5L5C4ogyuVpdKIVHeW0vV1MloM65/f7W45nR9ZxwVdyiA==}
     engines: {node: '>=14.0'}
     dependencies:
       busboy: 1.6.0
-    dev: false
 
   /unherit@3.0.1:
     resolution: {integrity: sha512-akOOQ/Yln8a2sgcLj4U0Jmx0R5jpIg2IUyRrWOzmEbjBtGzBdHtSeFKgoEcoH4KYIG/Pb8GQ/BwtYm0GCq1Sqg==}
