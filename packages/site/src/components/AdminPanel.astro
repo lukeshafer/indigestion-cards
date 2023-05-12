@@ -1,12 +1,10 @@
 ---
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import { Icon } from 'astro-icon';
-import { routes } from '@/constants';
-import type { Session } from '@/session';
+import { api, routes } from '@/constants';
 
 export interface Props {
 	class?: string;
-	session: Session;
 }
 
 const currentPage = Astro.url.pathname;
@@ -42,7 +40,11 @@ const actionLinks = [
 							font-heading font-extrabold rounded-2xl relative transition-transform 
 							hover:scale-105 shine text-shadow">
 						{actionLink.count ? (
-							<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
+							<span
+								class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow"
+								hx-get={api.PACK.GET_TOTAL_PACK_COUNT}
+								hx-trigger="refreshCount from:body"
+								hx-swap="innerHTML transition:false">
 								{packs.length}
 							</span>
 						) : null}
@@ -92,12 +94,12 @@ const actionLinks = [
 			</div>
 			<button
 				class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
-				title={Astro.props.session?.properties?.username}>
+				title={Astro.locals.session?.properties.username}>
 				<Icon
 					name="mdi:gear"
 					class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
 				/>
-				{Astro.props.session?.properties?.username}
+				{Astro.locals.session?.properties.username}
 			</button>
 		</div>
 	</nav>

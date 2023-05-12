@@ -1,4 +1,5 @@
 ---
+import { api } from '@/constants';
 const rarityId = Astro.url.searchParams.get('rarityId');
 const rarityName = Astro.url.searchParams.get('rarityName');
 const defaultCount = Astro.url.searchParams.get('defaultCount');
@@ -16,11 +17,11 @@ if (!defaultCount) return new Response('No defaultCount provided', { status: 400
 		hx-swap="outerHTML"
 		hx-include="[data-rarity-info]"
 		hx-vals={JSON.stringify({ rarityId: rarityId })}
-		hx-get={`/api/html/rarity/update-rarity`}>
+		hx-get={api.RARITY.UPDATE}>
 		Save
 	</button>
 	<input
-		class="my-form-input"
+		class="my-form-input w-max text-center"
 		id={`rarityName-${rarityId}`}
 		data-rarity-info
 		name="rarityName"
@@ -30,7 +31,7 @@ if (!defaultCount) return new Response('No defaultCount provided', { status: 400
 		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
 	/>
 	<input
-		class="my-form-input"
+		class="my-form-input w-max text-center"
 		id={`defaultCount-${rarityId}`}
 		data-rarity-info
 		name="defaultCount"

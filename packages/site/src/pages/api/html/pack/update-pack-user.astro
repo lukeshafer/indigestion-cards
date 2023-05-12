@@ -1,11 +1,9 @@
 ---
 import { updatePackUser } from '@lil-indigestion-cards/core/pack';
-import { useAdmin } from '@/session';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { getUserByUserName } from '@lil-indigestion-cards/core/user';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/');
+import { getPackById } from '@lil-indigestion-cards/core/card';
+import { api } from '@/constants';
 
 const packId = Astro.url.searchParams.get('packId');
 const username = Astro.url.searchParams.get('username');
@@ -24,10 +22,31 @@ if (!id) {
 	return new Response('Missing id', { status: 400 });
 }
 
-const userId = (await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
-if (!userId) return new Response('User not found', { status: 404 });
+const pack = await getPackById({ packId });
 
-await updatePackUser({ packId, username, userId });
+if (!pack) {
+	console.error('Pack not found');
+	return new Response('Pack not found', { status: 404 });
+}
+
+if (pack.username !== username) {
+	const userId =
+		(await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
+	if (!userId)
+		return new Response('User not found', {
+			status: 404,
+			headers: {
+				'HX-Trigger': JSON.stringify({
+					displayAlert: {
+						message: `Twitch user '${username}' not found`,
+					},
+				}),
+			},
+		});
+	await updatePackUser({ packId, username, userId });
+}
+
+Astro.response.headers.set('HX-Trigger', 'clearAlert');
 ---
 
 <body>
@@ -43,7 +62,7 @@ await updatePackUser({ packId, username, userId });
 			username,
 			packId,
 		})}
-		hx-get={`/api/html/pack/start-edit`}>
+		hx-get={api.PACK.START_EDIT}>
 		Saved
 	</button>
 </body>

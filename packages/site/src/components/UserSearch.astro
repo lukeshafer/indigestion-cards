@@ -6,7 +6,7 @@ import Form from './form/Form.astro';
 <user-search data-api-route={publicApi.GET_ALL_USERNAMES}>
 	<Form method="get" action={publicApi.SEARCH} loadingText="Searching" autocomplete="off">
 		<label class="visually-hidden" for="username">Search Twitch Username</label>
-		<input name="username" data-user-search type="text" placeholder="Search Users" required />
+		<input class="input" name="username" data-user-search type="text" placeholder="Search Users" required />
 		<ul data-results class="brand-shadow no-text-shadow"></ul>
 	</Form>
 </user-search>

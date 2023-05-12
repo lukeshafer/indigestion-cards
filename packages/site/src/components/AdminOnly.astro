@@ -1,13 +1,9 @@
 ---
-import type { Session } from '@/session'
-
 interface Props {
-	session: Session
+	fallback?: any;
 }
 
-const { session } = Astro.props
-
-const isAdmin = session?.type === 'admin'
+const isAdmin = Astro.locals.session?.type === 'admin';
 ---
 
-{isAdmin ? <slot /> : null}
+{isAdmin ? <slot /> : <slot name="fallback" />}

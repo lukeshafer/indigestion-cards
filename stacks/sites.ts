@@ -26,6 +26,7 @@ export function Sites({ stack }: StackContext) {
 			siteAuth,
 			TWITCH_CLIENT_ID,
 			TWITCH_ACCESS_TOKEN,
+			STREAMER_USER_ID,
 		],
 		customDomain: {
 			domainName: baseDomain,

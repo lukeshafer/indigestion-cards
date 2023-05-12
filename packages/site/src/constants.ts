@@ -1,21 +1,56 @@
-export const publicRoutes = ['/', '/user', '/user/*'];
+/** Only routes that are accessible without logging in */
+export const PUBLIC_ROUTES = [
+	'/',
+	'/user',
+	'/user/*',
+	'/404',
+	'/admin',
+	'/api/get-all-usernames',
+	'/api/auth/*',
+] as const;
 
 export const api = {
-	GIVE_PACK_TO_USER: '/api/admin/give-pack-to-user',
-	CREATE_CARD_SEASON: '/api/admin/create-card-season',
-	CREATE_CARD_DESIGN: '/api/admin/create-card-design',
-	CREATE_RARITY: '/api/admin/create-rarity',
-	CREATE_PACK_TYPE: '/api/admin/create-pack-type',
-	DELETE_CARD_DESIGN: '/api/admin/delete-card-design',
-	DELETE_CARD_SEASON: '/api/admin/delete-card-season',
-	DELETE_UNMATCHED_IMAGE: '/api/admin/delete-unmatched-image',
-	DELETE_RARITY: '/api/admin/delete-rarity',
-	CREATE_ADMIN_USER: '/api/admin/create-admin-user',
-	DELETE_ADMIN_USER: '/api/admin/delete-admin-user',
-	REVOKE_PACK: '/api/admin/revoke-pack',
-	OPEN_CARD: '/api/admin/open-card',
-	GET_ALL_PACK_TYPES: '/api/get-all-pack-types',
-	UPDATE_RARITY: '/api/admin/update-rarity',
+	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
+	OPEN_CARD: '/api/html/open-card',
+	IMAGE: {
+		DELETE: '/api/html/image/delete-unmatched-image',
+	},
+	RARITY: {
+		START_EDIT: '/api/html/rarity/start-edit',
+		UPDATE: '/api/html/rarity/update-rarity',
+		CREATE: '/api/html/rarity/create-rarity',
+		DELETE: '/api/html/rarity/delete-rarity',
+	},
+	PACK_TYPE: {
+		GET_ALL: '/api/html/pack-type/get-all-pack-types',
+		CREATE: '/api/html/pack-type/create-pack-type',
+		DELETE: '/api/html/pack-type/delete',
+	},
+	PACK: {
+		CREATE: '/api/html/pack/create-pack',
+		DELETE: '/api/html/pack/delete-pack',
+		GET_PACK_COUNT_FOR_USER: '/api/html/pack/get-pack-count-for-user',
+		GET_TOTAL_PACK_COUNT: '/api/html/pack/get-total-pack-count',
+		START_EDIT: '/api/html/pack/start-edit',
+		UPDATE_USER: '/api/html/pack/update-pack-user',
+	},
+	ADMIN: {
+		CREATE: '/api/html/admin/create-admin',
+		DELETE: '/api/html/admin/delete-admin',
+		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
+	},
+	SEASON: {
+		START_EDIT: '/api/html/season/start-edit',
+		UPDATE: '/api/html/season/update-season',
+		CREATE: '/api/html/season/create-season',
+		DELETE: '/api/html/season/delete-season',
+	},
+	DESIGN: {
+		START_EDIT: '/api/html/design/start-edit',
+		UPDATE: '/api/html/design/update-design',
+		CREATE: '/api/html/design/create-design',
+		DELETE: '/api/html/design/delete-design',
+	},
 } as const;
 
 export const publicApi = {
@@ -63,5 +98,4 @@ export const routes = {
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
-
 export const HTML_API_PATH = '/api/html';

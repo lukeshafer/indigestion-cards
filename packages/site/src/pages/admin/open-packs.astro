@@ -1,23 +1,14 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import TradingCard from '@/components/TradingCard.astro';
-
-const user = useAdmin(Astro.cookies);
-
-if (!user) {
-	return Astro.redirect('/404');
-}
+import { api } from '@/constants';
 
 const allPacks = await getAllPacks();
 const packs = allPacks.filter((pack) => pack.userId && pack.username);
 ---
 
-<Page
-	title="Open Packs"
-	session={user}
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Open Packs' }]}>
+<Page title="Open Packs" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Open Packs' }]}>
 	<div class="grid grid-cols-[auto_1fr]">
 		<h1 class="page-heading">Open Packs</h1>
 		<section class="my-8 bg-[#dde] p-3 col-start-1" id="pack-list">
@@ -25,27 +16,25 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 			<ul class="packs overflow-y-scroll flex flex-col gap-6 relative pb-2 min-h-[20rem]">
 				{
 					packs.map((pack) => (
-						<li data-pack-info={JSON.stringify(pack)} id={pack.packId}>
-							<div
-								data-pack-main
-								class="pack-main flex justify-center gap-2 w-60 bg-brand-main p-2">
+						<li id={pack.packId}>
+							<div class="pack-main flex justify-center gap-2 w-60 bg-brand-main p-2">
 								<button
 									class="text-shadow shine bg-brand-main font-display italic text-white text-xl w-full mx-auto text-center"
-									hx-get={`/api/html/get-pack-to-open?packId=${pack.packId}`}
-									hx-swap="innerHTML transition:true"
+									hx-get={api.GET_PACK_TO_OPEN}
+									hx-vals={JSON.stringify({ packId: pack.packId })}
+									hx-swap="innerHTML"
 									hx-target="#open-showcase">
 									<h3 class="p-2 pb-1 text-center bg-brand-dark">
 										{pack.username}
 									</h3>
 								</button>
 							</div>
-							<div data-pack-placeholder class="pack-drag-placeholder" />
 						</li>
 					))
 				}
 			</ul>
 		</section>
-		<div id="open-showcase" class="slide-it"></div>
+		<div id="open-showcase"></div>
 		<TradingCard isTemplateOnly />
 	</div>
 </Page>
@@ -56,14 +45,6 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 		--scrollbar-color: var(--color-main);
 		--scrollbar-track-color: #dde;
 		scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
-	}
-
-	.pack-drag-placeholder {
-		display: none;
-		border: 0.2rem dashed black;
-		padding: 0.5rem;
-		height: 3rem;
-		width: 100%;
 	}
 
 	#pack-list ul::-webkit-scrollbar {
@@ -84,97 +65,3 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 		filter: brightness(1.5);
 	}
 </style>
-
-{
-	/*<style is:global>
-	li.dragging [data-pack-main] {
-		opacity: 0.5;
-		position: absolute;
-		z-index: 100;
-		top: 0;
-		transform: translateY(var(--mouse-y));
-	}
-
-	li.dragging [data-pack-placeholder] {
-		display: block;
-	}
-</style>*/
-}
-
-<script>
-	import type { getAllPacks } from '@lil-indigestion-cards/core/card';
-	type PackInfo = Awaited<ReturnType<typeof getAllPacks>>[number];
-	type Pack = {
-		element: HTMLLIElement;
-		info: PackInfo;
-	};
-
-	const packList = document.querySelector<HTMLUListElement>('#pack-list ul')!;
-	const packEls = document.querySelectorAll<HTMLLIElement>('#pack-list li');
-
-	const packs = new Map<string, Pack>();
-	let mouseUp = () => {};
-	let currentDraggedPack: HTMLLIElement | null = null;
-
-	for (const pack of packEls) {
-		const packInfo = JSON.parse(pack.dataset.packInfo!) as PackInfo;
-
-		let pressed = false;
-		let dragging = false;
-		let dragTimeout: number;
-		/*const button = pack.querySelector('button')!;
-
-		button.addEventListener('mousedown', (e) => {
-			pressed = true;
-			dragTimeout = window.setTimeout(() => {
-				e.preventDefault();
-				startDrag();
-			}, 200);
-		});
-		button.addEventListener('click', () => {
-			if (dragging) {
-				return;
-			}
-			showcase.currentPack = packs.get(packInfo.packId)!;
-		});*/
-
-		function startDrag() {
-			if (!pressed) return;
-			currentDraggedPack = pack;
-			dragging = true;
-			mouseUp = () => {
-				if (!pressed) return;
-				currentDraggedPack = null;
-				pressed = false;
-				dragging = false;
-				pack.classList.remove('dragging');
-			};
-			pack.classList.add('dragging');
-		}
-
-		packs.set(packInfo.packId, {
-			element: pack,
-			info: packInfo,
-		});
-	}
-
-	document.addEventListener('mouseup', () => {
-		mouseUp();
-	});
-
-	window.addEventListener('mousemove', (e) => {
-		const packListTop = packList.getBoundingClientRect().top;
-		const y = e.clientY - packListTop;
-		document.documentElement.style.setProperty('--mouse-y', `${y - 30}px`);
-
-		if (!currentDraggedPack) return;
-
-		packEls.forEach((pack) => {
-			if (pack === currentDraggedPack || !currentDraggedPack) return;
-			const rect = pack.getBoundingClientRect();
-			if (e.clientY > rect.top && e.clientY < rect.bottom) {
-				packList.insertBefore(currentDraggedPack, pack);
-			}
-		});
-	});
-</script>

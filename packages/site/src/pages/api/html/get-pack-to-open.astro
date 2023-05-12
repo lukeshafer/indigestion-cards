@@ -1,9 +1,7 @@
 ---
-import { useAdmin } from '@/session';
 import { getPackById } from '@lil-indigestion-cards/core/card';
 import TradingCard from '@/components/TradingCard.astro';
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
+import { api } from '@/constants';
 
 const packId = Astro.url.searchParams.get('packId');
 if (!packId) return new Response('PackId Required', { status: 400 });
@@ -26,8 +24,8 @@ if (!pack) return new Response('Pack not found', { status: 404 });
 						class:list={{ flipped: card.opened }}
 						class="relative perspective preserve-3d origin-center duration-500 transition-transform block w-40 h-56">
 						<button
-							data-script="on click add .flipped to the closest parent <div/>"
-							hx-patch="/api/html/open-card"
+							_="on click add .flipped to the closest parent <div/>"
+							hx-patch={api.OPEN_CARD}
 							hx-target="previous p.error-text"
 							hx-swap="outerHTML"
 							hx-vals={JSON.stringify({

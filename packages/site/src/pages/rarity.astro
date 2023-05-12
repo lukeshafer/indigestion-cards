@@ -1,13 +1,8 @@
 ---
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
-import { useAdmin } from '@/session';
 import Page from '@/layouts/Page.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { api, routes } from '@/constants';
-import PostButton from '@/components/form/PostButton.astro';
-
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect('/404');
 
 const rarities = await getAllRarities();
 ---
@@ -15,7 +10,6 @@ const rarities = await getAllRarities();
 <Page
 	title="Rarities"
 	class="flex flex-col gap-4"
-	session={admin}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Rarities', href: routes.RARITIES },
@@ -37,8 +31,8 @@ const rarities = await getAllRarities();
 			</thead>
 			<tbody>
 				{
-					rarities.map(({ rarityName, rarityId, defaultCount }) => (
-						<tr class="text-center">
+					rarities.map(({ rarityName, rarityId, defaultCount, frameUrl }) => (
+						<tr class="text-center relative">
 							<td>
 								<span id={`rarityName-${rarityId}`}>{rarityName}</span>
 							</td>
@@ -55,19 +49,18 @@ const rarities = await getAllRarities();
 									hx-select=".save-button"
 									hx-swap="outerHTML"
 									hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-									hx-get={`/api/html/rarity/start-edit`}>
+									hx-get={api.RARITY.START_EDIT}>
 									Edit
 								</button>
-								<div hx-disable>
-									<PostButton
-										url={`${api.DELETE_RARITY}/${rarityId}`}
-										type="delete"
-										class="w-24"
-										confirm
-										id={`delete-rarity-${rarityId}`}
-										label="Delete"
-									/>
-								</div>
+								<button
+									class="post-button edit-button w-24"
+									data-type="delete"
+									hx-swap="none"
+									hx-vals={JSON.stringify({ rarityId, frameUrl })}
+									hx-delete={api.RARITY.DELETE}>
+									Delete
+									<form-indicator />
+								</button>
 							</td>
 						</tr>
 					))

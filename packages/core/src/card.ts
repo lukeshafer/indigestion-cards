@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -122,18 +122,18 @@ export async function generateCard(info: {
 	const user =
 		info.userId && info.username
 			? (await getUser(info.userId)) ??
-			  (await createNewUser({ userId: info.userId, username: info.username }))
+			(await createNewUser({ userId: info.userId, username: info.username }))
 			: null;
 
 	const result = await db.transaction
 		.write(({ users, cardInstances }) => [
 			...(user && info.userId && info.username
 				? [
-						users
-							.patch({ userId: info.userId })
-							.set({ cardCount: (user.cardCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: info.userId })
+						.set({ cardCount: (user.cardCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 			cardInstances
 				.create({
@@ -211,12 +211,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({ packCount: (user?.packCount || 1) - 1 })
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -261,12 +261,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({ packCount: (user?.packCount || 1) - 1 })
+						.commit(),
+				]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -297,7 +297,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			  (await createNewUser({ userId: args.userId, username: args.username }))
+			(await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
@@ -317,11 +317,11 @@ export async function createPack(args: {
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [
-						users
-							.patch({ userId: args.userId })
-							.set({ packCount: (user.packCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: args.userId })
+						.set({ packCount: (user.packCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 			packs
 				.create({
@@ -451,7 +451,7 @@ export async function getCardDesignAndInstancesById(args: { designId: string }) 
 	return result.data;
 }
 
-export async function deleteCardDesignById(args: { designId: string; seasonId: string }) {
+export async function deleteCardDesignById(args: { designId: string }) {
 	const design = await getCardDesignAndInstancesById(args);
 	if (design.cardInstances.length > 0)
 		return {
@@ -553,6 +553,31 @@ export async function createSeason(
 				success: false,
 				error: 'Season already exists',
 			};
+
+		// default
+		return {
+			success: false,
+			error: err.message,
+		};
+	}
+}
+
+export async function updateSeason(
+	season: UpdateEntityItem<Season> & { seasonId: string }
+): Promise<Result<EntityItem<Season>>> {
+	const { seasonId, seasonName, seasonDescription } = season;
+	try {
+		const result = await db.entities.season
+			.update({ seasonId })
+			.set({ seasonName, seasonDescription })
+			.go();
+		return {
+			success: true,
+			// @ts-ignore
+			data: result.data,
+		};
+	} catch (err) {
+		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` };
 
 		// default
 		return {

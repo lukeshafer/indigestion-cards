@@ -1,0 +1,61 @@
+---
+import { AUTH_TOKEN } from '@/constants';
+import { Api } from 'sst/node/api';
+import { deleteRarityById } from '@lil-indigestion-cards/core/card';
+
+if (Astro.request.method.toUpperCase() !== 'DELETE')
+	return new Response('Method not allowed', { status: 405 });
+
+const body = await Astro.request.text();
+const params = new URLSearchParams(body);
+
+const rarityId = params.get('rarityId');
+const frameUrl = params.get('frameUrl');
+const rarityName = params.get('rarityName');
+if (!rarityId) return new Response('Missing rarity id', { status: 400 });
+if (!frameUrl) return new Response('Missing frame url', { status: 400 });
+
+const deleteFrameUrl = `${Api.api.url}/delete-rarity-frame`;
+const deleteFrameResult = await fetch(deleteFrameUrl, {
+	method: 'DELETE',
+	body: JSON.stringify({ frameUrl }),
+	headers: {
+		authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value ?? ''}`,
+	},
+});
+if (!deleteFrameResult.ok) {
+	console.error(deleteFrameResult);
+	return new Response('Failed to delete frame', {
+		status: 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: 'Failed to delete frame',
+				},
+			}),
+		},
+	});
+}
+
+const result = await deleteRarityById(rarityId);
+if (!result || !result.success)
+	return new Response('Failed to delete rarity', {
+		status: 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: result.error || 'Failed to delete rarity',
+				},
+			}),
+		},
+	});
+
+Astro.response.headers.set(
+	'HX-Redirect',
+	`/rarity?alert=Successfully deleted rarity ${rarityName || rarityId}&alertType=success`
+);
+---
+
+<body></body>

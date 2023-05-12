@@ -1,9 +1,6 @@
 ---
-import { useAdmin } from '@/session';
+import { api } from '@/constants';
 import crypto from 'crypto';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 const token = 'a' + crypto.randomBytes(2).toString('hex');
 ---
 
@@ -22,7 +19,7 @@ const token = 'a' + crypto.randomBytes(2).toString('hex');
 				_="on setCancel set my innerHTML to 'Cancel' on setSave set my innerHTML to 'Save'"
 				class="post-button text-center"
 				data-type="submit"
-				hx-post="/api/html/admin/create-admin"
+				hx-post={api.ADMIN.CREATE}
 				hx-target={`#${token}`}
 				hx-swap="outerHTML"
 				hx-include={`#${token}-username`}>

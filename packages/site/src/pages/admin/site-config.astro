@@ -1,15 +1,13 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import { Api } from 'sst/node/api';
 import { AUTH_TOKEN } from '@/constants';
-
-const user = useAdmin(Astro.cookies);
-if (!user) {
-	return Astro.redirect('/404');
-}
+import { customReward } from '@lil-indigestion-cards/core/twitch-event-schemas';
+import { z } from 'astro/zod';
+import TableSearch from '@/components/TableSearch.astro';
 
 const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
 
@@ -18,58 +16,66 @@ const channelPointResponse = await fetch(`${Api.api.url}/get-all-channel-point-r
 		Authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value || ''}`,
 	},
 });
-console.log(channelPointResponse);
-console.log(await channelPointResponse.text());
 
-// this is a sample of the data returned from the api
-const rawRewards = [
-	{
-		id: '92af127c-7326-4483-a52b-b0da0be61c01',
-		image: null,
-		background_color: '#00E5CB',
-		is_enabled: true,
-		cost: 50000,
-		title: 'Redeem 1 Pack',
-	},
-	{
-		id: '92af127c-7326-4483-a52b-b0da0be61c02',
-		image: null,
-		background_color: '#00E5CB',
-		is_enabled: true,
-		cost: 50000,
-		title: 'Give the dogs a treat.',
-	},
-];
+const body = await channelPointResponse.json();
+const parseResult = z.array(customReward).safeParse(body);
 
-const rewards = rawRewards.map((reward) => {
-	const dbEvent = twitchEvents.data.find((event) => event.eventId === reward.id);
+if (!parseResult.success) {
+	throw new Error(parseResult.error.message);
+}
 
-	return {
-		...reward,
-		packType: JSON.stringify(
-			dbEvent?.packTypeId && dbEvent?.packTypeName
-				? {
-						packTypeId: dbEvent?.packTypeId || '',
-						packTypeName: dbEvent?.packTypeName || '',
-				  }
-				: undefined
-		),
-	};
-});
+const giftSubEvent = twitchEvents.data.find((event) => event.eventId === TWITCH_GIFT_SUB_ID);
+const giftSubPackType =
+	giftSubEvent?.packTypeId && giftSubEvent?.packTypeName
+		? {
+				packTypeId: giftSubEvent?.packTypeId || '',
+				packTypeName: giftSubEvent?.packTypeName || '',
+		  }
+		: undefined;
+
+const rawRewards = parseResult.data;
+
+const rewards = rawRewards
+	.map((reward) => {
+		const dbEvent = twitchEvents.data.find((event) => event.eventId === reward.id);
+
+		return {
+			...reward,
+			packType: JSON.stringify(
+				dbEvent?.packTypeId && dbEvent?.packTypeName
+					? {
+							packTypeId: dbEvent?.packTypeId || '',
+							packTypeName: dbEvent?.packTypeName || '',
+					  }
+					: undefined
+			),
+		};
+	})
+	.filter((reward) => reward.is_enabled)
+	.sort((a, b) => {
+		if (a.packType && !b.packType) return -1;
+		if (!a.packType && b.packType) return 1;
+		if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
+		if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
+		return 0;
+	});
 ---
 
-<Page
-	session={user}
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]}
-	title="Site Config">
+<Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
 	<h1 class="page-heading">Site Config</h1>
 	<section>
-		<header class="page-header">
-			<h2 class="sub-heading">Twitch Channel Point Rewards</h2>
-			<button class="post-button" data-type="submit" data-save hidden>Save</button>
-		</header>
 		<sort-table>
-			<table class="mt-4">
+			<header class="page-header">
+				<h2 class="sub-heading">Twitch Event Rewards</h2>
+				<button class="post-button" data-type="submit" data-save hidden>Save</button>
+				<TableSearch
+					id="rewards-search"
+					tableId="rewards-table"
+					label="Search Rewards"
+					searchColumn="Event"
+				/>
+			</header>
+			<table class="mt-4" id="rewards-table">
 				<thead>
 					<tr>
 						<th class="w-2/3">Event</th>
@@ -77,6 +83,31 @@ const rewards = rawRewards.map((reward) => {
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td>5 Gift Subs</td>
+						<td>
+							<select
+								data-pack-type-select
+								data-id={TWITCH_GIFT_SUB_ID}
+								data-title={'5 Gift Subs'}
+								data-cost="5"
+								data-value={giftSubPackType ? JSON.stringify(giftSubPackType) : ''}
+								class="my-form-input">
+								<option value="">None</option>
+								{
+									packTypes.map(({ packTypeId, packTypeName }) => (
+										<option
+											value={JSON.stringify({
+												packTypeId,
+												packTypeName,
+											})}>
+											{packTypeName}
+										</option>
+									))
+								}
+							</select>
+						</td>
+					</tr>
 					{
 						rewards.map((reward) => (
 							<tr>
@@ -88,7 +119,7 @@ const rewards = rawRewards.map((reward) => {
 										data-title={reward.title}
 										data-cost={reward.cost}
 										data-value={reward.packType}
-										class="my-form-select">
+										class="my-form-input">
 										<option value="">None</option>
 										{packTypes.map(({ packTypeId, packTypeName }) => (
 											<option

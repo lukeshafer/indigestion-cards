@@ -1,10 +1,8 @@
 ---
 import { routes } from '@/constants';
-import type { Session } from '@/session';
 import TradingCard from './TradingCard.astro';
 
 interface Props {
-	session: Session | null;
 	cards: {
 		designId: string;
 		seasonId: string;
@@ -18,7 +16,7 @@ interface Props {
 }
 const { props } = Astro;
 
-const Element = props.session?.type === 'admin' ? 'a' : 'div';
+const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 ---
 
 <ul class="grid justify-start w-full px-3">

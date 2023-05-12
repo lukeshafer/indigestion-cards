@@ -3,7 +3,9 @@ import type { CreateEntityItem } from 'electrodb';
 
 type TwitchEvent = typeof db.entities.twitchEvents;
 
-export async function batchTwitchEvents(options: { events: CreateEntityItem<TwitchEvent>[] }) {
+export async function addBatchTwitchEventsToDb(options: {
+	events: CreateEntityItem<TwitchEvent>[];
+}) {
 	const results = options.events.map(async (event) => {
 		const existingEvent = await db.entities.twitchEvents
 			.get({ eventId: event.eventId })
@@ -35,6 +37,11 @@ export async function batchTwitchEvents(options: { events: CreateEntityItem<Twit
 
 export async function getTwitchEvents() {
 	return await db.entities.twitchEvents.query.byEventId({}).go();
+}
+
+export async function getTwitchEventById(args: { eventId: string }) {
+	const result = await db.entities.twitchEvents.query.byEventId(args).go();
+	return result.data[0];
 }
 
 export function checkIsValidTwitchEventType(

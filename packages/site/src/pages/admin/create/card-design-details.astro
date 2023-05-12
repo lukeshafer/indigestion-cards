@@ -1,25 +1,18 @@
 ---
-import Page from '@/layouts/Page.astro'
-import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card'
-import { useAdmin } from '@/session'
-import PostButton from '@/components/form/PostButton.astro'
-import { api, routes } from '@/constants'
-import CardDesignForm from '@/components/entity-forms/CardDesignForm.astro'
+import Page from '@/layouts/Page.astro';
+import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
+import { api, routes } from '@/constants';
 
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/404')
-
-const bucket = Astro.url.searchParams.get('bucket')
-const key = Astro.url.searchParams.get('key')
+const bucket = Astro.url.searchParams.get('bucket');
+const key = Astro.url.searchParams.get('key');
 
 if (!bucket || !key) {
-	return Astro.redirect('/?alert=Please upload an image first')
+	return Astro.redirect('/?alert=Please upload an image first');
 }
 
-const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`
-const seasons = await getAllSeasons()
-const rarities = await getAllRarities()
-const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGNS}`
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
+const seasons = await getAllSeasons();
+const rarities = await getAllRarities();
 ---
 
 <Page
@@ -29,28 +22,78 @@ const deleteUrl = `${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.DESIGN
 		{ href: routes.DESIGNS, label: 'Designs' },
 		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
 		{ label: 'Details' },
-	]}
-	session={user}>
+	]}>
 	<h1 class="page-heading">Add Card Design</h1>
 	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
-		<div>
+		<div class="relative">
 			<img src={imgUrl} class="w-60 h-auto object-contain mb-4" />
-			<PostButton
-				label="Delete Draft"
-				type="delete"
-				url={deleteUrl}
-				id="delete"
-				hiddenProperties={[{ name: 'type', value: 'cardDesign' }]}
-				]}
-			/>
+			<button
+				class="post-button"
+				hx-delete={api.IMAGE.DELETE}
+				hx-swap="none"
+				hx-vals={JSON.stringify({ key, type: 'cardDesign' })}
+				data-type="delete">Delete Draft<form-indicator></form-indicator></button
+			>
 		</div>
 
-		<CardDesignForm
-			rarities={rarities}
-			seasons={seasons}
-			key={key}
-			bucket={bucket}
-			action={`${api.CREATE_CARD_DESIGN}?redirect=${routes.DESIGNS}`}
-		/>
+		<my-form>
+			<form action={api.DESIGN.CREATE} method="post" hx-swap="none">
+				<input type="hidden" name="imgUrl" value={imgUrl} />
+				<input type="hidden" name="imageKey" value={key} />
+				<div class="input-group">
+					<label for="season">Season</label>
+					<select name="season" required>
+						{
+							seasons.map(({ seasonId, seasonName }) => (
+								<option value={JSON.stringify({ seasonId, seasonName })}>
+									{seasonName}
+								</option>
+							))
+						}
+					</select>
+				</div>
+				<div class="input-group">
+					<label for="cardName">Card Name</label>
+					<input name="cardName" id="cardName" required />
+				</div>
+				<div class="input-group">
+					<label for="designId">Id</label>
+					<input
+						data-id-from="cardName"
+						data-edit-button
+						name="designId"
+						id="designId"
+						required
+						readonly
+					/>
+				</div>
+				<div class="input-group">
+					<label for="cardDescription">Description</label>
+					<textarea name="cardDescription" required></textarea>
+				</div>
+				<div class="input-group">
+					<label for="artist">Artist</label>
+					<input name="artist" required />
+				</div>
+				<fieldset>
+					<legend>Rarity Details</legend>
+					{
+						rarities.map(({ rarityId, rarityName, defaultCount }) => (
+							<div class="input-group">
+								<label for={`rarity-${rarityId}-count`}>{rarityName}</label>
+								<input
+									title={rarityName + ' Count'}
+									name={`rarity-${rarityId}-count`}
+									type="number"
+									required
+									value={defaultCount}
+								/>
+							</div>
+						))
+					}
+				</fieldset>
+				<button type="submit">Save</button>
+			</form>
+		</my-form>
 	</div>
 </Page>

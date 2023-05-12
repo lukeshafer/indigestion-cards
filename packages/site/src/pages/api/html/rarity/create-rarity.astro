@@ -1,0 +1,67 @@
+---
+import { createRarity, deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
+
+if (Astro.request.method !== 'POST')
+	return new Response('Error: Method not allowed', { status: 405 });
+
+const params = new URLSearchParams(await Astro.request.text());
+
+const rarityId = params.get('rarityId');
+const rarityName = params.get('rarityName');
+const defaultCount = parseInt(params.get('defaultCount') || '0') || 0;
+const imgUrl = params.get('imgUrl');
+const imageKey = params.get('imageKey');
+const bucket = params.get('bucket');
+
+let errorMessage = '';
+if (!imgUrl) errorMessage += 'Missing imgUrl. ';
+if (!imageKey) errorMessage += 'Missing imageKey. ';
+if (!rarityName) errorMessage += 'Missing rarityName. ';
+if (!rarityId) errorMessage += 'Missing rarityId. ';
+if (defaultCount < 1) errorMessage += 'Default count must be greater than 0. ';
+if (!bucket) errorMessage += 'Missing bucket. ';
+if (!rarityId!.match(/^[a-z0-9-]+$/))
+	errorMessage += 'Invalid seasonId. (Must be lowercase, numbers, and dashes only) ';
+if (errorMessage)
+	return new Response(errorMessage, {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					message: errorMessage,
+					type: 'error',
+				},
+			}),
+		},
+	});
+
+const deleteUnmatchedImagePromise = deleteUnmatchedDesignImage({
+	imageId: imageKey!,
+	type: 'frame',
+});
+const createPromise = createRarity({
+	rarityId: rarityId!,
+	rarityName: rarityName!,
+	frameUrl: imgUrl!,
+	defaultCount,
+});
+
+const [result] = await Promise.all([createPromise, deleteUnmatchedImagePromise]);
+
+if (!result.success)
+	return new Response(result.error, {
+		status: result.error === 'Rarity already exists' ? 409 : 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					message: result.error,
+					type: 'error',
+				},
+			}),
+		},
+	});
+
+Astro.response.headers.set('HX-Redirect', `/rarity?alert=Rarity%20created!&alertType=success`);
+---
+
+<body></body>

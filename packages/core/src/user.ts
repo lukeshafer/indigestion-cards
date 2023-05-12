@@ -54,7 +54,14 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 		});
 	}
 
-	const result = await db.entities.users.create(args).go();
+	const { display_name } = await getUserByLogin(args.username);
+
+	const result = await db.entities.users
+		.create({
+			...args,
+			username: display_name,
+		})
+		.go();
 	return result.data;
 }
 

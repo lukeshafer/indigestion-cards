@@ -1,12 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { Icon } from 'astro-icon';
-import { useAdmin } from '@/session';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
 import TableSearch from '@/components/TableSearch.astro';
 import { publicApi, routes } from '@/constants';
-
-const admin = useAdmin(Astro.cookies);
 
 const users = await getAllUsers();
 ---
@@ -14,7 +11,6 @@ const users = await getAllUsers();
 <Page
 	title="Users"
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
-	session={admin}
 	pageType="public">
 	<sort-table>
 		<header class="page-header">

@@ -1,16 +1,19 @@
 ---
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
-import { useAdmin } from '@/session';
+// @ts-ignore -- typescript is erroring here even though it's valid
+import { html } from '@/lib/template-tags';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { createAdminUser } from '@lil-indigestion-cards/core/user';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const body = await Astro.request.text();
 
 const username = new URLSearchParams(body).get('username');
-if (!username) return new Response('Missing username', { status: 400 });
+if (!username)
+	return html`<body></body>`.response({
+		headers: {
+			'HX-Trigger': 'clearAlert',
+		},
+	});
 
 const user = await getUserByLogin(username);
 if (!user) return new Response('User not found', { status: 404 });
@@ -18,9 +21,20 @@ const { display_name, id } = user;
 
 const result = await createAdminUser({ userId: id, username: display_name });
 
-if (!result.success) return new Response(result.error, { status: 400 });
+if (!result.success)
+	return new Response(result.error, {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: result.error,
+				},
+			}),
+		},
+	});
 ---
 
 <body>
-	<AdminUserRow username={display_name} userId={id} currentUser={session.properties.username} />
+	<AdminUserRow username={display_name} userId={id} />
 </body>

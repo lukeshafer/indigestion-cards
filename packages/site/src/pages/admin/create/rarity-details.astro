@@ -1,12 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
-import PostButton from '@/components/form/PostButton.astro';
-import { api, routes } from '@/constants';
-import RarityForm from '@/components/entity-forms/RarityForm.astro';
-
-const user = useAdmin(Astro.cookies);
-if (!user) return Astro.redirect('/404');
+import { api } from '@/constants';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -25,25 +19,47 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 		{ label: 'Rarities', href: '/rarity' },
 		{ label: 'New Rarity', href: '/admin/create/rarity' },
 		{ label: 'Details', href: '/admin/create/rarity-details' },
-	]}
-	session={user}>
+	]}>
 	<h1 class="page-heading">Add Rarity</h1>
 	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
 		<div>
 			<img src={imgUrl} class="w-60 h-auto object-contain mb-4" />
-			<PostButton
-				label="Delete Draft"
-				type="delete"
-				url={`${api.DELETE_UNMATCHED_IMAGE}/${key}?redirect=${routes.RARITIES}`}
-				id="delete"
-				hiddenProperties={[{ name: 'type', value: 'frame' }]}
-			/>
+			<button
+				class="post-button z-10"
+				hx-delete={api.IMAGE.DELETE}
+				hx-swap="none"
+				hx-vals={JSON.stringify({ key, type: 'frame' })}
+				data-type="delete">Delete Draft<form-indicator></form-indicator></button
+			>
 		</div>
 
-		<RarityForm
-			action={`${api.CREATE_RARITY}?redirect=${routes.RARITIES}`}
-			bucket={bucket}
-			key={key}
-		/>
+		<my-form>
+			<form action={api.RARITY.CREATE} method="post" hx-swap="none">
+				<input type="hidden" name="imgUrl" value={imgUrl} />
+				<input type="hidden" name="imageKey" value={key} />
+				<input type="hidden" name="bucket" value={bucket} />
+				<div class="input-group">
+					<label for="rarityName">Rarity Name</label>
+					<input id="rarityName" name="rarityName" type="text" />
+				</div>
+				<div class="input-group">
+					<label for="rarityId">Rarity ID</label>
+					<input
+						id="rarityId"
+						name="rarityId"
+						type="text"
+						readonly
+						data-edit-button
+						data-id-from="rarityName"
+						pattern="[a-z0-9-]+"
+					/>
+				</div>
+				<div class="input-group">
+					<label for="defaultCount">Default number per card</label>
+					<input id="defaultCount" name="defaultCount" type="number" value="0" />
+				</div>
+				<button type="submit">Save</button>
+			</form>
+		</my-form>
 	</div>
 </Page>

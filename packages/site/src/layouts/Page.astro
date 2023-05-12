@@ -6,40 +6,24 @@ import UserSearch from '@/components/UserSearch.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
 
-Astro.cookies.set('lilind_code', 'pants', {
-	path: '/',
-	httpOnly: true,
-	maxAge: 60 * 60 * 24 * 30,
-	sameSite: 'lax',
-});
-
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
 }
 
 const { class: className, breadcrumbs, ...baseProps } = Astro.props;
-
-const alert = Astro.url.searchParams.get('alert');
-const alertType =
-	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error';
-const alertColor =
-	{
-		success: 'bg-green-200',
-		error: 'bg-red-200',
-	}[alertType] ?? 'bg-red-200';
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="morphdom transition:true">
-		<AdminOnly session={Astro.props.session}>
-			<AdminPanel session={Astro.props.session} />
+	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="true transition:true">
+		<AdminOnly>
+			<AdminPanel />
 		</AdminOnly>
-		<div class="md:col-start-2 overflow-y-scroll relative">
+		<div class="md:col-start-2 overflow-y-scroll relative" id="page-scroll-wrapper">
 			<header
 				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
 				hx-disable>
-				<AdminOnly session={Astro.props.session}>
+				<AdminOnly>
 					<div
 						data-for-admin-panel
 						class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
@@ -55,11 +39,9 @@ const alertColor =
 				</a>
 				<UserSearch />
 			</header>
+			<div id="alert-wrapper" class="sticky top-0"></div>
 			<div class="flex-1">
 				<Breadcrumbs path={breadcrumbs ?? []} />
-			</div>
-			<div id="alert-wrapper">
-				{alert ? <div class={`p-4 ${alertColor}`}>{alert}</div> : null}
 			</div>
 			<main
 				class={(className ?? '') +
@@ -115,15 +97,54 @@ const alertColor =
 </style>
 
 <script>
+	window.onload = () => {
+		const url = new URL(window.location.href);
+
+		// Check for alert in url search params
+		const alert = url.searchParams.get('alert');
+		const alertType = url.searchParams.get('alertType') ?? url.searchParams.get('type');
+		// call displayAlert event if alert exists
+		if (alert) {
+			document.body.dispatchEvent(
+				new CustomEvent('displayAlert', {
+					detail: {
+						message: alert,
+						type: alertType,
+					},
+				})
+			);
+		}
+
+		// remove alert and alertType from url search params
+		url.searchParams.delete('alert');
+		url.searchParams.delete('alertType');
+		window.history.replaceState({}, '', url);
+	};
+
 	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
+	document.body.addEventListener('clearAlert', () => {
+		alertWrapper.replaceChildren();
+	});
+
 	document.body.addEventListener('displayAlert', (e) => {
+		// @ts-expect-error - this does exist
 		const text = e.detail.message;
+		// @ts-expect-error - this one too
 		const type = e.detail.type ?? 'error';
 
 		const alert = document.createElement('p');
 		alert.classList.add('alert-text-box');
 		alert.dataset.type = type;
 		alert.textContent = text;
+		const closeBtn = document.createElement('button');
+		closeBtn.textContent = 'x';
+		closeBtn.addEventListener('click', () => {
+			alertWrapper.replaceChildren();
+		});
+		alert.appendChild(closeBtn);
 		alertWrapper.replaceChildren(alert);
+
+		// scroll to top
+		document.getElementById('page-scroll-wrapper')?.scrollTo(0, 0);
 	});
 </script>

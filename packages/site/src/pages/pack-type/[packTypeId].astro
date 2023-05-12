@@ -1,11 +1,8 @@
 ---
+import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
 
 const packTypeId = Astro.params.packTypeId;
 
@@ -18,7 +15,6 @@ const cardPool = await getCardPoolFromType(packType);
 
 <Page
 	title={`Pack Type: ${packType.packTypeName}`}
-	session={session}
 	breadcrumbs={[
 		{ label: 'Home', href: '/' },
 		{ label: 'Pack Types', href: '/pack-type' },
@@ -28,7 +24,8 @@ const cardPool = await getCardPoolFromType(packType);
 	<button
 		class="post-button shine"
 		data-type="delete"
-		hx-delete="/api/html/pack-type"
+		hx-delete={api.PACK_TYPE.DELETE}
+		hx-swap="false"
 		hx-vals={JSON.stringify({
 			packTypeId: packType.packTypeId,
 		})}>
@@ -42,7 +39,7 @@ const cardPool = await getCardPoolFromType(packType);
 				<thead>
 					<tr>
 						<th class="w-3/4">Card Name</th>
-						<th>Card Type</th>
+						<th>Season Name</th>
 					</tr>
 				</thead>
 				<tbody>

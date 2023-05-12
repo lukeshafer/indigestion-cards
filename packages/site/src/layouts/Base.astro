@@ -2,17 +2,17 @@
 import '../global.css';
 import '@fontsource/montserrat/variable.css';
 import 'open-props/colors';
-import type { Session } from '@/session';
 
 interface Props {
 	title: string;
-	session: Session;
 	pageType?: 'public' | 'private';
 }
 
 export type BaseProps = Props;
 
-const { title, session, pageType = 'private' } = Astro.props;
+const { title, pageType = 'private' } = Astro.props;
+
+const session = Astro.locals.session;
 ---
 
 <html lang="en">
@@ -23,6 +23,8 @@ const { title, session, pageType = 'private' } = Astro.props;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#fd94e6" />
 		<script src="../elements/sort-table.ts"></script>
+		<script src="../elements/my-form.ts"></script>
+		<script src="../elements/form-indicator.ts"></script>
 		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<title>{title}</title>
 	</head>

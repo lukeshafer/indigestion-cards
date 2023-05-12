@@ -1,6 +1,6 @@
 import { Config } from 'sst/node/config';
 import { Issuer } from 'openid-client';
-import { AuthHandler, OauthAdapter, Session } from 'sst/node/future/auth';
+import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import { getAdminUserById } from '@lil-indigestion-cards/core/user';
 import { putTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
 
