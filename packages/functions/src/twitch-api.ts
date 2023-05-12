@@ -1,21 +1,24 @@
-import { type APIGatewayProxyHandlerV2 } from 'aws-lambda'
-import { EventBus } from 'sst/node/event-bus'
-import { EventBridge } from 'aws-sdk'
+import { type APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import { EventBus } from 'sst/node/event-bus';
+import { EventBridge } from 'aws-sdk';
 import {
 	verifyDiscordRequest,
 	parseRequestBody,
 	MESSAGE_TYPE,
 	getHeaders,
-} from '@lil-indigestion-cards/core/twitch-helpers'
+} from '@lil-indigestion-cards/core/twitch-helpers';
+import { getTwitchEventById } from '@lil-indigestion-cards/core/site-config';
+import { getPackTypeById } from '@lil-indigestion-cards/core/card';
+import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
-		console.error('Message not verified')
-		return { statusCode: 403 }
+		console.error('Message not verified');
+		return { statusCode: 403 };
 	}
 
-	const { messageType } = getHeaders(event.headers)
-	const unsafeBody = JSON.parse(event.body) as unknown
+	const { messageType } = getHeaders(event.headers);
+	const unsafeBody = JSON.parse(event.body) as unknown;
 
 	if (messageType === MESSAGE_TYPE.VERIFICATION) {
 		if (
@@ -24,33 +27,40 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 			!('challenge' in unsafeBody) ||
 			typeof unsafeBody.challenge !== 'string'
 		) {
-			console.error('Invalid verification request')
-			return { statusCode: 400 }
+			console.error('Invalid verification request');
+			return { statusCode: 400 };
 		}
 
 		return {
 			statusCode: 200,
 			body: unsafeBody.challenge,
-		}
+		};
 	}
 
 	if (messageType !== MESSAGE_TYPE.NOTIFICATION) {
-		console.error('Invalid message type')
-		return { statusCode: 400 }
+		console.error('Invalid message type');
+		return { statusCode: 400 };
 	}
 
-	const body = parseRequestBody(unsafeBody)
+	const body = parseRequestBody(unsafeBody);
 
+	const eventBridge = new EventBridge();
 	switch (body.type) {
 		case 'channel.subscription.gift':
 			if (body.event.total < 5) {
 				// gifted less than 5 subs, ignore
-				return { statusCode: 200 }
+				return { statusCode: 200 };
 			}
 
-			const totalPacks = Math.floor(body.event.total / 5)
+			const totalPacks = Math.floor(body.event.total / 5);
 
-			const eventBridge = new EventBridge()
+			const event = await getTwitchEventById({ eventId: TWITCH_GIFT_SUB_ID });
+			if (!event) {
+				return { statusCode: 200 };
+			}
+
+			const giftSubPackType = await getPackTypeById({ packTypeId: event.packTypeId });
+
 			await eventBridge
 				.putEvents({
 					Entries: [
@@ -61,16 +71,42 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 								userId: body.event.user_id,
 								username: body.event.user_name,
 								packCount: totalPacks,
+								packType: giftSubPackType,
 							}),
 							EventBusName: EventBus.eventBus.eventBusName,
 						},
 					],
 				})
-				.promise()
-			break
+				.promise();
+			break;
 		case 'channel.channel_points_custom_reward_redemption.add':
-			//onsole.log('Redeemed channel points')
-			break
+			console.log('Redeemed channel points', body);
+			const rewardId = body.event.reward.id;
+			const reward = await getTwitchEventById({ eventId: rewardId });
+			if (!reward) {
+				return { statusCode: 200 };
+			}
+
+			const rewardPackType = await getPackTypeById({ packTypeId: reward.packTypeId });
+
+			await eventBridge
+				.putEvents({
+					Entries: [
+						{
+							Source: 'twitch',
+							DetailType: 'give-pack-to-user',
+							Detail: JSON.stringify({
+								userId: body.event.user_id,
+								username: body.event.user_name,
+								packCount: 1,
+								packType: rewardPackType,
+							}),
+							EventBusName: EventBus.eventBus.eventBusName,
+						},
+					],
+				})
+				.promise();
+			break;
 	}
-	return { statusCode: 200 }
-}
+	return { statusCode: 200 };
+};

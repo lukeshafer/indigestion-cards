@@ -1,6 +1,6 @@
 import { Config } from 'sst/node/config';
 import crypto from 'crypto';
-import { bodySchema, type TwitchBody } from './twitch-event-schemas';
+import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-event-schemas';
 import fetch from 'node-fetch';
 import { SecretsManager } from 'aws-sdk';
 import { z } from 'zod';
@@ -160,26 +160,14 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 	}
 
 	const body = await twitchResponse.json();
-	const rewards = z
-		.object({
-			data: z.array(
-				z.object({
-					id: z.string(),
-					image: z.object({
-						url_1x: z.string(),
-						url_2x: z.string(),
-						url_4x: z.string(),
-					}),
-					background_color: z.string(),
-					is_enabled: z.boolean(),
-					title: z.string(),
-					cost: z.number(),
-				})
-			),
-		})
-		.parse(body).data;
+	const result = customRewardResponse.safeParse(body);
 
-	return rewards;
+	if (!result.success) {
+		console.log(body);
+		throw new Error('Failed to parse rewards');
+	}
+
+	return result.data.data;
 }
 
 const subscriptionsUrl = 'https://api.twitch.tv/helix/eventsub/subscriptions';
@@ -341,4 +329,46 @@ export async function putTokenSecrets(args: { access_token: string; refresh_toke
 		.promise();
 
 	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise]);
+}
+
+export async function getActiveTwitchEventSubscriptions() {
+	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
+	fetchUrl.searchParams.append('user_id', Config.STREAMER_USER_ID);
+	const response = await fetch(fetchUrl.toString(), {
+		method: 'GET',
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch subscriptions');
+	}
+
+	const body = await response.json();
+	const subscriptionSchema = z.object({
+		data: z.array(
+			z.object({
+				id: z.string(),
+				status: z.string(),
+				type: z.string(),
+				condition: z.record(z.string().or(z.number())),
+			})
+		),
+		total: z.number(),
+		total_cost: z.number(),
+		max_total_cost: z.number(),
+		pagination: z.object({
+			cursor: z.string().optional(),
+		}),
+	});
+
+	const result = subscriptionSchema.safeParse(body);
+	if (!result.success) {
+		throw new Error('Failed to parse subscriptions');
+	}
+	const subscriptions = result.data.data;
+	console.log(result.data);
+	return subscriptions;
 }

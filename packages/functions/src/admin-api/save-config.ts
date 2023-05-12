@@ -1,11 +1,10 @@
 import { ApiHandler, useJsonBody } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
 import { z } from 'zod';
-import { batchTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { addBatchTwitchEventsToDb } from '@lil-indigestion-cards/core/site-config';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
-
 	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
@@ -43,7 +42,7 @@ export const handler = ApiHandler(async () => {
 
 	const body = parseResult.data;
 
-	await batchTwitchEvents({
+	await addBatchTwitchEventsToDb({
 		events: body.channelPointRewards.map((event) => ({
 			eventId: event.twitchEventId,
 			eventName: event.twitchEventName,

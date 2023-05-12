@@ -64,6 +64,8 @@ export function API({ app, stack }: StackContext) {
 				'packages/functions/src/admin-api/delete-rarity-frame.handler',
 			'DELETE /delete-card-image':
 				'packages/functions/src/admin-api/delete-card-image.handler',
+			'POST /refresh-twitch-event-subscriptions':
+				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 		},
 		defaults: {
 			function: {
@@ -79,6 +81,7 @@ export function API({ app, stack }: StackContext) {
 					frameBucket,
 					cardDesignBucket,
 					siteAuth,
+					twitchApi,
 				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
