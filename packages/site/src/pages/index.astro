@@ -1,4 +1,5 @@
 ---
+import AdminOnly from '@/components/AdminOnly.astro';
 import { authApi } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { Icon } from 'astro-icon';
@@ -17,9 +18,11 @@ const session = Astro.locals.session;
 			{session?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
 		</span>
 	</a>
-	<button class="post-button" id="refresh-twitch-button" data-type="submit"
-		>Refresh Twitch Events</button
-	>
+	<AdminOnly>
+		<button class="post-button mt-5" id="refresh-twitch-button" data-type="submit"
+			>Refresh Twitch Events</button
+		>
+	</AdminOnly>
 	<!-- TODO: Add FAQ -->
 </Page>
 
