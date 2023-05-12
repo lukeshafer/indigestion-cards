@@ -31,15 +31,6 @@ export function Events({ stack }: StackContext) {
 					queue,
 				},
 			},
-			'refresh-twitch-event-subscriptions': {
-				pattern: {
-					source: ['auth'],
-					detailType: ['refresh-twitch-event-subscriptions'],
-				},
-				targets: {
-					handler: 'packages/functions/src/refresh-twitch-event-subscriptions',
-				},
-			},
 		},
 		defaults: {
 			function: {

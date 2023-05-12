@@ -5,8 +5,8 @@ export const PUBLIC_ROUTES = [
 	'/user/*',
 	'/404',
 	'/admin',
-	'/api/auth/login',
 	'/api/get-all-usernames',
+	'/api/auth/*',
 ] as const;
 
 export const api = {

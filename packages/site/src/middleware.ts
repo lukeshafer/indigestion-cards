@@ -5,9 +5,13 @@ import { AUTH_TOKEN, HTML_API_PATH, PUBLIC_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 
 const auth: MiddlewareResponseHandler = async (ctx, next) => {
+	//console.log(ctx.url.pathname);
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
-	// @ts-ignore
-	ctx.locals.session = SSTSession.verify(cookie.value);
+	const session = SSTSession.verify(cookie.value ?? '');
+	//console.log(session);
+
+	// @ts-expect-error
+	ctx.locals.session = session;
 
 	const currentRoute = ctx.url.pathname;
 	const isPublicRoute = PUBLIC_ROUTES.some((route) => {
@@ -20,7 +24,10 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	if (isPublicRoute) return next();
 
 	const isAdmin = ctx.locals.session?.type === 'admin';
-	if (!isAdmin && ctx.url.pathname !== '/404') return ctx.redirect('/404');
+	if (!isAdmin && ctx.url.pathname !== '/404') {
+		//console.log("Not admin, redirecting to '/404'");
+		return ctx.redirect('/404');
+	}
 
 	ctx.locals.admin = ctx.locals.session?.type === 'admin' ? ctx.locals.session : null;
 	ctx.locals.user =

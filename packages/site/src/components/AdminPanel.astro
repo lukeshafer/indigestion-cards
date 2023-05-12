@@ -94,12 +94,12 @@ const actionLinks = [
 			</div>
 			<button
 				class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
-				title={Astro.locals.admin?.properties.username}>
+				title={Astro.locals.session?.properties.username}>
 				<Icon
 					name="mdi:gear"
 					class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
 				/>
-				{Astro.locals.admin?.properties.username}
+				{Astro.locals.session?.properties.username}
 			</button>
 		</div>
 	</nav>

@@ -5,6 +5,12 @@ import Page from '@/layouts/Page.astro';
 import { Icon } from 'astro-icon';
 
 const session = Astro.locals.session;
+Astro.cookies.set('lilind_code', 'pants', {
+	path: '/',
+	httpOnly: true,
+	maxAge: 60 * 60 * 24 * 30,
+	sameSite: 'lax',
+});
 ---
 
 <Page title="index" breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">

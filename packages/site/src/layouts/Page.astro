@@ -6,13 +6,6 @@ import UserSearch from '@/components/UserSearch.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
 
-Astro.cookies.set('lilind_code', 'pants', {
-	path: '/',
-	httpOnly: true,
-	maxAge: 60 * 60 * 24 * 30,
-	sameSite: 'lax',
-});
-
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
