@@ -1,8 +1,10 @@
-import { StackContext, EventBus, Queue, use } from 'sst/constructs'
-import { Database } from './database'
+import { StackContext, EventBus, Queue, use } from 'sst/constructs';
+import { Database } from './database';
+import { ConfigStack } from './config';
 
 export function Events({ stack }: StackContext) {
-	const table = use(Database)
+	const table = use(Database);
+	const config = use(ConfigStack);
 
 	const queue = new Queue(stack, 'queue', {
 		consumer: {
@@ -16,7 +18,7 @@ export function Events({ stack }: StackContext) {
 				},
 			},
 		},
-	})
+	});
 
 	const eventBus = new EventBus(stack, 'eventBus', {
 		rules: {
@@ -29,13 +31,27 @@ export function Events({ stack }: StackContext) {
 					queue,
 				},
 			},
+			'refresh-twitch-event-subscriptions': {
+				pattern: {
+					source: ['auth'],
+					detailType: ['refresh-twitch-event-subscriptions'],
+				},
+				targets: {
+					handler: 'packages/functions/src/refresh-twitch-event-subscriptions',
+				},
+			},
 		},
 		defaults: {
 			function: {
-				bind: [table],
+				bind: [
+					table,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_ACCESS_TOKEN,
+				],
 			},
 		},
-	})
+	});
 
-	return eventBus
+	return eventBus;
 }

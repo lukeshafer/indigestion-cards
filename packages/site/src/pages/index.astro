@@ -17,5 +17,28 @@ const session = Astro.locals.session;
 			{session?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
 		</span>
 	</a>
+	<button class="post-button" id="refresh-twitch-button" data-type="submit"
+		>Refresh Twitch Events</button
+	>
 	<!-- TODO: Add FAQ -->
 </Page>
+
+<script>
+	const refreshButton = document.getElementById('refresh-twitch-button') as HTMLButtonElement;
+	refreshButton.addEventListener('click', async () => {
+		refreshButton.disabled = true;
+		refreshButton.innerText = 'Refreshing...';
+		const res = await fetch('/api/admin/refresh-twitch-event-subscriptions?fetch=true', {
+			method: 'POST',
+		});
+		if (res.ok) {
+			refreshButton.innerText = 'Refreshed!';
+		} else {
+			refreshButton.innerText = 'Error!';
+		}
+		refreshButton.disabled = false;
+		setTimeout(() => {
+			refreshButton.innerText = 'Refresh Twitch Events';
+		}, 2000);
+	});
+</script>

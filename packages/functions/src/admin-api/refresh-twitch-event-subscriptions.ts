@@ -1,19 +1,11 @@
-import { Api, ApiHandler } from 'sst/node/api';
-import { useSession } from 'sst/node/future/auth';
+import { Api } from 'sst/node/api';
 import {
 	subscribeToTwitchEvent,
 	getActiveTwitchEventSubscriptions,
 } from '@lil-indigestion-cards/core/twitch-helpers';
 import { Config } from 'sst/node/config';
 
-export const handler = ApiHandler(async () => {
-	const session = useSession();
-	if (session.type !== 'admin')
-		return {
-			statusCode: 401,
-			body: 'Unauthorized',
-		};
-
+export const handler = async () => {
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();
 
 	let hasGiftSubSubscription = false;
@@ -47,10 +39,8 @@ export const handler = ApiHandler(async () => {
 
 	const results = await Promise.all([giftSubPromise, channelPointSubPromise]);
 
-	console.log(JSON.stringify(results));
-
 	return {
 		statusCode: 200,
 		body: JSON.stringify(results),
 	};
-});
+};

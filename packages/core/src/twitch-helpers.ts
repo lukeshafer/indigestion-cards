@@ -369,6 +369,5 @@ export async function getActiveTwitchEventSubscriptions() {
 		throw new Error('Failed to parse subscriptions');
 	}
 	const subscriptions = result.data.data;
-	console.log(result.data);
 	return subscriptions;
 }

@@ -18,8 +18,8 @@ export default {
 		app
 			.stack(ConfigStack)
 			.stack(Database)
-			.stack(Auth)
 			.stack(Events)
+			.stack(Auth)
 			.stack(DesignBucket)
 			.stack(API)
 			.stack(Sites)
