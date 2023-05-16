@@ -1,0 +1,44 @@
+---
+import type { RarityStats } from '@/pages/design/[designId].astro';
+import { routes } from '@/constants';
+
+type Props = RarityStats;
+---
+
+<li>
+	<h3 class="sub-heading text-xl">{Astro.props.rarityName}</h3>
+	<sort-table class="compact">
+		<table>
+			<thead>
+				<tr>
+					<th data-type="number" class="w-1/5">Card Number</th>
+					<th>Owner</th>
+					<th data-type="date">Opened At</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					Astro.props.instances.map((instance, index) => (
+						<tr x-show={instance?.username ? 'true' : '!hideUnowned'}>
+							<td>{index + 1}</td>
+							<td>
+								{instance?.username ? (
+									<a href={`${routes.USERS}/${instance?.username ?? ''}`}>
+										{instance.username}
+									</a>
+								) : (
+									'Not Owned'
+								)}
+							</td>
+							<td>
+								{instance?.openedAt
+									? new Date(instance.openedAt).toLocaleDateString()
+									: ''}
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</sort-table>
+</li>
