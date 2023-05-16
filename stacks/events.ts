@@ -9,7 +9,12 @@ export function Events({ stack }: StackContext) {
 	const queue = new Queue(stack, 'queue', {
 		consumer: {
 			function: {
-				bind: [table],
+				bind: [
+					table,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_ACCESS_TOKEN,
+				],
 				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 			},
 			cdk: {
@@ -30,16 +35,6 @@ export function Events({ stack }: StackContext) {
 				targets: {
 					queue,
 				},
-			},
-		},
-		defaults: {
-			function: {
-				bind: [
-					table,
-					config.TWITCH_CLIENT_ID,
-					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
-				],
 			},
 		},
 	});
