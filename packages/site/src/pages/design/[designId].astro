@@ -38,13 +38,18 @@ if (from?.includes('season')) {
 	);
 }
 
+const rarities = {} as Record<string, Array<CardInstance | null>>;
+design.rarityDetails?.forEach((rarity) => {
+	rarities[rarity.rarityId] = new Array<CardInstance | null>(rarity.count).fill(null);
+});
+
 const instancesByRarity = cardInstances.reduce((acc, instance) => {
 	const rarityId = instance.rarityId;
 	if (!acc[rarityId])
 		acc[rarityId] = new Array<CardInstance | null>(instance.totalOfType).fill(null);
 	acc[rarityId]![instance.cardNumber - 1] = instance;
 	return acc;
-}, {} as Record<string, Array<CardInstance | null>>);
+}, rarities);
 ---
 
 <Page
