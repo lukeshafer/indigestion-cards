@@ -107,12 +107,14 @@ export async function getUserByLogin(login: string) {
 
 	const schema = z.object({
 		data: z.array(
-			z.object({
-				id: z.string(),
-				login: z.string(),
-				display_name: z.string(),
-				profile_image_url: z.string(),
-			})
+			z
+				.object({
+					id: z.string(),
+					login: z.string(),
+					display_name: z.string(),
+					profile_image_url: z.string(),
+				})
+				.optional()
 		),
 	});
 

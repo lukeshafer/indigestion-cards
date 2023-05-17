@@ -54,12 +54,12 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 		});
 	}
 
-	const { display_name } = await getUserByLogin(args.username);
+	const twitchLogin = await getUserByLogin(args.username);
 
 	const result = await db.entities.users
 		.create({
 			...args,
-			username: display_name,
+			username: twitchLogin?.display_name ?? args.username,
 		})
 		.go();
 	return result.data;
