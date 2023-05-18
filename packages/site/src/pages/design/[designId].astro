@@ -3,6 +3,8 @@ import Page from '@/layouts/Page.astro';
 import TradingCard from '@/components/TradingCard.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { routes, api } from '@/constants';
+import AdminOnly from '@/components/AdminOnly.astro';
+import RarityStatsTable from '@/components/RarityStatsTable.astro';
 
 const designId = Astro.params.designId;
 
@@ -38,69 +40,121 @@ if (from?.includes('season')) {
 	);
 }
 
-const instancesByRarity = cardInstances.reduce((acc, instance) => {
+export interface RarityStats {
+	rarityId: string;
+	rarityName: string;
+	received: number;
+	unopened: number;
+	opened: number;
+	notGivenOut: number;
+	total: number;
+	instances: Array<CardInstance | null>;
+}
+
+const rarityStats = {} as Record<string, RarityStats>;
+design.rarityDetails?.forEach((rarity) => {
+	rarityStats[rarity.rarityId] = {
+		rarityId: rarity.rarityId,
+		rarityName: rarity.rarityName,
+		received: 0,
+		unopened: 0,
+		opened: 0,
+		notGivenOut: rarity.count,
+		total: rarity.count,
+		instances: new Array<CardInstance | null>(rarity.count).fill(null),
+	};
+});
+
+cardInstances.forEach((instance) => {
 	const rarityId = instance.rarityId;
-	if (!acc[rarityId])
-		acc[rarityId] = new Array<CardInstance | null>(instance.totalOfType).fill(null);
-	acc[rarityId]![instance.cardNumber - 1] = instance;
-	return acc;
-}, {} as Record<string, Array<CardInstance | null>>);
+	const rarity = rarityStats[rarityId];
+	if (!rarity) return;
+
+	rarity.received += 1;
+	rarity.unopened += instance.openedAt ? 0 : 1;
+	rarity.opened += instance.openedAt ? 1 : 0;
+	rarity.notGivenOut -= instance.openedAt ? 1 : 0;
+	rarity.instances[instance.cardNumber - 1] = instance;
+});
+
+const rarityStatsArray = Object.values(rarityStats);
 ---
 
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
-	class="flex flex-col gap-4"
+	class="flex flex-col gap-9"
 	breadcrumbs={breadcrumbs}>
-	<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
-	<div class="mx-4">
-		<TradingCard>
-			<img src={design.imgUrl} width="300" class="max-w-full" />
-		</TradingCard>
-	</div>
-	{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
-	<section class="text-lg">
-		<h2 class="sub-heading">Stats:</h2>
-		<ul>
-			{
-				design.rarityDetails?.map((rarity) => (
-					<li>
-						{rarity.rarityName}:
-						<ul>
-							{instancesByRarity[rarity.rarityId]?.map((instance, index, arr) => (
-								<li>
-									{index + 1} of {arr.length}
-									{instance === null ? (
-										<span class="text-gray-400">Not owned</span>
-									) : (
-										<a href={`${routes.USERS}/${instance.username}`}>
-											<span class="font-semibold">{instance.username}</span>
-											{instance.openedAt
-												? ` - ${new Date(
-														instance.openedAt
-												  ).toLocaleDateString()}`
-												: ' - Unopened'}
-										</a>
-									)}
-								</li>
-							))}
-						</ul>
-					</li>
-				))
-			}
-		</ul>
-	</section>
-	<button
-		class="post-button w-max"
-		data-type="delete"
-		hx-delete={api.DESIGN.DELETE}
-		hx-vals={JSON.stringify({
-			designId: design.designId,
-			imgUrl: design.imgUrl,
-			cardName: design.cardName,
-		})}>
-		Delete Card
-		<form-indicator>Deleting</form-indicator>
-	</button>
+	<header class="flex flex-col gap-4">
+		<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
+		<div class="mx-4">
+			<TradingCard>
+				<img src={design.imgUrl} width="300" class="max-w-full" />
+			</TradingCard>
+		</div>
+		{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
+	</header>
+	<AdminOnly>
+		<section class="text-lg">
+			<h2 class="sub-heading mb-4">Stats Overview</h2>
+			<sort-table class="compact">
+				<table>
+					<thead>
+						<tr>
+							<th>Rarity</th>
+							<th data-type="number">Received</th>
+							<th data-type="number" class="hidden lg:table-cell">Opened</th>
+							<th data-type="number" class="hidden lg:table-cell">Unopened</th>
+							<th data-type="number" class="hidden sm:table-cell">Not Given Out</th>
+							<th data-type="number">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							rarityStatsArray.map((rarity) => (
+								<tr>
+									<td>{rarity.rarityName}</td>
+									<td>{rarity.received}</td>
+									<td class="hidden lg:table-cell">{rarity.opened}</td>
+									<td class="hidden lg:table-cell">{rarity.unopened}</td>
+									<td class="hidden sm:table-cell">{rarity.notGivenOut}</td>
+									<td>{rarity.total}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</sort-table>
+		</section>
+		<section x-data="{ hideUnowned: false }">
+			<header class="flex items-center gap-6">
+				<h2 class="sub-heading mb-4">Instance Breakdown</h2>
+				<div>
+					<input
+						type="checkbox"
+						x-model="hideUnowned"
+						id="hide-unowned"
+						class="my-form-checkbox"
+					/>
+					<label for="hide-unowned">Hide Unowned</label>
+				</div>
+			</header>
+			<ul>
+				{rarityStatsArray.map((rarity) => <RarityStatsTable {...rarity} />)}
+			</ul>
+		</section>
+		<button
+			class="post-button w-max"
+			data-type="delete"
+			hx-delete={api.DESIGN.DELETE}
+			hx-vals={JSON.stringify({
+				designId: design.designId,
+				imgUrl: design.imgUrl,
+				cardName: design.cardName,
+			})}>
+			Delete Card
+			<form-indicator>Deleting</form-indicator>
+		</button>
+	</AdminOnly>
 </Page>
 
 <script>

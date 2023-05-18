@@ -43,6 +43,9 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 	const existingUser = await getUserByUserName(args.username);
 	if (existingUser && existingUser.username === args.username) {
 		const twitchData = await getUserByLogin(args.username);
+		if (!twitchData) {
+			throw new Error(`Username ${args.username} is not a valid Twitch user`);
+		}
 		if (twitchData.login === args.username) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.username} is taken`);
@@ -54,12 +57,12 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 		});
 	}
 
-	const { display_name } = await getUserByLogin(args.username);
+	const twitchLogin = await getUserByLogin(args.username);
 
 	const result = await db.entities.users
 		.create({
 			...args,
-			username: display_name,
+			username: twitchLogin?.display_name ?? args.username,
 		})
 		.go();
 	return result.data;
@@ -74,6 +77,9 @@ export async function updateUsername(
 	if (existingUser && existingUser.username === args.newUsername) {
 		// username is taken in our database, and is likely out of date
 		const twitchData = await getUserByLogin(args.newUsername);
+		if (!twitchData) {
+			throw new Error(`Username ${args.newUsername} is not a valid Twitch user`);
+		}
 		if (twitchData.login === args.newUsername) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.newUsername} is still taken`);

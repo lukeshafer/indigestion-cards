@@ -107,12 +107,14 @@ export async function getUserByLogin(login: string) {
 
 	const schema = z.object({
 		data: z.array(
-			z.object({
-				id: z.string(),
-				login: z.string(),
-				display_name: z.string(),
-				profile_image_url: z.string(),
-			})
+			z
+				.object({
+					id: z.string(),
+					login: z.string(),
+					display_name: z.string(),
+					profile_image_url: z.string(),
+				})
+				.optional()
 		),
 	});
 
@@ -125,6 +127,7 @@ export async function getUserByLogin(login: string) {
 	return result.data.data[0];
 }
 
+export type ChannelPointReward = Awaited<ReturnType<typeof getAllChannelPointRewards>>[0];
 export async function getAllChannelPointRewards(args: { userId: string }) {
 	const { access_token, refresh_token } = await retrieveTokenSecrets();
 

@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-		success: true;
-		data: T;
-	}
+			success: true;
+			data: T;
+	  }
 	| {
-		success: false;
-		error: string;
-	};
+			success: false;
+			error: string;
+	  };
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -32,152 +32,128 @@ export async function generateCard(info: {
 	cardPool: CardPool;
 }) {
 	// Steps:
-	// 1. Get a random card design from the season
-	// 2. Get all existing instances of that card design
-	// 3. Generate a rarity for the card
-	// 4. Generate a unique instanceId for the card
-	// 5. Create the card instance
+	// 1. Take all the designs and instances, and generate a list of remaining possible cards that can be generated
 	const { cardDesigns, cardInstances: existingInstances } = info.cardPool;
 
 	if (cardDesigns.length === 0) {
 		throw new Error('No designs found');
 	}
 
-	const design = cardDesigns[Math.floor(Math.random() * cardDesigns.length)];
-
-	if (!design.rarityDetails) {
-		throw new Error('No rarity details found');
-	}
-
-	const rarityMap = new Map(
-		design.rarityDetails.map(({ rarityName, rarityId, count, frameUrl }) => [
-			rarityId,
-			{ rarityName, rarityId, max: count, count: 0, frameUrl },
-		])
-	);
-
-	existingInstances.forEach((instance) => {
-		const rarityDetails = rarityMap.get(instance.rarityId);
-		if (!rarityDetails) return;
-		const newCount = rarityDetails.count + 1;
-		if (rarityDetails.max - newCount === 0) rarityMap.delete(instance.rarityId);
-		else rarityMap.set(instance.rarityId, { ...rarityDetails, count: newCount });
-	});
-
-	const rarityList: string[] = [];
-	rarityMap.forEach(({ max, count }, rarity) => {
-		for (let i = 0; i < max - count; i++) {
-			rarityList.push(rarity);
+	const possibleCardsList = [];
+	for (const design of cardDesigns) {
+		if (!design.rarityDetails) continue;
+		for (const rarity of design.rarityDetails) {
+			for (let i = 0; i < rarity.count; i++) {
+				possibleCardsList.push({
+					designId: design.designId,
+					rarityId: rarity.rarityId,
+					cardNumber: i + 1,
+				});
+			}
 		}
-	});
-
-	if (!rarityList || rarityList.length === 0) {
-		throw new Error('No rarities found');
 	}
 
-	const assignedRarityId = rarityList[Math.floor(Math.random() * rarityList.length)];
-	const assignedRarity = rarityMap.get(assignedRarityId)!;
-
-	const existingInstancesOfRarity = existingInstances
-		.filter((instance) => instance.rarityId === assignedRarityId)
-		.map((instance) => instance.cardNumber);
-
-	const possibleCardNumbers = Array.from({ length: assignedRarity.max }, (_, i) => i + 1).filter(
-		(cardNumber) => !existingInstancesOfRarity.includes(cardNumber)
-	);
-
-	if (possibleCardNumbers.length === 0) {
-		throw new Error('No card numbers found');
+	for (const card of existingInstances) {
+		// remove the card from the list of possible cards
+		const index = possibleCardsList.findIndex(
+			(possibleCard) =>
+				possibleCard.designId === card.designId &&
+				possibleCard.rarityId === card.rarityId &&
+				possibleCard.cardNumber === card.cardNumber
+		);
+		if (index !== -1) {
+			possibleCardsList.splice(index, 1);
+		}
 	}
 
-	const cardNumber = possibleCardNumbers[Math.floor(Math.random() * possibleCardNumbers.length)];
-	const totalOfType = assignedRarity.max;
-	const instanceId = `${design.seasonId}-${design.designId}-${assignedRarityId}-${cardNumber}`;
+	if (possibleCardsList.length === 0) {
+		throw new Error('No possible cards found');
+	}
+
+	const {
+		designId: assignedDesignId,
+		rarityId: assignedRarityId,
+		cardNumber: assignedCardNumber,
+	} = possibleCardsList[Math.floor(Math.random() * possibleCardsList.length)];
+	const design = cardDesigns.find((design) => design.designId === assignedDesignId)!;
+	const rarity = design.rarityDetails?.find((rarity) => rarity.rarityId === assignedRarityId);
+
+	if (!rarity) throw new Error('No rarity found');
+
+	const totalOfType = rarity?.count;
+	const instanceId = `${design.seasonId}-${design.designId}-${assignedRarityId}-${assignedCardNumber}`;
+
+	const cardDetails = {
+		seasonId: design.seasonId,
+		designId: design.designId,
+		rarityId: assignedRarityId,
+		rarityName: rarity.rarityName,
+		frameUrl: rarity.frameUrl,
+		imgUrl: design.imgUrl,
+		cardName: design.cardName,
+		cardDescription: design.cardDescription,
+		instanceId,
+		username: info.username,
+		userId: info.userId,
+		minterId: info.userId,
+		minterUsername: info.username,
+		openedAt: info.packId ? undefined : new Date().toISOString(),
+		packId: info.packId,
+		cardNumber: assignedCardNumber,
+		totalOfType,
+	};
 
 	if (info.packId) {
-		const result = await db.entities.cardInstances
-			.create({
-				seasonId: design.seasonId,
-				designId: design.designId,
-				rarityId: assignedRarityId,
-				rarityName: assignedRarity.rarityName,
-				frameUrl: assignedRarity.frameUrl,
-				imgUrl: design.imgUrl,
-				cardName: design.cardName,
-				cardDescription: design.cardDescription,
-				instanceId,
-				username: info.username,
-				userId: info.userId,
-				minterId: info.userId,
-				minterUsername: info.username,
-				openedAt: info.packId ? undefined : new Date().toISOString(),
-				packId: info.packId,
-				cardNumber,
-				totalOfType,
-			})
-			.go();
+		const result = await db.entities.cardInstances.create(cardDetails).go();
 		return result.data;
 	}
 
 	const user =
 		info.userId && info.username
 			? (await getUser(info.userId)) ??
-			(await createNewUser({ userId: info.userId, username: info.username }))
+			  (await createNewUser({ userId: info.userId, username: info.username }))
 			: null;
 
 	const result = await db.transaction
 		.write(({ users, cardInstances }) => [
+			cardInstances.create(cardDetails).commit(),
 			...(user && info.userId && info.username
 				? [
-					users
-						.patch({ userId: info.userId })
-						.set({ cardCount: (user.cardCount ?? 0) + 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: info.userId })
+							.set({ cardCount: (user.cardCount ?? 0) + 1 })
+							.commit(),
+				  ]
 				: []),
-			cardInstances
-				.create({
-					seasonId: design.seasonId,
-					designId: design.designId,
-					rarityId: assignedRarityId,
-					rarityName: assignedRarity.rarityName,
-					frameUrl: assignedRarity.frameUrl,
-					imgUrl: design.imgUrl,
-					cardName: design.cardName,
-					cardDescription: design.cardDescription,
-					instanceId,
-					username: info.username,
-					userId: info.userId,
-					minterId: info.userId,
-					minterUsername: info.username,
-					openedAt: info.packId ? undefined : new Date().toISOString(),
-					packId: info.packId,
-					cardNumber,
-					totalOfType,
-				})
-				.commit(),
 		])
 		.go();
 
-	if (result.canceled || !result.data[1].item) throw new Error('Failed to create card instance');
+	if (result.canceled || !result.data[0].item) throw new Error('Failed to create card instance');
 
-	return result.data[1].item;
+	return result.data[0].item;
 }
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
-	const card = await db.entities.cardInstances.query.byId(args).go();
-	const user = await getUser(card.data[0].userId);
-	if (!user) throw new Error('User not found');
+	const {
+		data: [card],
+	} = await db.entities.cardInstances.query.byId(args).go();
+	if (!card) throw new Error('Card not found');
+	const user = card.userId ? await getUser(card.userId) : null;
 
-	const result = await db.transaction
-		.write(({ cardInstances, users }) => [
-			cardInstances.delete(args).commit(),
-			users
-				.patch({ userId: user.userId })
-				.set({ cardCount: (user.cardCount || 1) - 1 })
-				.commit(),
-		])
-		.go();
+	if (user) {
+		const result = await db.transaction
+			.write(({ cardInstances, users }) => [
+				cardInstances.delete(args).commit(),
+				users
+					.patch({ userId: user.userId })
+					.set({ cardCount: (user.cardCount || 1) - 1 })
+					.commit(),
+			])
+			.go();
+		return result.data;
+	}
+
+	const result = await db.entities.cardInstances.delete(args).go();
 	return result.data;
 }
 
@@ -211,12 +187,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-					]
+							users
+								.patch({ userId: pack.userId })
+								// if packCount is null OR 0, set it to 0, otherwise subtract 1
+								.set({ packCount: (user?.packCount || 1) - 1 })
+								.commit(),
+					  ]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -261,12 +237,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-					users
-						.patch({ userId: pack.userId })
-						// if packCount is null OR 0, set it to 0, otherwise subtract 1
-						.set({ packCount: (user?.packCount || 1) - 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+				  ]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -297,7 +273,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			(await createNewUser({ userId: args.userId, username: args.username }))
+			  (await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
@@ -317,11 +293,11 @@ export async function createPack(args: {
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [
-					users
-						.patch({ userId: args.userId })
-						.set({ packCount: (user.packCount ?? 0) + 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: args.userId })
+							.set({ packCount: (user.packCount ?? 0) + 1 })
+							.commit(),
+				  ]
 				: []),
 			packs
 				.create({
@@ -356,9 +332,12 @@ export async function openCardFromPack(args: { designId: string; instanceId: str
 		throw new Error('Card already opened');
 	}
 
+	const userId = card.data[0].userId;
+	if (!userId) throw new Error('Pack must include a user to be opened');
+
 	const packId = card.data[0].packId;
 	const pack = await getPackById({ packId: packId });
-	const user = await getUser(card.data[0].userId);
+	const user = await getUser(userId);
 	if (!user) throw new Error('User not found');
 
 	const newCardDetails = pack.cardDetails?.map((c) =>
@@ -373,7 +352,7 @@ export async function openCardFromPack(args: { designId: string; instanceId: str
 				.set({ openedAt: new Date().toISOString(), packId: undefined })
 				.commit(),
 			users
-				.patch({ userId: card.data[0].userId })
+				.patch({ userId })
 				.set({
 					cardCount: (user.cardCount ?? 0) + 1,
 					packCount: deletePack ? (user.packCount ?? 1) - 1 : user.packCount,

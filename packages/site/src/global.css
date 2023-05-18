@@ -165,12 +165,12 @@
 		color: var(--red-9);
 	}
 
-	my-form input[type='checkbox'] {
+	my-form input[type='checkbox'], .my-form-checkbox {
 		display: inline-block;
 		width: auto;
 	}
 
-	my-form input[type='checkbox'] + label {
+	my-form input[type='checkbox'] + label, .my-form-checkbox + label {
 		display: inline-block;
 		font-weight: 400;
 	}
@@ -364,6 +364,10 @@
 		position: relative;
 	}
 
+	sort-table.compact tbody td {
+		padding: 0.5rem;
+	}
+
 	sort-table tbody td span {
 		position: relative;
 	}
@@ -381,7 +385,7 @@
 		color: lightgray;
 	}
 
-	sort-table tbody tr:nth-child(even) {
+	sort-table tbody tr:not:nth-child(even) {
 		background-color: var(--gray-1)
 	}
 
@@ -416,12 +420,12 @@
 	}
 
 	.sub-heading {
-		font-size: 1.3rem;
+		font-size: 1.5rem;
 		line-height: 1.3rem;
 		font-family: var(--font-heading);
 		font-weight: 500;
 		text-transform: uppercase;
-		margin: 0.2rem 0;
+		margin: 0.5rem 0;
 	}
 
 	.button-link {

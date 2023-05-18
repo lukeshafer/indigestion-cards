@@ -9,7 +9,12 @@ export function Events({ stack }: StackContext) {
 	const queue = new Queue(stack, 'queue', {
 		consumer: {
 			function: {
-				bind: [table],
+				bind: [
+					table,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_ACCESS_TOKEN,
+				],
 				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 			},
 			cdk: {
@@ -22,6 +27,32 @@ export function Events({ stack }: StackContext) {
 
 	const eventBus = new EventBus(stack, 'eventBus', {
 		rules: {
+			'refresh-channel-point-rewards': {
+				pattern: {
+					source: ['twitch'],
+					detailType: ['refresh-channel-point-rewards'],
+				},
+				targets: {
+					refreshFunction: {
+						function: {
+							handler:
+								'packages/functions/src/event-bridge/refresh-channel-point-rewards.handler',
+							bind: [
+								table,
+								config.STREAMER_USER_ID,
+								config.STREAMER_ACCESS_TOKEN_ARN,
+								config.STREAMER_REFRESH_TOKEN_ARN,
+								config.TWITCH_CLIENT_ID,
+								config.TWITCH_CLIENT_SECRET,
+							],
+							permissions: [
+								'secretsmanager:GetSecretValue',
+								'secretsmanager:PutSecretValue',
+							],
+						},
+					},
+				},
+			},
 			'give-pack-to-user': {
 				pattern: {
 					source: ['twitch'],
@@ -30,16 +61,6 @@ export function Events({ stack }: StackContext) {
 				targets: {
 					queue,
 				},
-			},
-		},
-		defaults: {
-			function: {
-				bind: [
-					table,
-					config.TWITCH_CLIENT_ID,
-					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
-				],
 			},
 		},
 	});

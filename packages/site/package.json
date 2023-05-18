@@ -11,12 +11,15 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/alpinejs": "^0.2.1",
     "@astrojs/prefetch": "^0.2.1",
     "@astrojs/solid-js": "^2.1.0",
     "@astrojs/tailwind": "^3.1.1",
     "@aws-sdk/client-s3": "^3.312.0",
     "@aws-sdk/s3-presigned-post": "^3.312.0",
     "@fontsource/montserrat": "^4.5.14",
+    "@types/alpinejs": "^3.0.0",
+    "alpinejs": "^3.0.0",
     "astro": "^2.4.4",
     "astro-icon": "^0.8.0",
     "astro-sst": "2.8.17",
