@@ -18,6 +18,8 @@ export const customReward = z.object({
 	id: z.string(),
 	background_color: z.string(),
 	is_enabled: z.boolean(),
+	is_paused: z.boolean(),
+	is_in_stock: z.boolean(),
 	title: z.string(),
 	cost: z.number(),
 	prompt: z.string(),
@@ -87,6 +89,33 @@ const channelChannelPointsCustomRewardRedemptionAddEvent = z.object({
 	reward,
 });
 
+interface ChannelPointsCustomRewardAddBody extends BaseBody {
+	type: 'channel.channel_points_custom_reward.add';
+	event: z.infer<typeof channelPointsCustomRewardAddEvent>;
+}
+const channelPointsCustomRewardAddEvent = z.object({
+	id: z.string(),
+	broadcaster_user_id,
+	broadcaster_user_login,
+	broadcaster_user_name,
+	is_enabled: z.boolean(),
+	is_paused: z.boolean(),
+	is_in_stock: z.boolean(),
+	title: z.string(),
+});
+
+interface ChannelPointsCustomRewardUpdateBody extends BaseBody {
+	type: 'channel.channel_points_custom_reward.update';
+	event: z.infer<typeof channelPointsCustomRewardUpdateEvent>;
+}
+const channelPointsCustomRewardUpdateEvent = channelPointsCustomRewardAddEvent;
+
+interface ChannelPointsCustomRewardRemoveBody extends BaseBody {
+	type: 'channel.channel_points_custom_reward.remove';
+	event: z.infer<typeof channelPointsCustomRewardRemoveEvent>;
+}
+const channelPointsCustomRewardRemoveEvent = channelPointsCustomRewardAddEvent;
+
 interface BaseBody {
 	challenge: string | undefined;
 	subscription: z.infer<typeof subscription>;
@@ -111,10 +140,31 @@ export const bodySchema = baseBody
 				}),
 				event: channelChannelPointsCustomRewardRedemptionAddEvent,
 			}),
+			z.object({
+				subscription: z.object({
+					type: z.literal('channel.channel_points_custom_reward.add'),
+				}),
+				event: channelPointsCustomRewardAddEvent,
+			}),
+			z.object({
+				subscription: z.object({
+					type: z.literal('channel.channel_points_custom_reward.update'),
+				}),
+				event: channelPointsCustomRewardUpdateEvent,
+			}),
+			z.object({
+				subscription: z.object({
+					type: z.literal('channel.channel_points_custom_reward.remove'),
+				}),
+				event: channelPointsCustomRewardRemoveEvent,
+			}),
 		])
 	)
 	.transform((b) => ({ ...b, type: b.subscription.type } as TwitchBody));
 
 export type TwitchBody =
 	| ChannelSubscriptionGiftBody
-	| ChannelChannelPointsCustomRewardRedemptionAddBody;
+	| ChannelChannelPointsCustomRewardRedemptionAddBody
+	| ChannelPointsCustomRewardAddBody
+	| ChannelPointsCustomRewardUpdateBody
+	| ChannelPointsCustomRewardRemoveBody;

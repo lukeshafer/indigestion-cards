@@ -27,6 +27,32 @@ export function Events({ stack }: StackContext) {
 
 	const eventBus = new EventBus(stack, 'eventBus', {
 		rules: {
+			'refresh-channel-point-rewards': {
+				pattern: {
+					source: ['twitch'],
+					detailType: ['refresh-channel-point-rewards'],
+				},
+				targets: {
+					refreshFunction: {
+						function: {
+							handler:
+								'packages/functions/src/event-bridge/refresh-channel-point-rewards.handler',
+							bind: [
+								table,
+								config.STREAMER_USER_ID,
+								config.STREAMER_ACCESS_TOKEN_ARN,
+								config.STREAMER_REFRESH_TOKEN_ARN,
+								config.TWITCH_CLIENT_ID,
+								config.TWITCH_CLIENT_SECRET,
+							],
+							permissions: [
+								'secretsmanager:GetSecretValue',
+								'secretsmanager:PutSecretValue',
+							],
+						},
+					},
+				},
+			},
 			'give-pack-to-user': {
 				pattern: {
 					source: ['twitch'],

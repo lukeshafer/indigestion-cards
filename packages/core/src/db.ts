@@ -671,11 +671,9 @@ const twitchEvents = new Entity({
 		},
 		packTypeId: {
 			type: 'string',
-			required: true,
 		},
 		packTypeName: {
 			type: 'string',
-			required: true,
 		},
 		cost: {
 			type: 'number',
@@ -689,7 +687,37 @@ const twitchEvents = new Entity({
 			},
 			sk: {
 				field: 'sk',
-				composite: ['eventId'],
+				composite: ['eventId', 'eventType'],
+			},
+		},
+	},
+});
+
+const twitchEventMessageHistory = new Entity({
+	model: {
+		entity: 'twitchEventMessageHistory',
+		version: '1',
+		service: 'card-app',
+	},
+	attributes: {
+		message_id: {
+			type: 'string',
+			required: true,
+		},
+		message_timestamp: {
+			type: 'string',
+			required: true,
+		},
+	},
+	indexes: {
+		byMessageId: {
+			pk: {
+				field: 'pk',
+				composite: ['message_id'],
+			},
+			sk: {
+				field: 'sk',
+				composite: [],
 			},
 		},
 	},
@@ -707,6 +735,7 @@ export const db = new Service(
 		rarities,
 		admins,
 		twitchEvents,
+		twitchEventMessageHistory,
 	},
 	config
 );

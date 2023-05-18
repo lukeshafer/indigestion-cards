@@ -127,6 +127,7 @@ export async function getUserByLogin(login: string) {
 	return result.data.data[0];
 }
 
+export type ChannelPointReward = Awaited<ReturnType<typeof getAllChannelPointRewards>>[0];
 export async function getAllChannelPointRewards(args: { userId: string }) {
 	const { access_token, refresh_token } = await retrieveTokenSecrets();
 

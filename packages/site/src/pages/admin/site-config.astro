@@ -3,28 +3,25 @@ import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import { Api } from 'sst/node/api';
-import { AUTH_TOKEN } from '@/constants';
-import { customReward } from '@lil-indigestion-cards/core/twitch-event-schemas';
-import { z } from 'astro/zod';
 import TableSearch from '@/components/TableSearch.astro';
 
 const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
 
-const channelPointResponse = await fetch(`${Api.api.url}/get-all-channel-point-rewards`, {
-	headers: {
-		Authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value || ''}`,
-	},
-});
+const giftSubEvent = twitchEvents.data.find(
+	(event) =>
+		event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
+);
 
-const body = await channelPointResponse.json();
-const parseResult = z.array(customReward).safeParse(body);
+const rewards = twitchEvents.data
+	.filter((event) => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
+	.sort((a, b) => {
+		if (a.packTypeId && !b.packTypeId) return -1;
+		if (!a.packTypeId && b.packTypeId) return 1;
+		if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
+		if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
+		return 0;
+	});
 
-if (!parseResult.success) {
-	throw new Error(parseResult.error.message);
-}
-
-const giftSubEvent = twitchEvents.data.find((event) => event.eventId === TWITCH_GIFT_SUB_ID);
 const giftSubPackType =
 	giftSubEvent?.packTypeId && giftSubEvent?.packTypeName
 		? {
@@ -32,33 +29,6 @@ const giftSubPackType =
 				packTypeName: giftSubEvent?.packTypeName || '',
 		  }
 		: undefined;
-
-const rawRewards = parseResult.data;
-
-const rewards = rawRewards
-	.map((reward) => {
-		const dbEvent = twitchEvents.data.find((event) => event.eventId === reward.id);
-
-		return {
-			...reward,
-			packType: JSON.stringify(
-				dbEvent?.packTypeId && dbEvent?.packTypeName
-					? {
-							packTypeId: dbEvent?.packTypeId || '',
-							packTypeName: dbEvent?.packTypeName || '',
-					  }
-					: undefined
-			),
-		};
-	})
-	.filter((reward) => reward.is_enabled)
-	.sort((a, b) => {
-		if (a.packType && !b.packType) return -1;
-		if (!a.packType && b.packType) return 1;
-		if (a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-		if (a.title.toLowerCase() > b.title.toLowerCase()) return 1;
-		return 0;
-	});
 ---
 
 <Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
@@ -111,14 +81,21 @@ const rewards = rawRewards
 					{
 						rewards.map((reward) => (
 							<tr>
-								<td>{reward.title}</td>
+								<td>Reward: {reward.eventName}</td>
 								<td>
 									<select
 										data-pack-type-select
-										data-id={reward.id}
-										data-title={reward.title}
+										data-id={reward.eventId}
+										data-title={reward.eventName}
 										data-cost={reward.cost}
-										data-value={reward.packType}
+										data-value={
+											reward.packTypeId
+												? JSON.stringify({
+														packTypeId: reward.packTypeId,
+														packTypeName: reward.packTypeName,
+												  })
+												: ''
+										}
 										class="my-form-input">
 										<option value="">None</option>
 										{packTypes.map(({ packTypeId, packTypeName }) => (
