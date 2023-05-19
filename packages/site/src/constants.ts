@@ -72,6 +72,7 @@ export const routes = {
 	ADMIN_USERS: '/admin-users',
 	PACK_TYPES: '/pack-type',
 	PACKS: '/packs',
+	INSTANCES: '/card',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',

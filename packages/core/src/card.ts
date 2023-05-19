@@ -85,6 +85,7 @@ export async function generateCard(info: {
 
 	const cardDetails = {
 		seasonId: design.seasonId,
+		seasonName: design.seasonName,
 		designId: design.designId,
 		rarityId: assignedRarityId,
 		rarityName: rarity.rarityName,
@@ -621,4 +622,11 @@ export async function deleteRarityById(id: string): Promise<Result<EntityItem<Ra
 
 	const result = await db.entities.rarities.delete({ rarityId: id }).go();
 	return { success: true, data: result.data };
+}
+
+// CARD INSTANCES //
+
+export async function getCardInstanceById(args: { instanceId: string; designId: string }) {
+	const result = await db.entities.cardInstances.query.byId(args).go();
+	return result.data[0];
 }
