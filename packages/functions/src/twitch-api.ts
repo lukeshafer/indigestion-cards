@@ -54,8 +54,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	const eventBridge = new EventBridge();
 	switch (body.type) {
 		case 'channel.subscription.gift':
-			// FIXME: remove this once we're confident in the logic
-			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 5 : 5;
+			// FIXME: remove this once we're confident in the logic, should always be 5
+			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 1 : 5;
 			const specialSubRoundLookup: Record<number, number> = {
 				69: 70,
 			};
