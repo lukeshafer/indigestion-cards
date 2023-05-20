@@ -727,6 +727,68 @@ const twitchEventMessageHistory = new Entity({
 	},
 });
 
+const audits = new Entity({
+	model: {
+		entity: 'audit',
+		version: '1',
+		service: 'card-app',
+	},
+	attributes: {
+		auditId: {
+			type: 'string',
+			required: true,
+		},
+		entity: {
+			type: 'string',
+			required: true,
+		},
+		field: {
+			type: 'string',
+			required: true,
+		},
+		oldValue: {
+			type: 'string',
+		},
+		newValue: {
+			type: 'string',
+		},
+		userId: {
+			type: 'string',
+			required: true,
+		},
+		username: {
+			type: 'string',
+			required: true,
+		},
+		timestamp: {
+			type: 'string',
+			required: true,
+		},
+	},
+	indexes: {
+		byEntity: {
+			pk: {
+				field: 'pk',
+				composite: ['entity'],
+			},
+			sk: {
+				field: 'sk',
+				composite: ['auditId', 'field', 'userId', 'username', 'timestamp'],
+			},
+		},
+		byUserId: {
+			pk: {
+				field: 'pk',
+				composite: ['userId'],
+			},
+			sk: {
+				field: 'sk',
+				composite: ['auditId', 'entity', 'field', 'username', 'timestamp'],
+			},
+		},
+	},
+});
+
 export const db = new Service(
 	{
 		cardDesigns,
