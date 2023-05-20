@@ -46,6 +46,7 @@ if (!seasonDescription)
 	<button
 		class="post-button"
 		data-type="submit"
+		@submit-season.window="$el.click()"
 		hx-include="[data-season-info]"
 		hx-swap="outerHTML transition:false"
 		hx-vals={JSON.stringify({ seasonId })}
@@ -60,7 +61,7 @@ if (!seasonDescription)
 		type="text"
 		value={seasonName}
 		hx-swap-oob="true"
-		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+		@keyup.enter="$dispatch('submit-season')"
 	/>
 	<input
 		class="my-form-input text-lg"
@@ -70,6 +71,6 @@ if (!seasonDescription)
 		type="text"
 		value={seasonDescription}
 		hx-swap-oob="true"
-		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+		@keyup.enter="$dispatch('submit-season')"
 	/>
 </body>

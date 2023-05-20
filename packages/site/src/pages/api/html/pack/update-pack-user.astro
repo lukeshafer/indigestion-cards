@@ -52,7 +52,7 @@ Astro.response.headers.set('HX-Trigger', 'clearAlert');
 <body>
 	<span {id} hx-swap-oob="true">{username}</span>
 	<button
-		_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
+		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
 		class="post-button edit-button"
 		data-type="success"
 		hx-select=".save-button"
