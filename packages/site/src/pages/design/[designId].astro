@@ -14,10 +14,15 @@ if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
 
+const session = Astro.locals.session;
+if (session?.type !== 'admin') throw new Error('Unauthorized');
+
 const {
 	cardDesigns: [design],
 	cardInstances,
-} = await getCardDesignAndInstancesById({ designId });
+} = await getCardDesignAndInstancesById({
+	designId,
+});
 
 type CardInstance = (typeof cardInstances)[number];
 
