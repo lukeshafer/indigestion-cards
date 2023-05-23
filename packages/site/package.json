@@ -20,9 +20,9 @@
     "@fontsource/montserrat": "^4.5.14",
     "@types/alpinejs": "^3.0.0",
     "alpinejs": "^3.0.0",
-    "astro": "^2.4.4",
+    "astro": "^2.5.3",
     "astro-icon": "^0.8.0",
-    "astro-sst": "2.8.17",
+    "astro-sst": "2.8.28",
     "aws-sdk": "^2.1357.0",
     "electrodb": "^2.5.1",
     "htmx.org": "^1.9.2",
@@ -30,7 +30,7 @@
     "install": "^0.13.0",
     "open-props": "^1.5.8",
     "solid-js": "^1.7.3",
-    "sst": "2.8.17",
+    "sst": "2.8.28",
     "tailwindcss": "^3.3.1"
   }
 }
