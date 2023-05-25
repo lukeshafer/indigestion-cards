@@ -37,11 +37,11 @@ export const handler = AuthHandler({
 		}),
 	},
 	async onSuccess(input) {
-		console.log(`https://${Config.DOMAIN_NAME}`);
 		if (input.provider === 'twitchUser') {
 			const claims = input.tokenset.claims();
 
 			const adminUser = await getAdminUserById(claims.sub);
+			//console.log(adminUser);
 			if (!adminUser)
 				return {
 					type: 'public',
