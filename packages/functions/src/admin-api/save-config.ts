@@ -3,6 +3,7 @@ import { useSession } from 'sst/node/future/auth';
 import { z } from 'zod';
 import { updateBatchTwitchEvents } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
@@ -11,6 +12,7 @@ export const handler = ApiHandler(async () => {
 			statusCode: 401,
 			body: 'Unauthorized',
 		};
+	setAdminEnvSession(session.properties.username, session.properties.userId);
 
 	const unparsedBody = useJsonBody();
 

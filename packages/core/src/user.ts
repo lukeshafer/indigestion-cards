@@ -132,7 +132,11 @@ export async function createAdminUser(args: { userId: string; username: string }
 	}
 }
 
-export async function deleteAdminUser(args: { userId: string }) {
+export async function deleteAdminUser(args: {
+	userId: string;
+	username: string;
+	isStreamer: boolean;
+}) {
 	try {
 		const result = await db.entities.admins.delete(args).go();
 		return { success: true, data: result.data };

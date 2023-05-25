@@ -33,7 +33,11 @@ const users = unsortedUsers.sort((a, b) => {
 				</tr>
 			</thead>
 			<tbody>
-				{users.map(({ username, userId }) => <AdminUserRow {username} {userId} />)}
+				{
+					users.map(({ username, userId, isStreamer }) => (
+						<AdminUserRow {username} {userId} {isStreamer} />
+					))
+				}
 			</tbody>
 		</table>
 	</sort-table>

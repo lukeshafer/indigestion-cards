@@ -4,9 +4,10 @@ import { api } from '@/constants';
 interface Props {
 	username: string;
 	userId: string;
+	isStreamer: boolean;
 }
 
-const { username, userId } = Astro.props;
+const { username, userId, isStreamer } = Astro.props;
 
 const isCurrentUser =
 	Astro.locals.session?.type === 'admin' && Astro.locals.session?.properties.userId === userId;
@@ -22,7 +23,7 @@ const isCurrentUser =
 			disabled={isCurrentUser}
 			hx-confirm="Are you sure you want to delete this user?"
 			hx-post={api.ADMIN.DELETE}
-			hx-vals={JSON.stringify({ userId, username })}
+			hx-vals={JSON.stringify({ userId, username, isStreamer })}
 			hx-swap="outerHTML transition:false"
 			hx-target="closest tr">
 			Delete

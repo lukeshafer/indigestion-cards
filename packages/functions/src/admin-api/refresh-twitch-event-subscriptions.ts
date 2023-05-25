@@ -7,8 +7,18 @@ import {
 	type SubscriptionType,
 } from '@lil-indigestion-cards/core/twitch-helpers';
 import { Config } from 'sst/node/config';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
+import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {
+	const session = useSession();
+	if (session.type !== 'admin')
+		return {
+			statusCode: 401,
+			body: 'Unauthorized',
+		};
+	setAdminEnvSession(session.properties.username, session.properties.userId);
+
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();
 
 	const subDetails: Record<SubscriptionType, TwitchSubscriptionDetails | undefined> = {

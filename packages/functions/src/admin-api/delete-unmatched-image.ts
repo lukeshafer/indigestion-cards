@@ -3,6 +3,7 @@ import { Bucket } from 'sst/node/bucket';
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
 import { S3 } from 'aws-sdk';
 import { useSession } from 'sst/node/future/auth';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
@@ -11,6 +12,7 @@ export const handler = ApiHandler(async () => {
 			statusCode: 401,
 			body: 'Unauthorized',
 		};
+	setAdminEnvSession(session.properties.username, session.properties.userId);
 
 	const data = useJsonBody() as unknown;
 
