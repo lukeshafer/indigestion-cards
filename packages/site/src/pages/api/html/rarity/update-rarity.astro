@@ -1,9 +1,6 @@
 ---
+import { api } from '@/constants';
 import { updateRarity } from '@lil-indigestion-cards/core/card';
-import { useAdmin } from '@/session';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return new Response('Unauthorized', { status: 401 });
 
 const rarityId = Astro.url.searchParams.get('rarityId');
 const rarityName = Astro.url.searchParams.get('rarityName');
@@ -19,15 +16,17 @@ await updateRarity({
 });
 ---
 
-<span id={`rarityName-${rarityId}`} hx-swap-oob="true">{rarityName}</span>
-<span id={`defaultCount-${rarityId}`} hx-swap-oob="true">{defaultCount}</span>
-<button
-	_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
-	class="post-button edit-button"
-	data-type="success"
-	hx-select=".save-button"
-	hx-swap="outerHTML"
-	hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-	hx-get={`/api/html/rarity/start-edit`}>
-	Saved
-</button>
+<body>
+	<span id={`rarityName-${rarityId}`} hx-swap-oob="true">{rarityName}</span>
+	<span id={`defaultCount-${rarityId}`} hx-swap-oob="true">{defaultCount}</span>
+	<button
+		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
+		class="post-button edit-button w-24"
+		data-type="success"
+		hx-select=".save-button"
+		hx-swap="outerHTML"
+		hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
+		hx-get={api.RARITY.START_EDIT}>
+		Saved
+	</button>
+</body>

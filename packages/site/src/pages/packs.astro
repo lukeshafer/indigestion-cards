@@ -1,18 +1,17 @@
 ---
+import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
-
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 
 const packs = await getAllPacks();
 ---
 
-<Page title="All Packs" session={session}>
-	<h1 class="page-heading">All Packs</h1>
+<Page title="All Packs" breadcrumbs={[{label: "Home", href: "/" }, {label: "Packs"}]}>
+	<header class="page-header">
+		<h1 class="page-heading">All Packs</h1>
+	</header>
 	<sort-table>
-		<table class="max-w-lg">
+		<table x-data="{}">
 			<thead>
 				<tr>
 					<th class="w-1/2">Owner</th>
@@ -46,7 +45,7 @@ const packs = await getAllPacks();
 											username: pack.username,
 											packId: pack.packId,
 										})}
-										hx-get={`/api/html/pack/start-edit`}>
+										hx-get={api.PACK.START_EDIT}>
 										Edit
 									</button>
 								</td>

@@ -1,12 +1,10 @@
 ---
 import Base, { type BaseProps } from './Base.astro';
 import Hamburger from '@/components/Hamburger.astro';
-import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
-import { Icon } from 'astro-icon';
 import UserSearch from '@/components/UserSearch.astro';
-import { routes } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
+import AdminPanel from '@/components/AdminPanel.astro';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -14,122 +12,25 @@ export interface Props extends BaseProps {
 }
 
 const { class: className, breadcrumbs, ...baseProps } = Astro.props;
-
-const alert = Astro.url.searchParams.get('alert');
-const alertType =
-	Astro.url.searchParams.get('alertType') ?? Astro.url.searchParams.get('type') ?? 'error';
-const alertColor =
-	{
-		success: 'bg-green-200',
-		error: 'bg-red-200',
-	}[alertType] ?? 'bg-red-200';
-
-const currentPage = Astro.url.pathname;
-const adminLinks = [
-	{ href: routes.ADMIN_USERS, title: 'Admins' },
-	{ href: routes.DESIGNS, title: 'Designs' },
-	{ href: routes.PACK_TYPES, title: 'Pack Types' },
-	{ href: routes.PACKS, title: 'Packs' },
-	{ href: routes.RARITIES, title: 'Rarities' },
-	{ href: routes.SEASONS, title: 'Seasons' },
-	{ href: routes.ADMIN.SITE_CONFIG, title: 'Site Config' },
-	{ href: routes.USERS, title: 'Users' },
-] satisfies { href: string; title: string }[];
-
-const packs = await getAllPacks();
-
-const actionLinks = [
-	{ href: routes.ADMIN.OPEN_PACKS, title: 'Open Packs', id: 'open-packs', count: packs.length },
-	{ href: routes.ADMIN.GIVE_PACK, title: 'Give Pack', id: 'give-pack' },
-];
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden">
-		<AdminOnly session={Astro.props.session}>
-			<side-nav class="overflow-y-scroll">
-				<nav
-					class="max-w-[16rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
-					<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
-						{
-							actionLinks.map((actionLink) => (
-								<a
-									rel="prefetch"
-									href={actionLink.href}
-									title={actionLink.title}
-									class="action-link shine text-shadow">
-									{actionLink.count ? (
-										<span class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow">
-											{packs.length}
-										</span>
-									) : null}
-									{actionLink.title}
-								</a>
-							))
-						}
-					</div>
-					<div class="pb">
-						<h2 class="text-2xl font-heading text-brand-dark font-medium my-3 p-1 px-6">
-							Administration
-						</h2>
-						{
-							adminLinks.map(({ href, title }) =>
-								currentPage === href || currentPage.startsWith(href) ? (
-									<a
-										rel="prefetch"
-										href={href}
-										title={title}
-										class="text-xl font-heading font-medium block bg-white text-black px-6 py-1 my-1">
-										{title}
-									</a>
-								) : (
-									<a
-										rel="prefetch"
-										href={href}
-										title={title}
-										class="text-xl font-heading font-medium block text-shadow px-6 py-1 my-1 hover:bg-gray-900/20">
-										{title}
-									</a>
-								)
-							)
-						}
-					</div>
-					<div class="px-4 py-2 items-center gap-3 relative">
-						<div
-							class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
-							<a
-								rel="prefetch"
-								href="/api/auth/logout"
-								title="Logout"
-								class="block hover:bg-gray-100 p-3">
-								Logout
-							</a>
-						</div>
-						<button
-							class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
-							title={Astro.props.session?.properties?.username}>
-							<Icon
-								name="mdi:gear"
-								class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
-							/>
-							{Astro.props.session?.properties?.username}
-						</button>
-					</div>
-				</nav>
-			</side-nav>
+	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="true transition:true">
+		<AdminOnly>
+			<AdminPanel />
 		</AdminOnly>
-		<div class="md:col-start-2 overflow-y-scroll relative">
+		<div class="md:col-start-2 overflow-y-scroll relative" id="page-scroll-wrapper">
 			<header
-				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4">
-				<AdminOnly session={Astro.props.session}>
+				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
+				hx-disable>
+				<AdminOnly>
 					<div
-						data-for-side-nav
+						data-for-admin-panel
 						class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
 						<Hamburger />
 					</div>
 				</AdminOnly>
 				<a
-					rel="prefetch"
 					href="/"
 					title="Home"
 					class="flex-col font-display text-white text-shadow hidden md:flex flex-1">
@@ -138,13 +39,13 @@ const actionLinks = [
 				</a>
 				<UserSearch />
 			</header>
+			<div id="alert-wrapper" class="sticky top-0"></div>
 			<div class="flex-1">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
-			<main class={(className ?? '') + ' p-2 md:p-4 col-start-2'}>
-				<div id="alert-wrapper">
-					{alert ? <div class={`p-4 ${alertColor} mb-4`}>{alert}</div> : null}
-				</div>
+			<main
+				class={(className ?? '') +
+					' p-4 md:p-6 lg:p-8 xl:p-10 col-start-2 max-w-6xl slide-it'}>
 				<slot />
 			</main>
 		</div>
@@ -183,52 +84,9 @@ const actionLinks = [
 		z-index: 0;
 	}
 
-	side-nav {
-		position: relative;
-	}
-
-	side-nav::-webkit-scrollbar {
-		display: none;
-	}
-
-	nav {
-		/* to bottom right */
-		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
-	}
-
-	.action-link {
-		font-size: 2.25rem /* 36px */;
-		line-height: 2.5rem /* 40px */;
-		text-transform: uppercase;
-		display: block;
-		text-align: center;
-		background-color: var(--color-tertiary);
-		padding: 0.5rem 1rem;
-		font-family: var(--font-heading);
-		font-weight: 800;
-		border-radius: 1rem;
-		position: relative;
-		transition: scale 50ms ease-in-out;
-	}
-
-	.action-link:hover {
-		scale: 1.05;
-	}
-
 	@media (max-width: 768px) {
 		.page-layout {
 			grid-template-columns: 1fr;
-		}
-
-		side-nav {
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			z-index: 1;
-			--isClosed: 1;
-			transform: translateX(calc(var(--isClosed) * -100%));
-			transition: transform 0.3s ease-in-out;
 		}
 
 		.toggle-btn {
@@ -239,31 +97,54 @@ const actionLinks = [
 </style>
 
 <script>
-	class SideNav extends HTMLElement {
-		isClosed = true;
-		constructor() {
-			super();
+	window.onload = () => {
+		const url = new URL(window.location.href);
+
+		// Check for alert in url search params
+		const alert = url.searchParams.get('alert');
+		const alertType = url.searchParams.get('alertType') ?? url.searchParams.get('type');
+		// call displayAlert event if alert exists
+		if (alert) {
+			document.body.dispatchEvent(
+				new CustomEvent('displayAlert', {
+					detail: {
+						message: alert,
+						type: alertType,
+					},
+				})
+			);
 		}
 
-		connectedCallback() {
-			const hamburgerButton = document.querySelector(
-				'[data-for-side-nav] button'
-			) as HTMLButtonElement;
-			const nav = this.querySelector('nav') as HTMLDivElement;
-			hamburgerButton.addEventListener('click', () => {
-				this.isClosed = !this.isClosed;
-				this.style.setProperty('--isClosed', `${+this.isClosed}`);
-				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`);
-				nav.setAttribute('aria-expanded', `${this.isClosed}`);
-			});
+		// remove alert and alertType from url search params
+		url.searchParams.delete('alert');
+		url.searchParams.delete('alertType');
+		window.history.replaceState({}, '', url);
+	};
 
-			const userMenu = this.querySelector('.user-menu') as HTMLDivElement;
-			const userButton = this.querySelector('.user-button') as HTMLButtonElement;
-			userButton.addEventListener('click', () => {
-				userMenu.classList.toggle('hidden');
-			});
-		}
-	}
+	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
+	document.body.addEventListener('clearAlert', () => {
+		alertWrapper.replaceChildren();
+	});
 
-	customElements.define('side-nav', SideNav);
+	document.body.addEventListener('displayAlert', (e) => {
+		// @ts-expect-error - this does exist
+		const text = e.detail.message;
+		// @ts-expect-error - this one too
+		const type = e.detail.type ?? 'error';
+
+		const alert = document.createElement('p');
+		alert.classList.add('alert-text-box');
+		alert.dataset.type = type;
+		alert.textContent = text;
+		const closeBtn = document.createElement('button');
+		closeBtn.textContent = 'x';
+		closeBtn.addEventListener('click', () => {
+			alertWrapper.replaceChildren();
+		});
+		alert.appendChild(closeBtn);
+		alertWrapper.replaceChildren(alert);
+
+		// scroll to top
+		document.getElementById('page-scroll-wrapper')?.scrollTo(0, 0);
+	});
 </script>

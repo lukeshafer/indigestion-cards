@@ -1,9 +1,7 @@
 ---
-import { useAdmin } from '@/session';
 import { getPackById } from '@lil-indigestion-cards/core/card';
 import TradingCard from '@/components/TradingCard.astro';
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
+import { api } from '@/constants';
 
 const packId = Astro.url.searchParams.get('packId');
 if (!packId) return new Response('PackId Required', { status: 400 });
@@ -13,37 +11,39 @@ const pack = await getPackById({ packId });
 if (!pack) return new Response('Pack not found', { status: 404 });
 ---
 
-<h2 class="text-center text-3xl font-semibold">
-	Now opening for <span class="font-display italic block">{pack.username}</span>
-</h2>
-<ul class="flex gap-12 flex-wrap justify-center items-center">
-	{
-		pack.cardDetails.map((card) => (
-			<li>
-				<p class="error-text" />
-				<div
-					class:list={{ flipped: card.opened }}
-					class="relative perspective preserve-3d origin-center duration-500 transition-transform block w-40 h-56">
-					<button
-						data-script="on click add .flipped to the closest parent <div/>"
-						hx-patch="/api/html/open-card"
-						hx-target="previous p.error-text"
-						hx-swap="outerHTML"
-						hx-vals={JSON.stringify({
-							instanceId: card.instanceId,
-							designId: card.designId,
-						})}
-						class="absolute inset-0 w-full h-full cursor-pointer
-							backface-hidden bg-brand-main border-4 border-brand-dark"
-						title="Click to reveal"
-					/>
-					<div class="absolute inset-0 w-full h-full backface-hidden flipped">
-						<TradingCard border={card.rarityName.toLowerCase()}>
-							<img class="w-40 h-56" src={card.imgUrl} />
-						</TradingCard>
+<body>
+	<h2 class="text-center text-3xl font-semibold">
+		Now opening for <span class="font-display italic block">{pack.username}</span>
+	</h2>
+	<ul class="flex gap-12 flex-wrap justify-center items-center">
+		{
+			pack.cardDetails.map((card) => (
+				<li x-data={`{ flipped: ${card.opened} }`}>
+					<p class="error-text" />
+					<div
+						x-effect="$el.classList.toggle('flipped', flipped)"
+						class="relative perspective preserve-3d origin-center duration-500 transition-transform block w-40 h-56">
+						<button
+							@click="flipped = true"
+							hx-patch={api.OPEN_CARD}
+							hx-target="previous p.error-text"
+							hx-swap="outerHTML"
+							hx-vals={JSON.stringify({
+								instanceId: card.instanceId,
+								designId: card.designId,
+							})}
+							class="absolute inset-0 w-full h-full cursor-pointer
+						backface-hidden bg-brand-main border-4 border-brand-dark"
+							title="Click to reveal"
+						/>
+						<div class="absolute inset-0 w-full h-full backface-hidden flipped">
+							<TradingCard border={card.rarityName.toLowerCase()}>
+								<img class="w-40 h-56" src={card.imgUrl} />
+							</TradingCard>
+						</div>
 					</div>
-				</div>
-			</li>
-		))
-	}
-</ul>
+				</li>
+			))
+		}
+	</ul>
+</body>

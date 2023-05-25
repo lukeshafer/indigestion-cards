@@ -1,28 +1,34 @@
 name: Deploy SST App
 
 on:
-  push:
-    branches:
-      - demo
+    push:
+        branches:
+            - demo
+            - dev
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
 
-    - name: Install dependencies
-      run: npm ci
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.2.4
+              with:
+                  version: 8.4.0
 
-    - name: Deploy SST app
-      run: npx sst deploy --stage demo
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Deploy SST app
+              run: pnpm run deploy --stage ${GITHUB_REF##*/}
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

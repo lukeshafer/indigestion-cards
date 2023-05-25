@@ -1,6 +1,7 @@
 import { ApiHandler, useFormValue } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
 import { db } from '@lil-indigestion-cards/core/db';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
@@ -10,6 +11,7 @@ export const handler = ApiHandler(async () => {
 			body: 'Unauthorized',
 		};
 	}
+	setAdminEnvSession(session.properties.username, session.properties.userId);
 
 	const firstInput = useFormValue('first-input');
 	const secondInput = useFormValue('second-input');
@@ -18,7 +20,7 @@ export const handler = ApiHandler(async () => {
 	const code2 = "I'm SURE!!";
 
 	if (firstInput !== code1 || secondInput !== code2) {
-		console.log('Invalid code');
+		console.error('Invalid code');
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
@@ -33,6 +35,9 @@ export const handler = ApiHandler(async () => {
 		...(await deleteEntity(db.entities.season)),
 		...(await deleteEntity(db.entities.rarities)),
 		...(await deleteEntity(db.entities.unmatchedImages)),
+		...(await deleteEntity(db.entities.twitchEvents)),
+		...(await deleteEntity(db.entities.twitchEventMessageHistory)),
+		...(await deleteEntity(db.entities.users)),
 	]);
 
 	return {
@@ -41,7 +46,7 @@ export const handler = ApiHandler(async () => {
 	};
 });
 
-type EntityName = keyof Omit<(typeof db)['entities'], 'users' | 'admins'>;
+type EntityName = keyof Omit<(typeof db)['entities'], 'admins'>;
 type Entity = (typeof db)['entities'][EntityName];
 
 async function deleteEntity(entity: Entity) {

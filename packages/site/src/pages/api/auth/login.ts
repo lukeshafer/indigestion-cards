@@ -1,20 +1,19 @@
-import { Auth } from 'sst/node/future/auth'
-//import { useUser } from '@/session'
-import type { APIRoute } from 'astro'
-import { authApi } from '@/constants'
+import { Auth } from 'sst/node/future/auth';
+import type { APIRoute } from 'astro';
+import { authApi } from '@/constants';
 
 export const get: APIRoute = async (ctx) => {
-	//const user = useUser(ctx.cookies)
-	//if (user) return ctx.redirect('/')
-	const streamer = ctx.url.searchParams.get('streamer')
+	const streamer = ctx.url.searchParams.get('streamer');
+
+	const client_id = ctx.url.host === 'localhost:3000' ? 'local' : 'main';
 
 	const authParams = new URLSearchParams({
-		client_id: 'local',
+		client_id: client_id,
 		redirect_uri: ctx.url.origin + authApi.CALLBACK,
 		response_type: 'code',
 		provider: streamer === 'true' ? 'twitchStreamer' : 'twitchUser',
-	}).toString()
+	}).toString();
 
-	const authUrl = `${Auth.AdminSiteAuth.url}/authorize?${authParams}`
-	return ctx.redirect(authUrl)
-}
+	const authUrl = `${Auth.AdminSiteAuth.url}/authorize?${authParams}`;
+	return ctx.redirect(authUrl);
+};

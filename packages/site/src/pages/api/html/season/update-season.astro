@@ -1,0 +1,36 @@
+---
+import { api } from '@/constants';
+import { updateSeason } from '@lil-indigestion-cards/core/card';
+
+if (Astro.request.method !== 'PATCH') return new Response('Invalid method', { status: 405 });
+
+const params = new URLSearchParams(await Astro.request.text());
+const seasonId = params.get('seasonId');
+const seasonName = params.get('seasonName');
+const seasonDescription = params.get('seasonDescription') || '';
+
+if (!seasonId || !seasonName) return new Response('Missing required parameters', { status: 400 });
+
+await updateSeason({
+	seasonId,
+	seasonName,
+	seasonDescription,
+});
+---
+
+<body>
+	<h1 class="page-heading" id="season-name" hx-swap-oob="true">{seasonName}</h1>
+	<p class="text-lg" id="season-description" hx-swap-oob="true">{seasonDescription}</p>
+	<button
+		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
+		class="post-button"
+		data-type="success"
+		hx-swap="outerHTML transition:false"
+		hx-get={api.SEASON.START_EDIT}
+		hx-vals={JSON.stringify({
+			seasonId,
+			seasonName,
+			seasonDescription,
+		})}>Saved</button
+	>
+</body>

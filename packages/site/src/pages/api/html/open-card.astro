@@ -1,11 +1,7 @@
 ---
-import { useAdmin } from '@/session';
 import { openCardFromPack } from '@lil-indigestion-cards/core/card';
-const session = useAdmin(Astro.cookies);
-if (!session) return Astro.redirect('/404');
 
 if (Astro.request.method !== 'PATCH') return new Response('Method not allowed', { status: 405 });
-
 const params = new URLSearchParams(await Astro.request.text());
 const instanceId = params.get('instanceId');
 const designId = params.get('designId');
@@ -17,7 +13,7 @@ if (!instanceId || !designId) {
 	};
 }
 
-//const result = { success: false, error: 'Not implemented' }; // for testing 
+//const result = { success: false, error: 'Not implemented' }; // for testing
 const result = await openCardFromPack({ instanceId, designId });
 
 if (result.success) {
@@ -25,4 +21,6 @@ if (result.success) {
 }
 ---
 
-<p class="text-red-500 font-bold text-center">An error occurred.</p>
+<body>
+	<p class="text-red-500 font-bold text-center">An error occurred.</p>
+</body>

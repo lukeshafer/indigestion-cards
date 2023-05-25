@@ -34,7 +34,7 @@ export async function getUserAndCardInstances(args: { username: string }) {
 		const data = await db.collections.cardsByOwnerName({ username: args.username }).go();
 		return data.data;
 	} catch {
-		console.log('Error while retrieving user and card instance data for user', args.username);
+		console.error('Error while retrieving user and card instance data for user', args.username);
 		return null;
 	}
 }
@@ -43,6 +43,9 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 	const existingUser = await getUserByUserName(args.username);
 	if (existingUser && existingUser.username === args.username) {
 		const twitchData = await getUserByLogin(args.username);
+		if (!twitchData) {
+			throw new Error(`Username ${args.username} is not a valid Twitch user`);
+		}
 		if (twitchData.login === args.username) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.username} is taken`);
@@ -54,7 +57,14 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 		});
 	}
 
-	const result = await db.entities.users.create(args).go();
+	const twitchLogin = await getUserByLogin(args.username);
+
+	const result = await db.entities.users
+		.create({
+			...args,
+			username: twitchLogin?.display_name ?? args.username,
+		})
+		.go();
 	return result.data;
 }
 
@@ -63,14 +73,13 @@ export async function updateUsername(
 	iteration = 0
 ) {
 	if (iteration > 10) throw new Error('Too many iterations');
-	console.log(
-		`Updating username for ${args.userId} to ${args.newUsername} from ${args.oldUsername}`
-	);
 	const existingUser = await getUserByUserName(args.newUsername);
 	if (existingUser && existingUser.username === args.newUsername) {
-		console.log(`Username ${args.newUsername} is taken, updating`);
 		// username is taken in our database, and is likely out of date
 		const twitchData = await getUserByLogin(args.newUsername);
+		if (!twitchData) {
+			throw new Error(`Username ${args.newUsername} is not a valid Twitch user`);
+		}
 		if (twitchData.login === args.newUsername) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.newUsername} is still taken`);
@@ -123,7 +132,11 @@ export async function createAdminUser(args: { userId: string; username: string }
 	}
 }
 
-export async function deleteAdminUser(args: { userId: string }) {
+export async function deleteAdminUser(args: {
+	userId: string;
+	username: string;
+	isStreamer: boolean;
+}) {
 	try {
 		const result = await db.entities.admins.delete(args).go();
 		return { success: true, data: result.data };
@@ -171,4 +184,10 @@ function getDefaultCardCountInPack() {
 function getCurrentSeasonId() {
 	// TODO: implement this properly with database
 	return 'season-1';
+}
+
+export function setAdminEnvSession(username: string, userId: string) {
+	process.env.SESSION_USER_ID = userId;
+	process.env.SESSION_TYPE = 'admin';
+	process.env.SESSION_USERNAME = username;
 }

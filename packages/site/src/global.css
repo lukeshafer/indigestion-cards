@@ -118,11 +118,150 @@
 		color: #000;
 	}
 
-	@media (prefers-color-scheme: dark) {
-		html {
-			/*--bg-color: var(--bg-color-dark);*/
-			/*--text-color: var(--text-dark);*/
-		}
+	my-form input, 
+	my-form textarea, 
+	my-form select, 
+	my-form option,
+	.my-form-input {
+		display: block;
+		width: 100%;
+		padding: 0.25rem;
+		background-color: #fff;
+		color: black;
+	}
+
+	my-form input[readonly], .my-form-input[readonly] {
+		background-color: var(--gray-2)
+	}
+
+	my-form input:not([type="file"]), my-form select, my-form textarea, .my-form-input {
+		outline: 1px solid #ccc;
+	}
+
+	my-form select:focus, my-form input:focus, my-form textarea:focus, .my-form-input:focus {
+		outline: 3px solid var(--color-main);
+	}
+
+	button.edit-readonly {
+		position: absolute;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: none;
+		border: none;
+		opacity: 0.5;
+		color: black;
+		line-height: 1;
+	}
+
+	button.edit-readonly:hover {
+		opacity: 1;
+	}
+
+	my-form label {
+		display: block;
+		font-weight: 600;
+		font-family: var(--font-heading);
+	}
+
+	my-form label.required::after {
+		content: ' *';
+		color: var(--red-9);
+	}
+
+	my-form input[type='checkbox'], .my-form-checkbox {
+		display: inline-block;
+		width: auto;
+	}
+
+	my-form input[type='checkbox'] + label, .my-form-checkbox + label {
+		display: inline-block;
+		font-weight: 400;
+	}
+
+	my-form fieldset label {
+		display: inline-block;
+		font-size: 0.9em;
+		font-weight: 500;
+	}
+
+	my-form input[type='file'] {
+		display: flex;
+		flex-direction: column;
+		font-family: var(--font-heading);
+		padding-inline: 0;
+	}
+
+	my-form input[type='file'] + img.preview {
+		max-width: 20rem;
+		object-fit: contain;
+		margin: 0;
+	}
+
+	my-form input::file-selector-button {
+		text-shadow: var(--brand-shadow);
+		font-family: var(--font-heading);
+		padding: 0.5rem;
+		font-weight: 500;
+		margin-bottom: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+		content: 'Choose a file';
+	}
+
+	my-form input::file-selector-button:hover {
+		background: var(--color-secondary);
+	}
+
+	.input-group {
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+		width: 100%;
+	}
+
+	my-form button {
+		font-family: var(--font-heading);
+		padding: 0.5rem;
+		display: block;
+		border: 1px solid #ccc;
+		background: var(--color-tertiary);
+		cursor: pointer;
+		color: white;
+		transition: background 0.2s ease;
+		text-shadow: var(--brand-shadow);
+	}
+
+	my-form textarea {
+		height: 100px;
+	}
+
+	my-form button:hover {
+		background-color: var(--color-secondary);
+	}
+
+	my-form button[type='submit'] {
+		font-weight: 700;
+		text-transform: uppercase;
+		background-color: var(--color-tertiary);
+	}
+
+	my-form fieldset {
+		/*fieldset: 'border border-gray-300 p-4 w-full grid gap-8',*/
+		border: 1px solid #ccc;
+		padding: 1rem;
+		width: 100%;
+		display: grid;
+		gap: 1rem;
+	}
+
+	my-form legend {
+		font-weight: 600;
+		font-size: 1rem;
 	}
 }
 
@@ -169,9 +308,47 @@
 	}
 }
 
+@keyframes fade-in {
+	from { opacity: 0; }
+}
+
+@keyframes fade-out {
+	to { opacity: 0; }
+}
+
+@keyframes slide-from-right {
+	from { transform: translateX(90px); }
+}
+
+@keyframes slide-to-left {
+	to { transform: translateX(-90px); }
+}
+
+@keyframes grow {
+	from { transform: scaleY(0); }
+	to { transform: scaleY(1); }
+}
+
+@keyframes shrink {
+	from { transform: scaleY(1); }
+	to { transform: scaleY(0); }
+}
+
 @layer components {
+	.slide-it {
+		view-transition-name: slide-it;
+	}
+
+   ::view-transition-old(slide-it) {
+     animation: 180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+     600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+   }
+   ::view-transition-new(slide-it) {
+     animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+     600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+   }
+
 	sort-table {
-		max-width: 60rem;
 		display: block;
 	}
 
@@ -179,7 +356,6 @@
 		table-layout: fixed;
 		text-align: center;
 		width: 100%;
-		max-width: 60rem;
 	}
 
 	sort-table th:not([data-no-sort]) {
@@ -190,6 +366,10 @@
 		font-weight: 500;
 		padding: 1.5rem;
 		position: relative;
+	}
+
+	sort-table.compact tbody td {
+		padding: 0.5rem;
 	}
 
 	sort-table tbody td span {
@@ -209,12 +389,12 @@
 		color: lightgray;
 	}
 
-	sort-table tbody tr:nth-child(even) {
-		@apply bg-gray-50;
+	sort-table tbody tr:not:nth-child(even) {
+		background-color: var(--gray-1)
 	}
 
 	sort-table tbody tr:nth-child(odd) {
-		@apply bg-gray-200;
+		background-color: var(--gray-3)
 	}
 
 	sort-table th[data-mode='ascending']::after {
@@ -235,8 +415,8 @@
 	}
 
 	.page-heading {
-		font-size: 2.25rem;
-		line-height: 2.5rem;
+		font-size: 2rem;
+		line-height: 2.25rem;
 		font-family: var(--font-heading);
 		font-weight: 700;
 		text-transform: uppercase;
@@ -245,30 +425,28 @@
 
 	.sub-heading {
 		font-size: 1.5rem;
-		line-height: 1.5rem;
+		line-height: 1.3rem;
 		font-family: var(--font-heading);
 		font-weight: 500;
 		text-transform: uppercase;
-		margin: 0.2rem 0;
+		margin: 0.5rem 0;
 	}
 
 	.button-link {
-		@apply shine;
 		text-shadow: var(--brand-shadow);
-		font-size: 1.25rem/* 20px */;
-		line-height: 1.75rem/* 28px */;
+		font-size: 1.2rem;
 		background-color: var(--color-tertiary);
-		padding: 1rem 1rem 0.75rem;
-		text-align: center;
+		padding: 0.5em 0.8em 0.3em;
+		vertical-align: middle;
 		width: max-content;
 		font-family: var(--font-display);
 		text-transform: lowercase;
 		font-style: italic;
+		height: fit-content;
 		color: #fff;
 	}
 
 	.post-button {
-		@apply shine;
 		text-shadow: var(--brand-shadow);
 		font-weight: 700;
 		padding: 0.5rem 1rem;
@@ -325,6 +503,50 @@
 	.htmx-indicator::after {
 		animation: loading-elipses 3s infinite;
 		content: '';
+	}
+
+	.page-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.3rem 2rem;
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	.alert-text-box {
+		padding: 1rem;
+		background-color: var(--red-2);
+		color: var(--red-12);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		view-transition-name: alert-grow-shrink;
+	}
+
+	.alert-text-box button {
+		font-size: 1.2em;
+	}
+
+	.alert-text-box[data-type="error"] {
+		background-color: var(--red-2);
+		color: var(--red-12);
+	}
+
+	.alert-text-box[data-type="success"] {
+		background-color: var(--teal-2);
+		color: var(--teal-12);
+	}
+
+	::view-transition-old(alert-grow-shrink) {
+		transform-origin: top;
+		animation: 500ms cubic-bezier(0.4, 0, 1, 1) both shrink;
+	}
+	::view-transition-new(alert-grow-shrink) {
+		transform-origin: top;
+		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both grow;
 	}
 }
 

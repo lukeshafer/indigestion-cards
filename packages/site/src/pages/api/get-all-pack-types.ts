@@ -1,16 +1,18 @@
-import { getAllPackTypes } from '@lil-indigestion-cards/core/card'
-import type { APIRoute } from 'astro'
-import { useAdmin } from '@/session'
+import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import type { APIRoute } from 'astro';
 
-export const get: APIRoute = async (ctx) => {
-	const session = useAdmin(ctx.cookies)
-	if (!session) return ctx.redirect('/')
-	const packTypes = await getAllPackTypes()
+export const get: APIRoute = async () => {
+	const packTypes = await getAllPackTypes();
 
-	return {
-		statusCode: 200,
-		body: JSON.stringify(
+	return new Response(
+		JSON.stringify(
 			packTypes.map(({ packTypeName, packTypeId }) => ({ packTypeName, packTypeId }))
 		),
-	}
-}
+		{
+			status: 200,
+			headers: {
+				'content-type': 'application/json',
+			},
+		}
+	);
+};

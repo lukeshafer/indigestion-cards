@@ -15,7 +15,6 @@ export const handler = ApiHandler(async () => {
 	if (!userId) return { statusCode: 400, body: 'Missing userId' }
 	if (!username) return { statusCode: 400, body: 'Missing username' }
 
-	console.log('Revoking pack for', username, userId)
 	const result = await deleteFirstPackForUser({ userId })
 
 	if (!result.success) {

@@ -1,84 +1,102 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
-
-const user = useAdmin(Astro.cookies);
-if (!user) {
-	return Astro.redirect('/404');
-}
+import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import TableSearch from '@/components/TableSearch.astro';
 
 const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
 
-// this is a sample of the data returned from the api
-const rawRewards = [
-	{
-		id: '92af127c-7326-4483-a52b-b0da0be61c01',
-		image: null,
-		background_color: '#00E5CB',
-		is_enabled: true,
-		cost: 50000,
-		title: 'Redeem 1 Pack',
-	},
-	{
-		id: '92af127c-7326-4483-a52b-b0da0be61c02',
-		image: null,
-		background_color: '#00E5CB',
-		is_enabled: true,
-		cost: 50000,
-		title: 'Give the dogs a treat.',
-	},
-];
+const giftSubEvent = twitchEvents.data.find(
+	(event) =>
+		event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
+);
 
-const rewards = rawRewards.map((reward) => {
-	const dbEvent = twitchEvents.data.find((event) => event.eventId === reward.id);
+const rewards = twitchEvents.data
+	.filter((event) => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
+	.sort((a, b) => {
+		if (a.packTypeId && !b.packTypeId) return -1;
+		if (!a.packTypeId && b.packTypeId) return 1;
+		if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
+		if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
+		return 0;
+	});
 
-	return {
-		...reward,
-		packType: JSON.stringify(
-			dbEvent?.packTypeId && dbEvent?.packTypeName
-				? {
-						packTypeId: dbEvent?.packTypeId || '',
-						packTypeName: dbEvent?.packTypeName || '',
-				  }
-				: undefined
-		),
-	};
-});
+const giftSubPackType =
+	giftSubEvent?.packTypeId && giftSubEvent?.packTypeName
+		? {
+				packTypeId: giftSubEvent?.packTypeId || '',
+				packTypeName: giftSubEvent?.packTypeName || '',
+		  }
+		: undefined;
 ---
 
-<Page
-	session={user}
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]}
-	title="Site Config">
+<Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
 	<h1 class="page-heading">Site Config</h1>
 	<section>
-		<header class="flex gap-x-10 gap-y-2 items-center flex-wrap">
-			<h2 class="sub-heading py-4">Twitch Channel Point Rewards</h2>
-			<button class="post-button" data-type="submit" data-save hidden>Save</button>
-		</header>
 		<sort-table>
-			<table class="mt-4">
+			<header class="page-header">
+				<h2 class="sub-heading">Twitch Event Rewards</h2>
+				<button class="post-button" data-type="submit" data-save hidden>Save</button>
+				<TableSearch
+					id="rewards-search"
+					tableId="rewards-table"
+					label="Search Rewards"
+					searchColumn="Event"
+				/>
+			</header>
+			<table class="mt-4" id="rewards-table">
 				<thead>
 					<tr>
 						<th class="w-2/3">Event</th>
-						<th>Pack Type</th>
+						<th data-no-sort>Pack Type</th>
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td>5 Gift Subs</td>
+						<td>
+							<select
+								data-pack-type-select
+								data-id={TWITCH_GIFT_SUB_ID}
+								data-title={'5 Gift Subs'}
+								data-cost="5"
+								data-value={giftSubPackType ? JSON.stringify(giftSubPackType) : ''}
+								class="my-form-input">
+								<option value="">None</option>
+								{
+									packTypes.map(({ packTypeId, packTypeName }) => (
+										<option
+											value={JSON.stringify({
+												packTypeId,
+												packTypeName,
+											})}>
+											{packTypeName}
+										</option>
+									))
+								}
+							</select>
+						</td>
+					</tr>
 					{
 						rewards.map((reward) => (
 							<tr>
-								<td>{reward.title}</td>
+								<td>Reward: {reward.eventName}</td>
 								<td>
 									<select
 										data-pack-type-select
-										data-id={reward.id}
-										data-title={reward.title}
+										data-id={reward.eventId}
+										data-title={reward.eventName}
 										data-cost={reward.cost}
-										data-value={reward.packType}
-										class="my-form-select">
+										data-value={
+											reward.packTypeId
+												? JSON.stringify({
+														packTypeId: reward.packTypeId,
+														packTypeName: reward.packTypeName,
+												  })
+												: ''
+										}
+										class="my-form-input">
 										<option value="">None</option>
 										{packTypes.map(({ packTypeId, packTypeName }) => (
 											<option

@@ -1,5 +1,4 @@
 import { AUTH_TOKEN } from '@/constants';
-import { useAdmin } from '@/session';
 import type { APIRoute } from 'astro';
 import { Api } from 'sst/node/api';
 
@@ -11,12 +10,6 @@ export const all: APIRoute = async (ctx) => {
 	const apiRoute = ctx.params.apiRoute;
 	if (!apiRoute) {
 		return ctx.redirect('/404');
-	}
-
-	const session = useAdmin(ctx.cookies);
-	const token = ctx.cookies.get(AUTH_TOKEN);
-	if (!token || !session) {
-		return new Response('Unauthorized', { status: 401 });
 	}
 
 	const redirectUrl = new URL(ctx.url.origin + (ctx.url.searchParams.get('redirect') ?? '/'));
@@ -42,7 +35,6 @@ export const all: APIRoute = async (ctx) => {
 		if (jsonBody.redirectPath) {
 			redirectUrl.pathname = jsonBody.redirectPath;
 		}
-		console.log(jsonBody.redirectPath);
 		params = new URLSearchParams(jsonBody.params);
 		params.forEach((value, key) => {
 			redirectUrl.searchParams.set(key, value);

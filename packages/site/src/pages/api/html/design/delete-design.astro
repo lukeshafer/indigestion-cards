@@ -1,0 +1,60 @@
+---
+import { AUTH_TOKEN } from '@/constants';
+import { deleteCardDesignById } from '@lil-indigestion-cards/core/card';
+import { Api } from 'sst/node/api';
+
+if (Astro.request.method.toUpperCase() !== 'DELETE')
+	return new Response('Method not allowed', { status: 405 });
+
+const params = new URLSearchParams(await Astro.request.text());
+
+const designId = params.get('designId');
+const imgUrl = params.get('imgUrl');
+const cardName = params.get('cardName');
+if (!designId) return { statusCode: 400, body: 'Missing design id' };
+if (!imgUrl) return { statusCode: 400, body: 'Missing image url' };
+
+const deleteImageUrl = `${Api.api.url}/delete-card-image`;
+const deleteImageResult = await fetch(deleteImageUrl, {
+	method: 'DELETE',
+	body: JSON.stringify({ imgUrl }),
+	headers: {
+		authorization: `Bearer ${Astro.cookies.get(AUTH_TOKEN).value ?? ''}`,
+	},
+});
+if (!deleteImageResult.ok) {
+	console.error(deleteImageResult);
+	return new Response('Failed to delete image from S3', {
+		status: 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: 'Failed to delete image from S3',
+				},
+			}),
+		},
+	});
+}
+
+const result = await deleteCardDesignById({ designId });
+if (!result || !result.success)
+	return new Response('Failed to delete card design', {
+		status: 500,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayAlert: {
+					type: 'error',
+					message: result.error || 'Failed to delete card design',
+				},
+			}),
+		},
+	});
+
+Astro.response.headers.set(
+	'HX-Redirect',
+	`/design?alert=Successfully deleted card ${cardName || designId}&alertType=success`
+);
+---
+
+<body></body>

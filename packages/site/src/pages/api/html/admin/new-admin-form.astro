@@ -1,0 +1,30 @@
+---
+import { api } from '@/constants';
+import crypto from 'crypto';
+const token = 'a' + crypto.randomBytes(2).toString('hex');
+---
+
+<body>
+	<tr id={token} x-data="{ buttonText: 'Cancel' }">
+		<td>
+			<input
+				id={`${token}-username`}
+				type="text"
+				name="username"
+				@input="$el.value.length > 0 ? buttonText = 'Save' : buttonText = 'Cancel'"
+			/>
+		</td>
+		<td>
+			<button
+				class="post-button text-center"
+				data-type="submit"
+				x-text="buttonText"
+				hx-post={api.ADMIN.CREATE}
+				hx-target={`#${token}`}
+				hx-swap="outerHTML"
+				hx-include={`#${token}-username`}>
+				Cancel</button
+			>
+		</td>
+	</tr>
+</body>

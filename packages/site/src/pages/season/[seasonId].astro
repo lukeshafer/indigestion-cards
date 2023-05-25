@@ -1,17 +1,11 @@
 ---
 import CardList from '@/components/CardList.astro';
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import {
 	getPackTypesBySeasonId,
 	getSeasonAndDesignsBySeasonId,
 } from '@lil-indigestion-cards/core/card';
-import PostButton from '@/components/form/PostButton.astro';
 import { api, routes } from '@/constants';
-
-console.log('test');
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect('/404');
 
 const id = Astro.params.seasonId;
 
@@ -63,23 +57,26 @@ const breadcrumbs = [
 ];
 ---
 
-<Page
-	title={season.seasonName}
-	class="flex flex-col gap-4"
-	session={admin}
-	breadcrumbs={breadcrumbs}>
-	<h1 class="page-heading">{season.seasonName}</h1>
-	{
-		season.seasonDescription ? (
-			<p class="text-lg">Description: {season.seasonDescription}</p>
-		) : null
-	}
+<Page title={season.seasonName} class="flex flex-col gap-4" breadcrumbs={breadcrumbs}>
+	<header>
+		<div class="page-header">
+			<h1 class="page-heading" id="season-name">{season.seasonName}</h1>
+			<button
+				class="post-button"
+				data-type="submit"
+				hx-swap="outerHTML transition:false"
+				hx-get={api.SEASON.START_EDIT}
+				hx-vals={JSON.stringify(season)}>Edit</button
+			>
+		</div>
+		<p class="text-lg" id="season-description">{season.seasonDescription || ''}</p>
+	</header>
 
 	<section class="text-lg">
 		<h2 class="sub-heading">Stats:</h2>
-		<p>Total cards in season: {totalPossibleCards}</p>
-		<p>Cards distributed: {ownedCards}</p>
-		<p>Card remaining to distribute: {remainingCards}</p>
+		<p><b>Total cards in season:</b> {totalPossibleCards}</p>
+		<p><b>Cards distributed:</b> {ownedCards}</p>
+		<p><b>Card remaining to distribute:</b> {remainingCards}</p>
 
 		<h3 class="sub-heading text-xl mt-4">Pack Types:</h3>
 		<ul>
@@ -97,14 +94,15 @@ const breadcrumbs = [
 	</section>
 
 	<h2 class="sub-heading">Cards:</h2>
-	<CardList cards={cardDesigns} session={admin} />
+	<CardList cards={cardDesigns} />
 
-	<PostButton
-		id="delete-season"
-		type="delete"
-		label="Delete Season"
-		url={`${api.DELETE_CARD_SEASON}/${id}?redirect=${routes.SEASONS}`}
-	/>
+	<button
+		class="post-button z-10 w-max"
+		hx-delete={api.SEASON.DELETE}
+		hx-swap="none"
+		hx-vals={JSON.stringify(season)}
+		data-type="delete">Delete Season<form-indicator></form-indicator></button
+	>
 </Page>
 
 <script>

@@ -1,16 +1,18 @@
 import { ApiHandler, useJsonBody } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
 import { z } from 'zod';
-import { batchTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { updateBatchTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
-
 	if (session.type !== 'admin')
 		return {
 			statusCode: 401,
 			body: 'Unauthorized',
 		};
+	setAdminEnvSession(session.properties.username, session.properties.userId);
 
 	const unparsedBody = useJsonBody();
 
@@ -20,14 +22,8 @@ export const handler = ApiHandler(async () => {
 				z.object({
 					twitchEventId: z.string(),
 					twitchEventName: z.string(),
-					packTypeId: z
-						.string()
-						.optional()
-						.transform((val) => val || ''),
-					packTypeName: z
-						.string()
-						.optional()
-						.transform((val) => val || ''),
+					packTypeId: z.string().optional(),
+					packTypeName: z.string().optional(),
 					cost: z.number().optional(),
 				})
 			),
@@ -42,16 +38,18 @@ export const handler = ApiHandler(async () => {
 	}
 
 	const body = parseResult.data;
-	console.log('success', body);
 
-	await batchTwitchEvents({
+	await updateBatchTwitchEvents({
 		events: body.channelPointRewards.map((event) => ({
 			eventId: event.twitchEventId,
 			eventName: event.twitchEventName,
 			packTypeId: event.packTypeId,
 			packTypeName: event.packTypeName,
 			cost: event.cost,
-			eventType: 'channel.channel_points_custom_reward_redemption.add',
+			eventType:
+				event.twitchEventId === TWITCH_GIFT_SUB_ID
+					? 'channel.subscription.gift'
+					: 'channel.channel_points_custom_reward_redemption.add',
 		})),
 	});
 

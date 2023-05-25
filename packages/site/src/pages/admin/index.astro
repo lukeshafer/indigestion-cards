@@ -1,9 +1,4 @@
 ---
-import { useAdmin } from '@/session'
-
-const user = useAdmin(Astro.cookies)
-if (!user) return Astro.redirect('/')
-
 import { Icon } from 'astro-icon'
 import '../../global.css'
 import { authApi } from '@/constants'

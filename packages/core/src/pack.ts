@@ -49,7 +49,6 @@ export async function createPackForNoUser(packDetails: PackDetailsWithoutUser) {
 
 export async function givePackToUser(packDetails: PackDetails) {
 	if (!(await checkIfUserExists(packDetails.userId))) {
-		console.log('User does not exist, creating user');
 		await createNewUser({
 			userId: packDetails.userId,
 			username: packDetails.username,

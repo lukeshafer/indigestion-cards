@@ -5,7 +5,6 @@ import { useQueryParam, useQueryParams } from 'sst/node/api';
 
 export const GET: APIGatewayProxyHandlerV2 = async (e) => {
 	const packId = useQueryParam('packId');
-	console.log(e);
 	if (!packId) return { statusCode: 400, body: 'Missing packId' };
 	const pack = await getPackById({ packId });
 	if (!pack) return { statusCode: 404, body: 'Pack not found' };

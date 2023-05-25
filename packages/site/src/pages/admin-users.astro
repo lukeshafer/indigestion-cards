@@ -1,17 +1,11 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { useAdmin } from '@/session';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
-import { api, routes } from '@/constants';
-import SortTable from '@/components/SortTable.astro';
-import PostButton from '@/components/form/PostButton.astro';
-
-const admin = useAdmin(Astro.cookies);
-if (!admin) return Astro.redirect(`/404`);
+import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
+import { api } from '@/constants';
 
 const unsortedUsers = await getAllAdminUsers();
-
-const currentUser = admin.properties.userId;
+const currentUser = Astro.locals.session?.properties?.userId;
 const users = unsortedUsers.sort((a, b) => {
 	if (a.userId === currentUser) return -1;
 	if (b.userId === currentUser) return 1;
@@ -19,153 +13,32 @@ const users = unsortedUsers.sort((a, b) => {
 });
 ---
 
-<Page
-	title="Users"
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
-	session={admin}>
-	<SortTable>
-		<header slot="header" class="flex justify-between flex-wrap mb-4">
+<Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}>
+	<sort-table>
+		<header slot="header" class="page-header">
 			<h1 class="page-heading">Admin Users</h1>
-			<a
-				href={routes.ADMIN.CREATE.ADMIN}
-				class="text-xl bg-brand-tertiary p-3 pt-4 px-4 text-center w-max font-display lowercase italic shine text-shadow text-white">
-				Add Admin
-			</a>
+			<button
+				class="button-link"
+				id="new-admin-user"
+				hx-get={api.ADMIN.NEW_ADMIN_FORM}
+				hx-target="next tbody"
+				hx-swap="beforeend">Add Admin</button
+			>
 		</header>
-		<thead>
-			<tr>
-				<th class="w-3/4">Username</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			{
-				users.map(({ username, userId }) => (
-					<tr>
-						<td>{username}</td>
-						<td>
-							{username !== admin.properties.username && (
-								<PostButton
-									id="delete-admin-user"
-									label="Delete"
-									type="delete"
-									url={`${api.DELETE_ADMIN_USER}?redirect=${routes.ADMIN_USERS}`}
-									hiddenProperties={[{ name: 'userId', value: userId }]}
-								/>
-							)}
-						</td>
-					</tr>
-				))
-			}
-		</tbody>
-	</SortTable>
+		<table id="#admin-users-table">
+			<thead>
+				<tr>
+					<th class="w-3/4">Username</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					users.map(({ username, userId, isStreamer }) => (
+						<AdminUserRow {username} {userId} {isStreamer} />
+					))
+				}
+			</tbody>
+		</table>
+	</sort-table>
 </Page>
-
-<style>
-	user-table {
-		max-width: 60rem;
-		display: block;
-	}
-
-	table {
-		table-layout: fixed;
-		width: 100%;
-		max-width: 60rem;
-		text-align: center;
-	}
-
-	th {
-		cursor: pointer;
-	}
-
-	tbody td {
-		font-weight: 500;
-		padding: 1.5rem;
-		position: relative;
-	}
-
-	tbody td span {
-		position: relative;
-	}
-
-	tbody td [astro-icon] {
-		width: 3rem;
-		color: white;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
-
-	tbody tr:nth-child(even) [astro-icon] {
-		color: lightgray;
-	}
-
-	tbody tr:nth-child(even) {
-		@apply bg-gray-50;
-	}
-
-	tbody tr:nth-child(odd) {
-		@apply bg-gray-200;
-	}
-
-	th[data-mode='ascending']::after {
-		content: '▲';
-	}
-
-	th[data-mode='descending']::after {
-		content: '▼';
-	}
-</style>
-
-<script>
-	class UserTable extends HTMLElement {
-		constructor() {
-			super();
-		}
-
-		connectedCallback() {
-			const headings = Array.from(this.querySelectorAll('th'));
-			const body = this.querySelector('tbody')!;
-			const rows = Array.from(body.querySelectorAll('tr'));
-			const originalRows = rows.slice();
-			headings.forEach((th, index) => {
-				th.addEventListener('click', () => {
-					const currentMode = th.dataset.mode || 'none';
-					const newMode =
-						currentMode === 'none'
-							? 'ascending'
-							: currentMode === 'ascending'
-							? 'descending'
-							: 'none';
-
-					th.dataset.mode = newMode;
-					if (newMode === 'none') {
-						originalRows.forEach((row) => {
-							body.appendChild(row);
-						});
-						return;
-					}
-
-					const isAscending = newMode === 'ascending';
-					const sortedRows = rows.sort((a, b) => {
-						const aVal = a.children[index]!.textContent!;
-						const bVal = b.children[index]!.textContent!;
-						if (aVal < bVal) {
-							return isAscending ? -1 : 1;
-						}
-						if (aVal > bVal) {
-							return isAscending ? 1 : -1;
-						}
-						return 0;
-					});
-					sortedRows.forEach((row) => {
-						body.appendChild(row);
-					});
-				});
-			});
-		}
-	}
-
-	customElements.define('user-table', UserTable);
-</script>

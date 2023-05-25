@@ -1,0 +1,183 @@
+---
+import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import { Icon } from 'astro-icon';
+import { api, routes } from '@/constants';
+
+export interface Props {
+	class?: string;
+}
+
+const currentPage = Astro.url.pathname;
+const adminLinks = [
+	{ href: routes.ADMIN_USERS, title: 'Admins' },
+	{ href: routes.DESIGNS, title: 'Designs' },
+	{ href: routes.PACK_TYPES, title: 'Pack Types' },
+	{ href: routes.PACKS, title: 'Packs' },
+	{ href: routes.RARITIES, title: 'Rarities' },
+	{ href: routes.SEASONS, title: 'Seasons' },
+	{ href: routes.ADMIN.SITE_CONFIG, title: 'Site Config' },
+	{ href: routes.USERS, title: 'Users' },
+] satisfies { href: string; title: string }[];
+
+const packs = await getAllPacks();
+
+const actionLinks = [
+	{ href: routes.ADMIN.OPEN_PACKS, title: 'Open Packs', id: 'open-packs', count: packs.length },
+	{ href: routes.ADMIN.GIVE_PACK, title: 'Give Pack', id: 'give-pack' },
+];
+---
+
+<admin-panel class="overflow-y-scroll">
+	<nav class="max-w-[14rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
+		<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
+			{
+				actionLinks.map((actionLink) => (
+					<a
+						preload="mouseover"
+						href={actionLink.href}
+						title={actionLink.title}
+						class="text-3xl uppercase block text-center bg-brand-tertiary px-2 py-1 
+							font-heading font-extrabold rounded-2xl relative transition-transform 
+							hover:scale-105 shine text-shadow">
+						{actionLink.count ? (
+							<span
+								class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow"
+								hx-get={api.PACK.GET_TOTAL_PACK_COUNT}
+								hx-trigger="refreshCount from:body"
+								hx-swap="innerHTML transition:false">
+								{packs.length}
+							</span>
+						) : null}
+						{actionLink.title}
+					</a>
+				))
+			}
+		</div>
+		<div class="pb">
+			<h2 class="text-lg font-heading text-brand-dark font-medium my-3 p-1 px-6">
+				Administration
+			</h2>
+			{
+				adminLinks.map(({ href, title }) =>
+					currentPage === href || currentPage.startsWith(href) ? (
+						<a
+							preload="mouseover"
+							preload-images="true"
+							href={href}
+							title={title}
+							class="font-heading font-medium block bg-white text-black px-6 py-1">
+							{title}
+						</a>
+					) : (
+						<a
+							preload="mouseover"
+							preload-images="true"
+							href={href}
+							title={title}
+							class="font-heading font-medium block text-shadow px-6 py-1 hover:bg-gray-900/20">
+							{title}
+						</a>
+					)
+				)
+			}
+		</div>
+		<div class="px-4 py-2 items-center gap-3 relative">
+			<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
+				<a
+					hx-disable
+					rel="prefetch"
+					href="/api/auth/logout"
+					title="Logout"
+					class="block hover:bg-gray-100 p-3">
+					Logout
+				</a>
+			</div>
+			<button
+				class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
+				title={Astro.locals.session?.properties.username}>
+				<Icon
+					name="mdi:gear"
+					class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+				/>
+				{Astro.locals.session?.properties.username}
+			</button>
+		</div>
+	</nav>
+</admin-panel>
+
+<style>
+	admin-panel {
+		position: relative;
+	}
+
+	admin-panel::-webkit-scrollbar {
+		display: none;
+	}
+
+	nav {
+		/* to bottom right */
+		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
+	}
+
+	.action-link {
+		font-size: 2rem;
+		line-height: 2.25rem;
+		text-transform: uppercase;
+		display: block;
+		text-align: center;
+		background-color: var(--color-tertiary);
+		padding: 0.5rem 1rem;
+		font-family: var(--font-heading);
+		font-weight: 800;
+		border-radius: 1rem;
+		position: relative;
+		transition: scale 50ms ease-in-out;
+	}
+
+	.action-link:hover {
+		scale: 1.05;
+	}
+
+	@media (max-width: 768px) {
+		admin-panel {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			z-index: 1;
+			--isClosed: 1;
+			transform: translateX(calc(var(--isClosed) * -100%));
+			transition: transform 0.3s ease-in-out;
+		}
+	}
+</style>
+
+<script>
+	class AdminPanel extends HTMLElement {
+		isClosed = true;
+		constructor() {
+			super();
+		}
+
+		connectedCallback() {
+			const hamburgerButton = document.querySelector(
+				'[data-for-admin-panel] button'
+			) as HTMLButtonElement;
+			const nav = this.querySelector('nav') as HTMLDivElement;
+			hamburgerButton.addEventListener('click', () => {
+				this.isClosed = !this.isClosed;
+				this.style.setProperty('--isClosed', `${+this.isClosed}`);
+				hamburgerButton.setAttribute('aria-pressed', `${!this.isClosed}`);
+				nav.setAttribute('aria-expanded', `${this.isClosed}`);
+			});
+
+			const userMenu = this.querySelector('.user-menu') as HTMLDivElement;
+			const userButton = this.querySelector('.user-button') as HTMLButtonElement;
+			userButton.addEventListener('click', () => {
+				userMenu.classList.toggle('hidden');
+			});
+		}
+	}
+
+	customElements.define('admin-panel', AdminPanel);
+</script>

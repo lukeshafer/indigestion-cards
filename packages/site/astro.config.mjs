@@ -2,15 +2,19 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import aws from 'astro-sst/lambda';
-import solidJs from '@astrojs/solid-js';
+import prefetch from '@astrojs/prefetch';
 
-import prefetch from "@astrojs/prefetch";
+import alpinejs from "@astrojs/alpinejs";
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
   adapter: aws(),
-  integrations: [tailwind(), solidJs(), prefetch()],
+  integrations: [tailwind(), alpinejs()],
+  //, prefetch()],
+  experimental: {
+    middleware: true
+  },
   vite: {
     ssr: {
       external: ['electrodb']
