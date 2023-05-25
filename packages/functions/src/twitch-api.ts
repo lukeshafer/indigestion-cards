@@ -13,6 +13,7 @@ import {
 } from '@lil-indigestion-cards/core/site-config';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
@@ -27,6 +28,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		return { statusCode: 200 };
 	}
 	const unsafeBody = JSON.parse(event.body) as unknown;
+
+	setAdminEnvSession('Event: twitch-webhook', 'event_twitch_webhook');
 
 	if (messageType === MESSAGE_TYPE.VERIFICATION) {
 		if (

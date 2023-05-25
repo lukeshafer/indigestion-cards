@@ -1,6 +1,7 @@
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import type { StackContext } from 'sst/constructs';
 import { Config } from 'sst/constructs';
+import { getDomainName } from './constants';
 
 export function ConfigStack({ stack }: StackContext) {
 	const streamerAccessToken = new Secret(stack, 'StreamerAccessToken');
@@ -10,6 +11,7 @@ export function ConfigStack({ stack }: StackContext) {
 		STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
 		STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
 		STREAMER_USER_ID: '227134852',
+		DOMAIN_NAME: getDomainName(stack.stage),
 	});
 
 	const secrets = Config.Secret.create(

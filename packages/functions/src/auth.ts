@@ -20,6 +20,7 @@ declare module 'sst/node/future/auth' {
 export const handler = AuthHandler({
 	clients: async () => ({
 		local: 'http://localhost:3000',
+		main: `https://${Config.DOMAIN_NAME}`,
 	}),
 	providers: {
 		twitchStreamer: OauthAdapter({
@@ -36,6 +37,7 @@ export const handler = AuthHandler({
 		}),
 	},
 	async onSuccess(input) {
+		console.log(`https://${Config.DOMAIN_NAME}`);
 		if (input.provider === 'twitchUser') {
 			const claims = input.tokenset.claims();
 

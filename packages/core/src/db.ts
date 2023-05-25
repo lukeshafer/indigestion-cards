@@ -41,8 +41,10 @@ const auditAttributes = (entityName: string) =>
 				!process.env.SESSION_USER_ID ||
 				process.env.SESSION_TYPE !== 'admin' ||
 				!process.env.SESSION_USERNAME
-			)
-				throw new Error('No session provided');
+			) {
+				throw new Error('Username and ID are required in process.env');
+				return;
+			}
 
 			audits.create({
 				entity: entityName,
@@ -624,7 +626,7 @@ const admins = new Entity(
 				},
 				sk: {
 					field: 'sk',
-					composite: ['userId'],
+					composite: ['userId', 'username', 'isStreamer'],
 				},
 			},
 		},

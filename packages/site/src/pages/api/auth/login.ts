@@ -6,7 +6,7 @@ export const get: APIRoute = async (ctx) => {
 	const streamer = ctx.url.searchParams.get('streamer');
 
 	const authParams = new URLSearchParams({
-		client_id: 'local',
+		client_id: ctx.url.host === 'localhost:3000' ? 'local' : 'main',
 		redirect_uri: ctx.url.origin + authApi.CALLBACK,
 		response_type: 'code',
 		provider: streamer === 'true' ? 'twitchStreamer' : 'twitchUser',
