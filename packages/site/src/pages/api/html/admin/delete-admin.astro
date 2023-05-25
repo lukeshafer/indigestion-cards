@@ -4,8 +4,14 @@ import { deleteAdminUser } from '@lil-indigestion-cards/core/user';
 const body = await Astro.request.text();
 const userId = new URLSearchParams(body).get('userId');
 const username = new URLSearchParams(body).get('username');
+const isStreamerStr = new URLSearchParams(body).get('isStreamer');
 if (!userId) return new Response('Missing userId', { status: 400 });
+if (!username) return new Response('Missing username', { status: 400 });
+if (!isStreamerStr) return new Response('Missing isStreamer', { status: 400 });
 
+const isStreamer = isStreamerStr === 'true';
+
+console.log('deleting userId', userId);
 if (userId === Astro.locals.session?.properties.userId)
 	return new Response(null, {
 		status: 400,
@@ -19,9 +25,14 @@ if (userId === Astro.locals.session?.properties.userId)
 		},
 	});
 
-const result = await deleteAdminUser({ userId });
+const result = await deleteAdminUser({ userId, username, isStreamer });
 
-if (!result.success) return new Response(result.error, { status: 400 });
+if (!result.success) {
+	console.log('error deleting userId', userId, result.error);
+	return new Response(result.error, { status: 400 });
+}
+
+console.log('deleted userId', userId);
 
 Astro.response.headers.set(
 	'HX-Trigger',

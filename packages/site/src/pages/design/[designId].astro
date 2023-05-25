@@ -14,10 +14,15 @@ if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
 
+const session = Astro.locals.session;
+if (session?.type !== 'admin') throw new Error('Unauthorized');
+
 const {
 	cardDesigns: [design],
 	cardInstances,
-} = await getCardDesignAndInstancesById({ designId });
+} = await getCardDesignAndInstancesById({
+	designId,
+});
 
 type CardInstance = (typeof cardInstances)[number];
 
@@ -73,7 +78,7 @@ cardInstances.forEach((instance) => {
 	rarity.received += 1;
 	rarity.unopened += instance.openedAt ? 0 : 1;
 	rarity.opened += instance.openedAt ? 1 : 0;
-	rarity.notGivenOut -= instance.openedAt ? 1 : 0;
+	rarity.notGivenOut -= 1;
 	rarity.instances[instance.cardNumber - 1] = instance;
 });
 
@@ -143,9 +148,10 @@ const rarityStatsArray = Object.values(rarityStats);
 			</ul>
 		</section>
 		<button
-			class="post-button w-max"
+			class="post-button w-max relative"
 			data-type="delete"
 			hx-delete={api.DESIGN.DELETE}
+			hx-confirm="Are you sure you want to delete this design?"
 			hx-vals={JSON.stringify({
 				designId: design.designId,
 				imgUrl: design.imgUrl,

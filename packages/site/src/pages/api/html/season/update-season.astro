@@ -22,7 +22,7 @@ await updateSeason({
 	<h1 class="page-heading" id="season-name" hx-swap-oob="true">{seasonName}</h1>
 	<p class="text-lg" id="season-description" hx-swap-oob="true">{seasonDescription}</p>
 	<button
-		_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
+		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
 		class="post-button"
 		data-type="success"
 		hx-swap="outerHTML transition:false"

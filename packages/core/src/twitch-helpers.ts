@@ -29,6 +29,16 @@ interface TwitchRequest {
 	body?: string | undefined;
 }
 
+export const SUBSCRIPTION_TYPE = {
+	GIFT_SUB: 'channel.subscription.gift',
+	REDEEM_REWARD: 'channel.channel_points_custom_reward_redemption.add',
+	ADD_REWARD: 'channel.channel_points_custom_reward.add',
+	UPDATE_REWARD: 'channel.channel_points_custom_reward.update',
+	REMOVE_REWARD: 'channel.channel_points_custom_reward.remove',
+} as const;
+
+export type SubscriptionType = (typeof SUBSCRIPTION_TYPE)[keyof typeof SUBSCRIPTION_TYPE];
+
 export function parseRequestBody(request: unknown): TwitchBody {
 	return bodySchema.parse(request);
 }
@@ -85,12 +95,10 @@ export function getHeaders(headers: TwitchRequest['headers']) {
 
 export function handleTwitchEvent(body: TwitchBody) {
 	switch (body.type) {
-		case 'channel.subscription.gift':
-			//
+		case SUBSCRIPTION_TYPE.GIFT_SUB:
 			break;
-		case 'channel.channel_points_custom_reward_redemption.add':
+		case SUBSCRIPTION_TYPE.REDEEM_REWARD:
 			body.event;
-			//
 			break;
 	}
 	return { statusCode: 200 };
@@ -166,7 +174,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 	const result = customRewardResponse.safeParse(body);
 
 	if (!result.success) {
-		console.log(body);
+		console.error(body);
 		throw new Error('Failed to parse rewards');
 	}
 
@@ -176,7 +184,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 const subscriptionsUrl = 'https://api.twitch.tv/helix/eventsub/subscriptions';
 
 interface ChannelSubscriptionGiftEvent {
-	type: 'channel.subscription.gift';
+	type: typeof SUBSCRIPTION_TYPE.GIFT_SUB;
 	condition: {
 		broadcaster_user_id: string;
 	};
@@ -184,14 +192,43 @@ interface ChannelSubscriptionGiftEvent {
 }
 
 interface ChannelPointsCustomRewardRedemptionEvent {
-	type: 'channel.channel_points_custom_reward_redemption.add';
+	type: typeof SUBSCRIPTION_TYPE.REDEEM_REWARD;
 	condition: {
 		broadcaster_user_id: string;
 	};
 	callback: string;
 }
 
-type TwitchEvent = ChannelSubscriptionGiftEvent | ChannelPointsCustomRewardRedemptionEvent;
+interface ChannelPointsCustomRewardAddEvent {
+	type: typeof SUBSCRIPTION_TYPE.ADD_REWARD;
+	condition: {
+		broadcaster_user_id: string;
+	};
+	callback: string;
+}
+
+interface ChannelPointsCustomRewardUpdateEvent {
+	type: typeof SUBSCRIPTION_TYPE.UPDATE_REWARD;
+	condition: {
+		broadcaster_user_id: string;
+	};
+	callback: string;
+}
+
+interface ChannelPointsCustomRewardRemoveEvent {
+	type: typeof SUBSCRIPTION_TYPE.REMOVE_REWARD;
+	condition: {
+		broadcaster_user_id: string;
+	};
+	callback: string;
+}
+
+export type TwitchEvent =
+	| ChannelSubscriptionGiftEvent
+	| ChannelPointsCustomRewardRedemptionEvent
+	| ChannelPointsCustomRewardAddEvent
+	| ChannelPointsCustomRewardUpdateEvent
+	| ChannelPointsCustomRewardRemoveEvent;
 
 export async function subscribeToTwitchEvent(event: TwitchEvent) {
 	const res = await fetch(subscriptionsUrl, {
@@ -355,8 +392,18 @@ export async function getActiveTwitchEventSubscriptions() {
 			z.object({
 				id: z.string(),
 				status: z.string(),
-				type: z.string(),
+				type: z.enum([
+					'channel.subscription.gift',
+					'channel.channel_points_custom_reward_redemption.add',
+					'channel.channel_points_custom_reward.add',
+					'channel.channel_points_custom_reward.update',
+					'channel.channel_points_custom_reward.remove',
+				]),
 				condition: z.record(z.string().or(z.number())),
+				transport: z.object({
+					method: z.string(),
+					callback: z.string(),
+				}),
 			})
 		),
 		total: z.number(),

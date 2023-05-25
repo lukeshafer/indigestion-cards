@@ -29,6 +29,10 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 		return ctx.redirect('/404');
 	}
 
+	process.env.SESSION_USER_ID = ctx.locals.session?.properties.userId ?? undefined;
+	process.env.SESSION_USERNAME = ctx.locals.session?.properties.username ?? undefined;
+	process.env.SESSION_TYPE = ctx.locals.session?.type ?? undefined;
+
 	ctx.locals.admin = ctx.locals.session?.type === 'admin' ? ctx.locals.session : null;
 	ctx.locals.user =
 		ctx.locals.session?.type === 'user' || ctx.locals.session?.type === 'admin'

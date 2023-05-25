@@ -3,16 +3,17 @@ import type { EntityItem, CreateEntityItem, Entity, UpdateEntityItem } from 'ele
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
 import { CardPool } from './pack';
+import type { Session } from './types';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -85,6 +86,7 @@ export async function generateCard(info: {
 
 	const cardDetails = {
 		seasonId: design.seasonId,
+		seasonName: design.seasonName,
 		designId: design.designId,
 		rarityId: assignedRarityId,
 		rarityName: rarity.rarityName,
@@ -111,7 +113,7 @@ export async function generateCard(info: {
 	const user =
 		info.userId && info.username
 			? (await getUser(info.userId)) ??
-			  (await createNewUser({ userId: info.userId, username: info.username }))
+			(await createNewUser({ userId: info.userId, username: info.username }))
 			: null;
 
 	const result = await db.transaction
@@ -119,11 +121,11 @@ export async function generateCard(info: {
 			cardInstances.create(cardDetails).commit(),
 			...(user && info.userId && info.username
 				? [
-						users
-							.patch({ userId: info.userId })
-							.set({ cardCount: (user.cardCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: info.userId })
+						.set({ cardCount: (user.cardCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 		])
 		.go();
@@ -187,12 +189,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({ packCount: (user?.packCount || 1) - 1 })
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -237,12 +239,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({ packCount: (user?.packCount || 1) - 1 })
+						.commit(),
+				]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -273,7 +275,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			  (await createNewUser({ userId: args.userId, username: args.username }))
+			(await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
@@ -293,11 +295,11 @@ export async function createPack(args: {
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [
-						users
-							.patch({ userId: args.userId })
-							.set({ packCount: (user.packCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: args.userId })
+						.set({ packCount: (user.packCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 			packs
 				.create({
@@ -420,7 +422,7 @@ export async function getAllCardDesigns() {
 	return result.data;
 }
 
-export async function getCardDesignById(args: { designId: string }) {
+export async function getCardDesignById(args: { designId: string; userId: string }) {
 	const result = await db.entities.cardDesigns.query.byDesignId(args).go();
 	return result.data[0];
 }
@@ -621,4 +623,11 @@ export async function deleteRarityById(id: string): Promise<Result<EntityItem<Ra
 
 	const result = await db.entities.rarities.delete({ rarityId: id }).go();
 	return { success: true, data: result.data };
+}
+
+// CARD INSTANCES //
+
+export async function getCardInstanceById(args: { instanceId: string; designId: string }) {
+	const result = await db.entities.cardInstances.query.byId(args).go();
+	return result.data[0];
 }

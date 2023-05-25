@@ -18,13 +18,13 @@ if (!pack) return new Response('Pack not found', { status: 404 });
 	<ul class="flex gap-12 flex-wrap justify-center items-center">
 		{
 			pack.cardDetails.map((card) => (
-				<li>
+				<li x-data={`{ flipped: ${card.opened} }`}>
 					<p class="error-text" />
 					<div
-						class:list={{ flipped: card.opened }}
+						x-effect="$el.classList.toggle('flipped', flipped)"
 						class="relative perspective preserve-3d origin-center duration-500 transition-transform block w-40 h-56">
 						<button
-							_="on click add .flipped to the closest parent <div/>"
+							@click="flipped = true"
 							hx-patch={api.OPEN_CARD}
 							hx-target="previous p.error-text"
 							hx-swap="outerHTML"

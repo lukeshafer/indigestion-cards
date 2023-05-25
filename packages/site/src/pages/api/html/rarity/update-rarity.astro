@@ -20,7 +20,7 @@ await updateRarity({
 	<span id={`rarityName-${rarityId}`} hx-swap-oob="true">{rarityName}</span>
 	<span id={`defaultCount-${rarityId}`} hx-swap-oob="true">{defaultCount}</span>
 	<button
-		_="on load wait 1s then set @data-type to 'submit' then put 'Edit' into my innerText"
+		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
 		class="post-button edit-button w-24"
 		data-type="success"
 		hx-select=".save-button"

@@ -13,12 +13,14 @@ import {
 } from '@lil-indigestion-cards/core/site-config';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event) || !event.body) {
 		console.error('Message not verified');
 		return { statusCode: 403 };
 	}
+	console.log('Message received from Twitch. Determining type...');
 
 	const { messageType, messageId } = getHeaders(event.headers);
 	if (!messageId || (await checkIsDuplicateTwitchEventMessage({ message_id: messageId }))) {
@@ -26,6 +28,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		return { statusCode: 200 };
 	}
 	const unsafeBody = JSON.parse(event.body) as unknown;
+
+	setAdminEnvSession('Event: twitch-webhook', 'event_twitch_webhook');
 
 	if (messageType === MESSAGE_TYPE.VERIFICATION) {
 		if (
@@ -54,8 +58,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	const eventBridge = new EventBridge();
 	switch (body.type) {
 		case 'channel.subscription.gift':
-			// FIXME: remove this once we're confident in the logic
-			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 5 : 5;
+			console.log(`Sub gifted by ${body.event.user_name}. Subs gifted: ${body.event.total}`);
+
+			// FIXME: remove this once we're confident in the logic, should always be 5
+			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 1 : 5;
 			const specialSubRoundLookup: Record<number, number> = {
 				69: 70,
 			};
@@ -66,10 +72,12 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 					: body.event.total || 0;
 			if (subsGifted < SUBS_PER_PACK) {
 				// gifted less than SUBS_PER_PACK subs, ignore
+				console.log('Gifted less than ${SUBS_PER_PACK} subs, ignoring');
 				return { statusCode: 200 };
 			}
 
 			const totalPacks = Math.floor(subsGifted / SUBS_PER_PACK);
+			console.log(`Giving user ${totalPacks} packs`);
 
 			const event = await getTwitchEventById({ eventId: TWITCH_GIFT_SUB_ID });
 			if (!event || !event.packTypeId) {
@@ -97,13 +105,28 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				.promise();
 			break;
 		case 'channel.channel_points_custom_reward_redemption.add':
-			console.log('Redeemed channel points', body);
+			console.log(
+				`Channel point reward redeemed by ${
+					body.event.user_name
+				}. Reward info: ${JSON.stringify(
+					{
+						rewardId: body.event.reward.id,
+						rewardTitle: body.event.reward.title,
+					},
+					null,
+					2
+				)}`
+			);
+
 			const rewardId = body.event.reward.id;
 			const reward = await getTwitchEventById({ eventId: rewardId });
 			if (!reward || !reward.packTypeId) {
+				if (!reward) console.log(`No reward found for reward id ${rewardId}`);
+				else console.log(`No pack type found for reward id ${rewardId}`);
 				return { statusCode: 200 };
 			}
 
+			console.log(`Giving user 1 pack`);
 			const rewardPackType = await getPackTypeById({ packTypeId: reward.packTypeId });
 
 			await eventBridge
@@ -127,7 +150,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		case 'channel.channel_points_custom_reward.add':
 		case 'channel.channel_points_custom_reward.update':
 		case 'channel.channel_points_custom_reward.remove':
-			console.log('Refresh channel point rewards');
+			console.log(`Channel point reward updated. Event type: ${body.type}`);
 			await eventBridge
 				.putEvents({
 					Entries: [

@@ -12,6 +12,7 @@ if (!id) return new Response('No packId provided', { status: 400 });
 		class="post-button save-button"
 		data-type="submit"
 		hx-select=".edit-button"
+		@submit-pack.window="$el.click()"
 		hx-swap="outerHTML"
 		hx-include="[data-username]"
 		hx-vals={JSON.stringify({ packId, id })}
@@ -27,6 +28,6 @@ if (!id) return new Response('No packId provided', { status: 400 });
 		type="text"
 		value={username}
 		hx-swap-oob="true"
-		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+		@keyup.enter="$dispatch('submit-pack')"
 	/>
 </body>

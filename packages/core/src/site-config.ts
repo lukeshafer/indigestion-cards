@@ -39,10 +39,26 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
 	const rewardsToDelete = existingRewards.filter(
 		(reward) => !newRewards.some((newReward) => newReward.id === reward.eventId)
 	);
+	if (rewardsToDelete.length > 0)
+		console.log(
+			`Deleting rewards: ${JSON.stringify(
+				rewardsToDelete.map((r) => r.eventName),
+				null,
+				2
+			)}`
+		);
 
 	const rewardsToAdd = newRewards.filter(
 		(newReward) => !existingRewards.some((reward) => reward.eventId === newReward.id)
 	);
+	if (rewardsToAdd.length > 0)
+		console.log(
+			`Adding rewards: ${JSON.stringify(
+				rewardsToAdd.map((r) => r.title),
+				null,
+				2
+			)}`
+		);
 
 	const rewardsToUpdate = newRewards.filter((newReward) =>
 		existingRewards.some((reward) => reward.eventId === newReward.id)

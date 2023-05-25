@@ -1,11 +1,64 @@
 import { Table } from 'sst/node/table';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { Entity, Service } from 'electrodb';
+import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
 const config = {
 	table: Table.data.tableName,
 	client: new DocumentClient(),
-};
+	listeners: [
+		(e) => {
+			//console.log(JSON.stringify(e, null, 2));
+			//if (e.type !== 'results') return;
+			if (
+				e.method === 'query' ||
+				e.method === 'get' ||
+				e.method === 'scan' ||
+				e.method === 'batchGet'
+			)
+				return;
+
+			//console.log(JSON.stringify(e, null, 2));
+		},
+	],
+} satisfies EntityConfiguration;
+
+const auditAttributes = (entityName: string) =>
+({
+	createdAt: {
+		type: 'number',
+		default: () => Date.now(),
+		// cannot be modified after created
+		readOnly: true,
+	},
+	updatedAt: {
+		type: 'number',
+		// watch for changes to any attribute
+		watch: '*',
+		// set current timestamp when updated
+		set: (e, i) => {
+			// add to audit log
+			if (
+				!process.env.SESSION_USER_ID ||
+				process.env.SESSION_TYPE !== 'admin' ||
+				!process.env.SESSION_USERNAME
+			) {
+				throw new Error('Username and ID are required in process.env');
+				return;
+			}
+
+			audits.create({
+				entity: entityName,
+				username: process.env.SESSION_USERNAME,
+				userId: process.env.SESSION_USER_ID,
+				timestamp: Date.now(),
+				item: JSON.stringify(i),
+			});
+
+			return Date.now();
+		},
+		readOnly: true,
+	},
+} satisfies Record<string, Attribute>);
 
 const cardDesigns = new Entity(
 	{
@@ -73,6 +126,7 @@ const cardDesigns = new Entity(
 					},
 				},
 			},
+			...auditAttributes('cardDesign'),
 		},
 		indexes: {
 			byDesignId: {
@@ -122,6 +176,7 @@ const season = new Entity(
 				type: 'string',
 				required: true,
 			},
+			...auditAttributes('season'),
 		},
 		indexes: {
 			allSeasons: {
@@ -183,6 +238,10 @@ const cardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
+			seasonName: {
+				type: 'string',
+				required: true,
+			},
 			rarityId: {
 				type: 'string',
 				required: true,
@@ -221,6 +280,7 @@ const cardInstances = new Entity(
 				type: 'number',
 				required: true,
 			},
+			...auditAttributes('cardInstance'),
 		},
 		indexes: {
 			byId: {
@@ -306,6 +366,7 @@ const users = new Entity(
 				required: true,
 				default: 0,
 			},
+			...auditAttributes('user'),
 		},
 		indexes: {
 			byId: {
@@ -410,6 +471,7 @@ const packs = new Entity(
 					},
 				},
 			},
+			...auditAttributes('pack'),
 		},
 		indexes: {
 			allPacks: {
@@ -471,6 +533,7 @@ const unmatchedImages = new Entity(
 				type: ['cardDesign', 'frame'] as const,
 				required: true,
 			},
+			...auditAttributes('unmatchedImage'),
 		},
 		indexes: {
 			byType: {
@@ -512,6 +575,7 @@ const rarities = new Entity(
 				type: 'number',
 				required: true,
 			},
+			...auditAttributes('rarity'),
 		},
 		indexes: {
 			allRarities: {
@@ -530,198 +594,270 @@ const rarities = new Entity(
 	config
 );
 
-const admins = new Entity({
-	model: {
-		entity: 'admin',
-		version: '1',
-		service: 'card-app',
-	},
-	attributes: {
-		userId: {
-			type: 'string',
-			required: true,
+const admins = new Entity(
+	{
+		model: {
+			entity: 'admin',
+			version: '1',
+			service: 'card-app',
 		},
-		username: {
-			type: 'string',
-			required: true,
-		},
-		isStreamer: {
-			type: 'boolean',
-			required: true,
-			default: false,
-		},
-	},
-	indexes: {
-		allAdmins: {
-			collection: 'siteConfig',
-			pk: {
-				field: 'pk',
-				composite: [],
+		attributes: {
+			userId: {
+				type: 'string',
+				required: true,
 			},
-			sk: {
-				field: 'sk',
-				composite: ['userId'],
+			username: {
+				type: 'string',
+				required: true,
 			},
+			isStreamer: {
+				type: 'boolean',
+				required: true,
+				default: false,
+			},
+			...auditAttributes('admin'),
 		},
-	},
-});
-
-const packTypes = new Entity({
-	model: {
-		entity: 'packType',
-		version: '1',
-		service: 'card-app',
-	},
-	attributes: {
-		packTypeId: {
-			type: 'string',
-			required: true,
-		},
-		packTypeName: {
-			type: 'string',
-			required: true,
-		},
-		packTypeDescription: {
-			type: 'string',
-		},
-		packTypeCategory: {
-			type: ['season', 'custom'] as const,
-			required: true,
-		},
-		cardCount: {
-			type: 'number',
-			required: true,
-		},
-		seasonId: {
-			type: 'string',
-		},
-		seasonName: {
-			type: 'string',
-		},
-		designs: {
-			type: 'list',
-			items: {
-				type: 'map',
-				properties: {
-					designId: {
-						type: 'string',
-						required: true,
-					},
-					cardName: {
-						type: 'string',
-						required: true,
-					},
-					imgUrl: {
-						type: 'string',
-						required: true,
-					},
+		indexes: {
+			allAdmins: {
+				collection: 'siteConfig',
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['userId', 'username', 'isStreamer'],
 				},
 			},
 		},
 	},
-	indexes: {
-		allPackTypes: {
-			collection: 'siteConfig',
-			pk: {
-				field: 'pk',
-				composite: [],
-			},
-			sk: {
-				field: 'sk',
-				composite: ['packTypeId'],
-			},
+	config
+);
+
+const packTypes = new Entity(
+	{
+		model: {
+			entity: 'packType',
+			version: '1',
+			service: 'card-app',
 		},
-		bySeasonId: {
-			index: 'gsi1',
-			pk: {
-				field: 'gsi1pk',
-				composite: ['seasonId'],
+		attributes: {
+			packTypeId: {
+				type: 'string',
+				required: true,
 			},
-			sk: {
-				field: 'gsi1sk',
-				composite: ['packTypeId'],
+			packTypeName: {
+				type: 'string',
+				required: true,
+			},
+			packTypeDescription: {
+				type: 'string',
+			},
+			packTypeCategory: {
+				type: ['season', 'custom'] as const,
+				required: true,
+			},
+			cardCount: {
+				type: 'number',
+				required: true,
+			},
+			seasonId: {
+				type: 'string',
+			},
+			seasonName: {
+				type: 'string',
+			},
+			designs: {
+				type: 'list',
+				items: {
+					type: 'map',
+					properties: {
+						designId: {
+							type: 'string',
+							required: true,
+						},
+						cardName: {
+							type: 'string',
+							required: true,
+						},
+						imgUrl: {
+							type: 'string',
+							required: true,
+						},
+					},
+				},
+			},
+			...auditAttributes('packType'),
+		},
+		indexes: {
+			allPackTypes: {
+				collection: 'siteConfig',
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['packTypeId'],
+				},
+			},
+			bySeasonId: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['seasonId'],
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['packTypeId'],
+				},
 			},
 		},
 	},
-});
+	config
+);
 
 export const twitchEventTypes = [
 	'channel.channel_points_custom_reward_redemption.add',
 	'channel.subscription.gift',
 ] as const;
 
-const twitchEvents = new Entity({
-	model: {
-		entity: 'twitchEvents',
-		version: '1',
-		service: 'card-app',
-	},
-	attributes: {
-		eventId: {
-			type: 'string',
-			required: true,
+const twitchEvents = new Entity(
+	{
+		model: {
+			entity: 'twitchEvents',
+			version: '1',
+			service: 'card-app',
 		},
-		eventName: {
-			type: 'string',
-			required: true,
-		},
-		eventType: {
-			type: twitchEventTypes,
-			required: true,
-		},
-		packTypeId: {
-			type: 'string',
-		},
-		packTypeName: {
-			type: 'string',
-		},
-		cost: {
-			type: 'number',
-		},
-	},
-	indexes: {
-		byEventId: {
-			pk: {
-				field: 'pk',
-				composite: [],
+		attributes: {
+			eventId: {
+				type: 'string',
+				required: true,
 			},
-			sk: {
-				field: 'sk',
-				composite: ['eventId', 'eventType'],
+			eventName: {
+				type: 'string',
+				required: true,
+			},
+			eventType: {
+				type: twitchEventTypes,
+				required: true,
+			},
+			packTypeId: {
+				type: 'string',
+			},
+			packTypeName: {
+				type: 'string',
+			},
+			cost: {
+				type: 'number',
+			},
+			...auditAttributes('twitchEvents'),
+		},
+		indexes: {
+			byEventId: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['eventId', 'eventType'],
+				},
 			},
 		},
 	},
-});
+	config
+);
 
-const twitchEventMessageHistory = new Entity({
-	model: {
-		entity: 'twitchEventMessageHistory',
-		version: '1',
-		service: 'card-app',
-	},
-	attributes: {
-		message_id: {
-			type: 'string',
-			required: true,
+const twitchEventMessageHistory = new Entity(
+	{
+		model: {
+			entity: 'twitchEventMessageHistory',
+			version: '1',
+			service: 'card-app',
 		},
-		message_timestamp: {
-			type: 'string',
-			required: true,
-		},
-	},
-	indexes: {
-		byMessageId: {
-			pk: {
-				field: 'pk',
-				composite: ['message_id'],
+		attributes: {
+			message_id: {
+				type: 'string',
+				required: true,
 			},
-			sk: {
-				field: 'sk',
-				composite: [],
+			message_timestamp: {
+				type: 'string',
+				required: true,
+			},
+			...auditAttributes('twitchEventMessageHistory'),
+		},
+		indexes: {
+			byMessageId: {
+				pk: {
+					field: 'pk',
+					composite: ['message_id'],
+				},
+				sk: {
+					field: 'sk',
+					composite: [],
+				},
 			},
 		},
 	},
-});
+	config
+);
+
+const audits = new Entity(
+	{
+		model: {
+			entity: 'audit',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			entity: {
+				type: 'string',
+				required: true,
+			},
+			item: {
+				type: 'string',
+				required: true,
+			},
+			userId: {
+				type: 'string',
+				required: true,
+			},
+			username: {
+				type: 'string',
+				required: true,
+			},
+			timestamp: {
+				type: 'number',
+				required: true,
+			},
+		},
+		indexes: {
+			byEntity: {
+				pk: {
+					field: 'pk',
+					composite: ['entity'],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['item', 'userId', 'username', 'timestamp'],
+				},
+			},
+			byUserId: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['userId'],
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['entity', 'item', 'username', 'timestamp'],
+				},
+			},
+		},
+	},
+	config
+);
 
 export const db = new Service(
 	{
@@ -739,65 +875,3 @@ export const db = new Service(
 	},
 	config
 );
-
-//const username = 'snailyluke'
-//const seasonId = 'season-1'
-//const designId = 'design-1'
-//const instanceId = 'instance-1'
-//const packId = 'pack-1'
-//const userId = 'user-1'
-
-//[>
-//As a user, I need to find all of the CARDS my USER owns
-//As a user, I need to see all of the CARD DESIGNS in a given SEASON
-//As a user, I need to see all of the CARDS and their OWNERS for a given CARD DESIGN
-//As a user, I need to see all of the TRADES made to my USER and other USERS
-//As a user, I need to see all of the SEASON released
-//As a user, I need to find a USER based on their USERNAME
-//As a user, I need to see how many UNOPENED PACKS I (USER) have earned
-//As an admin, I need to see all of the UNOPENED PACKS earned by ALL USERS
-//*/
-
-//// As a user, I need to find all of the CARDS my USER owns
-//const myCards = db.collections
-//.cardsByOwnerName({
-//username,
-//})
-//.go()
-
-//// As a user, I need to see all of the CARD DESIGNS in a given SEASON
-//const designsInSeason = db.collections
-//.s easonAndDesigns({
-//seasonId,
-//})
-//.go()
-
-//// As a user, I need to see all of the CARDS for a given CARD DESIGN
-//const cardsInDesign = db.collections
-//.designsAndCards({
-//designId,
-//})
-//.go()
-
-//// As a user, I need to see all of the TRADES made between my USER and other USERS
-//// TODO Trades will be added in a future release
-
-//// As a user, I need to see all of the SEASONS released
-//const allSeasons = db.entities.season.query.allSeasons({}).go()
-
-//// As a user, I need to find a USER based on their USERNAME
-//const user = db.entities.users.query.byUsername({
-//username,
-//})
-
-//// As a user, I need to see how many UNOPENED PACKS I (USER) have earned
-//const unopenedPacks = db.entities.packs.query
-//.byUsername({
-//username,
-//})
-//.go()
-
-//// As an admin, I need to see all of the UNOPENED PACKS earned by ALL users
-//const allUnopenedPacks = db.entities.packs.query.allPacks({
-//entityType: 'pack',
-//})

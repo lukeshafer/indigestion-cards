@@ -9,7 +9,9 @@ declare global {
 	}
 }
 
-declare type Session = UserSession | AdminSession | PublicSession;
+import type { Session as AuthSession } from '@lil-indigestion-cards/core/types';
+
+declare type Session = AuthSession;
 
 interface PublicSession {
 	type: 'public';
@@ -35,4 +37,4 @@ interface AdminSession {
 	};
 }
 
-export { };
+export { Session };

@@ -1,16 +1,19 @@
-import { S3Handler } from 'aws-lambda'
-import { createUnmatchedDesignImage } from '@lil-indigestion-cards/core/card'
+import { S3Handler } from 'aws-lambda';
+import { createUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler: S3Handler = async (event) => {
+	setAdminEnvSession('S3 Event', 's3_event');
+
 	event.Records.forEach(async (record) => {
 		if (record.eventName !== 'ObjectCreated:Post' && record.eventName !== 'ObjectCreated:Put')
-			return
+			return;
 
-		const key = record.s3.object.key
+		const key = record.s3.object.key;
 		await createUnmatchedDesignImage({
 			url: `https://${record.s3.bucket.name}.s3.amazonaws.com/${key}`,
 			imageId: key,
 			type: 'cardDesign',
-		})
-	})
-}
+		});
+	});
+};

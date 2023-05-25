@@ -20,7 +20,16 @@ type Props = RarityStats;
 				{
 					Astro.props.instances.map((instance, index) => (
 						<tr x-show={instance?.username ? 'true' : '!hideUnowned'}>
-							<td>{index + 1}</td>
+							<td>
+								{instance?.cardNumber && Astro.locals.session?.type === 'admin' ? (
+									<a
+										href={`${routes.INSTANCES}/${instance.designId}/${instance.instanceId}`}>
+										{instance.cardNumber}
+									</a>
+								) : (
+									index + 1
+								)}
+							</td>
 							<td>
 								{instance?.username ? (
 									<a href={`${routes.USERS}/${instance?.username ?? ''}`}>

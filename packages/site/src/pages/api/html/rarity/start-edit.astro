@@ -13,6 +13,7 @@ if (!defaultCount) return new Response('No defaultCount provided', { status: 400
 	<button
 		class="post-button save-button"
 		data-type="submit"
+		@submit-rarity.window="$el.click()"
 		hx-select=".edit-button"
 		hx-swap="outerHTML"
 		hx-include="[data-rarity-info]"
@@ -28,7 +29,7 @@ if (!defaultCount) return new Response('No defaultCount provided', { status: 400
 		type="text"
 		value={rarityName}
 		hx-swap-oob="true"
-		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+		@keyup.enter="$dispatch('submit-rarity')"
 	/>
 	<input
 		class="my-form-input w-max text-center"
@@ -38,6 +39,6 @@ if (!defaultCount) return new Response('No defaultCount provided', { status: 400
 		type="number"
 		value={defaultCount}
 		hx-swap-oob="true"
-		_="on keyup[key is 'Enter'] send click to the next <.save-button/>"
+		@keyup.enter="$dispatch('submit-rarity')"
 	/>
 </body>

@@ -20,6 +20,7 @@ declare module 'sst/node/future/auth' {
 export const handler = AuthHandler({
 	clients: async () => ({
 		local: 'http://localhost:3000',
+		main: `https://${Config.DOMAIN_NAME}`,
 	}),
 	providers: {
 		twitchStreamer: OauthAdapter({
@@ -40,6 +41,7 @@ export const handler = AuthHandler({
 			const claims = input.tokenset.claims();
 
 			const adminUser = await getAdminUserById(claims.sub);
+			//console.log(adminUser);
 			if (!adminUser)
 				return {
 					type: 'public',

@@ -138,6 +138,10 @@
 		outline: 1px solid #ccc;
 	}
 
+	my-form select:focus, my-form input:focus, my-form textarea:focus, .my-form-input:focus {
+		outline: 3px solid var(--color-main);
+	}
+
 	button.edit-readonly {
 		position: absolute;
 		right: 0;

@@ -132,7 +132,11 @@ export async function createAdminUser(args: { userId: string; username: string }
 	}
 }
 
-export async function deleteAdminUser(args: { userId: string }) {
+export async function deleteAdminUser(args: {
+	userId: string;
+	username: string;
+	isStreamer: boolean;
+}) {
 	try {
 		const result = await db.entities.admins.delete(args).go();
 		return { success: true, data: result.data };
@@ -180,4 +184,10 @@ function getDefaultCardCountInPack() {
 function getCurrentSeasonId() {
 	// TODO: implement this properly with database
 	return 'season-1';
+}
+
+export function setAdminEnvSession(username: string, userId: string) {
+	process.env.SESSION_USER_ID = userId;
+	process.env.SESSION_TYPE = 'admin';
+	process.env.SESSION_USERNAME = username;
 }

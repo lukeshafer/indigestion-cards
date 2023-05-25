@@ -17,6 +17,7 @@ export function Auth({ stack }: StackContext) {
 				secrets.STREAMER_USER_ID,
 				secrets.STREAMER_ACCESS_TOKEN_ARN,
 				secrets.STREAMER_REFRESH_TOKEN_ARN,
+				secrets.DOMAIN_NAME,
 			],
 			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 		},
