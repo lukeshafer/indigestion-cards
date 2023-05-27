@@ -21,11 +21,23 @@ if (!result.success) {
 }
 
 console.log('deleted userId', userId);
+if (userId === Astro.locals.session?.properties.userId)
+	return new Response(null, {
+		status: 400,
+		headers: {
+			'HX-Trigger': JSON.stringify({
+				displayalert: {
+					type: 'error',
+					message: 'Cannot delete yourself',
+				},
+			}),
+		},
+	});
 
 Astro.response.headers.set(
 	'HX-Trigger',
 	JSON.stringify({
-		displayAlert: {
+		displayalert: {
 			type: 'success',
 			message: `Successfully deleted ${username ?? 'user'}.`,
 		},

@@ -1,7 +1,7 @@
 ---
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
 // @ts-ignore -- typescript is erroring here even though it's valid
-import { html } from '@/lib/template-tags';
+import { html } from '@/lib/api';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { createAdminUser } from '@lil-indigestion-cards/core/user';
 
@@ -36,5 +36,5 @@ if (!result.success)
 ---
 
 <body>
-	<AdminUserRow username={display_name} userId={id} />
+	<AdminUserRow username={display_name} userId={id} isStreamer={false} />
 </body>

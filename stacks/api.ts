@@ -34,37 +34,15 @@ export function API({ app, stack }: StackContext) {
 
 	const api = new Api(stack, 'api', {
 		routes: {
-			//'POST /add-new-pack-to-queue':
-			//'packages/functions/src/admin-api/invoke-give-pack-event.handler',
-			//'POST /give-pack-to-user':
-			//'packages/functions/src/admin-api/give-pack-to-user-api.handler',
-			//'POST /create-card-season':
-			//'packages/functions/src/admin-api/create-card-season.handler',
-			//'POST /create-card-design':
-			//'packages/functions/src/admin-api/create-card-design.handler',
-			//'POST /create-rarity': 'packages/functions/src/admin-api/create-rarity.handler',
-			//'POST /create-pack-type': 'packages/functions/src/admin-api/create-pack-type.handler',
-			//'POST /delete-card-design/{seasonId}/{designId}':
-				//'packages/functions/src/admin-api/delete-card-design.handler',
-			//'POST /delete-card-season/{id}':
-				//'packages/functions/src/admin-api/delete-card-season.handler',
 			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
-			//'POST /delete-rarity/{id}': 'packages/functions/src/admin-api/delete-rarity.handler',
-			//'POST /create-admin-user': 'packages/functions/src/admin-api/create-admin-user.handler',
-			//'POST /delete-admin-user': 'packages/functions/src/admin-api/delete-admin-user.handler',
-			//'POST /revoke-pack': 'packages/functions/src/admin-api/revoke-pack.handler',
-			//'POST /open-card': 'packages/functions/src/admin-api/open-card.handler',
-			//'GET /get-all-channel-point-rewards':
-				//'packages/functions/src/admin-api/get-all-channel-point-rewards.handler',
-			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
-			//'POST /update-rarity': 'packages/functions/src/admin-api/update-rarity.handler',
 			'DELETE /delete-rarity-frame':
 				'packages/functions/src/admin-api/delete-rarity-frame.handler',
 			'DELETE /delete-card-image':
 				'packages/functions/src/admin-api/delete-card-image.handler',
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
+			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			...(app.stage === 'luke'
 				? {
 						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',

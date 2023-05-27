@@ -14,7 +14,7 @@ if (!userId || !username)
 		status: 400,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					type: 'error',
 					message: 'Missing parameters',
 				},
@@ -27,7 +27,7 @@ if (!result || !result.success)
 		status: 500,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: { type: 'error', message: 'Failed to revoke pack' },
+				displayalert: { type: 'error', message: 'Failed to revoke pack' },
 			}),
 		},
 	});
@@ -35,7 +35,7 @@ if (!result || !result.success)
 Astro.response.headers.set(
 	'HX-Trigger',
 	JSON.stringify({
-		displayAlert: {
+		displayalert: {
 			type: 'success',
 			message: `Revoked 1 pack for ${username}`,
 		},

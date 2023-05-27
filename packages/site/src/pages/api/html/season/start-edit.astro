@@ -9,7 +9,7 @@ if (!seasonId)
 		status: 400,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					message: 'No seasonId provided',
 					type: 'error',
 				},
@@ -21,7 +21,7 @@ if (!seasonName)
 		status: 400,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					message: 'No seasonName provided',
 					type: 'error',
 				},
@@ -33,7 +33,7 @@ if (!seasonDescription)
 		status: 400,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					message: 'No seasonDescription provided',
 					type: 'error',
 				},

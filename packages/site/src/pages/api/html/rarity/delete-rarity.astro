@@ -29,7 +29,7 @@ if (!deleteFrameResult.ok) {
 		status: 500,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					type: 'error',
 					message: 'Failed to delete frame',
 				},
@@ -44,7 +44,7 @@ if (!result || !result.success)
 		status: 500,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					type: 'error',
 					message: result.error || 'Failed to delete rarity',
 				},

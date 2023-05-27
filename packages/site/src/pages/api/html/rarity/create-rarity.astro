@@ -27,7 +27,7 @@ if (errorMessage)
 		status: 400,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					message: errorMessage,
 					type: 'error',
 				},
@@ -53,7 +53,7 @@ if (!result.success)
 		status: result.error === 'Rarity already exists' ? 409 : 500,
 		headers: {
 			'HX-Trigger': JSON.stringify({
-				displayAlert: {
+				displayalert: {
 					message: result.error,
 					type: 'error',
 				},
