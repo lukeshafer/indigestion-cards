@@ -23,42 +23,42 @@ const config = {
 } satisfies EntityConfiguration;
 
 const auditAttributes = (entityName: string) =>
-({
-	createdAt: {
-		type: 'number',
-		default: () => Date.now(),
-		// cannot be modified after created
-		readOnly: true,
-	},
-	updatedAt: {
-		type: 'number',
-		// watch for changes to any attribute
-		watch: '*',
-		// set current timestamp when updated
-		set: (e, i) => {
-			// add to audit log
-			if (
-				!process.env.SESSION_USER_ID ||
-				process.env.SESSION_TYPE !== 'admin' ||
-				!process.env.SESSION_USERNAME
-			) {
-				throw new Error('Username and ID are required in process.env');
-				return;
-			}
-
-			audits.create({
-				entity: entityName,
-				username: process.env.SESSION_USERNAME,
-				userId: process.env.SESSION_USER_ID,
-				timestamp: Date.now(),
-				item: JSON.stringify(i),
-			});
-
-			return Date.now();
+	({
+		createdAt: {
+			type: 'number',
+			default: () => Date.now(),
+			// cannot be modified after created
+			readOnly: true,
 		},
-		readOnly: true,
-	},
-} satisfies Record<string, Attribute>);
+		updatedAt: {
+			type: 'number',
+			// watch for changes to any attribute
+			watch: '*',
+			// set current timestamp when updated
+			set: (e, i) => {
+				// add to audit log
+				if (
+					!process.env.SESSION_USER_ID ||
+					process.env.SESSION_TYPE !== 'admin' ||
+					!process.env.SESSION_USERNAME
+				) {
+					throw new Error('Username and ID are required in process.env');
+					return;
+				}
+
+				audits.create({
+					entity: entityName,
+					username: process.env.SESSION_USERNAME,
+					userId: process.env.SESSION_USER_ID,
+					timestamp: Date.now(),
+					item: JSON.stringify(i),
+				});
+
+				return Date.now();
+			},
+			readOnly: true,
+		},
+	} satisfies Record<string, Attribute>);
 
 const cardDesigns = new Entity(
 	{
@@ -355,6 +355,35 @@ const users = new Entity(
 			username: {
 				type: 'string',
 				required: true,
+				set: (value) => {
+					if (!value) return value;
+					packs.query
+						.byUsername({ username: value })
+						.go()
+						.then((res) =>
+							res.data.forEach((pack) => {
+								packs.update(pack).set({ username: value }).go();
+							})
+						);
+
+					admins.query
+						.allAdmins({ username: value })
+						.go()
+						.then((res) => {
+							res.data.forEach((admin) =>
+								admins.update(admin).set({ username: value }).go()
+							);
+						});
+
+					cardInstances.query
+						.byOwnerId({ username: value })
+						.go()
+						.then((res) => {
+							res.data.forEach((card) =>
+								cardInstances.update(card).set({ username: value }).go()
+							);
+						});
+				},
 			},
 			cardCount: {
 				type: 'number',

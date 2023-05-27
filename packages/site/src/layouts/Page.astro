@@ -15,7 +15,10 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div class="page-layout grid h-[100svh] overflow-hidden" hx-swap="true transition:true">
+	<div
+		class="page-layout grid h-[100svh] overflow-hidden"
+		hx-swap="true transition:true"
+		x-data="{}">
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -39,7 +42,22 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 				</a>
 				<UserSearch />
 			</header>
-			<div id="alert-wrapper" class="sticky top-0"></div>
+			<div
+				class="sticky top-0"
+				id="alert-wrapper"
+				@displayalert.window={`\
+					document.getElementById('page-scroll-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' }); 
+					message = $event.detail.message; 
+					type = $event.detail.type`}
+				x-data="{ message: undefined, type: undefined }"
+				x-cloak>
+				<template x-if="message">
+					<div class="alert-text-box" :data-type="type ?? 'error'">
+						<p x-text="message"></p>
+						<button @click="message = undefined">x</button>
+					</div>
+				</template>
+			</div>
 			<div class="flex-1">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
@@ -95,56 +113,3 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 		}
 	}
 </style>
-
-<script>
-	window.onload = () => {
-		const url = new URL(window.location.href);
-
-		// Check for alert in url search params
-		const alert = url.searchParams.get('alert');
-		const alertType = url.searchParams.get('alertType') ?? url.searchParams.get('type');
-		// call displayAlert event if alert exists
-		if (alert) {
-			document.body.dispatchEvent(
-				new CustomEvent('displayAlert', {
-					detail: {
-						message: alert,
-						type: alertType,
-					},
-				})
-			);
-		}
-
-		// remove alert and alertType from url search params
-		url.searchParams.delete('alert');
-		url.searchParams.delete('alertType');
-		window.history.replaceState({}, '', url);
-	};
-
-	const alertWrapper = document.getElementById('alert-wrapper') as HTMLDivElement;
-	document.body.addEventListener('clearAlert', () => {
-		alertWrapper.replaceChildren();
-	});
-
-	document.body.addEventListener('displayAlert', (e) => {
-		// @ts-expect-error - this does exist
-		const text = e.detail.message;
-		// @ts-expect-error - this one too
-		const type = e.detail.type ?? 'error';
-
-		const alert = document.createElement('p');
-		alert.classList.add('alert-text-box');
-		alert.dataset.type = type;
-		alert.textContent = text;
-		const closeBtn = document.createElement('button');
-		closeBtn.textContent = 'x';
-		closeBtn.addEventListener('click', () => {
-			alertWrapper.replaceChildren();
-		});
-		alert.appendChild(closeBtn);
-		alertWrapper.replaceChildren(alert);
-
-		// scroll to top
-		document.getElementById('page-scroll-wrapper')?.scrollTo(0, 0);
-	});
-</script>

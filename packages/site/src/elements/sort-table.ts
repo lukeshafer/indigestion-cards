@@ -17,13 +17,12 @@ class SortTable extends HTMLElement {
 				}
 				currentHeading = th;
 				const currentMode = th.dataset.mode || 'none';
-				const newMode =
-					currentMode === 'none'
-						? 'ascending'
-						: currentMode === 'ascending'
-							? 'descending'
-							: 'none';
-
+				const startDescending = th.dataset.startDescending === '';
+				const modes = ['none', 'ascending', 'descending'];
+				const currentModeIndex = modes.indexOf(currentMode);
+				const newMode = modes.at(
+					((startDescending ? modes.length - 1 : 1) + currentModeIndex) % modes.length
+				);
 				th.dataset.mode = newMode;
 				if (newMode === 'none') {
 					originalRows.forEach((row) => {
@@ -35,8 +34,8 @@ class SortTable extends HTMLElement {
 				const dataType = th.dataset.type || 'string';
 				const isAscending = newMode === 'ascending';
 				const sortedRows = rows.sort((a, b) => {
-					const aVal = a.children[index]!.textContent!;
-					const bVal = b.children[index]!.textContent!;
+					const aVal = a.children[index]!.textContent!.toLowerCase();
+					const bVal = b.children[index]!.textContent!.toLowerCase();
 					if (dataType === 'number') {
 						return isAscending
 							? Number(aVal) - Number(bVal)

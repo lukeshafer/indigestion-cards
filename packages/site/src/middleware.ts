@@ -1,17 +1,22 @@
 import type { MiddlewareResponseHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { html } from './lib/api';
+import { getAdminUserById } from '@lil-indigestion-cards/core/user';
 import { AUTH_TOKEN, HTML_API_PATH, PUBLIC_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
+import type { Session } from '@lil-indigestion-cards/core/types';
 
 const auth: MiddlewareResponseHandler = async (ctx, next) => {
-	//console.log(ctx.url.pathname);
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
-	const session = SSTSession.verify(cookie.value ?? '');
-	//console.log(session);
 
 	// @ts-expect-error
-	ctx.locals.session = session;
+	const session: Session = SSTSession.verify(cookie.value ?? '');
+	const adminUser = await getAdminUserById(session?.properties.userId ?? '');
+	if (!adminUser) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(AUTH_TOKEN);
+		console.error('No admin user found for session:', session);
+	} else ctx.locals.session = session;
 
 	const currentRoute = ctx.url.pathname;
 	const isPublicRoute = PUBLIC_ROUTES.some((route) => {
