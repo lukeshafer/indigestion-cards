@@ -383,6 +383,7 @@ export async function getActiveTwitchEventSubscriptions() {
 	});
 
 	if (!response.ok) {
+		console.error(response, await response.text());
 		throw new Error('Failed to fetch subscriptions');
 	}
 
