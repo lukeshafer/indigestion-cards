@@ -1,13 +1,26 @@
 ---
 import Page from '@/layouts/Page.astro';
-import CardList from '@/components/CardList.astro';
+//import CardList from '@/components/CardList.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { routes } from '@/constants';
+import Card from '@/components/Card.astro';
 
 const designs = await getAllCardDesigns();
 
 const message = Astro.url.searchParams.get('message') || '';
+
+const designsAndRarities = designs
+	.map(
+		(design) =>
+			design.rarityDetails?.map((rarity) => ({
+				frameUrl: rarity.frameUrl,
+				designUrl: design.imgUrl,
+				name: design.cardName,
+				description: design.cardDescription,
+			})) || []
+	)
+	.flat();
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
@@ -22,5 +35,6 @@ const breadcrumbs = [
 		<h1 class="page-heading">All Card Designs</h1>
 		<a href={routes.ADMIN.CREATE.CARD_DESIGN} class="button-link"> Create New Design</a>
 	</header>
-	<CardList cards={designs} />
+	<!--<CardList cards={designs} />-->
+	{designsAndRarities.map((card) => <Card {...card} />)}
 </Page>

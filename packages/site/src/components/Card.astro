@@ -1,0 +1,63 @@
+---
+interface Props {
+	frameUrl: string;
+	designUrl: string;
+	name: string;
+	description: string;
+}
+
+const { frameUrl, designUrl, name, description } = Astro.props;
+---
+
+<article class="card-wrapper" style={{ 'background-image': `url(${frameUrl})` }}>
+	<img src={designUrl} alt={name} class="design-img" />
+	<h3 class="card-name">{name}</h3>
+	<p class="card-description">{description}</p>
+</article>
+
+<style>
+	.card-wrapper {
+		position: relative;
+		background-size: cover;
+		width: 385px;
+		height: 535px;
+	}
+
+	.design-img {
+		position: absolute;
+		--left: 9%;
+		left: var(--left);
+		width: calc(100% - var(--left) * 2);
+		object-fit: cover;
+
+		top: 15%;
+		height: 51%;
+	}
+
+	.card-name {
+		position: absolute;
+		--left: 9%;
+		left: var(--left);
+		--top: 67%;
+		top: var(--top);
+		width: calc(100% - var(--left) * 2);
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #fff;
+	}
+
+	.card-description {
+		position: absolute;
+		--left: 9%;
+		left: var(--left);
+		--top: 75%;
+		top: var(--top);
+		width: calc(100% - var(--left) * 2);
+		height: 15%;
+		padding: 0.5rem;
+		font-size: 1rem;
+		font-weight: 400;
+		color: #fff;
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+</style>
