@@ -11,7 +11,7 @@ export function Sites({ stack }: StackContext) {
 	const { api, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
-	const { TWITCH_CLIENT_ID, TWITCH_ACCESS_TOKEN, STREAMER_USER_ID } = use(ConfigStack);
+	const { TWITCH_CLIENT_ID, STREAMER_USER_ID, APP_ACCESS_TOKEN_ARN } = use(ConfigStack);
 
 	const baseDomain = getDomainName(stack.stage);
 
@@ -25,13 +25,14 @@ export function Sites({ stack }: StackContext) {
 			cardDesignBucket,
 			siteAuth,
 			TWITCH_CLIENT_ID,
-			TWITCH_ACCESS_TOKEN,
+			APP_ACCESS_TOKEN_ARN,
 			STREAMER_USER_ID,
 		],
 		customDomain: {
 			domainName: baseDomain,
 			hostedZone: 'lksh.dev',
 		},
+		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 	});
 
 	// TODO: add cron job to check twitch for users who have updated their username

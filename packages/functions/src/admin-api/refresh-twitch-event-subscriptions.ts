@@ -21,6 +21,8 @@ export const handler = ApiHandler(async () => {
 
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();
 
+	console.log(JSON.stringify(activeSubscriptions, null, 2));
+
 	const subDetails: Record<SubscriptionType, TwitchSubscriptionDetails | undefined> = {
 		[SUBSCRIPTION_TYPE.GIFT_SUB]: {
 			exists: false,

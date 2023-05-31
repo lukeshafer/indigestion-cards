@@ -24,10 +24,11 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
+					config.APP_ACCESS_TOKEN_ARN,
 					table,
 					eventBus,
 				],
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	});
@@ -54,9 +55,9 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
 					config.STREAMER_ACCESS_TOKEN_ARN,
 					config.STREAMER_REFRESH_TOKEN_ARN,
+					config.APP_ACCESS_TOKEN_ARN,
 					config.STREAMER_USER_ID,
 					table,
 					eventBus,

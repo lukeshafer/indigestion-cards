@@ -1,4 +1,4 @@
-import { type StackContext, dependsOn, use, Script } from 'sst/constructs';
+import { type StackContext, use, Script } from 'sst/constructs';
 import { Database } from './database';
 import { ConfigStack } from './config';
 
@@ -14,9 +14,12 @@ export function AfterDeployStack({ stack }: StackContext) {
 					db,
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
+					config.APP_ACCESS_TOKEN_ARN,
 				],
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	});
+
+	return script;
 }

@@ -13,9 +13,10 @@ export function Events({ stack }: StackContext) {
 					table,
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_ACCESS_TOKEN,
+					config.APP_ACCESS_TOKEN_ARN,
 				],
 				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 			cdk: {
 				eventSource: {
@@ -42,6 +43,7 @@ export function Events({ stack }: StackContext) {
 								config.STREAMER_USER_ID,
 								config.STREAMER_ACCESS_TOKEN_ARN,
 								config.STREAMER_REFRESH_TOKEN_ARN,
+								config.APP_ACCESS_TOKEN_ARN,
 								config.TWITCH_CLIENT_ID,
 								config.TWITCH_CLIENT_SECRET,
 							],

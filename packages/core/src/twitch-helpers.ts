@@ -105,13 +105,37 @@ export function handleTwitchEvent(body: TwitchBody) {
 }
 
 export async function getUserByLogin(login: string) {
-	const user = await fetch(`https://api.twitch.tv/helix/users?login=${login}`, {
+	const appAccessToken = await retrieveAppTokenSecret();
+	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
+	let response = await fetch(fetchUrl, {
 		headers: {
 			'Client-ID': Config.TWITCH_CLIENT_ID,
-			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+			Authorization: `Bearer ${appAccessToken}`,
 		},
 	});
-	const body = await user.json();
+
+	if (!response.ok) {
+		if (response.status !== 401) {
+			console.error(response, await response.text());
+			throw new Error('Failed to get user from Twitch');
+		}
+
+		const newToken = await refreshAppAccessToken();
+		response = await fetch(fetchUrl, {
+			method: 'GET',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken}`,
+			},
+		});
+
+		if (!response.ok) {
+			console.error(response, await response.text());
+			throw new Error('Failed to get user from Twitch');
+		}
+	}
+
+	const body = await response.json();
 
 	const schema = z.object({
 		data: z.array(
@@ -137,7 +161,7 @@ export async function getUserByLogin(login: string) {
 
 export type ChannelPointReward = Awaited<ReturnType<typeof getAllChannelPointRewards>>[0];
 export async function getAllChannelPointRewards(args: { userId: string }) {
-	const { access_token, refresh_token } = await retrieveTokenSecrets();
+	const { access_token, refresh_token } = await retrieveUserTokenSecrets();
 
 	if (!access_token || !refresh_token) {
 		throw new Error('Missing token secrets');
@@ -158,7 +182,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 		if (!newToken) {
 			throw new Error('Failed to refresh token');
 		}
-		const putResults = await putTokenSecrets(newToken);
+		const putResults = await putUserTokenSecrets(newToken);
 		twitchResponse = await fetch(url.toString(), {
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
@@ -231,11 +255,12 @@ export type TwitchEvent =
 	| ChannelPointsCustomRewardRemoveEvent;
 
 export async function subscribeToTwitchEvent(event: TwitchEvent) {
-	const res = await fetch(subscriptionsUrl, {
+	const appAccessToken = await retrieveAppTokenSecret();
+	let response = await fetch(subscriptionsUrl, {
 		method: 'POST',
 		headers: {
 			'Client-ID': Config.TWITCH_CLIENT_ID,
-			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+			Authorization: `Bearer ${appAccessToken}`,
 			'Content-Type': 'application/json',
 		},
 		body: JSON.stringify({
@@ -250,11 +275,45 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 		}),
 	});
 
-	if (!res.ok) {
-		return { success: false, statusCode: res.status, body: await res.text() };
+	if (!response.ok) {
+		if (response.status !== 401) {
+			const text = await response.text();
+			console.error(response, text);
+			return { success: false, statusCode: response.status, body: text };
+		}
+
+		const newToken = await refreshAppAccessToken();
+		response = await fetch(subscriptionsUrl, {
+			method: 'POST',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				type: event.type,
+				version: '1',
+				condition: event.condition,
+				transport: {
+					method: 'webhook',
+					callback: event.callback,
+					secret: Config.TWITCH_CLIENT_SECRET,
+				},
+			}),
+		});
+
+		if (!response.ok) {
+			const text = await response.text();
+			console.error(response, text);
+			return { success: false, statusCode: response.status, body: text };
+		}
 	}
 
-	const body = await res.json();
+	if (!response.ok) {
+		return { success: false, statusCode: response.status, body: await response.text() };
+	}
+
+	const body = await response.json();
 
 	const bodySchema = z.object({
 		data: z.array(
@@ -281,10 +340,10 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 
 	if (!result.success) {
 		console.error(result.error);
-		return { success: false, statusCode: res.status, body: body };
+		return { success: false, statusCode: response.status, body: body };
 	}
 
-	return { success: true, statusCode: res.status, body: result.data };
+	return { success: true, statusCode: response.status, body: result.data };
 }
 
 export async function getUserAccessToken(args: { code: string; redirect_uri: string }) {
@@ -329,7 +388,7 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 	return result.data;
 }
 
-export async function retrieveTokenSecrets() {
+export async function retrieveUserTokenSecrets() {
 	const getAccessTokenPromise = secretsManager
 		.getSecretValue({
 			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
@@ -353,7 +412,7 @@ export async function retrieveTokenSecrets() {
 	};
 }
 
-export async function putTokenSecrets(args: { access_token: string; refresh_token: string }) {
+export async function putUserTokenSecrets(args: { access_token: string; refresh_token: string }) {
 	const putAccessTokenPromise = secretsManager
 		.putSecretValue({
 			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
@@ -371,20 +430,94 @@ export async function putTokenSecrets(args: { access_token: string; refresh_toke
 	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise]);
 }
 
+async function refreshAppAccessToken() {
+	const newAppAccessToken = await getNewAppAccessToken();
+	await secretsManager.putSecretValue({
+		SecretId: Config.APP_ACCESS_TOKEN_ARN,
+		SecretString: newAppAccessToken,
+	});
+
+	return newAppAccessToken;
+}
+
+async function getNewAppAccessToken() {
+	const response = await fetch('https://id.twitch.tv/oauth2/token', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: new URLSearchParams({
+			client_id: Config.TWITCH_CLIENT_ID,
+			client_secret: Config.TWITCH_CLIENT_SECRET,
+			grant_type: 'client_credentials',
+		}).toString(),
+	});
+
+	const rawBody = await response.json();
+	const bodySchema = z.object({
+		access_token: z.string(),
+		token_type: z.literal('bearer'),
+	});
+	const result = bodySchema.safeParse(rawBody);
+	if (!result.success) {
+		console.error(JSON.stringify(result.error, null, 2));
+		throw new Error('Failed to refresh token');
+	}
+	return result.data.access_token;
+}
+
+async function retrieveAppTokenSecret() {
+	const getSecretPromise = secretsManager
+		.getSecretValue({
+			SecretId: Config.APP_ACCESS_TOKEN_ARN,
+		})
+		.promise();
+
+	const secret = await getSecretPromise;
+
+	return secret.SecretString;
+}
+
+async function putAppTokenSecret(args: { access_token: string }) {
+	return secretsManager
+		.putSecretValue({
+			SecretId: Config.APP_ACCESS_TOKEN_ARN,
+			SecretString: args.access_token,
+		})
+		.promise();
+}
+
 export async function getActiveTwitchEventSubscriptions() {
+	const appAccessToken = await retrieveAppTokenSecret();
 	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
 	fetchUrl.searchParams.append('user_id', Config.STREAMER_USER_ID);
-	const response = await fetch(fetchUrl.toString(), {
+	let response = await fetch(fetchUrl.toString(), {
 		method: 'GET',
 		headers: {
 			'Client-ID': Config.TWITCH_CLIENT_ID,
-			Authorization: `Bearer ${Config.TWITCH_ACCESS_TOKEN}`,
+			Authorization: `Bearer ${appAccessToken}`,
 		},
 	});
 
 	if (!response.ok) {
-		console.error(response, await response.text());
-		throw new Error('Failed to fetch subscriptions');
+		if (response.status !== 401) {
+			console.error(response, await response.text());
+			throw new Error('Failed to fetch subscriptions');
+		}
+
+		const newToken = await refreshAppAccessToken();
+		response = await fetch(fetchUrl.toString(), {
+			method: 'GET',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken}`,
+			},
+		});
+
+		if (!response.ok) {
+			console.error(response, await response.text());
+			throw new Error('Failed to fetch subscriptions');
+		}
 	}
 
 	const body = await response.json();

@@ -2,7 +2,7 @@ import { Config } from 'sst/node/config';
 import { Issuer } from 'openid-client';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import { getAdminUserById } from '@lil-indigestion-cards/core/user';
-import { putTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
+import { putUserTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -68,7 +68,7 @@ export const handler = AuthHandler({
 				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
-				putTokenSecrets({
+				putUserTokenSecrets({
 					access_token: input.tokenset.access_token,
 					refresh_token: input.tokenset.refresh_token,
 				});
