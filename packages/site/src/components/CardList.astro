@@ -1,6 +1,6 @@
 ---
 import { routes } from '@/constants';
-import TradingCard from './TradingCard.astro';
+import TiltCardEffect from './TiltCardEffect.astro';
 
 interface Props {
 	cards: {
@@ -31,12 +31,11 @@ const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 						'bg-gray-200': index % 2 === 0,
 						'bg-white': index % 2 === 1,
 					}}>
-					<TradingCard
-						border={
+					<TiltCardEffect	border={
 							card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName ?? ''
 						}>
 						<img src={card.imgUrl} width="250" alt={`${card.cardName} image`} />
-					</TradingCard>
+					</TiltCardEffect>
 					<h2 class="mt-4 font-display font-bold italic text-2xl">{card.cardName}</h2>
 					<p>{card.cardDescription}</p>
 					{card.rarityName && card.cardNumber && card.totalOfType ? (

@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
-import TradingCard from '@/components/TradingCard.astro';
+import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { api } from '@/constants';
 
 const allPacks = await getAllPacks();
@@ -35,7 +35,7 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 			</ul>
 		</section>
 		<div id="open-showcase"></div>
-		<TradingCard isTemplateOnly />
+		<TiltCardEffect isTemplateOnly />
 	</div>
 </Page>
 

@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import TradingCard from '@/components/TradingCard.astro';
+import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
 import { routes } from '@/constants';
 
@@ -60,9 +60,9 @@ const openDate = instance.openedAt
 			{instance.cardName}, {instance.rarityName} #{instance.cardNumber}
 		</h1>
 		<div class="mx-4">
-			<TradingCard>
+			<TiltCardEffect>
 				<img src={instance.imgUrl} width="300" class="max-w-full" />
-			</TradingCard>
+			</TiltCardEffect>
 		</div>
 		{
 			instance.cardDescription ? (

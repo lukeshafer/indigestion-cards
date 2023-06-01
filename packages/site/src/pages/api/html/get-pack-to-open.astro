@@ -1,6 +1,6 @@
 ---
 import { getPackById } from '@lil-indigestion-cards/core/card';
-import TradingCard from '@/components/TradingCard.astro';
+import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { api } from '@/constants';
 
 const packId = Astro.url.searchParams.get('packId');
@@ -37,9 +37,9 @@ if (!pack) return new Response('Pack not found', { status: 404 });
 							title="Click to reveal"
 						/>
 						<div class="absolute inset-0 w-full h-full backface-hidden flipped">
-							<TradingCard border={card.rarityName.toLowerCase()}>
+							<TiltCardEffect border={card.rarityName.toLowerCase()}>
 								<img class="w-40 h-56" src={card.imgUrl} />
-							</TradingCard>
+							</TiltCardEffect>
 						</div>
 					</div>
 				</li>

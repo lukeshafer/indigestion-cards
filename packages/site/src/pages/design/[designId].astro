@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import TradingCard from '@/components/TradingCard.astro';
+import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { routes, api } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
@@ -92,9 +92,9 @@ const rarityStatsArray = Object.values(rarityStats);
 	<header class="flex flex-col gap-4">
 		<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
 		<div class="mx-4">
-			<TradingCard>
+			<TiltCardEffect>
 				<img src={design.imgUrl} width="300" class="max-w-full" />
-			</TradingCard>
+			</TiltCardEffect>
 		</div>
 		{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
 	</header>

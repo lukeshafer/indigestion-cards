@@ -14,6 +14,7 @@ const designsAndRarities = designs
 	.map(
 		(design) =>
 			design.rarityDetails?.map((rarity) => ({
+				rarityName: rarity.rarityName,
 				frameUrl: rarity.frameUrl,
 				designUrl: design.imgUrl,
 				name: design.cardName,

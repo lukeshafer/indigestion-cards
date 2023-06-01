@@ -1,19 +1,24 @@
 ---
+import TiltCardEffect from './TiltCardEffect.astro';
+
 interface Props {
+	rarityName: string;
 	frameUrl: string;
 	designUrl: string;
 	name: string;
 	description: string;
 }
 
-const { frameUrl, designUrl, name, description } = Astro.props;
+const { rarityName, frameUrl, designUrl, name, description } = Astro.props;
 ---
 
-<article class="card-wrapper" style={{ 'background-image': `url(${frameUrl})` }}>
-	<img src={designUrl} alt={name} class="design-img" />
-	<h3 class="card-name">{name}</h3>
-	<p class="card-description">{description}</p>
-</article>
+<TiltCardEffect border={rarityName === 'rainbow' ? 'mediumorchid' : rarityName ?? ''} shiny={true}>
+	<article class="card-wrapper" style={{ 'background-image': `url(${frameUrl})` }}>
+		<img src={designUrl} alt={name} class="design-img" />
+		<h3 class="card-name">{name}</h3>
+		<p class="card-description">{description}</p>
+	</article>
+</TiltCardEffect>
 
 <style>
 	.card-wrapper {
