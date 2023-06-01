@@ -5,6 +5,7 @@ import {
 	TwitchEvent,
 	SUBSCRIPTION_TYPE,
 	type SubscriptionType,
+	deleteTwitchEventSubscription,
 } from '@lil-indigestion-cards/core/twitch-helpers';
 import { Config } from 'sst/node/config';
 import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
@@ -76,8 +77,11 @@ export const handler = ApiHandler(async () => {
 		},
 	};
 
-	activeSubscriptions.forEach((sub) => {
-		if (sub.status !== 'enabled') return;
+	activeSubscriptions.forEach(async (sub) => {
+		if (sub.status !== 'enabled') {
+			await deleteTwitchEventSubscription(sub.id);
+			return;
+		}
 		const details = subDetails[sub.type];
 		if (details && sub.transport.callback === Api.twitchApi.url) details.exists = true;
 	});
