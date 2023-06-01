@@ -555,3 +555,39 @@ export async function getActiveTwitchEventSubscriptions() {
 	const subscriptions = result.data.data;
 	return subscriptions;
 }
+
+export async function deleteTwitchEventSubscription(id: string) {
+	const appAccessToken = await retrieveAppTokenSecret();
+	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
+	fetchUrl.searchParams.append('id', id);
+
+	return fetch(fetchUrl.toString(), {
+		method: 'DELETE',
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${appAccessToken}`,
+		},
+	}).then(async (res) => {
+		if (res.ok) return res;
+		if (res.status !== 401) {
+			console.error(res, await res.text());
+			throw new Error('Failed to fetch subscriptions');
+		}
+
+		const newToken = await refreshAppAccessToken();
+		const newResponse = await fetch(fetchUrl.toString(), {
+			method: 'DELETE',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken}`,
+			},
+		});
+
+		if (!newResponse.ok) {
+			console.error(res, await newResponse.text());
+			throw new Error('Failed to fetch subscriptions');
+		}
+
+		return newResponse;
+	});
+}
