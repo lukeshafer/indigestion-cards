@@ -1,11 +1,15 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import { getAllPackTypes, getAllRarities } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TableSearch from '@/components/TableSearch.astro';
 
-const [twitchEvents, packTypes] = await Promise.all([getTwitchEvents(), getAllPackTypes()]);
+const [twitchEvents, packTypes, rarities] = await Promise.all([
+	getTwitchEvents(),
+	getAllPackTypes(),
+	getAllRarities(),
+]);
 
 const giftSubEvent = twitchEvents.data.find(
 	(event) =>
@@ -33,6 +37,16 @@ const giftSubPackType =
 
 <Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
 	<h1 class="page-heading">Site Config</h1>
+	<section class="my-4 flex gap-4">
+		<h2 class="sub-heading w-max">Base Rarity for Design Previews</h2>
+		<select class="my-form-input max-w-xs">
+			{
+				rarities.map(({ rarityId, rarityName }) => (
+					<option value={rarityId}>{rarityName}</option>
+				))
+			}
+		</select>
+	</section>
 	<section>
 		<sort-table>
 			<header class="page-header">
