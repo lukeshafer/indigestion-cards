@@ -12,6 +12,7 @@ export const PUBLIC_ROUTES = [
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
 	OPEN_CARD: '/api/html/open-card',
+	SAVE_CONFIG: '/api/html/save-config',
 	IMAGE: {
 		DELETE: '/api/html/image/delete-unmatched-image',
 	},

@@ -1,15 +1,25 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes, getAllRarities } from '@lil-indigestion-cards/core/card';
-import { getTwitchEvents } from '@lil-indigestion-cards/core/site-config';
+import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TableSearch from '@/components/TableSearch.astro';
+import { api } from '@/constants';
+import TwitchEvent from '@/components/site-config/TwitchEvent.astro';
 
-const [twitchEvents, packTypes, rarities] = await Promise.all([
+const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
 	getAllPackTypes(),
 	getAllRarities(),
+	getSiteConfig(),
 ]);
+
+const baseRarityValue = new URLSearchParams(
+	siteConfig.baseRarity || {
+		rarityId: rarities[0].rarityId,
+		frameUrl: rarities[0].frameUrl,
+	}
+).toString();
 
 const giftSubEvent = twitchEvents.data.find(
 	(event) =>
@@ -36,189 +46,78 @@ const giftSubPackType =
 ---
 
 <Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
-	<h1 class="page-heading">Site Config</h1>
-	<section class="my-4 flex gap-4">
-		<h2 class="sub-heading w-max">Base Rarity for Design Previews</h2>
-		<select class="my-form-input max-w-xs">
-			{
-				rarities.map(({ rarityId, rarityName }) => (
-					<option value={rarityId}>{rarityName}</option>
-				))
-			}
-		</select>
-	</section>
-	<section>
-		<sort-table>
-			<header class="page-header">
-				<h2 class="sub-heading">Twitch Event Rewards</h2>
-				<button class="post-button" data-type="submit" data-save hidden>Save</button>
-				<TableSearch
-					id="rewards-search"
-					tableId="rewards-table"
-					label="Search Rewards"
-					searchColumn="Event"
-				/>
-			</header>
-			<table class="mt-4" id="rewards-table">
-				<thead>
-					<tr>
-						<th class="w-2/3">Event</th>
-						<th data-no-sort>Pack Type</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>5 Gift Subs</td>
-						<td>
-							<select
-								data-pack-type-select
-								data-id={TWITCH_GIFT_SUB_ID}
-								data-title={'5 Gift Subs'}
-								data-cost="5"
-								data-value={giftSubPackType ? JSON.stringify(giftSubPackType) : ''}
-								class="my-form-input">
-								<option value="">None</option>
-								{
-									packTypes.map(({ packTypeId, packTypeName }) => (
-										<option
-											value={JSON.stringify({
-												packTypeId,
-												packTypeName,
-											})}>
-											{packTypeName}
-										</option>
-									))
-								}
-							</select>
-						</td>
-					</tr>
-					{
-						rewards.map((reward) => (
-							<tr>
-								<td>Reward: {reward.eventName}</td>
-								<td>
-									<select
-										data-pack-type-select
-										data-id={reward.eventId}
-										data-title={reward.eventName}
-										data-cost={reward.cost}
-										data-value={
-											reward.packTypeId
-												? JSON.stringify({
-														packTypeId: reward.packTypeId,
-														packTypeName: reward.packTypeName,
-												  })
-												: ''
-										}
-										class="my-form-input">
-										<option value="">None</option>
-										{packTypes.map(({ packTypeId, packTypeName }) => (
-											<option
-												value={JSON.stringify({
-													packTypeId,
-													packTypeName,
-												})}>
-												{packTypeName}
-											</option>
-										))}
-									</select>
-								</td>
-							</tr>
-						))
-					}
-				</tbody>
-			</table>
-		</sort-table>
-	</section>
+	<form
+		x-data="{ isEdited: false }"
+		@change="isEdited = true"
+		hx-post={api.SAVE_CONFIG}
+		hx-swap="none"
+		method="post">
+		<header class="flex gap-8 items-center">
+			<h1 class="page-heading">Site Config</h1>
+			<button
+				class="post-button h-max w-24"
+				id="save-config-btn"
+				data-type="submit"
+				x-show="isEdited"
+				x-cloak>Save</button
+			>
+		</header>
+		<section class="my-4 flex gap-4">
+			<h2 class="sub-heading w-max">Base Rarity for Design Previews</h2>
+			<select class="my-form-input max-w-xs" name="base-rarity">
+				{
+					rarities.map(({ rarityId, rarityName, frameUrl }) => {
+						const value = new URLSearchParams({ rarityId, frameUrl }).toString();
+						return (
+							<option value={value} selected={value === baseRarityValue}>
+								{rarityName}
+							</option>
+						);
+					})
+				}
+			</select>
+		</section>
+		<section>
+			<sort-table>
+				<header class="page-header">
+					<h2 class="sub-heading">Twitch Event Rewards</h2>
+					<TableSearch
+						id="rewards-search"
+						tableId="rewards-table"
+						label="Search Rewards"
+						searchColumn="Event"
+					/>
+				</header>
+				<table class="mt-4" id="rewards-table">
+					<thead>
+						<tr>
+							<th class="w-2/3">Event</th>
+							<th data-no-sort>Pack Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<TwitchEvent
+							eventName="5 Gift Subs"
+							id={TWITCH_GIFT_SUB_ID}
+							defaultValue={giftSubPackType}
+							packTypes={packTypes}
+						/>
+						{
+							rewards.map((reward) => (
+								<TwitchEvent
+									eventName={`Reward: ${reward.eventName}`}
+									id={reward.eventId}
+									defaultValue={{
+										packTypeId: reward.packTypeId,
+										packTypeName: reward.packTypeName,
+									}}
+									packTypes={packTypes}
+								/>
+							))
+						}
+					</tbody>
+				</table>
+			</sort-table>
+		</section>
+	</form>
 </Page>
-
-<script>
-	const saveButton = document.querySelector('[data-save]') as HTMLButtonElement;
-	const packTypeSelects = document.querySelectorAll<HTMLSelectElement>('[data-pack-type-select]');
-
-	interface PackType {
-		packTypeId: string;
-		packTypeName: string;
-		twitchEventId: string;
-		twitchEventName: string;
-		cost?: number | undefined;
-	}
-
-	packTypeSelects.forEach((select) => {
-		if (select.dataset.value) select.value = select.dataset.value;
-		select.addEventListener('change', () => {
-			const eventId = select.dataset.id!;
-			const eventName = select.dataset.title!;
-			const cost = parseInt(select.dataset.cost!) || undefined;
-
-			try {
-				const packType = JSON.parse(select.value) as PackType;
-				stateUpdates.channelPointRewards.set(select.dataset.id!, {
-					...packType,
-					twitchEventId: eventId,
-					twitchEventName: eventName,
-					cost,
-				});
-			} catch {
-				stateUpdates.channelPointRewards.set(select.dataset.id!, {
-					packTypeId: '',
-					packTypeName: '',
-					twitchEventId: eventId,
-					twitchEventName: eventName,
-					cost,
-				});
-			}
-		});
-	});
-
-	const stateUpdates = {
-		channelPointRewards: {
-			set(rewardId: string, packType: PackType) {
-				this.__state.set(rewardId, packType);
-				stateUpdates.update();
-			},
-			__state: new Map<string, PackType>(),
-		},
-		update() {
-			if (this.channelPointRewards.__state.size > 0) {
-				saveButton.hidden = false;
-			}
-		},
-		get state() {
-			return {
-				channelPointRewards: [...this.channelPointRewards.__state.values()],
-			};
-		},
-	};
-
-	saveButton.addEventListener('click', async () => {
-		saveButton.innerText = 'Saving...';
-		saveButton.disabled = true;
-
-		const response = await fetch('/api/admin/save-config?fetch=true', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(stateUpdates.state),
-		});
-
-		if (response.ok) {
-			saveButton.innerText = 'Saved!';
-			saveButton.dataset.type = 'success';
-			setTimeout(() => {
-				saveButton.innerText = 'Save';
-				saveButton.dataset.type = 'submit';
-				saveButton.disabled = false;
-			}, 1000);
-		} else {
-			saveButton.innerText = 'Error!';
-			saveButton.dataset.type = 'error';
-			setTimeout(() => {
-				saveButton.innerText = 'Save';
-				saveButton.dataset.type = 'submit';
-				saveButton.disabled = false;
-			}, 1000);
-		}
-	});
-</script>

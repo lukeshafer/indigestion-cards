@@ -5,21 +5,6 @@ import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb'
 const config = {
 	table: Table.data.tableName,
 	client: new DocumentClient(),
-	listeners: [
-		(e) => {
-			//console.log(JSON.stringify(e, null, 2));
-			//if (e.type !== 'results') return;
-			if (
-				e.method === 'query' ||
-				e.method === 'get' ||
-				e.method === 'scan' ||
-				e.method === 'batchGet'
-			)
-				return;
-
-			//console.log(JSON.stringify(e, null, 2));
-		},
-	],
 } satisfies EntityConfiguration;
 
 const auditAttributes = (entityName: string) =>
@@ -888,6 +873,45 @@ const audits = new Entity(
 	config
 );
 
+const siteConfig = new Entity(
+	{
+		model: {
+			entity: 'siteConfig',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			baseRarity: {
+				type: 'map',
+				required: true,
+				properties: {
+					rarityId: {
+						type: 'string',
+						required: true,
+					},
+					frameUrl: {
+						type: 'string',
+						required: true,
+					},
+				},
+			},
+		},
+		indexes: {
+			primary: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: [],
+				},
+			},
+		},
+	},
+	config
+);
+
 export const db = new Service(
 	{
 		cardDesigns,
@@ -901,6 +925,7 @@ export const db = new Service(
 		admins,
 		twitchEvents,
 		twitchEventMessageHistory,
+		siteConfig,
 	},
 	config
 );

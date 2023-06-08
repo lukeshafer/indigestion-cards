@@ -1,12 +1,16 @@
 ---
 import TiltCardEffect from './TiltCardEffect.astro';
 
+export type CardProps = Props;
 interface Props {
 	rarityName: string;
 	frameUrl: string;
 	designUrl: string;
 	name: string;
 	description: string;
+	designId: string;
+	cardNumber: number;
+	totalOfType: number;
 }
 
 const { rarityName, frameUrl, designUrl, name, description } = Astro.props;
@@ -24,8 +28,8 @@ const { rarityName, frameUrl, designUrl, name, description } = Astro.props;
 	.card-wrapper {
 		position: relative;
 		background-size: cover;
-		width: 385px;
-		height: 535px;
+		width: 300px;
+		aspect-ratio: 77 / 107;
 	}
 
 	.design-img {

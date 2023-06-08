@@ -1,14 +1,18 @@
 import { db, twitchEventTypes } from './db';
-import type { CreateEntityItem } from 'electrodb';
+import type { CreateEntityItem, UpdateEntityItem, UpdateQueryParams } from 'electrodb';
 import { ChannelPointReward } from './twitch-helpers';
 
 type TwitchEvent = typeof db.entities.twitchEvents;
+type SiteConfig = typeof db.entities.siteConfig;
 
-export async function updateBatchTwitchEvents(options: {
-	events: CreateEntityItem<TwitchEvent>[];
-}) {
+export async function updateBatchTwitchEvents(
+	events: (UpdateEntityItem<TwitchEvent> & {
+		eventId: string;
+		eventType: CreateEntityItem<TwitchEvent>['eventType'];
+	})[]
+) {
 	const result = await Promise.all(
-		options.events.map(async (event) => {
+		events.map(async (event) => {
 			const { eventId, eventType, ...rest } = event;
 			return db.entities.twitchEvents.update({ eventId, eventType }).set(rest).go();
 		})
@@ -108,4 +112,13 @@ export async function checkIsDuplicateTwitchEventMessage(args: { message_id: str
 		.catch(() => []);
 
 	return result.length > 0;
+}
+
+export async function updateSiteConfig(config: CreateEntityItem<SiteConfig>) {
+	const result = await db.entities.siteConfig.upsert(config).go();
+}
+
+export async function getSiteConfig() {
+	const result = await db.entities.siteConfig.query.primary({}).go();
+	return result.data[0];
 }

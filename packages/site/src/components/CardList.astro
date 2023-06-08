@@ -1,48 +1,22 @@
 ---
 import { routes } from '@/constants';
 import TiltCardEffect from './TiltCardEffect.astro';
+import Card, { type CardProps } from './Card.astro';
 
 interface Props {
-	cards: {
-		designId: string;
-		seasonId: string;
-		cardName: string;
-		imgUrl: string;
-		cardDescription: string;
-		cardNumber?: number;
-		totalOfType?: number;
-		rarityName?: string;
-	}[];
+	cards: CardProps[];
 }
-const { props } = Astro;
+const { cards } = Astro.props;
 
 const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 ---
 
-<ul class="grid justify-start w-full px-3">
+<ul class="grid justify-start w-full px-3 gap-4">
 	{
-		props.cards.length > 0 ? (
-			props.cards.map((card, index) => (
-				<Element
-					rel="prefetch"
-					href={`${routes.DESIGNS}/${card.designId}`}
-					class="flex flex-col gap-1 bg-gray-200 items-center py-8 px-4"
-					class:list={{
-						'bg-gray-200': index % 2 === 0,
-						'bg-white': index % 2 === 1,
-					}}>
-					<TiltCardEffect	border={
-							card.rarityName === 'rainbow' ? 'mediumorchid' : card.rarityName ?? ''
-						}>
-						<img src={card.imgUrl} width="250" alt={`${card.cardName} image`} />
-					</TiltCardEffect>
-					<h2 class="mt-4 font-display font-bold italic text-2xl">{card.cardName}</h2>
-					<p>{card.cardDescription}</p>
-					{card.rarityName && card.cardNumber && card.totalOfType ? (
-						<p>
-							{card.rarityName}, {card.cardNumber} / {card.totalOfType}
-						</p>
-					) : null}
+		cards.length > 0 ? (
+			cards.map((card) => (
+				<Element rel="prefetch" href={`${routes.DESIGNS}/${card.designId}`}>
+					<Card {...card} />
 				</Element>
 			))
 		) : (
