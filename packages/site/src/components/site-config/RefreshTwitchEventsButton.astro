@@ -1,0 +1,42 @@
+---
+import AdminOnly from '../AdminOnly.astro';
+---
+
+<AdminOnly>
+	<button
+		class="post-button mt-5"
+		id="refresh-twitch-button"
+		data-type="submit"
+		:data-type="btnType"
+		x-text="btnText"
+		:disabled="disabled"
+		@click="refreshTwitch($data)"
+		x-data="{ btnText: 'Refresh Twitch Events', disabled: false, btnType: 'submit' }"
+		>Refresh Twitch Events</button
+	>
+	<script is:inline>
+		/** @param {Record<string, any>} data */
+		function refreshTwitch(data) {
+			data.btnText = 'Refreshing...';
+			data.disabled = true;
+			console.log('refreshing');
+			fetch('/api/admin/refresh-twitch-event-subscriptions?fetch=true', {
+				method: 'POST',
+			}).then((res) => {
+				if (res.ok) {
+					data.btnText = 'Refreshed!';
+					data.btnType = 'success';
+				} else {
+					data.btnText = 'Error!';
+					data.btnType = 'error';
+				}
+
+				data.disabled = false;
+				setTimeout(() => {
+					data.btnText = 'Refresh Twitch Events';
+					data.btnType = 'submit';
+				}, 2000);
+			});
+		}
+	</script>
+</AdminOnly>

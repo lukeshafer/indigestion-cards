@@ -6,6 +6,8 @@ import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TableSearch from '@/components/TableSearch.astro';
 import { api } from '@/constants';
 import TwitchEvent from '@/components/site-config/TwitchEvent.astro';
+import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton.astro';
+import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -119,5 +121,7 @@ const giftSubPackType =
 				</table>
 			</sort-table>
 		</section>
+		<RefreshTwitchEventsButton />
+		<TwitchLoginButton />
 	</form>
 </Page>
