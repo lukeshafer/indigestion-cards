@@ -23,27 +23,3 @@ class HTMLResponse extends Response {
 		});
 	}
 }
-
-import { ApiHandler, useHeader } from 'sst/node/api';
-type HandlerCallback = Parameters<typeof ApiHandler>[0];
-type HtmlApiResponse = (...args: Parameters<typeof String.raw>) => string
-function HTMLApiHandler(handler: (args: {
-	html: typeof html;
-
-})) {
-	return ApiHandler(async (event, ctx) => {
-		const html = (...args: Parameters<typeof String.raw>) => {
-			const htmlString = String.raw(...args);
-
-			useHeader
-		}
-
-		const response = await handler({
-
-		});
-
-
-
-		return response;
-	});
-}

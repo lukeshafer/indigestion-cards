@@ -44,10 +44,11 @@ export function API({ app, stack }: StackContext) {
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
+			'GET /test-credentials': 'packages/functions/src/admin-api/test-credentials.handler',
 			...(app.stage === 'luke'
 				? {
-						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				  }
+					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+				}
 				: {}),
 		},
 		defaults: {
@@ -71,9 +72,22 @@ export function API({ app, stack }: StackContext) {
 		},
 		cors: {
 			allowCredentials: true,
-			allowHeaders: ['content-type'],
+			allowHeaders: [
+				'content-type',
+				'HX-Boosted',
+				'HX-Request',
+				'HX-Target',
+				'HX-Current-URL',
+				'HX-Trigger',
+				'HX-Trigger-Name',
+				'HX-Prompt',
+				'HX-History-Restore-Request',
+			],
 			allowMethods: ['ANY'],
-			allowOrigins: ['http://localhost:3000', `https://${baseDomain}`],
+			allowOrigins:
+				app.stage === 'luke'
+					? ['http://localhost:3000', `https://${baseDomain}`]
+					: [`https://${baseDomain}`],
 		},
 		customDomain: {
 			domainName: `api.${baseDomain}`,
