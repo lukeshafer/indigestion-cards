@@ -44,7 +44,6 @@ export function API({ app, stack }: StackContext) {
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
-			'GET /test-credentials': 'packages/functions/src/admin-api/test-credentials.handler',
 			...(app.stage === 'luke'
 				? {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
