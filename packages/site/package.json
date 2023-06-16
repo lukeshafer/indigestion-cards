@@ -27,7 +27,6 @@
 		"aws-sdk": "^2.1357.0",
 		"electrodb": "^2.5.1",
 		"htmx.org": "^1.9.2",
-		"hyperscript.org": "^0.9.8",
 		"install": "^0.13.0",
 		"open-props": "^1.5.8",
 		"solid-js": "^1.7.3",
