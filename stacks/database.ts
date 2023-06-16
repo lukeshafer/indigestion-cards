@@ -1,6 +1,9 @@
-import { StackContext, Table } from 'sst/constructs'
+import { StackContext, Table, Cron, use } from 'sst/constructs';
+import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
+	const { TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN } = use(ConfigStack);
+
 	const table = new Table(stack, 'data', {
 		fields: {
 			pk: 'string',
@@ -30,9 +33,23 @@ export function Database({ stack }: StackContext) {
 				sortKey: 'gsi3sk',
 			},
 		},
-	})
+	});
 
 	// TODO: add cron job to check twitch for users who have updated their username
+	new Cron(stack, 'RefreshUsernamesCron', {
+		schedule: 'cron(0 6 * * ? *)',
+		job: {
+			function: {
+				handler: 'packages/functions/src/cron/refresh-usernames.handler',
+				environment: {
+					SESSION_USER_ID: 'RefreshUsernamesCron',
+					SESSION_TYPE: 'admin',
+					SESSION_USERNAME: 'Refresh Usernames Cron Job',
+				},
+				bind: [table, TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN],
+			},
+		},
+	});
 
-	return table
+	return table;
 }

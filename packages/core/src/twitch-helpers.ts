@@ -229,7 +229,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 		// token may have expired, try refreshing
 		const newToken = await refreshUserAccessToken({ refresh_token });
 		if (!newToken) {
-			throw new Error('Failed to refresh token');
+			throw new Error('Failed to refresh user access token');
 		}
 		const putResults = await putUserTokenSecrets(newToken);
 		twitchResponse = await fetch(url.toString(), {
@@ -426,13 +426,15 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 	});
 
 	const rawBody = await response.json();
+	console.log('Twitch response to refresh request: ', rawBody);
 	const bodySchema = z.object({
 		access_token: z.string(),
 		refresh_token: z.string(),
 	});
 	const result = bodySchema.safeParse(rawBody);
 	if (!result.success) {
-		throw new Error('Failed to refresh token');
+		//console.error(result.error);
+		throw new Error('Failed to refresh user access token');
 	}
 	return result.data;
 }
@@ -510,7 +512,7 @@ async function getNewAppAccessToken() {
 	const result = bodySchema.safeParse(rawBody);
 	if (!result.success) {
 		console.error(JSON.stringify(result.error, null, 2));
-		throw new Error('Failed to refresh token');
+		throw new Error('Failed to refresh app access token');
 	}
 	return result.data.access_token;
 }

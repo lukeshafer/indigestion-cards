@@ -351,14 +351,15 @@ const users = new Entity(
 							})
 						);
 
-					admins.query
-						.allAdmins({ username: value })
-						.go()
-						.then((res) => {
-							res.data.forEach((admin) =>
-								admins.update(admin).set({ username: value }).go()
-							);
-						});
+					// Admins can't be updated right now because username is part of a primary key
+					//admins.query
+						//.allAdmins({ username: value })
+						//.go()
+						//.then((res) => {
+							//res.data.forEach((admin) =>
+								//admins.update(admin).set({ username: value }).go()
+							//);
+						//});
 
 					cardInstances.query
 						.byOwnerId({ username: value })
