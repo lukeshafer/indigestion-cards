@@ -17,6 +17,11 @@ export function Events({ stack }: StackContext) {
 				],
 				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				environment: {
+					SESSION_USER_ID: 'event_give_pack_to_user',
+					SESSION_USERNAME: 'Event: give-pack-to-user',
+					SESSION_TYPE: 'admin',
+				},
 			},
 			cdk: {
 				eventSource: {

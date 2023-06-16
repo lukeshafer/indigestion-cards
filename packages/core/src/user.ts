@@ -102,6 +102,10 @@ export async function updateUsername(
 	return result.data;
 }
 
+export async function batchUpdateUsers(users: CreateEntityItem<User>[]) {
+	const result = await db.entities.users.put(users).go();
+}
+
 export async function checkIfUserExists(userId: string): Promise<boolean> {
 	return getUser(userId).then((user) => !!user);
 }

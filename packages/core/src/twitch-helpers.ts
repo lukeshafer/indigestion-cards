@@ -104,6 +104,55 @@ export function handleTwitchEvent(body: TwitchBody) {
 	return { statusCode: 200 };
 }
 
+export async function getListOfTwitchUsersByIds(ids: string[]) {
+	const appAccessToken = await retrieveAppTokenSecret();
+	const fetchUrl = `https://api.twitch.tv/helix/users?id=${ids.join('&id=')}`;
+	let response = await fetch(fetchUrl, {
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${appAccessToken}`,
+		},
+	});
+
+	if (!response.ok) {
+		if (response.status !== 401) {
+			console.error(response, await response.text());
+			throw new Error('Failed to get user from Twitch');
+		}
+
+		const newToken = await refreshAppAccessToken();
+		response = await fetch(fetchUrl, {
+			method: 'GET',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken}`,
+			},
+		});
+	}
+
+	const json = await response.json();
+
+	const schema = z.object({
+		data: z.array(
+			z.object({
+				id: z.string(),
+				login: z.string(),
+				display_name: z.string(),
+				profile_image_url: z.string(),
+			})
+		),
+	});
+
+	const parsed = schema.safeParse(json);
+
+	if (!parsed.success) {
+		console.error(parsed.error);
+		throw new Error('Failed to parse Twitch response');
+	}
+
+	return parsed.data.data;
+}
+
 export async function getUserByLogin(login: string) {
 	const appAccessToken = await retrieveAppTokenSecret();
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;

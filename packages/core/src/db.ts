@@ -368,6 +368,7 @@ const users = new Entity(
 								cardInstances.update(card).set({ username: value }).go()
 							);
 						});
+					return value;
 				},
 			},
 			cardCount: {
