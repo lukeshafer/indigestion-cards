@@ -27,6 +27,12 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Deploy SST app
+              run: pnpm run deploy --stage ${GITHUB_REF##*/}
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
             - name: 'Check Types: Core'
               run: pnpm run core:check
 
@@ -35,9 +41,3 @@ jobs:
 
             - name: 'Check Types: Site'
               run: pnpm run site:check
-
-            - name: Deploy SST app
-              run: pnpm run deploy --stage ${GITHUB_REF##*/}
-              env:
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
