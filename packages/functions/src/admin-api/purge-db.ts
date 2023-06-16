@@ -51,6 +51,12 @@ type Entity = (typeof db)['entities'][EntityName];
 
 async function deleteEntity(entity: Entity) {
 	const entityData = await entity.scan.go();
-	const deleteResults = entityData.data.map(async (item) => await entity.delete(item).go());
+	const deleteResults = entityData.data.map(
+		async (item) =>
+			await entity
+				// @ts-ignore
+				.delete(item)
+				.go()
+	);
 	return deleteResults;
 }

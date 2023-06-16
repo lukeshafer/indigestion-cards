@@ -1,7 +1,5 @@
 ---
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
-// @ts-ignore -- typescript is erroring here even though it's valid
-import { html } from '@/lib/api';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { createAdminUser } from '@lil-indigestion-cards/core/user';
 
@@ -9,8 +7,9 @@ const body = await Astro.request.text();
 
 const username = new URLSearchParams(body).get('username');
 if (!username)
-	return html`<body></body>`.response({
+	return new Response('<body></body>', {
 		headers: {
+			'Content-Type': 'text/html; charset=utf-8',
 			'HX-Trigger': 'clearAlert',
 		},
 	});

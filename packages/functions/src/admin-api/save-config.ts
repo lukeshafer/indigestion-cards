@@ -39,8 +39,8 @@ export const handler = ApiHandler(async () => {
 
 	const body = parseResult.data;
 
-	await updateBatchTwitchEvents({
-		events: body.channelPointRewards.map((event) => ({
+	await updateBatchTwitchEvents(
+		body.channelPointRewards.map((event) => ({
 			eventId: event.twitchEventId,
 			eventName: event.twitchEventName,
 			packTypeId: event.packTypeId,
@@ -50,8 +50,8 @@ export const handler = ApiHandler(async () => {
 				event.twitchEventId === TWITCH_GIFT_SUB_ID
 					? 'channel.subscription.gift'
 					: 'channel.channel_points_custom_reward_redemption.add',
-		})),
-	});
+		}))
+	);
 
 	return {
 		statusCode: 200,

@@ -17,7 +17,7 @@ const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 ]);
 
 const baseRarityValue = new URLSearchParams(
-	siteConfig.baseRarity || {
+	siteConfig?.baseRarity || {
 		rarityId: rarities[0].rarityId,
 		frameUrl: rarities[0].frameUrl,
 	}

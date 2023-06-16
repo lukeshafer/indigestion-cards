@@ -45,7 +45,7 @@ params.forEach((value, key) => {
 const siteConfig = updateSiteConfig({ baseRarity: rarityObject });
 const batchTwitchEvents = updateBatchTwitchEvents(events);
 
-const results = await Promise.all([siteConfig, batchTwitchEvents]);
+await Promise.all([siteConfig, batchTwitchEvents]);
 
 function parseEventValue(value: any): {
 	packTypeId: string | undefined;

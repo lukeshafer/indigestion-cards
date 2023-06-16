@@ -4,7 +4,6 @@ import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-even
 import fetch from 'node-fetch';
 import { SecretsManager } from 'aws-sdk';
 import { z } from 'zod';
-import { Api } from 'sst/node/api';
 
 const secretsManager = new SecretsManager();
 
@@ -231,7 +230,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 		if (!newToken) {
 			throw new Error('Failed to refresh user access token');
 		}
-		const putResults = await putUserTokenSecrets(newToken);
+		await putUserTokenSecrets(newToken);
 		twitchResponse = await fetch(url.toString(), {
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
@@ -483,11 +482,7 @@ export async function putUserTokenSecrets(args: { access_token: string; refresh_
 
 async function refreshAppAccessToken() {
 	const newAppAccessToken = await getNewAppAccessToken();
-	await secretsManager.putSecretValue({
-		SecretId: Config.APP_ACCESS_TOKEN_ARN,
-		SecretString: newAppAccessToken,
-	});
-
+	await putAppTokenSecret({ access_token: newAppAccessToken });
 	return newAppAccessToken;
 }
 

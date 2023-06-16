@@ -1,6 +1,4 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-
 interface Props {
 	/** ID of the table to search. Must be to a <table> element. */
 	tableId: string;
@@ -90,8 +88,12 @@ const { method = 'get', action, tableId, label, id: inputId, searchColumn = '' }
 						return false;
 					})
 					.sort((a, b) => {
-						const aUsername = a.children[searchColumnIndex]?.textContent?.toLowerCase().trim();
-						const bUsername = b.children[searchColumnIndex]?.textContent?.toLowerCase().trim();
+						const aUsername = a.children[searchColumnIndex]?.textContent
+							?.toLowerCase()
+							.trim();
+						const bUsername = b.children[searchColumnIndex]?.textContent
+							?.toLowerCase()
+							.trim();
 						if (!aUsername || !bUsername) return 0;
 
 						// Sort by exact match first, then by starting with search, then by alphabetical

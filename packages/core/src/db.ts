@@ -20,7 +20,7 @@ const auditAttributes = (entityName: string) =>
 			// watch for changes to any attribute
 			watch: '*',
 			// set current timestamp when updated
-			set: (e, i) => {
+			set: (_, i) => {
 				// add to audit log
 				if (
 					!process.env.SESSION_USER_ID ||

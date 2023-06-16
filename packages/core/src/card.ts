@@ -1,9 +1,8 @@
 import { UnmatchedImageType, db } from './db';
-import type { EntityItem, CreateEntityItem, Entity, UpdateEntityItem } from 'electrodb';
+import type { EntityItem, CreateEntityItem, UpdateEntityItem } from 'electrodb';
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
 import { CardPool } from './pack';
-import type { Session } from './types';
 
 type Result<T> =
 	| {
@@ -291,7 +290,7 @@ export async function createPack(args: {
 		cards.push(card);
 	}
 
-	const result = await db.transaction
+	await db.transaction
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [

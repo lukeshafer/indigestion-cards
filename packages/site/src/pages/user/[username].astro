@@ -122,6 +122,17 @@ const packTypes = await getAllPackTypes();
 	</header>
 	<div>
 		<h2 class="text-xl pt-4">Cards:</h2>
-		<CardList cards={cardsNotInPack} />
+		<CardList
+			cards={cardsNotInPack.map((card) => ({
+				name: card.cardName,
+				designId: card.designId,
+				frameUrl: card.frameUrl,
+				designUrl: card.imgUrl,
+				cardNumber: card.cardNumber,
+				rarityName: card.rarityName,
+				description: card.cardDescription,
+				totalOfType: card.totalOfType,
+			}))}
+		/>
 	</div>
 </Page>

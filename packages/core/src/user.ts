@@ -1,8 +1,6 @@
 import { db } from './db';
-import { EntityRecord, CreateEntityItem, ElectroError, EntityItem } from 'electrodb';
-import { createPack } from './card';
+import { CreateEntityItem, ElectroError } from 'electrodb';
 import { getUserByLogin } from './twitch-helpers';
-import type { CardPool } from './pack';
 
 type User = typeof db.entities.users;
 
@@ -50,7 +48,7 @@ export async function createNewUser(args: CreateEntityItem<User>) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.username} is taken`);
 		}
-		const result = await updateUsername({
+		await updateUsername({
 			userId: existingUser.userId,
 			newUsername: twitchData.login,
 			oldUsername: existingUser.username,
@@ -85,7 +83,7 @@ export async function updateUsername(
 			throw new Error(`Username ${args.newUsername} is still taken`);
 		}
 		// we can update the username, as it is no longer taken
-		const result = await updateUsername(
+		await updateUsername(
 			{
 				userId: existingUser.userId,
 				newUsername: twitchData.login,
@@ -103,7 +101,7 @@ export async function updateUsername(
 }
 
 export async function batchUpdateUsers(users: CreateEntityItem<User>[]) {
-	const result = await db.entities.users.put(users).go();
+	await db.entities.users.put(users).go();
 }
 
 export async function checkIfUserExists(userId: string): Promise<boolean> {

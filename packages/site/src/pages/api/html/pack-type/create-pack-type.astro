@@ -39,7 +39,6 @@ if (!contents.success)
 
 const { season, designs } = contents;
 
-// @ts-expect-error - it doesn't like description being undefined
 const result = await createPackType({
 	packTypeName: packTypeName!,
 	packTypeId: packTypeId!,

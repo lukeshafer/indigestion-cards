@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { db } from './db';
-import { checkIfUserExists, createNewUser, getUser, getUserByUserName } from './user';
+import { checkIfUserExists, createNewUser, getUser } from './user';
 import { EntityItem } from 'electrodb';
 import { Card, CardDesign, getPackById } from './card';
 import { createPack } from './card';
@@ -125,7 +125,7 @@ export async function updatePackUser(options: {
 
 	const oldUserList = oldUser ? [oldUser] : [];
 
-	const result = await db.transaction
+	await db.transaction
 		.write(({ packs, cardInstances, users }) => [
 			packs
 				.update({ packId: pack.packId })

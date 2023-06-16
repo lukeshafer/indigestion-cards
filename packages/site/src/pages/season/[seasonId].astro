@@ -5,6 +5,7 @@ import {
 	getPackTypesBySeasonId,
 	getSeasonAndDesignsBySeasonId,
 } from '@lil-indigestion-cards/core/card';
+import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { api, routes } from '@/constants';
 
 const id = Astro.params.seasonId;
@@ -50,6 +51,10 @@ const packTypesWithCardPools = await Promise.all(
 	})
 );
 
+const {
+	baseRarity: { frameUrl, rarityId },
+} = await getSiteConfig();
+
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
 	{ label: 'Seasons', href: routes.SEASONS },
@@ -94,22 +99,25 @@ const breadcrumbs = [
 	</section>
 
 	<h2 class="sub-heading">Cards:</h2>
-	<CardList cards={cardDesigns} />
+	<CardList
+		cards={cardDesigns.map((card) => ({
+			name: card.cardName,
+			designId: card.designId,
+			frameUrl,
+			designUrl: card.imgUrl,
+			cardNumber: 0,
+			rarityName: rarityId,
+			description: card.cardDescription,
+			totalOfType: 0,
+		}))}
+	/>
 
 	<button
 		class="post-button z-10 w-max"
 		hx-delete={api.SEASON.DELETE}
+		hx-confirm="Are you sure you want to delete this season?"
 		hx-swap="none"
 		hx-vals={JSON.stringify(season)}
 		data-type="delete">Delete Season<form-indicator></form-indicator></button
 	>
 </Page>
-
-<script>
-	const form = document.getElementById('delete-season') as HTMLFormElement;
-
-	form.addEventListener('submit', async (e) => {
-		const confirmation = confirm('Are you sure you want to delete this season?');
-		if (!confirmation) e.preventDefault();
-	});
-</script>

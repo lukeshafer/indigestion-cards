@@ -10,7 +10,6 @@ const broadcaster_user_login = z.string();
 const total = z.number().nullable();
 const tier = z.string();
 const cumulative_total = z.number().nullable();
-const is_gift = z.boolean();
 const is_anonymous = z.boolean();
 const channelPointRedemptionStatus = z.enum(['unfulfilled', 'fulfilled', 'canceled', 'unknown']);
 
