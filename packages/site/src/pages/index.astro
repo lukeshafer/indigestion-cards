@@ -12,8 +12,4 @@ Astro.cookies.set('lilind_code', 'pants', {
 
 <Page title="index" breadcrumbs={[{ label: 'Home', href: '/' }]} pageType="public">
 	<a href="/user" class="button-link">Users</a>
-
-	<button hx-get={`${Api.api.url}/test-credentials`} hx-swap="innerHTML" class="post-button" data-type="submit">
-		Click me
-	</button>
 </Page>

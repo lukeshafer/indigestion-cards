@@ -15,7 +15,7 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	if (!adminUser) {
 		ctx.locals.session = null;
 		ctx.cookies.delete(AUTH_TOKEN);
-		console.error('No admin user found for session:', session);
+		//console.error('No admin user found for session:', session);
 	} else ctx.locals.session = session;
 
 	const currentRoute = ctx.url.pathname;

@@ -38,6 +38,7 @@ interface Props {
 	 * @param {HTMLElement} outer
 	 */
 	function handleCardHoverEvent(e, outer) {
+		if (window.localStorage.getItem('disableAnimations') === 'true') return;
 		if (e.type === 'touchmove') e.preventDefault();
 
 		const { clientX, clientY } = 'touches' in e ? e.touches[0] : e;

@@ -5,6 +5,8 @@ import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
 import UserSearch from '@/components/UserSearch.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
+import UserConfig from '@/components/UserConfig';
+import { Icon } from 'astro-icon';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -40,6 +42,12 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 					<span class="italic text-2xl mt-1">indigestion</span>
 					<span class="text-lg -mt-2">cards</span>
 				</a>
+				<UserConfig client:load>
+					<Icon
+						name="mdi:gear"
+						class="w-6 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+					/>
+				</UserConfig>
 				<UserSearch />
 			</header>
 			<div

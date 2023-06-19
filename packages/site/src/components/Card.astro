@@ -1,5 +1,5 @@
 ---
-import TiltCardEffect from './TiltCardEffect.astro';
+import TiltCardEffect from './cards/TiltCardEffect';
 
 export type CardProps = Props;
 interface Props {
@@ -16,7 +16,10 @@ interface Props {
 const { rarityName, frameUrl, designUrl, name, description } = Astro.props;
 ---
 
-<TiltCardEffect border={rarityName === 'rainbow' ? 'mediumorchid' : rarityName ?? ''} shiny={true}>
+<TiltCardEffect
+	client:load
+	border={rarityName === 'rainbow' ? 'mediumorchid' : rarityName ?? ''}
+	shiny={true}>
 	<article class="card-wrapper" style={{ 'background-image': `url(${frameUrl})` }}>
 		<img src={designUrl} alt={name} class="design-img" />
 		<h3 class="card-name">{name}</h3>
