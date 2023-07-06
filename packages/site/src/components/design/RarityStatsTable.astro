@@ -1,0 +1,51 @@
+---
+import type { RarityStats } from '@lil-indigestion-cards/core/rarity';
+import { routes } from '@/constants';
+
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
+
+type Props = RarityStats;
+---
+
+<li>
+	<h3 class="sub-heading text-xl">{Astro.props.rarityName}</h3>
+	<SortTable compact>
+		<SortTableHead slot="heading">
+			<SortTableHeading type="number" width="20%">Card Number</SortTableHeading>
+			<SortTableHeading>Owner</SortTableHeading>
+			<SortTableHeading type="date">Opened At</SortTableHeading>
+		</SortTableHead>
+		{
+			Astro.props.instances.map((instance, index) => (
+				<SortTableRow x-show={instance?.username ? 'true' : '!hideUnowned'}>
+					<SortTableCell>
+						{instance?.cardNumber && Astro.locals.session?.type === 'admin' ? (
+							<a
+								href={`${routes.INSTANCES}/${instance.designId}/${instance.instanceId}`}>
+								{instance.cardNumber}
+							</a>
+						) : (
+							index + 1
+						)}
+					</SortTableCell>
+					<SortTableCell>
+						{instance?.username ? (
+							<a href={`${routes.USERS}/${instance?.username ?? ''}`}>
+								{instance.username}
+							</a>
+						) : (
+							'Not Owned'
+						)}
+					</SortTableCell>
+					<SortTableCell>
+						{instance?.openedAt ? new Date(instance.openedAt).toLocaleDateString() : ''}
+					</SortTableCell>
+				</SortTableRow>
+			))
+		}
+	</SortTable>
+</li>

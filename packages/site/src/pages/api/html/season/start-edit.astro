@@ -2,7 +2,7 @@
 import { api } from '@/constants';
 const seasonId = Astro.url.searchParams.get('seasonId');
 const seasonName = Astro.url.searchParams.get('seasonName');
-const seasonDescription = Astro.url.searchParams.get('seasonDescription');
+const seasonDescription = Astro.url.searchParams.get('seasonDescription') || '';
 
 if (!seasonId)
 	return new Response('No seasonId provided', {
@@ -28,18 +28,6 @@ if (!seasonName)
 			}),
 		},
 	});
-if (!seasonDescription)
-	return new Response('No seasonDescription provided', {
-		status: 400,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: {
-					message: 'No seasonDescription provided',
-					type: 'error',
-				},
-			}),
-		},
-	});
 ---
 
 <body>
@@ -53,8 +41,9 @@ if (!seasonDescription)
 		hx-patch={api.SEASON.UPDATE}>
 		Save
 	</button>
+	<!-- below input uses the same classes as PageHeading -->
 	<input
-		class="my-form-input w-max page-heading"
+		class="my-form-input w-max font-heading my-2 text-3xl font-bold uppercase"
 		id="season-name"
 		data-season-info
 		name="seasonName"

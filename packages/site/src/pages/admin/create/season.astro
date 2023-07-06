@@ -1,6 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { api, routes } from '@/constants';
+import PageHeading from '@/components/text/PageHeading.astro';
 ---
 
 <Page
@@ -10,7 +11,7 @@ import { api, routes } from '@/constants';
 		{ label: 'Seasons', href: routes.SEASONS },
 		{ label: 'New Season' },
 	]}>
-	<h1 class="page-heading">Create New Season</h1>
+	<PageHeading>Create New Season</PageHeading>
 
 	<my-form>
 		<form action={`${api.SEASON.CREATE}`} hx-swap="none" method="post">

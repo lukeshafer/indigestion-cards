@@ -5,13 +5,19 @@ module.exports = {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 	theme: {
 		extend: {
+			spacing: {
+				'main': 'var(--spacing-main)',
+			},
+			maxWidth: {
+				'main': 'var(--spacing-main)',
+			},
 			fontFamily: {
 				display: ['var(--font-display)', ...fontFamily.sans],
 				heading: ['var(--font-heading)', ...fontFamily.sans],
 			},
 			colors: {
 				brand: {
-					main: '#fd94e6',
+					main: '#EF6EDA',
 					secondary: '#f66efa',
 					tertiary: '#EF6DD9',
 					dark: '#bc40a0',

@@ -1,13 +1,15 @@
 ---
 import Page from '@/layouts/Page.astro';
-import TiltCardEffect from '@/components/TiltCardEffect.astro';
+import Card from '@/components/Card.astro';
+import CardList from '@/components/CardList.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
+import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routes, api } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
-import RarityStatsTable from '@/components/RarityStatsTable.astro';
+import PageHeading from '@/components/text/PageHeading.astro';
+import AdminDesignStats from '@/components/design/AdminDesignStats.astro';
 
 const designId = Astro.params.designId;
-
 const from = Astro.request.headers.get('referer');
 
 if (!designId) {
@@ -19,17 +21,16 @@ if (session?.type !== 'admin') throw new Error('Unauthorized');
 
 const {
 	cardDesigns: [design],
-	cardInstances,
+	cardInstances: instances,
 } = await getCardDesignAndInstancesById({
 	designId,
 });
-
-type CardInstance = (typeof cardInstances)[number];
 
 if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
+const { baseRarity } = await getSiteConfig();
 const breadcrumbs = [{ label: 'Home', href: '/' }];
 
 if (from?.includes('season')) {
@@ -44,111 +45,36 @@ if (from?.includes('season')) {
 		{ label: design.cardName, href: `${routes.DESIGNS}/${designId}` }
 	);
 }
-
-export interface RarityStats {
-	rarityId: string;
-	rarityName: string;
-	received: number;
-	unopened: number;
-	opened: number;
-	notGivenOut: number;
-	total: number;
-	instances: Array<CardInstance | null>;
-}
-
-const rarityStats = {} as Record<string, RarityStats>;
-design.rarityDetails?.forEach((rarity) => {
-	rarityStats[rarity.rarityId] = {
-		rarityId: rarity.rarityId,
-		rarityName: rarity.rarityName,
-		received: 0,
-		unopened: 0,
-		opened: 0,
-		notGivenOut: rarity.count,
-		total: rarity.count,
-		instances: new Array<CardInstance | null>(rarity.count).fill(null),
-	};
-});
-
-cardInstances.forEach((instance) => {
-	const rarityId = instance.rarityId;
-	const rarity = rarityStats[rarityId];
-	if (!rarity) return;
-
-	rarity.received += 1;
-	rarity.unopened += instance.openedAt ? 0 : 1;
-	rarity.opened += instance.openedAt ? 1 : 0;
-	rarity.notGivenOut -= 1;
-	rarity.instances[instance.cardNumber - 1] = instance;
-});
-
-const rarityStatsArray = Object.values(rarityStats);
 ---
 
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-9"
 	breadcrumbs={breadcrumbs}>
-	<header class="flex flex-col gap-4">
-		<h1 class="text-3xl font-display italic my-3">{design.cardName}</h1>
-		<div class="mx-4">
-			<TiltCardEffect>
-				<img src={design.imgUrl} width="300" class="max-w-full" />
-			</TiltCardEffect>
-		</div>
-		{design.cardDescription ? <p class="text-lg  max-w-sm">{design.cardDescription}</p> : null}
+	<header class="flex flex-col items-center gap-4">
+		<PageHeading>{design.cardName}</PageHeading>
+		<Card
+			rarityName={baseRarity.rarityId}
+			designId={design.designId}
+			frameUrl={baseRarity.frameUrl}
+			imgUrl={design.imgUrl}
+			cardName={design.cardName}
+			cardDescription={design.cardDescription}
+			cardNumber={1}
+			totalOfType={1}
+		/>
 	</header>
+	<section>
+		<h2 class="sub-heading text-center my-8">Instances</h2>
+		<CardList cards={instances} />
+	</section>
 	<AdminOnly>
-		<section class="text-lg">
-			<h2 class="sub-heading mb-4">Stats Overview</h2>
-			<sort-table class="compact">
-				<table>
-					<thead>
-						<tr>
-							<th>Rarity</th>
-							<th data-type="number">Received</th>
-							<th data-type="number" class="hidden lg:table-cell">Opened</th>
-							<th data-type="number" class="hidden lg:table-cell">Unopened</th>
-							<th data-type="number" class="hidden sm:table-cell">Not Given Out</th>
-							<th data-type="number">Total</th>
-						</tr>
-					</thead>
-					<tbody>
-						{
-							rarityStatsArray.map((rarity) => (
-								<tr>
-									<td>{rarity.rarityName}</td>
-									<td>{rarity.received}</td>
-									<td class="hidden lg:table-cell">{rarity.opened}</td>
-									<td class="hidden lg:table-cell">{rarity.unopened}</td>
-									<td class="hidden sm:table-cell">{rarity.notGivenOut}</td>
-									<td>{rarity.total}</td>
-								</tr>
-							))
-						}
-					</tbody>
-				</table>
-			</sort-table>
-		</section>
-		<section x-data="{ hideUnowned: false }">
-			<header class="flex items-center gap-6">
-				<h2 class="sub-heading mb-4">Instance Breakdown</h2>
-				<div>
-					<input
-						type="checkbox"
-						x-model="hideUnowned"
-						id="hide-unowned"
-						class="my-form-checkbox"
-					/>
-					<label for="hide-unowned">Hide Unowned</label>
-				</div>
-			</header>
-			<ul>
-				{rarityStatsArray.map((rarity) => <RarityStatsTable {...rarity} />)}
-			</ul>
-		</section>
+		<details>
+			<summary class="font-heading text-xl">Stats for Admins</summary>
+			<AdminDesignStats {design} {instances} />
+		</details>
 		<button
-			class="post-button w-max relative"
+			class="post-button relative w-max"
 			data-type="delete"
 			hx-delete={api.DESIGN.DELETE}
 			hx-confirm="Are you sure you want to delete this design?"
@@ -162,13 +88,3 @@ const rarityStatsArray = Object.values(rarityStats);
 		</button>
 	</AdminOnly>
 </Page>
-
-<script>
-	const form = document.getElementById('delete-design-form') as HTMLFormElement;
-
-	form.addEventListener('submit', async (e) => {
-		// prevent default, confirm, then resume
-		const confirmation = confirm('Are you sure you want to delete this design?');
-		if (!confirmation) e.preventDefault();
-	});
-</script>

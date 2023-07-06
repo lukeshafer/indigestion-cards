@@ -1,0 +1,58 @@
+@layer components {
+	sort-table {
+		display: block;
+	}
+
+	sort-table table {
+		table-layout: fixed;
+		text-align: center;
+		width: 100%;
+	}
+
+	sort-table th:not([data-no-sort]) {
+		cursor: pointer;
+	}
+
+	sort-table tbody td {
+		font-weight: 500;
+		padding: 1.5rem;
+		position: relative;
+	}
+
+	sort-table.compact tbody td {
+		padding: 0.5rem;
+	}
+
+	sort-table tbody td span {
+		position: relative;
+	}
+
+	sort-table tbody td [astro-icon] {
+		width: 3rem;
+		color: white;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	sort-table tbody tr:nth-child(even) [astro-icon] {
+		color: lightgray;
+	}
+
+	sort-table tbody tr:nth-child(even) {
+		background-color: var(--pink-1);
+	}
+
+	sort-table tbody tr:nth-child(odd) {
+		background-color: var(--gray-3);
+	}
+
+	sort-table th[data-mode='ascending']::after {
+		content: '▲';
+	}
+
+	sort-table th[data-mode='descending']::after {
+		content: '▼';
+	}
+}

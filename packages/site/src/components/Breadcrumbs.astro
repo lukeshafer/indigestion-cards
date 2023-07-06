@@ -1,30 +1,32 @@
 ---
 export interface Path {
-	label: string
-	href?: string | undefined
+	label: string;
+	href?: string | undefined;
 }
 
 interface Props {
-	path: Path[]
+	path: Path[];
 }
+
+const { path } = Astro.props;
 ---
 
-<section class="flex gap-2 p-4 font-medium underline-offset-4 text-sm">
+<section class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4">
 	{
-		Astro.props.path.map(({ label, href }, index) =>
+		path.map(({ label, href }, index) =>
 			index === Astro.props.path.length - 1 ? (
-				<p class="block font-heading font-bold">{label}</p>
+				<p class="font-heading text-brand-main block font-bold">{label}</p>
 			) : href ? (
 				<>
-					<a rel="prefetch" class="underline font-heading" href={href}>
+					<a rel="prefetch" class="font-heading underline" href={href}>
 						{label}
 					</a>
-					<p class="block font-heading">/</p>
+					<p class="font-heading block">/</p>
 				</>
 			) : (
 				<>
-					<p class="block font-heading">{label}</p>
-					<p class="block font-heading">/</p>
+					<p class="font-heading block">{label}</p>
+					<p class="font-heading block">/</p>
 				</>
 			)
 		)

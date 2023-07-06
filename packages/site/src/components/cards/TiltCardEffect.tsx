@@ -5,7 +5,6 @@ import styles from './TiltCardEffect.module.css';
 export default function TiltCardEffect(props: {
 	children?: JSX.Element;
 	shiny?: boolean;
-	border?: string;
 }) {
 	const [state, setState] = createStore({
 		transition: 'transform 0.5s',
@@ -76,7 +75,6 @@ export default function TiltCardEffect(props: {
 				style={{
 					'--shine-position': state.shinePosition,
 					'--shine-opacity': state.shineOpacity,
-					'--border': props.border,
 					'--shine-after-opacity': state.shineAfterOpacity,
 					transform: state.transform,
 					transition: state.transition,

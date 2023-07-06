@@ -27,7 +27,7 @@ const session = Astro.locals.session;
 		<script src="../elements/form-indicator.ts"></script>
 		<title>{title}</title>
 	</head>
-	<body hx-ext="head-support, preload" hx-boost="true">
+	<body hx-ext="head-support, preload" hx-boost="false">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
@@ -43,10 +43,10 @@ const session = Astro.locals.session;
 		import('htmx.org/dist/ext/preload');
 
 		import Alpine from 'alpinejs';
-		import persist from '@alpinejs/persist';
+		// import persist from '@alpinejs/persist';
 
 		window.Alpine = Alpine;
-		window.Alpine.plugin(persist);
+		// window.Alpine.plugin(persist);
 		Alpine.start();
 	</script>
 </html>

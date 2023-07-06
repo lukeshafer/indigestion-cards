@@ -5,6 +5,9 @@ import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routes } from '@/constants';
+import PageHeading from '@/components/text/PageHeading.astro';
+import PageHeader from '@/components/text/PageHeader.astro';
+import AdminOnly from '@/components/AdminOnly.astro';
 
 const [designs, siteConfig] = await Promise.all([getAllCardDesigns(), getSiteConfig()]);
 
@@ -12,22 +15,24 @@ const message = Astro.url.searchParams.get('message') || '';
 
 const breadcrumbs = [
 	{ label: 'Home', href: '/' },
-	{ label: 'Designs', href: routes.DESIGNS },
+	{ label: 'Cards', href: routes.DESIGNS },
 ];
 ---
 
-<Page title="All Cards Designs" breadcrumbs={breadcrumbs}>
-	{message ? <p class="text-xl text-center p-4 bg-green-200">{message}</p> : null}
+<Page title="All Cards" breadcrumbs={breadcrumbs}>
+	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
-	<header class="page-header">
-		<h1 class="page-heading">All Card Designs</h1>
-		<a href={routes.ADMIN.CREATE.CARD_DESIGN} class="button-link"> Create New Design</a>
-	</header>
+	<PageHeader>
+		<PageHeading>All Cards</PageHeading>
+		<AdminOnly>
+			<a href={routes.ADMIN.CREATE.CARD_DESIGN} class="button-link">Create New Design</a>
+		</AdminOnly>
+	</PageHeader>
 	<CardList
 		cards={designs.map((card) => ({
-			name: card.cardName,
-			description: card.cardDescription,
-			designUrl: card.imgUrl,
+			cardName: card.cardName,
+			cardDescription: card.cardDescription,
+			imgUrl: card.imgUrl,
 			rarityName: siteConfig?.baseRarity.rarityId ?? '',
 			frameUrl: siteConfig?.baseRarity.frameUrl ?? '',
 			designId: card.designId,

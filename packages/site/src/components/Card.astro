@@ -5,25 +5,24 @@ export type CardProps = Props;
 interface Props {
 	rarityName: string;
 	frameUrl: string;
-	designUrl: string;
-	name: string;
-	description: string;
+	imgUrl: string;
+	cardName: string;
+	cardDescription: string;
 	designId: string;
 	cardNumber: number;
 	totalOfType: number;
 }
 
-const { rarityName, frameUrl, designUrl, name, description } = Astro.props;
+const { frameUrl, imgUrl, cardName, cardDescription } = Astro.props;
 ---
 
 <TiltCardEffect
 	client:load
-	border={rarityName === 'rainbow' ? 'mediumorchid' : rarityName ?? ''}
 	shiny={true}>
 	<article class="card-wrapper" style={{ 'background-image': `url(${frameUrl})` }}>
-		<img src={designUrl} alt={name} class="design-img" />
-		<h3 class="card-name">{name}</h3>
-		<p class="card-description">{description}</p>
+		<img src={imgUrl} alt={cardName} class="design-img" />
+		<h3 class="card-name">{cardName}</h3>
+		<p class="card-description">{cardDescription}</p>
 	</article>
 </TiltCardEffect>
 

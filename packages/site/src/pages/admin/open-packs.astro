@@ -3,6 +3,7 @@ import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { api } from '@/constants';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const allPacks = await getAllPacks();
 const packs = allPacks.filter((pack) => pack.userId && pack.username);
@@ -10,7 +11,7 @@ const packs = allPacks.filter((pack) => pack.userId && pack.username);
 
 <Page title="Open Packs" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Open Packs' }]}>
 	<div class="grid grid-cols-[auto_1fr]">
-		<h1 class="page-heading">Open Packs</h1>
+		<PageHeading>Open Packs</PageHeading>
 		<section class="my-8 bg-[#dde] p-3 col-start-1" id="pack-list">
 			<h2 class="font-semibold text-xl mb-2">Unopened packs:</h2>
 			<ul class="packs overflow-y-scroll flex flex-col gap-6 relative pb-2 min-h-[20rem]">

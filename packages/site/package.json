@@ -12,7 +12,6 @@
 		"typecheck": "astro check"
 	},
 	"dependencies": {
-		"@alpinejs/persist": "^3.12.2",
 		"@astrojs/alpinejs": "^0.2.1",
 		"@astrojs/prefetch": "^0.2.1",
 		"@astrojs/solid-js": "^2.1.0",

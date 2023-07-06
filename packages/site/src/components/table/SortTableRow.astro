@@ -1,0 +1,11 @@
+---
+interface Props {
+	id?: string;
+}
+
+const { id, ...rest } = Astro.props;
+---
+
+<tr class="even:bg-brand-light/50 odd:bg-gray-100" {id} {...rest}>
+	<slot />
+</tr>

@@ -1,0 +1,37 @@
+---
+import { Icon } from 'astro-icon';
+
+interface Props {
+	icon?: string;
+	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+const { icon, showOnBreakpoint } = Astro.props;
+---
+
+<td
+	class="relative p-6 font-medium group-[compact]:p-2"
+	class:list={{
+		hidden: !!showOnBreakpoint,
+		'sm:table-cell': showOnBreakpoint === 'sm',
+		'md:table-cell': showOnBreakpoint === 'md',
+		'lg:table-cell': showOnBreakpoint === 'lg',
+		'xl:table-cell': showOnBreakpoint === 'xl',
+	}}>
+	{
+		icon ? (
+			<>
+				<Icon
+					name={icon}
+					aria-hidden="true"
+					class="absolute left-1/2 top-1/2 w-12 translate-x-1/2 translate-y-1/2 text-white"
+				/>
+				<span class="relative">
+					<slot />
+				</span>
+			</>
+		) : (
+			<slot />
+		)
+	}
+</td>

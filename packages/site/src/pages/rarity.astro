@@ -1,8 +1,16 @@
 ---
-import { getAllRarities } from '@lil-indigestion-cards/core/card';
 import Page from '@/layouts/Page.astro';
+import PageHeader from '@/components/text/PageHeader.astro';
+import PageHeading from '@/components/text/PageHeading.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
+
+import { getAllRarities } from '@lil-indigestion-cards/core/card';
 import { api, routes } from '@/constants';
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
 
 const rarities = await getAllRarities();
 ---
@@ -15,68 +23,61 @@ const rarities = await getAllRarities();
 		{ label: 'Rarities', href: routes.RARITIES },
 	]}>
 	<UnmatchedImageList type="frame" />
-	<sort-table>
-		<header class="page-header">
-			<h1 class="page-heading">Rarities</h1>
-			<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
-		</header>
-		<table>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th class="hidden lg:table-cell">Id</th>
-					<th data-type="number" class="hidden sm:table-cell">Default Count</th>
-					<th data-no-sort>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					rarities.map(({ rarityName, rarityId, defaultCount, frameUrl }) => (
-						<tr class="text-center relative">
-							<td>
-								<span id={`rarityName-${rarityId}`}>{rarityName}</span>
-							</td>
-							<td class="hidden lg:table-cell">
-								<span id={`rarityId-${rarityId}`}>{rarityId}</span>
-							</td>
-							<td class="hidden sm:table-cell">
-								<span id={`defaultCount-${rarityId}`}>{defaultCount}</span>
-							</td>
-							<td class="flex flex-wrap gap-2 text-sm justify-center">
-								<button
-									class="post-button edit-button w-24"
-									data-type="submit"
-									hx-select=".save-button"
-									hx-swap="outerHTML"
-									hx-vals={JSON.stringify({ rarityName, rarityId, defaultCount })}
-									hx-get={api.RARITY.START_EDIT}>
-									Edit
-								</button>
-								<button
-									class="post-button edit-button w-24"
-									data-type="delete"
-									hx-swap="none"
-									hx-vals={JSON.stringify({ rarityId, frameUrl })}
-									hx-delete={api.RARITY.DELETE}>
-									Delete
-									<form-indicator>Deleting</form-indicator>
-								</button>
-							</td>
-						</tr>
-					))
-				}
-			</tbody>
-		</table>
-	</sort-table>
+	<PageHeader>
+		<PageHeading>Rarities</PageHeading>
+		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
+	</PageHeader>
+	<SortTable>
+		<SortTableHead slot="heading">
+			<SortTableHeading>Name</SortTableHeading>
+			<SortTableHeading showOnBreakpoint="lg">Id</SortTableHeading>
+			<SortTableHeading type="number" showOnBreakpoint="sm">Default Count</SortTableHeading>
+			<SortTableHeading sort={false}>Actions</SortTableHeading>
+		</SortTableHead>
+		{
+			rarities.map((rarity) => (
+				<SortTableRow class="relative text-center">
+					<SortTableCell>
+						<span id={`rarityName-${rarity.rarityId}`}>{rarity.rarityName}</span>
+					</SortTableCell>
+					<SortTableCell showOnBreakpoint="lg">
+						<span id={`rarityId-${rarity.rarityId}`}>{rarity.rarityId}</span>
+					</SortTableCell>
+					<SortTableCell showOnBreakpoint="sm">
+						<span id={`defaultCount-${rarity.rarityId}`}>{rarity.defaultCount}</span>
+					</SortTableCell>
+					<SortTableCell>
+						<div class="flex flex-wrap justify-center gap-2 text-sm">
+							<button
+								class="post-button edit-button w-24"
+								data-type="submit"
+								hx-select=".save-button"
+								hx-swap="outerHTML"
+								hx-vals={JSON.stringify({
+									rarityName: rarity.rarityName,
+									rarityId: rarity.rarityId,
+									defaultCount: rarity.defaultCount,
+								})}
+								hx-get={api.RARITY.START_EDIT}>
+								Edit
+							</button>
+							<button
+								class="post-button edit-button w-24"
+								data-type="delete"
+								hx-swap="none"
+								hx-vals={JSON.stringify({
+									rarityId: rarity.rarityId,
+									frameUrl: rarity.frameUrl,
+								})}
+								hx-confirm="Are you sure you want to delete this rarity?"
+								hx-delete={api.RARITY.DELETE}>
+								Delete
+								<form-indicator>Deleting</form-indicator>
+							</button>
+						</div>
+					</SortTableCell>
+				</SortTableRow>
+			))
+		}
+	</SortTable>
 </Page>
-
-<script>
-	const forms = document.querySelectorAll('#rarity-list form') as NodeListOf<HTMLFormElement>;
-
-	forms.forEach((form) =>
-		form.addEventListener('submit', async (e) => {
-			const confirmation = confirm('Are you sure you want to delete this rarity?');
-			if (!confirmation) e.preventDefault();
-		})
-	);
-</script>

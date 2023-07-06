@@ -6,9 +6,12 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { api, routes } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
-if (redirectCount > 3) return Astro.redirect(`${routes.USERS}?alert=Username not found`);
+if (redirectCount > 3) {
+	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
+}
 
 const id = Astro.params.username;
 
@@ -53,23 +56,23 @@ const packTypes = await getAllPackTypes();
 		<img
 			src={twitchData?.profile_image_url}
 			width="200"
-			class="rounded-full col-start-1 row-span-full"
+			class="col-start-1 row-span-full rounded-full"
 		/>
 		<AdminOnly>
-			<section class="flex flex-col gap-2" slot="fallback">
-				<h1 class="page-heading col-start-2">{user.username}</h1>
+			<section slot="fallback" class="flex flex-col gap-2">
+				<PageHeading>{user.username}</PageHeading>
 			</section>
 			<section class="flex flex-col gap-2">
-				<h1 class="page-heading col-start-2">{user.username}</h1>
+				<PageHeading>{user.username}</PageHeading>
 				<p class="-mt-5">User Id: {user.userId}</p>
-				<div class="w-full flex flex-wrap items-center gap-2 col-start-2">
+				<div class="col-start-2 flex w-full flex-wrap items-center gap-2">
 					<input type="hidden" name="userId" value={user.userId} />
 					<input type="hidden" name="username" value={user.username} />
 
 					<select
 						id="packTypeSelect"
 						name="packType"
-						class="w-40 h-full my-form-input"
+						class="my-form-input h-full w-40"
 						required>
 						<option value="">Choose Pack</option>
 						{
@@ -94,7 +97,7 @@ const packTypes = await getAllPackTypes();
 					>
 				</div>
 
-				<div class="flex flex-wrap items-center gap-2 w-full">
+				<div class="flex w-full flex-wrap items-center gap-2">
 					<h2 class="text-lg">
 						Unopened Packs: <span
 							hx-get={api.PACK.GET_PACK_COUNT_FOR_USER}
@@ -121,16 +124,16 @@ const packTypes = await getAllPackTypes();
 		</AdminOnly>
 	</header>
 	<div>
-		<h2 class="text-xl pt-4">Cards:</h2>
+		<h2 class="pt-4 text-xl">Cards:</h2>
 		<CardList
 			cards={cardsNotInPack.map((card) => ({
-				name: card.cardName,
+				cardName: card.cardName,
 				designId: card.designId,
 				frameUrl: card.frameUrl,
-				designUrl: card.imgUrl,
+				imgUrl: card.imgUrl,
 				cardNumber: card.cardNumber,
 				rarityName: card.rarityName,
-				description: card.cardDescription,
+				cardDescription: card.cardDescription,
 				totalOfType: card.totalOfType,
 			}))}
 		/>

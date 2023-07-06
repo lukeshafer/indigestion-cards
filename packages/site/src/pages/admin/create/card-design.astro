@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import Page from '@/layouts/Page.astro';
 import Form from '@/components/form/Form.astro';
 import { routes } from '@/constants';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {
@@ -27,7 +28,7 @@ const presigned = await createPresignedPost(s3, {
 		{ label: 'Designs', href: routes.DESIGNS },
 		{ label: 'New Card', href: routes.ADMIN.CREATE.CARD_DESIGN },
 	]}>
-	<h1 class="page-heading">Create New Card</h1>
+	<PageHeading>Create New Card</PageHeading>
 	<div hx-disable>
 		<Form method="post" action={presigned.url} enctype="multipart/form-data">
 			{

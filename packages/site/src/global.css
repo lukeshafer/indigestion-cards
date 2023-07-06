@@ -113,6 +113,8 @@
 		font-family: var(--base-font-sans);
 
 		--brand-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+
+		--spacing-main: 60rem;
 	}
 
 	*::selection {
@@ -137,7 +139,7 @@
 	}
 
 	my-form input:not([type="file"]), my-form select, my-form textarea, .my-form-input {
-		outline: 1px solid #ccc;
+		outline: 2px solid #ccc;
 	}
 
 	my-form select:focus, my-form input:focus, my-form textarea:focus, .my-form-input:focus {
@@ -391,8 +393,8 @@
 		color: lightgray;
 	}
 
-	sort-table tbody tr:not:nth-child(even) {
-		background-color: var(--gray-1)
+	sort-table tbody tr:nth-child(even) {
+		background-color: var(--pink-1)
 	}
 
 	sort-table tbody tr:nth-child(odd) {

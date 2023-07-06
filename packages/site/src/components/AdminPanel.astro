@@ -27,21 +27,22 @@ const actionLinks = [
 ];
 ---
 
-<admin-panel class="overflow-y-scroll">
-	<nav class="max-w-[14rem] pt-28 md:pt-10 pb-4 flex flex-col gap-8 text-white min-h-[100svh]">
-		<div class="my-10 flex-1 self-center flex flex-col gap-8 items-center px-12">
+<admin-panel
+	class="absolute bottom-0 top-0 z-[1] overflow-y-scroll transition-transform duration-300 ease-in-out md:relative md:z-0 md:transition-none">
+	<nav class="flex min-h-[100svh] max-w-[14rem] flex-col gap-8 pb-4 pt-28 text-white md:pt-10">
+		<div class="my-10 flex flex-1 flex-col items-center gap-8 self-center px-12">
 			{
 				actionLinks.map((actionLink) => (
 					<a
 						preload="mouseover"
 						href={actionLink.href}
 						title={actionLink.title}
-						class="text-3xl uppercase block text-center bg-brand-tertiary px-2 py-1 
-							font-heading font-extrabold rounded-2xl relative transition-transform 
-							hover:scale-105 shine text-shadow">
+						class="bg-brand-tertiary font-heading shine text-shadow relative block rounded-2xl 
+							px-2 py-1 text-center text-3xl font-extrabold 
+							uppercase transition-transform hover:scale-105">
 						{actionLink.count ? (
 							<span
-								class="absolute -top-2 -right-2 w-8 h-8 bg-white flex items-center justify-center rounded-full text-lg text-black no-text-shadow"
+								class="no-text-shadow absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg text-black"
 								hx-get={api.PACK.GET_TOTAL_PACK_COUNT}
 								hx-trigger="refreshCount from:body"
 								hx-swap="innerHTML transition:false">
@@ -54,7 +55,7 @@ const actionLinks = [
 			}
 		</div>
 		<div class="pb">
-			<h2 class="text-lg font-heading text-brand-dark font-medium my-3 p-1 px-6">
+			<h2 class="font-heading text-brand-dark my-3 p-1 px-6 text-lg font-medium">
 				Administration
 			</h2>
 			{
@@ -65,7 +66,7 @@ const actionLinks = [
 							preload-images="true"
 							href={href}
 							title={title}
-							class="font-heading font-medium block bg-white text-black px-6 py-1">
+							class="font-heading block bg-white px-6 py-1 font-medium text-black">
 							{title}
 						</a>
 					) : (
@@ -74,30 +75,30 @@ const actionLinks = [
 							preload-images="true"
 							href={href}
 							title={title}
-							class="font-heading font-medium block text-shadow px-6 py-1 hover:bg-gray-900/20">
+							class="font-heading text-shadow block px-6 py-1 font-medium hover:bg-gray-900/20">
 							{title}
 						</a>
 					)
 				)
 			}
 		</div>
-		<div class="px-4 py-2 items-center gap-3 relative">
-			<div class="user-menu absolute bottom-full bg-white text-black w-11/12 p-1 hidden">
+		<div class="relative items-center gap-3 px-4 py-2">
+			<div class="user-menu absolute bottom-full hidden w-11/12 bg-white p-1 text-black">
 				<a
 					hx-disable
 					rel="prefetch"
 					href="/api/auth/logout"
 					title="Logout"
-					class="block hover:bg-gray-100 p-3">
+					class="block p-3 hover:bg-gray-100">
 					Logout
 				</a>
 			</div>
 			<button
-				class="items-center gap-3 relative user-button text-shadow font-display lowercase italic flex group brand-shadow"
+				class="user-button text-shadow font-display brand-shadow group relative flex items-center gap-3 lowercase italic"
 				title={Astro.locals.session?.properties.username}>
 				<Icon
 					name="mdi:gear"
-					class="w-10 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
+					class="w-10 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
 				/>
 				{Astro.locals.session?.properties.username}
 			</button>
@@ -106,10 +107,6 @@ const actionLinks = [
 </admin-panel>
 
 <style>
-	admin-panel {
-		position: relative;
-	}
-
 	admin-panel::-webkit-scrollbar {
 		display: none;
 	}
@@ -119,35 +116,10 @@ const actionLinks = [
 		background-image: linear-gradient(125deg, var(--color-main), var(--color-secondary));
 	}
 
-	.action-link {
-		font-size: 2rem;
-		line-height: 2.25rem;
-		text-transform: uppercase;
-		display: block;
-		text-align: center;
-		background-color: var(--color-tertiary);
-		padding: 0.5rem 1rem;
-		font-family: var(--font-heading);
-		font-weight: 800;
-		border-radius: 1rem;
-		position: relative;
-		transition: scale 50ms ease-in-out;
-	}
-
-	.action-link:hover {
-		scale: 1.05;
-	}
-
 	@media (max-width: 768px) {
 		admin-panel {
-			position: absolute;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			z-index: 1;
 			--isClosed: 1;
 			transform: translateX(calc(var(--isClosed) * -100%));
-			transition: transform 0.3s ease-in-out;
 		}
 	}
 </style>

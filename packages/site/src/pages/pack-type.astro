@@ -4,49 +4,50 @@ import { Icon } from 'astro-icon';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { routes } from '@/constants';
 
+import PageHeader from '@/components/text/PageHeader.astro';
+import PageHeading from '@/components/text/PageHeading.astro';
+
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
+
 const packTypes = await getAllPackTypes();
 ---
 
 <Page title="Pack Types" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Pack Types' }]}>
-	<sort-table>
-		<header class="page-header">
-			<h1 class="page-heading">Pack Types</h1>
-			<a href={routes.ADMIN.CREATE.PACK_TYPE} class="button-link"> Create New Pack Type</a>
-		</header>
-		<table>
-			<thead>
-				<tr>
-					<th class="w-1/2">Pack Name</th>
-					<th>Card Pool</th>
-					<th>Cards</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					packTypes.map(
-						({ cardCount, packTypeName, packTypeId, packTypeCategory, seasonName }) => (
-							<tr>
-								<td>
-									<a href={`${routes.PACK_TYPES}/${packTypeId}`}>
-										{packTypeName}
-									</a>
-								</td>
-								<td>
-									<span>
-										{packTypeCategory === 'season'
-											? seasonName
-											: packTypeCategory}
-									</span>
-								</td>
-								<td>
-									<Icon name="mdi:cards" aria-hidden="true" />
-									<span>{cardCount}</span>
-								</td>
-							</tr>
-						)
-					)
-				}
-			</tbody>
-		</table>
-	</sort-table>
+	<PageHeader>
+		<PageHeading>Pack Types</PageHeading>
+		<a href={routes.ADMIN.CREATE.PACK_TYPE} class="button-link"> Create New Pack Type</a>
+	</PageHeader>
+	<SortTable>
+		<SortTableHead slot="heading">
+			<SortTableHeading width="50%">Pack Name</SortTableHeading>
+			<SortTableHeading>Card Pool</SortTableHeading>
+			<SortTableHeading type="number">Cards</SortTableHeading>
+		</SortTableHead>
+		{
+			packTypes.map((packType) => (
+				<SortTableRow>
+					<SortTableCell>
+						<a href={`${routes.PACK_TYPES}/${packType.packTypeId}`}>
+							{packType.packTypeName}
+						</a>
+					</SortTableCell>
+					<SortTableCell>
+						<span>
+							{packType.packTypeCategory === 'season'
+								? packType.seasonName
+								: packType.packTypeCategory}
+						</span>
+					</SortTableCell>
+					<SortTableCell>
+						<Icon name="mdi:cards" aria-hidden="true" />
+						<span>{packType.cardCount}</span>
+					</SortTableCell>
+				</SortTableRow>
+			))
+		}
+	</SortTable>
 </Page>

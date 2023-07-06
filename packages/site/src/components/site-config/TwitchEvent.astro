@@ -1,4 +1,7 @@
 ---
+import SortTableRow from '../table/SortTableRow.astro';
+import SortTableCell from '../table/SortTableCell.astro';
+
 interface PackType {
 	packTypeId: string | undefined;
 	packTypeName: string | undefined;
@@ -16,25 +19,25 @@ const { eventName, id, defaultValue: defaultValueObj, packTypes } = Astro.props;
 const inputName = `event-type-${id}`;
 const defaultValue = JSON.stringify(
 	defaultValueObj ?? {
-		packTypeId: "",
-		packTypeName: "",
+		packTypeId: '',
+		packTypeName: '',
 	}
 );
 ---
 
-<tr>
-	<td>{eventName}</td>
-	<td>
+<SortTableRow>
+	<SortTableCell>{eventName}</SortTableCell>
+	<SortTableCell>
 		<select name={inputName} class="my-form-input">
 			<option
 				value={JSON.stringify({
-					packTypeId: "",
-					packTypeName: "",
+					packTypeId: '',
+					packTypeName: '',
 				})}
 				selected={defaultValue ===
 					JSON.stringify({
-						packTypeId: "",
-						packTypeName: "",
+						packTypeId: '',
+						packTypeName: '',
 					})}>
 				None
 			</option>
@@ -57,5 +60,5 @@ const defaultValue = JSON.stringify(
 				))
 			}
 		</select>
-	</td>
-</tr>
+	</SortTableCell>
+</SortTableRow>

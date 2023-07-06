@@ -1,0 +1,61 @@
+---
+import { Icon } from 'astro-icon';
+
+import AdminOnly from '@/components/AdminOnly.astro';
+import Hamburger from '@/components/Hamburger.astro';
+import UserConfig from '@/components/UserConfig';
+import UserSearch from '@/components/UserSearch.astro';
+---
+
+<div class="sticky top-0 z-10 border-b border-b-gray-300 bg-white">
+	<header
+		class="max-w-main mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4"
+		hx-disable>
+		<AdminOnly>
+			<div data-for-admin-panel class="toggle-btn z-100 px-2 py-2 text-lg">
+				<Hamburger />
+			</div>
+		</AdminOnly>
+		<a href="/" title="Home" class="flex flex-1 items-center gap-4">
+			<img src="/logo.png" alt="logo" class="w-12" />
+			<div class="font-display hidden flex-1 flex-col pt-1 text-white md:flex">
+				<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
+				<span class="-mt-2 text-lg text-gray-700">cards</span>
+			</div>
+		</a>
+		<UserSearch />
+		<UserConfig client:load>
+			<Icon
+				name="bi:gear"
+				class="w-8 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
+			/>
+		</UserConfig>
+	</header>
+</div>
+
+<style>
+	.toggle-btn {
+		display: none;
+		--color: black;
+		--open-color: white;
+		--spacing: 0.2em;
+		--thickness: 4px;
+		--size: 1rem;
+		--width: 1.3em;
+		--text-value: calc(255 - 255 * var(--isClosed));
+		padding-left: 1rem;
+		color: rgb(var(--text-value), var(--text-value), var(--text-value));
+		z-index: 1;
+		background: transparent;
+		font-weight: 900;
+		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+		align-self: center;
+	}
+
+	@media (max-width: 768px) {
+		.toggle-btn {
+			display: block;
+			transform: translateX(calc(var(--isClosed) * 100%));
+		}
+	}
+</style>

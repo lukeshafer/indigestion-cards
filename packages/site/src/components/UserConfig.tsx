@@ -11,9 +11,7 @@ export default function UserConfig(props: { children?: JSX.Element }) {
 	onMount(() => {
 		const disableAnimationsStorage =
 			window.localStorage.getItem('disableAnimations') === 'true';
-
 		setUserConfig('disableAnimations', disableAnimationsStorage);
-
 		createEffect(() => {
 			window.localStorage.setItem('disableAnimations', String(userConfig.disableAnimations));
 		});
@@ -43,9 +41,7 @@ export default function UserConfig(props: { children?: JSX.Element }) {
 function ConfigItem(props: { name: keyof typeof userConfig; value: boolean; children: string }) {
 	onMount(() => {
 		const storedValue = window.localStorage.getItem(props.name) === 'true';
-
 		setUserConfig(props.name, storedValue);
-
 		createEffect(() => {
 			window.localStorage.setItem(props.name, String(userConfig[props.name]));
 		});

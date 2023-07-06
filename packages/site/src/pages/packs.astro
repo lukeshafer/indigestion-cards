@@ -1,59 +1,27 @@
 ---
-import { api } from '@/constants';
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import PackRow from '@/components/pack/PackRow.astro';
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const packs = await getAllPacks();
 ---
 
-<Page title="All Packs" breadcrumbs={[{label: "Home", href: "/" }, {label: "Packs"}]}>
+<Page title="All Packs" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Packs' }]}>
 	<header class="page-header">
-		<h1 class="page-heading">All Packs</h1>
+		<PageHeading>All Packs</PageHeading>
 	</header>
-	<sort-table>
-		<table x-data="{}">
-			<thead>
-				<tr>
-					<th class="w-1/2">Owner</th>
-					<th>Pack Type</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					packs.map((pack) => {
-						const id = pack.packId.replace(/[^\w\d]/g, '') + '-username';
-						return (
-							<tr>
-								{pack.username ? (
-									<td>
-										<span {id}>
-											{pack.username}
-										</span>
-									</td>
-								) : (
-									<td class="text-gray-600">None</td>
-								)}
-								<td>{pack.packTypeName}</td>
-								<td>
-									<button
-										class="post-button"
-										data-type="submit"
-										hx-swap="outerHTML"
-										hx-vals={JSON.stringify({
-											id,
-											username: pack.username,
-											packId: pack.packId,
-										})}
-										hx-get={api.PACK.START_EDIT}>
-										Edit
-									</button>
-								</td>
-							</tr>
-						);
-					})
-				}
-			</tbody>
-		</table>
-	</sort-table>
+	<div x-data="{}">
+		<SortTable>
+			<SortTableHead slot="heading">
+				<SortTableHeading width="50%">Owner</SortTableHeading>
+				<SortTableHeading>Pack Type</SortTableHeading>
+				<SortTableHeading />
+			</SortTableHead>
+			{packs.map((pack) => <PackRow pack={pack} />)}
+		</SortTable>
+	</div>
 </Page>

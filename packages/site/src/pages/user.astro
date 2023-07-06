@@ -4,6 +4,7 @@ import { Icon } from 'astro-icon';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
 import TableSearch from '@/components/TableSearch.astro';
 import { publicApi, routes } from '@/constants';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const users = await getAllUsers();
 ---
@@ -14,7 +15,7 @@ const users = await getAllUsers();
 	pageType="public">
 	<sort-table>
 		<header class="page-header">
-			<h1 class="page-heading">Users</h1>
+			<PageHeading>Users</PageHeading>
 			<TableSearch
 				tableId="user-table"
 				label="Search Users"

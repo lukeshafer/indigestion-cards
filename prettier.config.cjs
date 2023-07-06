@@ -16,4 +16,5 @@ module.exports = {
 	useTabs: true,
 	printWidth: 100,
 	bracketSameLine: true,
-}
+	plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
+};

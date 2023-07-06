@@ -8,6 +8,10 @@ import { api } from '@/constants';
 import TwitchEvent from '@/components/site-config/TwitchEvent.astro';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton.astro';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import PageHeading from '@/components/text/PageHeading.astro';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -54,8 +58,8 @@ const giftSubPackType =
 		hx-post={api.SAVE_CONFIG}
 		hx-swap="none"
 		method="post">
-		<header class="flex gap-8 items-center">
-			<h1 class="page-heading">Site Config</h1>
+		<header class="flex items-center gap-8">
+			<PageHeading>Site Config</PageHeading>
 			<button
 				class="post-button h-max w-24"
 				id="save-config-btn"
@@ -80,46 +84,40 @@ const giftSubPackType =
 			</select>
 		</section>
 		<section>
-			<sort-table>
-				<header class="page-header">
-					<h2 class="sub-heading">Twitch Event Rewards</h2>
-					<TableSearch
-						id="rewards-search"
-						tableId="rewards-table"
-						label="Search Rewards"
-						searchColumn="Event"
-					/>
-				</header>
-				<table class="mt-4" id="rewards-table">
-					<thead>
-						<tr>
-							<th class="w-2/3">Event</th>
-							<th data-no-sort>Pack Type</th>
-						</tr>
-					</thead>
-					<tbody>
+			<header class="page-header">
+				<h2 class="sub-heading">Twitch Event Rewards</h2>
+				<TableSearch
+					id="rewards-search"
+					tableId="rewards-table"
+					label="Search Rewards"
+					searchColumn="Event"
+				/>
+			</header>
+			<SortTable>
+				<SortTableHead>
+					<SortTableHeading width="66%">Event</SortTableHeading>
+					<SortTableHeading sort={false}>Pack Type</SortTableHeading>
+				</SortTableHead>
+				<TwitchEvent
+					eventName="5 Gift Subs"
+					id={TWITCH_GIFT_SUB_ID}
+					defaultValue={giftSubPackType}
+					packTypes={packTypes}
+				/>
+				{
+					rewards.map((reward) => (
 						<TwitchEvent
-							eventName="5 Gift Subs"
-							id={TWITCH_GIFT_SUB_ID}
-							defaultValue={giftSubPackType}
+							eventName={`Reward: ${reward.eventName}`}
+							id={reward.eventId}
+							defaultValue={{
+								packTypeId: reward.packTypeId,
+								packTypeName: reward.packTypeName,
+							}}
 							packTypes={packTypes}
 						/>
-						{
-							rewards.map((reward) => (
-								<TwitchEvent
-									eventName={`Reward: ${reward.eventName}`}
-									id={reward.eventId}
-									defaultValue={{
-										packTypeId: reward.packTypeId,
-										packTypeName: reward.packTypeName,
-									}}
-									packTypes={packTypes}
-								/>
-							))
-						}
-					</tbody>
-				</table>
-			</sort-table>
+					))
+				}
+			</SortTable>
 		</section>
 		<RefreshTwitchEventsButton />
 		<TwitchLoginButton />

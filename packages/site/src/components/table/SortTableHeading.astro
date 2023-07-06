@@ -1,0 +1,26 @@
+---
+interface Props {
+	sort?: boolean;
+	width?: string;
+	type?: 'text' | 'number' | 'date';
+	class?: string;
+	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+const { sort = true, width = 'auto', type = 'text', showOnBreakpoint } = Astro.props;
+---
+
+<th
+	data-type={type}
+	class:list={{
+		'cursor-pointer': sort,
+		hidden: showOnBreakpoint !== undefined,
+		'sm:table-cell': showOnBreakpoint === 'sm',
+		'md:table-cell': showOnBreakpoint === 'md',
+		'lg:table-cell': showOnBreakpoint === 'lg',
+		'xl:table-cell': showOnBreakpoint === 'xl',
+	}}
+	style={{ width }}
+	class={`data-[mode=ascending]:after:content-[\"▲\"] data-[mode=descending]:after:content-[\"▼\"]`}>
+	<slot />
+</th>

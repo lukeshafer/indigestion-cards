@@ -1,12 +1,9 @@
 ---
 import Base, { type BaseProps } from './Base.astro';
-import Hamburger from '@/components/Hamburger.astro';
 import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
-import UserSearch from '@/components/UserSearch.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
-import UserConfig from '@/components/UserConfig';
-import { Icon } from 'astro-icon';
+import Header from '@/components/Header.astro';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -24,32 +21,8 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
-		<div class="md:col-start-2 overflow-y-scroll relative" id="page-scroll-wrapper">
-			<header
-				class="text-white text-shadow flex sticky top-0 z-10 h-14 items-center px-4 py-4 md:py-8 gap-4"
-				hx-disable>
-				<AdminOnly>
-					<div
-						data-for-admin-panel
-						class="toggle-btn flex-1 text-lg brand-shadow px-2 py-2 z-100">
-						<Hamburger />
-					</div>
-				</AdminOnly>
-				<a
-					href="/"
-					title="Home"
-					class="flex-col font-display text-white text-shadow hidden md:flex flex-1">
-					<span class="italic text-2xl mt-1">indigestion</span>
-					<span class="text-lg -mt-2">cards</span>
-				</a>
-				<UserConfig client:load>
-					<Icon
-						name="mdi:gear"
-						class="w-6 group-hover:rotate-[30deg] transition-transform duration-300 group-hover:scale-110"
-					/>
-				</UserConfig>
-				<UserSearch />
-			</header>
+		<div class="relative overflow-y-scroll md:col-start-2" id="page-scroll-wrapper">
+			<Header />
 			<div
 				class="sticky top-0"
 				id="alert-wrapper"
@@ -66,12 +39,12 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 					</div>
 				</template>
 			</div>
-			<div class="flex-1">
+			<div class="flex-1 max-w-main mx-auto">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
 				class={(className ?? '') +
-					' p-4 md:p-6 lg:p-8 xl:p-10 col-start-2 max-w-6xl slide-it'}>
+					' p-3 col-start-2 max-w-main mx-auto slide-it'}>
 				<slot />
 			</main>
 		</div>
@@ -81,29 +54,6 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 <style>
 	.page-layout {
 		grid-template-columns: max-content 1fr;
-	}
-
-	header {
-		background-color: var(--dark-main);
-		background-image: linear-gradient(35deg, var(--dark-secondary) 0%, var(--dark-main) 100%);
-	}
-
-	.toggle-btn {
-		display: none;
-		--color: white;
-		--open-color: white;
-		--spacing: 0.34em;
-		--thickness: 0.16em;
-		--size: 1rem;
-		--width: 1.3em;
-		--text-value: calc(255 - 255 * var(--isClosed));
-		padding-left: 1rem;
-		color: rgb(var(--text-value), var(--text-value), var(--text-value));
-		z-index: 1;
-		background: transparent;
-		font-weight: 900;
-		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
-		align-self: center;
 	}
 
 	main {

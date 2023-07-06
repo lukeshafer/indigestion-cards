@@ -18,10 +18,6 @@
 
 .inner::after,
 .inner::before {
-	border-color: var(--border, transparent);
-	border-width: 5px;
-	border-style: solid;
-
 	transform: translateZ(200px);
 	position: absolute;
 	inset: 0;
