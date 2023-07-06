@@ -64,10 +64,6 @@ if (from?.includes('season')) {
 			totalOfType={1}
 		/>
 	</header>
-	<section>
-		<h2 class="sub-heading text-center my-8">Instances</h2>
-		<CardList cards={instances} />
-	</section>
 	<AdminOnly>
 		<details>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
@@ -75,6 +71,8 @@ if (from?.includes('season')) {
 		</details>
 		<button
 			class="post-button relative w-max"
+			title={instances.length ? 'Cannot delete card with instances' : 'Delete Card'}
+			disabled={instances.length > 0}
 			data-type="delete"
 			hx-delete={api.DESIGN.DELETE}
 			hx-confirm="Are you sure you want to delete this design?"
@@ -87,4 +85,8 @@ if (from?.includes('season')) {
 			<form-indicator>Deleting</form-indicator>
 		</button>
 	</AdminOnly>
+	<section>
+		<h2 class="sub-heading my-8 text-center">Instances</h2>
+		<CardList cards={instances} />
+	</section>
 </Page>
