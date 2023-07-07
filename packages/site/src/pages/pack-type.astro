@@ -42,10 +42,7 @@ const packTypes = await getAllPackTypes();
 								: packType.packTypeCategory}
 						</span>
 					</SortTableCell>
-					<SortTableCell>
-						<Icon name="mdi:cards" aria-hidden="true" />
-						<span>{packType.cardCount}</span>
-					</SortTableCell>
+					<SortTableCell icon="mdi:cards">{packType.cardCount}</SortTableCell>
 				</SortTableRow>
 			))
 		}

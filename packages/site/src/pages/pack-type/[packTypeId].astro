@@ -1,4 +1,9 @@
 ---
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
@@ -6,11 +11,14 @@ import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
 
 const packTypeId = Astro.params.packTypeId;
-
-if (!packTypeId) return Astro.redirect('/pack-type?alert=Missing pack type ID');
+if (!packTypeId) {
+	return Astro.redirect('/pack-type?alert=Missing pack type ID');
+}
 
 const packType = await getPackTypeById({ packTypeId });
-if (!packType) return Astro.redirect('/404?alert=Invalid pack type ID');
+if (!packType) {
+	return Astro.redirect('/404?alert=Invalid pack type ID');
+}
 const cardPool = await getCardPoolFromType(packType);
 ---
 
@@ -33,27 +41,21 @@ const cardPool = await getCardPoolFromType(packType);
 		Delete Pack Type
 		<div class="htmx-indicator">Deleting</div>
 	</button>
-	<section aria-label="Card Pool" class="flex flex-col gap-4 mt-4">
+	<section aria-label="Card Pool" class="mt-4 flex flex-col gap-4">
 		<h2 class="sub-heading">Card Pool</h2>
-		<sort-table>
-			<table>
-				<thead>
-					<tr>
-						<th class="w-3/4">Card Name</th>
-						<th>Season Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					{
-						cardPool.cardDesigns.map((card) => (
-							<tr>
-								<td>{card.cardName}</td>
-								<td>{card.seasonName}</td>
-							</tr>
-						))
-					}
-				</tbody>
-			</table>
-		</sort-table>
+		<SortTable>
+			<SortTableHead slot="heading">
+				<SortTableHeading width="75%">Card Name</SortTableHeading>
+				<SortTableHeading>Season Name</SortTableHeading>
+			</SortTableHead>
+			{
+				cardPool.cardDesigns.map((card) => (
+					<SortTableRow>
+						<SortTableCell>{card.cardName}</SortTableCell>
+						<SortTableCell>{card.seasonName}</SortTableCell>
+					</SortTableRow>
+				))
+			}
+		</SortTable>
 	</section>
 </Page>

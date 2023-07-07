@@ -1,10 +1,15 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { Icon } from 'astro-icon';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
 import TableSearch from '@/components/TableSearch.astro';
 import { publicApi, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
+import SortTable from '@/components/table/SortTable.astro';
+import PageHeader from '@/components/text/PageHeader.astro';
+import SortTableHead from '@/components/table/SortTableHead.astro';
+import SortTableHeading from '@/components/table/SortTableHeading.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
 
 const users = await getAllUsers();
 ---
@@ -13,43 +18,31 @@ const users = await getAllUsers();
 	title="Users"
 	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
 	pageType="public">
-	<sort-table>
-		<header class="page-header">
-			<PageHeading>Users</PageHeading>
-			<TableSearch
-				tableId="user-table"
-				label="Search Users"
-				id="user-table-search"
-				action={publicApi.SEARCH}
-			/>
-		</header>
-		<table id="user-table">
-			<thead>
-				<tr>
-					<th class="w-3/4">Username</th>
-					<th data-type="number" data-start-descending>Cards</th>
-					<th data-type="number" data-start-descending>Packs</th>
-				</tr>
-			</thead>
-			<tbody>
-				{
-					users.map(({ username, cardCount, packCount }) => (
-						<tr>
-							<td>
-								<a href={`${routes.USERS}/${username}`}>{username}</a>
-							</td>
-							<td>
-								<Icon name="mdi:cards" aria-hidden="true" />
-								<span>{cardCount}</span>
-							</td>
-							<td>
-								<Icon name="mdi:gift" aria-hidden="true" />
-								<span>{packCount}</span>
-							</td>
-						</tr>
-					))
-				}
-			</tbody>
-		</table>
-	</sort-table>
+	<PageHeader>
+		<PageHeading>Users</PageHeading>
+		<TableSearch
+			tableId="user-table"
+			label="Search Users"
+			id="user-table-search"
+			action={publicApi.SEARCH}
+		/>
+	</PageHeader>
+	<SortTable>
+		<SortTableHead slot="heading">
+			<SortTableHeading width="75%">Username</SortTableHeading>
+			<SortTableHeading type="number" startDescending>Cards</SortTableHeading>
+			<SortTableHeading type="number" startDescending>Packs</SortTableHeading>
+		</SortTableHead>
+		{
+			users.map((user) => (
+				<SortTableRow>
+					<SortTableCell>
+						<a href={`${routes.USERS}/${user.username}`}>{user.username}</a>
+					</SortTableCell>
+					<SortTableCell icon="mdi:cards">{user.cardCount}</SortTableCell>
+					<SortTableCell icon="mdi:gift">{user.packCount}</SortTableCell>
+				</SortTableRow>
+			))
+		}
+	</SortTable>
 </Page>

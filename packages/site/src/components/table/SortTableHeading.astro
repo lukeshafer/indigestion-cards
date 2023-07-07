@@ -5,13 +5,21 @@ interface Props {
 	type?: 'text' | 'number' | 'date';
 	class?: string;
 	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	startDescending?: boolean;
 }
 
-const { sort = true, width = 'auto', type = 'text', showOnBreakpoint } = Astro.props;
+const {
+	sort = true,
+	width = 'auto',
+	type = 'text',
+	showOnBreakpoint,
+	startDescending = false,
+} = Astro.props;
 ---
 
 <th
 	data-type={type}
+	data-start-descending={startDescending}
 	class:list={{
 		'cursor-pointer': sort,
 		hidden: showOnBreakpoint !== undefined,

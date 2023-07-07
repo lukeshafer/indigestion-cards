@@ -1,12 +1,13 @@
 ---
 interface Props {
 	compact?: boolean;
+	id?: string;
 }
 
-const { compact } = Astro.props;
+const { compact, id, ...rest } = Astro.props;
 ---
 
-<sort-table class="block" class:list={{ groupcompact: compact }}>
+<sort-table class="block" class:list={{ groupcompact: compact }} {id} {...rest}>
 	<table class="w-full table-fixed text-center">
 		<slot name="heading" />
 		<tbody>

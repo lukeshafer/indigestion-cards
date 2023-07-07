@@ -1,5 +1,7 @@
 ---
 import { api } from '@/constants';
+import SortTableRow from '@/components/table/SortTableRow.astro';
+import SortTableCell from '@/components/table/SortTableCell.astro';
 
 interface Props {
 	username: string;
@@ -13,9 +15,9 @@ const isCurrentUser =
 	Astro.locals.session?.type === 'admin' && Astro.locals.session?.properties.userId === userId;
 ---
 
-<tr>
-	<td>{username}</td>
-	<td>
+<SortTableRow>
+	<SortTableCell>{username}</SortTableCell>
+	<SortTableCell>
 		<button
 			class="post-button"
 			class:list={{ 'opacity-0': isCurrentUser }}
@@ -28,5 +30,5 @@ const isCurrentUser =
 			hx-target="closest tr">
 			Delete
 		</button>
-	</td>
-</tr>
+	</SortTableCell>
+</SortTableRow>
