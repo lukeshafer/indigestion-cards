@@ -4,6 +4,7 @@ import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
 import Header from '@/components/Header.astro';
+import Footer from '@/components/footer/Footer.astro';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -21,7 +22,9 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
-		<div class="relative overflow-y-scroll md:col-start-2" id="page-scroll-wrapper">
+		<div
+			class="relative flex flex-col overflow-y-scroll md:col-start-2"
+			id="page-scroll-wrapper">
 			<Header />
 			<div
 				class="sticky top-0"
@@ -39,14 +42,15 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 					</div>
 				</template>
 			</div>
-			<div class="flex-1 max-w-main mx-auto">
+			<div class="max-w-main mx-auto w-full">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
 				class={(className ?? '') +
-					' p-3 col-start-2 max-w-main mx-auto slide-it'}>
+					' p-3 col-start-2 max-w-main mx-auto slide-it flex-1 w-full'}>
 				<slot />
 			</main>
+			<Footer />
 		</div>
 	</div>
 </Base>
