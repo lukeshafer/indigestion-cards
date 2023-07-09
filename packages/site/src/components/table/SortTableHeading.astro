@@ -6,6 +6,7 @@ interface Props {
 	class?: string;
 	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
 	startDescending?: boolean;
+	align?: 'left' | 'center' | 'right';
 }
 
 const {
@@ -14,6 +15,7 @@ const {
 	type = 'text',
 	showOnBreakpoint,
 	startDescending = false,
+	align = 'center',
 } = Astro.props;
 ---
 
@@ -27,8 +29,11 @@ const {
 		'md:table-cell': showOnBreakpoint === 'md',
 		'lg:table-cell': showOnBreakpoint === 'lg',
 		'xl:table-cell': showOnBreakpoint === 'xl',
+		'text-left': align === 'left',
+		'text-center': align === 'center',
+		'text-right': align === 'right',
+		'px-6 py-2 data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]': true,
 	}}
-	style={{ width }}
-	class={`data-[mode=ascending]:after:content-[\"▲\"] data-[mode=descending]:after:content-[\"▼\"]`}>
+	style={{ width }}>
 	<slot />
 </th>

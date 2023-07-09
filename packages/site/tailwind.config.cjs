@@ -1,4 +1,4 @@
-const { fontFamily } = require('tailwindcss/defaultTheme')
+const { fontFamily } = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -6,10 +6,10 @@ module.exports = {
 	theme: {
 		extend: {
 			spacing: {
-				'main': 'var(--spacing-main)',
+				main: 'var(--spacing-main)',
 			},
 			maxWidth: {
-				'main': 'var(--spacing-main)',
+				main: 'var(--spacing-main)',
 			},
 			fontFamily: {
 				display: ['var(--font-display)', ...fontFamily.sans],
@@ -22,6 +22,7 @@ module.exports = {
 					tertiary: '#EF6DD9',
 					dark: '#bc40a0',
 					light: '#f9b7eb',
+					100: '#FFE0F9',
 				},
 				accent: {
 					main: '#31FFD6',
@@ -34,4 +35,4 @@ module.exports = {
 		},
 	},
 	plugins: [],
-}
+};

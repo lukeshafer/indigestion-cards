@@ -7,8 +7,8 @@ interface Props {
 const { compact, id, ...rest } = Astro.props;
 ---
 
-<sort-table class="block" class:list={{ groupcompact: compact }} {id} {...rest}>
-	<table class="w-full table-fixed text-center">
+<sort-table class="block" class:list={{ groupcompact: compact }} {...rest}>
+	<table class="w-full table-fixed text-center" {id}>
 		<slot name="heading" />
 		<tbody>
 			<slot />

@@ -7,6 +7,7 @@ import { api, routes } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
+import SubHeading from '@/components/text/SubHeading.astro';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -123,8 +124,8 @@ const packTypes = await getAllPackTypes();
 			</section>
 		</AdminOnly>
 	</header>
-	<div>
-		<h2 class="pt-4 text-xl">Cards:</h2>
+	<section class="my-4 grid gap-4 text-center">
+		<SubHeading>Cards</SubHeading>
 		<CardList
 			cards={cardsNotInPack.map((card) => ({
 				cardName: card.cardName,
@@ -137,5 +138,5 @@ const packTypes = await getAllPackTypes();
 				totalOfType: card.totalOfType,
 			}))}
 		/>
-	</div>
+	</section>
 </Page>

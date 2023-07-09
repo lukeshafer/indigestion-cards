@@ -33,11 +33,13 @@ const users = unsortedUsers.sort((a, b) => {
 			hx-swap="beforeend">Add Admin</button
 		>
 	</PageHeader>
-	<SortTable id="#admin-users-table">
-		<SortTableHead slot="heading">
-			<SortTableHeading width="75%">Username</SortTableHeading>
-			<SortTableHeading>Actions</SortTableHeading>
-		</SortTableHead>
-		{users.map((user) => <AdminUserRow {...user} />)}
-	</SortTable>
+	<div class="mx-auto max-w-2xl">
+		<SortTable id="#admin-users-table">
+			<SortTableHead slot="heading">
+				<SortTableHeading width="75%" align="left">Username</SortTableHeading>
+				<SortTableHeading>Actions</SortTableHeading>
+			</SortTableHead>
+			{users.map((user) => <AdminUserRow {...user} />)}
+		</SortTable>
+	</div>
 </Page>

@@ -4,9 +4,11 @@ import { Icon } from 'astro-icon';
 interface Props {
 	icon?: string;
 	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	font?: 'default' | 'title';
+	align?: 'left' | 'center' | 'right';
 }
 
-const { icon, showOnBreakpoint } = Astro.props;
+const { icon, showOnBreakpoint, font = 'default', align = 'center' } = Astro.props;
 ---
 
 <td
@@ -17,6 +19,15 @@ const { icon, showOnBreakpoint } = Astro.props;
 		'md:table-cell': showOnBreakpoint === 'md',
 		'lg:table-cell': showOnBreakpoint === 'lg',
 		'xl:table-cell': showOnBreakpoint === 'xl',
+		'font-display': font === 'title',
+		'text-xl': font === 'title',
+		italic: font === 'title',
+		'text-gray-700': font === 'title',
+		'font-body': font === 'default',
+		'text-base': font === 'default',
+		'text-left': align === 'left',
+		'text-center': align === 'center',
+		'text-right': align === 'right',
 	}}>
 	{
 		icon ? (
@@ -26,7 +37,7 @@ const { icon, showOnBreakpoint } = Astro.props;
 					aria-hidden="true"
 					class="absolute left-1/2 top-1/2 w-12 -translate-x-1/2 -translate-y-1/2 text-white"
 				/>
-				<span class="relative">
+				<span class="relative bg-white p-1 rounded-full">
 					<slot />
 				</span>
 			</>
