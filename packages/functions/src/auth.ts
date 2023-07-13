@@ -44,21 +44,15 @@ export const handler = AuthHandler({
 
 			if (!adminUser)
 				return {
-					type: 'session',
-					properties: {
-						type: 'public',
-						properties: {},
-					},
+					type: 'public',
+					properties: {},
 				};
 
 			return {
-				type: 'session',
+				type: 'admin',
 				properties: {
-					type: 'admin',
-					properties: {
-						userId: adminUser.userId,
-						username: adminUser.username,
-					},
+					userId: adminUser.userId,
+					username: adminUser.username,
 				},
 			};
 		}
@@ -69,11 +63,8 @@ export const handler = AuthHandler({
 			const adminUser = await getAdminUserById(claims.sub);
 			if (!adminUser || claims.sub !== Config.STREAMER_USER_ID)
 				return {
-					type: 'session',
-					properties: {
-						type: 'public',
-						properties: {},
-					},
+					type: 'public',
+					properties: {},
 				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
@@ -84,13 +75,10 @@ export const handler = AuthHandler({
 			}
 
 			return {
-				type: 'session',
+				type: 'admin',
 				properties: {
-					type: 'admin',
-					properties: {
-						userId: adminUser.userId,
-						username: adminUser.username,
-					},
+					userId: adminUser.userId,
+					username: adminUser.username,
 				},
 			};
 		}

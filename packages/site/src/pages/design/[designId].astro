@@ -45,6 +45,14 @@ if (from?.includes('season')) {
 		{ label: design.cardName, href: `${routes.DESIGNS}/${designId}` }
 	);
 }
+
+instances.sort((a, b) => (
+	+a.totalOfType === +b.totalOfType 
+		? a.instanceId !== b.instanceId
+			? +a.instanceId - +b.instanceId
+			: +a.cardNumber - +b.cardNumber
+		: +a.totalOfType - +b.totalOfType
+))
 ---
 
 <Page
