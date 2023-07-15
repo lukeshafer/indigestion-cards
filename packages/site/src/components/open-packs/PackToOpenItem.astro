@@ -1,0 +1,21 @@
+---
+import { api } from '@/constants';
+
+interface Props {
+	packId: string;
+	username: string;
+}
+
+const { packId, username } = Astro.props;
+---
+
+<li id={packId}>
+	<button
+		class="shine font-display w-full text-left text-2xl italic text-gray-600 p-1"
+		hx-get={api.GET_PACK_TO_OPEN}
+		hx-vals={JSON.stringify({ packId })}
+		hx-swap="innerHTML"
+		hx-target="#open-showcase">
+		{username}
+	</button>
+</li>

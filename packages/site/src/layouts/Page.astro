@@ -9,9 +9,10 @@ import Footer from '@/components/footer/Footer.astro';
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
+	wide?: boolean;
 }
 
-const { class: className, breadcrumbs, ...baseProps } = Astro.props;
+const { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
@@ -46,8 +47,8 @@ const { class: className, breadcrumbs, ...baseProps } = Astro.props;
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
-				class={(className ?? '') +
-					' p-3 col-start-2 max-w-main mx-auto slide-it flex-1 w-full'}>
+				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
+				class="slide-it col-start-2 mx-auto w-full flex-1 p-3">
 				<slot />
 			</main>
 			<Footer />

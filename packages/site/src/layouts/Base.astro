@@ -26,7 +26,7 @@ const session = Astro.locals.session;
 		<script src="../elements/form-indicator.ts"></script>
 		<title>{title}</title>
 	</head>
-	<body hx-ext="head-support, preload" hx-boost="false">
+	<body hx-ext="head-support, preload" hx-boost="true">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />

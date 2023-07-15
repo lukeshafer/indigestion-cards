@@ -29,6 +29,8 @@ export const packSchema = z.object({
 });
 export const packSchemaWithoutUser = packSchema.omit({ userId: true, username: true });
 
+type Pack = typeof db.entities.packs;
+export type PackEntity = EntityItem<Pack>;
 export type PackDetails = z.infer<typeof packSchema>;
 export type PackDetailsWithoutUser = z.infer<typeof packSchemaWithoutUser>;
 
