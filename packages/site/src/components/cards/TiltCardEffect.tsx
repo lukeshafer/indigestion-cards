@@ -25,7 +25,7 @@ export default function TiltCardEffect(props: {
 		setState('shineAfterOpacity', '1');
 		setTimeout(() => {
 			setState('transition', 'transform 0.0s');
-		}, 100);
+		}, 500);
 	}
 
 	function handleMoveEvent(e: MouseEvent | TouchEvent) {
@@ -51,7 +51,7 @@ export default function TiltCardEffect(props: {
 	function handleLeaveEvent() {
 		if (window.localStorage.getItem('disableAnimations') === 'true') return;
 		setState({
-			transition: 'transform 0.5s',
+			transition: 'transform 0.2s linear',
 			shinePosition: '50%',
 			shineAfterOpacity: '0',
 			transform: 'rotate3d(0, 0, 0, 0deg)',

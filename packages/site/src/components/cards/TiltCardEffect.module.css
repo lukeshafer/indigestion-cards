@@ -12,7 +12,7 @@
 }
 
 .outer:hover {
-	scale: 1.1;
+	/*scale: 1.1;*/
 	transform: translateZ(300px);
 }
 

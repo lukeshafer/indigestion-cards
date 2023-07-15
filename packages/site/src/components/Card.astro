@@ -19,7 +19,7 @@ const { frameUrl, imgUrl, cardName, cardDescription, cardNumber, totalOfType } =
 <TiltCardEffect
 	client:load
 	shiny={true}>
-	<article class="card-wrapper relative bg-cover w-72 aspect-[77_/_107]" style={{ 'background-image': `url(${frameUrl})`, 'aspect-ratio': '77 / 107' }}>
+	<article class="card-wrapper relative bg-cover w-72 text-left" style={{ 'background-image': `url(${frameUrl})`, 'aspect-ratio': '77 / 107' }}>
 		<img src={imgUrl} alt={cardName} class="design-img absolute object-cover h-[51%] left-[9%] top-[15%] w-[82%]" />
 		<h3 
 			style={{ '--left': '12%', '--top': '4.4%', width: 'calc(100% - var(--left) * 2)', left: 'var(--left)', top: 'var(--top)' }}
