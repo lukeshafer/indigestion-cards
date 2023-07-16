@@ -42,10 +42,15 @@ const session = Astro.locals.session;
 		import('htmx.org/dist/ext/preload');
 
 		import Alpine from 'alpinejs';
-		// import persist from '@alpinejs/persist';
 
 		window.Alpine = Alpine;
-		// window.Alpine.plugin(persist);
 		Alpine.start();
+
+		function deleteParam(paramName) {
+			const url = new URL(window.location.href);
+			url.searchParams.delete(paramName);
+			window.history.replaceState({}, '', url);
+		}
+		window.deleteParam = deleteParam;
 	</script>
 </html>

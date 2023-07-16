@@ -25,7 +25,7 @@ export default function UserConfig(props: { children?: JSX.Element }) {
 				{props.children || 'Open'}
 			</button>
 			<Show when={isOpen()}>
-				<menu class="absolute w-max bg-brand-main mt-4">
+				<menu class="absolute w-max bg-brand-main mt-4 right-0">
 					<h2 class="text-xl font-bold font-heading uppercase text-center py-2">
 						Preferences
 					</h2>

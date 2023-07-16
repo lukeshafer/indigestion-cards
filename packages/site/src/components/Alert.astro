@@ -16,7 +16,7 @@ const alertStyles =
 <div hx-swap-oob="beforeend:#alert-wrapper">
 	<div
 		class="view-transition-alert flex items-center justify-between p-4"
-		@delete-alert="$el.remove()"
+		@delete-alert="$el.remove(); deleteParam('alert'); deleteParam('type')"
 		class:list={{ [alertStyles]: true }}>
 		<p><slot /></p>
 		<button @click="$dispatch('delete-alert')" class="text-xl">x</button>
