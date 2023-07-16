@@ -2,12 +2,12 @@ import { Table } from 'sst/node/table';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
-const config = {
+export const config = {
 	table: Table.data.tableName,
 	client: new DocumentClient(),
 } satisfies EntityConfiguration;
 
-const auditAttributes = (entityName: string) =>
+export const auditAttributes = (entityName: string) =>
 	({
 		createdAt: {
 			type: 'number',
@@ -416,7 +416,7 @@ const packs = new Entity(
 	{
 		model: {
 			entity: 'pack',
-			version: '1',
+			version: '2',
 			service: 'card-app',
 		},
 		attributes: {
@@ -483,6 +483,14 @@ const packs = new Entity(
 							type: 'boolean',
 							required: true,
 							default: false,
+						},
+						cardNumber: {
+							type: 'number',
+							required: true,
+						},
+						totalOfType: {
+							type: 'number',
+							required: true,
 						},
 					},
 				},

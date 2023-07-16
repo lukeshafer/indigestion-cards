@@ -9,6 +9,7 @@ export function AfterDeployStack({ stack }: StackContext) {
 	const script = new Script(stack, 'AfterDeployScript', {
 		onCreate: 'packages/functions/src/deployment/seed-db.handler',
 		onDelete: 'packages/functions/src/deployment/delete-twitch-events.handler',
+		onUpdate: 'packages/functions/src/deployment/migrate-db.handler',
 		defaults: {
 			function: {
 				bind: [

@@ -318,6 +318,8 @@ export async function createPack(args: {
 						rarityId: card.rarityId,
 						rarityName: card.rarityName,
 						frameUrl: card.frameUrl,
+						totalOfType: card.totalOfType,
+						cardNumber: card.cardNumber,
 					})),
 				})
 				.commit(),
