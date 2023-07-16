@@ -560,4 +560,12 @@
 	.backface-hidden {
 		backface-visibility: hidden;
 	}
+
+	.card-aspect-ratio {
+		aspect-ratio: 77 / 107;
+	}
+
+	.w-card {
+		width: 18rem;
+	}
 }

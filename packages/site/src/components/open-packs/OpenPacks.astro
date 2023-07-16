@@ -3,45 +3,24 @@ import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import PackToOpenItem from './PackToOpenItem.astro';
 import PackShowcase from './PackShowcase.astro';
 
+interface Props {
+	packId?: string;
+}
+
+const { packId = null } = Astro.props;
+
 const allPacks = await getAllPacks();
 const packs = allPacks
 	.filter((pack) => pack.userId && pack.username)
 	.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 ---
 
-<div class="grid grid-cols-[auto_1fr] grid-rows-[80vh] gap-x-8">
+<div class="grid grid-cols-[auto_1fr] grid-rows-[80vh] gap-x-8" x-data={JSON.stringify({ activePackId: packId })}>
 	<section class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6" id="pack-list">
 		<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">Coming up...</h2>
-		<ul class="packs flex w-full flex-col pb-2 gap-3">
+		<ul class="packs flex w-full flex-col gap-2 pb-2">
 			{packs.map((pack) => <PackToOpenItem username={pack.username!} packId={pack.packId} />)}
 		</ul>
 	</section>
 	<div id="open-showcase" class="bg-brand-100 h-full p-6"><PackShowcase /></div>
 </div>
-
-<style>
-	/*#pack-list ul {
-		scrollbar-width: auto;
-		--scrollbar-color: var(--color-main);
-		--scrollbar-track-color: #dde;
-		scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
-	}
-
-	#pack-list ul::-webkit-scrollbar {
-		width: 1rem;
-	}
-
-	#pack-list ul::-webkit-scrollbar-track {
-		background: var(--scrollbar-track-color);
-	}
-
-	#pack-list ul::-webkit-scrollbar-thumb {
-		background-color: var(--scrollbar-color);
-		border: 3px solid var(--scrollbar-track-color);
-		cursor: pointer;
-	}
-
-	#pack-list ul::-webkit-scrollbar:hover {
-		filter: brightness(1.5);
-	}*/
-</style>

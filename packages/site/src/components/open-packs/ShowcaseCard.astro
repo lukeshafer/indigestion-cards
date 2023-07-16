@@ -1,0 +1,38 @@
+---
+import type { PackEntity } from '@lil-indigestion-cards/core/pack';
+import TiltCardEffect from '@/components/TiltCardEffect.astro';
+import { api } from '@/constants';
+import Card from '@/components/Card.astro';
+
+interface Props {
+	card: PackEntity['cardDetails'][number];
+}
+
+const { card } = Astro.props;
+---
+
+<li x-data={`{ flipped: ${card.opened} }`}>
+	<p class="error-text"></p>
+	<div
+		:class="{ flipped }"
+		class="perspective preserve-3d card-aspect-ratio relative block w-60 origin-center transition-transform duration-500">
+		<button
+			@click="flipped = true"
+			hx-patch={api.OPEN_CARD}
+			hx-target="previous p.error-text"
+			hx-swap="outerHTML"
+			hx-vals={JSON.stringify({
+				instanceId: card.instanceId,
+				designId: card.designId,
+			})}
+			class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
+			title="Click to reveal">
+			<img src="/card-back.png" class="w-full" />
+		</button>
+		<div class="backface-hidden flipped absolute inset-0 h-full w-full">
+			<div style={{ scale: '0.8333' }} class="origin-top-left">
+				<Card {...card} />
+			</div>
+		</div>
+	</div>
+</li>

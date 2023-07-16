@@ -9,9 +9,11 @@ interface Props {
 const { packId, username } = Astro.props;
 ---
 
-<li id={packId}>
+<li id={packId} x-data={JSON.stringify({ packId })}>
 	<button
-		class="shine font-display w-full text-left text-2xl italic text-gray-600 p-1"
+		class="font-display -mx-2 w-full p-2 text-left text-2xl italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+		:class={`{ 'bg-gray-300 text-gray-800': activePackId === packId }`}
+		@click={`activePackId = packId`}
 		hx-get={api.GET_PACK_TO_OPEN}
 		hx-vals={JSON.stringify({ packId })}
 		hx-swap="innerHTML"

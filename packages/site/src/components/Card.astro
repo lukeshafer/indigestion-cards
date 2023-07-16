@@ -11,28 +11,52 @@ interface Props {
 	designId: string;
 	cardNumber: number;
 	totalOfType: number;
+	scale?: number;
 }
 
-const { frameUrl, imgUrl, cardName, cardDescription, cardNumber, totalOfType } = Astro.props;
+const {
+	frameUrl,
+	imgUrl,
+	cardName,
+	cardDescription,
+	cardNumber,
+	totalOfType,
+	scale = 1,
+} = Astro.props;
 ---
 
-<TiltCardEffect
-	client:load
-	shiny={true}>
-	<article class="card-wrapper relative bg-cover w-72 text-left" style={{ 'background-image': `url(${frameUrl})`, 'aspect-ratio': '77 / 107' }}>
-		<img src={imgUrl} alt={cardName} class="design-img absolute object-cover h-[51%] left-[9%] top-[15%] w-[82%]" />
-		<h3 
-			style={{ '--left': '12%', '--top': '4.4%', width: 'calc(100% - var(--left) * 2)', left: 'var(--left)', top: 'var(--top)' }}
-			class="absolute text-lg font-bold text-slate-900 font-display italic">
+<TiltCardEffect client:load shiny={true}>
+	<article
+		class="card-wrapper card-aspect-ratio relative w-72 bg-cover text-left"
+		style={{ 'background-image': `url(${frameUrl})`, scale }}>
+		<img
+			src={imgUrl}
+			alt={cardName}
+			class="design-img absolute left-[9%] top-[15%] h-[51%] w-[82%] object-cover"
+		/>
+		<h3
+			style={{
+				'--left': '12%',
+				'--top': '4.4%',
+				width: 'calc(100% - var(--left) * 2)',
+				left: 'var(--left)',
+				top: 'var(--top)',
+			}}
+			class="font-display absolute text-lg font-bold italic text-slate-900">
 			{cardName}
 		</h3>
-		<p 
-			style={{ '--left': '10%', 'top': '70%', 'height': '15%', width: 'calc(100% - var(--left) * 2)', left: 'var(--left)' }}
-			class="card-description absolute font-sans p-2 font-normal text-black">
+		<p
+			style={{
+				'--left': '10%',
+				top: '70%',
+				height: '15%',
+				width: 'calc(100% - var(--left) * 2)',
+				left: 'var(--left)',
+			}}
+			class="card-description absolute p-2 font-sans font-normal text-black">
 			{cardDescription}
 		</p>
-		<p
-			class="right-3 absolute bottom-1 font-bold text-xs font-display italic text-white">
+		<p class="font-display absolute bottom-1 right-3 text-xs font-bold italic text-white">
 			{cardNumber} / {totalOfType}
 		</p>
 	</article>
