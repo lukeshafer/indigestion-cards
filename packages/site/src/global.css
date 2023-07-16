@@ -111,6 +111,7 @@
 		--card-aspect-ratio: 312 / 265;
 
 		font-family: var(--base-font-sans);
+		font-size: clamp(0.75rem, 1.5vw, 1rem);
 
 		--brand-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
 
