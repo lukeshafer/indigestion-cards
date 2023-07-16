@@ -5,12 +5,16 @@ import AdminOnly from '@/components/AdminOnly.astro';
 import AdminPanel from '@/components/AdminPanel.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
+import Alert from '@/components/Alert.astro';
 
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
 	wide?: boolean;
 }
+
+const alert = Astro.url.searchParams.get('alert');
+const alertType = Astro.url.searchParams.get('alertType') || Astro.url.searchParams.get('alerttype') || Astro.url.searchParams.get('type');
 
 const { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
@@ -27,21 +31,9 @@ const { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.prop
 			class="relative flex flex-col overflow-y-scroll md:col-start-2"
 			id="page-scroll-wrapper">
 			<Header />
-			<div
-				class="sticky top-0"
-				id="alert-wrapper"
-				@displayalert.window={`\
-					document.getElementById('page-scroll-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' }); 
-					message = $event.detail.message; 
-					type = $event.detail.type`}
-				x-data="{ message: undefined, type: undefined }"
-				x-cloak>
-				<template x-if="message">
-					<div class="alert-text-box" :data-type="type ?? 'error'">
-						<p x-text="message"></p>
-						<button @click="message = undefined">x</button>
-					</div>
-				</template>
+			<div class="sticky top-0" id="alert-wrapper">
+				<div id="alert" class="sticky top-0"></div>
+				{alert ? <Alert type={alertType ?? 'error'}>{alert}</Alert> : null}
 			</div>
 			<div class="max-w-main mx-auto w-full">
 				<Breadcrumbs path={breadcrumbs ?? []} />

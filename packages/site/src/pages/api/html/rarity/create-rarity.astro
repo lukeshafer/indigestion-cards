@@ -1,8 +1,11 @@
 ---
+import Alert from '@/components/Alert.astro';
+import Redirect from '@/lib/redirect';
 import { createRarity, deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
 
-if (Astro.request.method !== 'POST')
+if (Astro.request.method !== 'POST') {
 	return new Response('Error: Method not allowed', { status: 405 });
+}
 
 const params = new URLSearchParams(await Astro.request.text());
 
@@ -22,46 +25,32 @@ if (defaultCount < 1) errorMessage += 'Default count must be greater than 0. ';
 if (!bucket) errorMessage += 'Missing bucket. ';
 if (!rarityId!.match(/^[a-z0-9-]+$/))
 	errorMessage += 'Invalid seasonId. (Must be lowercase, numbers, and dashes only) ';
-if (errorMessage)
-	return new Response(errorMessage, {
-		status: 400,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: {
-					message: errorMessage,
-					type: 'error',
-				},
-			}),
-		},
+
+if (errorMessage.length === 0) {
+	const deleteUnmatchedImagePromise = deleteUnmatchedDesignImage({
+		imageId: imageKey!,
+		type: 'frame',
+	});
+	const createPromise = createRarity({
+		rarityId: rarityId!,
+		rarityName: rarityName!,
+		frameUrl: imgUrl!,
+		defaultCount,
 	});
 
-const deleteUnmatchedImagePromise = deleteUnmatchedDesignImage({
-	imageId: imageKey!,
-	type: 'frame',
-});
-const createPromise = createRarity({
-	rarityId: rarityId!,
-	rarityName: rarityName!,
-	frameUrl: imgUrl!,
-	defaultCount,
-});
-
-const [result] = await Promise.all([createPromise, deleteUnmatchedImagePromise]);
-
-if (!result.success)
-	return new Response(result.error, {
-		status: result.error === 'Rarity already exists' ? 409 : 500,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: {
-					message: result.error,
-					type: 'error',
-				},
-			}),
-		},
-	});
-
-Astro.response.headers.set('HX-Redirect', `/rarity?alert=Rarity%20created!&alertType=success`);
+	const [result] = await Promise.all([createPromise, deleteUnmatchedImagePromise]);
+	if (!result.success) {
+		errorMessage = result.error;
+	}
+}
 ---
 
-<body></body>
+<body>
+	{
+		errorMessage ? (
+			<Alert type="error">{errorMessage}</Alert>
+		) : (
+			<Redirect to="/rarity" alert="Rarity created!" type="success" {Astro} />
+		)
+	}
+</body>

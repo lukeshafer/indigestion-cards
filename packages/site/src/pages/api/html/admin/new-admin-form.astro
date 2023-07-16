@@ -1,21 +1,25 @@
 ---
+import SortTableCell from '@/components/table/SortTableCell.astro';
+import SortTableRow from '@/components/table/SortTableRow.astro';
 import { api } from '@/constants';
 import crypto from 'crypto';
 const token = 'a' + crypto.randomBytes(2).toString('hex');
 ---
 
 <body>
-	<tr id={token} x-data="{ buttonText: 'Cancel' }">
-		<td>
+	<SortTableRow id={token} x-data="{ buttonText: 'Cancel' }">
+		<SortTableCell align="left" font="title">
 			<input
 				id={`${token}-username`}
 				type="text"
 				name="username"
 				@input="$el.value.length > 0 ? buttonText = 'Save' : buttonText = 'Cancel'"
+				@keyup.enter="$dispatch('submit-admin')"
 			/>
-		</td>
-		<td>
+		</SortTableCell>
+		<SortTableCell>
 			<button
+				@submit-admin.window="$dispatch('click')"
 				class="post-button text-center"
 				data-type="submit"
 				x-text="buttonText"
@@ -25,6 +29,9 @@ const token = 'a' + crypto.randomBytes(2).toString('hex');
 				hx-include={`#${token}-username`}>
 				Cancel</button
 			>
-		</td>
-	</tr>
+		</SortTableCell>
+	</SortTableRow>
 </body>
+<script>
+	document.querySelector('button[hx-target=f]')?.dispatchEvent(new CustomEvent('submit-admin'));
+</script>

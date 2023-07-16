@@ -4,6 +4,7 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { getUserByUserName } from '@lil-indigestion-cards/core/user';
 import { getPackById } from '@lil-indigestion-cards/core/card';
 import { api } from '@/constants';
+import Alert from '@/components/Alert.astro';
 
 const packId = Astro.url.searchParams.get('packId');
 const username = Astro.url.searchParams.get('username');
@@ -29,40 +30,56 @@ if (!pack) {
 	return new Response('Pack not found', { status: 404 });
 }
 
-if (pack.username !== username) {
-	const userId =
-		(await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
-	if (!userId)
-		return new Response('User not found', {
-			status: 404,
-			headers: {
-				'HX-Trigger': JSON.stringify({
-					displayalert: {
-						message: `Twitch user '${username}' not found`,
-					},
-				}),
-			},
-		});
-	await updatePackUser({ packId, username, userId });
-}
+const userId = (await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
 
-Astro.response.headers.set('HX-Trigger', 'clearAlert');
+if (userId) {
+	Astro.response.headers.set('HX-Trigger', 'clearAlert');
+	if (pack.username !== username) await updatePackUser({ packId, username, userId });
+}
 ---
 
 <body>
-	<span {id} hx-swap-oob="true">{username}</span>
-	<button
-		@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
-		class="post-button edit-button"
-		data-type="success"
-		hx-select=".save-button"
-		hx-swap="outerHTML"
-		hx-vals={JSON.stringify({
-			id,
-			username,
-			packId,
-		})}
-		hx-get={api.PACK.START_EDIT}>
-		Saved
-	</button>
+	{
+		!userId ? (
+			<>
+				<Alert type="error">Twitch user {username} not found.</Alert>
+				<span {id} hx-swap-oob="true">
+					{pack.username}
+				</span>
+				<button
+					class="post-button edit-button"
+					data-type="submit"
+					hx-select=".save-button"
+					hx-swap="outerHTML"
+					hx-vals={JSON.stringify({
+						id,
+						username: pack.username,
+						packId,
+					})}
+					hx-get={api.PACK.START_EDIT}>
+					Edit
+				</button>
+			</>
+		) : (
+			<>
+				<span {id} hx-swap-oob="true">
+					{username}
+				</span>
+				<button
+					@htmx:load="setTimeout(() => { $el.innerText = 'Edit'; $el.dataset.type = 'submit'; }, 1000)"
+					class="post-button edit-button"
+					data-type="success"
+					hx-select=".save-button"
+					hx-swap="outerHTML"
+					hx-vals={JSON.stringify({
+						id,
+						username,
+						packId,
+					})}
+					hx-get={api.PACK.START_EDIT}>
+					Saved
+				</button>
+			</>
+		)
+	}
 </body>

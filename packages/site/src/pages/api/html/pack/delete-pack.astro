@@ -1,47 +1,37 @@
 ---
 import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card';
+import Alert from '@/components/Alert.astro';
+import Show from '@/components/Show.astro';
 
 const method = Astro.request.method.toUpperCase();
 const body = await Astro.request.text();
 const params = new URLSearchParams(body);
 
-if (method !== 'DELETE') return new Response('Invalid method', { status: 405 });
+if (method !== 'DELETE') {
+	return new Response('Invalid method', { status: 405 });
+}
 
 const userId = params.get('userId');
 const username = params.get('username');
-if (!userId || !username)
-	return new Response('Missing parameters', {
-		status: 400,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: {
-					type: 'error',
-					message: 'Missing parameters',
-				},
-			}),
-		},
-	});
-const result = await deleteFirstPackForUser({ username, userId });
-if (!result || !result.success)
-	return new Response('Failed to revoke pack', {
-		status: 500,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: { type: 'error', message: 'Failed to revoke pack' },
-			}),
-		},
-	});
 
-Astro.response.headers.set(
-	'HX-Trigger',
-	JSON.stringify({
-		displayalert: {
-			type: 'success',
-			message: `Revoked 1 pack for ${username}`,
-		},
-		refreshCount: 'true',
-	})
-);
+Astro.response.headers.set('HX-Trigger', '{ "refreshCount": "true" }');
 ---
 
-<body>1</body>
+<body>
+	<Show when={userId && username}>
+		{
+			deleteFirstPackForUser({ username: username!, userId: userId! }).then((result) =>
+				!result || !result.success ? (
+					<Alert type="error">Failed to revoke pack</Alert>
+				) : (
+					<Alert type="success">
+						Revoked 1 pack for <strong>{username}</strong>
+					</Alert>
+				)
+			)
+		}
+		<div slot="fallback">
+			<Alert type="error">Missing parameters</Alert>
+		</div>
+	</Show>
+</body>

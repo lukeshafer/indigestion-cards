@@ -1,32 +1,30 @@
 ---
+import Alert from '@/components/Alert.astro';
+import Redirect from '@/lib/redirect';
 import { deleteSeasonById } from '@lil-indigestion-cards/core/card';
 
 const method = Astro.request.method.toUpperCase();
 const body = await Astro.request.text();
 const params = new URLSearchParams(body);
 
-if (method !== 'DELETE') return new Response('Method not allowed', { status: 405 });
+if (method !== 'DELETE') {
+	return new Response('Method not allowed', { status: 405 });
+}
 
 const seasonId = params.get('seasonId');
 const seasonName = params.get('seasonName');
-if (!seasonId) return new Response('Missing season id', { status: 400 });
+if (!seasonId) {
+	return new Response('Missing season id', { status: 400 });
+}
 const result = await deleteSeasonById(seasonId);
-if (!result || !result.success)
-	return new Response('Failed to delete season', {
-		status: 500,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: {
-					type: 'error',
-					message: result.error || 'Failed to delete season',
-				},
-			}),
-		},
-	});
-Astro.response.headers.set(
-	'HX-Redirect',
-	`/season?alert=Successfully deleted ${seasonName || 'season'}&type=success`
-);
 ---
 
-<body></body>
+<body>
+	{
+		result.success ? (
+			<Redirect {Astro} to="/season" alert={`Successfully deleted ${seasonName || 'season'}`} type="success" />
+		) : (
+			<Alert type="error">{result.error || 'Failed to delete season'}</Alert>
+		)
+	}
+</body>

@@ -1,4 +1,6 @@
 ---
+import Redirect from '@/lib/redirect';
+import Alert from '@/components/Alert.astro';
 import { createPackType } from '@lil-indigestion-cards/core/card';
 import { type Category, getPackTypeContents } from '@/lib/packType';
 
@@ -20,43 +22,38 @@ if (!cardCountPerPack || !Number(cardCountPerPack)) errorList.push('Missing card
 if (!category) errorList.push('Missing category.');
 if (category === 'season' && !seasonString) errorList.push('Missing season.');
 if (category === 'custom' && !cardDesigns) errorList.push('Missing cardDesigns.');
-if (errorList.length)
-	return new Response(errorList.join(' '), {
-		status: 400,
-		headers: {
-			'HX-Trigger': JSON.stringify({
-				displayalert: { message: errorList.join(' ') },
-			}),
-		},
-	});
 
-const contents = getPackTypeContents({ category, season: seasonString, cardDesigns });
-if (!contents.success)
-	return new Response(contents.error, {
-		status: 400,
-		headers: { 'HX-Trigger': JSON.stringify({ displayalert: { message: contents.error } }) },
-	});
+let season = undefined;
+let designs = undefined;
+if (!errorList.length) {
+	const contents = getPackTypeContents({ category, season: seasonString, cardDesigns });
+	if (!contents.success) errorList.push(contents.error);
+	else {
+		season = contents.season;
+		designs = contents.designs;
+	}
+}
 
-const { season, designs } = contents;
-
-const result = await createPackType({
-	packTypeName: packTypeName!,
-	packTypeId: packTypeId!,
-	packTypeDescription: description || undefined,
-	cardCount: Number(cardCountPerPack!),
-	packTypeCategory: category!,
-	seasonId: season?.seasonId,
-	seasonName: season?.seasonName,
-	designs: designs || undefined,
-});
-
-if (!result.success)
-	return new Response(result.error, {
-		status: 400,
-		headers: { 'HX-Trigger': JSON.stringify({ displayalert: { message: result.error } }) },
-	});
-
-Astro.response.headers.set('HX-Redirect', `/pack-type/?alert=Pack%20created!&alertType=success`);
+const result = errorList.length
+	? { success: false, error: errorList.join(' ') }
+	: await createPackType({
+			packTypeName: packTypeName!,
+			packTypeId: packTypeId!,
+			packTypeDescription: description || undefined,
+			cardCount: Number(cardCountPerPack!),
+			packTypeCategory: category!,
+			seasonId: season?.seasonId,
+			seasonName: season?.seasonName,
+			designs: designs || undefined,
+	  });
 ---
 
-<body></body>
+<body>
+	{
+		result.success ? (
+			<Redirect to="/pack-type" alert="Pack created!" type="success" {Astro} />
+		) : (
+			<Alert type="error">{result.error}</Alert>
+		)
+	}
+</body>

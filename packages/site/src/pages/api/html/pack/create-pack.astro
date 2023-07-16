@@ -1,4 +1,5 @@
 ---
+import Alert from '@/components/Alert.astro';
 import {
 	createPackForNoUser,
 	givePackToUser,
@@ -7,8 +8,9 @@ import {
 } from '@lil-indigestion-cards/core/pack';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 
-if (Astro.request.method.toUpperCase() !== 'POST')
+if (Astro.request.method.toUpperCase() !== 'POST') {
 	return new Response('Method not allowed', { status: 405 });
+}
 
 const body = await Astro.request.text();
 const formData = new URLSearchParams(body);
@@ -18,10 +20,14 @@ const rawCount = formData.get('count');
 const paramUserId = formData.get('userId');
 const packTypeString = formData.get('packType');
 
-if (!packTypeString) return new Response('Missing pack type', { status: 400 });
+if (!packTypeString) {
+	return new Response('Missing pack type', { status: 400 });
+}
 const userId = username ? paramUserId ?? (await getUserByLogin(username))?.id ?? null : null;
 
 const count = Number(rawCount) || 1;
+let success = false;
+let errorStr = '';
 
 try {
 	const packTypeUnparsed = JSON.parse(packTypeString);
@@ -41,22 +47,33 @@ try {
 		});
 		await givePackToUser(packDetails);
 	}
+	Astro.response.headers.set('HX-Trigger', `{ "refreshCount": "true" }`);
+	success = true;
 } catch (error) {
-	console.error(JSON.stringify(error));
-	if (error instanceof Error) return new Response(error.message, { status: 500 });
-	return new Response('Unknown error', { status: 500 });
+	if (error instanceof Error) {
+		console.error(error.message);
+		errorStr = error.message;
+	} else {
+		console.error('Unknown error', error);
+		errorStr = 'An unknown error occurred';
+	}
 }
-
-Astro.response.headers.set(
-	'HX-Trigger',
-	JSON.stringify({
-		displayalert: {
-			type: 'success',
-			message: username ? `Pack created for ${username}!` : `Pack created!`,
-		},
-		refreshCount: 'true',
-	})
-);
 ---
 
-<body></body>
+<body>
+	{
+		success ? (
+			<Alert type="success">
+				{username ? (
+					<>
+						Pack created for <strong>{username}!</strong>
+					</>
+				) : (
+					`Pack created!`
+				)}
+			</Alert>
+		) : (
+			<Alert type="error">{errorStr}</Alert>
+		)
+	}
+</body>
