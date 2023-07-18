@@ -5,7 +5,7 @@ import Form from '@/components/form/Form.astro';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Bucket } from 'sst/node/bucket';
 import crypto from 'crypto';
-import { routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 
 const s3 = new S3Client({ region: 'us-east-2' });
@@ -22,11 +22,7 @@ const presigned = await createPresignedPost(s3, {
 <Page
 	title="Create new rarity"
 	class="grid gap-4"
-	breadcrumbs={[
-		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: routes.RARITIES },
-		{ label: 'New Rarity', href: routes.ADMIN.CREATE.RARITY },
-	]}>
+	breadcrumbs={[{ label: routeNames.RARITIES, href: routes.RARITIES }, { label: 'New Rarity' }]}>
 	<PageHeading>Create new rarity</PageHeading>
 	<div hx-disable>
 		<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">

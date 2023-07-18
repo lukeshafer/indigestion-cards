@@ -8,13 +8,21 @@ interface Props {
 	path: Path[];
 }
 
-const { path } = Astro.props;
+const { path: pathProp } = Astro.props;
+
+const path = [
+	{
+		label: 'Home',
+		href: '/',
+	},
+	...pathProp,
+] as Path[];
 ---
 
 <section class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4">
 	{
 		path.map(({ label, href }, index) =>
-			index === Astro.props.path.length - 1 ? (
+			index === path.length - 1 && (label !== 'Home' || Astro.url.pathname === '/') ? (
 				<p class="font-heading text-brand-main block font-bold">{label}</p>
 			) : href ? (
 				<>

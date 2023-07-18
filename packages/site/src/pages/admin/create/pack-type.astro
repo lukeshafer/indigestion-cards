@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { api } from '@/constants';
+import { api, routeNames, routes } from '@/constants';
 import { getAllSeasons, getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
 
@@ -11,8 +11,7 @@ const cardDesigns = await getAllCardDesigns();
 <Page
 	title="Create Pack Type"
 	breadcrumbs={[
-		{ label: 'Home', href: '/' },
-		{ label: 'Pack Types', href: '/pack-type' },
+		{ label: routeNames.PACK_TYPES, href: routes.PACK_TYPES },
 		{ label: 'Create Pack Type' },
 	]}>
 	<PageHeading>Create Pack Type</PageHeading>

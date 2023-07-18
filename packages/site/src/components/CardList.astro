@@ -14,7 +14,9 @@ const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 	{
 		cards.length > 0 ? (
 			cards.map((card) => (
-				<Element rel="prefetch" href={`${routes.DESIGNS}/${card.designId}`}>
+				<Element
+					rel="prefetch"
+					href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''}`}>
 					<Card {...card} />
 				</Element>
 			))

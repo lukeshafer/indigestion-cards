@@ -12,6 +12,7 @@ import SortTable from '@/components/table/SortTable.astro';
 import SortTableHead from '@/components/table/SortTableHead.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
+import SubHeading from '@/components/text/SubHeading.astro';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -51,7 +52,7 @@ const giftSubPackType =
 		: undefined;
 ---
 
-<Page breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Config' }]} title="Site Config">
+<Page breadcrumbs={[{ label: 'Config' }]} title="Site Config">
 	<form
 		x-data="{ isEdited: false }"
 		@change="isEdited = true"
@@ -69,7 +70,7 @@ const giftSubPackType =
 			>
 		</header>
 		<section class="my-4 flex gap-4">
-			<h2 class="sub-heading w-max">Base Rarity for Design Previews</h2>
+			<SubHeading>Base Rarity for Design Previews</SubHeading>
 			<select class="my-form-input max-w-xs" name="base-rarity">
 				{
 					rarities.map(({ rarityId, rarityName, frameUrl }) => {
@@ -85,7 +86,7 @@ const giftSubPackType =
 		</section>
 		<section>
 			<header class="page-header">
-				<h2 class="sub-heading">Twitch Event Rewards</h2>
+				<SubHeading>Twitch Event Rewards</SubHeading>
 				<TableSearch
 					id="rewards-search"
 					tableId="rewards-table"

@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
 import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
-import { api } from '@/constants';
+import { api, routeNames } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import SortTable from '@/components/table/SortTable.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
@@ -22,7 +22,7 @@ const users = unsortedUsers.sort((a, b) => {
 });
 ---
 
-<Page title="Users" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}>
+<Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]}>
 	<PageHeader>
 		<PageHeading>Admin Users</PageHeading>
 		<button

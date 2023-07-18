@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
 import TableSearch from '@/components/TableSearch.astro';
-import { publicApi, routes } from '@/constants';
+import { publicApi, routes, routeNames } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import SortTable from '@/components/table/SortTable.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
@@ -14,10 +14,7 @@ import SortTableCell from '@/components/table/SortTableCell.astro';
 const users = await getAllUsers();
 ---
 
-<Page
-	title="Users"
-	breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Users' }]}
-	pageType="public">
+<Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
 	<PageHeader>
 		<PageHeading>Users</PageHeading>
 		<TableSearch

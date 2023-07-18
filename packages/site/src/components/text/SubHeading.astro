@@ -4,11 +4,11 @@ interface Props {
 	heading?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }
 
-const { id, heading = 'h2' } = Astro.props;
+const { id, heading = 'h2', ...rest } = Astro.props;
 
 const Element = heading;
 ---
 
-<Element id={id} class="font-heading my-2 text-2xl font-medium uppercase leading-5">
+<Element id={id} class="font-heading my-2 text-2xl font-medium uppercase leading-5" {...rest}>
 	<slot />
 </Element>

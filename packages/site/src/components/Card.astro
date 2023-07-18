@@ -12,6 +12,8 @@ interface Props {
 	cardNumber: number;
 	totalOfType: number;
 	scale?: number;
+	instanceId?: string;
+	preview?: boolean;
 }
 
 const {
@@ -22,6 +24,7 @@ const {
 	cardNumber,
 	totalOfType,
 	scale = 1,
+	preview = false,
 } = Astro.props;
 ---
 
@@ -42,21 +45,23 @@ const {
 				left: 'var(--left)',
 				top: 'var(--top)',
 			}}
+			x-text={preview ? 'preview_cardName' : undefined}
 			class="font-display absolute text-lg font-bold italic text-slate-900">
 			{cardName}
 		</h3>
 		<p
 			style={{
-				'--left': '10%',
-				top: '70%',
+				'--left': '11%',
+				top: '68.5%',
 				height: '15%',
 				width: 'calc(100% - var(--left) * 2)',
 				left: 'var(--left)',
 			}}
-			class="card-description absolute p-2 font-sans font-normal text-black">
+			x-text={preview ? 'preview_cardDescription' : undefined}
+			class="card-description absolute p-2 font-sans text-sm font-normal text-black">
 			{cardDescription}
 		</p>
-		<p class="font-display absolute bottom-1 right-3 text-xs font-bold italic text-white">
+		<p class="font-display absolute bottom-2 right-4 text-xs font-bold italic text-white">
 			{cardNumber} / {totalOfType}
 		</p>
 	</article>

@@ -3,6 +3,7 @@ import type { CardInstanceEntity, CardDesignEntity } from '@lil-indigestion-card
 import DesignOverviewTable from './DesignOverviewTable.astro';
 import RarityStatsTable from './RarityStatsTable.astro';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
+import SubHeading from '../text/SubHeading.astro';
 
 interface Props {
 	design: CardDesignEntity;
@@ -14,14 +15,14 @@ const { design, instances } = Astro.props;
 const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, instances);
 ---
 
-<div class="flex flex-col gap-8 my-4">
-	<section class="text-lg">
-		<h2 class="sub-heading mb-4">Stats Overview</h2>
+<div class="my-4 flex flex-col gap-8">
+	<section class="grid text-lg">
+		<SubHeading>Stats Overview</SubHeading>
 		<DesignOverviewTable {rarityStatsArray} />
 	</section>
 	<section x-data="{ hideUnowned: false }">
 		<header class="flex items-center gap-6">
-			<h2 class="sub-heading mb-4">Instance Breakdown</h2>
+			<SubHeading>Instance Breakdown</SubHeading>
 			<div>
 				<input
 					type="checkbox"

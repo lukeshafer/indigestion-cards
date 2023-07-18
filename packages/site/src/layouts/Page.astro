@@ -14,9 +14,12 @@ export interface Props extends BaseProps {
 }
 
 const alert = Astro.url.searchParams.get('alert');
-const alertType = Astro.url.searchParams.get('alertType') || Astro.url.searchParams.get('alerttype') || Astro.url.searchParams.get('type');
+const alertType =
+	Astro.url.searchParams.get('alertType') ||
+	Astro.url.searchParams.get('alerttype') ||
+	Astro.url.searchParams.get('type');
 
-const { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
+let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>

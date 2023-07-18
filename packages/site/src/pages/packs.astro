@@ -6,11 +6,12 @@ import PackRow from '@/components/pack/PackRow.astro';
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
+import { routeNames } from '@/constants';
 
 const packs = await getAllPacks();
 ---
 
-<Page title="All Packs" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Packs' }]}>
+<Page title="All Packs" breadcrumbs={[{ label: routeNames.PACKS }]}>
 	<header class="page-header">
 		<PageHeading>All Packs</PageHeading>
 	</header>

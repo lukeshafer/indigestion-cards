@@ -1,28 +1,26 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons } from '@lil-indigestion-cards/core/card';
-import { routes } from '@/constants';
+import { routes, routeNames } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 
 const seasons = await getAllSeasons();
-
-const breadcrumbs = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Seasons', href: routes.SEASONS },
-];
 ---
 
-<Page title="All Seasons" class="max-w-5xl grid gap-4 grid-cols-1" breadcrumbs={breadcrumbs}>
+<Page
+	title="All Seasons"
+	class="grid max-w-5xl grid-cols-1 gap-4"
+	breadcrumbs={[{ label: routeNames.SEASONS }]}>
 	<header class="page-header">
 		<PageHeading>All Seasons</PageHeading>
 		<a href={routes.ADMIN.CREATE.SEASON} class="button-link"> Create New Season</a>
 	</header>
-	<ul class="flex flex-wrap gap-8 text-4xl pt-10">
+	<ul class="flex flex-wrap gap-8 pt-10 text-4xl">
 		{
 			seasons.map((season, index) => (
 				<li>
 					<a
-						class="font-display shine italic text-white text-shadow p-8 pt-9 transition-transform"
+						class="font-display shine text-shadow p-8 pt-9 italic text-white transition-transform"
 						class:list={{
 							'bg-brand-secondary': index % 2 === 1,
 							'bg-accent-secondary': index % 2 === 0,

@@ -1,8 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
-import { api, routes } from '@/constants';
+import { api, routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
+import Card from '@/components/Card.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -14,20 +16,32 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 const seasons = await getAllSeasons();
 const rarities = await getAllRarities();
+const { baseRarity } = await getSiteConfig();
 ---
 
 <Page
 	title="Add Card Design"
 	breadcrumbs={[
-		{ href: '/', label: 'Home' },
-		{ href: routes.DESIGNS, label: 'Designs' },
+		{ href: routes.DESIGNS, label: routeNames.CARDS },
 		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
 		{ label: 'Details' },
 	]}>
 	<PageHeading>Add Card Design</PageHeading>
-	<div class="flex flex-col pt-8 gap-8 max-w-4xl">
-		<div class="relative">
-			<img src={imgUrl} class="w-60 h-auto object-contain mb-4" />
+	<div
+		class="flex max-w-4xl flex-col gap-8 pt-8"
+		x-data="{ preview_cardName: '', preview_cardDescription: '' }">
+		<div class="relative grid justify-start gap-4">
+			<Card
+				preview
+				rarityName={baseRarity.rarityId}
+				frameUrl={baseRarity.frameUrl}
+				{imgUrl}
+				cardName=""
+				cardDescription=""
+				designId=""
+				cardNumber={1}
+				totalOfType={1}
+			/>
 			<button
 				class="post-button"
 				hx-delete={api.IMAGE.DELETE}
@@ -55,7 +69,7 @@ const rarities = await getAllRarities();
 				</div>
 				<div class="input-group">
 					<label for="cardName">Card Name</label>
-					<input name="cardName" id="cardName" required />
+					<input name="cardName" id="cardName" required x-model="preview_cardName" />
 				</div>
 				<div class="input-group">
 					<label for="designId">Id</label>
@@ -70,7 +84,8 @@ const rarities = await getAllRarities();
 				</div>
 				<div class="input-group">
 					<label for="cardDescription">Description</label>
-					<textarea name="cardDescription" required></textarea>
+					<textarea name="cardDescription" required x-model="preview_cardDescription"
+					></textarea>
 				</div>
 				<div class="input-group">
 					<label for="artist">Artist</label>

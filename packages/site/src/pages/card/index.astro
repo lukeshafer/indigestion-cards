@@ -4,7 +4,7 @@ import CardList from '@/components/CardList.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
@@ -12,14 +12,9 @@ import AdminOnly from '@/components/AdminOnly.astro';
 const [designs, siteConfig] = await Promise.all([getAllCardDesigns(), getSiteConfig()]);
 
 const message = Astro.url.searchParams.get('message') || '';
-
-const breadcrumbs = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Cards', href: routes.DESIGNS },
-];
 ---
 
-<Page title="All Cards" breadcrumbs={breadcrumbs}>
+<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]}>
 	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<PageHeader>

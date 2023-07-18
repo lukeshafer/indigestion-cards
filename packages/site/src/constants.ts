@@ -67,13 +67,14 @@ export const authApi = {
 
 export const routes = {
 	USERS: '/user',
-	DESIGNS: '/design',
+	DESIGNS: '/card',
 	SEASONS: '/season',
 	RARITIES: '/rarity',
 	ADMIN_USERS: '/admin-users',
 	PACK_TYPES: '/pack-type',
 	PACKS: '/packs',
 	INSTANCES: '/card',
+	CARDS: '/card',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',
@@ -97,6 +98,19 @@ export const routes = {
 			PACK_TYPE: '/admin/edit/pack-type',
 		},
 	},
+} as const;
+
+export const routeNames = {
+	USER: 'Users',
+	CARDS: 'Cards',
+	SEASONS: 'Seasons',
+	RARITIES: 'Rarities',
+	ADMIN_USERS: 'Admins',
+	PACK_TYPES: 'Pack Types',
+	PACKS: 'Packs',
+	ADMIN: 'Admin',
+	ADMIN_CREATE: 'Create',
+	ADMIN_EDIT: 'Edit',
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';

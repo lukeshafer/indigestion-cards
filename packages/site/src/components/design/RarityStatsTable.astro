@@ -7,12 +7,13 @@ import SortTableHead from '@/components/table/SortTableHead.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import SortTableRow from '@/components/table/SortTableRow.astro';
 import SortTableCell from '@/components/table/SortTableCell.astro';
+import SubHeading from '../text/SubHeading.astro';
 
 type Props = RarityStats;
 ---
 
-<li>
-	<h3 class="sub-heading text-xl">{Astro.props.rarityName}</h3>
+<li class="my-8">
+	<SubHeading heading="h3"><span class="text-xl">{Astro.props.rarityName}</span></SubHeading>
 	<SortTable compact>
 		<SortTableHead slot="heading">
 			<SortTableHeading type="number" width="20%">Card Number</SortTableHeading>

@@ -1,6 +1,6 @@
 ---
 import Alert from '@/components/Alert.astro';
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN, routes } from '@/constants';
 import Redirect from '@/lib/redirect';
 import { Api } from 'sst/node/api';
 
@@ -45,7 +45,7 @@ const result = await deleteImage();
 	{
 		result.success ? (
 			<Redirect
-				to={type === 'frame' ? '/rarity' : '/design'}
+				to={type === 'frame' ? routes.RARITIES : routes.DESIGNS}
 				alert="Image deleted"
 				type="success"
 				{Astro}

@@ -1,8 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
-import TiltCardEffect from '@/components/TiltCardEffect.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
-import { routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
+import SubHeading from '@/components/text/SubHeading.astro';
+import Card from '@/components/Card.astro';
 
 const slug = Astro.params.instanceSlug;
 if (!slug) {
@@ -23,29 +24,6 @@ if (!instance) {
 	return Astro.redirect(`${routes.DESIGNS}?error=No instance found with id ${instanceId}`);
 }
 
-const breadcrumbs = [{ label: 'Home', href: '/' }];
-
-const from = Astro.request.headers.get('referer');
-if (from?.includes('user') && instance.username) {
-	breadcrumbs.push(
-		{ label: 'Users', href: routes.USERS },
-		{ label: instance.username, href: `${routes.USERS}/${instance.username}` },
-		{
-			label: `${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`,
-			href: `${routes.INSTANCES}/${designId}/${instanceId}`,
-		}
-	);
-} else {
-	breadcrumbs.push(
-		{ label: 'Designs', href: routes.DESIGNS },
-		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
-		{
-			label: `${instance.rarityName} #${instance.cardNumber}`,
-			href: `${routes.INSTANCES}/${designId}/${instanceId}`,
-		}
-	);
-}
-
 const openDate = instance.openedAt
 	? new Date(instance.openedAt).toLocaleString()
 	: 'Not opened yet';
@@ -54,24 +32,26 @@ const openDate = instance.openedAt
 <Page
 	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
 	class="flex flex-col gap-9"
-	breadcrumbs={breadcrumbs}>
+	breadcrumbs={[
+		{ label: routeNames.CARDS, href: routes.DESIGNS },
+		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
+		{ label: `${instance.rarityName} #${instance.cardNumber}` },
+	]}>
 	<header class="flex flex-col gap-4">
-		<h1 class="text-3xl font-display italic my-3">
+		<h1 class="font-display my-3 text-3xl italic">
 			{instance.cardName}, {instance.rarityName} #{instance.cardNumber}
 		</h1>
 		<div class="mx-4">
-			<TiltCardEffect>
-				<img src={instance.imgUrl} width="300" class="max-w-full" />
-			</TiltCardEffect>
+			<Card {...instance} />
 		</div>
 		{
 			instance.cardDescription ? (
-				<p class="text-lg  max-w-sm">{instance.cardDescription}</p>
+				<p class="max-w-sm  text-lg">{instance.cardDescription}</p>
 			) : null
 		}
 	</header>
 	<section class="text-lg">
-		<h2 class="sub-heading">Stats:</h2>
+		<SubHeading>Stats:</SubHeading>
 		<p>
 			<b>Rarity:</b>
 			{instance.rarityName}

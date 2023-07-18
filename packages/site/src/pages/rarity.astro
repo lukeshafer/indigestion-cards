@@ -5,7 +5,7 @@ import PageHeading from '@/components/text/PageHeading.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
-import { api, routes } from '@/constants';
+import { api, routes, routeNames } from '@/constants';
 import SortTable from '@/components/table/SortTable.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import SortTableRow from '@/components/table/SortTableRow.astro';
@@ -15,13 +15,7 @@ import SortTableHead from '@/components/table/SortTableHead.astro';
 const rarities = await getAllRarities();
 ---
 
-<Page
-	title="Rarities"
-	class="flex flex-col gap-4"
-	breadcrumbs={[
-		{ label: 'Home', href: '/' },
-		{ label: 'Rarities', href: routes.RARITIES },
-	]}>
+<Page title="Rarities" class="flex flex-col gap-4" breadcrumbs={[{ label: routeNames.RARITIES }]}>
 	<UnmatchedImageList type="frame" />
 	<PageHeader>
 		<PageHeading>Rarities</PageHeading>

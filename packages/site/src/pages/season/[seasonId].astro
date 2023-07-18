@@ -6,8 +6,9 @@ import {
 	getSeasonAndDesignsBySeasonId,
 } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { api, routes } from '@/constants';
+import { api, routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
+import SubHeading from '@/components/text/SubHeading.astro';
 
 const id = Astro.params.seasonId;
 
@@ -55,15 +56,15 @@ const packTypesWithCardPools = await Promise.all(
 const {
 	baseRarity: { frameUrl, rarityId },
 } = await getSiteConfig();
-
-const breadcrumbs = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Seasons', href: routes.SEASONS },
-	{ label: season.seasonName, href: `${routes.SEASONS}/${id}` },
-];
 ---
 
-<Page title={season.seasonName} class="flex flex-col gap-4" breadcrumbs={breadcrumbs}>
+<Page
+	title={season.seasonName}
+	class="flex flex-col gap-4"
+	breadcrumbs={[
+		{ label: routeNames.SEASONS, href: routes.SEASONS },
+		{ label: season.seasonName },
+	]}>
 	<header>
 		<div class="page-header">
 			<PageHeading id="season-name">{season.seasonName}</PageHeading>
@@ -79,27 +80,30 @@ const breadcrumbs = [
 	</header>
 
 	<section class="text-lg">
-		<h2 class="sub-heading">Stats:</h2>
-		<p><b>Total cards in season:</b> {totalPossibleCards}</p>
-		<p><b>Cards distributed:</b> {ownedCards}</p>
-		<p><b>Card remaining to distribute:</b> {remainingCards}</p>
+		<SubHeading>Stats:</SubHeading>
+		<p class="ml-4"><b>Total cards in season:</b> {totalPossibleCards}</p>
+		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
+		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
 
-		<h3 class="sub-heading mt-4 text-xl">Pack Types:</h3>
-		<ul>
-			{
-				packTypesWithCardPools.map(async (packType) => (
-					<li>
-						<b>{packType.packTypeName}</b>: {packType.totalPossiblePacks} total
-						{packType.totalPossiblePacks === 1 ? 'pack' : 'packs'},{' '}
-						{packType.remainingPacks}
-						{packType.remainingPacks === 1 ? 'pack' : 'packs'} remaining to be opened
-					</li>
-				))
-			}
-		</ul>
+		<div class="ml-4 mt-4">
+			<SubHeading heading="h3"><span class="text-xl">Pack Types:</span></SubHeading>
+			<ul>
+				{
+					packTypesWithCardPools.map(async (packType) => (
+						<li>
+							<b>{packType.packTypeName}</b>: {packType.totalPossiblePacks} total
+							{packType.totalPossiblePacks === 1 ? 'pack' : 'packs'},{' '}
+							{packType.remainingPacks}
+							{packType.remainingPacks === 1 ? 'pack' : 'packs'} remaining to be
+							opened
+						</li>
+					))
+				}
+			</ul>
+		</div>
 	</section>
 
-	<h2 class="sub-heading">Cards:</h2>
+	<SubHeading>Designs:</SubHeading>
 	<CardList
 		cards={cardDesigns.map((card) => ({
 			cardName: card.cardName,

@@ -4,10 +4,11 @@ import Card from '@/components/Card.astro';
 import CardList from '@/components/CardList.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routes, api } from '@/constants';
+import { routes, api, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import AdminDesignStats from '@/components/design/AdminDesignStats.astro';
+import SubHeading from '@/components/text/SubHeading.astro';
 
 const designId = Astro.params.designId;
 const from = Astro.request.headers.get('referer');
@@ -31,34 +32,20 @@ if (!design) {
 }
 
 const { baseRarity } = await getSiteConfig();
-const breadcrumbs = [{ label: 'Home', href: '/' }];
 
-if (from?.includes('season')) {
-	breadcrumbs.push(
-		{ label: 'Seasons', href: routes.SEASONS },
-		{ label: design.seasonName, href: `${routes.SEASONS}/${design.seasonId}` },
-		{ label: design.cardName, href: `${routes.DESIGNS}/${designId}` }
-	);
-} else {
-	breadcrumbs.push(
-		{ label: 'Designs', href: routes.DESIGNS },
-		{ label: design.cardName, href: `${routes.DESIGNS}/${designId}` }
-	);
-}
-
-instances.sort((a, b) => (
-	+a.totalOfType === +b.totalOfType 
+instances.sort((a, b) =>
+	+a.totalOfType === +b.totalOfType
 		? a.instanceId !== b.instanceId
 			? +a.instanceId - +b.instanceId
 			: +a.cardNumber - +b.cardNumber
 		: +a.totalOfType - +b.totalOfType
-))
+);
 ---
 
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-9"
-	breadcrumbs={breadcrumbs}>
+	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageHeading>{design.cardName}</PageHeading>
 		<Card
@@ -93,8 +80,8 @@ instances.sort((a, b) => (
 			<form-indicator>Deleting</form-indicator>
 		</button>
 	</AdminOnly>
-	<section>
-		<h2 class="sub-heading my-8 text-center">Instances</h2>
+	<section class="text-center">
+		<SubHeading>Instances</SubHeading>
 		<CardList cards={instances} />
 	</section>
 </Page>

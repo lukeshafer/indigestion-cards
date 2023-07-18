@@ -3,7 +3,7 @@ import CardList from '@/components/CardList.astro';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
-import { api, routes } from '@/constants';
+import { api, routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
@@ -43,16 +43,14 @@ const user = users[0]!;
 
 const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt);
 
-const breadcrumbs = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Users', href: routes.USERS },
-	{ label: user.username },
-];
-
 const packTypes = await getAllPackTypes();
 ---
 
-<Page title={user.username} class="flex flex-col gap-4" breadcrumbs={breadcrumbs} pageType="public">
+<Page
+	title={user.username}
+	class="flex flex-col gap-4"
+	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
+	pageType="public">
 	<header class="flex items-start gap-12 p-4">
 		<img
 			src={twitchData?.profile_image_url}

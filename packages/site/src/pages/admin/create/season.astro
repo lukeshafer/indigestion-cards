@@ -1,16 +1,12 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { api, routes } from '@/constants';
+import { api, routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 ---
 
 <Page
 	title="Create New Season"
-	breadcrumbs={[
-		{ label: 'Home', href: '/' },
-		{ label: 'Seasons', href: routes.SEASONS },
-		{ label: 'New Season' },
-	]}>
+	breadcrumbs={[{ label: routeNames.SEASONS, href: routes.SEASONS }, { label: 'New Season' }]}>
 	<PageHeading>Create New Season</PageHeading>
 
 	<my-form>

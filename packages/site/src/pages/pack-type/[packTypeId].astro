@@ -5,7 +5,8 @@ import SortTableHead from '@/components/table/SortTableHead.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import SortTableRow from '@/components/table/SortTableRow.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
-import { api } from '@/constants';
+import SubHeading from '@/components/text/SubHeading.astro';
+import { api, routeNames } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
@@ -25,8 +26,7 @@ const cardPool = await getCardPoolFromType(packType);
 <Page
 	title={`Pack Type: ${packType.packTypeName}`}
 	breadcrumbs={[
-		{ label: 'Home', href: '/' },
-		{ label: 'Pack Types', href: '/pack-type' },
+		{ label: routeNames.PACK_TYPES, href: '/pack-type' },
 		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
 	]}>
 	<PageHeading>{packType.packTypeName}</PageHeading>
@@ -42,7 +42,7 @@ const cardPool = await getCardPoolFromType(packType);
 		<div class="htmx-indicator">Deleting</div>
 	</button>
 	<section aria-label="Card Pool" class="mt-4 flex flex-col gap-4">
-		<h2 class="sub-heading">Card Pool</h2>
+		<SubHeading>Card Pool</SubHeading>
 		<SortTable>
 			<SortTableHead slot="heading">
 				<SortTableHeading width="75%">Card Name</SortTableHeading>
