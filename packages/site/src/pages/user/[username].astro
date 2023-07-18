@@ -51,7 +51,7 @@ const packTypes = await getAllPackTypes();
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
-	<header class="flex items-start gap-12 p-4">
+	<header class="flex flex-col items-center gap-4 sm:gap-12 p-4 sm:flex-row sm:items-start">
 		<img
 			src={twitchData?.profile_image_url}
 			width="200"
