@@ -36,6 +36,7 @@ const session = Astro.locals.session;
 		}
 	</body>
 	<script>
+		// @ts-nocheck
 		import htmx from 'htmx.org';
 		window.htmx = htmx;
 		import('htmx.org/dist/ext/head-support');
@@ -43,6 +44,7 @@ const session = Astro.locals.session;
 
 		import Alpine from 'alpinejs';
 
+		// @ts-ignore
 		window.Alpine = Alpine;
 		Alpine.start();
 

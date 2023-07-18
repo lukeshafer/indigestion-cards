@@ -28,9 +28,6 @@ import Form from './form/Form.astro';
 </style>
 
 <script>
-	const anchorTemplate = document.createElement('template');
-	//anchorTemplate.innerHTML = `
-
 	class UserSearch extends HTMLElement {
 		searchInput = this.querySelector('[data-user-search]') as HTMLInputElement;
 		results = this.querySelector('[data-results]') as HTMLUListElement;

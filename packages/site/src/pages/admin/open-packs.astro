@@ -1,9 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import OpenPacks from '@/components/open-packs/OpenPacks.astro';
-
-const allPacks = await getAllPacks();
 ---
 
 <Page title="Open Packs" breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Open Packs' }]} wide>
