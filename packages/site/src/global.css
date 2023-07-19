@@ -6,6 +6,11 @@
 
 [x-cloak] { display: none !important; }
 
+body.disable-animations * {
+	transition: none !important;
+	animation: none !important;
+}
+
 @layer reset {
 	/*
 	  1. Use a more-intuitive box-sizing model.
@@ -371,14 +376,14 @@
 		/*margin: 0.5rem 0;*/
 	/*}*/
 
-	.sub-heading {
-		font-size: 1.5rem;
-		line-height: 1.3rem;
-		font-family: var(--font-heading);
-		font-weight: 500;
-		text-transform: uppercase;
-		margin: 0.5rem 0;
-	}
+	/*.sub-heading {*/
+		/*font-size: 1.5rem;*/
+		/*line-height: 1.3rem;*/
+		/*font-family: var(--font-heading);*/
+		/*font-weight: 500;*/
+		/*text-transform: uppercase;*/
+		/*margin: 0.5rem 0;*/
+	/*}*/
 
 	.button-link {
 		text-shadow: var(--brand-shadow);

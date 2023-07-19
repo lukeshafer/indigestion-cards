@@ -1,9 +1,7 @@
 ---
-import { Icon } from 'astro-icon';
-
 import AdminOnly from '@/components/AdminOnly.astro';
 import Hamburger from '@/components/Hamburger.astro';
-import UserConfig from '@/components/UserConfig';
+import UserConfig from '@/components/UserConfig.astro';
 import UserSearch from '@/components/UserSearch.astro';
 ---
 
@@ -24,12 +22,7 @@ import UserSearch from '@/components/UserSearch.astro';
 			</div>
 		</a>
 		<UserSearch />
-		<UserConfig client:load>
-			<Icon
-				name="bi:gear"
-				class="w-8 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
-			/>
-		</UserConfig>
+		<UserConfig />
 	</header>
 </div>
 

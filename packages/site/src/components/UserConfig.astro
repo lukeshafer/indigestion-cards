@@ -1,0 +1,31 @@
+---
+import { Icon } from 'astro-icon';
+const javascript = String.raw;
+---
+
+<div
+	class="relative z-10"
+	x-data="{ open: false, disableAnimations: localStorage.getItem('disableAnimations') === 'true' }"
+	x-effect={javascript`
+		document.body.classList.toggle('disable-animations', disableAnimations); 
+		localStorage.setItem('disableAnimations', disableAnimations);
+	`}>
+	<button class="group flex h-full items-center justify-center" @click="open = !open">
+		<Icon
+			name="bi:gear"
+			class="w-8 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
+		/>
+	</button>
+	<template x-if="open">
+		<menu class="bg-brand-main absolute right-0 mt-4 w-max">
+			<h2 class="font-heading py-2 text-center text-xl font-bold uppercase">Preferences</h2>
+			<button
+				class="post-button flex gap-4 after:flex after:h-6 after:w-6 after:items-center after:justify-center after:border after:border-white"
+				:class={`{ 'after:content-["✔"]': disableAnimations, 'after:content-[""]': !disableAnimations }`}
+				:aria-pressed="disableAnimations"
+				@click="disableAnimations = !disableAnimations">
+				Disable Animations
+			</button>
+		</menu>
+	</template>
+</div>
