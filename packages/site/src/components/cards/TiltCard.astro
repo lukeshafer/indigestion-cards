@@ -1,0 +1,21 @@
+<div
+	class="outer"
+	x-data="tiltCard"
+	@mouseenter="start"
+	@touchstart="start"
+	@mouseleave="end"
+	@touchend="end"
+	@mousemove="move($event, $el)"
+	@touchmove="move($event, $el)">
+	<div
+		class="inner shiny"
+		:style={'`\
+		--shine-position: ${shinePosition};\
+		--shine-opacity: ${shineOpacity};\
+		--shine-after-opacity: ${shineAfterOpacity};\
+		transform: ${transform};\
+		transition: ${transition};\
+	`'}>
+		<slot />
+	</div>
+</div>

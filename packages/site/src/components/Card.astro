@@ -1,5 +1,5 @@
 ---
-import TiltCardEffect from './cards/TiltCardEffect';
+import TiltCard from '@/components/cards/TiltCard.astro';
 
 export type CardProps = Props;
 interface Props {
@@ -28,7 +28,7 @@ const {
 } = Astro.props;
 ---
 
-<TiltCardEffect client:load shiny={true}>
+<TiltCard shiny={true}>
 	<article
 		class="card-wrapper card-aspect-ratio relative w-72 bg-cover text-left"
 		style={{ 'background-image': `url(${frameUrl})`, scale }}>
@@ -65,4 +65,4 @@ const {
 			{cardNumber} / {totalOfType}
 		</p>
 	</article>
-</TiltCardEffect>
+</TiltCard>

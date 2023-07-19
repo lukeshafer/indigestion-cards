@@ -16,16 +16,19 @@ const javascript = String.raw;
 			class="w-8 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
 		/>
 	</button>
-	<template x-if="open">
-		<menu class="bg-brand-main absolute right-0 mt-4 w-max">
-			<h2 class="font-heading py-2 text-center text-xl font-bold uppercase">Preferences</h2>
-			<button
-				class="post-button flex gap-4 after:flex after:h-6 after:w-6 after:items-center after:justify-center after:border after:border-white"
-				:class={`{ 'after:content-["✔"]': disableAnimations, 'after:content-[""]': !disableAnimations }`}
-				:aria-pressed="disableAnimations"
-				@click="disableAnimations = !disableAnimations">
-				Disable Animations
-			</button>
-		</menu>
-	</template>
+
+	<menu
+		x-show="open"
+		x-cloak
+		class="bg-brand-main absolute right-0 mt-4 w-max"
+		@click.outside="open = false">
+		<h2 class="font-heading py-2 text-center text-xl font-bold uppercase">Preferences</h2>
+		<button
+			class="post-button flex gap-4 after:flex after:h-6 after:w-6 after:items-center after:justify-center after:border after:border-white"
+			:class={`{ 'after:content-["✔"]': disableAnimations, 'after:content-[""]': !disableAnimations }`}
+			:aria-pressed="disableAnimations"
+			@click="disableAnimations = !disableAnimations">
+			Disable Animations
+		</button>
+	</menu>
 </div>

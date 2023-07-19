@@ -36,16 +36,17 @@ const session = Astro.locals.session;
 		}
 	</body>
 	<script>
-		// @ts-nocheck
 		import htmx from 'htmx.org';
 		window.htmx = htmx;
 		import('htmx.org/dist/ext/head-support');
 		import('htmx.org/dist/ext/preload');
 
 		import Alpine from 'alpinejs';
+		import tiltCard from '@/components/cards/TiltCard'
 
-		// @ts-ignore
+		Alpine.data('tiltCard', tiltCard);
 		window.Alpine = Alpine;
+
 		Alpine.start();
 
 		function deleteParam(paramName) {
