@@ -15,7 +15,7 @@ const packs = allPacks
 	.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 ---
 
-<div class="grid grid-cols-[auto_1fr] grid-rows-[80vh] gap-x-8" x-data={JSON.stringify({ activePackId: packId })}>
+<div class="grid grid-cols-[auto_1fr] grid-rows-[80vh] gap-x-8 mt-52" x-data={JSON.stringify({ activePackId: packId })}>
 	<section class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6" id="pack-list">
 		<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">Coming up...</h2>
 		<ul class="packs flex w-full flex-col gap-2 pb-2">
