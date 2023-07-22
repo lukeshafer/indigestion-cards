@@ -1,34 +1,34 @@
 {
-	"name": "lil-indigestion-cards",
-	"version": "0.0.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "sst dev",
-		"build": "sst build",
-		"deploy": "sst deploy",
-		"remove": "sst remove",
-		"console": "sst console",
-		"typecheck": "tsc --noEmit",
-		"core:check": "pnpm --filter core run typecheck",
-		"functions:check": "pnpm --filter functions run typecheck",
-		"site:check": "pnpm --filter admin-site run typecheck",
-		"admin:add": "pnpm --filter admin-site run astro add",
-		"admin:dev": "pnpm --filter admin-site run dev",
-		"admin:dev:host": "pnpm --filter admin-site run dev:host",
-		"admin:build": "pnpm --filter admin-site run build",
-		"admin:astro": "pnpm --filter admin-site run astro"
-	},
-	"devDependencies": {
-		"sst": "2.13.2",
-		"aws-cdk-lib": "2.79.1",
-		"constructs": "10.1.156",
-		"typescript": "^5.0.3",
-		"@tsconfig/node16": "^1.0.3",
-		"prettier-plugin-astro": "^0.8.1",
-		"prettier-plugin-tailwindcss": "^0.2.8"
-	},
-	"workspaces": [
-		"packages/*"
-	]
+  "name": "lil-indigestion-cards",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit",
+    "core:check": "pnpm --filter core run typecheck",
+    "functions:check": "pnpm --filter functions run typecheck",
+    "site:check": "pnpm --filter admin-site run typecheck",
+    "admin:add": "pnpm --filter admin-site run astro add",
+    "admin:dev": "pnpm --filter admin-site run dev",
+    "admin:dev:host": "pnpm --filter admin-site run dev:host",
+    "admin:build": "pnpm --filter admin-site run build",
+    "admin:astro": "pnpm --filter admin-site run astro"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "aws-cdk-lib": "2.84.0",
+    "constructs": "10.1.156",
+    "prettier-plugin-astro": "^0.11.0",
+    "prettier-plugin-tailwindcss": "^0.4.1",
+    "sst": "2.22.3",
+    "typescript": "^5.0.3"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

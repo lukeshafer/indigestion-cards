@@ -3,8 +3,12 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"],
-			"@lil-indigestion-cards/core/*": ["../core/src/*"]
+			"@/*": [
+				"src/*"
+			],
+			"@lil-indigestion-cards/core/*": [
+				"../core/src/*"
+			]
 		},
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js"
