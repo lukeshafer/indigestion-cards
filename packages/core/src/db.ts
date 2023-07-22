@@ -43,7 +43,7 @@ export const auditAttributes = (entityName: string) =>
 			},
 			readOnly: true,
 		},
-	} satisfies Record<string, Attribute>);
+	}) satisfies Record<string, Attribute>;
 
 const cardDesigns = new Entity(
 	{
@@ -353,13 +353,13 @@ const users = new Entity(
 
 					// Admins can't be updated right now because username is part of a primary key
 					//admins.query
-						//.allAdmins({ username: value })
-						//.go()
-						//.then((res) => {
-							//res.data.forEach((admin) =>
-								//admins.update(admin).set({ username: value }).go()
-							//);
-						//});
+					//.allAdmins({ username: value })
+					//.go()
+					//.then((res) => {
+					//res.data.forEach((admin) =>
+					//admins.update(admin).set({ username: value }).go()
+					//);
+					//});
 
 					cardInstances.query
 						.byOwnerId({ username: value })
@@ -905,6 +905,25 @@ const siteConfig = new Entity(
 					},
 				},
 			},
+			messages: {
+				type: 'list',
+				required: true,
+				items: {
+					type: 'map',
+					properties: {
+						message: {
+							type: 'string',
+							required: true,
+						},
+						type: {
+							type: ['error', 'success', 'info', 'warning'] as const,
+							required: true,
+							default: 'info',
+						},
+					},
+				},
+			},
+			...auditAttributes('siteConfig'),
 		},
 		indexes: {
 			primary: {

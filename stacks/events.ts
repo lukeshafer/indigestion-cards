@@ -35,7 +35,6 @@ export function Events({ stack }: StackContext) {
 		rules: {
 			'refresh-channel-point-rewards': {
 				pattern: {
-					source: ['twitch'],
 					detailType: ['refresh-channel-point-rewards'],
 				},
 				targets: {

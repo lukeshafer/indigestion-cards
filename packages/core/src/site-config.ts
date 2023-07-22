@@ -1,5 +1,5 @@
 import { db, twitchEventTypes } from './db';
-import type { CreateEntityItem, UpdateEntityItem } from 'electrodb';
+import type { CreateEntityItem, EntityItem, UpdateEntityItem } from 'electrodb';
 import { ChannelPointReward } from './twitch-helpers';
 
 type TwitchEvent = typeof db.entities.twitchEvents;
@@ -121,4 +121,19 @@ export async function updateSiteConfig(config: CreateEntityItem<SiteConfig>) {
 export async function getSiteConfig() {
 	const result = await db.entities.siteConfig.query.primary({}).go();
 	return result.data[0];
+}
+
+export async function addMessageToSiteConfig(args: EntityItem<SiteConfig>['messages'][number]) {
+	const siteConfig = await getSiteConfig();
+	const existingMessages = siteConfig.messages ?? [];
+	if (existingMessages.some((message) => message.message === args.message)) return;
+	const newMessages = [...existingMessages, args];
+	await updateSiteConfig({ ...siteConfig, messages: newMessages });
+}
+
+export async function removeMessageFromSiteConfig(args: { message: string }) {
+	const siteConfig = await getSiteConfig();
+	const existingMessages = siteConfig.messages ?? [];
+	const newMessages = existingMessages.filter(({ message }) => message !== args.message);
+	await updateSiteConfig({ ...siteConfig, messages: newMessages });
 }

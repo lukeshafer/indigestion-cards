@@ -6,6 +6,7 @@ import AdminPanel from '@/components/AdminPanel.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import Alert from '@/components/Alert.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -13,11 +14,17 @@ export interface Props extends BaseProps {
 	wide?: boolean;
 }
 
-const alert = Astro.url.searchParams.get('alert');
-const alertType =
-	Astro.url.searchParams.get('alertType') ||
-	Astro.url.searchParams.get('alerttype') ||
-	Astro.url.searchParams.get('type');
+const isAdmin = Astro.locals.session?.type === 'admin';
+const alerts = isAdmin ? (await getSiteConfig()).messages ?? [] : [];
+
+{
+	const alert = Astro.url.searchParams.get('alert');
+	const alertType =
+		Astro.url.searchParams.get('alertType') ||
+		Astro.url.searchParams.get('alerttype') ||
+		Astro.url.searchParams.get('type');
+	if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
+}
 
 let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
@@ -36,7 +43,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 			<Header />
 			<div class="sticky top-0" id="alert-wrapper">
 				<div id="alert" class="sticky top-0"></div>
-				{alert ? <Alert type={alertType ?? 'error'}>{alert}</Alert> : null}
+				{alerts.map((alert) => <Alert type={alert.type}>{alert.message}</Alert>)}
 			</div>
 			<div class="max-w-main mx-auto w-full">
 				<Breadcrumbs path={breadcrumbs ?? []} />

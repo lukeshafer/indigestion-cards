@@ -424,6 +424,11 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 		}).toString(),
 	});
 
+	if (!response.ok) {
+		console.error(response);
+		throw new Error('Failed to refresh user access token');
+	}
+
 	const rawBody = await response.json();
 	console.log('Twitch response to refresh request: ', rawBody);
 	const bodySchema = z.object({
