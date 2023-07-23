@@ -53,7 +53,8 @@ export function verifyDiscordRequest(request: TwitchRequest) {
 		if (messageSignature && verifyMessage(hmac, messageSignature)) {
 			return true;
 		}
-	} catch {
+	} catch (e) {
+		console.error(e);
 		return false;
 	}
 	return false;

@@ -1,11 +1,13 @@
 import { type StackContext, use } from 'sst/constructs';
 import { Auth as SSTAuth } from 'sst/constructs/future';
+import { Events } from './events';
 import { ConfigStack } from './config';
 import { Database } from './database';
 
 export function Auth({ stack }: StackContext) {
 	const config = use(ConfigStack);
 	const db = use(Database);
+	const events = use(Events);
 
 	const siteAuth = new SSTAuth(stack, 'AdminSiteAuth', {
 		authenticator: {
@@ -18,6 +20,7 @@ export function Auth({ stack }: StackContext) {
 				config.STREAMER_ACCESS_TOKEN_ARN,
 				config.STREAMER_REFRESH_TOKEN_ARN,
 				config.DOMAIN_NAME,
+				events,
 			],
 			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 		},

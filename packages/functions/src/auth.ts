@@ -1,5 +1,7 @@
 import { Config } from 'sst/node/config';
 import { Issuer } from 'openid-client';
+import { EventBus } from 'sst/node/event-bus';
+import { EventBridge } from 'aws-sdk';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import { getAdminUserById } from '@lil-indigestion-cards/core/user';
 import { putUserTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
@@ -73,7 +75,7 @@ export const handler = AuthHandler({
 					properties: {
 						type: 'public',
 						properties: {},
-					}
+					},
 				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
@@ -82,6 +84,20 @@ export const handler = AuthHandler({
 					refresh_token: input.tokenset.refresh_token,
 				});
 			}
+
+			const eventBridge = new EventBridge();
+			await eventBridge
+				.putEvents({
+					Entries: [
+						{
+							Source: 'auth',
+							DetailType: 'refresh-channel-point-rewards',
+							Detail: JSON.stringify({}),
+							EventBusName: EventBus.eventBus.eventBusName,
+						},
+					],
+				})
+				.promise();
 
 			return {
 				type: 'session',

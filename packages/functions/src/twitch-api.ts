@@ -16,9 +16,13 @@ import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
-	if (!verifyDiscordRequest(event) || !event.body) {
+	if (!verifyDiscordRequest(event)) {
 		console.error('Message not verified');
 		return { statusCode: 403 };
+	}
+	if (!event.body) {
+		console.error('No event body.');
+		return { statusCode: 400 };
 	}
 	console.log('Message received from Twitch. Determining type...');
 

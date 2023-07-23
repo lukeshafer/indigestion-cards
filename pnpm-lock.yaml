@@ -58,8 +58,8 @@ importers:
   packages/functions:
     dependencies:
       openid-client:
-        specifier: ^5.4.0
-        version: 5.4.0
+        specifier: ^5.4.3
+        version: 5.4.3
       parse-multipart-data:
         specifier: ^1.5.0
         version: 1.5.0
@@ -7167,15 +7167,6 @@ packages:
       define-lazy-prop: 3.0.0
       is-inside-container: 1.0.0
       is-wsl: 2.2.0
-    dev: false
-
-  /openid-client@5.4.0:
-    resolution: {integrity: sha512-hgJa2aQKcM2hn3eyVtN12tEA45ECjTJPXCgUh5YzTzy9qwapCvmDTVPWOcWVL0d34zeQoQ/hbG9lJhl3AYxJlQ==}
-    dependencies:
-      jose: 4.14.4
-      lru-cache: 6.0.0
-      object-hash: 2.2.0
-      oidc-token-hash: 5.0.3
     dev: false
 
   /openid-client@5.4.3:
