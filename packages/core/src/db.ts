@@ -599,6 +599,10 @@ const rarities = new Entity(
 				type: 'number',
 				required: true,
 			},
+			rarityColor: {
+				type: 'string',
+				required: true,
+			},
 			...auditAttributes('rarity'),
 		},
 		indexes: {

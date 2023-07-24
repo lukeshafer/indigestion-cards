@@ -15,16 +15,20 @@ const defaultCount = parseInt(params.get('defaultCount') || '0') || 0;
 const imgUrl = params.get('imgUrl');
 const imageKey = params.get('imageKey');
 const bucket = params.get('bucket');
+const rarityColor = params.get('rarityColor');
 
 let errorMessage = '';
 if (!imgUrl) errorMessage += 'Missing imgUrl. ';
 if (!imageKey) errorMessage += 'Missing imageKey. ';
 if (!rarityName) errorMessage += 'Missing rarityName. ';
 if (!rarityId) errorMessage += 'Missing rarityId. ';
+else if (!rarityId?.match(/^[a-z0-9-]+$/))
+	errorMessage += 'Invalid seasonId. (Must be lowercase, numbers, and dashes only) ';
 if (defaultCount < 1) errorMessage += 'Default count must be greater than 0. ';
 if (!bucket) errorMessage += 'Missing bucket. ';
-if (!rarityId!.match(/^[a-z0-9-]+$/))
-	errorMessage += 'Invalid seasonId. (Must be lowercase, numbers, and dashes only) ';
+if (!rarityColor) errorMessage += 'Missing rarityColor. ';
+else if (!rarityColor?.match(/^#[0-9a-f]{6}$/i))
+	errorMessage += 'Invalid rarityColor. (Must be a hex color) ';
 
 if (errorMessage.length === 0) {
 	const deleteUnmatchedImagePromise = deleteUnmatchedDesignImage({
@@ -36,6 +40,7 @@ if (errorMessage.length === 0) {
 		rarityName: rarityName!,
 		frameUrl: imgUrl!,
 		defaultCount,
+		rarityColor: rarityColor!,
 	});
 
 	const [result] = await Promise.all([createPromise, deleteUnmatchedImagePromise]);
