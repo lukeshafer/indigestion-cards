@@ -18,9 +18,9 @@ export const api = {
 	},
 	RARITY: {
 		START_EDIT: '/api/html/rarity/start-edit',
-		UPDATE: '/api/html/rarity/update-rarity',
-		CREATE: '/api/html/rarity/create-rarity',
-		DELETE: '/api/html/rarity/delete-rarity',
+		UPDATE: '/api/admin/rarity',
+		CREATE: '/api/admin/rarity',
+		DELETE: '/api/admin/rarity',
 	},
 	PACK_TYPE: {
 		GET_ALL: '/api/html/pack-type/get-all-pack-types',
@@ -42,9 +42,9 @@ export const api = {
 	},
 	SEASON: {
 		START_EDIT: '/api/html/season/start-edit',
-		UPDATE: '/api/html/season/update-season',
-		CREATE: '/api/html/season/create-season',
-		DELETE: '/api/html/season/delete-season',
+		UPDATE: '/api/admin/season',
+		CREATE: '/api/admin/season',
+		DELETE: '/api/admin/season',
 	},
 	DESIGN: {
 		START_EDIT: '/api/html/design/start-edit',

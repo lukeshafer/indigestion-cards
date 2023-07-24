@@ -14,5 +14,5 @@ export default function Redirect({ Astro, to, alert, type }: Props) {
 	if (alert) url.searchParams.set('alert', alert);
 	if (type) url.searchParams.set('type', type);
 
-	Astro.response.headers.set('HX-Redirect', url.toString());
+	return Astro.redirect(url.toString());
 }

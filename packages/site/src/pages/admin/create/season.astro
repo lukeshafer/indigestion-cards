@@ -1,7 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { api, routeNames, routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
+import SeasonForm from '@/components/seasons/SeasonForm';
 ---
 
 <Page
@@ -9,31 +10,7 @@ import PageHeading from '@/components/text/PageHeading.astro';
 	breadcrumbs={[{ label: routeNames.SEASONS, href: routes.SEASONS }, { label: 'New Season' }]}>
 	<PageHeading>Create New Season</PageHeading>
 
-	<my-form>
-		<form action={`${api.SEASON.CREATE}`} hx-swap="none" method="post">
-			<div class="input-group">
-				<label for="seasonName">Season Name</label>
-				<input id="seasonName" name="seasonName" type="text" />
-			</div>
-			<div class="input-group">
-				<label for="seasonId">Season ID</label>
-				<input
-					id="seasonId"
-					name="seasonId"
-					type="text"
-					data-id-from="seasonName"
-					data-edit-button
-					readonly
-					pattern="[a-z0-9-]+"
-				/>
-			</div>
-			<div class="input-group">
-				<label for="seasonDescription">Description</label>
-				<input type="text" id="seasonDescription" name="seasonDescription" />
-			</div>
-			<button type="submit">Create</button>
-		</form>
-	</my-form>
+	<SeasonForm client:load />
 </Page>
 
 <script></script>

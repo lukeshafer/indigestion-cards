@@ -2,6 +2,7 @@
 import '../global.css';
 import '@fontsource/montserrat/variable.css';
 import 'open-props/colors';
+import { ViewTransitions } from 'astro:transitions';
 
 interface Props {
 	title: string;
@@ -25,8 +26,9 @@ const session = Astro.locals.session;
 		<script src="../elements/my-form.ts"></script>
 		<script src="../elements/form-indicator.ts"></script>
 		<title>{title}</title>
+		<ViewTransitions fallback="none" />
 	</head>
-	<body hx-ext="head-support, preload" hx-boost="true">
+	<body hx-ext="head-support, preload" hx-boost="false">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
@@ -34,28 +36,28 @@ const session = Astro.locals.session;
 				<script> window.location.href = '/' </script>
 			)
 		}
+		<script>
+			import htmx from 'htmx.org';
+			window.htmx = htmx;
+			import('htmx.org/dist/ext/head-support');
+			import('htmx.org/dist/ext/preload');
+
+			import Alpine from 'alpinejs';
+			import tiltCard from '@/components/cards/TiltCard';
+			import refreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
+
+			Alpine.data('tiltCard', tiltCard);
+			Alpine.data('refreshTwitchEventsButton', refreshTwitchEventsButton);
+			window.Alpine = Alpine;
+
+			Alpine.start();
+
+			function deleteParam(paramName) {
+				const url = new URL(window.location.href);
+				url.searchParams.delete(paramName);
+				window.history.replaceState({}, '', url);
+			}
+			window.deleteParam = deleteParam;
+		</script>
 	</body>
-	<script>
-		import htmx from 'htmx.org';
-		window.htmx = htmx;
-		import('htmx.org/dist/ext/head-support');
-		import('htmx.org/dist/ext/preload');
-
-		import Alpine from 'alpinejs';
-		import tiltCard from '@/components/cards/TiltCard';
-		import refreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
-
-		Alpine.data('tiltCard', tiltCard);
-		Alpine.data('refreshTwitchEventsButton', refreshTwitchEventsButton);
-		window.Alpine = Alpine;
-
-		Alpine.start();
-
-		function deleteParam(paramName) {
-			const url = new URL(window.location.href);
-			url.searchParams.delete(paramName);
-			window.history.replaceState({}, '', url);
-		}
-		window.deleteParam = deleteParam;
-	</script>
 </html>

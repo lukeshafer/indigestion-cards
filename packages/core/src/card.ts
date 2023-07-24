@@ -25,6 +25,7 @@ type PackType = typeof db.entities.packTypes;
 export type CardInstanceEntity = EntityItem<Card>;
 export type CardDesignEntity = EntityItem<CardDesign>;
 export type RarityEntity = EntityItem<Rarity>;
+export type SeasonEntity = EntityItem<Season>;
 
 export async function generateCard(info: {
 	userId?: string;

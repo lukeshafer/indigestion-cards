@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { api, routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
+import RarityForm from '@/components/rarities/RarityForm';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -33,6 +34,7 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 			>
 		</div>
 
+		<RarityForm client:load {imgUrl} {key} {bucket} />
 		<my-form>
 			<form action={api.RARITY.CREATE} method="post" hx-swap="none">
 				<input type="hidden" name="imgUrl" value={imgUrl} />

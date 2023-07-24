@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
-
+import DeleteRarityButton from '@/components/rarities/DeleteRarityButton';
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
 import { api, routes, routeNames } from '@/constants';
 import SortTable from '@/components/table/SortTable.astro';
@@ -26,7 +26,7 @@ const rarities = await getAllRarities();
 			<SortTableHeading>Name</SortTableHeading>
 			<SortTableHeading showOnBreakpoint="lg">Id</SortTableHeading>
 			<SortTableHeading type="number" showOnBreakpoint="sm">Default Count</SortTableHeading>
-			<SortTableHeading sort={false}>Actions</SortTableHeading>
+			<SortTableHeading sort={false} />
 		</SortTableHead>
 		{
 			rarities.map((rarity) => (
@@ -42,32 +42,11 @@ const rarities = await getAllRarities();
 					</SortTableCell>
 					<SortTableCell>
 						<div class="flex flex-wrap justify-center gap-2 text-sm">
-							<button
-								class="post-button edit-button w-24"
-								data-type="submit"
-								hx-select=".save-button"
-								hx-swap="outerHTML"
-								hx-vals={JSON.stringify({
-									rarityName: rarity.rarityName,
-									rarityId: rarity.rarityId,
-									defaultCount: rarity.defaultCount,
-								})}
-								hx-get={api.RARITY.START_EDIT}>
-								Edit
-							</button>
-							<button
-								class="post-button edit-button w-24"
-								data-type="delete"
-								hx-swap="none"
-								hx-vals={JSON.stringify({
-									rarityId: rarity.rarityId,
-									frameUrl: rarity.frameUrl,
-								})}
-								hx-confirm="Are you sure you want to delete this rarity?"
-								hx-delete={api.RARITY.DELETE}>
-								Delete
-								<form-indicator>Deleting</form-indicator>
-							</button>
+							<DeleteRarityButton
+								client:load
+								rarityId={rarity.rarityId}
+								frameUrl={rarity.frameUrl}
+							/>
 						</div>
 					</SortTableCell>
 				</SortTableRow>
