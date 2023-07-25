@@ -14,7 +14,7 @@ export const api = {
 	OPEN_CARD: '/api/html/open-card',
 	SAVE_CONFIG: '/api/html/save-config',
 	IMAGE: {
-		DELETE: '/api/html/image/delete-unmatched-image',
+		DELETE: '/api/admin/image',
 	},
 	RARITY: {
 		START_EDIT: '/api/html/rarity/start-edit',
@@ -23,9 +23,8 @@ export const api = {
 		DELETE: '/api/admin/rarity',
 	},
 	PACK_TYPE: {
-		GET_ALL: '/api/html/pack-type/get-all-pack-types',
-		CREATE: '/api/html/pack-type/create-pack-type',
-		DELETE: '/api/html/pack-type/delete',
+		CREATE: '/api/admin/pack-type',
+		DELETE: '/api/admin/pack-type',
 	},
 	PACK: {
 		CREATE: '/api/html/pack/create-pack',

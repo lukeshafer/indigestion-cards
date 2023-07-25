@@ -1,18 +1,18 @@
 import type { APIRoute } from 'astro';
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN, routes } from '@/constants';
 import { Api } from 'sst/node/api';
 import {
 	createRarity,
 	deleteUnmatchedDesignImage,
 	deleteRarityById,
 } from '@lil-indigestion-cards/core/card';
-import { routes } from '@/constants';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
 
 	const rarityId = params.get('rarityId');
 	const rarityName = params.get('rarityName');
+	const rarityColor = params.get('rarityColor');
 	const defaultCount = parseInt(params.get('defaultCount') || '0') || 0;
 	const imgUrl = params.get('imgUrl');
 	const imageKey = params.get('imageKey');
@@ -20,10 +20,13 @@ export const post: APIRoute = async (ctx) => {
 
 	const errors = [];
 	if (!rarityId) errors.push('Missing rarityId');
-	if (!rarityName) errors.push('Missing rarityName');
-	if (rarityId && !rarityId!.match(/^[a-z0-9-]+$/))
+	else if (!rarityId.match(/^[a-z0-9-]+$/))
 		errors.push('Invalid rarityId. (Must be lowercase, numbers, and dashes only)');
+	if (!rarityName) errors.push('Missing rarityName');
 	if (!imgUrl) errors.push('Missing imgUrl');
+	if (!rarityColor) errors.push('Missing rarityColor');
+	else if (!rarityColor.match(/^#[a-f0-9]{6}$/i))
+		errors.push('Invalid rarityColor. (Must be a hex color code)');
 	if (!imageKey) errors.push('Missing imageKey');
 	if (!bucket) errors.push('Missing bucket');
 	if (defaultCount < 1) errors.push('Default count must be greater than 0');
@@ -34,6 +37,7 @@ export const post: APIRoute = async (ctx) => {
 	const createPromise = createRarity({
 		rarityId: rarityId!,
 		rarityName: rarityName!,
+		rarityColor: rarityColor!,
 		defaultCount,
 		frameUrl: imgUrl!,
 	});
@@ -66,8 +70,7 @@ export const del: APIRoute = async (ctx) => {
 			authorization: `Bearer ${ctx.cookies.get(AUTH_TOKEN).value ?? ''}`,
 		},
 	});
-	if (!deleteFrameResult.ok)
-		return new Response('Failed to delete frame', { status: 500 });
+	if (!deleteFrameResult.ok) return new Response('Failed to delete frame', { status: 500 });
 
 	const result = await deleteRarityById(rarityId);
 

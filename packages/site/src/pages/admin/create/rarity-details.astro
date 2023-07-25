@@ -1,8 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { api, routeNames, routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import RarityForm from '@/components/rarities/RarityForm';
+import DeleteImageButton from '@/components/image/DeleteImageButton';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -25,63 +26,8 @@ const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 	<div class="flex max-w-4xl flex-col gap-8 pt-8">
 		<div>
 			<img src={imgUrl} class="mb-4 h-auto w-60 object-contain" id="rarity-frame-preview" />
-			<button
-				class="post-button z-10"
-				hx-delete={api.IMAGE.DELETE}
-				hx-swap="none"
-				hx-vals={JSON.stringify({ key, type: 'frame' })}
-				data-type="delete">Delete Draft<form-indicator></form-indicator></button
-			>
+			<DeleteImageButton {key} type="frame" client:load />
 		</div>
-
 		<RarityForm client:load {imgUrl} {key} {bucket} />
-		<my-form>
-			<form action={api.RARITY.CREATE} method="post" hx-swap="none">
-				<input type="hidden" name="imgUrl" value={imgUrl} />
-				<input type="hidden" name="imageKey" value={key} />
-				<input type="hidden" name="bucket" value={bucket} />
-				<div class="input-group">
-					<label for="rarityName">Rarity Name</label>
-					<input id="rarityName" name="rarityName" type="text" />
-				</div>
-				<div class="input-group">
-					<label for="rarityId">Rarity ID</label>
-					<input
-						id="rarityId"
-						name="rarityId"
-						type="text"
-						readonly
-						data-edit-button
-						data-id-from="rarityName"
-						pattern="[a-z0-9-]+"
-					/>
-				</div>
-				<div class="input-group">
-					<label for="rarityColor">Rarity Color (HEX code)</label>
-					<input
-						id="rarityColor"
-						name="rarityColor"
-						type="text"
-						placeholder="#EF6EDA"
-						pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
-					/>
-					<script is:inline>
-						const input = document.getElementById('rarityColor');
-						const preview = document.getElementById('rarity-frame-preview');
-						input.addEventListener('input', (e) => {
-							// set background color on preview to the input value if it's a valid hex code
-							if (e.target.validity.valid) {
-								preview.style.backgroundColor = e.target.value;
-							}
-						});
-					</script>
-				</div>
-				<div class="input-group">
-					<label for="defaultCount">Default number per card</label>
-					<input id="defaultCount" name="defaultCount" type="number" value="0" />
-				</div>
-				<button type="submit">Save</button>
-			</form>
-		</my-form>
 	</div>
 </Page>

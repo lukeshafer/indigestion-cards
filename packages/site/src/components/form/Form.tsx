@@ -60,7 +60,7 @@ export function Form(props: {
 // TODO: form-indicator
 
 const BASE_INPUT_CLASS =
-	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline-2 outline-gray-300 focus:outline-none focus:ring-2';
+	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-none focus:ring-4';
 
 function InputGroup(props: ParentProps) {
 	return <div class="flex w-full flex-col items-start">{props.children}</div>;
@@ -167,7 +167,7 @@ export function Select(props: {
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' bg-white'}
 				required={props.required}
-				value={props.value ?? ''}
+				value={props.value ?? props.options[0]?.value}
 				onInput={(e) => props.setValue?.(e.target.value ?? '')}>
 				<For each={props.options}>
 					{(option) => (
@@ -189,23 +189,24 @@ export function Checkbox(props: {
 	setValue?: (value: boolean) => void;
 }) {
 	return (
-		<InputGroup>
+		<div class="flex gap-2">
 			<input
 				id={props.name}
 				name={props.name}
 				type="checkbox"
-				class={BASE_INPUT_CLASS + ' inline-block w-auto'}
+				class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
+				rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 				required={props.required}
 				checked={props.value ?? false}
 				onInput={(e) => props.setValue?.(e.target.checked)}
 			/>
 			<label
 				for={props.name}
-				class="inline-block font-normal"
+				class="inline-block flex-1 font-normal"
 				classList={{ required: props.required }}>
 				{props.label}
 			</label>
-		</InputGroup>
+		</div>
 	);
 }
 

@@ -12,6 +12,12 @@ export default function RarityForm(props: { imgUrl: string; key: string; bucket:
 			<input type="hidden" name="bucket" value={props.bucket} />
 			<TextInput label="Rarity Name" name="rarityName" required setValue={setRarityName} />
 			<IdInput label="Rarity ID" name="rarityId" required from={rarityName()} />
+			<TextInput
+				label="Rarity Color (HEX code)"
+				name="rarityColor"
+				required
+				placeholder="#EF6EDA"
+			/>
 			<NumberInput label="Default Number per Card" name="defaultCount" required value={0} />
 			<SubmitButton>Save</SubmitButton>
 		</Form>

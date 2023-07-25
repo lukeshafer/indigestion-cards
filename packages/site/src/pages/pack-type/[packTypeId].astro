@@ -6,6 +6,7 @@ import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import SortTableRow from '@/components/table/SortTableRow.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
+import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
 import { api, routeNames } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
@@ -30,17 +31,7 @@ const cardPool = await getCardPoolFromType(packType);
 		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
 	]}>
 	<PageHeading>{packType.packTypeName}</PageHeading>
-	<button
-		class="post-button shine"
-		data-type="delete"
-		hx-delete={api.PACK_TYPE.DELETE}
-		hx-swap="false"
-		hx-vals={JSON.stringify({
-			packTypeId: packType.packTypeId,
-		})}>
-		Delete Pack Type
-		<div class="htmx-indicator">Deleting</div>
-	</button>
+	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
 	<section aria-label="Card Pool" class="mt-4 flex flex-col gap-4">
 		<SubHeading>Card Pool</SubHeading>
 		<SortTable>

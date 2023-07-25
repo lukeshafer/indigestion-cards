@@ -7,12 +7,15 @@ import {
 	SubmitButton,
 	Select,
 	Fieldset,
+	Checkbox,
 } from '@/components/form/Form';
 import { createSignal, For, Match, Switch } from 'solid-js';
 import type { CardDesignEntity, SeasonEntity } from '@lil-indigestion-cards/core/card';
-import { createStore } from 'solid-js/store';
 
-export default function SeasonForm(props: { seasons: SeasonEntity[] }) {
+export default function PackTypeForm(props: {
+	seasons: SeasonEntity[];
+	cardDesigns: CardDesignEntity[];
+}) {
 	const [packTypeName, setPackTypeName] = createSignal('');
 	const [category, setCategory] = createSignal('season');
 
@@ -52,21 +55,51 @@ export default function SeasonForm(props: { seasons: SeasonEntity[] }) {
 						}))}
 					/>
 				</Match>
-				<Match when={category() === 'custom'}></Match>
+				<Match when={category() === 'custom'}>
+					<CustomCardPool cards={props.cardDesigns} />
+				</Match>
 			</Switch>
+			<SubmitButton>Save</SubmitButton>
 		</Form>
 	);
 }
 
-function CustomCardPool(props: {
-	cards: CardDesignEntity[]
-}) {
-	const [cardsSelected, setCardsSelected] = createStore<string[]>([]);
+function CustomCardPool(props: { cards: CardDesignEntity[] }) {
+	interface DesignDetails {
+		designId: string;
+		cardName: string;
+		imgUrl: string;
+	}
+	const [cardsSelected, setCardsSelected] = createSignal<Map<string, DesignDetails>>(new Map());
+	const designDetails = (): DesignDetails[] => [...cardsSelected().values()];
 
-	return <Fieldset legend="Cards">
-		<input name="cardDesigns" type="hidden" value={JSON.stringify(cardsSelected)} />
-		<For each={props.cards}>
-
-		</For>
-	</Fieldset>;
+	return (
+		<Fieldset legend="Cards">
+			<input name="cardDesigns" type="hidden" value={JSON.stringify(designDetails)} />
+			<For each={props.cards}>
+				{(card) => (
+					<Checkbox
+						name={card.designId}
+						label={card.cardName}
+						setValue={(value) => {
+							if (value) {
+								setCardsSelected((selected) =>
+									selected.set(card.designId, {
+										designId: card.designId,
+										cardName: card.cardName,
+										imgUrl: card.imgUrl,
+									})
+								);
+							} else {
+								setCardsSelected((selected) => {
+									selected.delete(card.designId);
+									return selected;
+								});
+							}
+						}}
+					/>
+				)}
+			</For>
+		</Fieldset>
+	);
 }
