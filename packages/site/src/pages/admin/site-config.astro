@@ -73,8 +73,13 @@ const giftSubPackType =
 			<SubHeading>Base Rarity for Design Previews</SubHeading>
 			<select class="my-form-input max-w-xs" name="base-rarity">
 				{
-					rarities.map(({ rarityId, rarityName, frameUrl }) => {
-						const value = new URLSearchParams({ rarityId, frameUrl }).toString();
+					rarities.map(({ rarityId, rarityName, frameUrl, rarityColor }) => {
+						const value = new URLSearchParams({
+							rarityId,
+							frameUrl,
+							rarityColor,
+							rarityName,
+						}).toString();
 						return (
 							<option value={value} selected={value === baseRarityValue}>
 								{rarityName}
@@ -87,11 +92,7 @@ const giftSubPackType =
 		<section>
 			<header class="page-header">
 				<SubHeading>Twitch Event Rewards</SubHeading>
-				<TableSearch
-					id="rewards-search"
-					tableId="rewards-table"
-					label="Search Rewards"
-				/>
+				<TableSearch id="rewards-search" tableId="rewards-table" label="Search Rewards" />
 			</header>
 			<SortTable id="rewards-table">
 				<SortTableHead slot="heading">

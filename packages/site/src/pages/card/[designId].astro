@@ -11,7 +11,6 @@ import AdminDesignStats from '@/components/design/AdminDesignStats.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
 
 const designId = Astro.params.designId;
-const from = Astro.request.headers.get('referer');
 
 if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
@@ -48,16 +47,7 @@ instances.sort((a, b) =>
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageHeading>{design.cardName}</PageHeading>
-		<Card
-			rarityName={baseRarity.rarityId}
-			designId={design.designId}
-			frameUrl={baseRarity.frameUrl}
-			imgUrl={design.imgUrl}
-			cardName={design.cardName}
-			cardDescription={design.cardDescription}
-			cardNumber={1}
-			totalOfType={1}
-		/>
+		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} />
 	</header>
 	<AdminOnly>
 		<details>

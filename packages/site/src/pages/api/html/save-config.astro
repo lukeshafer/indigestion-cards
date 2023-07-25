@@ -10,12 +10,18 @@ const params = new URLSearchParams(await Astro.request.text());
 const rarity = new URLSearchParams(params.get('base-rarity') || '');
 const rarityId = rarity.get('rarityId');
 if (!rarityId) return new Response('Missing rarityId', { status: 400 });
+const rarityName = rarity.get('rarityName');
+if (!rarityName) return new Response('Missing rarityName', { status: 400 });
 const frameUrl = rarity.get('frameUrl');
 if (!frameUrl) return new Response('Missing frameUrl', { status: 400 });
+const rarityColor = rarity.get('rarityColor');
+if (!rarityColor) return new Response('Missing rarityColor', { status: 400 });
 
 const rarityObject = {
 	rarityId,
+	rarityName,
 	frameUrl,
+	rarityColor,
 };
 
 const eventValueSchema = z.object({
@@ -42,7 +48,7 @@ params.forEach((value, key) => {
 	}
 });
 
-const siteConfig = updateSiteConfig({ baseRarity: rarityObject });
+const siteConfig = updateSiteConfig({ baseRarity: rarityObject, messages: [] });
 const batchTwitchEvents = updateBatchTwitchEvents(events);
 
 await Promise.all([siteConfig, batchTwitchEvents]);

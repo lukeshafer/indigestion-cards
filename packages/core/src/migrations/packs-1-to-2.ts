@@ -24,6 +24,7 @@ export async function migration() {
 						...card,
 						cardNumber: cardEntity.data[0].cardNumber,
 						totalOfType: cardEntity.data[0].totalOfType,
+						rarityColor: cardEntity.data[0].rarityColor,
 					};
 				})
 			),

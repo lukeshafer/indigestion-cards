@@ -41,12 +41,10 @@ async function createDesign() {
 
 	const rarities = await getAllRarities();
 
-	const rarityDetails = rarities.map(({ rarityId, rarityName, frameUrl }) => {
-		const count = params.get(`rarity-${rarityId}-count`);
+	const rarityDetails = rarities.map((rarity) => {
+		const count = params.get(`rarity-${rarity.rarityId}-count`);
 		return {
-			rarityId,
-			rarityName,
-			frameUrl,
+			...rarity,
 			count: count ? parseInt(count) : 0,
 		};
 	});

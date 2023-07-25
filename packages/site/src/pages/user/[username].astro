@@ -124,17 +124,6 @@ const packTypes = await getAllPackTypes();
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<SubHeading>Cards</SubHeading>
-		<CardList
-			cards={cardsNotInPack.map((card) => ({
-				cardName: card.cardName,
-				designId: card.designId,
-				frameUrl: card.frameUrl,
-				imgUrl: card.imgUrl,
-				cardNumber: card.cardNumber,
-				rarityName: card.rarityName,
-				cardDescription: card.cardDescription,
-				totalOfType: card.totalOfType,
-			}))}
-		/>
+		<CardList cards={cardsNotInPack} />
 	</section>
 </Page>

@@ -33,7 +33,8 @@ const { baseRarity } = await getSiteConfig();
 		<div class="relative grid justify-start gap-4">
 			<Card
 				preview
-				rarityName={baseRarity.rarityId}
+				rarityName={baseRarity.rarityName}
+				rarityColor={baseRarity.rarityColor}
 				frameUrl={baseRarity.frameUrl}
 				{imgUrl}
 				cardName=""

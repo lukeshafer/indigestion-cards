@@ -108,6 +108,10 @@ const cardDesigns = new Entity(
 							type: 'number',
 							required: true,
 						},
+						rarityColor: {
+							type: 'string',
+							required: true,
+						},
 					},
 				},
 			},
@@ -236,6 +240,10 @@ const cardInstances = new Entity(
 				required: true,
 			},
 			frameUrl: {
+				type: 'string',
+				required: true,
+			},
+			rarityColor: {
 				type: 'string',
 				required: true,
 			},
@@ -472,6 +480,10 @@ const packs = new Entity(
 							required: true,
 						},
 						rarityName: {
+							type: 'string',
+							required: true,
+						},
+						rarityColor: {
 							type: 'string',
 							required: true,
 						},
@@ -904,6 +916,14 @@ const siteConfig = new Entity(
 						required: true,
 					},
 					frameUrl: {
+						type: 'string',
+						required: true,
+					},
+					rarityColor: {
+						type: 'string',
+						required: true,
+					},
+					rarityName: {
 						type: 'string',
 						required: true,
 					},

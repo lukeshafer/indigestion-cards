@@ -54,7 +54,7 @@ const packTypesWithCardPools = await Promise.all(
 );
 
 const {
-	baseRarity: { frameUrl, rarityId },
+	baseRarity: { frameUrl, rarityId, rarityColor },
 } = await getSiteConfig();
 ---
 
@@ -112,6 +112,7 @@ const {
 			imgUrl: card.imgUrl,
 			cardNumber: 0,
 			rarityName: rarityId,
+			rarityColor: rarityColor || '#FFF',
 			cardDescription: card.cardDescription,
 			totalOfType: 0,
 		}))}
