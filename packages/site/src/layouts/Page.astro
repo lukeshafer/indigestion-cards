@@ -15,7 +15,7 @@ export interface Props extends BaseProps {
 }
 
 const isAdmin = Astro.locals.session?.type === 'admin';
-const alerts = isAdmin ? (await getSiteConfig()).messages ?? [] : [];
+const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
 
 {
 	const alert = Astro.url.searchParams.get('alert');

@@ -91,6 +91,7 @@ export async function generateCard(info: {
 		designId: design.designId,
 		rarityId: assignedRarityId,
 		rarityName: rarity.rarityName,
+		rarityColor: rarity.rarityColor,
 		frameUrl: rarity.frameUrl,
 		imgUrl: design.imgUrl,
 		cardName: design.cardName,
@@ -104,7 +105,7 @@ export async function generateCard(info: {
 		packId: info.packId,
 		cardNumber: assignedCardNumber,
 		totalOfType,
-	};
+	} satisfies CardInstanceEntity;
 
 	if (info.packId) {
 		const result = await db.entities.cardInstances.create(cardDetails).go();
@@ -318,6 +319,7 @@ export async function createPack(args: {
 						imgUrl: card.imgUrl,
 						rarityId: card.rarityId,
 						rarityName: card.rarityName,
+						rarityColor: card.rarityColor,
 						frameUrl: card.frameUrl,
 						totalOfType: card.totalOfType,
 						cardNumber: card.cardNumber,
@@ -614,8 +616,8 @@ export async function updateRarity(args: UpdateEntityItem<Rarity> & { rarityId: 
 
 export async function deleteRarityById(id: string): Promise<Result<EntityItem<Rarity>>> {
 	const allDesigns = await getAllCardDesigns();
-	const designsWithRarity = allDesigns.some((design) =>
-		design.rarityDetails?.some((r) => r.rarityId === id)
+	const designsWithRarity = allDesigns.some(
+		(design) => design.rarityDetails?.some((r) => r.rarityId === id)
 	);
 	if (designsWithRarity) {
 		return {

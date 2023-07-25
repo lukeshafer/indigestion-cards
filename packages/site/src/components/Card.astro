@@ -14,6 +14,7 @@ interface Props {
 	scale?: number;
 	instanceId?: string;
 	preview?: boolean;
+	rarityColor: string;
 }
 
 const {
@@ -25,13 +26,16 @@ const {
 	totalOfType,
 	scale = 1,
 	preview = false,
+	rarityColor,
 } = Astro.props;
+
+console.log('rarityColor', rarityColor);
 ---
 
 <TiltCard shiny={true}>
 	<article
 		class="card-wrapper card-aspect-ratio relative w-72 bg-cover text-left"
-		style={{ 'background-image': `url(${frameUrl})`, scale }}>
+		style={{ 'background-image': `url(${frameUrl})`, scale, 'background-color': rarityColor }}>
 		<img
 			src={imgUrl}
 			alt={cardName}
