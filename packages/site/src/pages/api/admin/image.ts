@@ -7,7 +7,7 @@ import {
 	deleteRarityById,
 } from '@lil-indigestion-cards/core/card';
 
-export const del: APIRoute = async (ctx) => { 
+export const del: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
 
 	const key = params.get('key');
@@ -32,5 +32,7 @@ export const del: APIRoute = async (ctx) => {
 
 	if (!result.ok) return new Response('Failed to delete image', { status: 500 });
 
-	return ctx.redirect(`${routes.RARITIES}?alert=Image%20deleted!&type=success`);
+	return ctx.redirect(
+		`${type === 'frame' ? routes.RARITIES : routes.DESIGNS}?alert=Draft%20deleted!&type=success`
+	);
 };

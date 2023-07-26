@@ -5,6 +5,8 @@ import { api, routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import Card from '@/components/Card.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import CardDesignForm from '@/components/design/CardDesignForm';
+import DeleteImageButton from '@/components/image/DeleteImageButton';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -43,74 +45,9 @@ const { baseRarity } = await getSiteConfig();
 				cardNumber={1}
 				totalOfType={1}
 			/>
-			<button
-				class="post-button"
-				hx-delete={api.IMAGE.DELETE}
-				hx-swap="none"
-				hx-vals={JSON.stringify({ key, type: 'cardDesign' })}
-				data-type="delete">Delete Draft<form-indicator></form-indicator></button
-			>
+			<DeleteImageButton {key} type="cardDesign" client:load />
 		</div>
 
-		<my-form>
-			<form action={api.DESIGN.CREATE} method="post" hx-swap="none">
-				<input type="hidden" name="imgUrl" value={imgUrl} />
-				<input type="hidden" name="imageKey" value={key} />
-				<div class="input-group">
-					<label for="season">Season</label>
-					<select name="season" required>
-						{
-							seasons.map(({ seasonId, seasonName }) => (
-								<option value={JSON.stringify({ seasonId, seasonName })}>
-									{seasonName}
-								</option>
-							))
-						}
-					</select>
-				</div>
-				<div class="input-group">
-					<label for="cardName">Card Name</label>
-					<input name="cardName" id="cardName" required x-model="preview_cardName" />
-				</div>
-				<div class="input-group">
-					<label for="designId">Id</label>
-					<input
-						data-id-from="cardName"
-						data-edit-button
-						name="designId"
-						id="designId"
-						required
-						readonly
-					/>
-				</div>
-				<div class="input-group">
-					<label for="cardDescription">Description</label>
-					<textarea name="cardDescription" required x-model="preview_cardDescription"
-					></textarea>
-				</div>
-				<div class="input-group">
-					<label for="artist">Artist</label>
-					<input name="artist" required />
-				</div>
-				<fieldset>
-					<legend>Rarity Details</legend>
-					{
-						rarities.map(({ rarityId, rarityName, defaultCount }) => (
-							<div class="input-group">
-								<label for={`rarity-${rarityId}-count`}>{rarityName}</label>
-								<input
-									title={rarityName + ' Count'}
-									name={`rarity-${rarityId}-count`}
-									type="number"
-									required
-									value={defaultCount}
-								/>
-							</div>
-						))
-					}
-				</fieldset>
-				<button type="submit">Save</button>
-			</form>
-		</my-form>
+		<CardDesignForm {imgUrl} {key} {seasons} {rarities} client:load />
 	</div>
 </Page>

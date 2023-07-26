@@ -1,6 +1,5 @@
 import { DeleteButton, Form } from '@/components/form/Form';
 import { api } from '@/constants';
-import type { JSX } from 'solid-js';
 
 export default function DeleteImageButton(props: { key: string; type: string }) {
 	return (

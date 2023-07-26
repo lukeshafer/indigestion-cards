@@ -107,6 +107,25 @@ export function TextInput(props: InputProps<string>) {
 	);
 }
 
+export function TextArea(props: InputProps<string>) {
+	return (
+		<InputGroup>
+			<Label {...props} />
+			<textarea
+				id={props.name}
+				name={props.name}
+				class={BASE_INPUT_CLASS + " h-32"}
+				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+				required={props.required}
+				placeholder={props.placeholder}
+				readOnly={props.readOnly}
+				value={props.value ?? ''}
+				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+			/>
+		</InputGroup>
+	);
+}
+
 export function NumberInput(props: InputProps<number>) {
 	return (
 		<InputGroup>

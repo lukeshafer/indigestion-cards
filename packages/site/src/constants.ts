@@ -48,8 +48,8 @@ export const api = {
 	DESIGN: {
 		START_EDIT: '/api/html/design/start-edit',
 		UPDATE: '/api/html/design/update-design',
-		CREATE: '/api/html/design/create-design',
-		DELETE: '/api/html/design/delete-design',
+		CREATE: '/api/admin/design',
+		DELETE: '/api/admin/design',
 	},
 } as const;
 

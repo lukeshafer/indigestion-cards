@@ -9,6 +9,7 @@ import AdminOnly from '@/components/AdminOnly.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import AdminDesignStats from '@/components/design/AdminDesignStats.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
+import DeleteDesignButton from '@/components/design/DeleteDesignButton';
 
 const designId = Astro.params.designId;
 
@@ -54,21 +55,7 @@ instances.sort((a, b) =>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
 			<AdminDesignStats {design} {instances} />
 		</details>
-		<button
-			class="post-button relative w-max"
-			title={instances.length ? 'Cannot delete card with instances' : 'Delete Card'}
-			disabled={instances.length > 0}
-			data-type="delete"
-			hx-delete={api.DESIGN.DELETE}
-			hx-confirm="Are you sure you want to delete this design?"
-			hx-vals={JSON.stringify({
-				designId: design.designId,
-				imgUrl: design.imgUrl,
-				cardName: design.cardName,
-			})}>
-			Delete Card
-			<form-indicator>Deleting</form-indicator>
-		</button>
+		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>
 	<section class="text-center">
 		<SubHeading>Instances</SubHeading>
