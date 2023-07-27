@@ -26,6 +26,8 @@ export type CardInstanceEntity = EntityItem<Card>;
 export type CardDesignEntity = EntityItem<CardDesign>;
 export type RarityEntity = EntityItem<Rarity>;
 export type SeasonEntity = EntityItem<Season>;
+export type PackTypeEntity = EntityItem<PackType>;
+export type PackEntity = EntityItem<Pack>;
 
 export async function generateCard(info: {
 	userId?: string;

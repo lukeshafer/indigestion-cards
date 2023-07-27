@@ -1,7 +1,8 @@
 ---
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import { Icon } from 'astro-icon';
-import { api, routes } from '@/constants';
+import { routes } from '@/constants';
+import TotalPackCount from '@/components/pack/TotalPackCount';
 
 export interface Props {
 	class?: string;
@@ -41,13 +42,7 @@ const actionLinks = [
 							px-2 py-1 text-center text-3xl font-extrabold 
 							uppercase transition-transform hover:scale-105">
 						{actionLink.count ? (
-							<span
-								class="no-text-shadow absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg text-black"
-								hx-get={api.PACK.GET_TOTAL_PACK_COUNT}
-								hx-trigger="refreshCount from:body"
-								hx-swap="innerHTML transition:false">
-								{packs.length}
-							</span>
+							<TotalPackCount count={actionLink.count} client:load />
 						) : null}
 						{actionLink.title}
 					</a>

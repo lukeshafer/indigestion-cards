@@ -8,6 +8,7 @@ export function Form(props: {
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
+	onsuccess?: () => void;
 }) {
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -24,7 +25,6 @@ export function Form(props: {
 			body: data,
 		});
 
-		console.log(response);
 		if (response.redirected) {
 			location.assign(response.url);
 			return;
@@ -37,6 +37,7 @@ export function Form(props: {
 				...alerts,
 				{ text: responseBody || 'Success!', type: 'success' },
 			]);
+			if (props.onsuccess) props.onsuccess();
 		} else {
 			setAlerts((alerts) => [
 				...alerts,
@@ -85,12 +86,14 @@ interface InputProps<T extends number | string> {
 	placeholder?: string;
 	readOnly?: boolean;
 	setValue?: (value: string) => void;
+	children?: JSX.Element;
 }
 
 export function TextInput(props: InputProps<string>) {
 	return (
 		<InputGroup>
 			<Label {...props} />
+			{props.children}
 			<input
 				id={props.name}
 				name={props.name}
@@ -114,7 +117,7 @@ export function TextArea(props: InputProps<string>) {
 			<textarea
 				id={props.name}
 				name={props.name}
-				class={BASE_INPUT_CLASS + " h-32"}
+				class={BASE_INPUT_CLASS + ' h-32'}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
 				required={props.required}
 				placeholder={props.placeholder}
@@ -171,7 +174,7 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 }
 
 export function Select(props: {
-	label: string;
+	label?: string;
 	name: string;
 	value?: string;
 	required?: boolean;
@@ -180,7 +183,7 @@ export function Select(props: {
 }) {
 	return (
 		<InputGroup>
-			<Label {...props} />
+			{props.label ? <Label {...props} /> : null}
 			<select
 				id={props.name}
 				name={props.name}

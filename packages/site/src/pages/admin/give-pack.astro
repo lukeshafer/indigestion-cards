@@ -1,35 +1,13 @@
 ---
 import PageHeading from '@/components/text/PageHeading.astro';
-import { api } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import GivePackForm from '@/components/pack/GivePackForm';
 
 const packTypes = await getAllPackTypes();
 ---
 
 <Page title="Give Pack" breadcrumbs={[{ label: 'Give Pack' }]}>
 	<PageHeading>Give Pack</PageHeading>
-	<my-form>
-		<form action={api.PACK.CREATE} hx-swap="none" method="post">
-			<div class="input-group">
-				<label for="username">Username</label>
-				<p>Leave blank for no user</p>
-				<input type="text" name="username" id="username" />
-			</div>
-			<div class="input-group">
-				<label for="packType">Pack Type</label>
-				<select name="packType" id="packType" required>
-					<option value="">--</option>
-					{
-						packTypes.map((packType) => (
-							<option value={JSON.stringify(packType)}>
-								{packType.packTypeName}
-							</option>
-						))
-					}
-				</select>
-			</div>
-			<button type="submit">Save</button>
-		</form>
-	</my-form>
+	<GivePackForm {packTypes} client:load />
 </Page>

@@ -27,8 +27,8 @@ export const api = {
 		DELETE: '/api/admin/pack-type',
 	},
 	PACK: {
-		CREATE: '/api/html/pack/create-pack',
-		DELETE: '/api/html/pack/delete-pack',
+		CREATE: '/api/admin/pack',
+		DELETE: '/api/admin/pack',
 		GET_PACK_COUNT_FOR_USER: '/api/html/pack/get-pack-count-for-user',
 		GET_TOTAL_PACK_COUNT: '/api/html/pack/get-total-pack-count',
 		START_EDIT: '/api/html/pack/start-edit',
@@ -51,6 +51,7 @@ export const api = {
 		CREATE: '/api/admin/design',
 		DELETE: '/api/admin/design',
 	},
+	PACK_COUNT: '/api/admin/pack-count',
 } as const;
 
 export const publicApi = {

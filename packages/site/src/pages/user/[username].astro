@@ -3,11 +3,12 @@ import CardList from '@/components/CardList.astro';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
-import { api, routes, routeNames } from '@/constants';
+import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
+import UserPackForms from '@/components/pack/UserPackForms';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -64,61 +65,7 @@ const packTypes = await getAllPackTypes();
 			<section class="flex flex-col gap-2">
 				<PageHeading>{user.username}</PageHeading>
 				<p class="-mt-5">User Id: {user.userId}</p>
-				<div class="col-start-2 flex w-full flex-wrap items-center gap-2">
-					<input type="hidden" name="userId" value={user.userId} />
-					<input type="hidden" name="username" value={user.username} />
-
-					<select
-						id="packTypeSelect"
-						name="packType"
-						class="my-form-input h-full w-40"
-						required>
-						<option value="">Choose Pack</option>
-						{
-							packTypes.map((packType) => (
-								<option value={JSON.stringify(packType)}>
-									{packType.packTypeName}
-								</option>
-							))
-						}
-					</select>
-
-					<button
-						class="post-button"
-						data-type="submit"
-						hx-post={api.PACK.CREATE}
-						hx-include="[name=packType]"
-						hx-swap="none"
-						hx-vals={JSON.stringify({
-							userId: user.userId,
-							username: user.username,
-						})}>Give Pack</button
-					>
-				</div>
-
-				<div class="flex w-full flex-wrap items-center gap-2">
-					<h2 class="text-lg">
-						Unopened Packs: <span
-							hx-get={api.PACK.GET_PACK_COUNT_FOR_USER}
-							hx-trigger="refreshCount from:body"
-							hx-vals={JSON.stringify({ userId: user.userId })}
-							hx-swap="innerHTML transition:false"
-							data-value={user.packCount}>{user.packCount}</span
-						>
-					</h2>
-					<button
-						class="post-button shine"
-						data-type="delete"
-						hx-delete={api.PACK.DELETE}
-						hx-swap="none"
-						hx-vals={JSON.stringify({
-							userId: user.userId,
-							username: user.username,
-						})}>
-						Revoke Pack
-						<div class="htmx-indicator">Deleting</div>
-					</button>
-				</div>
+				<UserPackForms {user} {packTypes} client:load />
 			</section>
 		</AdminOnly>
 	</header>
