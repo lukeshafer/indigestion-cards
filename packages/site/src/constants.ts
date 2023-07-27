@@ -36,7 +36,7 @@ export const api = {
 	},
 	ADMIN: {
 		CREATE: '/api/html/admin/create-admin',
-		DELETE: '/api/html/admin/delete-admin',
+		DELETE: '/api/admin/admin-user',
 		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
 	},
 	SEASON: {

@@ -133,6 +133,9 @@ importers:
       open-props:
         specifier: ^1.5.8
         version: 1.5.8
+      solid-icons:
+        specifier: ^1.0.11
+        version: 1.0.11(solid-js@1.7.8)
       solid-js:
         specifier: ^1.4.3
         version: 1.7.8
@@ -8127,6 +8130,15 @@ packages:
     dependencies:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 4.0.0
+
+  /solid-icons@1.0.11(solid-js@1.7.8):
+    resolution: {integrity: sha512-shEL5Otrl73LPZukpanJKi6ISnQhpIvhqqAb8haKyCGrixHOYC6yGfNkSE7jpkKSikZ0rGtSMRiFETRrec2Uzw==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      solid-js: '*'
+    dependencies:
+      solid-js: 1.7.8
+    dev: false
 
   /solid-js@1.7.8:
     resolution: {integrity: sha512-XHBWk1FvFd0JMKljko7FfhefJMTSgYEuVKcQ2a8hzRXfiuSJAGsrPPafqEo+f6l+e8Oe3cROSpIL6kbzjC1fjQ==}

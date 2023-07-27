@@ -10,6 +10,7 @@ import SortTableHead from '@/components/table/SortTableHead.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import SortTableRow from '@/components/table/SortTableRow.astro';
 import SortTableCell from '@/components/table/SortTableCell.astro';
+import UsersTable from '@/components/user/UsersTable';
 
 const users = await getAllUsers();
 ---
@@ -25,27 +26,6 @@ const users = await getAllUsers();
 		/>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
-		<SortTable id="user-table">
-			<SortTableHead slot="heading">
-				<SortTableHeading width="65%" align="left">Username</SortTableHeading>
-				<SortTableHeading type="number" startDescending>Cards</SortTableHeading>
-				<SortTableHeading type="number" startDescending>Packs</SortTableHeading>
-			</SortTableHead>
-			{
-				users.map((user) => (
-					<SortTableRow>
-						<SortTableCell font="title" align="left">
-							<a
-								href={`${routes.USERS}/${user.username}`}
-								class="hover:underline focus:underline">
-								{user.username}
-							</a>
-						</SortTableCell>
-						<SortTableCell icon="mdi:cards">{user.cardCount}</SortTableCell>
-						<SortTableCell icon="mdi:gift">{user.packCount}</SortTableCell>
-					</SortTableRow>
-				))
-			}
-		</SortTable>
+		<UsersTable users={users} client:load />
 	</div>
 </Page>

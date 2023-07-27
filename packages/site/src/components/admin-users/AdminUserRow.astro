@@ -2,6 +2,7 @@
 import { api } from '@/constants';
 import SortTableRow from '@/components/table/SortTableRow.astro';
 import SortTableCell from '@/components/table/SortTableCell.astro';
+import DeleteAdminUserButton from '@/components/admin-users/DeleteAdminUserButton';
 
 interface Props {
 	username: string;
@@ -18,17 +19,10 @@ const isCurrentUser =
 <SortTableRow>
 	<SortTableCell align="left" font="title">{username}</SortTableCell>
 	<SortTableCell>
-		<button
-			class="post-button"
-			class:list={{ 'opacity-0': isCurrentUser }}
-			data-type="delete"
-			disabled={isCurrentUser}
-			hx-confirm="Are you sure you want to delete this user?"
-			hx-post={api.ADMIN.DELETE}
-			hx-vals={JSON.stringify({ userId, username, isStreamer })}
-			hx-swap="outerHTML transition:false"
-			hx-target="closest tr">
-			Delete
-		</button>
+		{
+			isCurrentUser ? null : (
+				<DeleteAdminUserButton {userId} {username} {isStreamer} client:load />
+			)
+		}
 	</SortTableCell>
 </SortTableRow>
