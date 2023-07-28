@@ -24,7 +24,7 @@ const presigned = await createPresignedPost(s3, {
 	class="grid gap-4"
 	breadcrumbs={[{ label: routeNames.RARITIES, href: routes.RARITIES }, { label: 'New Rarity' }]}>
 	<PageHeading>Create new rarity</PageHeading>
-	<div hx-disable>
+	<div>
 		<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
 			{
 				Object.entries(presigned.fields).map(([key, value]) => (

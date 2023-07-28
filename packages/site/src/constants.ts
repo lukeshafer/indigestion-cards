@@ -12,12 +12,12 @@ export const PUBLIC_ROUTES = [
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
 	OPEN_CARD: '/api/html/open-card',
-	SAVE_CONFIG: '/api/html/save-config',
+	SITE_CONFIG: '/api/admin/site-config',
+	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},
 	RARITY: {
-		START_EDIT: '/api/html/rarity/start-edit',
 		UPDATE: '/api/admin/rarity',
 		CREATE: '/api/admin/rarity',
 		DELETE: '/api/admin/rarity',
@@ -29,25 +29,20 @@ export const api = {
 	PACK: {
 		CREATE: '/api/admin/pack',
 		DELETE: '/api/admin/pack',
-		GET_PACK_COUNT_FOR_USER: '/api/html/pack/get-pack-count-for-user',
-		GET_TOTAL_PACK_COUNT: '/api/html/pack/get-total-pack-count',
-		START_EDIT: '/api/html/pack/start-edit',
-		UPDATE_USER: '/api/html/pack/update-pack-user',
+		UPDATE: '/api/admin/pack',
 	},
 	ADMIN: {
-		CREATE: '/api/html/admin/create-admin',
+		GET_ALL: '/api/admin/admin-user',
+		CREATE: '/api/admin/admin-user',
 		DELETE: '/api/admin/admin-user',
 		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
 	},
 	SEASON: {
-		START_EDIT: '/api/html/season/start-edit',
 		UPDATE: '/api/admin/season',
 		CREATE: '/api/admin/season',
 		DELETE: '/api/admin/season',
 	},
 	DESIGN: {
-		START_EDIT: '/api/html/design/start-edit',
-		UPDATE: '/api/html/design/update-design',
 		CREATE: '/api/admin/design',
 		DELETE: '/api/admin/design',
 	},

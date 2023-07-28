@@ -6,13 +6,15 @@ import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TableSearch from '@/components/TableSearch.astro';
 import { api } from '@/constants';
 import TwitchEvent from '@/components/site-config/TwitchEvent.astro';
-import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton.astro';
+import RefreshTwitchEventsButtonOld from '@/components/site-config/RefreshTwitchEventsButton.astro';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
 import SortTable from '@/components/table/SortTable.astro';
 import SortTableHead from '@/components/table/SortTableHead.astro';
 import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
+import SiteConfigForm from '@/components/site-config/SiteConfigForm';
+import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -33,6 +35,10 @@ const giftSubEvent = twitchEvents.data.find(
 		event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
 );
 
+if (!giftSubEvent) {
+	throw new Error('Could not find gift sub event');
+}
+
 const rewards = twitchEvents.data
 	.filter((event) => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
 	.sort((a, b) => {
@@ -42,85 +48,22 @@ const rewards = twitchEvents.data
 		if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
 		return 0;
 	});
-
-const giftSubPackType =
-	giftSubEvent?.packTypeId && giftSubEvent?.packTypeName
-		? {
-				packTypeId: giftSubEvent?.packTypeId || '',
-				packTypeName: giftSubEvent?.packTypeName || '',
-		  }
-		: undefined;
 ---
 
 <Page breadcrumbs={[{ label: 'Config' }]} title="Site Config">
-	<form
-		x-data="{ isEdited: false }"
-		@change="isEdited = true"
-		hx-post={api.SAVE_CONFIG}
-		hx-swap="none"
-		method="post">
-		<header class="flex items-center gap-8">
-			<PageHeading>Site Config</PageHeading>
-			<button
-				class="post-button h-max w-24"
-				id="save-config-btn"
-				data-type="submit"
-				x-show="isEdited"
-				x-cloak>Save</button
-			>
-		</header>
-		<section class="my-4 flex gap-4">
-			<SubHeading>Base Rarity for Design Previews</SubHeading>
-			<select class="my-form-input max-w-xs" name="base-rarity">
-				{
-					rarities.map(({ rarityId, rarityName, frameUrl, rarityColor }) => {
-						const value = new URLSearchParams({
-							rarityId,
-							frameUrl,
-							rarityColor,
-							rarityName,
-						}).toString();
-						return (
-							<option value={value} selected={value === baseRarityValue}>
-								{rarityName}
-							</option>
-						);
-					})
-				}
-			</select>
-		</section>
-		<section>
-			<header class="page-header">
-				<SubHeading>Twitch Event Rewards</SubHeading>
-				<TableSearch id="rewards-search" tableId="rewards-table" label="Search Rewards" />
-			</header>
-			<SortTable id="rewards-table">
-				<SortTableHead slot="heading">
-					<SortTableHeading width="66%">Event</SortTableHeading>
-					<SortTableHeading sort={false}>Pack Type</SortTableHeading>
-				</SortTableHead>
-				<TwitchEvent
-					eventName="5 Gift Subs"
-					id={TWITCH_GIFT_SUB_ID}
-					defaultValue={giftSubPackType}
-					packTypes={packTypes}
-				/>
-				{
-					rewards.map((reward) => (
-						<TwitchEvent
-							eventName={`Reward: ${reward.eventName}`}
-							id={reward.eventId}
-							defaultValue={{
-								packTypeId: reward.packTypeId,
-								packTypeName: reward.packTypeName,
-							}}
-							packTypes={packTypes}
-						/>
-					))
-				}
-			</SortTable>
-		</section>
-		<RefreshTwitchEventsButton />
-		<TwitchLoginButton />
-	</form>
+	<header class="flex items-center gap-8">
+		<PageHeading>Site Config</PageHeading>
+	</header>
+	<div class="max-w-2xl mx-auto">
+		<SiteConfigForm
+			{rarities}
+			{packTypes}
+			twitchEvents={rewards}
+			{giftSubEvent}
+			{baseRarityValue}
+			client:load
+		/>
+	</div>
+	<RefreshTwitchEventsButton client:load />
+	<TwitchLoginButton />
 </Page>

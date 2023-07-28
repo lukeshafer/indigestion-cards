@@ -6,9 +6,7 @@ import UserSearch from '@/components/UserSearch.astro';
 ---
 
 <div class="border-b border-b-gray-300 bg-white">
-	<header
-		class="max-w-main mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4"
-		hx-disable>
+	<header class="max-w-main mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
 		<AdminOnly>
 			<div data-for-admin-panel class="toggle-btn z-100 px-2 py-2 text-lg">
 				<Hamburger />
@@ -41,7 +39,9 @@ import UserSearch from '@/components/UserSearch.astro';
 		z-index: 1;
 		background: transparent;
 		font-weight: 900;
-		transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+		transition:
+			transform 0.3s ease-in-out,
+			color 0.3s ease-in-out;
 		align-self: center;
 	}
 

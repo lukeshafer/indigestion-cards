@@ -4,7 +4,7 @@ import { createSignal } from 'solid-js';
 
 export default function DeleteRarityButton(props: { rarityId: string; frameUrl: string }) {
 	return (
-		<div class="w-max">
+		<div class="mx-auto w-fit">
 			<Form
 				method="delete"
 				action={api.RARITY.DELETE}

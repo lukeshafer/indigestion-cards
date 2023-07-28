@@ -1,14 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
-import AdminUserRow from '@/components/admin-users/AdminUserRow.astro';
-import { api, routeNames } from '@/constants';
+import { routeNames } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
-import SortTable from '@/components/table/SortTable.astro';
-import SortTableHeading from '@/components/table/SortTableHeading.astro';
-import SortTableHead from '@/components/table/SortTableHead.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
-import AdminUsersTable from '@/components/admin-users/AdminUsersTable';
+import AdminUsersTable, { AddAdminButton } from '@/components/admin-users/AdminUsersTable';
 
 const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
@@ -26,22 +22,9 @@ const users = unsortedUsers.sort((a, b) => {
 <Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]}>
 	<PageHeader>
 		<PageHeading>Admin Users</PageHeading>
-		<button
-			class="button-link"
-			id="new-admin-user"
-			hx-get={api.ADMIN.NEW_ADMIN_FORM}
-			hx-target="next tbody"
-			hx-swap="beforeend">Add Admin</button
-		>
+		<AddAdminButton client:load />
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
 		<AdminUsersTable {users} currentUser={currentUser ?? ''} client:load />
-		<SortTable id="#admin-users-table">
-			<SortTableHead slot="heading">
-				<SortTableHeading width="75%" align="left">Username</SortTableHeading>
-				<SortTableHeading>Actions</SortTableHeading>
-			</SortTableHead>
-			{users.map((user) => <AdminUserRow {...user} />)}
-		</SortTable>
 	</div>
 </Page>

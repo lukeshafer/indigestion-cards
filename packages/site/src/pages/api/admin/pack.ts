@@ -4,9 +4,12 @@ import {
 	givePackToUser,
 	packSchema,
 	packSchemaWithoutUser,
+	updatePackUser,
 } from '@lil-indigestion-cards/core/pack';
 import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
+import { getUserByUserName } from '@lil-indigestion-cards/core/user';
+import { getPackById } from '@lil-indigestion-cards/core/card';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
@@ -49,6 +52,32 @@ export const post: APIRoute = async (ctx) => {
 		}
 		return new Response('Unknown error', { status: 400 });
 	}
+};
+
+export const patch: APIRoute = async (ctx) => {
+	const params = new URLSearchParams(await ctx.request.text());
+
+	const packId = params.get('packId');
+	const username = params.get('username');
+
+	if (!packId) return new Response('Missing pack ID', { status: 400 });
+	if (!username) return new Response('Missing username', { status: 400 });
+
+	const pack = await getPackById({ packId });
+
+	if (!pack) return new Response('Pack not found', { status: 404 });
+
+	const userId =
+		(await getUserByUserName(username))?.userId ?? (await getUserByLogin(username))?.id;
+
+	if (!userId) return new Response('User not found', { status: 404 });
+
+	if (pack.username !== username) {
+		await updatePackUser({ packId, userId, username });
+		return new Response("Updated pack's user", { status: 200 });
+	}
+
+	return new Response('Pack already has that user', { status: 200 });
 };
 
 export const del: APIRoute = async (ctx) => {

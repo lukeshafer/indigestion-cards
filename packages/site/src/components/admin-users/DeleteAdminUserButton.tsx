@@ -5,11 +5,15 @@ export default function DeleteAdminUserButton(props: {
 	userId: string;
 	username: string;
 	isStreamer: boolean;
+	onClick?: () => void;
+	onSuccess?: () => void;
 }) {
 	return (
 		<Form
 			action={api.ADMIN.DELETE}
 			method="delete"
+			onsuccess={props.onSuccess}
+			onsubmit={props.onClick}
 			confirm="Are you sure you want to delete this user?">
 			<input type="hidden" name="userId" value={props.userId} />
 			<input type="hidden" name="username" value={props.username} />

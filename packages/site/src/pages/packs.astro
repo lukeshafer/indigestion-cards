@@ -1,12 +1,9 @@
 ---
-import SortTable from '@/components/table/SortTable.astro';
-import SortTableHead from '@/components/table/SortTableHead.astro';
-import SortTableHeading from '@/components/table/SortTableHeading.astro';
-import PackRow from '@/components/pack/PackRow.astro';
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
 import PageHeading from '@/components/text/PageHeading.astro';
 import { routeNames } from '@/constants';
+import PackTable from '@/components/pack/PackTable';
 
 const packs = await getAllPacks();
 ---
@@ -15,14 +12,7 @@ const packs = await getAllPacks();
 	<header class="page-header">
 		<PageHeading>All Packs</PageHeading>
 	</header>
-	<div x-data="{}">
-		<SortTable>
-			<SortTableHead slot="heading">
-				<SortTableHeading width="50%">Owner</SortTableHeading>
-				<SortTableHeading>Pack Type</SortTableHeading>
-				<SortTableHeading />
-			</SortTableHead>
-			{packs.map((pack) => <PackRow pack={pack} />)}
-		</SortTable>
+	<div class="max-w-2xl mx-auto">
+		<PackTable {packs} client:load />
 	</div>
 </Page>

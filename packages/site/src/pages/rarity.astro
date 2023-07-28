@@ -3,14 +3,9 @@ import Page from '@/layouts/Page.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
-import DeleteRarityButton from '@/components/rarities/DeleteRarityButton';
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
-import { api, routes, routeNames } from '@/constants';
-import SortTable from '@/components/table/SortTable.astro';
-import SortTableHeading from '@/components/table/SortTableHeading.astro';
-import SortTableRow from '@/components/table/SortTableRow.astro';
-import SortTableCell from '@/components/table/SortTableCell.astro';
-import SortTableHead from '@/components/table/SortTableHead.astro';
+import { routes, routeNames } from '@/constants';
+import RarityTable from '@/components/rarities/RarityTable';
 
 const rarities = await getAllRarities();
 ---
@@ -21,36 +16,7 @@ const rarities = await getAllRarities();
 		<PageHeading>Rarities</PageHeading>
 		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
 	</PageHeader>
-	<SortTable>
-		<SortTableHead slot="heading">
-			<SortTableHeading>Name</SortTableHeading>
-			<SortTableHeading showOnBreakpoint="lg">Id</SortTableHeading>
-			<SortTableHeading type="number" showOnBreakpoint="sm">Default Count</SortTableHeading>
-			<SortTableHeading sort={false} />
-		</SortTableHead>
-		{
-			rarities.map((rarity) => (
-				<SortTableRow class="relative text-center">
-					<SortTableCell>
-						<span id={`rarityName-${rarity.rarityId}`}>{rarity.rarityName}</span>
-					</SortTableCell>
-					<SortTableCell showOnBreakpoint="lg">
-						<span id={`rarityId-${rarity.rarityId}`}>{rarity.rarityId}</span>
-					</SortTableCell>
-					<SortTableCell showOnBreakpoint="sm">
-						<span id={`defaultCount-${rarity.rarityId}`}>{rarity.defaultCount}</span>
-					</SortTableCell>
-					<SortTableCell>
-						<div class="flex flex-wrap justify-center gap-2 text-sm">
-							<DeleteRarityButton
-								client:load
-								rarityId={rarity.rarityId}
-								frameUrl={rarity.frameUrl}
-							/>
-						</div>
-					</SortTableCell>
-				</SortTableRow>
-			))
-		}
-	</SortTable>
+	<div class="mx-auto max-w-2xl">
+		<RarityTable {rarities} client:load />
+	</div>
 </Page>

@@ -32,7 +32,6 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 <Base {...baseProps}>
 	<div
 		class="page-layout grid h-[100svh] overflow-hidden"
-		hx-swap="true transition:true"
 		x-data="{}">
 		<AdminOnly>
 			<AdminPanel />

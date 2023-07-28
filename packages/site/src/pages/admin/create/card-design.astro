@@ -28,7 +28,7 @@ const presigned = await createPresignedPost(s3, {
 		{ label: 'New Card', href: routes.ADMIN.CREATE.CARD_DESIGN },
 	]}>
 	<PageHeading>Create New Card</PageHeading>
-	<div hx-disable>
+	<div>
 		<Form method="post" action={presigned.url} enctype="multipart/form-data">
 			{
 				Object.entries(presigned.fields).map(([key, value]) => (

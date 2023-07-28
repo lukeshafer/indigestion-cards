@@ -4,25 +4,38 @@ import { setAlerts } from '@/lib/client/state';
 
 export function Form(props: {
 	children: JSX.Element;
-	method: 'get' | 'post' | 'dialog' | 'put' | 'delete' | 'options' | 'head' | 'trace' | 'connect';
+	method:
+		| 'get'
+		| 'post'
+		| 'dialog'
+		| 'put'
+		| 'delete'
+		| 'options'
+		| 'head'
+		| 'trace'
+		| 'connect'
+		| 'patch';
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
+	onsubmit?: () => void;
 }) {
 	const formAction = () => {
 		const formURL = new URL(props.action, 'http://localhost:3000');
 		formURL.searchParams.set('formmethod', props.method);
-		console.log(formURL.pathname, formURL.searchParams.toString());
 		return formURL.pathname + '?' + formURL.searchParams.toString();
 	};
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
+		if (props.onsubmit) props.onsubmit();
 		if (props.confirm && !confirm(props.confirm)) return;
 		const form = e.target as HTMLFormElement;
 		const formData = new FormData(form);
 		const data = new URLSearchParams(formData as unknown as string);
+
+		console.log('form data', Object.fromEntries(formData));
 
 		const response = await fetch(props.action, {
 			method: props.method.toUpperCase(),
@@ -94,10 +107,24 @@ interface InputProps<T extends number | string> {
 	readOnly?: boolean;
 	setValue?: (value: string) => void;
 	children?: JSX.Element;
+	inputOnly?: boolean;
 }
 
 export function TextInput(props: InputProps<string>) {
-	return (
+	return props.inputOnly ? (
+		<input
+			id={props.name}
+			name={props.name}
+			type="text"
+			class={BASE_INPUT_CLASS}
+			classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+			required={props.required}
+			placeholder={props.placeholder ?? props.label}
+			readOnly={props.readOnly}
+			value={props.value ?? ''}
+			onInput={(e) => props.setValue?.(e.target.value ?? '')}
+		/>
+	) : (
 		<InputGroup>
 			<Label {...props} />
 			{props.children}
@@ -251,17 +278,23 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 const BUTTON_CLASS =
 	'text-shadow font-heading rounded border border-gray-300 px-4 py-2 font-bold uppercase text-white transition-colors';
 
-export function SubmitButton(props: { children?: string }) {
+export function SubmitButton(props: { children?: string; onClick?: () => void }) {
 	return (
-		<button type="submit" class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark`}>
+		<button
+			type="submit"
+			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark`}
+			onClick={props.onClick}>
 			{props.children ?? 'Submit'}
 		</button>
 	);
 }
 
-export function DeleteButton(props: { children?: string }) {
+export function DeleteButton(props: { children?: string; onClick?: () => void }) {
 	return (
-		<button type="submit" class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800`}>
+		<button
+			type="submit"
+			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800`}
+			onClick={props.onClick}>
 			{props.children ?? 'Delete'}
 		</button>
 	);

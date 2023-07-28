@@ -5,6 +5,8 @@ import { ChannelPointReward } from './twitch-helpers';
 type TwitchEvent = typeof db.entities.twitchEvents;
 type SiteConfig = typeof db.entities.siteConfig;
 
+export type TwitchEventEntity = EntityItem<TwitchEvent>;
+
 export async function updateBatchTwitchEvents(
 	events: (UpdateEntityItem<TwitchEvent> & {
 		eventId: string;

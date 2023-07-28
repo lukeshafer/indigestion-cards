@@ -30,7 +30,7 @@ const session = Astro.locals.session;
 		<title>{title}</title>
 		<ViewTransitions fallback="none" />
 	</head>
-	<body hx-ext="head-support, preload" hx-boost="false">
+	<body hx-ext="head-support, preload">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
