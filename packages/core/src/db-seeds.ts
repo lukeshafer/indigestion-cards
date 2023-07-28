@@ -35,3 +35,25 @@ export async function seedAdmins() {
 	console.log('Done seeding admins! Final result:', finalResult);
 	return finalResult;
 }
+
+export async function seedSiteConfig() {
+	const siteConfig = await db.entities.siteConfig.query.primary({}).go();
+	if (siteConfig.data.length > 0) {
+		console.log('Site config already exists, skipping...');
+		return true;
+	}
+
+	console.log('Seeding site config...');
+	const result = await db.entities.siteConfig
+		.create({
+			baseRarity: {
+				rarityId: 'default',
+				rarityName: 'Default',
+				rarityColor: '#fff',
+				frameUrl: '/default-base-rarity.png',
+			},
+			messages: [],
+		})
+		.go();
+	return result;
+}
