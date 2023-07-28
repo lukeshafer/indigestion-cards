@@ -16,7 +16,14 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 const seasons = await getAllSeasons();
 const rarities = await getAllRarities();
-const { baseRarity } = await getSiteConfig();
+const config = await getSiteConfig();
+const baseRarity = config?.baseRarity ??
+	rarities[0] ?? {
+		rarityId: 'default',
+		rarityName: 'Default',
+		rarityColor: '#fff',
+		frameUrl: '/default-base-rarity.png',
+	};
 ---
 
 <Page
