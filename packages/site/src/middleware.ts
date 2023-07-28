@@ -6,6 +6,18 @@ import { AUTH_TOKEN, HTML_API_PATH, PUBLIC_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
 
+const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
+	const formMethod = ctx.url.searchParams.get('formmethod');
+	if (!formMethod) return next();
+	if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(formMethod.toUpperCase())) return next();
+
+	const reqMethod = ctx.request.method;
+	if (reqMethod === formMethod) return next();
+
+	ctx.request = new Request(ctx.request, { method: formMethod.toUpperCase() });
+	return next();
+};
+
 const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
 
@@ -90,4 +102,4 @@ const passwordProtection: MiddlewareResponseHandler = async (ctx, next) => {
 	`;
 };
 
-export const onRequest = sequence(passwordProtection, auth, appendText);
+export const onRequest = sequence(passwordProtection, auth, appendText, transformMethod);

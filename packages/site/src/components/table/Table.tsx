@@ -15,7 +15,7 @@ interface Column {
 	font?: 'default' | 'title';
 }
 
-export function Table(props: {
+export default function Table(props: {
 	id?: string;
 	columns: Column[];
 	rows: Record<string, JSX.Element>[];

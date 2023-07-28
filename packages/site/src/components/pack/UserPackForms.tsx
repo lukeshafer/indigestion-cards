@@ -1,6 +1,6 @@
 import { Form, Select, SubmitButton, TextInput, DeleteButton } from '@/components/form/Form';
 import { api } from '@/constants';
-import { refetchTotalPackCount } from '@/lib/client/state';
+import { setTotalPackCount } from '@/lib/client/state';
 import type { PackTypeEntity } from '@lil-indigestion-cards/core/card';
 import type { UserEntity } from '@lil-indigestion-cards/core/user';
 import { createResource } from 'solid-js';
@@ -15,7 +15,7 @@ export default function UserPackForms(props: { packTypes: PackTypeEntity[]; user
 	});
 
 	const refreshPackCounts = () => {
-		refetchTotalPackCount();
+		setTotalPackCount((count) => count - 1);
 		refetch();
 	};
 

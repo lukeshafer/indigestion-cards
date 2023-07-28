@@ -3,7 +3,9 @@ import { CreateEntityItem, ElectroError, EntityItem } from 'electrodb';
 import { getUserByLogin } from './twitch-helpers';
 
 type User = typeof db.entities.users;
+type Admin = typeof db.entities.admins;
 export type UserEntity = EntityItem<User>;
+export type AdminEntity = EntityItem<Admin>;
 
 export async function getUser(userId: string) {
 	const user = await db.entities.users.get({ userId }).go();

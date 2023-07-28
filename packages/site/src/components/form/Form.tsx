@@ -10,6 +10,13 @@ export function Form(props: {
 	confirm?: string;
 	onsuccess?: () => void;
 }) {
+	const formAction = () => {
+		const formURL = new URL(props.action, 'http://localhost:3000');
+		formURL.searchParams.set('formmethod', props.method);
+		console.log(formURL.pathname, formURL.searchParams.toString());
+		return formURL.pathname + '?' + formURL.searchParams.toString();
+	};
+
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 		if (props.confirm && !confirm(props.confirm)) return;
@@ -50,7 +57,7 @@ export function Form(props: {
 		<form
 			class="relative flex w-full flex-col items-start gap-6"
 			method={props.method === 'get' ? 'get' : 'post'}
-			action={props.action}
+			action={formAction()}
 			enctype={props.enctype}
 			onsubmit={handleSubmit}>
 			{props.children}

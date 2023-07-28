@@ -1,4 +1,4 @@
-import { Table } from '../table/Table';
+import Table from '@/components/table/Table';
 import type { UserEntity } from '@lil-indigestion-cards/core/user';
 import { TbCards } from 'solid-icons/tb';
 import { FaSolidGift } from 'solid-icons/fa';
