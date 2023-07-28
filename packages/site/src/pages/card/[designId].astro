@@ -30,7 +30,8 @@ if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
-const { baseRarity } = await getSiteConfig();
+const siteConfig = await getSiteConfig();
+const baseRarity = siteConfig?.baseRarity || { rarityId: 'default', rarityName: 'Default', frameUrl: '/default-base-rarity.png', rarityColor: '#fff' };
 
 instances.sort((a, b) =>
 	+a.totalOfType === +b.totalOfType
