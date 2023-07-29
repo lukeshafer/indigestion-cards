@@ -12,12 +12,12 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@astrojs/prefetch": "^0.2.1",
+    "@astrojs/prefetch": "^0.3.0",
     "@astrojs/solid-js": "^2.2.0",
-    "@astrojs/tailwind": "^3.1.1",
+    "@astrojs/tailwind": "^4.0.0",
     "@aws-sdk/client-s3": "^3.312.0",
     "@aws-sdk/s3-presigned-post": "^3.312.0",
-    "@fontsource/montserrat": "^4.5.14",
+    "@fontsource/montserrat": "^5.0.5",
     "@types/alpinejs": "^3.0.0",
     "astro": "^2.9.6",
     "astro-icon": "^0.8.0",
@@ -29,6 +29,6 @@
     "solid-icons": "^1.0.11",
     "solid-js": "^1.4.3",
     "sst": "2.22.6",
-    "tailwindcss": "^3.3.1"
+    "tailwindcss": "^3.3.3"
   }
 }
