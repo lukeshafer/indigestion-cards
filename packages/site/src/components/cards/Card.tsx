@@ -22,9 +22,7 @@ export default function Card(props: Props) {
 				style={{ scale: props.scale, 'background-color': props.rarityColor }}>
 				<img src={props.imgUrl} alt={props.cardName} class="absolute inset-0" />
 				<img src={props.frameUrl} alt="" class="absolute inset-0" />
-				<h3
-					style={{ left: '12%', width: '76%', top: '4.4%' }}
-					class="font-display absolute left-[12%] top-[4.4%] w-[76%] font-bold italic text-slate-900">
+				<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9rem] font-bold italic text-slate-900">
 					{props.cardName}
 				</h3>
 				<p
@@ -35,10 +33,10 @@ export default function Card(props: Props) {
 						width: 'calc(100% - var(--left) * 2)',
 						left: 'var(--left)',
 					}}
-					class="card-description absolute p-2 font-sans text-sm font-normal text-black">
+					class="card-description font-heading absolute p-2 text-sm font-normal text-black">
 					{props.cardDescription}
 				</p>
-				<p class="font-display absolute bottom-2 right-4 text-xs font-bold italic text-white">
+				<p class="font-display absolute bottom-2 right-4 text-xs font-bold italic text-black">
 					{props.cardNumber} / {props.totalOfType}
 				</p>
 			</article>
