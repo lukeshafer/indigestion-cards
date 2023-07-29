@@ -6,6 +6,7 @@ type TwitchEvent = typeof db.entities.twitchEvents;
 type SiteConfig = typeof db.entities.siteConfig;
 
 export type TwitchEventEntity = EntityItem<TwitchEvent>;
+export type SiteConfigEntity = EntityItem<SiteConfig>;
 
 export async function updateBatchTwitchEvents(
 	events: (UpdateEntityItem<TwitchEvent> & {

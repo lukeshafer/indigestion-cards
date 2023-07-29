@@ -1,9 +1,9 @@
 ---
 import { routes } from '@/constants';
-import Card, { type CardProps } from './Card.astro';
+import Card from './cards/Card';
 
 interface Props {
-	cards: CardProps[];
+	cards: Parameters<typeof Card>[0][];
 }
 const { cards } = Astro.props;
 
@@ -17,7 +17,7 @@ const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 				<Element
 					rel="prefetch"
 					href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''}`}>
-					<Card {...card} />
+					<Card {...card} client:load />
 				</Element>
 			))
 		) : (

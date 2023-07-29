@@ -30,9 +30,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div
-		class="page-layout grid h-[100svh] overflow-hidden"
-		x-data="{}">
+	<div class="page-layout grid h-[100svh] overflow-hidden" x-data="{}">
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -40,24 +38,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 			class="relative flex flex-col overflow-y-scroll md:col-start-2"
 			id="page-scroll-wrapper">
 			<Header />
-			<div class="sticky top-0" id="alert-wrapper" x-data={JSON.stringify({ alerts })}>
-				<div id="alert" class="sticky top-0"></div>
-				<AlertBox client:load />
-				<template x-for="alert in alerts">
-					<div
-						class="view-transition-alert flex items-center justify-between p-4"
-						@delete-alert="$el.remove(); deleteParam('alert'); deleteParam('type')"
-						:class={JSON.stringify({
-							'bg-teal-200 text-teal-950': 'alert.type === "success"',
-							'bg-red-200 text-red-950': 'alert.type === "error"',
-							'bg-gray-200 text-gray-950':
-								'alert.type !== "success" && alert.type !== "error"',
-						})}>
-						<p x-text="alert.message"></p>
-						<button @click="$dispatch('delete-alert')" class="text-xl">x</button>
-					</div>
-				</template>
-			</div>
+			<AlertBox client:load {alerts} />
 			<div class="max-w-main mx-auto w-full">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>

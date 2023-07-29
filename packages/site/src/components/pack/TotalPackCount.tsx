@@ -1,7 +1,7 @@
 import { setTotalPackCount, totalPackCount } from '@/lib/client/state';
 import { api } from '@/constants';
 import type { PackEntity } from '@lil-indigestion-cards/core/card';
-import { createEffect, createResource } from 'solid-js';
+import { Show, createEffect, createResource } from 'solid-js';
 
 export default function TotalPackCount(props: { count: number }) {
 	const [packCountResource, { refetch }] = createResource(
@@ -19,8 +19,10 @@ export default function TotalPackCount(props: { count: number }) {
 	createEffect(() => setTotalPackCount(packCountResource()));
 
 	return (
-		<span class="no-text-shadow absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg text-black">
-			{packCountResource()}
-		</span>
+		<Show when={packCountResource() > 0}>
+			<span class="no-text-shadow absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg text-black">
+				{packCountResource()}
+			</span>
+		</Show>
 	);
 }

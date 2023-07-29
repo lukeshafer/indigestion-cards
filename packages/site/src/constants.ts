@@ -11,9 +11,9 @@ export const PUBLIC_ROUTES = [
 
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
-	OPEN_CARD: '/api/html/open-card',
 	SITE_CONFIG: '/api/admin/site-config',
 	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
+	CARD: '/api/admin/card',
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},

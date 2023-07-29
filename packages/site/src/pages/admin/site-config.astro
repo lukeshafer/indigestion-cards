@@ -3,16 +3,8 @@ import Page from '@/layouts/Page.astro';
 import { getAllPackTypes, getAllRarities } from '@lil-indigestion-cards/core/card';
 import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import TableSearch from '@/components/TableSearch.astro';
-import { api } from '@/constants';
-import TwitchEvent from '@/components/site-config/TwitchEvent.astro';
-import RefreshTwitchEventsButtonOld from '@/components/site-config/RefreshTwitchEventsButton.astro';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
-import SortTable from '@/components/table/SortTable.astro';
-import SortTableHead from '@/components/table/SortTableHead.astro';
-import SortTableHeading from '@/components/table/SortTableHeading.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
-import SubHeading from '@/components/text/SubHeading.astro';
 import SiteConfigForm from '@/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
 
@@ -33,11 +25,11 @@ const baseRarityValue = new URLSearchParams(
 const giftSubEvent = twitchEvents.data.find(
 	(event) =>
 		event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
-);
-
-if (!giftSubEvent) {
-	throw new Error('Could not find gift sub event');
-}
+) || {
+	eventId: TWITCH_GIFT_SUB_ID,
+	eventName: '5 Gift Subs',
+	eventType: 'channel.subscription.gift',
+};
 
 const rewards = twitchEvents.data
 	.filter((event) => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
@@ -54,7 +46,7 @@ const rewards = twitchEvents.data
 	<header class="flex items-center gap-8">
 		<PageHeading>Site Config</PageHeading>
 	</header>
-	<div class="max-w-2xl mx-auto">
+	<div class="max-w-2xl mx-auto my-6">
 		<SiteConfigForm
 			{rarities}
 			{packTypes}

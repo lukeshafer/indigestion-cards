@@ -1,7 +1,7 @@
 ---
 import AdminOnly from '@/components/AdminOnly.astro';
 import Hamburger from '@/components/Hamburger.astro';
-import UserConfig from '@/components/UserConfig.astro';
+import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch.astro';
 ---
 
@@ -20,7 +20,7 @@ import UserSearch from '@/components/UserSearch.astro';
 			</div>
 		</a>
 		<UserSearch />
-		<UserConfig />
+		<UserConfig client:load />
 	</header>
 </div>
 

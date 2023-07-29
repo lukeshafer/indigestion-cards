@@ -1,12 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
-import { api, routeNames, routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
-import Card from '@/components/Card.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import CardDesignForm from '@/components/design/CardDesignForm';
-import DeleteImageButton from '@/components/image/DeleteImageButton';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -36,25 +34,5 @@ const baseRarity = config?.baseRarity ??
 		{ label: 'Details' },
 	]}>
 	<PageHeading>Add Card Design</PageHeading>
-	<div
-		class="flex max-w-4xl flex-col gap-8 pt-8"
-		x-data="{ preview_cardName: '', preview_cardDescription: '' }">
-		<div class="relative grid justify-start gap-4">
-			<Card
-				preview
-				rarityName={baseRarity.rarityName}
-				rarityColor={baseRarity.rarityColor}
-				frameUrl={baseRarity.frameUrl}
-				{imgUrl}
-				cardName=""
-				cardDescription=""
-				designId=""
-				cardNumber={1}
-				totalOfType={1}
-			/>
-			<DeleteImageButton {key} type="cardDesign" client:load />
-		</div>
-
-		<CardDesignForm {imgUrl} {key} {seasons} {rarities} client:load />
-	</div>
+	<CardDesignForm {imgUrl} {key} {seasons} {rarities} {baseRarity} client:load />
 </Page>

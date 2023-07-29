@@ -4,7 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-[x-cloak] { display: none !important; }
+[x-cloak] {
+	display: none !important;
+}
 
 body.disable-animations * {
 	transition: none !important;
@@ -15,20 +17,23 @@ body.disable-animations * {
 	/*
 	  1. Use a more-intuitive box-sizing model.
 	*/
-	*, *::before, *::after {
-	  box-sizing: border-box;
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
 	}
 	/*
 	  2. Remove default margin
 	*/
 	* {
-	  margin: 0;
+		margin: 0;
 	}
 	/*
 	  3. Allow percentage-based heights in the application
 	*/
-	html, body {
-	  height: 100%;
+	html,
+	body {
+		height: 100%;
 	}
 	/*
 	  Typographic tweaks!
@@ -36,33 +41,47 @@ body.disable-animations * {
 	  5. Improve text rendering
 	*/
 	body {
-	  line-height: 1.5;
-	  -webkit-font-smoothing: antialiased;
+		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
 	}
 	/*
 	  6. Improve media defaults
 	*/
-	img, picture, video, canvas, svg {
-	  display: block;
-	  max-width: 100%;
+	img,
+	picture,
+	video,
+	canvas,
+	svg {
+		display: block;
+		max-width: 100%;
 	}
 	/*
 	  7. Remove built-in form typography styles
 	*/
-	input, button, textarea, select {
-	  font: inherit;
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
 	}
 	/*
 	  8. Avoid text overflows
 	*/
-	p, h1, h2, h3, h4, h5, h6 {
-	  overflow-wrap: break-word;
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		overflow-wrap: break-word;
 	}
 	/*
 	  9. Create a root stacking context
 	*/
-	#root, #__next {
-	  isolation: isolate;
+	#root,
+	#__next {
+		isolation: isolate;
 	}
 }
 
@@ -101,15 +120,16 @@ body.disable-animations * {
 		--color-main-light: #f9b7eb;
 
 		--dark-main: #ce008a;
-		--dark-secondary: #7F19F8;
+		--dark-secondary: #7f19f8;
 
-		--accent-main: #31FFD6;
+		--accent-main: #31ffd6;
 		--accent-secondary: ##1fdeb8;
 		--accent-tertiary: #08fccc;
 		--accent-main-dark: #1eb395;
 		--accent-main-light: #8afff8;
 
-		--base-font-sans: "MontserratVariable", Montserrat, Avenir, 'Avenir Next LT Pro', Corbel, 'URW Gothic', source-sans-pro, sans-serif;
+		--base-font-sans: 'MontserratVariable', Montserrat, Avenir, 'Avenir Next LT Pro', Corbel,
+			'URW Gothic', source-sans-pro, sans-serif;
 		--base-font-serif: font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
 		--font-heading: var(--base-font-sans);
@@ -128,9 +148,9 @@ body.disable-animations * {
 		color: #000;
 	}
 
-	my-form input, 
-	my-form textarea, 
-	my-form select, 
+	my-form input,
+	my-form textarea,
+	my-form select,
 	my-form option,
 	.my-form-input {
 		display: block;
@@ -140,15 +160,22 @@ body.disable-animations * {
 		color: black;
 	}
 
-	my-form input[readonly], .my-form-input[readonly] {
-		background-color: var(--gray-2)
+	my-form input[readonly],
+	.my-form-input[readonly] {
+		background-color: var(--gray-2);
 	}
 
-	my-form input:not([type="file"]), my-form select, my-form textarea, .my-form-input {
+	my-form input:not([type='file']),
+	my-form select,
+	my-form textarea,
+	.my-form-input {
 		outline: 2px solid #ccc;
 	}
 
-	my-form select:focus, my-form input:focus, my-form textarea:focus, .my-form-input:focus {
+	my-form select:focus,
+	my-form input:focus,
+	my-form textarea:focus,
+	.my-form-input:focus {
 		outline: 3px solid var(--color-main);
 	}
 
@@ -179,12 +206,14 @@ body.disable-animations * {
 		color: var(--red-9);
 	}
 
-	my-form input[type='checkbox'], .my-form-checkbox {
+	my-form input[type='checkbox'],
+	.my-form-checkbox {
 		display: inline-block;
 		width: auto;
 	}
 
-	my-form input[type='checkbox'] + label, .my-form-checkbox + label {
+	my-form input[type='checkbox'] + label,
+	.my-form-checkbox + label {
 		display: inline-block;
 		font-weight: 400;
 	}
@@ -290,7 +319,6 @@ body.disable-animations * {
 
 @keyframes shine {
 	0% {
-		
 	}
 	50% {
 		opacity: 1;
@@ -319,37 +347,57 @@ body.disable-animations * {
 }
 
 @keyframes fade-in {
-	from { opacity: 0; }
+	from {
+		opacity: 0;
+	}
 }
 
 @keyframes fade-out {
-	to { opacity: 0; }
+	to {
+		opacity: 0;
+	}
 }
 
 @keyframes slide-from-right {
-	from { transform: translateX(90px); }
+	from {
+		transform: translateX(90px);
+	}
 }
 
 @keyframes slide-from-left {
-	from { transform: translateX(-90px); }
+	from {
+		transform: translateX(-90px);
+	}
 }
 
 @keyframes slide-to-left {
-	to { transform: translateX(-90px); }
+	to {
+		transform: translateX(-90px);
+	}
 }
 
 @keyframes slide-to-right {
-	to { transform: translateX(90px); }
+	to {
+		transform: translateX(90px);
+	}
 }
 
 @keyframes grow {
-	from { transform: scaleY(0); }
-	to { transform: scaleY(1); }
+	from {
+		transform: scaleY(0);
+	}
+	to {
+		transform: scaleY(1);
+	}
 }
 
 @keyframes shrink {
-	from { transform: scaleY(1); }
-	to { transform: scaleY(0); }
+	from {
+		transform: scaleY(1);
+	}
+	to {
+		transform: scaleY(0);
+	}
 }
 
 @layer components {
@@ -361,22 +409,26 @@ body.disable-animations * {
 		view-transition-name: slide-back;
 	}
 
-   ::view-transition-old(slide-forward) {
-		animation: 180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-		600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
-   }
-   ::view-transition-new(slide-forward) {
-		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-		600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
-   }
+	::view-transition-old(slide-forward) {
+		animation:
+			180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+	}
+	::view-transition-new(slide-forward) {
+		animation:
+			420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+	}
 
 	::view-transition-old(slide-back) {
-		animation: 180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-		600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
+		animation:
+			180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
 	}
 	::view-transition-new(slide-back) {
-		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-		600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
+		animation:
+			420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
 	}
 
 	.visually-hidden {
@@ -410,32 +462,32 @@ body.disable-animations * {
 		text-transform: uppercase;
 	}
 
-	.post-button[data-type="submit"] {
+	.post-button[data-type='submit'] {
 		background-color: var(--color-tertiary);
 		color: #fff;
 	}
 
-	.post-button[data-type="submit"]:hover {
+	.post-button[data-type='submit']:hover {
 		background-color: var(--color-secondary);
 	}
 
-	.post-button[data-type="delete"],
-	.post-button[data-type="error"] {
+	.post-button[data-type='delete'],
+	.post-button[data-type='error'] {
 		background-color: var(--red-6);
 		color: #fff;
 	}
 
-	.post-button[data-type="delete"]:hover,
-	.post-button[data-type="error"]:hover {
+	.post-button[data-type='delete']:hover,
+	.post-button[data-type='error']:hover {
 		background-color: var(--red-9);
 	}
 
-	.post-button[data-type="success"] {
+	.post-button[data-type='success'] {
 		background-color: var(--teal-6);
 		color: #fff;
 	}
 
-	.post-button[data-type="success"]:hover {
+	.post-button[data-type='success']:hover {
 		background-color: var(--teal-9);
 	}
 
@@ -479,68 +531,6 @@ body.disable-animations * {
 		transform-origin: top;
 		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both grow;
 	}
-
-	[x-data='tiltCard'] {
-		width: max-content;
-		position: relative;
-		transform-style: preserve-3d;
-		transition: transform 0.3s, scale 0.3s;
-		perspective: 900px;
-		z-index: 1;
-
-		--shine-opacity: 0.2;
-		--shine-position: 50%;
-		--shine-after-opacity: 0;
-	}
-
-	[x-data='tiltCard']:hover {
-		transform: translateZ(300px);
-	}
-
-	[x-data='tiltCard'] .inner::after,
-	[x-data='tiltCard'] .inner::before {
-		transform: translateZ(200px);
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		display: block;
-		z-index: 1;
-		content: '';
-
-		background-position: var(--shine-position) 0%;
-		opacity: var(--shine-after-opacity);
-		transition: opacity 0.5s;
-		background-repeat: no-repeat;
-	}
-
-	[x-data='tiltCard'] .inner::after {
-		--shine-level: clamp(0.05, calc(0.1 * var(--shine-opacity)), 1);
-		background-size: 200% 200%;
-		background-image: radial-gradient(
-			ellipse at center,
-			rgba(255, 255, 255, var(--shine-level)) 0%,
-			#fff0 100%
-		);
-	}
-
-	[x-data='tiltCard'] .inner::before {
-		--adjusted: calc(var(--shine-opacity) - 0.5);
-		--sq: calc(1 - 3 * var(--adjusted) * var(--adjusted));
-		--shine-level: clamp(0.1, calc(0.6 * var(--sq)), 0.7);
-		background-size: 300% 110%;
-		background-image: linear-gradient(
-			110deg,
-			#fff0 0%,
-			hsl(calc(var(--shine-opacity) * 360) 100% 95% / 25%) 20%,
-			#fff3 30%,
-			hsl(calc(var(--shine-opacity) * 360) 100% 95% / var(--shine-level)) 50%,
-			rgb(255 255 255 / var(--shine-level)) 55%,
-			hsl(calc(var(--shine-opacity) * 360 + 180) 100% 95% / var(--shine-level)) 65%,
-			#fff3 100%
-		);
-	}
-
 }
 
 @layer utilities {
@@ -568,7 +558,12 @@ body.disable-animations * {
 		background-repeat: no-repeat;
 		position: absolute;
 		inset: 0;
-		background-image: linear-gradient(135deg,#fff0 25%,rgba(255,255,255,.2) 50%,#fff0 75%);
+		background-image: linear-gradient(
+			135deg,
+			#fff0 25%,
+			rgba(255, 255, 255, 0.2) 50%,
+			#fff0 75%
+		);
 		background-size: 300%;
 		background-position: 120%;
 	}

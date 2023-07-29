@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
 import SubHeading from '@/components/text/SubHeading.astro';
-import Card from '@/components/Card.astro';
+import Card from '@/components/cards/Card';
 
 const slug = Astro.params.instanceSlug;
 if (!slug) {
@@ -42,7 +42,7 @@ const openDate = instance.openedAt
 			{instance.cardName}, {instance.rarityName} #{instance.cardNumber}
 		</h1>
 		<div class="mx-4">
-			<Card {...instance} />
+			<Card {...instance} client:load />
 		</div>
 		{
 			instance.cardDescription ? (

@@ -35,8 +35,6 @@ export function Form(props: {
 		const formData = new FormData(form);
 		const data = new URLSearchParams(formData as unknown as string);
 
-		console.log('form data', Object.fromEntries(formData));
-
 		const response = await fetch(props.action, {
 			method: props.method.toUpperCase(),
 			headers: {
@@ -55,13 +53,13 @@ export function Form(props: {
 		if (response.ok) {
 			setAlerts((alerts) => [
 				...alerts,
-				{ text: responseBody || 'Success!', type: 'success' },
+				{ message: responseBody || 'Success!', type: 'success' },
 			]);
 			if (props.onsuccess) props.onsuccess();
 		} else {
 			setAlerts((alerts) => [
 				...alerts,
-				{ text: responseBody || 'There was an error.', type: 'error' },
+				{ message: responseBody || 'There was an error.', type: 'error' },
 			]);
 		}
 	};

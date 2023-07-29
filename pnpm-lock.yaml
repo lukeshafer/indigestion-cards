@@ -82,9 +82,6 @@ importers:
 
   packages/site:
     dependencies:
-      '@astrojs/alpinejs':
-        specifier: ^0.2.1
-        version: 0.2.1(@types/alpinejs@3.7.0)(alpinejs@3.0.0)
       '@astrojs/prefetch':
         specifier: ^0.2.1
         version: 0.2.1
@@ -106,9 +103,6 @@ importers:
       '@types/alpinejs':
         specifier: ^3.0.0
         version: 3.7.0
-      alpinejs:
-        specifier: ^3.0.0
-        version: 3.0.0
       astro:
         specifier: ^2.9.4
         version: 2.9.4
@@ -124,9 +118,6 @@ importers:
       electrodb:
         specifier: ^2.5.1
         version: 2.5.1(@aws-sdk/client-dynamodb@3.378.0)(@aws-sdk/types@3.378.0)
-      htmx.org:
-        specifier: ^1.9.2
-        version: 1.9.2
       install:
         specifier: ^0.13.0
         version: 0.13.0
@@ -161,16 +152,6 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
-
-  /@astrojs/alpinejs@0.2.1(@types/alpinejs@3.7.0)(alpinejs@3.0.0):
-    resolution: {integrity: sha512-lIwCw2XUB/3HAstWpqGvUnSH4BnFwXxkSxq+jpkPw0U1mMw4JP4RauGUbD1F2acZXun7T68alJydAF1dLLCv4A==}
-    peerDependencies:
-      '@types/alpinejs': ^3.0.0
-      alpinejs: ^3.0.0
-    dependencies:
-      '@types/alpinejs': 3.7.0
-      alpinejs: 3.0.0
-    dev: false
 
   /@astrojs/compiler@1.6.1:
     resolution: {integrity: sha512-QZZhV2kOhvyXEfpaGLgHWNPUOlkMVx3Zw+5IlXXU2p448NwtyYt3C6MuS7baVsTlluH3EedAoDBmelt9hPhfiQ==}
@@ -4632,12 +4613,6 @@ packages:
       require-from-string: 2.0.2
       uri-js: 4.4.1
 
-  /alpinejs@3.0.0:
-    resolution: {integrity: sha512-g86ksY6nYLOcEYd/15kj11+iPX8f+8o0/uSHu0CIJK8GbWlQXx58yaljpaBrp9jB1UgV2YsOQ7ErXBLlF1i8Mg==}
-    dependencies:
-      '@vue/reactivity': 3.3.4
-    dev: false
-
   /ansi-align@3.0.1:
     resolution: {integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==}
     dependencies:
@@ -6551,10 +6526,6 @@ packages:
 
   /html-void-elements@2.0.1:
     resolution: {integrity: sha512-0quDb7s97CfemeJAnW9wC0hw78MtW7NU3hqtCD75g2vFlDLt36llsYD7uB7SUzojLMP24N5IatXf7ylGXiGG9A==}
-    dev: false
-
-  /htmx.org@1.9.2:
-    resolution: {integrity: sha512-ZGbucKcalQyXdGUl+4Zt3xdRDPmNy70yNhMyDG1eDYUm/ImxmSo2rhIBDa53XitrAVhA+/CGgry+wJ1SO77wrA==}
     dev: false
 
   /http-errors@2.0.0:

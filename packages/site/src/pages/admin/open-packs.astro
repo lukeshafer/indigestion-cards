@@ -1,8 +1,14 @@
 ---
 import Page from '@/layouts/Page.astro';
-import OpenPacks from '@/components/open-packs/OpenPacks.astro';
+import OpenPacksComponent from '@/components/open-packs/OpenPacks';
+import { getAllPacks } from '@lil-indigestion-cards/core/card';
+
+const allPacks = await getAllPacks();
+const packs = allPacks
+	.filter((pack) => pack.userId && pack.username)
+	.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 ---
 
 <Page title="Open Packs" breadcrumbs={[{ label: 'Open Packs' }]} wide>
-	<OpenPacks />
+	<OpenPacksComponent packs={packs} client:load />
 </Page>

@@ -2,14 +2,9 @@
 import Page from '@/layouts/Page.astro';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
 import TableSearch from '@/components/TableSearch.astro';
-import { publicApi, routes, routeNames } from '@/constants';
+import { publicApi, routeNames } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
-import SortTable from '@/components/table/SortTable.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
-import SortTableHead from '@/components/table/SortTableHead.astro';
-import SortTableHeading from '@/components/table/SortTableHeading.astro';
-import SortTableRow from '@/components/table/SortTableRow.astro';
-import SortTableCell from '@/components/table/SortTableCell.astro';
 import UsersTable from '@/components/user/UsersTable';
 
 const users = await getAllUsers();

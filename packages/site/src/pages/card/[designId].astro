@@ -1,15 +1,17 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Card from '@/components/Card.astro';
+import Card from '@/components/cards/Card';
 import CardList from '@/components/CardList.astro';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routes, api, routeNames } from '@/constants';
+import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
-import AdminDesignStats from '@/components/design/AdminDesignStats.astro';
+import AdminDesignStats from '@/components/design/AdminDesignStats';
+import DesignOverviewTable from '@/components/design/DesignOverviewTable.astro';
 import SubHeading from '@/components/text/SubHeading.astro';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
+import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
 
 const designId = Astro.params.designId;
 
@@ -32,7 +34,12 @@ if (!design) {
 }
 
 const siteConfig = await getSiteConfig();
-const baseRarity = siteConfig?.baseRarity || { rarityId: 'default', rarityName: 'Default', frameUrl: '/default-base-rarity.png', rarityColor: '#fff' };
+const baseRarity = siteConfig?.baseRarity || {
+	rarityId: 'default',
+	rarityName: 'Default',
+	frameUrl: '/default-base-rarity.png',
+	rarityColor: '#fff',
+};
 
 instances.sort((a, b) =>
 	+a.totalOfType === +b.totalOfType
@@ -41,6 +48,8 @@ instances.sort((a, b) =>
 			: +a.cardNumber - +b.cardNumber
 		: +a.totalOfType - +b.totalOfType
 );
+
+const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, instances);
 ---
 
 <Page
@@ -49,12 +58,18 @@ instances.sort((a, b) =>
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageHeading>{design.cardName}</PageHeading>
-		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} />
+		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
 	</header>
 	<AdminOnly>
 		<details>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
-			<AdminDesignStats {design} {instances} />
+			<div class="my-4 flex flex-col gap-8">
+				<section class="grid text-lg">
+					<SubHeading>Stats Overview</SubHeading>
+					<DesignOverviewTable {rarityStatsArray} />
+				</section>
+				<AdminDesignStats {rarityStatsArray} client:load />
+			</div>
 		</details>
 		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>

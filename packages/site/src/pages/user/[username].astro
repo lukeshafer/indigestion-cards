@@ -65,7 +65,7 @@ const packTypes = await getAllPackTypes();
 			<section class="flex flex-col gap-2">
 				<PageHeading>{user.username}</PageHeading>
 				<p class="-mt-5">User Id: {user.userId}</p>
-				<UserPackForms {user} {packTypes} />
+				<UserPackForms {user} {packTypes} client:load />
 			</section>
 		</AdminOnly>
 	</header>
