@@ -36,7 +36,7 @@ export function getPackTypeContents(options: {
 }
 
 function parseSeason(unparsedSeason: string) {
-	const season = JSON.parse(unparsedSeason!) as unknown;
+	const season = JSON.parse(unparsedSeason) as unknown;
 	const result = seasonSchema.safeParse(season);
 	if (!result.success)
 		return { success: false, error: 'Invalid season. ' + result.error.format() } as const;

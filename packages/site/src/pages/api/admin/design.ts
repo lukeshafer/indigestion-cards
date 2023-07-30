@@ -44,12 +44,7 @@ export const post: APIRoute = async (ctx) => {
 
 	const { seasonId, seasonName } = JSON.parse(season!);
 
-	const newUrl = await moveImageBetweenBuckets({
-		sourceBucket: Bucket.CardDrafts.bucketName,
-		key: imageKey!,
-		destinationBucket: Bucket.CardDesigns.bucketName,
-	}).then(() => createS3Url({ bucket: Bucket.CardDesigns.bucketName, key: imageKey! }));
-	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
+	const newUrl = createS3Url({ bucket: Bucket.CardDesigns.bucketName, key: imageKey! });
 
 	const result = await createCardDesign({
 		seasonId: seasonId!,
@@ -64,6 +59,22 @@ export const post: APIRoute = async (ctx) => {
 
 	if (!result.success) return new Response(result.error, { status: 500 });
 
+	try {
+		await moveImageBetweenBuckets({
+			sourceBucket: Bucket.CardDrafts.bucketName,
+			key: imageKey!,
+			destinationBucket: Bucket.CardDesigns.bucketName,
+		});
+	} catch (e) {
+		console.error(e);
+		await deleteCardDesignById({ designId: designId! });
+		return new Response(
+			'An error occurred converting draft to design. Please try again and contact support if you have more issues.',
+			{ status: 500 }
+		);
+	}
+	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
+
 	return ctx.redirect(`${routes.DESIGNS}?alert=Design%20created!&type=success`);
 };
 
@@ -77,6 +88,9 @@ export const del: APIRoute = async (ctx) => {
 	if (!designId) return new Response('Missing design ID', { status: 400 });
 	if (!imgUrl) return new Response('Missing image URL', { status: 400 });
 
+	const result = await deleteCardDesignById({ designId: designId! });
+	if (!result.success) return new Response(result.error, { status: 500 });
+
 	const deleteImageUrl = `${Api.api.url}/delete-card-image`;
 	const deleteImageResult = await fetch(deleteImageUrl, {
 		method: 'DELETE',
@@ -86,10 +100,10 @@ export const del: APIRoute = async (ctx) => {
 		},
 	});
 
-	if (!deleteImageResult.ok) return new Response('Failed to delete image', { status: 500 });
-
-	const result = await deleteCardDesignById({ designId: designId! });
-	if (!result.success) return new Response(result.error, { status: 500 });
+	if (!deleteImageResult.ok)
+		return new Response('Failed to delete image -- see admin to manually delete', {
+			status: 500,
+		});
 
 	return ctx.redirect(
 		`${routes.DESIGNS}?alert=Design%20${cardName ? cardName : designId}%20deleted!&type=success`

@@ -9,7 +9,7 @@ import {
 	Fieldset,
 	Checkbox,
 } from '@/components/form/Form';
-import { createSignal, For, Match, Switch } from 'solid-js';
+import { createEffect, createSignal, For, Match, Switch } from 'solid-js';
 import type { CardDesignEntity, SeasonEntity } from '@lil-indigestion-cards/core/card';
 
 export default function PackTypeForm(props: {
@@ -70,12 +70,12 @@ function CustomCardPool(props: { cards: CardDesignEntity[] }) {
 		cardName: string;
 		imgUrl: string;
 	}
-	const [cardsSelected, setCardsSelected] = createSignal<Map<string, DesignDetails>>(new Map());
-	const designDetails = (): DesignDetails[] => [...cardsSelected().values()];
+	const [cardsSelected, setCardsSelected] = createSignal<Record<string, DesignDetails>>({});
+	const designDetails = (): DesignDetails[] => Object.values(cardsSelected());
 
 	return (
 		<Fieldset legend="Cards">
-			<input name="cardDesigns" type="hidden" value={JSON.stringify(designDetails)} />
+			<input name="cardDesigns" type="hidden" value={JSON.stringify(designDetails())} />
 			<For each={props.cards}>
 				{(card) => (
 					<Checkbox
@@ -83,17 +83,19 @@ function CustomCardPool(props: { cards: CardDesignEntity[] }) {
 						label={card.cardName}
 						setValue={(value) => {
 							if (value) {
-								setCardsSelected((selected) =>
-									selected.set(card.designId, {
+								setCardsSelected((selected) => ({
+									...selected,
+									[card.designId]: {
 										designId: card.designId,
 										cardName: card.cardName,
 										imgUrl: card.imgUrl,
-									})
-								);
+									},
+								}));
 							} else {
 								setCardsSelected((selected) => {
-									selected.delete(card.designId);
-									return selected;
+									const newSelected = { ...selected };
+									delete newSelected[card.designId];
+									return newSelected;
 								});
 							}
 						}}

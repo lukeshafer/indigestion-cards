@@ -24,6 +24,7 @@ export const post: APIRoute = async (ctx) => {
 
 	if (errorList.length) return new Response(errorList.join(' '), { status: 400 });
 
+	console.log({ category, seasonString, cardDesigns });
 	const contents = getPackTypeContents({ category, season: seasonString, cardDesigns });
 	if (!contents.success) return new Response(contents.error, { status: 400 });
 

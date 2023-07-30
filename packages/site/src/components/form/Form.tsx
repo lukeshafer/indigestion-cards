@@ -1,4 +1,4 @@
-import { For, JSX, ParentProps, createSignal } from 'solid-js';
+import { For, JSX, ParentProps, Show, createSignal } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { setAlerts } from '@/lib/client/state';
 
@@ -20,7 +20,10 @@ export function Form(props: {
 	confirm?: string;
 	onsuccess?: () => void;
 	onsubmit?: () => void;
+	loadingText?: string;
 }) {
+	const [isLoading, setIsLoading] = createSignal(false);
+
 	const formAction = () => {
 		const formURL = new URL(props.action, 'http://localhost:3000');
 		formURL.searchParams.set('formmethod', props.method);
@@ -35,13 +38,14 @@ export function Form(props: {
 		const formData = new FormData(form);
 		const data = new URLSearchParams(formData as unknown as string);
 
+		setIsLoading(true);
 		const response = await fetch(props.action, {
 			method: props.method.toUpperCase(),
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body: data,
-		});
+		}).finally(() => setIsLoading(false));
 
 		if (response.redirected) {
 			location.assign(response.url);
@@ -71,6 +75,14 @@ export function Form(props: {
 			action={formAction()}
 			enctype={props.enctype}
 			onsubmit={handleSubmit}>
+			<Show when={isLoading()}>
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-50">
+					<img src="/lilindPB.gif" alt="" />
+					{props.loadingText ? (
+						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
+					) : null}
+				</div>
+			</Show>
 			{props.children}
 		</form>
 	);
@@ -215,7 +227,7 @@ export function Select(props: {
 }) {
 	return (
 		<InputGroup>
-			{props.label ? <Label {...props} /> : null}
+			{props.label ? <Label {...props} label={props.label} /> : null}
 			<select
 				id={props.name}
 				name={props.name}

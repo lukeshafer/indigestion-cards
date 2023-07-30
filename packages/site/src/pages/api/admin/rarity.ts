@@ -34,12 +34,7 @@ export const post: APIRoute = async (ctx) => {
 
 	if (errors.length) return new Response(errors.join(', '), { status: 400 });
 
-	const newUrl = await moveImageBetweenBuckets({
-		sourceBucket: Bucket.FrameDrafts.bucketName,
-		key: imageKey!,
-		destinationBucket: Bucket.FrameDesigns.bucketName,
-	}).then(() => createS3Url({ bucket: Bucket.FrameDesigns.bucketName, key: imageKey! }));
-	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'frame' });
+	const newUrl = createS3Url({ bucket: Bucket.FrameDesigns.bucketName, key: imageKey! });
 
 	const result = await createRarity({
 		rarityId: rarityId!,
@@ -54,6 +49,13 @@ export const post: APIRoute = async (ctx) => {
 			status: result.error === 'Rarity already exists' ? 409 : 500,
 		});
 
+	await moveImageBetweenBuckets({
+		sourceBucket: Bucket.FrameDrafts.bucketName,
+		key: imageKey!,
+		destinationBucket: Bucket.FrameDesigns.bucketName,
+	});
+	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'frame' });
+
 	return ctx.redirect(`${routes.RARITIES}?alert=Rarity%20created!&type=success`);
 };
 
@@ -67,6 +69,10 @@ export const del: APIRoute = async (ctx) => {
 	if (!rarityId) return new Response('Missing rarityId', { status: 400 });
 	if (!frameUrl) return new Response('Missing frameUrl', { status: 400 });
 
+	const result = await deleteRarityById(rarityId);
+
+	if (!result.success) return new Response(result.error, { status: 500 });
+
 	const deleteFrameUrl = `${Api.api.url}/delete-rarity-frame`;
 	const deleteFrameResult = await fetch(deleteFrameUrl, {
 		method: 'DELETE',
@@ -75,10 +81,10 @@ export const del: APIRoute = async (ctx) => {
 			authorization: `Bearer ${ctx.cookies.get(AUTH_TOKEN).value ?? ''}`,
 		},
 	});
-	if (!deleteFrameResult.ok) return new Response('Failed to delete frame', { status: 500 });
+	if (!deleteFrameResult.ok)
+		return new Response('Failed to delete frame -- see admin to manually delete.', {
+			status: 500,
+		});
 
-	const result = await deleteRarityById(rarityId);
-
-	if (!result.success) return new Response(result.error, { status: 500 });
 	return ctx.redirect(`${routes.RARITIES}?alert=Rarity%20deleted!&type=success`);
 };

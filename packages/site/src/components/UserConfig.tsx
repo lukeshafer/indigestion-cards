@@ -8,9 +8,9 @@ function clickOutside(el: Element, accessor: () => any) {
 	onCleanup(() => document.body.removeEventListener('click', onClick));
 }
 
-export default function UserConfig(props: { disableAnimantion?: boolean }) {
+export default function UserConfig(props: { disableAnimations?: boolean }) {
 	const [isOpen, setIsOpen] = createSignal(false);
-	const [disableAnimations, setDisableAnimations] = createSignal(props.disableAnimantion ?? false);
+	const [disableAnimations, setDisableAnimations] = createSignal(props.disableAnimations ?? false);
 	onMount(() => {
 		setDisableAnimations(localStorage.getItem('disableAnimations') === 'true');
 	});
