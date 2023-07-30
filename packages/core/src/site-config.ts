@@ -123,7 +123,6 @@ export async function updateSiteConfig(config: CreateEntityItem<SiteConfig>) {
 
 export async function getSiteConfig(): Promise<EntityItem<SiteConfig>> {
 	const result = await db.entities.siteConfig.query.primary({}).go();
-	const config = result.data[0];
 	return result.data[0];
 }
 

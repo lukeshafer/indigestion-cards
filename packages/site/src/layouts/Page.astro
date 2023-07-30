@@ -7,7 +7,6 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import type { TransitionAnimationPair } from 'astro';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -26,12 +25,6 @@ const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
 		Astro.url.searchParams.get('type');
 	if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
 }
-
-/*const transitionSlideRight: TransitionAnimationPair = {
-	old: {
-		name: 
-	}
-}*/
 
 let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
