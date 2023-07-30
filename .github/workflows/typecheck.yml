@@ -1,12 +1,5 @@
 name: Deploy SST App
-
-on:
-    push:
-        branches:
-            - dev
-            - qa
-            - main
-
+on: push
 jobs:
     deploy:
         runs-on: ubuntu-latest
@@ -28,11 +21,14 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Set Stage Name
-              run: if [ "${GITHUB_REF##*/}" = "main" ]; then STAGE="staging" else STAGE="${GITHUB_REF##*/}" fi
+            - name: Build SST App
+              run: pnpm run sst build
 
-            - name: Deploy SST app
-              run: pnpm run deploy --stage $STAGE
-              env:
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            - name: 'Check Types: Core'
+              run: pnpm run core:check
+
+            - name: 'Check Types: Functions'
+              run: pnpm run functions:check
+
+            - name: 'Check Types: Site'
+              run: pnpm run site:check
