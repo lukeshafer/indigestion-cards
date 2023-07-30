@@ -22,7 +22,7 @@ jobs:
               run: pnpm install
 
             - name: Build SST App
-              run: pnpm run sst build
+              run: pnpm run build
 
             - name: 'Check Types: Core'
               run: pnpm run core:check
