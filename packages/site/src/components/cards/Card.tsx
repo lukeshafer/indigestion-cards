@@ -1,4 +1,5 @@
 import TiltCardEffect from './TiltCardEffect';
+import { FULL_ART_ID } from '@/constants';
 
 interface Props {
 	rarityName: string;
@@ -12,9 +13,14 @@ interface Props {
 	scale?: number;
 	instanceId?: string;
 	rarityColor: string;
+	rarityId: string;
 }
 
 export default function Card(props: Props) {
+	const isFullArt = () => props.rarityId === FULL_ART_ID;
+	const cardName = () => (isFullArt() ? '' : props.cardName);
+	const cardDescription = () => (isFullArt() ? '' : props.cardDescription);
+
 	return (
 		<TiltCardEffect shiny={true}>
 			<article
@@ -23,7 +29,7 @@ export default function Card(props: Props) {
 				<img src={props.imgUrl} alt={props.cardName} class="absolute inset-0" />
 				<img src={props.frameUrl} alt="" class="absolute inset-0" />
 				<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9rem] font-bold italic text-slate-900">
-					{props.cardName}
+					{cardName()}
 				</h3>
 				<p
 					style={{
@@ -34,9 +40,14 @@ export default function Card(props: Props) {
 						left: 'var(--left)',
 					}}
 					class="card-description font-heading absolute p-2 text-sm font-normal text-black">
-					{props.cardDescription}
+					{cardDescription()}
 				</p>
-				<p class="font-display absolute bottom-2 right-4 text-xs font-bold italic text-black">
+				<p
+					class="font-display absolute bottom-2 right-4 text-xs font-bold italic"
+					classList={{
+						'text-black': !isFullArt(),
+						'text-white': isFullArt(),
+					}}>
 					{props.cardNumber} / {props.totalOfType}
 				</p>
 			</article>

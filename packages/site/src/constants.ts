@@ -110,3 +110,4 @@ export const routeNames = {
 
 export const AUTH_TOKEN = 'sst_auth_token';
 export const HTML_API_PATH = '/api/html';
+export const FULL_ART_ID = 'full-art';

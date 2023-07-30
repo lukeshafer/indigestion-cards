@@ -1,5 +1,6 @@
 import { api } from '@/constants';
 import {
+	Checkbox,
 	Fieldset,
 	Form,
 	IdInput,
@@ -8,7 +9,7 @@ import {
 	SubmitButton,
 	TextArea,
 	TextInput,
-} from '../form/Form';
+} from '@/components/form/Form';
 import Card from '@/components/cards/Card';
 import DeleteImageButton from '@/components/image/DeleteImageButton';
 import { For, createSignal } from 'solid-js';
@@ -75,6 +76,7 @@ export default function CardDesignForm(props: {
 							/>
 						)}
 					</For>
+					<Checkbox label="Include full art card?" name="fullArt" />
 				</Fieldset>
 				<SubmitButton />
 			</Form>
