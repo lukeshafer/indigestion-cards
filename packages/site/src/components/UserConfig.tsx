@@ -8,16 +8,20 @@ function clickOutside(el: Element, accessor: () => any) {
 	onCleanup(() => document.body.removeEventListener('click', onClick));
 }
 
-export default function UserConfig() {
+export default function UserConfig(props: { disableAnimantion?: boolean }) {
 	const [isOpen, setIsOpen] = createSignal(false);
-	const [disableAnimations, setDisableAnimations] = createSignal(false);
+	const [disableAnimations, setDisableAnimations] = createSignal(props.disableAnimantion ?? false);
 	onMount(() => {
 		setDisableAnimations(localStorage.getItem('disableAnimations') === 'true');
 	});
 
 	createEffect(() => {
 		document?.body.classList.toggle('disable-animations', disableAnimations());
-		localStorage.setItem('disableAnimations', disableAnimations.toString());
+		localStorage.setItem('disableAnimations', disableAnimations().toString());
+
+		// set disable-animations cookie
+		document.cookie = `disable-animations=${disableAnimations()}; path=/; max-age=31536000`;
+
 	});
 
 	return (
@@ -25,7 +29,10 @@ export default function UserConfig() {
 			<button
 				class="group flex h-full items-center justify-center"
 				onclick={() => setIsOpen((v) => !v)}>
-				<FaSolidGear size="25" class="w-8 text-gray-700 fill-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110" />
+				<FaSolidGear
+					size="25"
+					class="w-8 fill-gray-700 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
+				/>
 			</button>
 
 			<Show when={isOpen()}>

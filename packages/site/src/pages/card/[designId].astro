@@ -73,7 +73,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 		</details>
 		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>
-	<section class="text-center">
+	<section class="text-center flex flex-col gap-5">
 		<SubHeading>Instances</SubHeading>
 		<CardList cards={instances} />
 	</section>

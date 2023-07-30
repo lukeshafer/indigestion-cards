@@ -95,6 +95,7 @@ function PackShowcase(props: {
 	flipCard: (instanceId: string) => void;
 	setNextPack: () => void;
 }) {
+	const sortedCardDetails = () => props.pack?.cardDetails.slice().sort((a, b) => b.totalOfType - a.totalOfType);
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
 	return (
@@ -108,7 +109,7 @@ function PackShowcase(props: {
 						</span>
 					</h2>
 					<ul class="flex flex-wrap items-center justify-center gap-4">
-						<For each={props.pack.cardDetails}>
+						<For each={sortedCardDetails()}>
 							{(card) => (
 								<ShowcaseCard
 									card={card}

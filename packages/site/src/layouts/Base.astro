@@ -14,6 +14,8 @@ export type BaseProps = Props;
 const { title, pageType = 'private' } = Astro.props;
 
 const session = Astro.locals.session;
+
+const disableAnimations = Astro.cookies.get('disable-animations').boolean();
 ---
 
 <html lang="en">
@@ -28,7 +30,7 @@ const session = Astro.locals.session;
 		<script src="../elements/sort-table.ts"></script>
 		<script src="../elements/table-search.ts"></script>
 		<title>{title || 'Indigestion Cards'}</title>
-		<ViewTransitions fallback="none" />
+		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>
 	<body>
 		{

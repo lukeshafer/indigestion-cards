@@ -14,7 +14,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 	const [outerEl, setOuterEl] = createSignal<HTMLDivElement>();
 
 	function handleEnterEvent() {
-		if (window.localStorage.getItem('disableAnimations') === 'true') {
+		if (window.localStorage.getItem('disableAnimations') === 'true' || document.body.classList.contains('disable-animations')) {
 			outerEl()!.style.transition = 'transform 0.0s';
 			return;
 		}
@@ -26,7 +26,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 	}
 
 	function handleMoveEvent(e: MouseEvent | TouchEvent) {
-		if (window.localStorage.getItem('disableAnimations') === 'true') return;
+		if (window.localStorage.getItem('disableAnimations') === 'true' || document.body.classList.contains('disable-animations')) return;
 
 		if (e.type === 'touchmove') e.preventDefault();
 		if (!outerEl()) return;
@@ -46,7 +46,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 	}
 
 	function handleLeaveEvent() {
-		if (window.localStorage.getItem('disableAnimations') === 'true') return;
+		if (window.localStorage.getItem('disableAnimations') === 'true' || document.body.classList.contains('disable-animations')) return;
 		setState({
 			transition: 'transform 0.2s linear',
 			shinePosition: '50%',
