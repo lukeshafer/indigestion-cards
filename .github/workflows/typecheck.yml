@@ -1,4 +1,4 @@
-name: Deploy SST App
+name: Check TS Types
 on: push
 jobs:
     deploy:
