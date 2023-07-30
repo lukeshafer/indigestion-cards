@@ -1,6 +1,6 @@
 ---
 import '../global.css';
-import '@fontsource/montserrat/variable.css';
+import '@fontsource-variable/montserrat';
 import 'open-props/colors';
 import { ViewTransitions } from 'astro:transitions';
 
@@ -27,7 +27,7 @@ const session = Astro.locals.session;
 		<script src="../elements/form-indicator.ts"></script>
 		<script src="../elements/sort-table.ts"></script>
 		<script src="../elements/table-search.ts"></script>
-		<title>{title}</title>
+		<title>{title || 'Indigestion Cards'}</title>
 		<ViewTransitions fallback="none" />
 	</head>
 	<body>

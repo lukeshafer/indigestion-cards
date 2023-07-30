@@ -97,9 +97,9 @@ importers:
       '@aws-sdk/s3-presigned-post':
         specifier: ^3.312.0
         version: 3.312.0
-      '@fontsource/montserrat':
-        specifier: ^5.0.5
-        version: 5.0.5
+      '@fontsource-variable/montserrat':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/alpinejs':
         specifier: ^3.0.0
         version: 3.7.0
@@ -3456,8 +3456,8 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@fontsource/montserrat@5.0.5:
-    resolution: {integrity: sha512-kR4hwC44p0GZQsy1oA2X8EdFMg/lC7qwVX9jNgNBQ+uSZXKoV4Vyc1VepcRAcGRKPIgcc/3OC1j7FNQDYpFLJA==}
+  /@fontsource-variable/montserrat@5.0.6:
+    resolution: {integrity: sha512-knjhYCaoKAqNce5LPezPY9j4Qbwa6mRwXvyS/Z3/yq2XoibX4V1E/39V6OnAonxUKwyCiu/D+QZfzlJp4Zu7CA==}
     dev: false
 
   /@graphql-tools/executor@0.0.18(graphql@16.7.1):

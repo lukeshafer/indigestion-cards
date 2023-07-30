@@ -17,7 +17,7 @@
     "@astrojs/tailwind": "^4.0.0",
     "@aws-sdk/client-s3": "^3.312.0",
     "@aws-sdk/s3-presigned-post": "^3.312.0",
-    "@fontsource/montserrat": "^5.0.5",
+    "@fontsource-variable/montserrat": "^5.0.6",
     "@types/alpinejs": "^3.0.0",
     "astro": "^2.9.6",
     "astro-icon": "^0.8.0",
