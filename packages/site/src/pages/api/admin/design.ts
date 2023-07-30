@@ -6,14 +6,16 @@ import {
 	getAllRarities,
 	deleteCardDesignById,
 } from '@lil-indigestion-cards/core/card';
+import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
+import { createS3Url } from '@lil-indigestion-cards/core/utils';
 import { Api } from 'sst/node/api';
+import { Bucket } from 'sst/node/bucket';
 import { AUTH_TOKEN } from '@/constants';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
 
 	const season = params.get('season');
-	const imgUrl = params.get('imgUrl');
 	const imageKey = params.get('imageKey');
 	const cardName = params.get('cardName');
 	const designId = params.get('designId');
@@ -21,7 +23,6 @@ export const post: APIRoute = async (ctx) => {
 	const artist = params.get('artist');
 
 	const errors = [];
-	if (!imgUrl) errors.push('Image URL is required');
 	if (!imageKey) errors.push('Image key is required');
 	if (!season) errors.push('Season is required');
 	if (!cardName) errors.push('Card name is required');
@@ -43,6 +44,13 @@ export const post: APIRoute = async (ctx) => {
 
 	const { seasonId, seasonName } = JSON.parse(season!);
 
+	const newUrl = await moveImageBetweenBuckets({
+		sourceBucket: Bucket.CardDrafts.bucketName,
+		key: imageKey!,
+		destinationBucket: Bucket.CardDesigns.bucketName,
+	}).then(() => createS3Url({ bucket: Bucket.CardDesigns.bucketName, key: imageKey! }));
+	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
+
 	const result = await createCardDesign({
 		seasonId: seasonId!,
 		seasonName: seasonName!,
@@ -50,13 +58,12 @@ export const post: APIRoute = async (ctx) => {
 		cardDescription: cardDescription!,
 		artist: artist!,
 		designId: designId!,
-		imgUrl: imgUrl!,
+		imgUrl: newUrl,
 		rarityDetails,
 	});
 
 	if (!result.success) return new Response(result.error, { status: 500 });
 
-	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
 	return ctx.redirect(`${routes.DESIGNS}?alert=Design%20created!&type=success`);
 };
 

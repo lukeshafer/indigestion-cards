@@ -14,6 +14,10 @@ export function parseS3Url(urlString: string) {
 	return { Bucket: bucket, Key: key };
 }
 
+export function createS3Url(props: { bucket: string; key: string }) {
+	return encodeURI(`https://${props.bucket}.s3.amazonaws.com/${props.key}`);
+}
+
 export function html(...args: Parameters<typeof String.raw>) {
 	const str = String.raw(...args);
 

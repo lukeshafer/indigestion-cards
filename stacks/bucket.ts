@@ -7,6 +7,44 @@ export function DesignBucket({ stack }: StackContext) {
 	const domainName = getDomainName(stack.stage);
 	const origin = `https://${domainName}`;
 
+	const cardDraftBucket = new Bucket(stack, 'CardDrafts', {
+		cors: [
+			{
+				allowedMethods: ['POST', 'GET'],
+				allowedOrigins: [origin, 'http://localhost:3000'],
+			},
+		],
+		notifications: {
+			fileUploaded: {
+				function: 'packages/functions/src/s3/handle-image-upload.handler',
+			},
+		},
+		defaults: {
+			function: {
+				bind: [db],
+			},
+		},
+	});
+
+	const frameDraftBucket = new Bucket(stack, 'FrameDrafts', {
+		cors: [
+			{
+				allowedMethods: ['POST', 'GET'],
+				allowedOrigins: [origin, 'http://localhost:3000'],
+			},
+		],
+		notifications: {
+			fileUploaded: {
+				function: 'packages/functions/src/s3/handle-frame-upload.handler',
+			},
+		},
+		defaults: {
+			function: {
+				bind: [db],
+			},
+		},
+	});
+
 	const cardDesignBucket = new Bucket(stack, 'CardDesigns', {
 		cors: [
 			{
@@ -45,5 +83,5 @@ export function DesignBucket({ stack }: StackContext) {
 		},
 	});
 
-	return { cardDesignBucket, frameBucket };
+	return { cardDesignBucket, frameBucket, cardDraftBucket, frameDraftBucket };
 }

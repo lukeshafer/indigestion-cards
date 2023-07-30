@@ -23,19 +23,17 @@ export const handler = ApiHandler(async () => {
 		return { statusCode: 400, body: 'Missing or invalid type' };
 
 	const bucketName =
-		data.type === 'cardDesign' ? Bucket.CardDesigns.bucketName : Bucket.FrameDesigns.bucketName;
+		data.type === 'cardDesign' ? Bucket.CardDrafts.bucketName : Bucket.FrameDrafts.bucketName;
 
 	const s3 = new S3();
 	try {
-		const dbResult = deleteUnmatchedDesignImage({ imageId: data.key, type: data.type });
-		const s3result = s3
+		await deleteUnmatchedDesignImage({ imageId: data.key, type: data.type });
+		await s3
 			.deleteObject({
 				Bucket: bucketName,
 				Key: data.key,
 			})
 			.promise();
-
-		await Promise.all([dbResult, s3result]);
 
 		return {
 			statusCode: 200,

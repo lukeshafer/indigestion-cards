@@ -19,8 +19,8 @@ const entityNames = {
 const name = entityNames[Astro.props.type ?? 'default']
 
 const urlByType = {
-	frame: `${routes.ADMIN.CREATE.RARITY_DETAILS}?bucket=${Bucket.FrameDesigns.bucketName}&key=`,
-	cardDesign: `${routes.ADMIN.CREATE.CARD_DESIGN_DETAILS}?bucket=${Bucket.CardDesigns.bucketName}&key=`,
+	frame: `${routes.ADMIN.CREATE.RARITY_DETAILS}?bucket=${Bucket.FrameDrafts.bucketName}&key=`,
+	cardDesign: `${routes.ADMIN.CREATE.CARD_DESIGN_DETAILS}?bucket=${Bucket.CardDrafts.bucketName}&key=`,
 } as const satisfies Record<UnmatchedImageType, string>
 ---
 

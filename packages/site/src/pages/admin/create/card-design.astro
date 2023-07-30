@@ -10,12 +10,11 @@ import PageHeading from '@/components/text/PageHeading.astro';
 
 const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {
-	Bucket: Bucket.CardDesigns.bucketName,
+	Bucket: Bucket.CardDrafts.bucketName,
 	Key: crypto.randomBytes(20).toString('hex') + '.jpg',
 	Fields: {
 		acl: 'public-read',
 		success_action_redirect: Astro.url.origin + routes.ADMIN.CREATE.CARD_DESIGN_DETAILS,
-		'x-amz-meta-test': 'test',
 	},
 });
 ---

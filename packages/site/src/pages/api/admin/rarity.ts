@@ -6,6 +6,9 @@ import {
 	deleteUnmatchedDesignImage,
 	deleteRarityById,
 } from '@lil-indigestion-cards/core/card';
+import { Bucket } from 'sst/node/bucket';
+import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
+import { createS3Url } from '@lil-indigestion-cards/core/utils';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
@@ -14,7 +17,6 @@ export const post: APIRoute = async (ctx) => {
 	const rarityName = params.get('rarityName');
 	const rarityColor = params.get('rarityColor');
 	const defaultCount = parseInt(params.get('defaultCount') || '0') || 0;
-	const imgUrl = params.get('imgUrl');
 	const imageKey = params.get('imageKey');
 	const bucket = params.get('bucket');
 
@@ -23,7 +25,6 @@ export const post: APIRoute = async (ctx) => {
 	else if (!rarityId.match(/^[a-z0-9-]+$/))
 		errors.push('Invalid rarityId. (Must be lowercase, numbers, and dashes only)');
 	if (!rarityName) errors.push('Missing rarityName');
-	if (!imgUrl) errors.push('Missing imgUrl');
 	if (!rarityColor) errors.push('Missing rarityColor');
 	else if (!rarityColor.match(/^#[a-f0-9]{6}$/i))
 		errors.push('Invalid rarityColor. (Must be a hex color code)');
@@ -33,16 +34,20 @@ export const post: APIRoute = async (ctx) => {
 
 	if (errors.length) return new Response(errors.join(', '), { status: 400 });
 
-	const deletePromise = deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'frame' });
-	const createPromise = createRarity({
+	const newUrl = await moveImageBetweenBuckets({
+		sourceBucket: Bucket.FrameDrafts.bucketName,
+		key: imageKey!,
+		destinationBucket: Bucket.FrameDesigns.bucketName,
+	}).then(() => createS3Url({ bucket: Bucket.FrameDesigns.bucketName, key: imageKey! }));
+	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'frame' });
+
+	const result = await createRarity({
 		rarityId: rarityId!,
 		rarityName: rarityName!,
 		rarityColor: rarityColor!,
 		defaultCount,
-		frameUrl: imgUrl!,
+		frameUrl: newUrl,
 	});
-
-	const [result] = await Promise.all([createPromise, deletePromise]);
 
 	if (!result.success)
 		return new Response(result.error, {

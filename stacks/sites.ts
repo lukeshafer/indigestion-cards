@@ -9,7 +9,7 @@ import { getDomainName } from './constants';
 export function Sites({ stack }: StackContext) {
 	const table = use(Database);
 	const { api, twitchApi } = use(API);
-	const { frameBucket, cardDesignBucket } = use(DesignBucket);
+	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
 	const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, STREAMER_USER_ID, APP_ACCESS_TOKEN_ARN } =
 		use(ConfigStack);
@@ -24,6 +24,8 @@ export function Sites({ stack }: StackContext) {
 			twitchApi,
 			frameBucket,
 			cardDesignBucket,
+			frameDraftBucket,
+			cardDraftBucket,
 			siteAuth,
 			TWITCH_CLIENT_ID,
 			TWITCH_CLIENT_SECRET,

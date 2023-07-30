@@ -9,7 +9,7 @@ import { API_VERSION, HOSTED_ZONE, getDomainName } from './constants';
 export function API({ app, stack }: StackContext) {
 	const table = use(Database);
 	const eventBus = use(Events);
-	const { frameBucket, cardDesignBucket } = use(DesignBucket);
+	const { frameBucket, cardDesignBucket, cardDraftBucket, frameDraftBucket } = use(DesignBucket);
 	const config = use(ConfigStack);
 	const { siteAuth } = use(Auth);
 
@@ -63,6 +63,8 @@ export function API({ app, stack }: StackContext) {
 					eventBus,
 					frameBucket,
 					cardDesignBucket,
+					cardDraftBucket,
+					frameDraftBucket,
 					siteAuth,
 					twitchApi,
 				],
