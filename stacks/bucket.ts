@@ -2,7 +2,7 @@ import { StackContext, Bucket, use } from 'sst/constructs';
 import { Database } from './database';
 import { getDomainName } from './constants';
 
-export function DesignBucket({ stack }: StackContext) {
+export function DesignBucket({ stack, app }: StackContext) {
 	const db = use(Database);
 	const domainName = getDomainName(stack.stage);
 	const origin = `https://${domainName}`;
@@ -11,7 +11,7 @@ export function DesignBucket({ stack }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: [origin, 'http://localhost:3000'],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:3000'] : [origin],
 			},
 		],
 		notifications: {
@@ -30,7 +30,7 @@ export function DesignBucket({ stack }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: [origin, 'http://localhost:3000'],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:3000'] : [origin],
 			},
 		],
 		notifications: {
@@ -49,14 +49,9 @@ export function DesignBucket({ stack }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: [origin, 'http://localhost:3000'],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:3000'] : [origin],
 			},
 		],
-		notifications: {
-			fileUploaded: {
-				function: 'packages/functions/src/s3/handle-image-upload.handler',
-			},
-		},
 		defaults: {
 			function: {
 				bind: [db],
@@ -68,14 +63,9 @@ export function DesignBucket({ stack }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: [origin, 'http://localhost:3000'],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:3000'] : [origin],
 			},
 		],
-		notifications: {
-			fileUploaded: {
-				function: 'packages/functions/src/s3/handle-frame-upload.handler',
-			},
-		},
 		defaults: {
 			function: {
 				bind: [db],

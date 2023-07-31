@@ -44,7 +44,7 @@ export function API({ app, stack }: StackContext) {
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
-			...(app.stage === 'luke'
+			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 				}
@@ -76,15 +76,16 @@ export function API({ app, stack }: StackContext) {
 			allowHeaders: ['content-type'],
 			allowMethods: ['ANY'],
 			allowOrigins:
-				app.stage === 'luke'
-					? ['http://localhost:3000', `https://${baseDomain}`]
-					: [`https://${baseDomain}`],
+				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
 		},
-		customDomain: {
-			domainName: `api.${baseDomain}`,
-			path: API_VERSION,
-			hostedZone: HOSTED_ZONE,
-		},
+		customDomain:
+			app.mode === 'dev'
+				? undefined
+				: {
+					domainName: `api.${baseDomain}`,
+					path: API_VERSION,
+					hostedZone: HOSTED_ZONE,
+				},
 	});
 
 	stack.addOutputs({

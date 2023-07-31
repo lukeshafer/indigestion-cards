@@ -4,9 +4,9 @@ import { API } from './api';
 import { DesignBucket } from './bucket';
 import { Auth } from './auth';
 import { ConfigStack } from './config';
-import { getDomainName } from './constants';
+import { HOSTED_ZONE, getDomainName } from './constants';
 
-export function Sites({ stack }: StackContext) {
+export function Sites({ app, stack }: StackContext) {
 	const table = use(Database);
 	const { api, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
@@ -32,9 +32,9 @@ export function Sites({ stack }: StackContext) {
 			APP_ACCESS_TOKEN_ARN,
 			STREAMER_USER_ID,
 		],
-		customDomain: {
+		customDomain: app.mode === 'dev' ? undefined : {
 			domainName: baseDomain,
-			hostedZone: 'lksh.dev',
+			hostedZone: HOSTED_ZONE,
 		},
 		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 	});
