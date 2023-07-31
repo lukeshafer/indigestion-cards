@@ -10,7 +10,7 @@ export function Events({ stack }: StackContext) {
 		consumer: {
 			function: {
 				bind: [table],
-				handler: 'packages/functions/src/dlq/create-failed-queue-alert.handler',
+				handler: 'packages/functions/src/sqs/create-failed-queue-alert.handler',
 				environment: {
 					SESSION_USER_ID: 'dlq',
 					SESSION_USERNAME: 'DLQ',
