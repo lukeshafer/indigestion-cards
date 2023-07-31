@@ -7,8 +7,15 @@ const allPacks = await getAllPacks();
 const packs = allPacks
 	.filter((pack) => pack.userId && pack.username)
 	.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+
+const startMargin = Astro.cookies.get('openPacksMargin').value;
 ---
 
 <Page title="Open Packs" breadcrumbs={[{ label: 'Open Packs' }]} wide>
-	<OpenPacksComponent packs={packs} client:load />
+	<OpenPacksComponent
+		packs={packs}
+		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
+		startMargin={startMargin ? parseInt(startMargin) : undefined}
+		client:load
+	/>
 </Page>

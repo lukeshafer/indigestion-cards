@@ -1,14 +1,23 @@
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
-import { For, Show, createEffect, createSignal } from 'solid-js';
+import { For, Show, createEffect, createRenderEffect, createSignal } from 'solid-js';
 import { api } from '@/constants';
 import Card from '@/components/cards/Card';
 import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
+import { createAutoAnimate } from '@formkit/auto-animate/solid';
+import { Checkbox } from '../form/Form';
 
-export default function OpenPacks(props: { packs: PackEntity[] }) {
+export default function OpenPacks(props: {
+	packs: PackEntity[];
+	startMargin?: number;
+	canTest?: boolean;
+}) {
+	const [setAutoAnimate] = createAutoAnimate();
+
 	const [state, setState] = createStore({
 		packs: props.packs,
 		activePack: null as PackEntity | null,
+		isTesting: props.canTest ? false : undefined,
 	});
 
 	createEffect(() => {
@@ -26,6 +35,8 @@ export default function OpenPacks(props: { packs: PackEntity[] }) {
 		setTotalPackCount((val) => val - 1);
 	};
 
+	const packsRemaining = () => state.packs.length;
+
 	const setNextPack = () => setState('activePack', { ...state.packs[0] } ?? null);
 
 	const flipCard = (instanceId: string) => {
@@ -37,46 +48,91 @@ export default function OpenPacks(props: { packs: PackEntity[] }) {
 	};
 
 	return (
-		<div class="mt-52 grid grid-cols-[auto_1fr] grid-rows-[80vh] gap-x-8">
-			<section class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6" id="pack-list">
-				<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">
-					Coming up...
-				</h2>
-				<ul class="packs flex w-full flex-col gap-2 pb-2">
-					<For each={state.packs}>
-						{(pack) => (
-							<PackToOpenItem
-								pack={pack}
-								activePackId={state.activePack?.packId || ''}
-								setAsActive={() => setState('activePack', { ...pack })}
-							/>
-						)}
-					</For>
-				</ul>
-			</section>
-			<PackShowcase
-				pack={state.activePack}
-				removePack={removePack}
-				flipCard={flipCard}
-				setNextPack={setNextPack}
-			/>
-		</div>
+		<>
+			<MarginAdjuster startMargin={props.startMargin} />
+			{props.canTest ? (
+				<>
+					<Checkbox
+						name="testmode"
+						label="Enable test mode (opening packs doesn't save)"
+						setValue={(value) => setState('isTesting', value && props.canTest)}
+					/>
+					{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
+				</>
+			) : null}
+			<div class="grid grid-cols-[auto_1fr] grid-rows-[minmax(80vh,auto)] gap-x-8">
+				<section
+					class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6"
+					id="pack-list">
+					<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">
+						Coming up...
+					</h2>
+					<ul class="packs flex w-full flex-col gap-2 pb-2" ref={setAutoAnimate}>
+						<For each={state.packs}>
+							{(pack, index) => (
+								<PackToOpenItem
+									index={index()}
+									pack={pack}
+									activePackId={state.activePack?.packId || ''}
+									setAsActive={() => setState('activePack', { ...pack })}
+								/>
+							)}
+						</For>
+					</ul>
+				</section>
+				<PackShowcase
+					pack={state.activePack}
+					removePack={removePack}
+					flipCard={flipCard}
+					setNextPack={setNextPack}
+					packsRemaining={packsRemaining()}
+					isTesting={(state.isTesting && props.canTest) || false}
+				/>
+			</div>
+		</>
+	);
+}
+
+function MarginAdjuster(props: { startMargin?: number }) {
+	const [margin, setMargin] = createSignal(props.startMargin ?? 200);
+
+	const handleMouseDown = (e: MouseEvent) => {
+		e.preventDefault();
+		let prevY = e.clientY / 1;
+		const handleMouseMove = (e: MouseEvent) => {
+			setMargin((prev) => prev + (e.clientY / 1 - prevY));
+			prevY = e.clientY / 1;
+		};
+		const handleMouseUp = () => {
+			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('mouseup', handleMouseUp);
+			// set the margin in a cookie
+			document.cookie = `openPacksMargin=${margin()}; path=/`;
+		};
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseup', handleMouseUp);
+	};
+
+	return (
+		<button
+			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:opacity-75"
+			onMouseDown={handleMouseDown}
+			style={{ 'margin-top': `${margin()}px` }}>
+			=
+		</button>
 	);
 }
 
 function PackToOpenItem(props: {
+	index: number;
 	pack: PackEntity;
 	activePackId: string;
 	setAsActive: () => void;
 }) {
 	const isActive = () => props.pack.packId === props.activePackId;
 
-	createEffect(() => {
-		console.log(props.pack.packId, props.activePackId, isActive());
-	});
-
 	return (
-		<li>
+		<li class="pack-list-item">
 			<button
 				class="font-display shover:bg-gray-300 shover:text-gray-800 -mx-2 w-full p-2 text-left text-2xl italic text-gray-600"
 				classList={{
@@ -94,48 +150,132 @@ function PackShowcase(props: {
 	removePack: () => void;
 	flipCard: (instanceId: string) => void;
 	setNextPack: () => void;
+	packsRemaining: number;
+	isTesting: boolean;
 }) {
-	const sortedCardDetails = () => props.pack?.cardDetails.slice().sort((a, b) => b.totalOfType - a.totalOfType);
+	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
+		let keyframes: Keyframe[] = [];
+
+		if (action === 'add') {
+			keyframes = [
+				{ transform: 'translateX(-10rem)', opacity: 0 },
+				{ transform: 'translateX(0%)', opacity: 1 },
+			];
+		}
+		if (action === 'remove') {
+			keyframes = [
+				{ transform: 'translateX(0%)', opacity: 1 },
+				{ transform: 'translateX(10rem)', opacity: 0 },
+			];
+		}
+		return new KeyframeEffect(el, keyframes, { duration: 500, easing: 'ease-in-out' });
+	});
+
+	const [animateCardList] = createAutoAnimate((el, action) => {
+		if (!(el instanceof HTMLElement)) return new KeyframeEffect(el, [], {});
+
+		let keyframes: Keyframe[] = [];
+		let duration = 1000;
+		let easing = 'ease-in-out';
+
+		// get the center of the element's parent
+		const parentCenter = {
+			x: (el.parentElement?.clientWidth ?? 0) / 2,
+			y: (el.parentElement?.clientHeight ?? 0) / 2,
+		};
+
+		// get the center of the element relative to its parent
+		const elementCenter = {
+			x: el.offsetLeft + el.clientWidth / 2,
+			y: el.offsetTop + el.clientHeight / 2,
+		};
+
+		// get the distance between the two centers for the x and y axis to translate in CSS
+		const distance = {
+			x: parentCenter.x - elementCenter.x,
+			y: parentCenter.y - elementCenter.y,
+		};
+
+		if (action === 'add') {
+			// start the element off at the parent's center, then translate it to its final position
+			keyframes = [
+				{ transform: `translate(${distance.x}px, ${distance.y}px)`, opacity: 0 },
+				{ transform: `translate(${distance.x}px, ${distance.y}px)`, opacity: 1 },
+				{ transform: 'translate(0px, 0px)' },
+			];
+			easing = 'cubic-bezier(0.33, 1, 0.68, 1)';
+		}
+
+		if (action === 'remove') {
+			// card should scatter and rotate in a random direction
+			const randomRotation = Math.random() * 360;
+			const randomX = Math.random() * 1000 - 500;
+			const randomY = Math.random() * 1000 - 500;
+			keyframes = [
+				{ transform: 'translate(0px, 0px)' },
+				{
+					transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
+					opacity: 0,
+				},
+			];
+			easing = 'cubic-bezier(0.33, 1, 0.68, 1)';
+			duration = 700;
+		}
+		return new KeyframeEffect(el, keyframes, { duration, easing });
+	});
+
+	const sortedCardDetails = () =>
+		props.pack?.cardDetails.slice().sort((a, b) => b.totalOfType - a.totalOfType);
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
+
+	const [username, setUsername] = createSignal(props.pack?.username);
+	createEffect(() => {
+		setUsername(props.pack?.username);
+	});
 
 	return (
 		<div class="bg-brand-100 flex h-full flex-col p-6">
-			{props.pack ? (
-				<>
-					<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">
-						Opening pack for{' '}
-						<span class="font-display text-brand-main block py-4 text-6xl normal-case italic">
-							{props.pack.username}
-						</span>
-					</h2>
-					<ul class="flex flex-wrap items-center justify-center gap-4">
-						<For each={sortedCardDetails()}>
-							{(card) => (
-								<ShowcaseCard
-									card={card}
-									setFlipped={() => props.flipCard(card.instanceId)}
-								/>
-							)}
-						</For>
-					</ul>
-					<Show when={allCardsOpened()}>
-						<button
-							class="bg-brand-main font-display ml-auto mt-8 block p-8 text-7xl italic text-white"
-							onClick={props.setNextPack}>
-							Next
-						</button>
-					</Show>
-				</>
-			) : (
-				<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">
-					Select a pack to start
-				</h2>
-			)}
+			<h2
+				class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700"
+				ref={animateTitle}>
+				{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
+				<Show when={props.pack?.packId} keyed>
+					<span
+						class="font-display text-brand-main block py-4 text-6xl normal-case italic"
+						style={{ 'view-transition-name': 'open-packs-title' }}>
+						{props.pack?.username}
+					</span>
+				</Show>
+			</h2>
+			<ul
+				class="flex w-full flex-wrap items-center justify-center gap-4"
+				ref={animateCardList}>
+				<For each={sortedCardDetails()}>
+					{(card) => (
+						<ShowcaseCard
+							card={card}
+							setFlipped={() => props.flipCard(card.instanceId)}
+							isTesting={props.isTesting}
+						/>
+					)}
+				</For>
+			</ul>
+			<Show when={allCardsOpened() && props.packsRemaining}>
+				<button
+					class="bg-brand-main font-display ml-auto mt-8 block p-8 text-7xl italic text-white"
+					onClick={props.setNextPack}>
+					Next
+				</button>
+			</Show>
 		</div>
 	);
 }
 
-function ShowcaseCard(props: { card: PackEntity['cardDetails'][number]; setFlipped: () => void }) {
+function ShowcaseCard(props: {
+	card: PackEntity['cardDetails'][number];
+	setFlipped: () => void;
+	isTesting: boolean;
+}) {
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
 	const handleClick = async () => {
@@ -147,10 +287,12 @@ function ShowcaseCard(props: { card: PackEntity['cardDetails'][number]; setFlipp
 			designId: props.card.designId,
 		}).toString();
 
-		const res = await fetch(api.CARD, {
-			method: 'PATCH',
-			body,
-		});
+		props.isTesting
+			? console.log('Card flipped: ', body)
+			: await fetch(api.CARD, {
+					method: 'PATCH',
+					body,
+			  });
 	};
 
 	return (

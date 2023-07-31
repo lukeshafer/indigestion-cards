@@ -100,6 +100,9 @@ importers:
       '@fontsource-variable/montserrat':
         specifier: ^5.0.6
         version: 5.0.6
+      '@formkit/auto-animate':
+        specifier: ^0.7.0
+        version: 0.7.0
       '@types/alpinejs':
         specifier: ^3.0.0
         version: 3.7.0
@@ -3458,6 +3461,10 @@ packages:
 
   /@fontsource-variable/montserrat@5.0.6:
     resolution: {integrity: sha512-knjhYCaoKAqNce5LPezPY9j4Qbwa6mRwXvyS/Z3/yq2XoibX4V1E/39V6OnAonxUKwyCiu/D+QZfzlJp4Zu7CA==}
+    dev: false
+
+  /@formkit/auto-animate@0.7.0:
+    resolution: {integrity: sha512-RczHUr0AhRPssREoNdRjLfk2b/id9/DFnbIq18QM8L7E4zNV3XH+WO480EZ46BQHDEsv76YPJ0JbG2Y2i3GfXw==}
     dev: false
 
   /@graphql-tools/executor@0.0.18(graphql@16.7.1):

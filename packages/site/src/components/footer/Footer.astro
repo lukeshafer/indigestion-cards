@@ -1,5 +1,5 @@
 ---
-import { authApi } from '@/constants';
+import { getLoginLink } from '@/lib/utils';
 import { Icon } from 'astro-icon';
 ---
 
@@ -20,5 +20,7 @@ import { Icon } from 'astro-icon';
 		</a>
 	</nav>
 	<p>&copy; {new Date().getFullYear()} lil_indigestion</p>
-	<a href={authApi.LOGIN} class="text-brand-main text-xs underline">Admin Login</a>
+	<a href={getLoginLink({ url: Astro.url })} class="text-brand-main text-xs underline" 
+		>Admin Login</a
+	>
 </footer>

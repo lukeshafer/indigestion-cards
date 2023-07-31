@@ -1,12 +1,14 @@
 ---
-import { authApi } from '@/constants';
+import { getLoginLink } from '@/lib/utils';
 import { Icon } from 'astro-icon';
 const session = Astro.locals.session;
+
+const isAdmin = session?.type === 'admin';
 ---
 
 <a
 	class="post-button mt-5 flex w-fit items-center bg-[#9146ff] text-white gap-2"
-	href={authApi.LOGIN + (session?.type === 'admin' ? '?streamer=true' : '')}>
+	href={getLoginLink({ isStreamer: isAdmin, url: Astro.url })}>
 	<Icon name="mdi:twitch" width="50" />
 	<span>
 		{session?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
