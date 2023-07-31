@@ -6,7 +6,29 @@ export function Events({ stack }: StackContext) {
 	const table = use(Database);
 	const config = use(ConfigStack);
 
+	const dlq = new Queue(stack, 'dlq', {
+		consumer: {
+			function: {
+				bind: [table],
+				handler: 'packages/functions/src/dlq/create-failed-queue-alert.handler',
+				environment: {
+					SESSION_USER_ID: 'dlq',
+					SESSION_USERNAME: 'DLQ',
+					SESSION_TYPE: 'admin',
+				},
+			},
+		},
+	});
+
 	const queue = new Queue(stack, 'queue', {
+		cdk: {
+			queue: {
+				deadLetterQueue: {
+					maxReceiveCount: 5,
+					queue: dlq.cdk.queue,
+				},
+			},
+		},
 		consumer: {
 			function: {
 				bind: [

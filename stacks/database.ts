@@ -47,6 +47,7 @@ export function Database({ stack }: StackContext) {
 					SESSION_USERNAME: 'Refresh Usernames Cron Job',
 				},
 				bind: [table, TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN],
+				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},
 	});
