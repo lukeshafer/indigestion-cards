@@ -4,8 +4,9 @@ import Card from './cards/Card';
 
 interface Props {
 	cards: Parameters<typeof Card>[0][];
+	showUsernames?: boolean;
 }
-const { cards } = Astro.props;
+const { cards, showUsernames } = Astro.props;
 
 const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 ---
@@ -14,11 +15,23 @@ const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 	{
 		cards.length > 0 ? (
 			cards.map((card) => (
-				<Element
-					rel="prefetch"
-					href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''}`}>
-					<Card {...card} client:load />
-				</Element>
+				<div>
+					<Element
+						rel="prefetch"
+						href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''}`}>
+						<Card {...card} client:load />
+					</Element>
+					{showUsernames ? (
+						<p class="mt-2">
+							Owner:{' '}
+							<a
+								href={`${routes.USERS}/${card.username}`}
+								class="font-bold hover:underline inline">
+								{card.username}
+							</a>
+						</p>
+					) : null}
+				</div>
 			))
 		) : (
 			<p>No cards found</p>

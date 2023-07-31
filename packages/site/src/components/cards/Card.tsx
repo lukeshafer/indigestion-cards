@@ -14,6 +14,7 @@ interface Props {
 	instanceId?: string;
 	rarityColor: string;
 	rarityId: string;
+	username?: string;
 }
 
 export default function Card(props: Props) {

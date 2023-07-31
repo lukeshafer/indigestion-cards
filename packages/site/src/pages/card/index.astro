@@ -26,7 +26,8 @@ const message = Astro.url.searchParams.get('message') || '';
 	<CardList
 		cards={designs.map((card) => ({
 			...card,
-			rarityName: siteConfig?.baseRarity.rarityId ?? '',
+			rarityName: siteConfig?.baseRarity.rarityName ?? '',
+			rarityId: siteConfig?.baseRarity.rarityId ?? '',
 			frameUrl: siteConfig?.baseRarity.frameUrl ?? '',
 			rarityColor: siteConfig?.baseRarity.rarityColor ?? '',
 			cardNumber: 1,
