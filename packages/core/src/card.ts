@@ -286,8 +286,8 @@ export async function createPack(args: {
 	const cardPool = args.cardPool;
 	for (let i = 0; i < args.count; i++) {
 		const card = await generateCard({
-			userId: args.userId,
-			username: args.username,
+			userId: user?.userId,
+			username: user?.username,
 			packId,
 			cardPool: args.cardPool,
 		});
@@ -300,7 +300,7 @@ export async function createPack(args: {
 			...(user && args.userId && args.username
 				? [
 						users
-							.patch({ userId: args.userId })
+							.patch({ userId: user.userId })
 							.set({ packCount: (user.packCount ?? 0) + 1 })
 							.commit(),
 				  ]
@@ -310,8 +310,8 @@ export async function createPack(args: {
 					packId,
 					packTypeId: args.packType.packTypeId,
 					packTypeName: args.packType.packTypeName,
-					userId: args.userId,
-					username: args.username,
+					userId: user?.userId,
+					username: user?.username,
 					seasonId: args.seasonId,
 					cardDetails: cards.map((card) => ({
 						instanceId: card.instanceId,
