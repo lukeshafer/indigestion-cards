@@ -10,6 +10,7 @@ import { Checkbox } from '../form/Form';
 export default function OpenPacks(props: {
 	packs: PackEntity[];
 	startMargin?: number;
+	startCardScale?: number;
 	canTest?: boolean;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
@@ -18,6 +19,7 @@ export default function OpenPacks(props: {
 		packs: props.packs,
 		activePack: null as PackEntity | null,
 		isTesting: props.canTest ? false : undefined,
+		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
 	});
 
 	createEffect(() => {
@@ -60,7 +62,7 @@ export default function OpenPacks(props: {
 					{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
 				</>
 			) : null}
-			<div class="grid grid-cols-[auto_1fr] grid-rows-[minmax(80vh,auto)] gap-x-8">
+			<div class="grid grid-cols-[auto_1fr] grid-rows-[minmax(80vh,auto)] ">
 				<section
 					class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6"
 					id="pack-list">
@@ -86,9 +88,14 @@ export default function OpenPacks(props: {
 					flipCard={flipCard}
 					setNextPack={setNextPack}
 					packsRemaining={packsRemaining()}
+					cardScale={state.cardScale}
 					isTesting={(state.isTesting && props.canTest) || false}
 				/>
 			</div>
+			<CardScaleAdjuster
+				scale={state.cardScale}
+				setScale={(newScale: number) => setState('cardScale', newScale)}
+			/>
 		</>
 	);
 }
@@ -123,6 +130,28 @@ function MarginAdjuster(props: { startMargin?: number }) {
 	);
 }
 
+function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => void }) {
+	createEffect(() => {
+		console.log("scale", props.scale)
+		document.cookie = `openPacksScale=${props.scale}; path=/`;
+	})
+
+	return (
+		<div class="flex items-center gap-x-2 justify-center opacity-0 hover:opacity-100 transition-opacity">
+			<label class="font-heading font-bold text-gray-700">Card Scale</label>
+			<input
+				type="range"
+				min="0.25"
+				max="4"
+				step="0.001"
+				value={props.scale}
+				class="w-1/2"
+				onInput={(e) => props.setScale(parseFloat((e.target as HTMLInputElement).value))}
+			/>
+		</div>
+	);
+}
+
 function PackToOpenItem(props: {
 	index: number;
 	pack: PackEntity;
@@ -134,7 +163,7 @@ function PackToOpenItem(props: {
 	return (
 		<li class="pack-list-item">
 			<button
-				class="font-display hover:bg-gray-300 hover:text-gray-800 -mx-2 w-full p-2 text-left text-2xl italic text-gray-600"
+				class="font-display -mx-2 w-full p-2 text-left text-2xl italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 				}}
@@ -152,6 +181,7 @@ function PackShowcase(props: {
 	setNextPack: () => void;
 	packsRemaining: number;
 	isTesting: boolean;
+	cardScale: number;
 }) {
 	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
 		let keyframes: Keyframe[] = [];
@@ -234,9 +264,9 @@ function PackShowcase(props: {
 	});
 
 	return (
-		<div class="bg-brand-100 flex h-full flex-col p-6">
+		<div class="bg-brand-100 flex h-full flex-col">
 			<h2
-				class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700"
+				class="font-heading m-6 mb-8 text-4xl font-bold uppercase text-gray-700"
 				ref={animateTitle}>
 				{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 				<Show when={props.pack?.packId} keyed>
@@ -248,7 +278,8 @@ function PackShowcase(props: {
 				</Show>
 			</h2>
 			<ul
-				class="flex w-full flex-wrap items-center justify-center gap-4"
+				style={{ gap: `${props.cardScale}rem` }}
+				class="flex w-full flex-wrap items-center justify-center"
 				ref={animateCardList}>
 				<For each={sortedCardDetails()}>
 					{(card) => (
@@ -256,6 +287,7 @@ function PackShowcase(props: {
 							card={card}
 							setFlipped={() => props.flipCard(card.instanceId)}
 							isTesting={props.isTesting}
+							scale={props.cardScale}
 						/>
 					)}
 				</For>
@@ -275,6 +307,7 @@ function ShowcaseCard(props: {
 	card: PackEntity['cardDetails'][number];
 	setFlipped: () => void;
 	isTesting: boolean;
+	scale: number;
 }) {
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
@@ -290,9 +323,9 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(api.CARD, {
-					method: 'PATCH',
-					body,
-			  });
+				method: 'PATCH',
+				body,
+			});
 	};
 
 	return (
@@ -300,7 +333,8 @@ function ShowcaseCard(props: {
 			<p class="error-text"></p>
 			<div
 				classList={{ flipped: flipped() }}
-				class="perspective preserve-3d card-aspect-ratio relative block w-60 origin-center transition-transform duration-500">
+				style={{ width: props.scale * 18 + 'rem' }}
+				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
 					onClick={handleClick}
 					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
@@ -308,7 +342,7 @@ function ShowcaseCard(props: {
 					<img src="/card-back.png" class="w-full" />
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
-					<div style={{ scale: '0.8333' }} class="origin-top-left">
+					<div style={{ scale: props.scale }} class="origin-top-left">
 						<Card {...props.card} />
 					</div>
 				</div>

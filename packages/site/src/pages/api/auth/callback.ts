@@ -1,6 +1,7 @@
 import { AUTH_TOKEN } from '@/constants';
 import type { APIContext } from 'astro';
 import { Auth } from 'sst/node/future/auth';
+import { Session } from 'sst/node/future/auth';
 
 export async function get(ctx: APIContext) {
 	const code = ctx.url.searchParams.get('code');
@@ -27,5 +28,10 @@ export async function get(ctx: APIContext) {
 		path: '/',
 	});
 
-	return ctx.redirect('/', 302);
+	const session = Session.verify(response.access_token);
+
+	if (session.type === 'admin') {
+		return ctx.redirect(`/?alert=Logged in!`, 302);
+	}
+	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }

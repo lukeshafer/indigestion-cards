@@ -9,13 +9,21 @@ export const patch: APIRoute = async (ctx) => {
 	const instanceId = params.get('instanceId');
 	const designId = params.get('designId');
 
-	if (!instanceId || !designId)
+	if (!instanceId || !designId) {
+		console.error({
+			message: 'Instance ID and design ID are required',
+			instanceId,
+			designId,
+		});
 		return new Response('Instance ID and design ID are required', { status: 400 });
+	}
 
 	const result = await openCardFromPack({ instanceId, designId });
 
-	if (!result.success)
-		return new Response("There was an error opening the card.", { status: 400 });
+	if (!result.success) {
+		console.error(result);
+		return new Response('There was an error opening the card.', { status: 400 });
+	}
 
 	return new Response('Card opened successfully', { status: 200 });
 };

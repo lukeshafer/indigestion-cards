@@ -9,6 +9,7 @@ const packs = allPacks
 	.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 
 const startMargin = Astro.cookies.get('openPacksMargin').value;
+const startCardScale = Astro.cookies.get('openPacksScale').value;
 ---
 
 <Page title="Open Packs" breadcrumbs={[{ label: 'Open Packs' }]} wide>
@@ -16,6 +17,7 @@ const startMargin = Astro.cookies.get('openPacksMargin').value;
 		packs={packs}
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
+		startCardScale={startCardScale ? Number(startCardScale) : undefined}
 		client:load
 	/>
 </Page>

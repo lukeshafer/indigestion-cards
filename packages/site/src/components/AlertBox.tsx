@@ -35,9 +35,8 @@ function Alert(
 					if (document.startViewTransition)
 						document.startViewTransition(() => deleteAlert());
 					else deleteAlert();
-				}}
-				class="pb-1">
-				x
+				}}>
+				<span class="opacity-50">✕</span>
 			</button>
 			<div>{props.message}</div>
 		</div>
