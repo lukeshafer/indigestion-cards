@@ -5,7 +5,7 @@ export default function AlertBox(props: { alerts: Alert[] }) {
 	setAlerts(props.alerts);
 
 	return (
-		<div class="sticky top-0">
+		<div>
 			<For each={alerts()}>{(alert, index) => <Alert index={index()} {...alert} />}</For>
 		</div>
 	);
@@ -28,12 +28,18 @@ function Alert(
 	};
 	return (
 		<div
-			class="view-transition-alert flex items-center justify-between p-4"
+			class="view-transition-alert flex items-center gap-x-5 p-4"
 			classList={{ [alertStyles[props.type]]: true }}>
-			<div>{props.message}</div>
-			<button class="text-xl" onclick={deleteAlert}>
-				X
+			<button
+				onclick={() => {
+					if (document.startViewTransition)
+						document.startViewTransition(() => deleteAlert());
+					else deleteAlert();
+				}}
+				class="pb-1">
+				x
 			</button>
+			<div>{props.message}</div>
 		</div>
 	);
 }

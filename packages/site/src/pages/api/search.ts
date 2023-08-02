@@ -1,53 +1,24 @@
-import type { APIRoute } from 'astro'
-import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user'
-import { routes } from '@/constants'
+import type { APIRoute } from 'astro';
+import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user';
+import { routes } from '@/constants';
 
 export const get: APIRoute = async (ctx) => {
-	const username = ctx.url.searchParams.get('username')
+	const username = ctx.url.searchParams.get('username');
 
-	if (!username) {
-		const referer = new URL(ctx.request.headers.get('referer') || '/')
-		referer.searchParams.set('alert', 'Please enter a username')
-		return new Response(null, {
-			status: 302,
-			headers: {
-				Location: referer.toString(),
-			},
-		})
-	}
+	if (!username) return ctx.redirect(routes.USERS);
 
-	const user = await getUserByUserName(username)
-	if (user) {
-		return new Response(null, {
-			status: 302,
-			headers: {
-				Location: `${routes.USERS}/${user.username}`,
-			},
-		})
-	}
+	const user = await getUserByUserName(username);
+	if (user) return ctx.redirect(`${routes.USERS}/${user.username}`);
 
-	const users = await getAllUsers()
-	const similarUsers = users.filter((user) => user.username.includes(username))
-	if (similarUsers.length === 1) {
-		return new Response(null, {
-			status: 302,
-			headers: {
-				Location: `${routes.USERS}/${similarUsers[0]!.username}`,
-			},
-		})
-	}
+	const users = await getAllUsers();
+	const similarUsers = users.filter((user) =>
+		user.username.toLowerCase().includes(username.toLowerCase())
+	);
 
-	const referer = new URL(ctx.request.headers.get('referer') || '/')
+	if (similarUsers.length === 1)
+		return ctx.redirect(`${routes.USERS}/${similarUsers[0]!.username}`);
 
-	if (similarUsers.length > 1) {
-		referer.searchParams.set('alert', 'User not found')
-	} else {
-		referer.searchParams.set('alert', 'User not found, too many similar users')
-	}
-	return new Response(null, {
-		status: 302,
-		headers: {
-			Location: referer.toString(),
-		},
-	})
-}
+	return ctx.redirect(
+		`${routes.USERS}?alert=${encodeURIComponent(`User ${username} not found.`)}`
+	);
+};

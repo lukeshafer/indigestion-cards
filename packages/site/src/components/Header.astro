@@ -2,7 +2,7 @@
 import AdminOnly from '@/components/AdminOnly.astro';
 import Hamburger from '@/components/Hamburger.astro';
 import UserConfig from '@/components/UserConfig';
-import UserSearch from '@/components/UserSearch.astro';
+import UserSearch from '@/components/UserSearch';
 
 const disableAnimations = Astro.cookies.get('disable-animations').boolean()
 ---
@@ -23,7 +23,7 @@ const disableAnimations = Astro.cookies.get('disable-animations').boolean()
 				</div>
 			</a>
 		</div>
-		<UserSearch />
+		<UserSearch client:load />
 		<UserConfig client:load {disableAnimations} />
 	</header>
 </div>

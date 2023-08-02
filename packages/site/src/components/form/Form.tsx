@@ -39,16 +39,25 @@ export function Form(props: {
 		const data = new URLSearchParams(formData as unknown as string);
 
 		setIsLoading(true);
-		const response = await fetch(props.action, {
+		const action =
+			props.method.toUpperCase() === 'GET' ? `${props.action}?${data}` : props.action;
+		const body = props.method.toUpperCase() === 'GET' ? undefined : data;
+
+		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
-			body: data,
+			body,
 		}).finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			location.assign(response.url);
+			const link = document.createElement('a')
+			link.href = response.url;
+			link.hidden = true;
+			document.body.appendChild(link);
+			link.click();
+			//location.assign(response.url);
 			return;
 		}
 
@@ -108,7 +117,7 @@ function Label(props: { label: string; name: string; required?: boolean }) {
 	);
 }
 
-interface InputProps<T extends number | string> {
+interface InputProps<T extends number | string> extends JSX.InputHTMLAttributes<HTMLInputElement> {
 	label: string;
 	name: string;
 	value?: T;
@@ -123,6 +132,7 @@ interface InputProps<T extends number | string> {
 export function TextInput(props: InputProps<string>) {
 	return props.inputOnly ? (
 		<input
+			{...props}
 			id={props.name}
 			name={props.name}
 			type="text"
