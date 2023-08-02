@@ -11,15 +11,15 @@ const { cards, showUsernames } = Astro.props;
 const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 ---
 
-<ul class="grid w-full justify-center justify-items-center gap-x-4 gap-y-10 px-3">
+<ul class="grid w-full justify-center justify-items-center gap-x-2 md:gap-x-6 gap-y-14 px-3">
 	{
 		cards.length > 0 ? (
 			cards.map((card) => (
-				<div>
+				<div class="w-fit">
 					<Element
 						rel="prefetch"
 						href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''}`}>
-						<Card {...card} client:load />
+						<Card {...card} scale="var(--card-scale)" client:load />
 					</Element>
 					{showUsernames ? (
 						<p class="mt-2">
@@ -41,6 +41,13 @@ const Element = Astro.locals.session?.type === 'admin' ? 'a' : 'div';
 
 <style>
 	ul {
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr));
+		--card-scale: 0.75;
+	}
+
+	@media (min-width: 640px) {
+		ul {
+			--card-scale: 1;
+		}
 	}
 </style>
