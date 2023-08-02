@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
-import { Heading } from '@/components/text';
+import { Heading, PageTitle } from '@/components/text';
 import Card from '@/components/cards/Card';
 
 const slug = Astro.params.instanceSlug;
@@ -31,26 +31,22 @@ const openDate = instance.openedAt
 
 <Page
 	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
-	class="flex flex-col gap-9"
+	class="flex flex-col gap-6"
 	breadcrumbs={[
 		{ label: routeNames.CARDS, href: routes.DESIGNS },
 		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
 		{ label: `${instance.rarityName} #${instance.cardNumber}` },
 	]}>
-	<header class="flex flex-col gap-4">
-		<h1 class="font-display my-3 text-3xl italic">
+	<header class="flex flex-col items-center gap-4">
+		<PageTitle>
 			{instance.cardName}, {instance.rarityName} #{instance.cardNumber}
-		</h1>
+		</PageTitle>
 		<div class="mx-4">
 			<Card {...instance} client:load />
 		</div>
-		{
-			instance.cardDescription ? (
-				<p class="max-w-sm  text-lg">{instance.cardDescription}</p>
-			) : null
-		}
+
 	</header>
-	<section class="text-lg">
+	<section class="text-lg mx-auto">
 		<Heading>Stats:</Heading>
 		<p>
 			<b>Rarity:</b>
@@ -62,13 +58,13 @@ const openDate = instance.openedAt
 		</p>
 		<p>
 			<b>Season:</b>
-			<a href={`${routes.SEASONS}/${instance.seasonId}`}>{instance.seasonName}</a>
+			<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}>{instance.seasonName}</a>
 		</p>
 		<p>
 			<b>Owner</b>
 			{
 				instance.username ? (
-					<a href={`${routes.USERS}/${instance.username}`}>{instance.username}</a>
+					<a class="underline" href={`${routes.USERS}/${instance.username}`}>{instance.username}</a>
 				) : (
 					'None'
 				)
@@ -78,7 +74,7 @@ const openDate = instance.openedAt
 			<b>Minter</b>
 			{
 				instance.minterUsername ? (
-					<a href={`${routes.USERS}/${instance.minterUsername}`}>
+					<a class="underline" href={`${routes.USERS}/${instance.minterUsername}`}>
 						{instance.minterUsername}
 					</a>
 				) : (

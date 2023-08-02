@@ -23,17 +23,27 @@ const path = [
 	{
 		path.map(({ label, href }, index) =>
 			index === path.length - 1 && (label !== 'Home' || Astro.url.pathname === '/') ? (
-				<p class="font-heading text-brand-main block font-bold">{label}</p>
+				<p
+					class="font-heading text-brand-main block font-bold"
+					transition:name={`breadcrumb-${index}`}>
+					{label}
+				</p>
 			) : href ? (
 				<>
-					<a rel="prefetch" class="font-heading underline" href={href}>
+					<a
+						rel="prefetch"
+						class="font-heading underline"
+						href={href}
+						transition:name={`breadcrumb-${index}`}>
 						{label}
 					</a>
 					<p class="font-heading block">/</p>
 				</>
 			) : (
 				<>
-					<p class="font-heading block">{label}</p>
+					<p class="font-heading block" transition:name={`breadcrumb-${index}`}>
+						{label}
+					</p>
 					<p class="font-heading block">/</p>
 				</>
 			)
