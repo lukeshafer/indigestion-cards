@@ -44,6 +44,7 @@ declare module 'solid-js' {
 		interface Directives {
 			clickOutside: any
 			searchDirective: any
+			showPreview: any
 		}
 	}
 }

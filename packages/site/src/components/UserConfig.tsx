@@ -10,7 +10,9 @@ function clickOutside(el: Element, accessor: () => any) {
 
 export default function UserConfig(props: { disableAnimations?: boolean }) {
 	const [isOpen, setIsOpen] = createSignal(false);
-	const [disableAnimations, setDisableAnimations] = createSignal(props.disableAnimations ?? false);
+	const [disableAnimations, setDisableAnimations] = createSignal(
+		props.disableAnimations ?? false
+	);
 	onMount(() => {
 		setDisableAnimations(localStorage.getItem('disableAnimations') === 'true');
 	});
@@ -21,7 +23,6 @@ export default function UserConfig(props: { disableAnimations?: boolean }) {
 
 		// set disable-animations cookie
 		document.cookie = `disable-animations=${disableAnimations()}; path=/; max-age=31536000`;
-
 	});
 
 	return (
@@ -43,7 +44,7 @@ export default function UserConfig(props: { disableAnimations?: boolean }) {
 						Preferences
 					</h2>
 					<button
-						class="post-button flex gap-4 after:flex after:h-6 after:w-6 after:items-center after:justify-center after:border after:border-white"
+						class="text-shadow flex gap-4 px-4 py-2 font-bold uppercase after:flex after:h-6 after:w-6 after:items-center after:justify-center after:border after:border-white"
 						classList={{
 							'after:content-["✔"]': disableAnimations(),
 							'after:content-[""]': !disableAnimations(),

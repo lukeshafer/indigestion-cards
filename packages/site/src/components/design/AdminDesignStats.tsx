@@ -2,6 +2,7 @@ import { Index, createSignal } from 'solid-js';
 import type { RarityStats } from '@lil-indigestion-cards/core/rarity';
 import Table from '@/components/table/Table';
 import { routes } from '@/constants';
+import { Checkbox } from '@/components/form';
 
 export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[] }) {
 	const [hideUnowned, setHideUnowned] = createSignal(false);
@@ -12,15 +13,7 @@ export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[
 				<h2 class="font-heading my-2 text-2xl font-medium uppercase leading-5">
 					Instance Breakdown
 				</h2>
-				<div>
-					<input
-						type="checkbox"
-						onInput={(e) => setHideUnowned(e.currentTarget.checked)}
-						id="hide-unowned"
-						class="my-form-checkbox"
-					/>
-					<label for="hide-unowned">Hide Unowned</label>
-				</div>
+				<Checkbox label="Hide Unowned" setValue={setHideUnowned} name="hide-unowned" />
 			</header>
 			<ul>
 				<Index each={props.rarityStatsArray}>
@@ -61,17 +54,20 @@ function RarityStatsTable(props: RarityStats & { hideUnowned: boolean }) {
 				]}
 				rows={rows().map((instance, index) => ({
 					cardNumber: instance?.cardNumber ?? index + 1,
-					username: (
-						<>
-							{instance?.username ? (
-								<a href={`${routes.USERS}/${instance?.username ?? ''}`}>
-									{instance.username}
-								</a>
-							) : (
-								'Not Owned'
-							)}
-						</>
-					),
+					username: {
+						element: (
+							<>
+								{instance?.username ? (
+									<a href={`${routes.USERS}/${instance?.username ?? ''}`}>
+										{instance.username}
+									</a>
+								) : (
+									'Not Owned'
+								)}
+							</>
+						),
+						value: instance?.username ?? '',
+					},
 					openedAt: instance?.openedAt
 						? new Date(instance.openedAt).toLocaleDateString()
 						: '',

@@ -8,6 +8,7 @@ import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 import PageHeader from '@/components/text/PageHeader.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
+import { Anchor } from '@/components/form/Form'
 
 const [designs, siteConfig] = await Promise.all([getAllCardDesigns(), getSiteConfig()]);
 
@@ -20,7 +21,7 @@ const message = Astro.url.searchParams.get('message') || '';
 	<PageHeader>
 		<PageHeading>All Cards</PageHeading>
 		<AdminOnly>
-			<a href={routes.ADMIN.CREATE.CARD_DESIGN} class="button-link">Create New Design</a>
+			<Anchor href={routes.ADMIN.CREATE.CARD_DESIGN}>New Card</Anchor>
 		</AdminOnly>
 	</PageHeader>
 	<CardList

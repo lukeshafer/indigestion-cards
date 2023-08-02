@@ -3,8 +3,7 @@ import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
 
-import PageHeader from '@/components/text/PageHeader.astro';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageHeader, PageTitle, Anchor } from '@/components/text';
 
 import PackTypeTable from '@/components/pack-type/PackTypeTable';
 
@@ -13,10 +12,10 @@ const packTypes = await getAllPackTypes();
 
 <Page title="Pack Types" breadcrumbs={[{ label: routeNames.PACK_TYPES }]}>
 	<PageHeader>
-		<PageHeading>Pack Types</PageHeading>
-		<a href={routes.ADMIN.CREATE.PACK_TYPE} class="button-link"> Create New Pack Type</a>
+		<PageTitle>Pack Types</PageTitle>
+		<Anchor href={routes.ADMIN.CREATE.PACK_TYPE}>Create New Pack Type</Anchor>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
-		<PackTypeTable {packTypes} />
+		<PackTypeTable {packTypes} client:load />
 	</div>
 </Page>

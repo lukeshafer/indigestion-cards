@@ -1,10 +1,10 @@
 ---
 import Page from '@/layouts/Page.astro';
-import PageHeader from '@/components/text/PageHeader.astro';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageHeader, PageTitle } from '@/components/text';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
 import { routes, routeNames } from '@/constants';
+import { Anchor } from '@/components/form/Form';
 import RarityTable from '@/components/rarities/RarityTable';
 
 const rarities = await getAllRarities();
@@ -13,8 +13,8 @@ const rarities = await getAllRarities();
 <Page title="Rarities" class="flex flex-col gap-4" breadcrumbs={[{ label: routeNames.RARITIES }]}>
 	<UnmatchedImageList type="frame" />
 	<PageHeader>
-		<PageHeading>Rarities</PageHeading>
-		<a href={routes.ADMIN.CREATE.RARITY} class="button-link">Create New Rarity</a>
+		<PageTitle>Rarities</PageTitle>
+		<Anchor href={routes.ADMIN.CREATE.RARITY}>New Rarity</Anchor>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
 		<RarityTable {rarities} client:load />

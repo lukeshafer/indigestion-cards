@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames } from '@/constants';
 import PackTable from '@/components/pack/PackTable';
 
@@ -9,9 +9,10 @@ const packs = await getAllPacks();
 ---
 
 <Page title="All Packs" breadcrumbs={[{ label: routeNames.PACKS }]}>
-	<header class="page-header">
-		<PageHeading>All Packs</PageHeading>
-	</header>
+	<PageHeader>
+		<PageTitle>All Packs</PageTitle>
+	</PageHeader>
+
 	<div class="max-w-2xl mx-auto">
 		<PackTable {packs} client:load />
 	</div>

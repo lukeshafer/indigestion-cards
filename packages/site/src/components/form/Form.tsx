@@ -25,6 +25,9 @@ export function Form(props: {
 	const [isLoading, setIsLoading] = createSignal(false);
 
 	const formAction = () => {
+		// Forms support GET and POST methods, so no need to modify the method on the server
+		if (props.method === 'get' || props.method === 'post') return props.action;
+
 		const formURL = new URL(props.action, 'http://localhost:3000');
 		formURL.searchParams.set('formmethod', props.method);
 		return formURL.pathname + '?' + formURL.searchParams.toString();
@@ -52,7 +55,7 @@ export function Form(props: {
 		}).finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			const link = document.createElement('a')
+			const link = document.createElement('a');
 			link.href = response.url;
 			link.hidden = true;
 			document.body.appendChild(link);
@@ -96,8 +99,6 @@ export function Form(props: {
 		</form>
 	);
 }
-
-// TODO: form-indicator
 
 const BASE_INPUT_CLASS =
 	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-none focus:ring-4';
@@ -227,6 +228,47 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 	);
 }
 
+export function FileInput(props: {
+	label: string;
+	name: string;
+	required?: boolean;
+	accept?: string;
+}) {
+	const [preview, setPreview] = createSignal<string | null>(null);
+	const showPreview = (el: HTMLInputElement) => {
+		el.addEventListener('change', () => {
+			const file = el.files?.[0];
+			if (!file || !file.type.startsWith('image/')) {
+				setPreview(null);
+				return;
+			}
+
+			setPreview(URL.createObjectURL(file));
+		});
+	};
+
+	return (
+		<InputGroup>
+			<Label {...props} />
+			<input
+				use:showPreview
+				id={props.name}
+				name={props.name}
+				type="file"
+				class="focus:border-accent-light focus:ring-accent-light file:text-shadow file:bg-brand-main 
+				file:hover:bg-brand-dark file:brand-shadow block w-full rounded-none p-1 text-black 
+				file:cursor-pointer file:rounded file:border-none file:px-4 file:py-2 file:font-bold 
+				file:uppercase file:text-white file:transition-colors focus:outline-none focus:ring-4"
+				required={props.required}
+				accept={props.accept}
+			/>
+			<Show when={preview()}>
+				<img src={preview()!} class="my-4 max-w-xs object-contain" />
+			</Show>
+		</InputGroup>
+	);
+}
+
 export function Select(props: {
 	label?: string;
 	name: string;
@@ -297,6 +339,20 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 
 const BUTTON_CLASS =
 	'text-shadow font-heading rounded border border-gray-300 px-4 py-2 font-bold uppercase text-white transition-colors';
+
+export function Anchor(props: { children: string; href: string; type?: 'submit' | 'delete' }) {
+	return (
+		<a
+			href={props.href}
+			class={BUTTON_CLASS}
+			classList={{
+				'bg-brand-main hover:bg-brand-dark': !props.type || props.type === 'submit',
+				'bg-red-500 hover:bg-red-800': props.type === 'delete',
+			}}>
+			{props.children}
+		</a>
+	);
+}
 
 export function SubmitButton(props: { children?: string; onClick?: () => void }) {
 	return (

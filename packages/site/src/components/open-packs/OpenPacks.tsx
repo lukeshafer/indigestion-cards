@@ -134,7 +134,7 @@ function PackToOpenItem(props: {
 	return (
 		<li class="pack-list-item">
 			<button
-				class="font-display shover:bg-gray-300 shover:text-gray-800 -mx-2 w-full p-2 text-left text-2xl italic text-gray-600"
+				class="font-display hover:bg-gray-300 hover:text-gray-800 -mx-2 w-full p-2 text-left text-2xl italic text-gray-600"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 				}}

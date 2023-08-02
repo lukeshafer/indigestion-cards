@@ -25,10 +25,6 @@ const disableAnimations = Astro.cookies.get('disable-animations').boolean();
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#ffffff" />
-		<script src="../elements/my-form.ts"></script>
-		<script src="../elements/form-indicator.ts"></script>
-		<script src="../elements/sort-table.ts"></script>
-		<script src="../elements/table-search.ts"></script>
 		<title>{title || 'Indigestion Cards'}</title>
 		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>

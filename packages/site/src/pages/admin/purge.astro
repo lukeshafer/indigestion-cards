@@ -1,5 +1,4 @@
 ---
-import Form from '@/components/form/Form.astro';
 import Page from '@/layouts/Page.astro';
 
 if (Astro.url.hostname !== 'localhost') {
@@ -13,7 +12,7 @@ if (Astro.url.hostname !== 'localhost') {
 		You are about to purge the database. This will delete <b>ALL</b> data in the database. This action
 		cannot be undone.
 	</p>
-	<Form id="purge-form" action="/api/admin/purge-db">
+	<form id="purge-form" action="/api/admin/purge-db">
 		<p class="mt-4 text-lg">
 			To confirm, type
 			<code class="px-2 py-1 text-sm font-mono bg-gray-100 rounded-md" data-first-code-text
@@ -24,7 +23,6 @@ if (Astro.url.hostname !== 'localhost') {
 		<input
 			type="text"
 			data-first-input
-			class="my-form-input"
 			name="first-input"
 			autocomplete="off"
 		/>
@@ -40,7 +38,7 @@ if (Astro.url.hostname !== 'localhost') {
 				<input
 					type="text"
 					data-second-input
-					class="my-form-input mt-4"
+					class="mt-4"
 					name="second-input"
 					autocomplete="off"
 				/>
@@ -48,11 +46,16 @@ if (Astro.url.hostname !== 'localhost') {
 		</div>
 
 		<button type="submit">Submit</button>
-	</Form>
+	</form>
 </Page>
 
 <style>
-	.my-form-input {
+	input {
+		display: block;
+		width: 100%;
+		padding: 0.25rem;
+		background-color: #fff;
+		color: black;
 		border: 1px solid #ef4444;
 	}
 

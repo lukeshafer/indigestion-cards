@@ -21,6 +21,7 @@ export default function PackTable(props: { packs: PackEntity[] }) {
 				{
 					name: 'actions',
 					label: 'Actions',
+					sort: false,
 				},
 			]}
 			rows={props.packs.map(PackRow)}
@@ -34,34 +35,40 @@ function PackRow(props: PackEntity) {
 
 	return {
 		get username() {
-			return isEditing() ? (
-				<TextInput
-					inputOnly
-					name="username"
-					label="Username"
-					value={username()}
-					setValue={setUsername}
-				/>
-			) : (
-				username() ?? 'None'
-			);
+			return isEditing()
+				? {
+						element: (
+							<TextInput
+								inputOnly
+								name="username"
+								label="Username"
+								value={username()}
+								setValue={setUsername}
+							/>
+						),
+						value: username() ?? 'None',
+				  }
+				: username() ?? 'None';
 		},
 		packTypeName: props.packTypeName,
-		actions: (
-			<div>
-				{isEditing() ? (
-					<Form
-						action={api.PACK.UPDATE}
-						method="patch"
-						onsuccess={() => setIsEditing(false)}>
-						<input type="hidden" name="packId" value={props.packId} />
-						<input type="hidden" name="username" value={username()} />
-						<SubmitButton>Save</SubmitButton>
-					</Form>
-				) : (
-					<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
-				)}
-			</div>
-		),
+		actions: {
+			element: (
+				<div>
+					{isEditing() ? (
+						<Form
+							action={api.PACK.UPDATE}
+							method="patch"
+							onsuccess={() => setIsEditing(false)}>
+							<input type="hidden" name="packId" value={props.packId} />
+							<input type="hidden" name="username" value={username()} />
+							<SubmitButton>Save</SubmitButton>
+						</Form>
+					) : (
+						<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
+					)}
+				</div>
+			),
+			value: '',
+		},
 	};
 }

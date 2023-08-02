@@ -4,7 +4,7 @@ import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { S3Client } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import Page from '@/layouts/Page.astro';
-import Form from '@/components/form/Form.astro';
+import { Form, FileInput, SubmitButton } from '@/components/form/Form';
 import { routeNames, routes } from '@/constants';
 import PageHeading from '@/components/text/PageHeading.astro';
 
@@ -21,24 +21,25 @@ const presigned = await createPresignedPost(s3, {
 
 <Page
 	title="Create New Card"
-	class="grid gap-4"
 	breadcrumbs={[
 		{ label: routeNames.CARDS, href: routes.DESIGNS },
 		{ label: 'New Card', href: routes.ADMIN.CREATE.CARD_DESIGN },
 	]}>
 	<PageHeading>Create New Card</PageHeading>
-	<div>
-		<Form method="post" action={presigned.url} enctype="multipart/form-data">
-			{
-				Object.entries(presigned.fields).map(([key, value]) => (
-					<input type="hidden" name={key} value={value} />
-				))
-			}
-			<div class="input-group">
-				<label data-for="file" for="file">Please upload the card image</label>
-				<input type="file" name="file" id="file" accept="image/jpeg" required />
-			</div>
-			<button type="submit">Upload</button>
-		</Form>
-	</div>
+
+	<Form method="post" action={presigned.url} enctype="multipart/form-data">
+		{
+			Object.entries(presigned.fields).map(([key, value]) => (
+				<input type="hidden" name={key} value={value} />
+			))
+		}
+		<FileInput
+			label="Please upload the card image."
+			name="file"
+			accept="image/*"
+			required
+			client:load
+		/>
+		<SubmitButton>Upload</SubmitButton>
+	</Form>
 </Page>

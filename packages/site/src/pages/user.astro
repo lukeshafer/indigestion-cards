@@ -1,10 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllUsers } from '@lil-indigestion-cards/core/user';
-import TableSearch from '@/components/TableSearch.astro';
-import { publicApi, routeNames } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
-import PageHeader from '@/components/text/PageHeader.astro';
+import { routeNames } from '@/constants';
+import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
 
 const users = await getAllUsers();
@@ -12,13 +10,7 @@ const users = await getAllUsers();
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
 	<PageHeader>
-		<PageHeading>Users</PageHeading>
-		<TableSearch
-			tableId="user-table"
-			label="Search Users"
-			id="user-table-search"
-			action={publicApi.SEARCH}
-		/>
+		<PageTitle>Users</PageTitle>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
 		<UsersTable users={users} client:load />

@@ -1,7 +1,7 @@
 ---
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import Page from '@/layouts/Page.astro';
-import Form from '@/components/form/Form.astro';
+import { Form, FileInput, SubmitButton } from '@/components/form/Form';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Bucket } from 'sst/node/bucket';
 import crypto from 'crypto';
@@ -21,21 +21,23 @@ const presigned = await createPresignedPost(s3, {
 
 <Page
 	title="Create new rarity"
-	class="grid gap-4"
 	breadcrumbs={[{ label: routeNames.RARITIES, href: routes.RARITIES }, { label: 'New Rarity' }]}>
 	<PageHeading>Create new rarity</PageHeading>
 	<div>
-		<Form class="w-max" method="post" action={presigned.url} enctype="multipart/form-data">
+		<Form method="post" action={presigned.url} enctype="multipart/form-data">
 			{
 				Object.entries(presigned.fields).map(([key, value]) => (
 					<input type="hidden" name={key} value={value} />
 				))
 			}
-			<div class="input-group">
-				<label for="file">Please upload frame image for rarity</label>
-				<input type="file" name="file" id="file" accept="image/png" required />
-			</div>
-			<button type="submit">Upload</button>
+			<FileInput
+				label="Please upload the frame image."
+				name="file"
+				accept="image/*"
+				required
+				client:load
+			/>
+			<SubmitButton>Upload</SubmitButton>
 		</Form>
 	</div>
 </Page>

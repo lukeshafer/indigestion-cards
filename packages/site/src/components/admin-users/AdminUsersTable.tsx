@@ -58,6 +58,10 @@ export default function AdminUsersTable(props: { users: AdminEntity[]; currentUs
 	return (
 		<Table
 			id="admin-users-table"
+			search={{
+				label: 'Search',
+				column: 'username',
+			}}
 			columns={[
 				{
 					name: 'username',
@@ -69,18 +73,22 @@ export default function AdminUsersTable(props: { users: AdminEntity[]; currentUs
 				{
 					name: 'actions',
 					label: 'Actions',
+					sort: false,
 				},
 			]}
 			rows={adminUsers()
 				.map((user) => ({
 					username: user.username,
-					actions: isCurrentUser(user.userId) ? (
-						''
-					) : (
-						<div class="m-auto w-fit">
-							<DeleteAdminUserButton {...user} onSuccess={refetch} />
-						</div>
-					),
+					actions: isCurrentUser(user.userId)
+						? ''
+						: {
+								element: (
+									<div class="m-auto w-fit">
+										<DeleteAdminUserButton {...user} onSuccess={refetch} />
+									</div>
+								),
+								value: '',
+						  },
 				}))
 				// @ts-ignore
 				.concat(addingAdminUser() === true ? [newUser()] : [])}

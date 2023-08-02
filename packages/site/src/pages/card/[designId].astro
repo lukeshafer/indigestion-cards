@@ -8,7 +8,7 @@ import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import PageHeading from '@/components/text/PageHeading.astro';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
-import DesignOverviewTable from '@/components/design/DesignOverviewTable.astro';
+import DesignOverviewTable from '@/components/design/DesignOverviewTable';
 import SubHeading from '@/components/text/SubHeading.astro';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
@@ -66,7 +66,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 			<div class="my-4 flex flex-col gap-8">
 				<section class="grid text-lg">
 					<SubHeading>Stats Overview</SubHeading>
-					<DesignOverviewTable {rarityStatsArray} />
+					<DesignOverviewTable {rarityStatsArray} client:load />
 				</section>
 				<AdminDesignStats {rarityStatsArray} client:load />
 			</div>

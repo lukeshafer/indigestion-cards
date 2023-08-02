@@ -39,6 +39,10 @@ export default function SiteConfigForm(props: {
 				})}
 			/>
 			<Table
+				search={{
+					label: 'Search Events',
+					column: 'event',
+				}}
 				columns={[
 					{
 						name: 'event',
@@ -55,27 +59,33 @@ export default function SiteConfigForm(props: {
 				rows={[
 					{
 						event: '5 Gift Subs',
-						packType: (
-							<TwitchEventSelect
-								twitchEvent={props.giftSubEvent}
-								packTypes={props.packTypes}
-								onChange={(val) => {
-									setIsEdited(true);
-								}}
-							/>
-						),
+						packType: {
+							element: (
+								<TwitchEventSelect
+									twitchEvent={props.giftSubEvent}
+									packTypes={props.packTypes}
+									onChange={(val) => {
+										setIsEdited(true);
+									}}
+								/>
+							),
+							value: '',
+						},
 					},
 					...props.twitchEvents.map((event) => ({
 						event: `Reward: ${event.eventName}`,
-						packType: (
-							<TwitchEventSelect
-								twitchEvent={event}
-								packTypes={props.packTypes}
-								onChange={(val) => {
-									setIsEdited(true);
-								}}
-							/>
-						),
+						packType: {
+							element: (
+								<TwitchEventSelect
+									twitchEvent={event}
+									packTypes={props.packTypes}
+									onChange={(val) => {
+										setIsEdited(true);
+									}}
+								/>
+							),
+							value: '',
+						},
 					})),
 				]}
 			/>

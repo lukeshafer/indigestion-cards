@@ -7,6 +7,10 @@ import { routes } from '@/constants';
 export default function UsersTable(props: { users: UserEntity[] }) {
 	return (
 		<Table
+			search={{
+				label: 'Search by username',
+				column: 'username',
+			}}
 			id="user-table"
 			columns={[
 				{
@@ -20,23 +24,26 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 					name: 'cardCount',
 					label: 'Cards',
 					type: 'number',
+					startDescending: true,
 				},
 				{
 					name: 'packCount',
 					label: 'Packs',
 					type: 'number',
+					startDescending: true,
 				},
 			]}
 			rows={props.users.map((user) => ({
-				username: (
-					<a
+				username: {
+					element: <a
 						href={`${routes.USERS}/${user.username}`}
 						class="hover:underline focus:underline">
 						{user.username}
-					</a>
-				),
-				cardCount: (
-					<>
+					</a>,
+					value: user.username,
+				},
+				cardCount: {
+					element: <>
 						<TbCards
 							aria-hidden="true"
 							fill="white"
@@ -45,10 +52,11 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 							class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 						/>
 						<span class="relative rounded-full bg-white p-1">{user.cardCount}</span>
-					</>
-				),
-				packCount: (
-					<>
+					</>,
+					value: user.cardCount,
+				},
+				packCount: {
+					element: <>
 						<FaSolidGift
 							aria-hidden="true"
 							fill="white"
@@ -57,8 +65,9 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 							class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 						/>
 						<span class="relative rounded-full bg-white p-1">{user.packCount}</span>
-					</>
-				),
+					</>,
+					value: user.packCount,
+				},
 			}))}
 		/>
 	);

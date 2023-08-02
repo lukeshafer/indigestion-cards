@@ -147,161 +147,6 @@ body.disable-animations * {
 		background: var(--accent-main-light, default);
 		color: #000;
 	}
-
-	my-form input,
-	my-form textarea,
-	my-form select,
-	my-form option,
-	.my-form-input {
-		display: block;
-		width: 100%;
-		padding: 0.25rem;
-		background-color: #fff;
-		color: black;
-	}
-
-	my-form input[readonly],
-	.my-form-input[readonly] {
-		background-color: var(--gray-2);
-	}
-
-	my-form input:not([type='file']),
-	my-form select,
-	my-form textarea,
-	.my-form-input {
-		outline: 2px solid #ccc;
-	}
-
-	my-form select:focus,
-	my-form input:focus,
-	my-form textarea:focus,
-	.my-form-input:focus {
-		outline: 3px solid var(--color-main);
-	}
-
-	button.edit-readonly {
-		position: absolute;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		background: none;
-		border: none;
-		opacity: 0.5;
-		color: black;
-		line-height: 1;
-	}
-
-	button.edit-readonly:hover {
-		opacity: 1;
-	}
-
-	my-form label {
-		display: block;
-		font-weight: 600;
-		font-family: var(--font-heading);
-	}
-
-	my-form label.required::after {
-		content: ' *';
-		color: var(--red-9);
-	}
-
-	my-form input[type='checkbox'],
-	.my-form-checkbox {
-		display: inline-block;
-		width: auto;
-	}
-
-	my-form input[type='checkbox'] + label,
-	.my-form-checkbox + label {
-		display: inline-block;
-		font-weight: 400;
-	}
-
-	my-form fieldset label {
-		display: inline-block;
-		font-size: 0.9em;
-		font-weight: 500;
-	}
-
-	my-form input[type='file'] {
-		display: flex;
-		flex-direction: column;
-		font-family: var(--font-heading);
-		padding-inline: 0;
-	}
-
-	my-form input[type='file'] + img.preview {
-		max-width: 20rem;
-		object-fit: contain;
-		margin: 0;
-	}
-
-	my-form input::file-selector-button {
-		text-shadow: var(--brand-shadow);
-		font-family: var(--font-heading);
-		padding: 0.5rem;
-		font-weight: 500;
-		margin-bottom: 0.5rem;
-		display: block;
-		border: 1px solid #ccc;
-		background: var(--color-tertiary);
-		cursor: pointer;
-		color: white;
-		transition: background 0.2s ease;
-		content: 'Choose a file';
-	}
-
-	my-form input::file-selector-button:hover {
-		background: var(--color-secondary);
-	}
-
-	.input-group {
-		display: flex;
-		flex-flow: column;
-		align-items: flex-start;
-		width: 100%;
-	}
-
-	my-form button {
-		font-family: var(--font-heading);
-		padding: 0.5rem;
-		display: block;
-		border: 1px solid #ccc;
-		background: var(--color-tertiary);
-		cursor: pointer;
-		color: white;
-		transition: background 0.2s ease;
-		text-shadow: var(--brand-shadow);
-	}
-
-	my-form textarea {
-		height: 100px;
-	}
-
-	my-form button:hover {
-		background-color: var(--color-secondary);
-	}
-
-	my-form button[type='submit'] {
-		font-weight: 700;
-		text-transform: uppercase;
-		background-color: var(--color-tertiary);
-	}
-
-	my-form fieldset {
-		/*fieldset: 'border border-gray-300 p-4 w-full grid gap-8',*/
-		border: 1px solid #ccc;
-		padding: 1rem;
-		width: 100%;
-		display: grid;
-		gap: 1rem;
-	}
-
-	my-form legend {
-		font-weight: 600;
-		font-size: 1rem;
-	}
 }
 
 @keyframes spin {
@@ -442,98 +287,6 @@ body.disable-animations * {
 			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
 	}
 
-	.visually-hidden {
-		clip: rect(1px, 1px, 1px, 1px);
-		height: 1px;
-		overflow: hidden;
-		position: absolute;
-		white-space: nowrap;
-		width: 1px;
-	}
-
-	.button-link {
-		text-shadow: var(--brand-shadow);
-		font-size: 1.2rem;
-		background-color: var(--color-tertiary);
-		padding: 0.5em 0.8em 0.3em;
-		vertical-align: middle;
-		width: max-content;
-		font-family: var(--font-display);
-		text-transform: lowercase;
-		font-style: italic;
-		height: fit-content;
-		color: #fff;
-	}
-
-	.post-button {
-		text-shadow: var(--brand-shadow);
-		font-weight: 700;
-		padding: 0.5rem 1rem;
-		transition: background-color 0.3s ease-out;
-		text-transform: uppercase;
-	}
-
-	.post-button[data-type='submit'] {
-		background-color: var(--color-tertiary);
-		color: #fff;
-	}
-
-	.post-button[data-type='submit']:hover {
-		background-color: var(--color-secondary);
-	}
-
-	.post-button[data-type='delete'],
-	.post-button[data-type='error'] {
-		background-color: var(--red-6);
-		color: #fff;
-	}
-
-	.post-button[data-type='delete']:hover,
-	.post-button[data-type='error']:hover {
-		background-color: var(--red-9);
-	}
-
-	.post-button[data-type='success'] {
-		background-color: var(--teal-6);
-		color: #fff;
-	}
-
-	.post-button[data-type='success']:hover {
-		background-color: var(--teal-9);
-	}
-
-	.htmx-indicator {
-		transition: none;
-		display: none;
-		position: absolute;
-		inset: 0;
-		height: 100%;
-		width: 100%;
-		justify-content: center;
-		align-items: center;
-		background-color: rgba(255, 255, 255, 0.5);
-		color: black;
-	}
-
-	.htmx-request .htmx-indicator {
-		display: flex;
-	}
-
-	.htmx-indicator::after {
-		animation: loading-elipses 3s infinite;
-		content: '';
-	}
-
-	.page-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.3rem 2rem;
-		width: 100%;
-		margin-bottom: 1rem;
-	}
-
 	::view-transition-old(alert-grow-shrink) {
 		transform-origin: top;
 		animation: 500ms cubic-bezier(0.4, 0, 1, 1) both shrink;
@@ -627,6 +380,15 @@ body.disable-animations * {
 
 	.required::after {
 		content: ' *';
-		color: theme(colors.red.600);
+		color: theme('colors.red.600');
+	}
+
+	.visually-hidden {
+		clip: rect(1px, 1px, 1px, 1px);
+		height: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
 	}
 }

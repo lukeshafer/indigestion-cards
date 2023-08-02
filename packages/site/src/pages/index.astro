@@ -1,7 +1,5 @@
 ---
-import PageHeader from '@/components/text/PageHeader.astro';
-import PageHeading from '@/components/text/PageHeading.astro';
-import SubHeading from '@/components/text/SubHeading.astro';
+import { PageHeader, PageTitle, Heading } from '@/components/text';
 import Page from '@/layouts/Page.astro';
 
 Astro.cookies.set('lilind_code', 'pants', {
@@ -15,12 +13,12 @@ Astro.cookies.set('lilind_code', 'pants', {
 <Page title="Indigestion Cards" pageType="public">
 	<PageHeader>
 		<div class="mx-auto">
-			<PageHeading>Frequently Asked Questions</PageHeading>
+			<PageTitle>Frequently Asked Questions</PageTitle>
 		</div>
 	</PageHeader>
 	<article class="flex-col gap-4 flex max-w-3xl mx-auto text-lg">
 		<section>
-			<SubHeading>What are indigestion cards?</SubHeading>
+			<Heading>What are indigestion cards?</Heading>
 			<p>
 				These cards are a way for Ryan (and several other people involved) to say thank you
 				to the tightest community on the internet for their generosity and loyalty. The
@@ -30,7 +28,7 @@ Astro.cookies.set('lilind_code', 'pants', {
 			</p>
 		</section>
 		<section>
-			<SubHeading>How do I get indigestion cards?</SubHeading>
+			<Heading>How do I get indigestion cards?</Heading>
 			<p>
 				You can get a pack (of 5 cards) in two ways: 1) by gifting any quantity of 5 subs at
 				once (5 gifted subs = 1 pack, 10 = 2 packs, etc) or 2) by redeeming 50k channel
@@ -38,7 +36,7 @@ Astro.cookies.set('lilind_code', 'pants', {
 			</p>
 		</section>
 		<section>
-			<SubHeading>How do I open my pack of cards?</SubHeading>
+			<Heading>How do I open my pack of cards?</Heading>
 			<p>
 				Ryan opens the packs on stream, so we can all be jealous when you pull that
 				incredible pink 1/1 card :) he will probably open packs at the start of stream once
@@ -46,17 +44,17 @@ Astro.cookies.set('lilind_code', 'pants', {
 			</p>
 		</section>
 		<section>
-			<SubHeading>How can I see what cards I have?</SubHeading>
+			<Heading>How can I see what cards I have?</Heading>
 			<p>
 				By typing a Twitch username in the "search users" bar at indigestioncards.com, you
 				can see all the cards that you (or anyone else) own!
 			</p>
 		</section>
 		<section>
-			<SubHeading>
+			<Heading>
 				What do the colored frames around my cards mean? And the numbers in the bottom
 				right?
-			</SubHeading>
+			</Heading>
 			<p>
 				The colors represent the “rarity” of the card--AKA how many of that specific color
 				of that card exist! If you have a brown lilindMEG with a 3/50 on the bottom right,
@@ -67,28 +65,28 @@ Astro.cookies.set('lilind_code', 'pants', {
 			</p>
 		</section>
 		<section>
-			<SubHeading>Can I trade my cards with others?</SubHeading>
+			<Heading>Can I trade my cards with others?</Heading>
 			<p>
 				Not yet :) but if this first season of cards is well-received, we would LOVE to work
 				on giving you the ability to do just that, and more!
 			</p>
 		</section>
 		<section>
-			<SubHeading>When will you introduce [insert feature here]???</SubHeading>
+			<Heading>When will you introduce [insert feature here]???</Heading>
 			<p>
 				We LOVE the idea of more features on the website or new ways to interact with the
 				cards–but that might take some time :)
 			</p>
 		</section>
 		<section>
-			<SubHeading>I have an idea for a future card!</SubHeading>
+			<Heading>I have an idea for a future card!</Heading>
 			<p>Great! Go to the #indigestion-cards channel in discord and tell us your idea :)</p>
 		</section>
 		<section>
-			<SubHeading>
+			<Heading>
 				What do I do if [insert problem here]? (my cards aren’t showing up in my inventory/I
 				think I should have a pack but I don’t/I encountered a problem with the website)
-			</SubHeading>
+			</Heading>
 			<p>
 				If you encounter a problem, you can either DM Ryan on discord or post in the
 				#indigestion-cards channel on discord with a description of what’s happening!

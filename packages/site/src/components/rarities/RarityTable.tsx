@@ -27,7 +27,7 @@ export default function RarityTable(props: { rarities: RarityEntity[] }) {
 			rows={props.rarities.map((rarity) => ({
 				name: rarity.rarityName,
 				count: rarity.defaultCount,
-				actions: <DeleteRarityButton {...rarity} />,
+				actions: { element: <DeleteRarityButton {...rarity} />, value: '' },
 			}))}
 		/>
 	);

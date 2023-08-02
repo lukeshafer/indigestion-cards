@@ -2,8 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllAdminUsers } from '@lil-indigestion-cards/core/user';
 import { routeNames } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
-import PageHeader from '@/components/text/PageHeader.astro';
+import { PageHeader, PageTitle } from '@/components/text';
 import AdminUsersTable, { AddAdminButton } from '@/components/admin-users/AdminUsersTable';
 
 const unsortedUsers = await getAllAdminUsers();
@@ -21,7 +20,7 @@ const users = unsortedUsers.sort((a, b) => {
 
 <Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]}>
 	<PageHeader>
-		<PageHeading>Admin Users</PageHeading>
+		<PageTitle>Admin Users</PageTitle>
 		<AddAdminButton client:load />
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
