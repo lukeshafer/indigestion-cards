@@ -2,9 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons } from '@lil-indigestion-cards/core/card';
 import { routes, routeNames } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
-import PageHeader from '@/components/text/PageHeader.astro';
-import { Anchor } from '@/components/form/Form'
+import { PageTitle, PageHeader, Anchor } from '@/components/text';
 
 const seasons = await getAllSeasons();
 ---
@@ -13,8 +11,8 @@ const seasons = await getAllSeasons();
 	title="All Seasons"
 	breadcrumbs={[{ label: routeNames.SEASONS }]}>
 	<PageHeader>
-		<PageHeading>All Seasons</PageHeading>
-		<Anchor href={routes.ADMIN.CREATE.SEASON}>Create New Season</Anchor>
+		<PageTitle>All Seasons</PageTitle>
+		<Anchor href={routes.ADMIN.CREATE.SEASON}>Add New Season</Anchor>
 	</PageHeader>
 	<ul class="flex flex-wrap gap-8 pt-10 text-4xl">
 		{

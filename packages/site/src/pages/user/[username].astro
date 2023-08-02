@@ -6,8 +6,7 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
-import PageHeading from '@/components/text/PageHeading.astro';
-import SubHeading from '@/components/text/SubHeading.astro';
+import { PageTitle, Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -60,17 +59,17 @@ const packTypes = await getAllPackTypes();
 		/>
 		<AdminOnly>
 			<section slot="fallback" class="flex flex-col gap-2">
-				<PageHeading>{user.username}</PageHeading>
+				<PageTitle>{user.username}</PageTitle>
 			</section>
 			<section class="flex flex-col gap-2">
-				<PageHeading>{user.username}</PageHeading>
+				<PageTitle>{user.username}</PageTitle>
 				<p class="-mt-5">User Id: {user.userId}</p>
 				<UserPackForms {user} {packTypes} client:load />
 			</section>
 		</AdminOnly>
 	</header>
 	<section class="my-4 grid gap-4 text-center">
-		<SubHeading>Cards</SubHeading>
+		<Heading>Cards</Heading>
 		<CardList cards={cardsNotInPack} />
 	</section>
 </Page>

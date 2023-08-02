@@ -4,7 +4,7 @@ import { getAllPackTypes, getAllRarities } from '@lil-indigestion-cards/core/car
 import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageTitle, PageHeader } from '@/components/text';
 import SiteConfigForm from '@/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
 
@@ -43,9 +43,10 @@ const rewards = twitchEvents.data
 ---
 
 <Page breadcrumbs={[{ label: 'Config' }]} title="Site Config">
-	<header class="flex items-center gap-8">
-		<PageHeading>Site Config</PageHeading>
-	</header>
+	<PageHeader>
+		<PageTitle>Site Config</PageTitle>
+	</PageHeader>
+
 	<div class="max-w-2xl mx-auto my-6">
 		<SiteConfigForm
 			{rarities}

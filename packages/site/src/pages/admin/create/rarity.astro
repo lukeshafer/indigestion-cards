@@ -6,7 +6,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Bucket } from 'sst/node/bucket';
 import crypto from 'crypto';
 import { routeNames, routes } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageTitle, PageHeader } from '@/components/text';
 
 const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {
@@ -22,7 +22,9 @@ const presigned = await createPresignedPost(s3, {
 <Page
 	title="Create new rarity"
 	breadcrumbs={[{ label: routeNames.RARITIES, href: routes.RARITIES }, { label: 'New Rarity' }]}>
-	<PageHeading>Create new rarity</PageHeading>
+	<PageHeader>
+		<PageTitle>Create new rarity</PageTitle>
+	</PageHeader>
 	<div>
 		<Form method="post" action={presigned.url} enctype="multipart/form-data">
 			{

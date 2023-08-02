@@ -7,10 +7,8 @@ import {
 } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routeNames, routes } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
-import SubHeading from '@/components/text/SubHeading.astro';
+import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
-import PageHeader from '@/components/text/PageHeader.astro';
 
 const id = Astro.params.seasonId;
 
@@ -69,20 +67,20 @@ const {
 	]}>
 	<header>
 		<PageHeader>
-			<PageHeading id="season-name">{season.seasonName}</PageHeading>
+			<PageTitle id="season-name">{season.seasonName}</PageTitle>
 		</PageHeader>
 
 		<p class="text-lg" id="season-description">{season.seasonDescription || ''}</p>
 	</header>
 
 	<section class="text-lg">
-		<SubHeading>Stats:</SubHeading>
+		<Heading>Stats:</Heading>
 		<p class="ml-4"><b>Total cards in season:</b> {totalPossibleCards}</p>
 		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
 		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
 
 		<div class="ml-4 mt-4">
-			<SubHeading heading="h3"><span class="text-xl">Pack Types:</span></SubHeading>
+			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
 			<ul>
 				{
 					packTypesWithCardPools.map(async (packType) => (
@@ -99,7 +97,7 @@ const {
 		</div>
 	</section>
 
-	<SubHeading>Designs:</SubHeading>
+	<Heading>Designs:</Heading>
 	<CardList
 		cards={cardDesigns.map((card) => ({
 			cardName: card.cardName,

@@ -103,9 +103,9 @@ export default function Table(props: {
 	};
 
 	return (
-		<div>
+		<div class="grid gap-0">
 			{props.search ? (
-				<div class="mb-4 ml-auto w-fit">
+				<div class="ml-auto w-fit text-sm">
 					<SearchBar
 						label={props.search.label}
 						setFilter={(filter) => setState('filter', filter)}
@@ -193,6 +193,7 @@ function TableHeading(
 			data-mode={props.mode}
 			onClick={props.sort === false ? undefined : props.onClick}
 			style={{ width: props.width }}
+			class="px-6 py-2"
 			classList={{
 				'cursor-pointer': props.sort ?? true,
 				hidden: props.showOnBreakpoint !== undefined,
@@ -203,7 +204,7 @@ function TableHeading(
 				'text-left': props.align === 'left',
 				'text-center': props.align === 'center',
 				'text-right': props.align === 'right',
-				'px-6 py-2 data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]':
+				'data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]':
 					true,
 			}}>
 			{props.label}

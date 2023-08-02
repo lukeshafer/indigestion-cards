@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageTitle, PageHeader } from '@/components/text';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import CardDesignForm from '@/components/design/CardDesignForm';
 
@@ -33,6 +33,8 @@ const baseRarity = config?.baseRarity ??
 		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
 		{ label: 'Details' },
 	]}>
-	<PageHeading>Add Card Design</PageHeading>
+	<PageHeader>
+		<PageTitle>Add Card Design</PageTitle>
+	</PageHeader>
 	<CardDesignForm {imgUrl} {key} {seasons} {rarities} {baseRarity} client:load />
 </Page>

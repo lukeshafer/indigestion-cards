@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
-import SubHeading from '@/components/text/SubHeading.astro';
+import { Heading } from '@/components/text';
 import Card from '@/components/cards/Card';
 
 const slug = Astro.params.instanceSlug;
@@ -51,7 +51,7 @@ const openDate = instance.openedAt
 		}
 	</header>
 	<section class="text-lg">
-		<SubHeading>Stats:</SubHeading>
+		<Heading>Stats:</Heading>
 		<p>
 			<b>Rarity:</b>
 			{instance.rarityName}

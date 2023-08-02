@@ -55,12 +55,12 @@ export function Form(props: {
 		}).finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			const link = document.createElement('a');
-			link.href = response.url;
-			link.hidden = true;
-			document.body.appendChild(link);
-			link.click();
-			//location.assign(response.url);
+			//const link = document.createElement('a');
+			//link.href = response.url;
+			//link.hidden = true;
+			//document.body.appendChild(link);
+			//link.click();
+			location.assign(response.url);
 			return;
 		}
 

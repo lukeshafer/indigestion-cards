@@ -1,10 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { PageHeader, PageTitle } from '@/components/text';
+import { PageHeader, PageTitle, Anchor } from '@/components/text';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllRarities } from '@lil-indigestion-cards/core/card';
 import { routes, routeNames } from '@/constants';
-import { Anchor } from '@/components/form/Form';
 import RarityTable from '@/components/rarities/RarityTable';
 
 const rarities = await getAllRarities();
@@ -14,7 +13,7 @@ const rarities = await getAllRarities();
 	<UnmatchedImageList type="frame" />
 	<PageHeader>
 		<PageTitle>Rarities</PageTitle>
-		<Anchor href={routes.ADMIN.CREATE.RARITY}>New Rarity</Anchor>
+		<Anchor href={routes.ADMIN.CREATE.RARITY}>Add New Rarity</Anchor>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
 		<RarityTable {rarities} client:load />

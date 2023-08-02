@@ -13,7 +13,7 @@ const packTypes = await getAllPackTypes();
 <Page title="Pack Types" breadcrumbs={[{ label: routeNames.PACK_TYPES }]}>
 	<PageHeader>
 		<PageTitle>Pack Types</PageTitle>
-		<Anchor href={routes.ADMIN.CREATE.PACK_TYPE}>Create New Pack Type</Anchor>
+		<Anchor href={routes.ADMIN.CREATE.PACK_TYPE}>Add Pack Type</Anchor>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
 		<PackTypeTable {packTypes} client:load />

@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { routeNames, routes } from '@/constants';
 import { getAllSeasons, getAllCardDesigns } from '@lil-indigestion-cards/core/card';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageTitle } from '@/components/text';
 import PackTypeForm from '@/components/pack-type/PackTypeForm';
 
 const seasons = await getAllSeasons();
@@ -15,6 +15,6 @@ const cardDesigns = await getAllCardDesigns();
 		{ label: routeNames.PACK_TYPES, href: routes.PACK_TYPES },
 		{ label: 'Create Pack Type' },
 	]}>
-	<PageHeading>Create Pack Type</PageHeading>
+	<PageTitle>Create Pack Type</PageTitle>
 	<PackTypeForm client:load {seasons} {cardDesigns} />
 </Page>

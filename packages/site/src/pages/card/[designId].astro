@@ -6,11 +6,11 @@ import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card'
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
-import PageHeading from '@/components/text/PageHeading.astro';
+import { PageTitle } from '@/components/text';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
 import DesignOverviewTable from '@/components/design/DesignOverviewTable';
-import SubHeading from '@/components/text/SubHeading.astro';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
+import { Heading } from '@/components/text';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
 
 const designId = Astro.params.designId;
@@ -57,7 +57,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 	class="flex flex-col gap-9"
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
-		<PageHeading>{design.cardName}</PageHeading>
+		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
 	</header>
 	<AdminOnly>
@@ -65,7 +65,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 			<summary class="font-heading text-xl">Stats for Admins</summary>
 			<div class="my-4 flex flex-col gap-8">
 				<section class="grid text-lg">
-					<SubHeading>Stats Overview</SubHeading>
+					<Heading>Stats Overview</Heading>
 					<DesignOverviewTable {rarityStatsArray} client:load />
 				</section>
 				<AdminDesignStats {rarityStatsArray} client:load />
@@ -74,7 +74,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>
 	<section class="text-center flex flex-col gap-5">
-		<SubHeading>Instances</SubHeading>
+		<Heading>Instances</Heading>
 		<CardList cards={instances} showUsernames />
 	</section>
 </Page>
