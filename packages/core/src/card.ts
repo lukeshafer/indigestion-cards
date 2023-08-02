@@ -6,13 +6,13 @@ import { CardPool } from './pack';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -117,7 +117,7 @@ export async function generateCard(info: {
 	const user =
 		info.userId && info.username
 			? (await getUser(info.userId)) ??
-			  (await createNewUser({ userId: info.userId, username: info.username }))
+			(await createNewUser({ userId: info.userId, username: info.username }))
 			: null;
 
 	const result = await db.transaction
@@ -125,11 +125,11 @@ export async function generateCard(info: {
 			cardInstances.create(cardDetails).commit(),
 			...(user && info.userId && info.username
 				? [
-						users
-							.patch({ userId: info.userId })
-							.set({ cardCount: (user.cardCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: info.userId })
+						.set({ cardCount: (user.cardCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 		])
 		.go();
@@ -193,12 +193,12 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({ packCount: (user?.packCount || 1) - 1 })
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({ packCount: (user?.packCount || 1) - 1 })
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -243,12 +243,12 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({ packCount: (user?.packCount || 1) - 1 })
+						.commit(),
+				]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -279,7 +279,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			  (await createNewUser({ userId: args.userId, username: args.username }))
+			(await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
@@ -299,11 +299,11 @@ export async function createPack(args: {
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [
-						users
-							.patch({ userId: user.userId })
-							.set({ packCount: (user.packCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: user.userId })
+						.set({ packCount: (user.packCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 			packs
 				.create({
@@ -332,13 +332,59 @@ export async function createPack(args: {
 		.go();
 }
 
-export async function openCardFromPack(args: { designId: string; instanceId: string }) {
+export async function openCardFromPack(args: {
+	designId: string;
+	instanceId: string;
+	packId: string;
+}) {
 	const card = await db.entities.cardInstances.query.byId(args).go();
 	if (!card.data || card.data.length === 0) {
 		throw new Error('Card not found');
 	}
 	if (card.data[0].openedAt || !card.data[0].packId) {
-		throw new Error('Card already opened');
+		console.log("Card already opened or doesn't belong to a pack");
+		const pack = await db.entities.packs.query.byPackId({ packId: args.packId }).go();
+		console.log({ pack });
+		if (!pack.data || pack.data.length === 0) {
+			return {
+				success: false,
+				error: 'Card already opened',
+			};
+		}
+
+		const cardInPack = pack.data[0].cardDetails?.find((c) => c.instanceId === args.instanceId);
+		if (!cardInPack) {
+			return {
+				success: false,
+				error: 'Card not found',
+			};
+		}
+
+		if (cardInPack.opened) {
+			return {
+				success: false,
+				error: 'Card already opened',
+			};
+		}
+
+		const newCardDetails = pack.data[0].cardDetails?.map((c) =>
+			c.instanceId !== args.instanceId ? c : { ...c, opened: true }
+		);
+
+		const deletePack = newCardDetails.every((c) => c.opened);
+
+		await db.transaction
+			.write(({ packs }) => [
+				deletePack
+					? packs.delete({ packId: args.packId }).commit()
+					: packs.patch({ packId: args.packId }).set({ cardDetails: newCardDetails }).commit(),
+			])
+			.go();
+
+		return {
+			success: true,
+			card: card.data[0],
+		}
 	}
 
 	const userId = card.data[0].userId;

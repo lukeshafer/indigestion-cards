@@ -285,6 +285,7 @@ function PackShowcase(props: {
 					{(card) => (
 						<ShowcaseCard
 							card={card}
+							packId={props.pack!.packId}
 							setFlipped={() => props.flipCard(card.instanceId)}
 							isTesting={props.isTesting}
 							scale={props.cardScale}
@@ -305,6 +306,7 @@ function PackShowcase(props: {
 
 function ShowcaseCard(props: {
 	card: PackEntity['cardDetails'][number];
+	packId: PackEntity['packId'];
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
@@ -318,6 +320,7 @@ function ShowcaseCard(props: {
 		const body = new URLSearchParams({
 			instanceId: props.card.instanceId,
 			designId: props.card.designId,
+			packId: props.packId,
 		}).toString();
 
 		props.isTesting
