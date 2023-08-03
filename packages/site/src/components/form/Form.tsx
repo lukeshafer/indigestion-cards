@@ -5,22 +5,24 @@ import { setAlerts } from '@/lib/client/state';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-		| 'get'
-		| 'post'
-		| 'dialog'
-		| 'put'
-		| 'delete'
-		| 'options'
-		| 'head'
-		| 'trace'
-		| 'connect'
-		| 'patch';
+	| 'get'
+	| 'post'
+	| 'dialog'
+	| 'put'
+	| 'delete'
+	| 'options'
+	| 'head'
+	| 'trace'
+	| 'connect'
+	| 'patch';
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
 	onsubmit?: () => void;
 	loadingText?: string;
+	successRedirect?: string;
+	errorRedirect?: string;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -28,9 +30,17 @@ export function Form(props: {
 		// Forms support GET and POST methods, so no need to modify the method on the server
 		if (props.method === 'get' || props.method === 'post') return props.action;
 
-		const formURL = new URL(props.action, 'http://localhost:3000');
+		let formURL: URL;
+		let isLocal = false;
+		try {
+			formURL = new URL(props.action);
+		} catch {
+			isLocal = true;
+			formURL = new URL(props.action, 'http://localhost');
+		}
+
 		formURL.searchParams.set('formmethod', props.method);
-		return formURL.pathname + '?' + formURL.searchParams.toString();
+		return isLocal ? formURL.pathname + formURL.search : formURL.toString();
 	};
 
 	const handleSubmit = async (e: SubmitEvent) => {
@@ -48,6 +58,7 @@ export function Form(props: {
 
 		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
@@ -55,13 +66,7 @@ export function Form(props: {
 		}).finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			//const link = document.createElement('a');
-			//link.href = response.url;
-			//link.hidden = true;
-			//document.body.appendChild(link);
-			//link.click();
-			location.assign(response.url);
-			return;
+			return location.assign(response.url);
 		}
 
 		const responseBody = await response.text();
@@ -72,11 +77,28 @@ export function Form(props: {
 				{ message: responseBody || 'Success!', type: 'success' },
 			]);
 			if (props.onsuccess) props.onsuccess();
+			if (props.successRedirect) {
+				const redirectURL = new URL(props.successRedirect, window.location.origin);
+				if (redirectURL.pathname !== location.pathname) {
+					if (responseBody) redirectURL.searchParams.set('alert', responseBody);
+					location.assign(redirectURL.toString());
+				}
+			}
 		} else {
 			setAlerts((alerts) => [
 				...alerts,
 				{ message: responseBody || 'There was an error.', type: 'error' },
 			]);
+			if (props.errorRedirect) {
+				const redirectURL = new URL(props.errorRedirect, window.location.origin);
+				if (redirectURL.pathname !== location.pathname) {
+					if (responseBody) {
+						redirectURL.searchParams.set('alert', responseBody);
+						redirectURL.searchParams.set('type', 'error');
+					}
+					location.assign(redirectURL.toString());
+				}
+			}
 		}
 	};
 

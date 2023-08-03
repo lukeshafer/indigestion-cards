@@ -35,6 +35,8 @@ export function API({ app, stack }: StackContext) {
 
 	const api = new Api(stack, 'api', {
 		routes: {
+			'POST /pack-type': 'packages/functions/src/admin-api/pack-type/post.handler',
+			'DELETE /pack-type': 'packages/functions/src/admin-api/pack-type/delete.handler',
 			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			'DELETE /delete-rarity-frame':
@@ -72,7 +74,7 @@ export function API({ app, stack }: StackContext) {
 			},
 		},
 		cors: {
-			allowCredentials: false,
+			allowCredentials: true,
 			allowHeaders: ['content-type'],
 			allowMethods: ['ANY'],
 			allowOrigins:

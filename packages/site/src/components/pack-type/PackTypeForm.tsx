@@ -1,4 +1,4 @@
-import { api } from '@/constants';
+import { routes } from '@/constants';
 import {
 	Form,
 	TextInput,
@@ -15,12 +15,16 @@ import type { CardDesignEntity, SeasonEntity } from '@lil-indigestion-cards/core
 export default function PackTypeForm(props: {
 	seasons: SeasonEntity[];
 	cardDesigns: CardDesignEntity[];
+	apiPath: string;
 }) {
 	const [packTypeName, setPackTypeName] = createSignal('');
 	const [category, setCategory] = createSignal('season');
 
 	return (
-		<Form method="post" action={api.PACK_TYPE.CREATE}>
+		<Form
+			method="post"
+			action={props.apiPath}
+			successRedirect={`${routes.PACK_TYPES}?alert=Pack%20type%20created!&type=success`}>
 			<TextInput label="Name" name="packTypeName" required setValue={setPackTypeName} />
 			<IdInput label="ID" name="packTypeId" required from={packTypeName()} />
 			<TextInput label="Description" name="packTypeDescription" />

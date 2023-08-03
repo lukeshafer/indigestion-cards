@@ -10,6 +10,10 @@ export const PUBLIC_ROUTES = [
 	'/api/auth/*',
 ] as const;
 
+export const api_paths = {
+	PACK_TYPE: '/pack-type',
+} as const;
+
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
 	SITE_CONFIG: '/api/admin/site-config',
