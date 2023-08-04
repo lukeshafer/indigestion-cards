@@ -1,14 +1,9 @@
 name: Deploy SST App
 
-on:
-    push:
-        branches:
-            - dev
-            - qa
-            - main
+on: workflow_dispatch
 
 jobs:
-    deploy:
+    deploy-main:
         runs-on: ubuntu-latest
 
         steps:
@@ -29,7 +24,7 @@ jobs:
               run: pnpm install
 
             - name: Deploy SST app
-              run: pnpm run deploy --stage "${GITHUB_REF##*/}"
+              run: pnpm run deploy --stage prod
               env:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
