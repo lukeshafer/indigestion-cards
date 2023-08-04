@@ -1,8 +1,9 @@
 import { publicApi, routes } from '@/constants';
 import { Form, TextInput } from '@/components/form/Form';
 import { Index, createSignal } from 'solid-js';
+import { AiOutlineSearch } from 'solid-icons/ai';
 
-export default function () {
+export default function UserSearch() {
 	const [users, setUsers] = createSignal<string[]>([]);
 	const [searchResults, setSearchResults] = createSignal<string[]>([]);
 	const [isFetching, setIsFetching] = createSignal(false);
@@ -37,6 +38,12 @@ export default function () {
 					inputOnly
 					autocomplete="off"
 				/>
+				<button
+					type="submit"
+					class="absolute right-0 top-0 h-full bg-white px-1 text-gray-500">
+					<span class="sr-only">Search</span>
+					<AiOutlineSearch size="1.4rem" />
+				</button>
 				<datalist id="users">
 					{users().map((username) => (
 						<option value={username} />

@@ -11,6 +11,7 @@
 body.disable-animations * {
 	transition: none !important;
 	animation: none !important;
+	view-transition-name: none !important;
 }
 
 @layer reset {
