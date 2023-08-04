@@ -1,4 +1,4 @@
-name: Deploy SST App
+name: Deploy Dev and QA
 
 on:
     push:

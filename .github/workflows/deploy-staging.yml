@@ -1,4 +1,4 @@
-name: Deploy SST App
+name: Deploy Staging on update main
 
 on:
     push:
