@@ -1,9 +1,9 @@
-name: Deploy Production
+name: Teardown Staging
 
 on: workflow_dispatch
 
 jobs:
-    deploy-prod:
+    teardown-staging:
         runs-on: ubuntu-latest
 
         steps:
