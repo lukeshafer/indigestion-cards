@@ -6,6 +6,7 @@ import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Checkbox } from '../form/Form';
+import TiltCardEffect from '../cards/TiltCardEffect';
 
 export default function OpenPacks(props: {
 	packs: PackEntity[];
@@ -132,12 +133,12 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => void }) {
 	createEffect(() => {
-		console.log("scale", props.scale)
+		console.log('scale', props.scale);
 		document.cookie = `openPacksScale=${props.scale}; path=/`;
-	})
+	});
 
 	return (
-		<div class="flex items-center gap-x-2 justify-center opacity-0 hover:opacity-100 transition-opacity">
+		<div class="flex items-center justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -326,9 +327,9 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(api.CARD, {
-				method: 'PATCH',
-				body,
-			});
+					method: 'PATCH',
+					body,
+			  });
 	};
 
 	return (
@@ -342,7 +343,11 @@ function ShowcaseCard(props: {
 					onClick={handleClick}
 					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
 					title="Click to reveal">
-					<img src="/card-back.png" class="w-full" />
+					<div style={{ scale: props.scale }} class="origin-top-left">
+						<TiltCardEffect>
+							<img src="/card-back.png" class="w-72" />
+						</TiltCardEffect>
+					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
 					<div style={{ scale: props.scale }} class="origin-top-left">
