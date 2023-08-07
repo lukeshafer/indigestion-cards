@@ -1,12 +1,9 @@
-name: Deploy Staging on update main
+name: Teardown Staging
 
-on:
-    push:
-        branches:
-            - main
+on: workflow_dispatch
 
 jobs:
-    deploy-staging:
+    teardown-staging:
         runs-on: ubuntu-latest
 
         steps:
@@ -27,7 +24,7 @@ jobs:
               run: pnpm install
 
             - name: Deploy SST app
-              run: pnpm run deploy --stage staging
+              run: pnpm run remove --stage staging
               env:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
