@@ -38,13 +38,12 @@ export default function Card(props: Props) {
 					</h3>
 					<p
 						style={{
-							'--left': '11%',
-							top: '68.5%',
-							height: '15%',
+							'--left': '11.5%',
+							top: '69.420%',
 							width: 'calc(100% - var(--left) * 2)',
 							left: 'var(--left)',
 						}}
-						class="card-description font-heading absolute p-[0.5em] text-[0.875em] font-normal leading-[1.25em] text-black">
+						class="card-description font-heading absolute p-[0.5em] text-[0.85em] font-medium leading-[1.30em] text-black">
 						{cardDescription()}
 					</p>
 					<p
