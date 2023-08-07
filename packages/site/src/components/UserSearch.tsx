@@ -17,7 +17,7 @@ export default function UserSearch() {
 			const response = await fetch(publicApi.GET_ALL_USERNAMES);
 			const usernames = await response.json();
 			if (!Array.isArray(usernames)) throw new Error('Invalid response from server');
-			setUsers(usernames);
+			setUsers(usernames.sort((a, b) => a.localeCompare(b)));
 			setIsFetching(false);
 
 			el.removeEventListener('focus', fetchUsernames);

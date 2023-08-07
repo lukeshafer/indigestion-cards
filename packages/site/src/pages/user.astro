@@ -5,7 +5,7 @@ import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
 
-const users = await getAllUsers();
+const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.username));
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">

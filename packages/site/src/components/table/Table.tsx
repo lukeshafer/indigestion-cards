@@ -68,9 +68,8 @@ export default function Table(props: {
 				return mode === 'ascending'
 					? Number(aVal) - Number(bVal)
 					: Number(bVal) - Number(aVal);
-			if (aVal < bVal) return mode === 'ascending' ? -1 : 1;
-			if (aVal > bVal) return mode === 'ascending' ? 1 : -1;
-			return 0;
+
+			return mode === 'ascending' ? String(aVal).localeCompare(String(bVal)) : String(bVal).localeCompare(String(aVal));
 		});
 	};
 
