@@ -5,6 +5,7 @@ import { Dynamic } from 'solid-js/web';
 import styles from './CardList.module.css';
 import { Select } from '../form';
 import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
+import { useViewTransition } from '@/lib/client/utils';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstanceEntity>;
 
@@ -28,7 +29,7 @@ export default function CardList(props: {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
 			? sortTypes.filter((type) => props.sortOnlyBy?.includes(type.value))
-			: sortTypes.slice()
+			: sortTypes.slice();
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
 
 	const sortedCards = () => sortCards({ cards: props.cards, sort: sort() });
@@ -40,7 +41,7 @@ export default function CardList(props: {
 					<Select
 						name="sort"
 						label="Sort by"
-						setValue={(val) => document.startViewTransition(() => setSort(val))}
+						setValue={(val) => useViewTransition(() => setSort(val))}
 						options={allowedSortTypes()}
 					/>
 				</div>
