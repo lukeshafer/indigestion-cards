@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import CardList from '@/components/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
@@ -23,6 +23,7 @@ const message = Astro.url.searchParams.get('message') || '';
 		</AdminOnly>
 	</PageHeader>
 	<CardList
+		sessionType={Astro.locals.session?.type}
 		cards={designs.map((card) => ({
 			...card,
 			rarityName: siteConfig?.baseRarity.rarityName ?? '',
@@ -32,5 +33,7 @@ const message = Astro.url.searchParams.get('message') || '';
 			cardNumber: 1,
 			totalOfType: 1,
 		}))}
+		sortOnlyBy={['card-name-asc', 'card-name-desc']}
+		client:load
 	/>
 </Page>

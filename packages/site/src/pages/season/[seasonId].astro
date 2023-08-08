@@ -1,5 +1,5 @@
 ---
-import CardList from '@/components/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import {
 	getPackTypesBySeasonId,
@@ -99,6 +99,7 @@ const {
 
 	<Heading>Designs:</Heading>
 	<CardList
+		sessionType={Astro.locals.session?.type}
 		cards={cardDesigns.map((card) => ({
 			cardName: card.cardName,
 			designId: card.designId,
@@ -111,6 +112,8 @@ const {
 			cardDescription: card.cardDescription,
 			totalOfType: 0,
 		}))}
+		sortOnlyBy={['card-name-asc', 'card-name-desc']}
+		client:load
 	/>
 
 	<DeleteSeasonButton seasonId={season.seasonId} client:load />

@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import Card from '@/components/cards/Card';
-import CardList from '@/components/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routes, routeNames } from '@/constants';
@@ -75,6 +75,12 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 	</AdminOnly>
 	<section class="text-center flex flex-col gap-5">
 		<Heading>Instances</Heading>
-		<CardList cards={instances} showUsernames />
+		<CardList
+			cards={instances}
+			showUsernames
+			sessionType={Astro.locals.session?.type}
+			client:load
+			sortOnlyBy={['rarest', 'common']}
+		/>
 	</section>
 </Page>

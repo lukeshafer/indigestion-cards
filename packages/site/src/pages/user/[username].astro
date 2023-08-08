@@ -1,5 +1,5 @@
 ---
-import CardList from '@/components/CardList.astro';
+import CardList from '@/components/cards/CardList'
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
@@ -70,6 +70,6 @@ const packTypes = await getAllPackTypes();
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-		<CardList cards={cardsNotInPack} />
+		<CardList cards={cardsNotInPack} sessionType={Astro.locals.session?.type} client:load />
 	</section>
 </Page>

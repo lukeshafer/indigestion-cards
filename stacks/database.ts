@@ -35,7 +35,6 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	// TODO: add cron job to check twitch for users who have updated their username
 	new Cron(stack, 'RefreshUsernamesCron', {
 		schedule: 'cron(0 6 * * ? *)',
 		job: {
@@ -48,6 +47,21 @@ export function Database({ stack }: StackContext) {
 				},
 				bind: [table, TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+			},
+		},
+	});
+
+	new Cron(stack, 'RefreshUserCardCountsCron', {
+		schedule: 'cron(10 6 * * ? *)',
+		job: {
+			function: {
+				handler: 'packages/functions/src/cron/refresh-card-and-pack-count.handler',
+				environment: {
+					SESSION_USER_ID: 'RefreshUserCardCountsCron',
+					SESSION_TYPE: 'admin',
+					SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
+				},
+				bind: [table],
 			},
 		},
 	});
