@@ -32,7 +32,7 @@ export default function UserConfig(props: { disableAnimations?: boolean }) {
 				onclick={() => setIsOpen((v) => !v)}>
 				<FaSolidGear
 					size="25"
-					class="w-8 fill-gray-700 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110"
+					class="w-8 fill-gray-700 text-gray-700 transition-transform duration-300 group-hover:rotate-[30deg] group-hover:scale-110 dark:fill-gray-300 dark:text-gray-300"
 				/>
 			</button>
 

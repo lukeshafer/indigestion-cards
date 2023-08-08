@@ -16,6 +16,14 @@ module.exports = {
 				heading: ['var(--font-heading)', ...fontFamily.sans],
 			},
 			colors: {
+				background: {
+					light: '#fcfcfd',
+					dark: '#08050a',
+				},
+				text: {
+					light: '#090b0e',
+					dark: '#f7f7fd',
+				},
 				brand: {
 					main: '#EF6EDA',
 					secondary: '#f66efa',

@@ -88,7 +88,7 @@ export function Form(props: {
 			enctype={props.enctype}
 			onsubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-50">
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-black bg-opacity-50">
 					<img src="/lilindPB.gif" alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
@@ -101,7 +101,7 @@ export function Form(props: {
 }
 
 const BASE_INPUT_CLASS =
-	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-brand-main focus:ring-4';
+	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white dark:bg-black p-1 text-black dark:text-gray-50 outline outline-2 outline-gray-300 dark:outline-gray-700 focus:outline-brand-main focus:ring-4';
 
 function InputGroup(props: ParentProps) {
 	return <div class="flex w-full flex-col items-start">{props.children}</div>;
