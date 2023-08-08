@@ -192,7 +192,7 @@ function TableHeading(
 			data-mode={props.mode}
 			onClick={props.sort === false ? undefined : props.onClick}
 			style={{ width: props.width }}
-			class="px-6 py-2"
+			class="px-6 py-2 hover:bg-gray-200"
 			classList={{
 				'cursor-pointer': props.sort ?? true,
 				hidden: props.showOnBreakpoint !== undefined,
