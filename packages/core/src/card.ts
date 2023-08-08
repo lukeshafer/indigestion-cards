@@ -187,6 +187,7 @@ export async function deleteFirstPackForUser(args: {
 		const pack = await findPackForUser(args);
 		if (!pack) return { success: false, error: 'User has no pack to delete!' };
 
+		const openedCount = pack.cardDetails.filter((card) => card.opened).length;
 		const user = await getUser(args.userId);
 		const result = await db.transaction
 			.write(({ users, cardInstances, packs }) => [
@@ -196,7 +197,10 @@ export async function deleteFirstPackForUser(args: {
 						users
 							.patch({ userId: pack.userId })
 							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({ packCount: (user?.packCount || 1) - 1 })
+							.set({
+								packCount: (user?.packCount || 1) - 1,
+								cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
+							})
 							.commit(),
 					]
 					: []),
@@ -237,6 +241,7 @@ export async function deletePack(args: { packId: string }) {
 	} = await db.collections.packsAndCards({ packId: args.packId }).go();
 
 	const user = pack.userId ? await getUser(pack.userId) : null;
+	const openCount = pack.cardDetails.filter((card) => card.opened).length;
 
 	const result = await db.transaction
 		.write(({ users, cardInstances, packs }) => [
@@ -246,7 +251,10 @@ export async function deletePack(args: { packId: string }) {
 					users
 						.patch({ userId: pack.userId })
 						// if packCount is null OR 0, set it to 0, otherwise subtract 1
-						.set({ packCount: (user?.packCount || 1) - 1 })
+						.set({
+							packCount: (user?.packCount || 1) - 1,
+							cardCount: user?.cardCount ? user.cardCount - openCount : 0,
+						})
 						.commit(),
 				]
 				: []),
@@ -373,18 +381,37 @@ export async function openCardFromPack(args: {
 
 		const deletePack = newCardDetails.every((c) => c.opened);
 
+		const userId = card.data[0].userId;
+		const user = userId ? await getUser(userId) : null;
+
 		await db.transaction
-			.write(({ packs }) => [
+			.write(({ packs, users }) => [
 				deletePack
 					? packs.delete({ packId: args.packId }).commit()
-					: packs.patch({ packId: args.packId }).set({ cardDetails: newCardDetails }).commit(),
+					: packs
+						.patch({ packId: args.packId })
+						.set({ cardDetails: newCardDetails })
+						.commit(),
+				...(user
+					? [
+						users
+							.patch({ userId: user.userId })
+							.set({
+								cardCount: (user.cardCount ?? 0) + 1,
+								packCount: deletePack
+									? (user.packCount ?? 1) - 1
+									: user.packCount,
+							})
+							.commit(),
+					]
+					: []),
 			])
 			.go();
 
 		return {
 			success: true,
 			card: card.data[0],
-		}
+		};
 	}
 
 	const userId = card.data[0].userId;
