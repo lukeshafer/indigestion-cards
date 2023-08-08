@@ -49,10 +49,3 @@ declare module 'solid-js' {
 		}
 	}
 }
-
-// add startViewTransition method to the document object
-declare global {
-	interface Document {
-		startViewTransition(cb: () => any): void;
-	}
-}
