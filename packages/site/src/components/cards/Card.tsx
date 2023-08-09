@@ -24,8 +24,7 @@ export default function Card(props: Props) {
 	const cardName = () => (isFullArt() ? '' : props.cardName);
 	const cardDescription = () => (isFullArt() ? '' : props.cardDescription);
 
-	const isShitPack = () => //props.stamps?.includes('shit-pack');
-		false // uncomment when ready
+	const isShitPack = () => props.stamps?.includes('shit-pack');
 
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
@@ -61,10 +60,10 @@ export default function Card(props: Props) {
 					</p>
 					{isShitPack() && (
 						<img
-							src="/shat.jpg"
-							class="absolute left-3/4 top-3/4 rotate-[30deg]"
-							classList={{ [styles.shitPackStamp]: true }}
-							width="70"
+							src="/shit_pack_brown.png"
+							class="absolute right-[3%] bottom-[5%] opacity-80"
+							classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp') }}
+							width="120"
 						/>
 					)}
 				</article>
