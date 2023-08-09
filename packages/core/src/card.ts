@@ -426,12 +426,19 @@ export async function openCardFromPack(args: {
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
 	const deletePack = newCardDetails.every((c) => c.opened);
+	const isShitPack = deletePack ? newCardDetails.every((c) => c.totalOfType >= 50) : false;
 
 	const result = await db.transaction
 		.write(({ cardInstances, users, packs }) => [
 			cardInstances
 				.patch(args)
-				.set({ openedAt: new Date().toISOString(), packId: undefined })
+				.set({
+					openedAt: new Date().toISOString(),
+					packId: undefined,
+					stamps: isShitPack
+						? [...(card.data[0].stamps || []), 'shit-pack']
+						: card.data[0].stamps,
+				})
 				.commit(),
 			users
 				.patch({ userId })
