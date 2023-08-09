@@ -1,7 +1,9 @@
 import TiltCardEffect from './TiltCardEffect';
 import { FULL_ART_ID } from '@/constants';
+import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
+import styles from './Card.module.css';
 
-interface Props {
+interface Props extends Partial<CardInstanceEntity> {
 	rarityName: string;
 	frameUrl: string;
 	imgUrl: string;
@@ -21,6 +23,9 @@ export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
 	const cardName = () => (isFullArt() ? '' : props.cardName);
 	const cardDescription = () => (isFullArt() ? '' : props.cardDescription);
+
+	const isShitPack = () => //props.stamps?.includes('shit-pack');
+		false // uncomment when ready
 
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
@@ -54,6 +59,14 @@ export default function Card(props: Props) {
 						}}>
 						{props.cardNumber} / {props.totalOfType}
 					</p>
+					{isShitPack() && (
+						<img
+							src="/shat.jpg"
+							class="absolute left-3/4 top-3/4 rotate-[30deg]"
+							classList={{ [styles.shitPackStamp]: true }}
+							width="70"
+						/>
+					)}
 				</article>
 			</TiltCardEffect>
 		</div>

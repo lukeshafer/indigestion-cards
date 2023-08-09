@@ -27,6 +27,20 @@ export default function OpenPacks(props: {
 		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
 	});
 
+	const setActivePack = (pack: PackEntity) => {
+		setState('activePack', { ...pack });
+		if (pack.packId === state.packs[0].packId) return;
+
+		setState(
+			'packs',
+			produce((draft) => {
+				const index = draft.findIndex((p) => p.packId === pack.packId);
+				draft.splice(index, 1);
+				draft.unshift(pack);
+			})
+		);
+	};
+
 	const removePack = () => {
 		setState(
 			'packs',
@@ -48,11 +62,24 @@ export default function OpenPacks(props: {
 		);
 		if (index === undefined) return;
 		setState('activePack', 'cardDetails', index, 'opened', true);
+
+		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
+			setTimeout(
+				// @ts-expect-error
+				() => setState('activePack', 'cardDetails', index, 'stamps', ['shit-pack']),
+				500
+			);
 	};
 
 	return (
 		<>
-			<MarginAdjuster startMargin={props.startMargin} />
+			<div class="flex items-end">
+				<MarginAdjuster startMargin={props.startMargin} />
+				<CardScaleAdjuster
+					scale={state.cardScale}
+					setScale={(newScale: number) => setState('cardScale', newScale)}
+				/>
+			</div>
 			{props.canTest ? (
 				<>
 					<Checkbox
@@ -67,17 +94,17 @@ export default function OpenPacks(props: {
 				<section
 					class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6"
 					id="pack-list">
-					<h2 class="font-heading mb-8 text-4xl font-bold uppercase text-gray-700">
+					<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
 						Coming up...
 					</h2>
-					<ul class="packs flex w-full flex-col gap-2 pb-2" ref={setAutoAnimate}>
+					<ul class="packs flex h-[50vh] w-full flex-col pb-2" ref={setAutoAnimate}>
 						<For each={state.packs}>
 							{(pack, index) => (
 								<PackToOpenItem
 									index={index()}
 									pack={pack}
 									activePackId={state.activePack?.packId || ''}
-									setAsActive={() => setState('activePack', { ...pack })}
+									setAsActive={() => setActivePack(pack)}
 								/>
 							)}
 						</For>
@@ -93,10 +120,6 @@ export default function OpenPacks(props: {
 					isTesting={(state.isTesting && props.canTest) || false}
 				/>
 			</div>
-			<CardScaleAdjuster
-				scale={state.cardScale}
-				setScale={(newScale: number) => setState('cardScale', newScale)}
-			/>
 		</>
 	);
 }
@@ -123,7 +146,7 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 	return (
 		<button
-			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:opacity-75"
+			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:opacity-75 hover:cursor-ns-resize"
 			onMouseDown={handleMouseDown}
 			style={{ 'margin-top': `${margin()}px` }}>
 			=
@@ -133,17 +156,16 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => void }) {
 	createEffect(() => {
-		console.log('scale', props.scale);
 		document.cookie = `openPacksScale=${props.scale}; path=/`;
 	});
 
 	return (
-		<div class="flex items-center justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
+		<div class="flex items-center w-full justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
 				min="0.25"
-				max="4"
+				max="2"
 				step="0.001"
 				value={props.scale}
 				class="w-1/2"
@@ -164,7 +186,7 @@ function PackToOpenItem(props: {
 	return (
 		<li class="pack-list-item">
 			<button
-				class="font-display -mx-2 w-full p-2 text-left text-2xl italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				class="font-display -mx-2 w-full p-1 pt-2 text-left text-lg italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 				}}
@@ -267,12 +289,12 @@ function PackShowcase(props: {
 	return (
 		<div class="bg-brand-100 flex h-full flex-col">
 			<h2
-				class="font-heading m-6 mb-8 text-4xl font-bold uppercase text-gray-700"
+				class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
 				ref={animateTitle}>
 				{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 				<Show when={props.pack?.packId} keyed>
 					<span
-						class="font-display text-brand-main block py-4 text-6xl normal-case italic"
+						class="font-display text-brand-main block py-4 text-5xl normal-case italic"
 						style={{ 'view-transition-name': 'open-packs-title' }}>
 						{props.pack?.username}
 					</span>
@@ -296,7 +318,7 @@ function PackShowcase(props: {
 			</ul>
 			<Show when={allCardsOpened() && props.packsRemaining}>
 				<button
-					class="bg-brand-main font-display ml-auto mt-8 block p-8 text-7xl italic text-white"
+					class="bg-brand-main font-display ml-auto mr-2 mt-2 block p-4 pb-2 text-3xl italic text-white"
 					onClick={props.setNextPack}>
 					Next
 				</button>
