@@ -10,6 +10,7 @@ import { PageTitle } from '@/components/text';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
 import DesignOverviewTable from '@/components/design/DesignOverviewTable';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
+import EditDesignForm from '@/components/design/EditDesignForm';
 import { Heading } from '@/components/text';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
 
@@ -59,6 +60,9 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
+	<AdminOnly>
+		<EditDesignForm {...design} client:load />
+	</AdminOnly>
 	</header>
 	<AdminOnly>
 		<details>

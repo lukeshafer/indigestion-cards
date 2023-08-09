@@ -15,6 +15,7 @@ export const api = {
 	SITE_CONFIG: '/api/admin/site-config',
 	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
 	CARD: '/api/admin/card',
+	DESIGN: '/api/admin/design',
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},
@@ -42,10 +43,6 @@ export const api = {
 		UPDATE: '/api/admin/season',
 		CREATE: '/api/admin/season',
 		DELETE: '/api/admin/season',
-	},
-	DESIGN: {
-		CREATE: '/api/admin/design',
-		DELETE: '/api/admin/design',
 	},
 	PACK_COUNT: '/api/admin/pack-count',
 } as const;
