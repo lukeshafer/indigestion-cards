@@ -288,18 +288,27 @@ function PackShowcase(props: {
 
 	return (
 		<div class="bg-brand-100 flex h-full flex-col">
-			<h2
-				class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
-				ref={animateTitle}>
-				{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
-				<Show when={props.pack?.packId} keyed>
-					<span
-						class="font-display text-brand-main block py-4 text-5xl normal-case italic"
-						style={{ 'view-transition-name': 'open-packs-title' }}>
-						{props.pack?.username}
-					</span>
-				</Show>
-			</h2>
+			<div class="flex justify-between items-end pr-8">
+				<h2
+					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
+					ref={animateTitle}>
+					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
+					<Show when={props.pack?.packId} keyed>
+						<span
+							class="font-display text-brand-main block py-4 text-5xl normal-case italic"
+							style={{ 'view-transition-name': 'open-packs-title' }}>
+							{props.pack?.username}
+						</span>
+					</Show>
+				</h2>
+			<Show when={allCardsOpened() && props.packsRemaining}>
+				<button
+					class="bg-brand-main font-display ml-auto mb-4 block p-4 pb-2 text-3xl italic text-white"
+					onClick={props.setNextPack}>
+					Next
+				</button>
+			</Show>
+			</div>
 			<ul
 				style={{ gap: `${props.cardScale}rem` }}
 				class="flex w-full flex-wrap items-center justify-center"
@@ -316,13 +325,6 @@ function PackShowcase(props: {
 					)}
 				</For>
 			</ul>
-			<Show when={allCardsOpened() && props.packsRemaining}>
-				<button
-					class="bg-brand-main font-display ml-auto mr-2 mt-2 block p-4 pb-2 text-3xl italic text-white"
-					onClick={props.setNextPack}>
-					Next
-				</button>
-			</Show>
 		</div>
 	);
 }

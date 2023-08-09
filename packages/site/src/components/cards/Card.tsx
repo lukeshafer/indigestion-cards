@@ -61,8 +61,8 @@ export default function Card(props: Props) {
 					{isShitPack() && (
 						<img
 							src="/shit_pack_brown.png"
-							class="absolute right-[3%] bottom-[5%] opacity-80"
-							classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp') }}
+							class="absolute right-[3%] bottom-[5%]"
+							classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp'), 'opacity-80': !props.stamps?.includes('new-stamp') }}
 							width="120"
 						/>
 					)}

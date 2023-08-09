@@ -44,13 +44,14 @@ const baseRarity = siteConfig?.baseRarity || {
 
 instances.sort((a, b) =>
 	+a.totalOfType === +b.totalOfType
-		? a.instanceId !== b.instanceId
-			? +a.instanceId - +b.instanceId
+		? a.designId !== b.designId
+			? a.designId.localeCompare(b.designId)
 			: +a.cardNumber - +b.cardNumber
 		: +a.totalOfType - +b.totalOfType
 );
 
 const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, instances);
+const openedInstances = instances.filter((instance) => instance.openedAt);
 ---
 
 <Page
@@ -60,13 +61,36 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
-	<AdminOnly>
-		<EditDesignForm {...design} client:load />
-	</AdminOnly>
+		<section class="text-lg mx-auto">
+			<p>
+				<b>Season:</b>
+				{design.seasonName}
+			</p>
+			<p>
+				<b>Artist:</b>
+				{design.artist}
+			</p>
+		</section>
+		<AdminOnly>
+			<EditDesignForm {...design} client:load />
+		</AdminOnly>
 	</header>
+	<section class="text-center flex flex-col">
+		<Heading>Instances</Heading>
+		<CardList
+			cards={openedInstances}
+			showUsernames
+			sessionType={Astro.locals.session?.type}
+			client:load
+			sortOnlyBy={['rarest', 'common']}
+		/>
+	</section>
 	<AdminOnly>
 		<details>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
+			<p class="text-red-600 font-bold">
+				This section is only visible to admins: not for stream!
+			</p>
 			<div class="my-4 flex flex-col gap-8">
 				<section class="grid text-lg">
 					<Heading>Stats Overview</Heading>
@@ -77,14 +101,4 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 		</details>
 		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>
-	<section class="text-center flex flex-col gap-5">
-		<Heading>Instances</Heading>
-		<CardList
-			cards={instances}
-			showUsernames
-			sessionType={Astro.locals.session?.type}
-			client:load
-			sortOnlyBy={['rarest', 'common']}
-		/>
-	</section>
 </Page>

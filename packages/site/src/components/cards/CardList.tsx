@@ -86,19 +86,19 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 	switch (sort) {
 		case 'card-name-asc':
 			return cards.sort(
-				(a, b) => a.cardName.localeCompare(b.cardName) || a.totalOfType - b.totalOfType
+				(a, b) => a.cardName.localeCompare(b.cardName) || a.totalOfType - b.totalOfType || +a.cardNumber - +b.cardNumber
 			);
 		case 'card-name-desc':
 			return cards.sort(
-				(a, b) => b.cardName.localeCompare(a.cardName) || a.totalOfType - b.totalOfType
+				(a, b) => b.cardName.localeCompare(a.cardName) || a.totalOfType - b.totalOfType || +a.cardNumber - +b.cardNumber
 			);
 		case 'rarest':
 			return cards.sort(
-				(a, b) => a.totalOfType - b.totalOfType || a.cardName.localeCompare(b.cardName)
+				(a, b) => a.totalOfType - b.totalOfType || a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber
 			);
 		case 'common':
 			return cards.sort(
-				(a, b) => b.totalOfType - a.totalOfType || a.cardName.localeCompare(b.cardName)
+				(a, b) => b.totalOfType - a.totalOfType || a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;
