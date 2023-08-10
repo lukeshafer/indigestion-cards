@@ -11,7 +11,6 @@ export default function UserSearch() {
 
 	const searchDirective = (el: HTMLElement) => {
 		const fetchUsernames = async () => {
-			console.log('fetching usernames');
 			if (users().length > 0 || isFetching()) return;
 			setIsFetching(true);
 			const response = await fetch(publicApi.GET_ALL_USERNAMES);
