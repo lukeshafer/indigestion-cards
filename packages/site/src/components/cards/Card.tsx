@@ -24,8 +24,7 @@ export default function Card(props: Props) {
 	const cardName = () => (isFullArt() ? '' : props.cardName);
 	const cardDescription = () => (isFullArt() ? '' : props.cardDescription);
 
-	const isShitPack = () => //props.stamps?.includes('shit-pack');
-		false // uncomment when ready
+	const isShitPack = () => props.stamps?.includes('shit-pack');
 
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
@@ -60,12 +59,15 @@ export default function Card(props: Props) {
 						{props.cardNumber} / {props.totalOfType}
 					</p>
 					{isShitPack() && (
-						<img
-							src="/shat.jpg"
-							class="absolute left-3/4 top-3/4 rotate-[30deg]"
-							classList={{ [styles.shitPackStamp]: true }}
-							width="70"
-						/>
+						<div
+								class="absolute top-1/2 left-[52%] -translate-x-1/2 -translate-y-1/2 rotate-12 w-[15em] block"
+							>
+							<img
+								src="/shit_pack_brown.png"
+								classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp'), 'opacity-80': !props.stamps?.includes('new-stamp') }}
+								width="350"
+							/>
+						</div>
 					)}
 				</article>
 			</TiltCardEffect>

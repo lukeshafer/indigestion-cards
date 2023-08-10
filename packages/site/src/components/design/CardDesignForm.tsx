@@ -41,7 +41,7 @@ export default function CardDesignForm(props: {
 				/>
 				<DeleteImageButton key={props.key} type="cardDesign" />
 			</div>
-			<Form action={api.DESIGN.CREATE} method="post">
+			<Form action={api.DESIGN} method="post">
 				<input type="hidden" name="imgUrl" value={props.imgUrl} />
 				<input type="hidden" name="imageKey" value={props.key} />
 				<Select

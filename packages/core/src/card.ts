@@ -556,6 +556,12 @@ export async function createCardDesign(
 	}
 }
 
+export async function updateCardDesign(args: UpdateEntityItem<CardDesign> & { designId: string }) {
+	const { designId, ...rest } = args;
+	const result = await db.entities.cardDesigns.update({designId}).set(rest).go();
+	return { success: true, data: result.data };
+}
+
 // UNMATCHED DESIGN IMAGES //
 export async function getUnmatchedDesignImages(type: EntityItem<UnmatchedImage>['type']) {
 	const result = await db.entities.unmatchedImages.query.byType({ type }).go();

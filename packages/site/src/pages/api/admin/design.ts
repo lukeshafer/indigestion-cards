@@ -5,6 +5,7 @@ import {
 	deleteUnmatchedDesignImage,
 	getAllRarities,
 	deleteCardDesignById,
+	updateCardDesign,
 } from '@lil-indigestion-cards/core/card';
 import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
 import { createS3Url } from '@lil-indigestion-cards/core/utils';
@@ -90,6 +91,25 @@ export const post: APIRoute = async (ctx) => {
 	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
 
 	return ctx.redirect(`${routes.DESIGNS}?alert=Design%20created!&type=success`);
+};
+
+export const patch: APIRoute = async (ctx) => {
+	const params = new URLSearchParams(await ctx.request.text());
+
+	const designId = params.get('designId');
+	const cardDescription = params.get('cardDescription');
+
+	if (!designId) return new Response('Missing design ID', { status: 400 });
+	if (!cardDescription) return new Response('Missing card description', { status: 400 });
+
+	const result = await updateCardDesign({
+		designId: designId!,
+		cardDescription: cardDescription!,
+	});
+
+	if (!result.success) return new Response("An error occurred while updating the card text.", { status: 500 });
+
+	return new Response('Card updated!', { status: 200 });
 };
 
 export const del: APIRoute = async (ctx) => {

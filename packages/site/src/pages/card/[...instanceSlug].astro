@@ -44,7 +44,6 @@ const openDate = instance.openedAt
 		<div class="mx-4">
 			<Card {...instance} client:load />
 		</div>
-
 	</header>
 	<section class="text-lg mx-auto">
 		<Heading>Stats:</Heading>
@@ -53,18 +52,28 @@ const openDate = instance.openedAt
 			{instance.rarityName}
 		</p>
 		<p>
+			<b>Card:</b>
+			<a class="underline" href={`${routes.CARDS}/${instance.designId}`}
+				>{instance.cardName}</a
+			>
+		</p>
+		<p>
 			<b>Card Number:</b>
 			{instance.cardNumber}
 		</p>
 		<p>
 			<b>Season:</b>
-			<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}>{instance.seasonName}</a>
+			<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}
+				>{instance.seasonName}</a
+			>
 		</p>
 		<p>
 			<b>Owner</b>
 			{
 				instance.username ? (
-					<a class="underline" href={`${routes.USERS}/${instance.username}`}>{instance.username}</a>
+					<a class="underline" href={`${routes.USERS}/${instance.username}`}>
+						{instance.username}
+					</a>
 				) : (
 					'None'
 				)
