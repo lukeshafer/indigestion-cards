@@ -59,12 +59,15 @@ export default function Card(props: Props) {
 						{props.cardNumber} / {props.totalOfType}
 					</p>
 					{isShitPack() && (
-						<img
-							src="/shit_pack_brown.png"
-							class="absolute right-[3%] bottom-[5%]"
-							classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp'), 'opacity-80': !props.stamps?.includes('new-stamp') }}
-							width="120"
-						/>
+						<div
+								class="absolute top-1/2 left-[52%] -translate-x-1/2 -translate-y-1/2 rotate-12 w-[15em] block"
+							>
+							<img
+								src="/shit_pack_brown.png"
+								classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp'), 'opacity-80': !props.stamps?.includes('new-stamp') }}
+								width="350"
+							/>
+						</div>
 					)}
 				</article>
 			</TiltCardEffect>
