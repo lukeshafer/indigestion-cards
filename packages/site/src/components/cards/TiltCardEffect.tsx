@@ -4,7 +4,7 @@ import styles from './TiltCardEffect.module.css';
 
 export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: boolean }) {
 	const [state, setState] = createStore({
-		transition: 'transform 0.5s',
+		transition: 'transform 0.1s linear',
 		shinePosition: '50%',
 		shineAfterOpacity: '0',
 		transform: 'rotate3d(0, 0, 0, 0deg)',
@@ -79,7 +79,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 			)
 				return;
 			setState({
-				transition: 'transform 0.2s linear',
+				transition: 'transform 0.1s linear',
 				shinePosition: '50%',
 				shineAfterOpacity: '0',
 				transform: 'rotate3d(0, 0, 0, 0deg)',
