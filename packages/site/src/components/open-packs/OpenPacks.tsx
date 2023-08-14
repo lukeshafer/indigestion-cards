@@ -1,6 +1,6 @@
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
 import { For, Show, createEffect, createRenderEffect, createSignal } from 'solid-js';
-import { api } from '@/constants';
+import { api, routes } from '@/constants';
 import Card from '@/components/cards/Card';
 import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
@@ -66,7 +66,11 @@ export default function OpenPacks(props: {
 		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
 			setTimeout(
 				// @ts-expect-error
-				() => setState('activePack', 'cardDetails', index, 'stamps', ['shit-pack', 'new-stamp']),
+				() =>
+					setState('activePack', 'cardDetails', index, 'stamps', [
+						'shit-pack',
+						'new-stamp',
+					]),
 				500
 			);
 	};
@@ -146,7 +150,7 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 	return (
 		<button
-			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:opacity-75 hover:cursor-ns-resize"
+			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
 			onMouseDown={handleMouseDown}
 			style={{ 'margin-top': `${margin()}px` }}>
 			=
@@ -160,7 +164,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex items-center w-full justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
+		<div class="flex w-full items-center justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -281,33 +285,29 @@ function PackShowcase(props: {
 		props.pack?.cardDetails.slice().sort((a, b) => b.totalOfType - a.totalOfType);
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
-	const [username, setUsername] = createSignal(props.pack?.username);
-	createEffect(() => {
-		setUsername(props.pack?.username);
-	});
-
 	return (
 		<div class="bg-brand-100 flex h-full flex-col">
-			<div class="flex justify-between items-end pr-8">
+			<div class="flex items-end justify-between pr-8">
 				<h2
 					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
 					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
-						<span
-							class="font-display text-brand-main block py-4 text-5xl normal-case italic"
+						<a
+							href={`${routes.USERS}/${props.pack?.username}`}
+							class="font-display text-brand-main block py-4 text-5xl normal-case italic hover:underline"
 							style={{ 'view-transition-name': 'open-packs-title' }}>
 							{props.pack?.username}
-						</span>
+						</a>
 					</Show>
 				</h2>
-			<Show when={allCardsOpened() && props.packsRemaining}>
-				<button
-					class="bg-brand-main font-display ml-auto mb-4 block p-4 pb-2 text-3xl italic text-white"
-					onClick={props.setNextPack}>
-					Next
-				</button>
-			</Show>
+				<Show when={allCardsOpened() && props.packsRemaining}>
+					<button
+						class="bg-brand-main font-display mb-4 ml-auto block p-4 pb-2 text-3xl italic text-white"
+						onClick={props.setNextPack}>
+						Next
+					</button>
+				</Show>
 			</div>
 			<ul
 				style={{ gap: `${props.cardScale}rem` }}

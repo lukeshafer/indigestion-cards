@@ -43,7 +43,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
-				transition:name="main"
+				transition:name={ wide ? undefined : "main" }
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
 				class="col-start-2 mx-auto w-full flex-1 p-3 z-0 mb-8">
 				<slot />
