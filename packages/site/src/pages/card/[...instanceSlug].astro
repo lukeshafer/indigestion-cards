@@ -25,7 +25,15 @@ if (!instance) {
 }
 
 const openDate = instance.openedAt
-	? new Date(instance.openedAt).toLocaleString()
+	? new Date(instance.openedAt).toLocaleString("en-US",{
+		timeZone: "America/New_York",
+		month: "long",
+		day: "numeric",
+		year: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+		timeZoneName: "short",
+	})
 	: 'Not opened yet';
 ---
 

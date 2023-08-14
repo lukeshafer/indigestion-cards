@@ -65,8 +65,8 @@ export default function OpenPacks(props: {
 
 		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
 			setTimeout(
-				// @ts-expect-error
 				() =>
+					// @ts-expect-error
 					setState('activePack', 'cardDetails', index, 'stamps', [
 						'shit-pack',
 						'new-stamp',
