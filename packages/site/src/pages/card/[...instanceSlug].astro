@@ -32,6 +32,7 @@ const openDate = instance.openedAt
 <Page
 	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
 	class="flex flex-col gap-6"
+	pageType="public"
 	breadcrumbs={[
 		{ label: routeNames.CARDS, href: routes.DESIGNS },
 		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },

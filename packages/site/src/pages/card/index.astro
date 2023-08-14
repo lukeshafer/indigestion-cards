@@ -13,7 +13,7 @@ const [designs, siteConfig] = await Promise.all([getAllCardDesigns(), getSiteCon
 const message = Astro.url.searchParams.get('message') || '';
 ---
 
-<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]}>
+<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
 	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<PageHeader>

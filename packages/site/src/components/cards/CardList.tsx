@@ -1,7 +1,6 @@
 import { routes } from '@/constants';
 import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
 import styles from './CardList.module.css';
 import { Select } from '../form';
 import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
@@ -21,11 +20,9 @@ type SortType = (typeof sortTypes)[number]['value'];
 export default function CardList(props: {
 	cards: CardType[];
 	showUsernames?: boolean;
-	sessionType?: string;
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
 }) {
-	const element = () => (props.sessionType === 'admin' ? 'a' : 'div');
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
 			? sortTypes.filter((type) => props.sortOnlyBy?.includes(type.value))
@@ -53,14 +50,13 @@ export default function CardList(props: {
 					<For each={sortedCards()}>
 						{(card) => (
 							<div class="w-fit">
-								<Dynamic
-									component={element()}
+								<a
 									rel="prefetch"
 									href={`${routes.INSTANCES}/${card.designId}/${
 										card.instanceId ?? ''
 									}`}>
 									<Card {...card} scale="var(--card-scale)" />
-								</Dynamic>
+								</a>
 								<Show when={props.showUsernames}>
 									<p class="mt-2">
 										Owner:{' '}

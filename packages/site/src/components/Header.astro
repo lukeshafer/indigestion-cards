@@ -4,7 +4,15 @@ import Hamburger from '@/components/Hamburger.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 
-const disableAnimations = Astro.cookies.get('disable-animations').boolean()
+const disableAnimations = Astro.cookies.get('disable-animations').boolean();
+
+const currentPage = Astro.url.pathname;
+console.log(currentPage);
+
+const headerLinks = [
+	{ href: '/card', title: 'Cards' },
+	{ href: '/user', title: 'Users' },
+];
 ---
 
 <div class="border-b border-b-gray-300 bg-white">
@@ -14,15 +22,37 @@ const disableAnimations = Astro.cookies.get('disable-animations').boolean()
 				<Hamburger />
 			</div>
 		</AdminOnly>
-		<div class="flex-1">
-			<a href="/" title="Home" class="flex items-center gap-4 w-fit">
+		<nav class="flex-1 flex text-black items-center gap-6">
+			<a href="/" title="Home" class="flex items-center gap-4 w-fit mr-4">
 				<img src="/logo.png" alt="logo" class="w-12" width="96" />
-				<div class="font-display hidden flex-1 flex-col pt-1 text-white md:flex">
+				<div class="font-display hidden flex-1 flex-col pt-1 md:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
 					<span class="-mt-2 text-lg text-gray-700">cards</span>
 				</div>
 			</a>
-		</div>
+			{
+				headerLinks.map(({ href, title }) => (
+					<a href={href} title={title} class="hidden md:inline-block relative px-2 py-1 hover:bg-gray-200">
+						{currentPage.startsWith(href) ? (
+							<div
+								class="bg-brand-main absolute inset-0 w-full h-full"
+								style={{
+									'view-transition-name': 'active-page-link-header',
+								}}
+							/>
+						) : null}
+						<span
+							class="underline underline-offset-4"
+							style={{ 'view-transition-name': `${title}-header-link` }}
+							class:list={{
+								'font-bold text-white': currentPage.startsWith(href),
+							}}>
+							{title}
+						</span>
+					</a>
+				))
+			}
+		</nav>
 		<UserSearch client:load />
 		<UserConfig client:load {disableAnimations} />
 	</header>
