@@ -30,20 +30,22 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" x-data="{}">
+	<div
+		class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden">
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
 		<div
 			class="relative flex flex-col overflow-y-scroll md:col-start-2"
 			id="page-scroll-wrapper">
+			<div id="card-preview"></div>
 			<Header />
 			<AlertBox client:load {alerts} />
 			<div class="max-w-main mx-auto w-full">
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
-				transition:name={ wide ? undefined : "main" }
+				transition:name={wide ? undefined : 'main'}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
 				class="col-start-2 mx-auto w-full flex-1 p-3 z-0 mb-8">
 				<slot />

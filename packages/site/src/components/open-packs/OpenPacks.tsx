@@ -7,6 +7,7 @@ import { setTotalPackCount } from '@/lib/client/state';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
+import CardPreview from '../cards/CardPreview';
 
 export default function OpenPacks(props: {
 	packs: PackEntity[];
@@ -21,6 +22,8 @@ export default function OpenPacks(props: {
 		activePack: null as PackEntity | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
+		previewedCard: undefined as Parameters<typeof Card>[0] | undefined,
+		isPreviewing: false,
 	});
 
 	createEffect(() => {
@@ -65,8 +68,8 @@ export default function OpenPacks(props: {
 
 		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
 			setTimeout(
-				// @ts-expect-error
 				() =>
+					// @ts-expect-error
 					setState('activePack', 'cardDetails', index, 'stamps', [
 						'shit-pack',
 						'new-stamp',
@@ -77,6 +80,11 @@ export default function OpenPacks(props: {
 
 	return (
 		<>
+			<CardPreview
+				card={state.previewedCard}
+				isOpen={state.isPreviewing}
+				setIsOpen={(val) => setState('isPreviewing', val)}
+			/>
 			<div class="flex items-end">
 				<MarginAdjuster startMargin={props.startMargin} />
 				<CardScaleAdjuster
@@ -122,6 +130,10 @@ export default function OpenPacks(props: {
 					packsRemaining={packsRemaining()}
 					cardScale={state.cardScale}
 					isTesting={(state.isTesting && props.canTest) || false}
+					previewCard={(card) => {
+						setState('previewedCard', card);
+						setState('isPreviewing', true);
+					}}
 				/>
 			</div>
 		</>
@@ -209,6 +221,7 @@ function PackShowcase(props: {
 	packsRemaining: number;
 	isTesting: boolean;
 	cardScale: number;
+	previewCard: (card: PackEntity['cardDetails'][number]) => void;
 }) {
 	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
 		let keyframes: Keyframe[] = [];
@@ -321,6 +334,7 @@ function PackShowcase(props: {
 							setFlipped={() => props.flipCard(card.instanceId)}
 							isTesting={props.isTesting}
 							scale={props.cardScale}
+							previewCard={() => props.previewCard(card)}
 						/>
 					)}
 				</For>
@@ -335,10 +349,11 @@ function ShowcaseCard(props: {
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
+	previewCard: () => void;
 }) {
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
-	const handleClick = async () => {
+	const flipCard = async () => {
 		setFlipped(true);
 		props.setFlipped();
 
@@ -356,6 +371,11 @@ function ShowcaseCard(props: {
 			  });
 	};
 
+	const previewCard = () => {
+		if (!flipped()) return;
+		props.previewCard();
+	};
+
 	return (
 		<li>
 			<p class="error-text"></p>
@@ -364,7 +384,7 @@ function ShowcaseCard(props: {
 				style={{ width: props.scale * 18 + 'rem' }}
 				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
-					onClick={handleClick}
+					onClick={flipCard}
 					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
 					title="Click to reveal">
 					<div style={{ scale: props.scale }} class="origin-top-left">
@@ -374,9 +394,12 @@ function ShowcaseCard(props: {
 					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
-					<div style={{ scale: props.scale }} class="origin-top-left">
+					<button
+						style={{ scale: props.scale }}
+						class="origin-top-left"
+						onClick={previewCard}>
 						<Card {...props.card} />
-					</div>
+					</button>
 				</div>
 			</div>
 		</li>
