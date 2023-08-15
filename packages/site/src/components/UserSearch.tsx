@@ -28,12 +28,12 @@ export default function UserSearch() {
 	};
 
 	return (
-		<div class="relative" use:searchDirective>
+		<div class="relative w-40 md:w-auto" use:searchDirective>
 			<Form action={publicApi.SEARCH} method="get">
 				<TextInput
 					list="users"
 					name="username"
-					label="Search Usernames"
+					label="Search Users"
 					inputOnly
 					autocomplete="off"
 				/>

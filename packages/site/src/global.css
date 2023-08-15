@@ -393,4 +393,13 @@ body.disable-animations * {
 		white-space: nowrap;
 		width: 1px;
 	}
+
+	.scrollbar-hidden::-webkit-scrollbar {
+		display: none; /* Chrome, Safari */
+	}
+
+	.scrollbar-hidden {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
 }

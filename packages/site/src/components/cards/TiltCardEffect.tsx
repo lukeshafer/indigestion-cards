@@ -16,11 +16,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 
 	function cardTilt(el: HTMLDivElement) {
 		el.addEventListener('mouseenter', handleEnterEvent);
-		el.addEventListener('mousemove', handleMoveEvent);
-		el.addEventListener('mouseleave', handleLeaveEvent);
 		el.addEventListener('touchstart', handleEnterEvent);
-		el.addEventListener('touchmove', handleMoveEvent);
-		el.addEventListener('touchend', handleLeaveEvent);
 
 		function handleEnterEvent() {
 			if (

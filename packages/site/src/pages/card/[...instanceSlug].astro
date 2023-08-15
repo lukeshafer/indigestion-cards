@@ -4,6 +4,7 @@ import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
 import { routeNames, routes } from '@/constants';
 import { Heading, PageTitle } from '@/components/text';
 import Card from '@/components/cards/Card';
+import AdminOnly from '@/components/AdminOnly.astro';
 
 const slug = Astro.params.instanceSlug;
 if (!slug) {
@@ -25,15 +26,15 @@ if (!instance) {
 }
 
 const openDate = instance.openedAt
-	? new Date(instance.openedAt).toLocaleString("en-US",{
-		timeZone: "America/New_York",
-		month: "long",
-		day: "numeric",
-		year: "numeric",
-		hour: "numeric",
-		minute: "numeric",
-		timeZoneName: "short",
-	})
+	? new Date(instance.openedAt).toLocaleString('en-US', {
+			timeZone: 'America/New_York',
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric',
+			timeZoneName: 'short',
+	  })
 	: 'Not opened yet';
 ---
 
@@ -70,12 +71,14 @@ const openDate = instance.openedAt
 			<b>Card Number:</b>
 			{instance.cardNumber}
 		</p>
-		<p>
-			<b>Season:</b>
-			<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}
-				>{instance.seasonName}</a
-			>
-		</p>
+		<AdminOnly>
+			<p>
+				<b>Season:</b>
+				<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}
+					>{instance.seasonName}</a
+				>
+			</p>
+		</AdminOnly>
 		<p>
 			<b>Owner</b>
 			{
