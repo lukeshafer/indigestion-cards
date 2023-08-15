@@ -9,10 +9,12 @@ import { useViewTransition } from '@/lib/client/utils';
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstanceEntity>;
 
 const sortTypes = [
-	{ value: 'card-name-asc', label: 'Card Name (A-Z)' },
-	{ value: 'card-name-desc', label: 'Card Name (Z-A)' },
 	{ value: 'rarest', label: 'Most to Least Rare' },
 	{ value: 'common', label: 'Least to Most Rare' },
+	{ value: 'card-name-asc', label: 'Card Name (A-Z)' },
+	{ value: 'card-name-desc', label: 'Card Name (Z-A)' },
+	{ value: 'open-date-desc', label: 'Date Opened (Newest to Oldest)' },
+	{ value: 'open-date-asc', label: 'Date Opened (Oldest to Newest)' },
 ] as const;
 
 type SortType = (typeof sortTypes)[number]['value'];
@@ -82,19 +84,47 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 	switch (sort) {
 		case 'card-name-asc':
 			return cards.sort(
-				(a, b) => a.cardName.localeCompare(b.cardName) || a.totalOfType - b.totalOfType || +a.cardNumber - +b.cardNumber
+				(a, b) =>
+					a.cardName.localeCompare(b.cardName) ||
+					a.totalOfType - b.totalOfType ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'card-name-desc':
 			return cards.sort(
-				(a, b) => b.cardName.localeCompare(a.cardName) || a.totalOfType - b.totalOfType || +a.cardNumber - +b.cardNumber
+				(a, b) =>
+					b.cardName.localeCompare(a.cardName) ||
+					a.totalOfType - b.totalOfType ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'rarest':
 			return cards.sort(
-				(a, b) => a.totalOfType - b.totalOfType || a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber
+				(a, b) =>
+					a.totalOfType - b.totalOfType ||
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'common':
 			return cards.sort(
-				(a, b) => b.totalOfType - a.totalOfType || a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber
+				(a, b) =>
+					b.totalOfType - a.totalOfType ||
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
+			);
+		case 'open-date-desc':
+			return cards.sort((a, b) =>
+				!(a.openedAt && b.openedAt)
+					? 0
+					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
+			);
+		case 'open-date-asc':
+			return cards.sort((a, b) =>
+				!(a.openedAt && b.openedAt)
+					? 0
+					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;
