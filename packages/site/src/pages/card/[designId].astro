@@ -74,13 +74,12 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 		</AdminOnly>
 	</header>
 	<section class="text-center flex flex-col">
-		<Heading>Instances</Heading>
+		<Heading>Cards Opened</Heading>
 		<CardList
 			cards={openedInstances}
 			showUsernames
-			sessionType={Astro.locals.session?.type}
 			client:load
-			sortOnlyBy={['rarest', 'common']}
+			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
 		/>
 	</section>
 	<AdminOnly>

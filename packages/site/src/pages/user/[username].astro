@@ -78,6 +78,17 @@ const packTypes = await getAllPackTypes();
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-		<CardList cards={cardsNotInPack} client:load />
+		<CardList
+			cards={cardsNotInPack}
+			client:load
+			sortOnlyBy={[
+				'rarest',
+				'common',
+				'card-name-asc',
+				'card-name-desc',
+				'open-date-asc',
+				'open-date-desc',
+			]}
+		/>
 	</section>
 </Page>

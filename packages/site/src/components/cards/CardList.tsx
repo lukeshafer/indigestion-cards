@@ -15,6 +15,8 @@ const sortTypes = [
 	{ value: 'card-name-desc', label: 'Card Name (Z-A)' },
 	{ value: 'open-date-desc', label: 'Date Opened (Newest to Oldest)' },
 	{ value: 'open-date-asc', label: 'Date Opened (Oldest to Newest)' },
+	{ value: 'owner-asc', label: 'Owner (A-Z)' },
+	{ value: 'owner-desc', label: 'Owner (Z-A)' },
 ] as const;
 
 type SortType = (typeof sortTypes)[number]['value'];
@@ -123,6 +125,22 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
+			);
+		case 'owner-asc':
+			return cards.sort((a, b) =>
+				!(a.username && b.username)
+					? 0
+					: a.username.localeCompare(b.username) ||
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
+			);
+		case 'owner-desc':
+			return cards.sort((a, b) =>
+				!(a.username && b.username)
+					? 0
+					: b.username.localeCompare(a.username) ||
 					  a.cardName.localeCompare(b.cardName) ||
 					  +a.cardNumber - +b.cardNumber
 			);
