@@ -4,7 +4,14 @@ import Hamburger from '@/components/Hamburger.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 
-const disableAnimations = Astro.cookies.get('disable-animations').boolean()
+const disableAnimations = Astro.cookies.get('disable-animations').boolean();
+
+const currentPage = Astro.url.pathname;
+
+const headerLinks = [
+	{ href: '/card', title: 'Cards' },
+	{ href: '/user', title: 'Users' },
+];
 ---
 
 <div class="border-b border-b-gray-300 bg-white">
@@ -14,15 +21,33 @@ const disableAnimations = Astro.cookies.get('disable-animations').boolean()
 				<Hamburger />
 			</div>
 		</AdminOnly>
-		<div class="flex-1">
-			<a href="/" title="Home" class="flex items-center gap-4 w-fit">
-				<img src="/logo.png" alt="logo" class="w-12" width="96" />
-				<div class="font-display hidden flex-1 flex-col pt-1 text-white md:flex">
+		<nav class="flex-1 flex text-black items-center gap-2 md:gap-4 overflow-x-scroll scrollbar-hidden">
+			<a href="/" title="Home" class="flex items-center gap-4 w-fit min-w-[2rem] mr-4">
+				<img src="/logo.png" alt="logo" class="w-12 block" width="192" />
+				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
 					<span class="-mt-2 text-lg text-gray-700">cards</span>
 				</div>
 			</a>
-		</div>
+			{
+				headerLinks.map(({ href, title }) => (
+					<a
+						href={href}
+						title={title}
+						class="relative px-2 py-1 hover:bg-gray-200 text-gray-700 rounded transition-colors"
+						class:list={{
+							'font-bold text-brand-main bg-brand-100': currentPage.startsWith(href),
+						}}>
+						<span
+							class:list={{
+								'font-bold text-brand-main': currentPage.startsWith(href),
+							}}>
+							{title}
+						</span>
+					</a>
+				))
+			}
+		</nav>
 		<UserSearch client:load />
 		<UserConfig client:load {disableAnimations} />
 	</header>

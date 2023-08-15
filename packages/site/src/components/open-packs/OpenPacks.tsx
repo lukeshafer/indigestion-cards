@@ -1,12 +1,14 @@
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
 import { For, Show, createEffect, createRenderEffect, createSignal } from 'solid-js';
-import { api } from '@/constants';
+import { api, routes } from '@/constants';
 import Card from '@/components/cards/Card';
 import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
+import CardPreview from '../cards/CardPreview';
+import { useViewTransition } from '@/lib/client/utils';
 
 export default function OpenPacks(props: {
 	packs: PackEntity[];
@@ -21,6 +23,7 @@ export default function OpenPacks(props: {
 		activePack: null as PackEntity | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
+		previewedCardId: null as string | null,
 	});
 
 	createEffect(() => {
@@ -65,8 +68,12 @@ export default function OpenPacks(props: {
 
 		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
 			setTimeout(
-				// @ts-expect-error
-				() => setState('activePack', 'cardDetails', index, 'stamps', ['shit-pack', 'new-stamp']),
+				() =>
+					// @ts-expect-error
+					setState('activePack', 'cardDetails', index, 'stamps', [
+						'shit-pack',
+						'new-stamp',
+					]),
 				500
 			);
 	};
@@ -118,6 +125,10 @@ export default function OpenPacks(props: {
 					packsRemaining={packsRemaining()}
 					cardScale={state.cardScale}
 					isTesting={(state.isTesting && props.canTest) || false}
+					previewCard={(id) => {
+						setState('previewedCardId', id);
+					}}
+					previewedCardId={state.previewedCardId}
 				/>
 			</div>
 		</>
@@ -146,7 +157,7 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 	return (
 		<button
-			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:opacity-75 hover:cursor-ns-resize"
+			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
 			onMouseDown={handleMouseDown}
 			style={{ 'margin-top': `${margin()}px` }}>
 			=
@@ -160,7 +171,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex items-center w-full justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
+		<div class="flex w-full items-center justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -205,6 +216,8 @@ function PackShowcase(props: {
 	packsRemaining: number;
 	isTesting: boolean;
 	cardScale: number;
+	previewCard: (cardId: string) => void;
+	previewedCardId: string | null;
 }) {
 	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
 		let keyframes: Keyframe[] = [];
@@ -281,37 +294,34 @@ function PackShowcase(props: {
 		props.pack?.cardDetails.slice().sort((a, b) => b.totalOfType - a.totalOfType);
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
-	const [username, setUsername] = createSignal(props.pack?.username);
-	createEffect(() => {
-		setUsername(props.pack?.username);
-	});
-
 	return (
-		<div class="bg-brand-100 flex h-full flex-col">
-			<div class="flex justify-between items-end pr-8">
+		<div class="bg-brand-100 relative flex h-full flex-col">
+			<div class="flex items-end justify-between pr-8">
 				<h2
 					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
 					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
-						<span
-							class="font-display text-brand-main block py-4 text-5xl normal-case italic"
+						<a
+							href={`${routes.USERS}/${props.pack?.username}`}
+							class="font-display text-brand-main block py-4 text-5xl normal-case italic hover:underline"
 							style={{ 'view-transition-name': 'open-packs-title' }}>
 							{props.pack?.username}
-						</span>
+						</a>
 					</Show>
 				</h2>
-			<Show when={allCardsOpened() && props.packsRemaining}>
-				<button
-					class="bg-brand-main font-display ml-auto mb-4 block p-4 pb-2 text-3xl italic text-white"
-					onClick={props.setNextPack}>
-					Next
-				</button>
-			</Show>
+				<Show when={allCardsOpened() && props.packsRemaining}>
+					<button
+						class="bg-brand-main font-display mb-4 ml-auto block p-4 pb-2 text-3xl italic text-white"
+						onClick={props.setNextPack}>
+						Next
+					</button>
+				</Show>
 			</div>
 			<ul
 				style={{ gap: `${props.cardScale}rem` }}
-				class="flex w-full flex-wrap items-center justify-center"
+				classList={{ 'blur' : !!props.previewedCardId }}
+				class="flex w-full flex-wrap items-center justify-center transition-[filter]"
 				ref={animateCardList}>
 				<For each={sortedCardDetails()}>
 					{(card) => (
@@ -321,10 +331,13 @@ function PackShowcase(props: {
 							setFlipped={() => props.flipCard(card.instanceId)}
 							isTesting={props.isTesting}
 							scale={props.cardScale}
+							previewCard={(val) => props.previewCard(val)}
+							isPreviewed={props.previewedCardId === card.instanceId}
 						/>
 					)}
 				</For>
 			</ul>
+			<div id="card-preview"></div>
 		</div>
 	);
 }
@@ -335,10 +348,12 @@ function ShowcaseCard(props: {
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
+	previewCard: (cardId: string) => void;
+	isPreviewed: boolean;
 }) {
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
-	const handleClick = async () => {
+	const flipCard = async () => {
 		setFlipped(true);
 		props.setFlipped();
 
@@ -356,6 +371,15 @@ function ShowcaseCard(props: {
 			  });
 	};
 
+	const previewCard = () => {
+		if (!flipped()) return;
+		props.previewCard(props.card.instanceId);
+	};
+
+	const closePreview = () => {
+		props.previewCard('');
+	};
+
 	return (
 		<li>
 			<p class="error-text"></p>
@@ -364,7 +388,7 @@ function ShowcaseCard(props: {
 				style={{ width: props.scale * 18 + 'rem' }}
 				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
-					onClick={handleClick}
+					onClick={flipCard}
 					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
 					title="Click to reveal">
 					<div style={{ scale: props.scale }} class="origin-top-left">
@@ -374,9 +398,17 @@ function ShowcaseCard(props: {
 					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
-					<div style={{ scale: props.scale }} class="origin-top-left">
-						<Card {...props.card} />
-					</div>
+					<button
+						class="block origin-top-left"
+						onClick={previewCard}>
+						{props.isPreviewed ? (
+							<CardPreview close={closePreview}>
+								<Card {...props.card} scale={props.scale * 1.5} />
+							</CardPreview>
+						) : (
+							<Card {...props.card} scale={props.scale} />
+						)}
+					</button>
 				</div>
 			</div>
 		</li>

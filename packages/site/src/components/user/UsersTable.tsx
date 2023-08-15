@@ -35,37 +35,44 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 			]}
 			rows={props.users.map((user) => ({
 				username: {
-					element: <a
-						href={`${routes.USERS}/${user.username}`}
-						class="hover:underline focus:underline">
-						{user.username}
-					</a>,
+					element: (
+						<a
+							style={{ 'view-transition-name': `${user.username}-username` }}
+							href={`${routes.USERS}/${user.username}`}
+							class="hover:underline focus:underline">
+							{user.username}
+						</a>
+					),
 					value: user.username,
 				},
 				cardCount: {
-					element: <>
-						<TbCards
-							aria-hidden="true"
-							fill="white"
-							stroke="white"
-							size={50}
-							class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-						/>
-						<span class="relative rounded-full bg-white p-1">{user.cardCount}</span>
-					</>,
+					element: (
+						<>
+							<TbCards
+								aria-hidden="true"
+								fill="white"
+								stroke="white"
+								size={50}
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+							/>
+							<span class="relative rounded-full bg-white p-1">{user.cardCount}</span>
+						</>
+					),
 					value: user.cardCount,
 				},
 				packCount: {
-					element: <>
-						<FaSolidGift
-							aria-hidden="true"
-							fill="white"
-							stroke="white"
-							size={40}
-							class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-						/>
-						<span class="relative rounded-full bg-white p-1">{user.packCount}</span>
-					</>,
+					element: (
+						<>
+							<FaSolidGift
+								aria-hidden="true"
+								fill="white"
+								stroke="white"
+								size={40}
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+							/>
+							<span class="relative rounded-full bg-white p-1">{user.packCount}</span>
+						</>
+					),
 					value: user.packCount,
 				},
 			}))}
