@@ -8,6 +8,7 @@ import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
+import { useViewTransition } from '@/lib/client/utils';
 
 export default function OpenPacks(props: {
 	packs: PackEntity[];
@@ -22,8 +23,7 @@ export default function OpenPacks(props: {
 		activePack: null as PackEntity | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
-		previewedCard: undefined as Parameters<typeof Card>[0] | undefined,
-		isPreviewing: false,
+		previewedCardId: null as string | null,
 	});
 
 	createEffect(() => {
@@ -80,11 +80,6 @@ export default function OpenPacks(props: {
 
 	return (
 		<>
-			<CardPreview
-				card={state.previewedCard}
-				isOpen={state.isPreviewing}
-				setIsOpen={(val) => setState('isPreviewing', val)}
-			/>
 			<div class="flex items-end">
 				<MarginAdjuster startMargin={props.startMargin} />
 				<CardScaleAdjuster
@@ -130,10 +125,10 @@ export default function OpenPacks(props: {
 					packsRemaining={packsRemaining()}
 					cardScale={state.cardScale}
 					isTesting={(state.isTesting && props.canTest) || false}
-					previewCard={(card) => {
-						setState('previewedCard', card);
-						setState('isPreviewing', true);
+					previewCard={(id) => {
+						setState('previewedCardId', id);
 					}}
+					previewedCardId={state.previewedCardId}
 				/>
 			</div>
 		</>
@@ -221,7 +216,8 @@ function PackShowcase(props: {
 	packsRemaining: number;
 	isTesting: boolean;
 	cardScale: number;
-	previewCard: (card: PackEntity['cardDetails'][number]) => void;
+	previewCard: (cardId: string) => void;
+	previewedCardId: string | null;
 }) {
 	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
 		let keyframes: Keyframe[] = [];
@@ -299,7 +295,7 @@ function PackShowcase(props: {
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
 	return (
-		<div class="bg-brand-100 flex h-full flex-col">
+		<div class="bg-brand-100 relative flex h-full flex-col">
 			<div class="flex items-end justify-between pr-8">
 				<h2
 					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
@@ -324,7 +320,8 @@ function PackShowcase(props: {
 			</div>
 			<ul
 				style={{ gap: `${props.cardScale}rem` }}
-				class="flex w-full flex-wrap items-center justify-center"
+				classList={{ 'blur' : !!props.previewedCardId }}
+				class="flex w-full flex-wrap items-center justify-center transition-[filter]"
 				ref={animateCardList}>
 				<For each={sortedCardDetails()}>
 					{(card) => (
@@ -334,11 +331,13 @@ function PackShowcase(props: {
 							setFlipped={() => props.flipCard(card.instanceId)}
 							isTesting={props.isTesting}
 							scale={props.cardScale}
-							previewCard={() => props.previewCard(card)}
+							previewCard={(val) => props.previewCard(val)}
+							isPreviewed={props.previewedCardId === card.instanceId}
 						/>
 					)}
 				</For>
 			</ul>
+			<div id="card-preview"></div>
 		</div>
 	);
 }
@@ -349,7 +348,8 @@ function ShowcaseCard(props: {
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
-	previewCard: () => void;
+	previewCard: (cardId: string) => void;
+	isPreviewed: boolean;
 }) {
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
@@ -373,7 +373,11 @@ function ShowcaseCard(props: {
 
 	const previewCard = () => {
 		if (!flipped()) return;
-		props.previewCard();
+		props.previewCard(props.card.instanceId);
+	};
+
+	const closePreview = () => {
+		props.previewCard('');
 	};
 
 	return (
@@ -395,10 +399,15 @@ function ShowcaseCard(props: {
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
 					<button
-						style={{ scale: props.scale }}
-						class="origin-top-left"
+						class="block origin-top-left"
 						onClick={previewCard}>
-						<Card {...props.card} />
+						{props.isPreviewed ? (
+							<CardPreview close={closePreview}>
+								<Card {...props.card} scale={props.scale * 1.5} />
+							</CardPreview>
+						) : (
+							<Card {...props.card} scale={props.scale} />
+						)}
 					</button>
 				</div>
 			</div>

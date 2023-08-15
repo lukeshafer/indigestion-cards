@@ -38,7 +38,6 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 		<div
 			class="relative flex flex-col overflow-y-scroll md:col-start-2"
 			id="page-scroll-wrapper">
-			<div id="card-preview"></div>
 			<Header />
 			<AlertBox client:load {alerts} />
 			<div class="max-w-main mx-auto w-full">
