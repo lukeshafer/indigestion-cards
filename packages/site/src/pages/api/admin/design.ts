@@ -11,7 +11,7 @@ import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
 import { createS3Url } from '@lil-indigestion-cards/core/utils';
 import { Api } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
-import { AUTH_TOKEN, FULL_ART_ID } from '@/constants';
+import { AUTH_TOKEN, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
@@ -22,7 +22,8 @@ export const post: APIRoute = async (ctx) => {
 	const designId = params.get('designId');
 	const cardDescription = params.get('cardDescription');
 	const artist = params.get('artist');
-	const fullArt = params.get('fullArt') === 'on';
+	const isFullArt = params.get('fullArt') === 'on';
+	const isLegacy = params.get('legacy') === 'on';
 
 	const errors = [];
 	if (!imageKey) errors.push('Image key is required');
@@ -44,11 +45,22 @@ export const post: APIRoute = async (ctx) => {
 				count: count ? parseInt(count) : 0,
 			};
 		}),
-		...(fullArt && rarities.length > 0
+		...(isFullArt && rarities.length > 0
 			? [
 					{
 						rarityId: FULL_ART_ID,
 						rarityName: 'Full Art',
+						count: 1,
+						frameUrl: '',
+						rarityColor: '',
+					},
+			  ]
+			: []),
+		...(isLegacy && rarities.length > 0
+			? [
+					{
+						rarityId: LEGACY_CARD_ID,
+						rarityName: 'Legacy',
 						count: 1,
 						frameUrl: '',
 						rarityColor: '',
@@ -107,7 +119,8 @@ export const patch: APIRoute = async (ctx) => {
 		cardDescription: cardDescription!,
 	});
 
-	if (!result.success) return new Response("An error occurred while updating the card text.", { status: 500 });
+	if (!result.success)
+		return new Response('An error occurred while updating the card text.', { status: 500 });
 
 	return new Response('Card updated!', { status: 200 });
 };

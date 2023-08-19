@@ -24,11 +24,13 @@ export default function CardDesignForm(props: {
 }) {
 	const [cardName, setCardName] = createSignal('');
 	const [cardDescription, setCardDescription] = createSignal('');
+	const [isLegacy, setIsLegacy] = createSignal(false);
 
 	return (
 		<div class="relative grid justify-start gap-4">
 			<div class="relative grid justify-start gap-4">
 				<Card
+					rarityId={props.baseRarity.rarityId}
 					rarityName={props.baseRarity.rarityName}
 					rarityColor={props.baseRarity.rarityColor}
 					frameUrl={props.baseRarity.frameUrl}
@@ -71,12 +73,13 @@ export default function CardDesignForm(props: {
 							<NumberInput
 								label={rarity.rarityName}
 								name={`rarity-${rarity.rarityId}-count`}
-								value={rarity.defaultCount}
+								value={isLegacy() ? 0 : rarity.defaultCount}
 								required
 							/>
 						)}
 					</For>
-					<Checkbox label="Include full art card?" name="fullArt" />
+					<Checkbox label="Include full art card?" name="fullArt" value={isLegacy() ? false : undefined} />
+					<Checkbox label="Legacy card?" name="legacy" setValue={setIsLegacy} />
 				</Fieldset>
 				<SubmitButton />
 			</Form>

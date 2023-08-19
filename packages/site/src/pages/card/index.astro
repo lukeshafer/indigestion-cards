@@ -4,7 +4,7 @@ import CardList from '@/components/cards/CardList';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routeNames, routes } from '@/constants';
+import { routeNames, routes, LEGACY_CARD_ID } from '@/constants';
 import { PageTitle, PageHeader, Anchor } from '@/components/text';
 import AdminOnly from '@/components/AdminOnly.astro';
 
@@ -23,16 +23,20 @@ const message = Astro.url.searchParams.get('message') || '';
 		</AdminOnly>
 	</PageHeader>
 	<CardList
-		sessionType={Astro.locals.session?.type}
-		cards={designs.map((card) => ({
-			...card,
-			rarityName: siteConfig?.baseRarity.rarityName ?? '',
-			rarityId: siteConfig?.baseRarity.rarityId ?? '',
-			frameUrl: siteConfig?.baseRarity.frameUrl ?? '',
-			rarityColor: siteConfig?.baseRarity.rarityColor ?? '',
-			cardNumber: 1,
-			totalOfType: 1,
-		}))}
+		cards={designs.map((card) => {
+			const rarity =
+				card.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ??
+				siteConfig?.baseRarity;
+			return {
+				...card,
+				rarityName: rarity?.rarityName ?? '',
+				rarityId: rarity?.rarityId ?? '',
+				frameUrl: rarity?.frameUrl ?? '',
+				rarityColor: rarity?.rarityColor ?? '',
+				cardNumber: 1,
+				totalOfType: 1,
+			};
+		})}
 		sortOnlyBy={['card-name-asc', 'card-name-desc']}
 		client:load
 	/>

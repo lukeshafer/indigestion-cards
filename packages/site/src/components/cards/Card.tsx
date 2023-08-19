@@ -1,5 +1,5 @@
 import TiltCardEffect from './TiltCardEffect';
-import { FULL_ART_ID } from '@/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
 import styles from './Card.module.css';
 
@@ -21,8 +21,9 @@ interface Props extends Partial<CardInstanceEntity> {
 
 export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
-	const cardName = () => (isFullArt() ? '' : props.cardName);
-	const cardDescription = () => (isFullArt() ? '' : props.cardDescription);
+	const isLegacy = () => props.rarityId === LEGACY_CARD_ID;
+	const cardName = () => (isFullArt() || isLegacy() ? '' : props.cardName);
+	const cardDescription = () => (isFullArt() || isLegacy() ? '' : props.cardDescription);
 
 	const isShitPack = () => props.stamps?.includes('shit-pack');
 
@@ -50,21 +51,24 @@ export default function Card(props: Props) {
 						class="card-description font-heading absolute p-[0.5em] text-[0.85em] font-medium leading-[1.30em] text-black">
 						{cardDescription()}
 					</p>
-					<p
-						class="font-display absolute bottom-[0.5em] right-[1em] text-[0.75em] font-bold italic"
-						classList={{
-							'text-black': !isFullArt(),
-							'text-white': isFullArt(),
-						}}>
-						{props.cardNumber} / {props.totalOfType}
-					</p>
+					{!isLegacy() && (
+						<p
+							class="font-display absolute bottom-[0.5em] right-[1em] text-[0.75em] font-bold italic"
+							classList={{
+								'text-black': !isFullArt(),
+								'text-white': isFullArt(),
+							}}>
+							{props.cardNumber} / {props.totalOfType}
+						</p>
+					)}
 					{isShitPack() && (
-						<div
-								class="absolute top-1/2 left-[52%] -translate-x-1/2 -translate-y-1/2 rotate-12 w-[15em] block"
-							>
+						<div class="absolute left-[52%] top-1/2 block w-[15em] -translate-x-1/2 -translate-y-1/2 rotate-12">
 							<img
 								src="/shit_pack_brown.png"
-								classList={{ [styles.animateStamp]: props.stamps?.includes('new-stamp'), 'opacity-80': !props.stamps?.includes('new-stamp') }}
+								classList={{
+									[styles.animateStamp]: props.stamps?.includes('new-stamp'),
+									'opacity-80': !props.stamps?.includes('new-stamp'),
+								}}
 								width="350"
 							/>
 						</div>
