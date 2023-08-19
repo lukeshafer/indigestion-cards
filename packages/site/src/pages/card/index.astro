@@ -25,6 +25,7 @@ const message = Astro.url.searchParams.get('message') || '';
 	<CardList
 		cards={designs.map((card) => {
 			const rarity =
+				card.bestRarityFound ?? 
 				card.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ??
 				siteConfig?.baseRarity;
 			return {

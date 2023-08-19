@@ -32,9 +32,9 @@ if (!design) {
 }
 
 const siteConfig = await getSiteConfig();
-const legacyDetails = design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID);
 
-const baseRarity = legacyDetails ||
+const baseRarity = design.bestRarityFound ||
+	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
 	siteConfig?.baseRarity || {
 		rarityId: 'default',
 		rarityName: 'Default',
