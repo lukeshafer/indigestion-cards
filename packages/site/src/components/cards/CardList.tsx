@@ -5,6 +5,7 @@ import styles from './CardList.module.css';
 import { Select } from '../form';
 import type { CardDesignEntity, CardInstanceEntity } from '@lil-indigestion-cards/core/card';
 import { useViewTransition } from '@/lib/client/utils';
+import type { Session } from '@/env';
 
 type CardType = Parameters<typeof Card>[0] &
 	Partial<CardInstanceEntity> &
@@ -28,6 +29,7 @@ export default function CardList(props: {
 	showUsernames?: boolean;
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
+	sessionType?: Session['type'];
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
@@ -56,7 +58,7 @@ export default function CardList(props: {
 					<For each={sortedCards()}>
 						{(card) => (
 							<div class="w-fit">
-								{card.bestRarityFound ? (
+								{card.bestRarityFound || props.sessionType === 'admin' ? (
 									<>
 										<a
 											rel="prefetch"
