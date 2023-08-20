@@ -112,3 +112,4 @@ export const AUTH_TOKEN = 'sst_auth_token';
 export const HTML_API_PATH = '/api/html';
 export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';
+export const NO_CARDS_OPENED_ID = 'no-cards-opened';

@@ -1,5 +1,5 @@
 import TiltCardEffect from './TiltCardEffect';
-import { FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
 import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
 import styles from './Card.module.css';
 
@@ -22,6 +22,7 @@ interface Props extends Partial<CardInstanceEntity> {
 export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
 	const isLegacy = () => props.rarityId === LEGACY_CARD_ID;
+	const isSecret = () => props.rarityId === NO_CARDS_OPENED_ID;
 	const cardName = () => (isFullArt() || isLegacy() ? '' : props.cardName);
 	const cardDescription = () => (isFullArt() || isLegacy() ? '' : props.cardDescription);
 
@@ -29,14 +30,20 @@ export default function Card(props: Props) {
 
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
-			<TiltCardEffect shiny={true}>
+			<TiltCardEffect shiny={!isSecret()}>
 				<article
 					class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left"
+					classList={{ 'grayscale blur-sm': isSecret() }}
 					style={{
 						'background-color': props.rarityColor,
 						'view-transition-name': `card-${props.instanceId ?? props.designId}`,
 					}}>
 					<img src={props.imgUrl} alt={props.cardName} class="absolute inset-0" />
+					{isSecret() && (
+						<p class="absolute top-[10%] w-full text-center text-[10em] font-extrabold text-gray-600">
+							?
+						</p>
+					)}
 					<img src={props.frameUrl} alt="" class="absolute inset-0" />
 					<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
 						{cardName()}

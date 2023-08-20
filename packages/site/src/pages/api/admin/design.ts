@@ -9,6 +9,7 @@ import {
 } from '@lil-indigestion-cards/core/card';
 import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
 import { createS3Url } from '@lil-indigestion-cards/core/utils';
+import { NO_CARDS_OPENED_ID } from '@lil-indigestion-cards/core/constants';
 import { Api } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
 import { AUTH_TOKEN, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
@@ -82,6 +83,13 @@ export const post: APIRoute = async (ctx) => {
 		designId: designId!,
 		imgUrl: newUrl,
 		rarityDetails,
+		bestRarityFound: {
+			count: 999999,
+			rarityId: NO_CARDS_OPENED_ID,
+			rarityName: 'No Cards Opened',
+			rarityColor: 'transparent',
+			frameUrl: '',
+		}
 	});
 
 	if (!result.success) return new Response(result.error, { status: 500 });

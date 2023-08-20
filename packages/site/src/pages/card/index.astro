@@ -4,7 +4,7 @@ import CardList from '@/components/cards/CardList';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routeNames, routes, LEGACY_CARD_ID } from '@/constants';
+import { routeNames, routes, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
 import { PageTitle, PageHeader, Anchor } from '@/components/text';
 import AdminOnly from '@/components/AdminOnly.astro';
 
@@ -25,9 +25,27 @@ const message = Astro.url.searchParams.get('message') || '';
 	<CardList
 		cards={designs.map((card) => {
 			const rarity =
-				card.bestRarityFound ?? 
-				card.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ??
-				siteConfig?.baseRarity;
+				card.bestRarityFound ??
+				card.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID);
+
+			if (rarity?.rarityId === NO_CARDS_OPENED_ID) {
+				return {
+					rarityName: 'No Cards Opened',
+					rarityId: NO_CARDS_OPENED_ID,
+					cardName: "zzz?????",
+					cardDescription: "????? ??????????????? ?? ?? ? ?????? ??????",
+					artist: "?????",
+					designId: "",
+					seasonId: "",
+					seasonName: "",
+					imgUrl: '',
+					frameUrl: '/default-base-rarity.png',
+					rarityColor: 'gray',
+					cardNumber: 1,
+					totalOfType: 1,
+				};
+			}
+
 			return {
 				...card,
 				rarityName: rarity?.rarityName ?? '',

@@ -410,7 +410,7 @@ export async function openCardFromPack(args: {
 			{ rarityId: instance.rarityId, count: instance.totalOfType },
 			{
 				rarityId: design.bestRarityFound?.rarityId ?? 'not found',
-				count: design.bestRarityFound?.count ?? Infinity,
+				count: design.bestRarityFound?.count ?? 99999999,
 			}
 		);
 
@@ -478,7 +478,7 @@ export async function openCardFromPack(args: {
 		{ rarityId: instance.rarityId, count: instance.totalOfType },
 		{
 			rarityId: design.bestRarityFound?.rarityId ?? 'not found',
-			count: design.bestRarityFound?.count ?? Infinity,
+			count: design.bestRarityFound?.count ?? 99999999,
 		}
 	);
 
@@ -576,75 +576,18 @@ export async function deletePackTypeById(args: { packTypeId: string }) {
 // DESIGN //
 export async function getAllCardDesigns() {
 	const result = await db.entities.cardDesigns.find({}).go();
-
-	const designs = result.data.map((d) => {
-		if (d.bestRarityFound) return d;
-		return { ...d, bestRarityFound: generateCardBestRarity({ design: d }) };
-	});
-	return designs;
-}
-
-async function generateCardBestRarity(args: {
-	design: CardDesignEntity;
-	instances?: CardInstanceEntity[];
-}): Promise<CardDesignEntity['bestRarityFound']> {
-	const design = args.design;
-	if (design.bestRarityFound) return design.bestRarityFound;
-
-	const instances =
-		args.instances ||
-		(await db.entities.cardInstances.query.byId({ designId: design.designId }).go()).data;
-
-	const bestRarityFound = instances.length
-		? instances.reduce(
-				(acc, curr) => {
-					if (!curr.openedAt) return acc;
-					if (curr.totalOfType < acc.count || curr.rarityId === FULL_ART_ID)
-						return {
-							count: curr.totalOfType,
-							rarityId: curr.rarityId,
-							rarityName: curr.rarityName,
-							rarityColor: curr.rarityColor,
-							frameUrl: curr.frameUrl,
-						};
-					return acc;
-				},
-				{ count: Infinity, rarityId: '', rarityName: '', rarityColor: '', frameUrl: '' }
-		  )
-		: design.rarityDetails?.reduce((acc, curr) => (curr.count > acc.count ? curr : acc));
-
-	await db.entities.cardDesigns
-		.update({ designId: design.designId })
-		.set({ bestRarityFound })
-		.go();
-	return bestRarityFound;
+	return result.data;
 }
 
 export async function getCardDesignById(args: { designId: string; userId: string }) {
 	const result = await db.entities.cardDesigns.query.byDesignId(args).go();
 	const design = result.data[0];
-	if (!design.bestRarityFound) {
-		const bestRarityFound = await generateCardBestRarity({ design });
-		return { ...design, bestRarityFound };
-	}
 	return design;
 }
 
 export async function getCardDesignAndInstancesById(args: { designId: string }) {
 	const result = await db.collections.designAndCards(args).go();
-	const design = result.data.cardDesigns[0];
-	if (design.bestRarityFound) return result.data;
-
-	const bestRarityFound = await generateCardBestRarity({
-		design,
-		instances: result.data.cardInstances,
-	});
-	const updatedData = {
-		cardDesigns: [{ ...design, bestRarityFound }],
-		cardInstances: result.data.cardInstances,
-	} satisfies (typeof result)['data'];
-
-	return updatedData;
+	return result.data;
 }
 
 export async function deleteCardDesignById(args: { designId: string }) {
