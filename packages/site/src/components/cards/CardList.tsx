@@ -1,4 +1,4 @@
-import { routes } from '@/constants';
+import { routes, NO_CARDS_OPENED_ID} from '@/constants';
 import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
 import styles from './CardList.module.css';
@@ -58,7 +58,7 @@ export default function CardList(props: {
 					<For each={sortedCards()}>
 						{(card) => (
 							<div class="w-fit">
-								{card.bestRarityFound || props.sessionType === 'admin' ? (
+								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID || props.sessionType === 'admin' ? (
 									<>
 										<a
 											rel="prefetch"

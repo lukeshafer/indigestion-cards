@@ -23,8 +23,15 @@ export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
 	const isLegacy = () => props.rarityId === LEGACY_CARD_ID;
 	const isSecret = () => props.rarityId === NO_CARDS_OPENED_ID;
-	const cardName = () => (isFullArt() || isLegacy() ? '' : props.cardName);
-	const cardDescription = () => (isFullArt() || isLegacy() ? '' : props.cardDescription);
+	const cardName = () => (isFullArt() || isLegacy() ? '' : isSecret() ? '?????' : props.cardName);
+	const cardDescription = () =>
+		isFullArt() || isLegacy()
+			? ''
+			: isSecret()
+			? '????? ??????????????? ?? ?? ? ?????? ??????'
+			: props.cardDescription;
+	const frameUrl = () => (isSecret() ? '/default-base-rarity.png' : props.frameUrl);
+	const imgUrl = () => (isSecret() ? '/hiddencard.png' : props.imgUrl);
 
 	const isShitPack = () => props.stamps?.includes('shit-pack');
 
@@ -38,13 +45,19 @@ export default function Card(props: Props) {
 						'background-color': props.rarityColor,
 						'view-transition-name': `card-${props.instanceId ?? props.designId}`,
 					}}>
-					<img src={props.imgUrl} alt={props.cardName} class="absolute inset-0" />
+					<img src={imgUrl()} alt={props.cardName} class="absolute inset-0" 
+						classList={{ 'blur contrast-50': isSecret() }}
+					/>
 					{isSecret() && (
 						<p class="absolute top-[10%] w-full text-center text-[10em] font-extrabold text-gray-600">
 							?
 						</p>
 					)}
-					<img src={props.frameUrl} alt="" class="absolute inset-0" />
+					<img
+						src={frameUrl()}
+						alt=""
+						class="absolute inset-0"
+					/>
 					<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
 						{cardName()}
 					</h3>
