@@ -1,12 +1,15 @@
-import { routes } from '@/constants';
+import { routes, NO_CARDS_OPENED_ID} from '@/constants';
 import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
 import styles from './CardList.module.css';
 import { Select } from '../form';
-import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
+import type { CardDesignEntity, CardInstanceEntity } from '@lil-indigestion-cards/core/card';
 import { useViewTransition } from '@/lib/client/utils';
+import type { Session } from '@/env';
 
-type CardType = Parameters<typeof Card>[0] & Partial<CardInstanceEntity>;
+type CardType = Parameters<typeof Card>[0] &
+	Partial<CardInstanceEntity> &
+	Partial<CardDesignEntity>;
 
 const sortTypes = [
 	{ value: 'rarest', label: 'Most to Least Rare' },
@@ -26,6 +29,7 @@ export default function CardList(props: {
 	showUsernames?: boolean;
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
+	sessionType?: Session['type'];
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
@@ -54,23 +58,29 @@ export default function CardList(props: {
 					<For each={sortedCards()}>
 						{(card) => (
 							<div class="w-fit">
-								<a
-									rel="prefetch"
-									href={`${routes.INSTANCES}/${card.designId}/${
-										card.instanceId ?? ''
-									}`}>
-									<Card {...card} scale="var(--card-scale)" />
-								</a>
-								<Show when={props.showUsernames}>
-									<p class="mt-2">
-										Owner:{' '}
+								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID || props.sessionType === 'admin' ? (
+									<>
 										<a
-											href={`${routes.USERS}/${card.username}`}
-											class="inline font-bold hover:underline">
-											{card.username}
+											rel="prefetch"
+											href={`${routes.INSTANCES}/${card.designId}/${
+												card.instanceId ?? ''
+											}`}>
+											<Card {...card} scale="var(--card-scale)" />
 										</a>
-									</p>
-								</Show>
+										<Show when={props.showUsernames}>
+											<p class="mt-2">
+												Owner:{' '}
+												<a
+													href={`${routes.USERS}/${card.username}`}
+													class="inline font-bold hover:underline">
+													{card.username}
+												</a>
+											</p>
+										</Show>
+									</>
+								) : (
+									<Card {...card} scale="var(--card-scale)" />
+								)}
 							</div>
 						)}
 					</For>

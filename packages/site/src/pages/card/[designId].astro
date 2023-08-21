@@ -4,7 +4,7 @@ import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routes, routeNames } from '@/constants';
+import { routes, routeNames, LEGACY_CARD_ID } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { PageTitle } from '@/components/text';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
@@ -32,12 +32,15 @@ if (!design) {
 }
 
 const siteConfig = await getSiteConfig();
-const baseRarity = siteConfig?.baseRarity || {
-	rarityId: 'default',
-	rarityName: 'Default',
-	frameUrl: '/default-base-rarity.png',
-	rarityColor: '#fff',
-};
+
+const baseRarity = design.bestRarityFound ||
+	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
+	siteConfig?.baseRarity || {
+		rarityId: 'default',
+		rarityName: 'Default',
+		frameUrl: '/default-base-rarity.png',
+		rarityColor: '#fff',
+	};
 
 instances.sort((a, b) =>
 	+a.totalOfType === +b.totalOfType
