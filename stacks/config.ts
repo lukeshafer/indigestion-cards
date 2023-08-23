@@ -16,9 +16,9 @@ export function ConfigStack({ stack }: StackContext) {
 	});
 
 	const params = Config.Parameter.create(stack, {
-		STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
-		STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
-		APP_ACCESS_TOKEN_ARN: appAccessToken.secretArn,
+		//STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
+		//STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
+		//APP_ACCESS_TOKEN_ARN: appAccessToken.secretArn,
 		TWITCH_TOKENS_ARN: twitchTokens.secretArn,
 		STREAMER_USER_ID: '227134852',
 		DOMAIN_NAME: getDomainName(stack.stage),

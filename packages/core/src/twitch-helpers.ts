@@ -461,7 +461,7 @@ export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>
 
 	return secretsManager
 		.putSecretValue({
-			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
+			SecretId: Config.TWITCH_TOKENS_ARN,
 			SecretString: JSON.stringify(newTokens),
 		})
 		.promise();
@@ -480,7 +480,7 @@ export async function getTwitchTokens() {
 	} catch (error) {
 		await secretsManager
 			.putSecretValue({
-				SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
+				SecretId: Config.TWITCH_TOKENS_ARN,
 				SecretString: JSON.stringify({
 					app_access_token: '',
 					streamer_access_token: '',
