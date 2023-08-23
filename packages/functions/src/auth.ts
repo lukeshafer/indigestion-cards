@@ -4,7 +4,7 @@ import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from 'aws-sdk';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import { getAdminUserById } from '@lil-indigestion-cards/core/user';
-import { putUserTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
+import { setTwitchTokens } from '@lil-indigestion-cards/core/twitch-helpers';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -79,9 +79,9 @@ export const handler = AuthHandler({
 				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
-				putUserTokenSecrets({
-					access_token: input.tokenset.access_token,
-					refresh_token: input.tokenset.refresh_token,
+				await setTwitchTokens({
+					streamer_access_token: input.tokenset.access_token,
+					streamer_refresh_token: input.tokenset.refresh_token,
 				});
 			}
 
