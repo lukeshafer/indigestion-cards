@@ -4,14 +4,16 @@ import { Config } from 'sst/constructs';
 import { getDomainName } from './constants';
 
 export function ConfigStack({ stack }: StackContext) {
-	const streamerAccessToken = new Secret(stack, 'StreamerAccessToken');
-	const streamerRefreshToken = new Secret(stack, 'StreamerRefreshToken');
-	const appAccessToken = new Secret(stack, 'AppAccessToken');
+	//const streamerAccessToken = new Secret(stack, 'StreamerAccessToken');
+	//const streamerRefreshToken = new Secret(stack, 'StreamerRefreshToken');
+	//const appAccessToken = new Secret(stack, 'AppAccessToken');
+	const twitchTokens = new Secret(stack, 'TwitchTokens');
 
 	const params = Config.Parameter.create(stack, {
-		STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
-		STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
-		APP_ACCESS_TOKEN_ARN: appAccessToken.secretArn,
+		//STREAMER_ACCESS_TOKEN_ARN: streamerAccessToken.secretArn,
+		//STREAMER_REFRESH_TOKEN_ARN: streamerRefreshToken.secretArn,
+		//APP_ACCESS_TOKEN_ARN: appAccessToken.secretArn,
+		TWITCH_TOKENS_ARN: twitchTokens.secretArn,
 		STREAMER_USER_ID: '227134852',
 		DOMAIN_NAME: getDomainName(stack.stage),
 	});

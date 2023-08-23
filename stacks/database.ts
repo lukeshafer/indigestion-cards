@@ -2,7 +2,7 @@ import { StackContext, Table, Cron, use } from 'sst/constructs';
 import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
-	const { TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN } = use(ConfigStack);
+	const config = use(ConfigStack);
 
 	const table = new Table(stack, 'data', {
 		fields: {
@@ -45,7 +45,7 @@ export function Database({ stack }: StackContext) {
 					SESSION_TYPE: 'admin',
 					SESSION_USERNAME: 'Refresh Usernames Cron Job',
 				},
-				bind: [table, TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN],
+				bind: [table, config.TWITCH_CLIENT_SECRET, config.TWITCH_CLIENT_ID, config.TWITCH_TOKENS_ARN],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 			},
 		},

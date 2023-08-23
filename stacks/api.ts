@@ -24,7 +24,8 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.APP_ACCESS_TOKEN_ARN,
+					//config.APP_ACCESS_TOKEN_ARN,
+					config.TWITCH_TOKENS_ARN,
 					table,
 					eventBus,
 				],
@@ -55,9 +56,10 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.STREAMER_ACCESS_TOKEN_ARN,
-					config.STREAMER_REFRESH_TOKEN_ARN,
-					config.APP_ACCESS_TOKEN_ARN,
+					//config.STREAMER_ACCESS_TOKEN_ARN,
+					//config.STREAMER_REFRESH_TOKEN_ARN,
+					//config.APP_ACCESS_TOKEN_ARN,
+					config.TWITCH_TOKENS_ARN,
 					config.STREAMER_USER_ID,
 					table,
 					eventBus,

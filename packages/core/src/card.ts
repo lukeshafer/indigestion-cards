@@ -575,8 +575,9 @@ export async function deletePackTypeById(args: { packTypeId: string }) {
 
 // DESIGN //
 export async function getAllCardDesigns() {
-	const result = await db.entities.cardDesigns.find({}).go();
-	return result.data;
+	const seasons = await getAllSeasons();
+	const results = await Promise.all(seasons.map((season) => db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()));
+	return results.flatMap((result) => result.data);
 }
 
 export async function getCardDesignById(args: { designId: string; userId: string }) {
