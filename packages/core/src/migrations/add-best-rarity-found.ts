@@ -4,10 +4,12 @@ import { db } from '../db';
 export async function migration({ force = false } = {}) {
 	const designs = db.entities.cardDesigns;
 
-	const cards = await designs.scan.go();
+	const seasons = await db.entities.season.query.allSeasons({}).go();
+	const results = await Promise.all(seasons.data.map((season) => db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()));
+	const cards = results.flatMap((result) => result.data);
 	let count = 0;
-	for (const card of cards.data) {
-		console.log(`Processing card ${++count} of ${cards.data.length}`);
+	for (const card of cards) {
+		console.log(`Processing card ${++count} of ${cards.length}`);
 		if (card.bestRarityFound && force !== true) {
 			console.log('Skipping card because it already has a bestRarityFound');
 			continue;
