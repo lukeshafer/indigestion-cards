@@ -28,7 +28,6 @@ export function Sites({ app, stack }: StackContext) {
 			siteAuth,
 			config.TWITCH_CLIENT_ID,
 			config.TWITCH_CLIENT_SECRET,
-			//config.APP_ACCESS_TOKEN_ARN,
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_ARN,
 		],

@@ -17,8 +17,6 @@ export function Auth({ stack }: StackContext) {
 				config.TWITCH_CLIENT_SECRET,
 				db,
 				config.STREAMER_USER_ID,
-				//config.STREAMER_ACCESS_TOKEN_ARN,
-				//config.STREAMER_REFRESH_TOKEN_ARN,
 				config.TWITCH_TOKENS_ARN,
 				config.DOMAIN_NAME,
 				events,
