@@ -97,13 +97,15 @@ function parseType<TypeToCheck extends SchemaType>(
 
 export const ProtectedApiHandler: typeof ApiHandler = (callback) => {
 	return ApiHandler(async (...args) => {
-		console.log(useCookies());
+		console.log('Cookies: ', useCookies());
 		const session = useSession();
-		if (session.type !== 'admin')
+		if (session.type !== 'admin') {
+			console.log('Session: ', session);
 			return {
 				statusCode: 401,
 				body: 'Unauthorized',
 			};
+		}
 		setAdminEnvSession(session.properties.username, session.properties.userId);
 
 		return callback(...args);

@@ -5,16 +5,16 @@ import { setAlerts } from '@/lib/client/state';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-	| 'get'
-	| 'post'
-	| 'dialog'
-	| 'put'
-	| 'delete'
-	| 'options'
-	| 'head'
-	| 'trace'
-	| 'connect'
-	| 'patch';
+		| 'get'
+		| 'post'
+		| 'dialog'
+		| 'put'
+		| 'delete'
+		| 'options'
+		| 'head'
+		| 'trace'
+		| 'connect'
+		| 'patch';
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
@@ -63,7 +63,12 @@ export function Form(props: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body,
-		}).finally(() => setIsLoading(false));
+		})
+			.catch((err) => {
+				console.error(err);
+				throw err;
+			})
+			.finally(() => setIsLoading(false));
 
 		if (response.redirected) {
 			return location.assign(response.url);

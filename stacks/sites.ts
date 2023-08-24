@@ -4,7 +4,7 @@ import { API } from './api';
 import { DesignBucket } from './bucket';
 import { Auth } from './auth';
 import { ConfigStack } from './config';
-import { HOSTED_ZONE, getDomainName } from './constants';
+import { getHostedZone, getDomainName } from './constants';
 
 export function Sites({ app, stack }: StackContext) {
 	const table = use(Database);
@@ -12,6 +12,7 @@ export function Sites({ app, stack }: StackContext) {
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
 	const config = use(ConfigStack);
+	const hostedZone = getHostedZone(stack.stage);
 
 	const baseDomain = getDomainName(stack.stage);
 
@@ -33,7 +34,7 @@ export function Sites({ app, stack }: StackContext) {
 		],
 		customDomain: app.mode === 'dev' ? undefined : {
 			domainName: baseDomain,
-			hostedZone: HOSTED_ZONE,
+			hostedZone: hostedZone,
 		},
 		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 	});

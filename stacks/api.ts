@@ -4,7 +4,7 @@ import { Events } from './events';
 import { DesignBucket } from './bucket';
 import { ConfigStack } from './config';
 import { Auth } from './auth';
-import { API_VERSION, HOSTED_ZONE, getDomainName } from './constants';
+import { API_VERSION, getHostedZone, getDomainName } from './constants';
 
 export function API({ app, stack }: StackContext) {
 	const table = use(Database);
@@ -13,6 +13,7 @@ export function API({ app, stack }: StackContext) {
 	const config = use(ConfigStack);
 	const { siteAuth } = use(Auth);
 
+	const hostedZone = getHostedZone(app.stage);
 	const baseDomain = getDomainName(app.stage);
 
 	const twitchApi = new Api(stack, 'twitchApi', {
@@ -84,7 +85,7 @@ export function API({ app, stack }: StackContext) {
 				: {
 					domainName: `api.${baseDomain}`,
 					path: API_VERSION,
-					hostedZone: HOSTED_ZONE,
+					hostedZone: hostedZone,
 				},
 	});
 
