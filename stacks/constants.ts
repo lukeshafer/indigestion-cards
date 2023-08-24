@@ -1,5 +1,5 @@
-export const DOMAIN_NAME = 'indigestioncards.com';
-export const HOSTED_ZONE = 'indigestioncards.com';
+const DOMAIN_NAME = 'indigestioncards.com';
+const HOSTED_ZONE = 'indigestioncards.com';
 export const API_VERSION = 'v1';
 
 export function getDomainName(stage: string) {
