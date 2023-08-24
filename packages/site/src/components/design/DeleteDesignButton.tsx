@@ -8,7 +8,7 @@ export default function DeleteDesignButton(props: {
 }) {
 	return (
 		<Form
-			action={api.DESIGN.DELETE}
+			action={api.DESIGN}
 			method="delete"
 			confirm="Are you sure you want to delete this card?">
 			<input type="hidden" name="designId" value={props.designId} />

@@ -2,7 +2,7 @@ import { StackContext, Table, Cron, use } from 'sst/constructs';
 import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
-	const { TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN } = use(ConfigStack);
+	const config = use(ConfigStack);
 
 	const table = new Table(stack, 'data', {
 		fields: {
@@ -35,7 +35,6 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	// TODO: add cron job to check twitch for users who have updated their username
 	new Cron(stack, 'RefreshUsernamesCron', {
 		schedule: 'cron(0 6 * * ? *)',
 		job: {
@@ -46,8 +45,23 @@ export function Database({ stack }: StackContext) {
 					SESSION_TYPE: 'admin',
 					SESSION_USERNAME: 'Refresh Usernames Cron Job',
 				},
-				bind: [table, TWITCH_CLIENT_SECRET, TWITCH_CLIENT_ID, APP_ACCESS_TOKEN_ARN],
+				bind: [table, config.TWITCH_CLIENT_SECRET, config.TWITCH_CLIENT_ID, config.TWITCH_TOKENS_ARN],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+			},
+		},
+	});
+
+	new Cron(stack, 'RefreshUserCardCountsCron', {
+		schedule: 'cron(10 6 * * ? *)',
+		job: {
+			function: {
+				handler: 'packages/functions/src/cron/refresh-card-and-pack-count.handler',
+				environment: {
+					SESSION_USER_ID: 'RefreshUserCardCountsCron',
+					SESSION_TYPE: 'admin',
+					SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
+				},
+				bind: [table],
 			},
 		},
 	});

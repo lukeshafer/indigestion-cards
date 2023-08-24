@@ -1,7 +1,9 @@
-name: Check TS Types
-on: push
+name: Teardown Staging
+
+on: workflow_dispatch
+
 jobs:
-    typecheck:
+    teardown-staging:
         runs-on: ubuntu-latest
 
         steps:
@@ -21,14 +23,8 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Build SST App
-              run: pnpm run build
-
-            - name: 'Check Types: Core'
-              run: pnpm run core:check
-
-            - name: 'Check Types: Functions'
-              run: pnpm run functions:check
-
-            - name: 'Check Types: Site'
-              run: pnpm run site:check
+            - name: Deploy SST app
+              run: pnpm run remove --stage staging
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

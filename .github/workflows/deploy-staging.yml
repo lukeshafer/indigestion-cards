@@ -1,14 +1,12 @@
-name: Deploy SST App
+name: Deploy Staging on update main
 
 on:
     push:
         branches:
-            - dev
-            - qa
             - main
 
 jobs:
-    deploy:
+    deploy-staging:
         runs-on: ubuntu-latest
 
         steps:
@@ -29,7 +27,7 @@ jobs:
               run: pnpm install
 
             - name: Deploy SST app
-              run: pnpm run deploy --stage "${GITHUB_REF##*/}"
+              run: pnpm run deploy --stage staging
               env:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

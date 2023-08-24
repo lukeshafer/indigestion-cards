@@ -64,8 +64,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		case 'channel.subscription.gift':
 			console.log(`Sub gifted by ${body.event.user_name}. Subs gifted: ${body.event.total}`);
 
-			// FIXME: remove this once we're confident in the logic, should always be 5
-			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 1 : 5;
+			const SUBS_PER_PACK = 5;
 			const specialSubRoundLookup: Record<number, number> = {
 				69: 70,
 			};

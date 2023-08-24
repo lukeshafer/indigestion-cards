@@ -87,6 +87,31 @@ const cardDesigns = new Entity(
 				type: 'string',
 				required: true,
 			},
+			bestRarityFound: {
+				type: 'map',
+				properties: {
+					rarityId: {
+						type: 'string',
+						required: true,
+					},
+					rarityName: {
+						type: 'string',
+						required: true,
+					},
+					frameUrl: {
+						type: 'string',
+						required: true,
+					},
+					count: {
+						type: 'number',
+						required: true,
+					},
+					rarityColor: {
+						type: 'string',
+						required: true,
+					},
+				},
+			},
 			rarityDetails: {
 				type: 'list',
 				items: {
@@ -272,6 +297,12 @@ const cardInstances = new Entity(
 			totalOfType: {
 				type: 'number',
 				required: true,
+			},
+			stamps: {
+				type: 'list',
+				items: {
+					type: 'string',
+				},
 			},
 			...auditAttributes('cardInstance'),
 		},

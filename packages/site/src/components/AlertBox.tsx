@@ -1,5 +1,6 @@
 import { For, onMount } from 'solid-js';
 import { alerts, setAlerts, type Alert } from '@/lib/client/state';
+import { useViewTransition } from '@/lib/client/utils';
 
 export default function AlertBox(props: { alerts: Alert[] }) {
 	setAlerts(props.alerts);
@@ -30,12 +31,7 @@ function Alert(
 		<div
 			class="view-transition-alert flex items-center gap-x-5 p-4"
 			classList={{ [alertStyles[props.type]]: true }}>
-			<button
-				onclick={() => {
-					if (document.startViewTransition)
-						document.startViewTransition(() => deleteAlert());
-					else deleteAlert();
-				}}>
+			<button onclick={() => useViewTransition(deleteAlert)}>
 				<span class="opacity-50">✕</span>
 			</button>
 			<div>{props.message}</div>

@@ -5,12 +5,14 @@ import {
 	deleteUnmatchedDesignImage,
 	getAllRarities,
 	deleteCardDesignById,
+	updateCardDesign,
 } from '@lil-indigestion-cards/core/card';
 import { moveImageBetweenBuckets } from '@lil-indigestion-cards/core/images';
 import { createS3Url } from '@lil-indigestion-cards/core/utils';
+import { NO_CARDS_OPENED_ID } from '@lil-indigestion-cards/core/constants';
 import { Api } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
-import { AUTH_TOKEN, FULL_ART_ID } from '@/constants';
+import { AUTH_TOKEN, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 
 export const post: APIRoute = async (ctx) => {
 	const params = new URLSearchParams(await ctx.request.text());
@@ -21,7 +23,8 @@ export const post: APIRoute = async (ctx) => {
 	const designId = params.get('designId');
 	const cardDescription = params.get('cardDescription');
 	const artist = params.get('artist');
-	const fullArt = params.get('fullArt') === 'on';
+	const isFullArt = params.get('fullArt') === 'on';
+	const isLegacy = params.get('legacy') === 'on';
 
 	const errors = [];
 	if (!imageKey) errors.push('Image key is required');
@@ -43,11 +46,22 @@ export const post: APIRoute = async (ctx) => {
 				count: count ? parseInt(count) : 0,
 			};
 		}),
-		...(fullArt && rarities.length > 0
+		...(isFullArt && rarities.length > 0
 			? [
 					{
 						rarityId: FULL_ART_ID,
 						rarityName: 'Full Art',
+						count: 1,
+						frameUrl: '',
+						rarityColor: '',
+					},
+			  ]
+			: []),
+		...(isLegacy && rarities.length > 0
+			? [
+					{
+						rarityId: LEGACY_CARD_ID,
+						rarityName: 'Legacy',
 						count: 1,
 						frameUrl: '',
 						rarityColor: '',
@@ -69,6 +83,13 @@ export const post: APIRoute = async (ctx) => {
 		designId: designId!,
 		imgUrl: newUrl,
 		rarityDetails,
+		bestRarityFound: {
+			count: 999999,
+			rarityId: NO_CARDS_OPENED_ID,
+			rarityName: 'No Cards Opened',
+			rarityColor: 'transparent',
+			frameUrl: '',
+		}
 	});
 
 	if (!result.success) return new Response(result.error, { status: 500 });
@@ -90,6 +111,26 @@ export const post: APIRoute = async (ctx) => {
 	await deleteUnmatchedDesignImage({ imageId: imageKey!, type: 'cardDesign' });
 
 	return ctx.redirect(`${routes.DESIGNS}?alert=Design%20created!&type=success`);
+};
+
+export const patch: APIRoute = async (ctx) => {
+	const params = new URLSearchParams(await ctx.request.text());
+
+	const designId = params.get('designId');
+	const cardDescription = params.get('cardDescription');
+
+	if (!designId) return new Response('Missing design ID', { status: 400 });
+	if (!cardDescription) return new Response('Missing card description', { status: 400 });
+
+	const result = await updateCardDesign({
+		designId: designId!,
+		cardDescription: cardDescription!,
+	});
+
+	if (!result.success)
+		return new Response('An error occurred while updating the card text.', { status: 500 });
+
+	return new Response('Card updated!', { status: 200 });
 };
 
 export const del: APIRoute = async (ctx) => {

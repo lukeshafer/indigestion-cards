@@ -8,6 +8,8 @@ export const PUBLIC_ROUTES = [
 	'/api/get-all-usernames',
 	'/api/search',
 	'/api/auth/*',
+	'/card',
+	'/card/*',
 ] as const;
 
 export const api_paths = {
@@ -19,6 +21,7 @@ export const api = {
 	SITE_CONFIG: '/api/admin/site-config',
 	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
 	CARD: '/api/admin/card',
+	DESIGN: '/api/admin/design',
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},
@@ -46,10 +49,6 @@ export const api = {
 		UPDATE: '/api/admin/season',
 		CREATE: '/api/admin/season',
 		DELETE: '/api/admin/season',
-	},
-	DESIGN: {
-		CREATE: '/api/admin/design',
-		DELETE: '/api/admin/design',
 	},
 	PACK_COUNT: '/api/admin/pack-count',
 } as const;
@@ -116,3 +115,5 @@ export const routeNames = {
 export const AUTH_TOKEN = 'sst_auth_token';
 export const HTML_API_PATH = '/api/html';
 export const FULL_ART_ID = 'full-art';
+export const LEGACY_CARD_ID = 'legacy';
+export const NO_CARDS_OPENED_ID = 'no-cards-opened';

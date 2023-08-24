@@ -1,96 +1,46 @@
 ---
-import { PageHeader, PageTitle, Heading } from '@/components/text';
 import Page from '@/layouts/Page.astro';
-
-Astro.cookies.set('lilind_code', 'pants', {
-	path: '/',
-	httpOnly: true,
-	maxAge: 60 * 60 * 24 * 30,
-	sameSite: 'lax',
-});
+import FAQ from '@/content/faq.md';
 ---
 
 <Page title="Indigestion Cards" pageType="public">
-	<PageHeader>
-		<div class="mx-auto">
-			<PageTitle>Frequently Asked Questions</PageTitle>
-		</div>
-	</PageHeader>
-	<article class="flex-col gap-4 flex max-w-3xl mx-auto text-lg">
-		<section>
-			<Heading>What are indigestion cards?</Heading>
-			<p>
-				These cards are a way for Ryan (and several other people involved) to say thank you
-				to the tightest community on the internet for their generosity and loyalty. The
-				cards feature incredible art from artists you know that celebrate the lore of
-				streams and videos from the last 4 years :) Collect the ones that mean the most to
-				you or chase the ultra-rare full art cards, whatever you desire!
-			</p>
+	<h1 class="sr-only">Indigestion Cards</h1>
+	<div class="flex flex-col gap-28">
+		<section
+			class="flex flex-wrap min-h-[30rem] justify-center items-center justify-items-center flex-row-reverse gap-y-8 gap-4">
+			<div class="flex origin-top pb-24 -mx-12 -mr-20 justify-center">
+				<img
+					src="/hero_card_1.png"
+					width="200"
+					class="w-52 shadow-black/50 -rotate-12 shadow-xl origin-top-right translate-y-6 translate-x-12 hover:translate-y-2 transition-transform duration-500 ease-in-out"
+				/>
+				<img
+					src="/hero_card_2.png"
+					width="200"
+					class="w-52 shadow-black/50 rotate-6 shadow-xl origin-top-left hover:-translate-y-4 transition-transform duration-500 ease-in-out"
+				/>
+				<img
+					src="/hero_card_3.png"
+					width="200"
+					class="w-52 shadow-black/50 rotate-[18deg] shadow-xl origin-top-left translate-y-6 -translate-x-12 hover:translate-y-2 transition-transform duration-500 ease-in-out"
+				/>
+			</div>
+			<h2 class="font-heading font-semibold text-[2.5rem] text-gray-600 leading-none w-max">
+				Trading cards<br />for the <s class="font-bold">cult</s><span
+					class="block font-bold text-brand-main text-shadow">community</span
+				>
+			</h2>
 		</section>
-		<section>
-			<Heading>How do I get indigestion cards?</Heading>
-			<p>
-				You can get a pack (of 5 cards) in two ways: 1) by gifting any quantity of 5 subs at
-				once (5 gifted subs = 1 pack, 10 = 2 packs, etc) or 2) by redeeming 50k channel
-				points.
-			</p>
-		</section>
-		<section>
-			<Heading>How do I open my pack of cards?</Heading>
-			<p>
-				Ryan opens the packs on stream, so we can all be jealous when you pull that
-				incredible pink 1/1 card :) he will probably open packs at the start of stream once
-				a week! Stay tuned to discord for details.
-			</p>
-		</section>
-		<section>
-			<Heading>How can I see what cards I have?</Heading>
-			<p>
-				By typing a Twitch username in the "search users" bar at indigestioncards.com, you
-				can see all the cards that you (or anyone else) own!
-			</p>
-		</section>
-		<section>
-			<Heading>
-				What do the colored frames around my cards mean? And the numbers in the bottom
-				right?
-			</Heading>
-			<p>
-				The colors represent the “rarity” of the card--AKA how many of that specific color
-				of that card exist! If you have a brown lilindMEG with a 3/50 on the bottom right,
-				that means you own the 3rd of the 50 brown lilindMEG’s that exist. If you have a 1/1
-				pink lilindMEG, you have <strong class="font-semibold">
-					the only pink lilindMEG that will ever exist
-				</strong>. Have a card without a frame? That’s an ultra-rare Full Art card!
-			</p>
-		</section>
-		<section>
-			<Heading>Can I trade my cards with others?</Heading>
-			<p>
-				Not yet :) but if this first season of cards is well-received, we would LOVE to work
-				on giving you the ability to do just that, and more!
-			</p>
-		</section>
-		<section>
-			<Heading>When will you introduce [insert feature here]???</Heading>
-			<p>
-				We LOVE the idea of more features on the website or new ways to interact with the
-				cards–but that might take some time :)
-			</p>
-		</section>
-		<section>
-			<Heading>I have an idea for a future card!</Heading>
-			<p>Great! Go to the #indigestion-cards channel in discord and tell us your idea :)</p>
-		</section>
-		<section>
-			<Heading>
-				What do I do if [insert problem here]? (my cards aren’t showing up in my inventory/I
-				think I should have a pack but I don’t/I encountered a problem with the website)
-			</Heading>
-			<p>
-				If you encounter a problem, you can either DM Ryan on discord or post in the
-				#indigestion-cards channel on discord with a description of what’s happening!
-			</p>
-		</section>
-	</article>
+		<article
+			class="prose max-w-3xl mx-auto text-lg prose-h2:uppercase prose-h2:text-center prose-h2:text-gray-600 prose-h2:font-bold prose-h2:text-3xl prose-h3:font-heading prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-gray-700">
+			<FAQ />
+		</article>
+	</div>
 </Page>
+
+<style>
+	.hero-card {
+		left: 50%;
+		transform: translateX(-50%);
+	}
+</style>

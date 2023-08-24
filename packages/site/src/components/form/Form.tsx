@@ -123,7 +123,7 @@ export function Form(props: {
 }
 
 const BASE_INPUT_CLASS =
-	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-none focus:ring-4';
+	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-brand-main focus:ring-4';
 
 function InputGroup(props: ParentProps) {
 	return <div class="flex w-full flex-col items-start">{props.children}</div>;

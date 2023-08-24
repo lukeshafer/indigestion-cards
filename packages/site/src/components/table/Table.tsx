@@ -68,9 +68,8 @@ export default function Table(props: {
 				return mode === 'ascending'
 					? Number(aVal) - Number(bVal)
 					: Number(bVal) - Number(aVal);
-			if (aVal < bVal) return mode === 'ascending' ? -1 : 1;
-			if (aVal > bVal) return mode === 'ascending' ? 1 : -1;
-			return 0;
+
+			return mode === 'ascending' ? String(aVal).localeCompare(String(bVal)) : String(bVal).localeCompare(String(aVal));
 		});
 	};
 
@@ -193,7 +192,7 @@ function TableHeading(
 			data-mode={props.mode}
 			onClick={props.sort === false ? undefined : props.onClick}
 			style={{ width: props.width }}
-			class="px-6 py-2"
+			class="px-6 py-2 hover:bg-gray-200"
 			classList={{
 				'cursor-pointer': props.sort ?? true,
 				hidden: props.showOnBreakpoint !== undefined,

@@ -11,6 +11,7 @@
 body.disable-animations * {
 	transition: none !important;
 	animation: none !important;
+	view-transition-name: none !important;
 }
 
 @layer reset {
@@ -302,7 +303,8 @@ body.disable-animations * {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
+		translate: -50% -50%;
+		/*transform: translate(-50%, -50%);*/
 	}
 
 	.spin {
@@ -390,5 +392,14 @@ body.disable-animations * {
 		position: absolute;
 		white-space: nowrap;
 		width: 1px;
+	}
+
+	.scrollbar-hidden::-webkit-scrollbar {
+		display: none; /* Chrome, Safari */
+	}
+
+	.scrollbar-hidden {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
 	}
 }
