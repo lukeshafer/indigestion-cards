@@ -493,48 +493,6 @@ export async function getTwitchTokens() {
 	}
 }
 
-//export async function retrieveUserTokenSecrets() {
-	//const getAccessTokenPromise = secretsManager
-		//.getSecretValue({
-			//SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
-		//})
-		//.promise();
-
-	//const getRefreshTokenPromise = secretsManager
-		//.getSecretValue({
-			//SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
-		//})
-		//.promise();
-
-	//const [accessToken, refreshToken] = await Promise.all([
-		//getAccessTokenPromise,
-		//getRefreshTokenPromise,
-	//]);
-
-	//return {
-		//access_token: accessToken.SecretString,
-		//refresh_token: refreshToken.SecretString,
-	//};
-//}
-
-//export async function putUserTokenSecrets(args: { access_token: string; refresh_token: string }) {
-	//const putAccessTokenPromise = secretsManager
-		//.putSecretValue({
-			//SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
-			//SecretString: args.access_token,
-		//})
-		//.promise();
-
-	//const putRefreshTokenPromise = secretsManager
-		//.putSecretValue({
-			//SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
-			//SecretString: args.refresh_token,
-		//})
-		//.promise();
-
-	//return Promise.all([putAccessTokenPromise, putRefreshTokenPromise]);
-//}
-
 async function refreshAppAccessToken() {
 	const newAppAccessToken = await getNewAppAccessToken();
 	await setTwitchTokens({ app_access_token: newAppAccessToken });
@@ -566,25 +524,6 @@ async function getNewAppAccessToken() {
 	}
 	return result.data.access_token;
 }
-
-//async function retrieveAppTokenSecret() {
-	//const secret = await secretsManager
-		//.getSecretValue({
-			//SecretId: Config.APP_ACCESS_TOKEN_ARN,
-		//})
-		//.promise();
-
-	//return secret.SecretString;
-//}
-
-//async function putAppTokenSecret(args: { access_token: string }) {
-	//return secretsManager
-		//.putSecretValue({
-			//SecretId: Config.APP_ACCESS_TOKEN_ARN,
-			//SecretString: args.access_token,
-		//})
-		//.promise();
-//}
 
 export async function getActiveTwitchEventSubscriptions() {
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
