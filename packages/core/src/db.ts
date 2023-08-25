@@ -1,10 +1,10 @@
 import { Table } from 'sst/node/table';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
 export const config = {
 	table: Table.data.tableName,
-	client: new DocumentClient(),
+	client: new DynamoDBClient(),
 } satisfies EntityConfiguration;
 
 export const auditAttributes = (entityName: string) =>

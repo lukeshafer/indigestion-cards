@@ -1,9 +1,9 @@
-import { S3 } from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 
 export async function deleteS3ObjectByUrl(url: string) {
 	const s3 = new S3();
 	const { Bucket, Key } = parseS3Url(url);
-	const result = await s3.deleteObject({ Bucket, Key }).promise();
+	const result = await s3.deleteObject({ Bucket, Key });
 	return result;
 }
 

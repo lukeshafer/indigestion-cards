@@ -1,6 +1,6 @@
 import { Api, ApiHandler } from 'sst/node/api';
 import { EventBus } from 'sst/node/event-bus';
-import { EventBridge } from 'aws-sdk';
+import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
 	subscribeToTwitchEvent,
 	getActiveTwitchEventSubscriptions,
@@ -96,18 +96,16 @@ export const handler = ApiHandler(async () => {
 	const results = await Promise.all(promises);
 
 	const eventBridge = new EventBridge();
-	await eventBridge
-		.putEvents({
-			Entries: [
-				{
-					Source: 'site',
-					DetailType: 'refresh-channel-point-rewards',
-					Detail: JSON.stringify({}),
-					EventBusName: EventBus.eventBus.eventBusName,
-				},
-			],
-		})
-		.promise();
+	await eventBridge.putEvents({
+		Entries: [
+			{
+				Source: 'site',
+				DetailType: 'refresh-channel-point-rewards',
+				Detail: JSON.stringify({}),
+				EventBusName: EventBus.eventBus.eventBusName,
+			},
+		],
+	});
 
 	return {
 		statusCode: 200,

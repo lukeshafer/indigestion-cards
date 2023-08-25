@@ -22,6 +22,7 @@ export function Auth({ stack }: StackContext) {
 				events,
 			],
 			permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+			runtime: 'nodejs18.x',
 		},
 	});
 

@@ -1,4 +1,4 @@
-import { FULL_ART_ID, NO_CARDS_OPENED_ID } from 'src/constants';
+import { FULL_ART_ID, NO_CARDS_OPENED_ID } from '../constants';
 import { db } from '../db';
 
 export async function migration({ force = false } = {}) {

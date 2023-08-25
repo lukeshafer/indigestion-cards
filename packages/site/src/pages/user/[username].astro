@@ -6,7 +6,7 @@ import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
-import { PageTitle, Heading } from '@/components/text';
+import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;

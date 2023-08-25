@@ -20,6 +20,7 @@ export function AfterDeployStack({ stack }: StackContext) {
 					config.STREAMER_USER_ID,
 				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
