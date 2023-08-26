@@ -37,6 +37,7 @@ const totalPossibleCards = cardDesigns.reduce((acc, card) => {
 
 const ownedCards = cardInstances.length;
 const remainingCards = totalPossibleCards - ownedCards;
+const percentageDistributed = Math.round((ownedCards / totalPossibleCards) * 1000) / 10;
 
 const packTypes = await getPackTypesBySeasonId({ seasonId: id });
 const packTypesWithCardPools = await Promise.all(
@@ -44,11 +45,13 @@ const packTypesWithCardPools = await Promise.all(
 		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
 		const openedPacks = ownedCards / packType.cardCount;
 		const remainingPacks = Math.floor(remainingCards / packType.cardCount);
+		const percentagePacksOpened = Math.round((openedPacks / totalPossiblePacks) * 1000) / 10;
 		return {
 			...packType,
 			totalPossiblePacks,
 			openedPacks,
 			remainingPacks,
+			percentagePacksOpened,
 		};
 	})
 );
@@ -78,6 +81,9 @@ const {
 		<p class="ml-4"><b>Total cards in season:</b> {totalPossibleCards}</p>
 		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
 		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
+		<p class="ml-4">
+			<b>Percentage distributed:</b> {percentageDistributed}%
+		</p>
 
 		<div class="ml-4 mt-4">
 			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
