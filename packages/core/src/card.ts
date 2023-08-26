@@ -7,13 +7,13 @@ import { FULL_ART_ID, LEGACY_CARD_ID } from './constants';
 
 type Result<T> =
 	| {
-			success: true;
-			data: T;
-	  }
+		success: true;
+		data: T;
+	}
 	| {
-			success: false;
-			error: string;
-	  };
+		success: false;
+		error: string;
+	};
 
 export type CardDesign = typeof db.entities.cardDesigns;
 export type Card = typeof db.entities.cardInstances;
@@ -118,7 +118,7 @@ export async function generateCard(info: {
 	const user =
 		info.userId && info.username
 			? (await getUser(info.userId)) ??
-			  (await createNewUser({ userId: info.userId, username: info.username }))
+			(await createNewUser({ userId: info.userId, username: info.username }))
 			: null;
 
 	const result = await db.transaction
@@ -126,11 +126,11 @@ export async function generateCard(info: {
 			cardInstances.create(cardDetails).commit(),
 			...(user && info.userId && info.username
 				? [
-						users
-							.patch({ userId: info.userId })
-							.set({ cardCount: (user.cardCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: info.userId })
+						.set({ cardCount: (user.cardCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 		])
 		.go();
@@ -195,15 +195,15 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
-								.patch({ userId: pack.userId })
-								// if packCount is null OR 0, set it to 0, otherwise subtract 1
-								.set({
-									packCount: (user?.packCount || 1) - 1,
-									cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
-								})
-								.commit(),
-					  ]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({
+								packCount: (user?.packCount || 1) - 1,
+								cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
+							})
+							.commit(),
+					]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -249,15 +249,15 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({
-								packCount: (user?.packCount || 1) - 1,
-								cardCount: user?.cardCount ? user.cardCount - openCount : 0,
-							})
-							.commit(),
-				  ]
+					users
+						.patch({ userId: pack.userId })
+						// if packCount is null OR 0, set it to 0, otherwise subtract 1
+						.set({
+							packCount: (user?.packCount || 1) - 1,
+							cardCount: user?.cardCount ? user.cardCount - openCount : 0,
+						})
+						.commit(),
+				]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -288,7 +288,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			  (await createNewUser({ userId: args.userId, username: args.username }))
+			(await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
@@ -308,11 +308,11 @@ export async function createPack(args: {
 		.write(({ users, packs }) => [
 			...(user && args.userId && args.username
 				? [
-						users
-							.patch({ userId: user.userId })
-							.set({ packCount: (user.packCount ?? 0) + 1 })
-							.commit(),
-				  ]
+					users
+						.patch({ userId: user.userId })
+						.set({ packCount: (user.packCount ?? 0) + 1 })
+						.commit(),
+				]
 				: []),
 			packs
 				.create({
@@ -419,37 +419,37 @@ export async function openCardFromPack(args: {
 				deletePack
 					? packs.delete({ packId: args.packId }).commit()
 					: packs
-							.patch({ packId: args.packId })
-							.set({ cardDetails: newCardDetails })
-							.commit(),
+						.patch({ packId: args.packId })
+						.set({ cardDetails: newCardDetails })
+						.commit(),
 				...(user
 					? [
-							users
-								.patch({ userId: user.userId })
-								.set({
-									cardCount: (user.cardCount ?? 0) + 1,
-									packCount: deletePack
-										? (user.packCount ?? 1) - 1
-										: user.packCount,
-								})
-								.commit(),
-					  ]
+						users
+							.patch({ userId: user.userId })
+							.set({
+								cardCount: (user.cardCount ?? 0) + 1,
+								packCount: deletePack
+									? (user.packCount ?? 1) - 1
+									: user.packCount,
+							})
+							.commit(),
+					]
 					: []),
 				...(updateRarity
 					? [
-							cardDesigns
-								.patch({ designId: args.designId })
-								.set({
-									bestRarityFound: {
-										rarityId: instance.rarityId,
-										rarityName: instance.rarityName,
-										count: instance.totalOfType,
-										frameUrl: instance.frameUrl,
-										rarityColor: instance.rarityColor,
-									},
-								})
-								.commit(),
-					  ]
+						cardDesigns
+							.patch({ designId: args.designId })
+							.set({
+								bestRarityFound: {
+									rarityId: instance.rarityId,
+									rarityName: instance.rarityName,
+									count: instance.totalOfType,
+									frameUrl: instance.frameUrl,
+									rarityColor: instance.rarityColor,
+								},
+							})
+							.commit(),
+					]
 					: []),
 			])
 			.go();
@@ -506,19 +506,19 @@ export async function openCardFromPack(args: {
 				: packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
 			...(updateRarity
 				? [
-						cardDesigns
-							.patch({ designId: args.designId })
-							.set({
-								bestRarityFound: {
-									rarityId: instance.rarityId,
-									rarityName: instance.rarityName,
-									count: instance.totalOfType,
-									frameUrl: instance.frameUrl,
-									rarityColor: instance.rarityColor,
-								},
-							})
-							.commit(),
-				  ]
+					cardDesigns
+						.patch({ designId: args.designId })
+						.set({
+							bestRarityFound: {
+								rarityId: instance.rarityId,
+								rarityName: instance.rarityName,
+								count: instance.totalOfType,
+								frameUrl: instance.frameUrl,
+								rarityColor: instance.rarityColor,
+							},
+						})
+						.commit(),
+				]
 				: []),
 		])
 		.go();
@@ -576,7 +576,11 @@ export async function deletePackTypeById(args: { packTypeId: string }) {
 // DESIGN //
 export async function getAllCardDesigns() {
 	const seasons = await getAllSeasons();
-	const results = await Promise.all(seasons.map((season) => db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()));
+	const results = await Promise.all(
+		seasons.map((season) =>
+			db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()
+		)
+	);
 	return results.flatMap((result) => result.data);
 }
 
@@ -587,7 +591,7 @@ export async function getCardDesignById(args: { designId: string; userId: string
 }
 
 export async function getCardDesignAndInstancesById(args: { designId: string }) {
-	const result = await db.collections.designAndCards(args).go();
+	const result = await db.collections.designAndCards(args).go({ pages: 'all' });
 	return result.data;
 }
 
@@ -655,8 +659,8 @@ export async function deleteUnmatchedDesignImage(args: {
 
 // SEASONS //
 export async function getAllSeasons() {
-	const result = await db.entities.season.query.allSeasons({}).go();
-	return result.data;
+	const result = await db.entities.season.query.allSeasons({}).go({ pages: 'all' });
+return result.data;
 }
 
 export async function getSeasonById(id: string) {
@@ -665,7 +669,7 @@ export async function getSeasonById(id: string) {
 }
 
 export async function getSeasonAndDesignsBySeasonId(id: string) {
-	const result = await db.collections.seasonAndDesigns({ seasonId: id }).go();
+	const result = await db.collections.seasonAndDesigns({ seasonId: id }).go({ pages: 'all' });
 	return result.data;
 }
 

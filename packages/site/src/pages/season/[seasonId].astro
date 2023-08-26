@@ -23,7 +23,7 @@ const {
 } = await getSeasonAndDesignsBySeasonId(id);
 
 if (!season) {
-	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist`);
+	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist&type=error`);
 }
 
 const totalPossibleCards = cardDesigns.reduce((acc, card) => {
