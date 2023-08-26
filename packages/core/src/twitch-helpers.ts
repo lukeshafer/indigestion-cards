@@ -2,7 +2,7 @@ import { Config } from 'sst/node/config';
 import crypto from 'crypto';
 import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-event-schemas';
 import fetch from 'node-fetch';
-import { SecretsManager } from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { z } from 'zod';
 
 const secretsManager = new SecretsManager();
@@ -459,35 +459,29 @@ export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>
 		...args,
 	};
 
-	return secretsManager
-		.putSecretValue({
-			SecretId: Config.TWITCH_TOKENS_ARN,
-			SecretString: JSON.stringify(newTokens),
-		})
-		.promise();
+	return secretsManager.putSecretValue({
+		SecretId: Config.TWITCH_TOKENS_ARN,
+		SecretString: JSON.stringify(newTokens),
+	});
 }
 
 export async function getTwitchTokens() {
-	const secret = await secretsManager
-		.getSecretValue({
-			SecretId: Config.TWITCH_TOKENS_ARN,
-		})
-		.promise();
+	const secret = await secretsManager.getSecretValue({
+		SecretId: Config.TWITCH_TOKENS_ARN,
+	});
 
 	try {
 		const result = twitchTokens.parse(JSON.parse(secret.SecretString || '{}'));
 		return result;
 	} catch (error) {
-		await secretsManager
-			.putSecretValue({
-				SecretId: Config.TWITCH_TOKENS_ARN,
-				SecretString: JSON.stringify({
-					app_access_token: '',
-					streamer_access_token: '',
-					streamer_refresh_token: '',
-				} satisfies z.infer<typeof twitchTokens>),
-			})
-			.promise();
+		await secretsManager.putSecretValue({
+			SecretId: Config.TWITCH_TOKENS_ARN,
+			SecretString: JSON.stringify({
+				app_access_token: '',
+				streamer_access_token: '',
+				streamer_refresh_token: '',
+			} satisfies z.infer<typeof twitchTokens>),
+		});
 		console.error(error);
 		throw new Error('Failed to parse Twitch tokens');
 	}

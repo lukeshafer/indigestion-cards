@@ -45,8 +45,14 @@ export function Database({ stack }: StackContext) {
 					SESSION_TYPE: 'admin',
 					SESSION_USERNAME: 'Refresh Usernames Cron Job',
 				},
-				bind: [table, config.TWITCH_CLIENT_SECRET, config.TWITCH_CLIENT_ID, config.TWITCH_TOKENS_ARN],
+				bind: [
+					table,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_TOKENS_ARN,
+				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
@@ -62,6 +68,7 @@ export function Database({ stack }: StackContext) {
 					SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
 				},
 				bind: [table],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});

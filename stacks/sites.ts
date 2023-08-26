@@ -31,14 +31,16 @@ export function Sites({ app, stack }: StackContext) {
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_ARN,
 		],
-		customDomain: app.mode === 'dev' ? undefined : {
-			domainName: baseDomain,
-			hostedZone: HOSTED_ZONE,
-		},
+		customDomain:
+			app.mode === 'dev'
+				? undefined
+				: {
+					domainName: baseDomain,
+					hostedZone: HOSTED_ZONE,
+				},
 		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+		runtime: 'nodejs18.x',
 	});
-
-	// TODO: add cron job to check twitch for users who have updated their username
 
 	stack.addOutputs({
 		AdminUrl: adminSite.url,

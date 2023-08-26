@@ -16,6 +16,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'DLQ',
 					SESSION_TYPE: 'admin',
 				},
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
@@ -44,6 +45,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: give-pack-to-user',
 					SESSION_TYPE: 'admin',
 				},
+				runtime: 'nodejs18.x',
 			},
 			cdk: {
 				eventSource: {
@@ -75,6 +77,7 @@ export function Events({ stack }: StackContext) {
 								'secretsmanager:GetSecretValue',
 								'secretsmanager:PutSecretValue',
 							],
+							runtime: 'nodejs18.x',
 						},
 					},
 				},

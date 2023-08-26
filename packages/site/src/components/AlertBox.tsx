@@ -29,7 +29,7 @@ function Alert(
 	};
 	return (
 		<div
-			class="view-transition-alert flex items-center gap-x-5 p-4"
+			class="flex items-center gap-x-5 p-4"
 			classList={{ [alertStyles[props.type]]: true }}>
 			<button onclick={() => useViewTransition(deleteAlert)}>
 				<span class="opacity-50">✕</span>
