@@ -1,7 +1,7 @@
 import { ApiHandler, useJsonBody } from 'sst/node/api';
 import { Bucket } from 'sst/node/bucket';
 import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
-import { S3 } from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import { useSession } from 'sst/node/future/auth';
 import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
 
@@ -28,12 +28,10 @@ export const handler = ApiHandler(async () => {
 	const s3 = new S3();
 	try {
 		await deleteUnmatchedDesignImage({ imageId: data.key, type: data.type });
-		await s3
-			.deleteObject({
-				Bucket: bucketName,
-				Key: data.key,
-			})
-			.promise();
+		await s3.deleteObject({
+			Bucket: bucketName,
+			Key: data.key,
+		});
 
 		return {
 			statusCode: 200,

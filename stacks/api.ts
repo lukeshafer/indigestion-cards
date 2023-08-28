@@ -30,6 +30,7 @@ export function API({ app, stack }: StackContext) {
 					eventBus,
 				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
@@ -70,6 +71,7 @@ export function API({ app, stack }: StackContext) {
 					twitchApi,
 				],
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				runtime: 'nodejs18.x',
 			},
 		},
 		cors: {

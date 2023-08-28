@@ -22,6 +22,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		defaults: {
 			function: {
 				bind: [db],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
@@ -41,6 +42,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		defaults: {
 			function: {
 				bind: [db],
+				runtime: 'nodejs18.x',
 			},
 		},
 	});

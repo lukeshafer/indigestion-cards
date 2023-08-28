@@ -7,9 +7,10 @@
     "typecheck": "tsc -noEmit"
   },
   "devDependencies": {
+    "@aws-sdk/client-eventbridge": "^3.398.0",
+    "@aws-sdk/client-s3": "^3.398.0",
     "@types/aws-lambda": "^8.10.114",
     "@types/node": "^18.15.11",
-    "aws-sdk": "^2.1348.0",
     "sst": "2.22.6"
   },
   "dependencies": {

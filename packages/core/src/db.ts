@@ -1,10 +1,10 @@
 import { Table } from 'sst/node/table';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
 export const config = {
 	table: Table.data.tableName,
-	client: new DocumentClient(),
+	client: new DynamoDBClient(),
 } satisfies EntityConfiguration;
 
 export const auditAttributes = (entityName: string) =>
@@ -379,37 +379,6 @@ const users = new Entity(
 			username: {
 				type: 'string',
 				required: true,
-				set: (value) => {
-					if (!value) return value;
-					packs.query
-						.byUsername({ username: value })
-						.go()
-						.then((res) =>
-							res.data.forEach((pack) => {
-								packs.update(pack).set({ username: value }).go();
-							})
-						);
-
-					// Admins can't be updated right now because username is part of a primary key
-					//admins.query
-					//.allAdmins({ username: value })
-					//.go()
-					//.then((res) => {
-					//res.data.forEach((admin) =>
-					//admins.update(admin).set({ username: value }).go()
-					//);
-					//});
-
-					cardInstances.query
-						.byOwnerId({ username: value })
-						.go()
-						.then((res) => {
-							res.data.forEach((card) =>
-								cardInstances.update(card).set({ username: value }).go()
-							);
-						});
-					return value;
-				},
 			},
 			cardCount: {
 				type: 'number',
