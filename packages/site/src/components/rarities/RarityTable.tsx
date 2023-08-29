@@ -32,8 +32,10 @@ export default function RarityTable(props: { rarities: RarityEntity[] }) {
 				actions: {
 					element: (
 						<>
-							<DeleteRarityButton {...rarity} />
-							<RarityPreview rarity={rarity} />
+							<div>
+								<DeleteRarityButton {...rarity} />
+								<RarityPreview rarity={rarity} />
+							</div>
 						</>
 					),
 					value: '',

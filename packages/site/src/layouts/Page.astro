@@ -7,6 +7,7 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { Api } from 'sst/node/api';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -30,8 +31,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div
-		class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden">
+	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" id="page-layout-wrapper" data-api-url={Api.api.url}>
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -63,6 +63,10 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 			params.delete('auth_token');
 			window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
 		}
+
+		const pageLayoutWrapper = document.getElementById('page-layout-wrapper')!;
+		const apiURL = pageLayoutWrapper.dataset.apiUrl!;
+		localStorage.setItem('api_url', apiURL);
 	</script>
 </Base>
 

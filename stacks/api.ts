@@ -44,6 +44,9 @@ export function API({ app, stack }: StackContext) {
 			'POST /season': 'packages/functions/src/admin-api/season/post.handler',
 			'DELETE /season': 'packages/functions/src/admin-api/season/delete.handler',
 			'PATCH /season': 'packages/functions/src/admin-api/season/patch.handler',
+			// RARITY
+			'POST /rarity': 'packages/functions/src/admin-api/rarity/post.handler',
+			'DELETE /rarity': 'packages/functions/src/admin-api/rarity/delete.handler',
 			// IMAGES
 			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
@@ -57,8 +60,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
-					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				}
+						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+				  }
 				: {}),
 		},
 		defaults: {
@@ -92,10 +95,10 @@ export function API({ app, stack }: StackContext) {
 			app.mode === 'dev'
 				? undefined
 				: {
-					domainName: `api.${baseDomain}`,
-					path: API_VERSION,
-					hostedZone: hostedZone,
-				},
+						domainName: `api.${baseDomain}`,
+						path: API_VERSION,
+						hostedZone: hostedZone,
+				  },
 	});
 
 	stack.addOutputs({

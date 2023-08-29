@@ -1,7 +1,6 @@
 ---
-import { Api } from 'sst/node/api';
 import Page from '@/layouts/Page.astro';
-import { api_paths, routeNames, routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import { getAllSeasons, getAllCardDesigns } from '@lil-indigestion-cards/core/card';
 import { PageTitle } from '@/components/text';
 import PackTypeForm from '@/components/pack-type/PackTypeForm';
@@ -17,5 +16,5 @@ const cardDesigns = await getAllCardDesigns();
 		{ label: 'Create Pack Type' },
 	]}>
 	<PageTitle>Create Pack Type</PageTitle>
-	<PackTypeForm client:load {seasons} {cardDesigns} apiPath={Api.api.url + api_paths.PACK_TYPE} />
+	<PackTypeForm client:load {seasons} {cardDesigns} />
 </Page>

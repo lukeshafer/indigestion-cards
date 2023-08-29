@@ -23,6 +23,7 @@ export function Form(props: {
 	loadingText?: string;
 	successRedirect?: string;
 	errorRedirect?: string;
+	successRefresh?: boolean;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -86,11 +87,10 @@ export function Form(props: {
 			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
-				if (redirectURL.pathname !== location.pathname) {
-					if (responseBody) redirectURL.searchParams.set('alert', responseBody);
-					location.assign(redirectURL.toString());
-				}
+				if (responseBody) redirectURL.searchParams.set('alert', responseBody);
+				location.assign(redirectURL.toString());
 			}
+			if (props.successRefresh) location.reload();
 		} else {
 			setAlerts((alerts) => [
 				...alerts,

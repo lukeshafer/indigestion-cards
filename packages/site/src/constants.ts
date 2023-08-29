@@ -15,6 +15,7 @@ export const PUBLIC_ROUTES = [
 export const api_paths = {
 	PACK_TYPE: '/pack-type',
 	SEASON: '/season',
+	RARITY: '/rarity',
 } as const;
 
 export const api = {
@@ -26,11 +27,11 @@ export const api = {
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},
-	RARITY: {
-		UPDATE: '/api/admin/rarity',
-		CREATE: '/api/admin/rarity',
-		DELETE: '/api/admin/rarity',
-	},
+	//RARITY: {
+		//UPDATE: '/api/admin/rarity',
+		//CREATE: '/api/admin/rarity',
+		//DELETE: '/api/admin/rarity',
+	//},
 	PACK: {
 		CREATE: '/api/admin/pack',
 		DELETE: '/api/admin/pack',
