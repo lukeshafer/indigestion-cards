@@ -37,14 +37,21 @@ export function API({ app, stack }: StackContext) {
 
 	const api = new Api(stack, 'api', {
 		routes: {
+			// PACK TYPE
 			'POST /pack-type': 'packages/functions/src/admin-api/pack-type/post.handler',
 			'DELETE /pack-type': 'packages/functions/src/admin-api/pack-type/delete.handler',
+			// SEASON
+			'POST /season': 'packages/functions/src/admin-api/season/post.handler',
+			'DELETE /season': 'packages/functions/src/admin-api/season/delete.handler',
+			'PATCH /season': 'packages/functions/src/admin-api/season/patch.handler',
+			// IMAGES
 			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			'DELETE /delete-rarity-frame':
 				'packages/functions/src/admin-api/delete-rarity-frame.handler',
 			'DELETE /delete-card-image':
 				'packages/functions/src/admin-api/delete-card-image.handler',
+			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
@@ -77,7 +84,7 @@ export function API({ app, stack }: StackContext) {
 		cors: {
 			allowCredentials: true,
 			allowHeaders: ['content-type', 'authorization'],
-			allowMethods: ['ANY'],
+			allowMethods: ['DELETE', 'POST', 'GET', 'PUT', 'PATCH'],
 			allowOrigins:
 				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
 		},

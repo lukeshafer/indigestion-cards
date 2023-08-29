@@ -1,7 +1,7 @@
 import { ProtectedApiHandler, useValidateFormData } from '@lil-indigestion-cards/core/api';
 import { deletePackTypeById } from '@lil-indigestion-cards/core/card';
 
-export const hansler = ProtectedApiHandler(async () => {
+export const handler = ProtectedApiHandler(async () => {
 	const validation = useValidateFormData({
 		packTypeId: 'string',
 	});

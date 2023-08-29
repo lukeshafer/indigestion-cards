@@ -14,6 +14,7 @@ export const PUBLIC_ROUTES = [
 
 export const api_paths = {
 	PACK_TYPE: '/pack-type',
+	SEASON: '/season',
 } as const;
 
 export const api = {
@@ -30,10 +31,6 @@ export const api = {
 		CREATE: '/api/admin/rarity',
 		DELETE: '/api/admin/rarity',
 	},
-	PACK_TYPE: {
-		CREATE: '/api/admin/pack-type',
-		DELETE: '/api/admin/pack-type',
-	},
 	PACK: {
 		CREATE: '/api/admin/pack',
 		DELETE: '/api/admin/pack',
@@ -45,11 +42,11 @@ export const api = {
 		DELETE: '/api/admin/admin-user',
 		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
 	},
-	SEASON: {
-		UPDATE: '/api/admin/season',
-		CREATE: '/api/admin/season',
-		DELETE: '/api/admin/season',
-	},
+	//SEASON: {
+		//UPDATE: '/api/admin/season',
+		//CREATE: '/api/admin/season',
+		//DELETE: '/api/admin/season',
+	//},
 	PACK_COUNT: '/api/admin/pack-count',
 } as const;
 
