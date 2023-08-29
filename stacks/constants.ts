@@ -3,7 +3,7 @@ const HOSTED_ZONE = 'indigestioncards.com';
 export const API_VERSION = 'v1';
 
 export function getDomainName(stage: string) {
-	if (stage === 'luke' || stage === 'luke-dev') return `${stage}.lksh.dev`;
+	if (stage.startsWith('luke')) return `${stage}.indigestioncards.lksh.dev`;
 
 	if (stage === 'prod') return DOMAIN_NAME;
 

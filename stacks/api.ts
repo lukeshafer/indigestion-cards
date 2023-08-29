@@ -76,7 +76,7 @@ export function API({ app, stack }: StackContext) {
 		},
 		cors: {
 			allowCredentials: true,
-			allowHeaders: ['content-type'],
+			allowHeaders: ['content-type', 'authorization'],
 			allowMethods: ['ANY'],
 			allowOrigins:
 				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],

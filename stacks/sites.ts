@@ -36,9 +36,9 @@ export function Sites({ app, stack }: StackContext) {
 			app.mode === 'dev'
 				? undefined
 				: {
-						domainName: baseDomain,
-						hostedZone: hostedZone,
-				  },
+					domainName: baseDomain,
+					hostedZone: hostedZone,
+				},
 		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 		runtime: 'nodejs18.x',
 	});
