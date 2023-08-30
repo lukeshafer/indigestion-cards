@@ -1,4 +1,4 @@
-import { api_paths, routes } from '@/constants';
+import { API, routes } from '@/constants';
 import {
 	Form,
 	TextInput,
@@ -18,12 +18,11 @@ export default function PackTypeForm(props: {
 }) {
 	const [packTypeName, setPackTypeName] = createSignal('');
 	const [category, setCategory] = createSignal('season');
-	const apiUrl = localStorage.getItem('api_url') ?? '';
 
 	return (
 		<Form
 			method="post"
-			action={apiUrl + api_paths.PACK_TYPE}
+			action={API.PACK_TYPE}
 			successRedirect={`${routes.PACK_TYPES}?alert=Pack%20type%20created!&type=success`}>
 			<TextInput label="Name" name="packTypeName" required setValue={setPackTypeName} />
 			<IdInput label="ID" name="packTypeId" required from={packTypeName()} />

@@ -54,6 +54,10 @@ export function API({ app, stack }: StackContext) {
 				'packages/functions/src/admin-api/delete-rarity-frame.handler',
 			'DELETE /delete-card-image':
 				'packages/functions/src/admin-api/delete-card-image.handler',
+			// ADMIN USER
+			'POST /admin-user': 'packages/functions/src/admin-api/admin-user/post.handler',
+			'DELETE /admin-user': 'packages/functions/src/admin-api/admin-user/delete.handler',
+			'GET /admin-user': 'packages/functions/src/admin-api/admin-user/get.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',

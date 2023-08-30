@@ -12,11 +12,21 @@ export const PUBLIC_ROUTES = [
 	'/card/*',
 ] as const;
 
-export const api_paths = {
+const api_paths = {
 	PACK_TYPE: '/pack-type',
 	SEASON: '/season',
 	RARITY: '/rarity',
-} as const;
+	ADMIN_USER: '/admin-user',
+} 
+
+export const API = new Proxy(api_paths, {
+	get: (target, prop) => {
+		if (!(prop in target)) return undefined;
+		const path = target[prop as keyof typeof target];
+		const base = localStorage.getItem('api_url');
+		return base ? base + path : path;
+	},
+});
 
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
@@ -27,27 +37,11 @@ export const api = {
 	IMAGE: {
 		DELETE: '/api/admin/image',
 	},
-	//RARITY: {
-		//UPDATE: '/api/admin/rarity',
-		//CREATE: '/api/admin/rarity',
-		//DELETE: '/api/admin/rarity',
-	//},
 	PACK: {
 		CREATE: '/api/admin/pack',
 		DELETE: '/api/admin/pack',
 		UPDATE: '/api/admin/pack',
 	},
-	ADMIN: {
-		GET_ALL: '/api/admin/admin-user',
-		CREATE: '/api/admin/admin-user',
-		DELETE: '/api/admin/admin-user',
-		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
-	},
-	//SEASON: {
-		//UPDATE: '/api/admin/season',
-		//CREATE: '/api/admin/season',
-		//DELETE: '/api/admin/season',
-	//},
 	PACK_COUNT: '/api/admin/pack-count',
 } as const;
 

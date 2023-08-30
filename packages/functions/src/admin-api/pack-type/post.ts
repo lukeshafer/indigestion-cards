@@ -3,7 +3,7 @@ import { createPackType } from '@lil-indigestion-cards/core/card';
 import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
 
 export const handler = ProtectedApiHandler(async () => {
-	const result = useValidateFormData({
+	const validateResult = useValidateFormData({
 		packTypeName: 'string',
 		packTypeId: 'string',
 		description: ['string', 'optional'],
@@ -13,8 +13,8 @@ export const handler = ProtectedApiHandler(async () => {
 		cardDesigns: ['string', 'optional'],
 	});
 
-	if (!result.success) return { statusCode: 400, body: result.errors.join(' ') };
-	const params = result.value;
+	if (!validateResult.success) return { statusCode: 400, body: validateResult.errors.join(' ') };
+	const params = validateResult.value;
 
 	if (params.category === 'season' && !params.season)
 		return { statusCode: 400, body: 'Missing season.' };
