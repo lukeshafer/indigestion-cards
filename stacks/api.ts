@@ -58,6 +58,10 @@ export function API({ app, stack }: StackContext) {
 			'POST /admin-user': 'packages/functions/src/admin-api/admin-user/post.handler',
 			'DELETE /admin-user': 'packages/functions/src/admin-api/admin-user/delete.handler',
 			'GET /admin-user': 'packages/functions/src/admin-api/admin-user/get.handler',
+			// PACK
+			'POST /pack': 'packages/functions/src/admin-api/pack/post.handler',
+			'PATCH /pack': 'packages/functions/src/admin-api/pack/patch.handler',
+			'DELETE /pack': 'packages/functions/src/admin-api/pack/delete.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',

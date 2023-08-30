@@ -17,6 +17,7 @@ const api_paths = {
 	SEASON: '/season',
 	RARITY: '/rarity',
 	ADMIN_USER: '/admin-user',
+	PACK: '/pack',
 } 
 
 export const API = new Proxy(api_paths, {
@@ -36,11 +37,6 @@ export const api = {
 	DESIGN: '/api/admin/design',
 	IMAGE: {
 		DELETE: '/api/admin/image',
-	},
-	PACK: {
-		CREATE: '/api/admin/pack',
-		DELETE: '/api/admin/pack',
-		UPDATE: '/api/admin/pack',
 	},
 	PACK_COUNT: '/api/admin/pack-count',
 } as const;

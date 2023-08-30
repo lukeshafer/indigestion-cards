@@ -1,5 +1,5 @@
 import { Form, Select, SubmitButton, TextInput, DeleteButton } from '@/components/form/Form';
-import { api } from '@/constants';
+import { api, API } from '@/constants';
 import { setTotalPackCount } from '@/lib/client/state';
 import type { PackTypeEntity } from '@lil-indigestion-cards/core/card';
 import type { UserEntity } from '@lil-indigestion-cards/core/user';
@@ -21,7 +21,7 @@ export default function UserPackForms(props: { packTypes: PackTypeEntity[]; user
 
 	return (
 		<>
-			<Form action={api.PACK.CREATE} method="post" onsuccess={refreshPackCounts}>
+			<Form action={API.PACK} method="post" onsuccess={refreshPackCounts}>
 				<input type="hidden" name="userId" value={props.user.userId} />
 				<input type="hidden" name="username" value={props.user.username} />
 				<div class="flex w-full items-center gap-2">
@@ -44,7 +44,7 @@ export default function UserPackForms(props: { packTypes: PackTypeEntity[]; user
 			</Form>
 			<div class="flex w-full flex-wrap items-center gap-2">
 				<p class="text-lg">Unopened Packs: {packCount() ?? props.user.packCount}</p>
-				<Form action={api.PACK.DELETE} method="delete" onsuccess={refreshPackCounts}>
+				<Form action={API.PACK} method="delete" onsuccess={refreshPackCounts}>
 					<input type="hidden" name="userId" value={props.user.userId} />
 					<input type="hidden" name="username" value={props.user.username} />
 					<DeleteButton>Revoke Pack</DeleteButton>
