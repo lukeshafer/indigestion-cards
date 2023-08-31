@@ -4,12 +4,13 @@ import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
-import { routes, routeNames } from '@/constants';
+import { routes, routeNames, LEGACY_CARD_ID } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { PageTitle } from '@/components/text';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
 import DesignOverviewTable from '@/components/design/DesignOverviewTable';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
+import EditDesignForm from '@/components/design/EditDesignForm';
 import { Heading } from '@/components/text';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
 
@@ -18,9 +19,6 @@ const designId = Astro.params.designId;
 if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
-
-const session = Astro.locals.session;
-if (session?.type !== 'admin') throw new Error('Unauthorized');
 
 const {
 	cardDesigns: [design],
@@ -34,35 +32,65 @@ if (!design) {
 }
 
 const siteConfig = await getSiteConfig();
-const baseRarity = siteConfig?.baseRarity || {
-	rarityId: 'default',
-	rarityName: 'Default',
-	frameUrl: '/default-base-rarity.png',
-	rarityColor: '#fff',
-};
+
+const baseRarity = design.bestRarityFound ||
+	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
+	siteConfig?.baseRarity || {
+		rarityId: 'default',
+		rarityName: 'Default',
+		frameUrl: '/default-base-rarity.png',
+		rarityColor: '#fff',
+	};
 
 instances.sort((a, b) =>
 	+a.totalOfType === +b.totalOfType
-		? a.instanceId !== b.instanceId
-			? +a.instanceId - +b.instanceId
+		? a.designId !== b.designId
+			? a.designId.localeCompare(b.designId)
 			: +a.cardNumber - +b.cardNumber
 		: +a.totalOfType - +b.totalOfType
 );
 
 const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, instances);
+const openedInstances = instances.filter((instance) => instance.openedAt);
 ---
 
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-9"
+	pageType="public"
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
+		<section class="text-lg mx-auto">
+			<p>
+				<b>Season:</b>
+				{design.seasonName}
+			</p>
+			<p>
+				<b>Artist:</b>
+				{design.artist}
+			</p>
+		</section>
+		<AdminOnly>
+			<EditDesignForm {...design} client:load />
+		</AdminOnly>
 	</header>
+	<section class="text-center flex flex-col">
+		<Heading>Cards Opened</Heading>
+		<CardList
+			cards={openedInstances}
+			showUsernames
+			client:load
+			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
+		/>
+	</section>
 	<AdminOnly>
 		<details>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
+			<p class="text-red-600 font-bold">
+				This section is only visible to admins: not for stream!
+			</p>
 			<div class="my-4 flex flex-col gap-8">
 				<section class="grid text-lg">
 					<Heading>Stats Overview</Heading>
@@ -73,14 +101,4 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 		</details>
 		<DeleteDesignButton {...design} client:load />
 	</AdminOnly>
-	<section class="text-center flex flex-col gap-5">
-		<Heading>Instances</Heading>
-		<CardList
-			cards={instances}
-			showUsernames
-			sessionType={Astro.locals.session?.type}
-			client:load
-			sortOnlyBy={['rarest', 'common']}
-		/>
-	</section>
 </Page>

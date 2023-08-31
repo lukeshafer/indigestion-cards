@@ -1,7 +1,7 @@
 import { Form, Select, SubmitButton } from '@/components/form/Form';
 import type { PackTypeEntity, RarityEntity } from '@lil-indigestion-cards/core/card';
 import type { TwitchEventEntity } from '@lil-indigestion-cards/core/site-config';
-import { api } from '@/constants';
+import { API } from '@/constants';
 import { Show, createSignal } from 'solid-js';
 import Table from '../table/Table';
 
@@ -16,7 +16,7 @@ export default function SiteConfigForm(props: {
 	const [rarity, setRarity] = createSignal(props.baseRarityValue);
 
 	return (
-		<Form action={api.SITE_CONFIG} method="post" onsuccess={() => setIsEdited(false)}>
+		<Form action={API.SITE_CONFIG} method="post" onsuccess={() => setIsEdited(false)}>
 			<Show when={isEdited()}>
 				<SubmitButton>Save</SubmitButton>
 			</Show>

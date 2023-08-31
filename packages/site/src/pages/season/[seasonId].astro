@@ -9,6 +9,7 @@ import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routeNames, routes } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
+import { Api } from 'sst/node/api';
 
 const id = Astro.params.seasonId;
 
@@ -23,7 +24,7 @@ const {
 } = await getSeasonAndDesignsBySeasonId(id);
 
 if (!season) {
-	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist`);
+	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist&type=error`);
 }
 
 const totalPossibleCards = cardDesigns.reduce((acc, card) => {
@@ -37,6 +38,7 @@ const totalPossibleCards = cardDesigns.reduce((acc, card) => {
 
 const ownedCards = cardInstances.length;
 const remainingCards = totalPossibleCards - ownedCards;
+const percentageDistributed = Math.round((ownedCards / totalPossibleCards) * 1000) / 10;
 
 const packTypes = await getPackTypesBySeasonId({ seasonId: id });
 const packTypesWithCardPools = await Promise.all(
@@ -44,11 +46,13 @@ const packTypesWithCardPools = await Promise.all(
 		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
 		const openedPacks = ownedCards / packType.cardCount;
 		const remainingPacks = Math.floor(remainingCards / packType.cardCount);
+		const percentagePacksOpened = Math.round((openedPacks / totalPossiblePacks) * 1000) / 10;
 		return {
 			...packType,
 			totalPossiblePacks,
 			openedPacks,
 			remainingPacks,
+			percentagePacksOpened,
 		};
 	})
 );
@@ -78,6 +82,10 @@ const {
 		<p class="ml-4"><b>Total cards in season:</b> {totalPossibleCards}</p>
 		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
 		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
+		<p class="ml-4">
+			<b>Percentage distributed:</b>
+			{percentageDistributed}%
+		</p>
 
 		<div class="ml-4 mt-4">
 			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
@@ -116,5 +124,5 @@ const {
 		client:load
 	/>
 
-	<DeleteSeasonButton seasonId={season.seasonId} client:load />
+	<DeleteSeasonButton seasonId={season.seasonId} apiUrl={Api.api.url} client:load />
 </Page>

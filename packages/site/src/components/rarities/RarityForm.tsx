@@ -1,4 +1,4 @@
-import { api } from '@/constants';
+import { API, routes } from '@/constants';
 import { Form, TextInput, IdInput, SubmitButton, NumberInput } from '@/components/form/Form';
 import { createSignal } from 'solid-js';
 
@@ -6,7 +6,10 @@ export default function RarityForm(props: { imgUrl: string; key: string; bucket:
 	const [rarityName, setRarityName] = createSignal('');
 
 	return (
-		<Form action={api.RARITY.CREATE} method="post">
+		<Form
+			action={API.RARITY}
+			method="post"
+			successRedirect={`${routes.RARITIES}?alert=Rarity%20created!&type=success`}>
 			<input type="hidden" name="imgUrl" value={props.imgUrl} />
 			<input type="hidden" name="imageKey" value={props.key} />
 			<input type="hidden" name="bucket" value={props.bucket} />

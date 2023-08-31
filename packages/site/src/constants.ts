@@ -8,47 +8,32 @@ export const PUBLIC_ROUTES = [
 	'/api/get-all-usernames',
 	'/api/search',
 	'/api/auth/*',
+	'/card',
+	'/card/*',
 ] as const;
 
-export const api = {
-	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
-	SITE_CONFIG: '/api/admin/site-config',
-	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
-	CARD: '/api/admin/card',
-	IMAGE: {
-		DELETE: '/api/admin/image',
+const api_paths = {
+	PACK_TYPE: '/pack-type',
+	SEASON: '/season',
+	RARITY: '/rarity',
+	ADMIN_USER: '/admin-user',
+	PACK: '/pack',
+	CARD: '/card',
+	DESIGN: '/design',
+	SITE_CONFIG: '/site-config',
+	UNMATCHED_IMAGE: '/unmatched-image',
+	PACK_COUNT: '/pack-count',
+	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
+} 
+
+export const API = new Proxy(api_paths, {
+	get: (target, prop) => {
+		if (!(prop in target)) return undefined;
+		const path = target[prop as keyof typeof target];
+		const base = localStorage.getItem('api_url');
+		return base ? base + path : path;
 	},
-	RARITY: {
-		UPDATE: '/api/admin/rarity',
-		CREATE: '/api/admin/rarity',
-		DELETE: '/api/admin/rarity',
-	},
-	PACK_TYPE: {
-		CREATE: '/api/admin/pack-type',
-		DELETE: '/api/admin/pack-type',
-	},
-	PACK: {
-		CREATE: '/api/admin/pack',
-		DELETE: '/api/admin/pack',
-		UPDATE: '/api/admin/pack',
-	},
-	ADMIN: {
-		GET_ALL: '/api/admin/admin-user',
-		CREATE: '/api/admin/admin-user',
-		DELETE: '/api/admin/admin-user',
-		NEW_ADMIN_FORM: '/api/html/admin/new-admin-form',
-	},
-	SEASON: {
-		UPDATE: '/api/admin/season',
-		CREATE: '/api/admin/season',
-		DELETE: '/api/admin/season',
-	},
-	DESIGN: {
-		CREATE: '/api/admin/design',
-		DELETE: '/api/admin/design',
-	},
-	PACK_COUNT: '/api/admin/pack-count',
-} as const;
+});
 
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',
@@ -110,5 +95,6 @@ export const routeNames = {
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
-export const HTML_API_PATH = '/api/html';
 export const FULL_ART_ID = 'full-art';
+export const LEGACY_CARD_ID = 'legacy';
+export const NO_CARDS_OPENED_ID = 'no-cards-opened';

@@ -7,6 +7,7 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { Api } from 'sst/node/api';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -30,7 +31,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" x-data="{}">
+	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" id="page-layout-wrapper" data-api-url={Api.api.url}>
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -43,7 +44,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 				<Breadcrumbs path={breadcrumbs ?? []} />
 			</div>
 			<main
-				transition:name="main"
+				transition:name={wide ? undefined : 'main'}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
 				class="col-start-2 mx-auto w-full flex-1 p-3 z-0 mb-8">
 				<slot />
@@ -51,6 +52,22 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 			<Footer />
 		</div>
 	</div>
+	<script>
+		// check search params for auth_token
+		const params = new URLSearchParams(window.location.search);
+		const auth_token = params.get('auth_token');
+		if (auth_token) {
+			// set auth_token in local storage
+			localStorage.setItem('auth_token', auth_token);
+			// remove auth_token from url
+			params.delete('auth_token');
+			window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+		}
+
+		const pageLayoutWrapper = document.getElementById('page-layout-wrapper')!;
+		const apiURL = pageLayoutWrapper.dataset.apiUrl!;
+		localStorage.setItem('api_url', apiURL);
+	</script>
 </Base>
 
 <style>

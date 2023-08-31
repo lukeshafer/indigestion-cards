@@ -16,6 +16,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'DLQ',
 					SESSION_TYPE: 'admin',
 				},
+				runtime: 'nodejs18.x',
 			},
 		},
 	});
@@ -35,7 +36,7 @@ export function Events({ stack }: StackContext) {
 					table,
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.APP_ACCESS_TOKEN_ARN,
+					config.TWITCH_TOKENS_ARN,
 				],
 				handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
@@ -44,6 +45,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: give-pack-to-user',
 					SESSION_TYPE: 'admin',
 				},
+				runtime: 'nodejs18.x',
 			},
 			cdk: {
 				eventSource: {
@@ -67,9 +69,7 @@ export function Events({ stack }: StackContext) {
 							bind: [
 								table,
 								config.STREAMER_USER_ID,
-								config.STREAMER_ACCESS_TOKEN_ARN,
-								config.STREAMER_REFRESH_TOKEN_ARN,
-								config.APP_ACCESS_TOKEN_ARN,
+								config.TWITCH_TOKENS_ARN,
 								config.TWITCH_CLIENT_ID,
 								config.TWITCH_CLIENT_SECRET,
 							],
@@ -77,6 +77,7 @@ export function Events({ stack }: StackContext) {
 								'secretsmanager:GetSecretValue',
 								'secretsmanager:PutSecretValue',
 							],
+							runtime: 'nodejs18.x',
 						},
 					},
 				},

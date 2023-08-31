@@ -1,12 +1,12 @@
 ---
-import CardList from '@/components/cards/CardList'
+import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
-import { PageTitle, Heading } from '@/components/text';
+import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -59,10 +59,18 @@ const packTypes = await getAllPackTypes();
 		/>
 		<AdminOnly>
 			<section slot="fallback" class="flex flex-col gap-2">
-				<PageTitle>{user.username}</PageTitle>
+				<h1
+					class="font-display italic my-2 text-4xl font-bold text-gray-600"
+					style={{ 'view-transition-name': `${user.username}-username` }}>
+					{user.username}
+				</h1>
 			</section>
 			<section class="flex flex-col gap-2">
-				<PageTitle>{user.username}</PageTitle>
+				<h1
+					class="font-display italic my-2 text-4xl font-bold text-gray-600"
+					style={{ 'view-transition-name': `${user.username}-username` }}>
+					{user.username}
+				</h1>
 				<p class="-mt-5">User Id: {user.userId}</p>
 				<UserPackForms {user} {packTypes} client:load />
 			</section>
@@ -70,6 +78,17 @@ const packTypes = await getAllPackTypes();
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-		<CardList cards={cardsNotInPack} sessionType={Astro.locals.session?.type} client:load />
+		<CardList
+			cards={cardsNotInPack}
+			client:load
+			sortOnlyBy={[
+				'rarest',
+				'common',
+				'card-name-asc',
+				'card-name-desc',
+				'open-date-asc',
+				'open-date-desc',
+			]}
+		/>
 	</section>
 </Page>

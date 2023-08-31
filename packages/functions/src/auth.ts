@@ -1,10 +1,10 @@
 import { Config } from 'sst/node/config';
 import { Issuer } from 'openid-client';
 import { EventBus } from 'sst/node/event-bus';
-import { EventBridge } from 'aws-sdk';
+import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import { getAdminUserById } from '@lil-indigestion-cards/core/user';
-import { putUserTokenSecrets } from '@lil-indigestion-cards/core/twitch-helpers';
+import { setTwitchTokens } from '@lil-indigestion-cards/core/twitch-helpers';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -79,25 +79,23 @@ export const handler = AuthHandler({
 				};
 
 			if (input.tokenset.access_token && input.tokenset.refresh_token) {
-				putUserTokenSecrets({
-					access_token: input.tokenset.access_token,
-					refresh_token: input.tokenset.refresh_token,
+				await setTwitchTokens({
+					streamer_access_token: input.tokenset.access_token,
+					streamer_refresh_token: input.tokenset.refresh_token,
 				});
 			}
 
 			const eventBridge = new EventBridge();
-			await eventBridge
-				.putEvents({
-					Entries: [
-						{
-							Source: 'auth',
-							DetailType: 'refresh-channel-point-rewards',
-							Detail: JSON.stringify({}),
-							EventBusName: EventBus.eventBus.eventBusName,
-						},
-					],
-				})
-				.promise();
+			await eventBridge.putEvents({
+				Entries: [
+					{
+						Source: 'auth',
+						DetailType: 'refresh-channel-point-rewards',
+						Detail: JSON.stringify({}),
+						EventBusName: EventBus.eventBus.eventBusName,
+					},
+				],
+			});
 
 			return {
 				type: 'session',

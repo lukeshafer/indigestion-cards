@@ -2,7 +2,7 @@ import Table from '@/components/table/Table';
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
 import { Form, SubmitButton, TextInput } from '@/components/form/Form';
 import { createSignal } from 'solid-js';
-import { api } from '@/constants';
+import { API } from '@/constants';
 
 export default function PackTable(props: { packs: PackEntity[] }) {
 	return (
@@ -56,7 +56,7 @@ function PackRow(props: PackEntity) {
 				<div>
 					{isEditing() ? (
 						<Form
-							action={api.PACK.UPDATE}
+							action={API.PACK}
 							method="patch"
 							onsuccess={() => setIsEditing(false)}>
 							<input type="hidden" name="packId" value={props.packId} />

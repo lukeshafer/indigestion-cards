@@ -23,8 +23,13 @@ export async function getUserByUserName(username: string) {
 
 export async function getAllUsers() {
 	try {
-		const users = await db.entities.users.find({}).go();
-		return users.data ?? [];
+		let { data, cursor } = await db.entities.users.find({}).go();
+		while (cursor) {
+			const users = await db.entities.users.find({}).go({ cursor });
+			data.push(...users.data);
+			cursor = users.cursor;
+		}
+		return data ?? [];
 	} catch {
 		return [];
 	}
@@ -96,11 +101,39 @@ export async function updateUsername(
 		);
 	}
 
-	const result = await db.entities.users
-		.patch({ userId: args.userId })
-		.set({ username: args.newUsername })
+	const cards = await db.entities.cardInstances.query
+		.byOwnerId({ username: args.oldUsername })
 		.go();
-	return result.data;
+	
+	const packData = await db.entities.packs.query
+		.byUsername({ username: args.oldUsername })
+		.go();
+
+	// TODO: get all minted cards and update those
+
+	const transactionResult = await db.transaction.write(({ users, cardInstances, packs }) => [
+		users.patch({ userId: args.userId }).set({ username: args.newUsername }).commit(),
+		...cards.data.map((card) =>
+			cardInstances
+				.patch({ designId: card.designId, instanceId: card.instanceId })
+				.set({
+					username: args.newUsername,
+					minterUsername:
+						card.minterUsername === args.oldUsername
+							? args.newUsername
+							: card.minterUsername,
+				})
+				.commit()
+		),
+		...packData.data.map((pack) =>
+			packs
+				.patch({ packId: pack.packId })
+				.set({ username: args.newUsername })
+				.commit()
+		),
+	]).go();
+
+	return transactionResult.data
 }
 
 export async function batchUpdateUsers(users: CreateEntityItem<User>[]) {

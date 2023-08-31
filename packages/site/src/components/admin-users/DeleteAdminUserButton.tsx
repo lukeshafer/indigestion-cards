@@ -1,5 +1,5 @@
 import { DeleteButton, Form } from '@/components/form/Form';
-import { api } from '@/constants';
+import { API } from '@/constants';
 
 export default function DeleteAdminUserButton(props: {
 	userId: string;
@@ -10,7 +10,7 @@ export default function DeleteAdminUserButton(props: {
 }) {
 	return (
 		<Form
-			action={api.ADMIN.DELETE}
+			action={API.ADMIN_USER}
 			method="delete"
 			onsuccess={props.onSuccess}
 			onsubmit={props.onClick}

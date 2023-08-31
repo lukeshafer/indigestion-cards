@@ -25,13 +25,14 @@ export async function get(ctx: APIContext) {
 	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
 		maxAge: 60 * 60 * 24 * 30,
 		httpOnly: true,
+		secure: ctx.url.host !== 'localhost',
 		path: '/',
 	});
 
 	const session = Session.verify(response.access_token);
 
 	if (session.type === 'admin') {
-		return ctx.redirect(`/?alert=Logged in!`, 302);
+		return ctx.redirect(`/?alert=Logged in!&auth_token=${response.access_token}`, 302);
 	}
 	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }

@@ -21,6 +21,9 @@ export function Form(props: {
 	onsuccess?: () => void;
 	onsubmit?: () => void;
 	loadingText?: string;
+	successRedirect?: string;
+	errorRedirect?: string;
+	successRefresh?: boolean;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -28,9 +31,17 @@ export function Form(props: {
 		// Forms support GET and POST methods, so no need to modify the method on the server
 		if (props.method === 'get' || props.method === 'post') return props.action;
 
-		const formURL = new URL(props.action, 'http://localhost:3000');
+		let formURL: URL;
+		let isLocal = false;
+		try {
+			formURL = new URL(props.action);
+		} catch {
+			isLocal = true;
+			formURL = new URL(props.action, 'http://localhost');
+		}
+
 		formURL.searchParams.set('formmethod', props.method);
-		return formURL.pathname + '?' + formURL.searchParams.toString();
+		return isLocal ? formURL.pathname + formURL.search : formURL.toString();
 	};
 
 	const handleSubmit = async (e: SubmitEvent) => {
@@ -46,22 +57,23 @@ export function Form(props: {
 			props.method.toUpperCase() === 'GET' ? `${props.action}?${data}` : props.action;
 		const body = props.method.toUpperCase() === 'GET' ? undefined : data;
 
+		const auth_token = localStorage.getItem('auth_token');
 		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
+				Authorization: auth_token ? `Bearer ${auth_token}` : '',
 			},
 			body,
-		}).finally(() => setIsLoading(false));
+		})
+			.catch((err) => {
+				console.error(err);
+				throw err;
+			})
+			.finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			//const link = document.createElement('a');
-			//link.href = response.url;
-			//link.hidden = true;
-			//document.body.appendChild(link);
-			//link.click();
-			location.assign(response.url);
-			return;
+			return location.assign(response.url);
 		}
 
 		const responseBody = await response.text();
@@ -72,11 +84,27 @@ export function Form(props: {
 				{ message: responseBody || 'Success!', type: 'success' },
 			]);
 			if (props.onsuccess) props.onsuccess();
+			if (props.successRedirect) {
+				const redirectURL = new URL(props.successRedirect, window.location.origin);
+				if (responseBody) redirectURL.searchParams.set('alert', responseBody);
+				location.assign(redirectURL.toString());
+			}
+			if (props.successRefresh) location.reload();
 		} else {
 			setAlerts((alerts) => [
 				...alerts,
 				{ message: responseBody || 'There was an error.', type: 'error' },
 			]);
+			if (props.errorRedirect) {
+				const redirectURL = new URL(props.errorRedirect, window.location.origin);
+				if (redirectURL.pathname !== location.pathname) {
+					if (responseBody) {
+						redirectURL.searchParams.set('alert', responseBody);
+						redirectURL.searchParams.set('type', 'error');
+					}
+					location.assign(redirectURL.toString());
+				}
+			}
 		}
 	};
 

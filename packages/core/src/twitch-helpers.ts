@@ -2,7 +2,7 @@ import { Config } from 'sst/node/config';
 import crypto from 'crypto';
 import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-event-schemas';
 import fetch from 'node-fetch';
-import { SecretsManager } from 'aws-sdk';
+import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { z } from 'zod';
 
 const secretsManager = new SecretsManager();
@@ -105,7 +105,7 @@ export function handleTwitchEvent(body: TwitchBody) {
 }
 
 export async function getListOfTwitchUsersByIds(ids: string[]) {
-	const appAccessToken = await retrieveAppTokenSecret();
+	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = `https://api.twitch.tv/helix/users?id=${ids.join('&id=')}`;
 	let response = await fetch(fetchUrl, {
 		headers: {
@@ -154,7 +154,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 }
 
 export async function getUserByLogin(login: string) {
-	const appAccessToken = await retrieveAppTokenSecret();
+	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
 	let response = await fetch(fetchUrl, {
 		headers: {
@@ -210,9 +210,9 @@ export async function getUserByLogin(login: string) {
 
 export type ChannelPointReward = Awaited<ReturnType<typeof getAllChannelPointRewards>>[0];
 export async function getAllChannelPointRewards(args: { userId: string }) {
-	const { access_token, refresh_token } = await retrieveUserTokenSecrets();
+	const { streamer_access_token, streamer_refresh_token } = await getTwitchTokens();
 
-	if (!access_token || !refresh_token) {
+	if (!streamer_access_token || !streamer_refresh_token) {
 		throw new Error('Missing token secrets');
 	}
 
@@ -221,17 +221,19 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 	let twitchResponse = await fetch(url.toString(), {
 		headers: {
 			'Client-ID': Config.TWITCH_CLIENT_ID,
-			Authorization: `Bearer ${access_token}`,
+			Authorization: `Bearer ${streamer_access_token}`,
 		},
 	});
 
 	if (twitchResponse.status === 401) {
 		// token may have expired, try refreshing
-		const newToken = await refreshUserAccessToken({ refresh_token });
+		const newToken = await refreshUserAccessToken({ refresh_token: streamer_refresh_token });
 		if (!newToken) {
 			throw new Error('Failed to refresh user access token');
 		}
-		await putUserTokenSecrets(newToken);
+		await setTwitchTokens({
+			streamer_access_token: newToken.access_token,
+		});
 		twitchResponse = await fetch(url.toString(), {
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
@@ -304,7 +306,7 @@ export type TwitchEvent =
 	| ChannelPointsCustomRewardRemoveEvent;
 
 export async function subscribeToTwitchEvent(event: TwitchEvent) {
-	const appAccessToken = await retrieveAppTokenSecret();
+	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	let response = await fetch(subscriptionsUrl, {
 		method: 'POST',
 		headers: {
@@ -444,51 +446,50 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 	return result.data;
 }
 
-export async function retrieveUserTokenSecrets() {
-	const getAccessTokenPromise = secretsManager
-		.getSecretValue({
-			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
-		})
-		.promise();
+const twitchTokens = z.object({
+	streamer_access_token: z.string(),
+	streamer_refresh_token: z.string(),
+	app_access_token: z.string(),
+});
 
-	const getRefreshTokenPromise = secretsManager
-		.getSecretValue({
-			SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
-		})
-		.promise();
-
-	const [accessToken, refreshToken] = await Promise.all([
-		getAccessTokenPromise,
-		getRefreshTokenPromise,
-	]);
-
-	return {
-		access_token: accessToken.SecretString,
-		refresh_token: refreshToken.SecretString,
+export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>>) {
+	const currentTokens = await getTwitchTokens().catch(() => ({}));
+	const newTokens = {
+		...currentTokens,
+		...args,
 	};
+
+	return secretsManager.putSecretValue({
+		SecretId: Config.TWITCH_TOKENS_ARN,
+		SecretString: JSON.stringify(newTokens),
+	});
 }
 
-export async function putUserTokenSecrets(args: { access_token: string; refresh_token: string }) {
-	const putAccessTokenPromise = secretsManager
-		.putSecretValue({
-			SecretId: Config.STREAMER_ACCESS_TOKEN_ARN,
-			SecretString: args.access_token,
-		})
-		.promise();
+export async function getTwitchTokens() {
+	const secret = await secretsManager.getSecretValue({
+		SecretId: Config.TWITCH_TOKENS_ARN,
+	});
 
-	const putRefreshTokenPromise = secretsManager
-		.putSecretValue({
-			SecretId: Config.STREAMER_REFRESH_TOKEN_ARN,
-			SecretString: args.refresh_token,
-		})
-		.promise();
-
-	return Promise.all([putAccessTokenPromise, putRefreshTokenPromise]);
+	try {
+		const result = twitchTokens.parse(JSON.parse(secret.SecretString || '{}'));
+		return result;
+	} catch (error) {
+		await secretsManager.putSecretValue({
+			SecretId: Config.TWITCH_TOKENS_ARN,
+			SecretString: JSON.stringify({
+				app_access_token: '',
+				streamer_access_token: '',
+				streamer_refresh_token: '',
+			} satisfies z.infer<typeof twitchTokens>),
+		});
+		console.error(error);
+		throw new Error('Failed to parse Twitch tokens');
+	}
 }
 
 async function refreshAppAccessToken() {
 	const newAppAccessToken = await getNewAppAccessToken();
-	await putAppTokenSecret({ access_token: newAppAccessToken });
+	await setTwitchTokens({ app_access_token: newAppAccessToken });
 	return newAppAccessToken;
 }
 
@@ -518,29 +519,8 @@ async function getNewAppAccessToken() {
 	return result.data.access_token;
 }
 
-async function retrieveAppTokenSecret() {
-	const getSecretPromise = secretsManager
-		.getSecretValue({
-			SecretId: Config.APP_ACCESS_TOKEN_ARN,
-		})
-		.promise();
-
-	const secret = await getSecretPromise;
-
-	return secret.SecretString;
-}
-
-async function putAppTokenSecret(args: { access_token: string }) {
-	return secretsManager
-		.putSecretValue({
-			SecretId: Config.APP_ACCESS_TOKEN_ARN,
-			SecretString: args.access_token,
-		})
-		.promise();
-}
-
 export async function getActiveTwitchEventSubscriptions() {
-	const appAccessToken = await retrieveAppTokenSecret();
+	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
 	fetchUrl.searchParams.append('user_id', Config.STREAMER_USER_ID);
 	let response = await fetch(fetchUrl.toString(), {
@@ -609,7 +589,7 @@ export async function getActiveTwitchEventSubscriptions() {
 }
 
 export async function deleteTwitchEventSubscription(id: string) {
-	const appAccessToken = await retrieveAppTokenSecret();
+	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
 	fetchUrl.searchParams.append('id', id);
 

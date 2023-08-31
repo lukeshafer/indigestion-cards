@@ -3,6 +3,7 @@ import Page from '@/layouts/Page.astro';
 import { routeNames, routes } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 import SeasonForm from '@/components/seasons/SeasonForm';
+import { Api } from 'sst/node/api';
 ---
 
 <Page
@@ -12,7 +13,7 @@ import SeasonForm from '@/components/seasons/SeasonForm';
 		<PageTitle>Create New Season</PageTitle>
 	</PageHeader>
 
-	<SeasonForm client:load />
+	<SeasonForm apiUrl={Api.api.url} client:load />
 </Page>
 
 <script></script>

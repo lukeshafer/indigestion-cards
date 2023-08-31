@@ -1,6 +1,6 @@
 import { type APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { EventBus } from 'sst/node/event-bus';
-import { EventBridge } from 'aws-sdk';
+import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
 	verifyDiscordRequest,
 	parseRequestBody,
@@ -64,8 +64,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		case 'channel.subscription.gift':
 			console.log(`Sub gifted by ${body.event.user_name}. Subs gifted: ${body.event.total}`);
 
-			// FIXME: remove this once we're confident in the logic, should always be 5
-			const SUBS_PER_PACK = ['luke', 'dev'].includes(process.env.SST_STAGE || '') ? 1 : 5;
+			const SUBS_PER_PACK = 5;
 			const specialSubRoundLookup: Record<number, number> = {
 				69: 70,
 			};
@@ -90,28 +89,25 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
 			const giftSubPackType = await getPackTypeById({ packTypeId: event.packTypeId });
 
-			await eventBridge
-				.putEvents({
-					Entries: [
-						{
-							Source: 'twitch',
-							DetailType: 'give-pack-to-user',
-							Detail: JSON.stringify({
-								userId: body.event.user_id,
-								username: body.event.user_name,
-								packCount: totalPacks,
-								packType: giftSubPackType,
-							}),
-							EventBusName: EventBus.eventBus.eventBusName,
-						},
-					],
-				})
-				.promise();
+			await eventBridge.putEvents({
+				Entries: [
+					{
+						Source: 'twitch',
+						DetailType: 'give-pack-to-user',
+						Detail: JSON.stringify({
+							userId: body.event.user_id,
+							username: body.event.user_name,
+							packCount: totalPacks,
+							packType: giftSubPackType,
+						}),
+						EventBusName: EventBus.eventBus.eventBusName,
+					},
+				],
+			});
 			break;
 		case 'channel.channel_points_custom_reward_redemption.add':
 			console.log(
-				`Channel point reward redeemed by ${
-					body.event.user_name
+				`Channel point reward redeemed by ${body.event.user_name
 				}. Reward info: ${JSON.stringify(
 					{
 						rewardId: body.event.reward.id,
@@ -133,40 +129,36 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 			console.log(`Giving user 1 pack`);
 			const rewardPackType = await getPackTypeById({ packTypeId: reward.packTypeId });
 
-			await eventBridge
-				.putEvents({
-					Entries: [
-						{
-							Source: 'twitch',
-							DetailType: 'give-pack-to-user',
-							Detail: JSON.stringify({
-								userId: body.event.user_id,
-								username: body.event.user_name,
-								packCount: 1,
-								packType: rewardPackType,
-							}),
-							EventBusName: EventBus.eventBus.eventBusName,
-						},
-					],
-				})
-				.promise();
+			await eventBridge.putEvents({
+				Entries: [
+					{
+						Source: 'twitch',
+						DetailType: 'give-pack-to-user',
+						Detail: JSON.stringify({
+							userId: body.event.user_id,
+							username: body.event.user_name,
+							packCount: 1,
+							packType: rewardPackType,
+						}),
+						EventBusName: EventBus.eventBus.eventBusName,
+					},
+				],
+			});
 			break;
 		case 'channel.channel_points_custom_reward.add':
 		case 'channel.channel_points_custom_reward.update':
 		case 'channel.channel_points_custom_reward.remove':
 			console.log(`Channel point reward updated. Event type: ${body.type}`);
-			await eventBridge
-				.putEvents({
-					Entries: [
-						{
-							Source: 'twitch',
-							DetailType: 'refresh-channel-point-rewards',
-							Detail: JSON.stringify({}),
-							EventBusName: EventBus.eventBus.eventBusName,
-						},
-					],
-				})
-				.promise();
+			await eventBridge.putEvents({
+				Entries: [
+					{
+						Source: 'twitch',
+						DetailType: 'refresh-channel-point-rewards',
+						Detail: JSON.stringify({}),
+						EventBusName: EventBus.eventBus.eventBusName,
+					},
+				],
+			});
 			break;
 	}
 	return { statusCode: 200 };

@@ -3,6 +3,7 @@ import type { EntityItem, CreateEntityItem, UpdateEntityItem } from 'electrodb';
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
 import { CardPool } from './pack';
+import { FULL_ART_ID, LEGACY_CARD_ID } from './constants';
 
 type Result<T> =
 	| {
@@ -340,16 +341,37 @@ export async function createPack(args: {
 		.go();
 }
 
+interface RarityForComparison {
+	rarityId: string;
+	count: number;
+}
+function checkIsRarityBetter(a: RarityForComparison, b: RarityForComparison) {
+	if (a.count < b.count) return true;
+	if (a.count > b.count) return false;
+
+	if (a.rarityId === FULL_ART_ID) return true;
+	if (b.rarityId === FULL_ART_ID) return false;
+
+	if (a.rarityId === LEGACY_CARD_ID) return true;
+	if (b.rarityId === LEGACY_CARD_ID) return false;
+
+	return false;
+}
+
 export async function openCardFromPack(args: {
 	designId: string;
 	instanceId: string;
 	packId: string;
 }) {
-	const card = await db.entities.cardInstances.query.byId(args).go();
-	if (!card.data || card.data.length === 0) {
+	const {
+		cardDesigns: [design],
+		cardInstances,
+	} = await getCardDesignAndInstancesById({ designId: args.designId });
+	const instance = cardInstances.find((c) => c.instanceId === args.instanceId);
+	if (!instance) {
 		throw new Error('Card not found');
 	}
-	if (card.data[0].openedAt || !card.data[0].packId) {
+	if (instance.openedAt || !instance.packId) {
 		console.log("Card already opened or doesn't belong to a pack");
 		const pack = await db.entities.packs.query.byPackId({ packId: args.packId }).go();
 		console.log({ pack });
@@ -381,11 +403,19 @@ export async function openCardFromPack(args: {
 
 		const deletePack = newCardDetails.every((c) => c.opened);
 
-		const userId = card.data[0].userId;
+		const userId = instance.userId;
 		const user = userId ? await getUser(userId) : null;
 
+		const updateRarity = checkIsRarityBetter(
+			{ rarityId: instance.rarityId, count: instance.totalOfType },
+			{
+				rarityId: design.bestRarityFound?.rarityId ?? 'not found',
+				count: design.bestRarityFound?.count ?? 99999999,
+			}
+		);
+
 		await db.transaction
-			.write(({ packs, users }) => [
+			.write(({ packs, users, cardDesigns }) => [
 				deletePack
 					? packs.delete({ packId: args.packId }).commit()
 					: packs
@@ -405,19 +435,35 @@ export async function openCardFromPack(args: {
 							.commit(),
 					]
 					: []),
+				...(updateRarity
+					? [
+						cardDesigns
+							.patch({ designId: args.designId })
+							.set({
+								bestRarityFound: {
+									rarityId: instance.rarityId,
+									rarityName: instance.rarityName,
+									count: instance.totalOfType,
+									frameUrl: instance.frameUrl,
+									rarityColor: instance.rarityColor,
+								},
+							})
+							.commit(),
+					]
+					: []),
 			])
 			.go();
 
 		return {
 			success: true,
-			card: card.data[0],
+			card: instance,
 		};
 	}
 
-	const userId = card.data[0].userId;
+	const userId = instance.userId;
 	if (!userId) throw new Error('Pack must include a user to be opened');
 
-	const packId = card.data[0].packId;
+	const packId = instance.packId;
 	const pack = await getPackById({ packId: packId });
 	const user = await getUser(userId);
 	if (!user) throw new Error('User not found');
@@ -426,12 +472,27 @@ export async function openCardFromPack(args: {
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
 	const deletePack = newCardDetails.every((c) => c.opened);
+	const isShitPack = deletePack ? newCardDetails.every((c) => c.totalOfType >= 50) : false;
+
+	const updateRarity = checkIsRarityBetter(
+		{ rarityId: instance.rarityId, count: instance.totalOfType },
+		{
+			rarityId: design.bestRarityFound?.rarityId ?? 'not found',
+			count: design.bestRarityFound?.count ?? 99999999,
+		}
+	);
 
 	const result = await db.transaction
-		.write(({ cardInstances, users, packs }) => [
+		.write(({ cardInstances, cardDesigns, users, packs }) => [
 			cardInstances
 				.patch(args)
-				.set({ openedAt: new Date().toISOString(), packId: undefined })
+				.set({
+					openedAt: new Date().toISOString(),
+					packId: undefined,
+					stamps: isShitPack
+						? [...(instance.stamps || []), 'shit-pack']
+						: instance.stamps,
+				})
 				.commit(),
 			users
 				.patch({ userId })
@@ -443,6 +504,22 @@ export async function openCardFromPack(args: {
 			deletePack
 				? packs.delete({ packId: packId }).commit()
 				: packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
+			...(updateRarity
+				? [
+					cardDesigns
+						.patch({ designId: args.designId })
+						.set({
+							bestRarityFound: {
+								rarityId: instance.rarityId,
+								rarityName: instance.rarityName,
+								count: instance.totalOfType,
+								frameUrl: instance.frameUrl,
+								rarityColor: instance.rarityColor,
+							},
+						})
+						.commit(),
+				]
+				: []),
 		])
 		.go();
 
@@ -498,17 +575,23 @@ export async function deletePackTypeById(args: { packTypeId: string }) {
 
 // DESIGN //
 export async function getAllCardDesigns() {
-	const result = await db.entities.cardDesigns.find({}).go();
-	return result.data;
+	const seasons = await getAllSeasons();
+	const results = await Promise.all(
+		seasons.map((season) =>
+			db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()
+		)
+	);
+	return results.flatMap((result) => result.data);
 }
 
 export async function getCardDesignById(args: { designId: string; userId: string }) {
 	const result = await db.entities.cardDesigns.query.byDesignId(args).go();
-	return result.data[0];
+	const design = result.data[0];
+	return design;
 }
 
 export async function getCardDesignAndInstancesById(args: { designId: string }) {
-	const result = await db.collections.designAndCards(args).go();
+	const result = await db.collections.designAndCards(args).go({ pages: 'all' });
 	return result.data;
 }
 
@@ -549,6 +632,12 @@ export async function createCardDesign(
 	}
 }
 
+export async function updateCardDesign(args: UpdateEntityItem<CardDesign> & { designId: string }) {
+	const { designId, ...rest } = args;
+	const result = await db.entities.cardDesigns.update({ designId }).set(rest).go();
+	return { success: true, data: result.data };
+}
+
 // UNMATCHED DESIGN IMAGES //
 export async function getUnmatchedDesignImages(type: EntityItem<UnmatchedImage>['type']) {
 	const result = await db.entities.unmatchedImages.query.byType({ type }).go();
@@ -570,8 +659,8 @@ export async function deleteUnmatchedDesignImage(args: {
 
 // SEASONS //
 export async function getAllSeasons() {
-	const result = await db.entities.season.query.allSeasons({}).go();
-	return result.data;
+	const result = await db.entities.season.query.allSeasons({}).go({ pages: 'all' });
+return result.data;
 }
 
 export async function getSeasonById(id: string) {
@@ -580,7 +669,7 @@ export async function getSeasonById(id: string) {
 }
 
 export async function getSeasonAndDesignsBySeasonId(id: string) {
-	const result = await db.collections.seasonAndDesigns({ seasonId: id }).go();
+	const result = await db.collections.seasonAndDesigns({ seasonId: id }).go({ pages: 'all' });
 	return result.data;
 }
 
