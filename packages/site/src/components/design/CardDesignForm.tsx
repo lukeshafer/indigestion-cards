@@ -1,4 +1,4 @@
-import { api } from '@/constants';
+import { API, routes } from '@/constants';
 import {
 	Checkbox,
 	Fieldset,
@@ -43,7 +43,10 @@ export default function CardDesignForm(props: {
 				/>
 				<DeleteImageButton key={props.key} type="cardDesign" />
 			</div>
-			<Form action={api.DESIGN} method="post">
+			<Form
+				action={API.DESIGN}
+				method="post"
+				successRedirect={`${routes.DESIGNS}?alert=Design%20created!&type=success`}>
 				<input type="hidden" name="imgUrl" value={props.imgUrl} />
 				<input type="hidden" name="imageKey" value={props.key} />
 				<Select
@@ -78,7 +81,11 @@ export default function CardDesignForm(props: {
 							/>
 						)}
 					</For>
-					<Checkbox label="Include full art card?" name="fullArt" value={isLegacy() ? false : undefined} />
+					<Checkbox
+						label="Include full art card?"
+						name="fullArt"
+						value={isLegacy() ? false : undefined}
+					/>
 					<Checkbox label="Legacy card?" name="legacy" setValue={setIsLegacy} />
 				</Fieldset>
 				<SubmitButton />

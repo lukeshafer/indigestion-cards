@@ -60,7 +60,6 @@ export function Form(props: {
 		const auth_token = localStorage.getItem('auth_token');
 		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
-			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				Authorization: auth_token ? `Bearer ${auth_token}` : '',

@@ -50,10 +50,6 @@ export function API({ app, stack }: StackContext) {
 			// IMAGES
 			'DELETE /delete-unmatched-image':
 				'packages/functions/src/admin-api/delete-unmatched-image.handler',
-			'DELETE /delete-rarity-frame':
-				'packages/functions/src/admin-api/delete-rarity-frame.handler',
-			'DELETE /delete-card-image':
-				'packages/functions/src/admin-api/delete-card-image.handler',
 			// ADMIN USER
 			'POST /admin-user': 'packages/functions/src/admin-api/admin-user/post.handler',
 			'DELETE /admin-user': 'packages/functions/src/admin-api/admin-user/delete.handler',
@@ -64,6 +60,10 @@ export function API({ app, stack }: StackContext) {
 			'DELETE /pack': 'packages/functions/src/admin-api/pack/delete.handler',
 			// CARD
 			'PATCH /card': 'packages/functions/src/admin-api/card/patch.handler',
+			// DESIGN
+			'POST /design': 'packages/functions/src/admin-api/design/post.handler',
+			'PATCH /design': 'packages/functions/src/admin-api/design/patch.handler',
+			'DELETE /design': 'packages/functions/src/admin-api/design/delete.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
