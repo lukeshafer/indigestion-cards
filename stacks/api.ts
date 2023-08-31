@@ -64,6 +64,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /design': 'packages/functions/src/admin-api/design/post.handler',
 			'PATCH /design': 'packages/functions/src/admin-api/design/patch.handler',
 			'DELETE /design': 'packages/functions/src/admin-api/design/delete.handler',
+			// SITE-CONFIG
+			'POST /site-config': 'packages/functions/src/admin-api/site-config/post.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',

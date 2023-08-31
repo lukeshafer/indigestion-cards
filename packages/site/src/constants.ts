@@ -20,6 +20,7 @@ const api_paths = {
 	PACK: '/pack',
 	CARD: '/card',
 	DESIGN: '/design',
+	SITE_CONFIG: '/site-config',
 } 
 
 export const API = new Proxy(api_paths, {
@@ -33,7 +34,6 @@ export const API = new Proxy(api_paths, {
 
 export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
-	SITE_CONFIG: '/api/admin/site-config',
 	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
 	IMAGE: {
 		DELETE: '/api/admin/image',

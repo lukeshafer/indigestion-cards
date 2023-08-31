@@ -1,4 +1,4 @@
-import { ApiHandler, useFormData, useCookies } from 'sst/node/api';
+import { ApiHandler, useFormData } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
 import { setAdminEnvSession } from './user';
 
@@ -44,6 +44,14 @@ export function useValidateFormData<SchemaToCheck extends Schema>(
 	const params = useFormData();
 	if (!params) return { success: false, errors: ['Missing form data.'] };
 
+	return validateSearchParams(params, schema);
+}
+
+export function validateSearchParams<SchemaToCheck extends Schema>(
+	params: URLSearchParams,
+	schema: SchemaToCheck
+): Result<SchemaToCheck> {
+	console.log('Validating search params', { params, schema });
 	const result: Record<string, Types[SchemaType] | undefined> = {};
 	const errors: string[] = [];
 	for (const key in schema) {
@@ -68,7 +76,11 @@ export function useValidateFormData<SchemaToCheck extends Schema>(
 		}
 	}
 
-	if (errors.length) return { success: false, errors };
+	if (errors.length) {
+		console.log('Validation failed', { errors });
+		return { success: false, errors };
+	}
+	console.log('Validation succeeded', { result });
 	return { success: true, value: result as ParsedOutput<SchemaToCheck> };
 }
 
@@ -97,10 +109,10 @@ function parseType<TypeToCheck extends SchemaType>(
 
 export const ProtectedApiHandler: typeof ApiHandler = (callback) => {
 	return ApiHandler(async (...args) => {
-		console.log('Cookies: ', useCookies());
+		console.log('Checking session');
 		const session = useSession();
 		if (session.type !== 'admin') {
-			console.log('Session: ', session);
+			console.log('Unauthorized', { session });
 			return {
 				statusCode: 401,
 				body: 'Unauthorized',
