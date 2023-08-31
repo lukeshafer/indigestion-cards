@@ -21,6 +21,9 @@ const api_paths = {
 	CARD: '/card',
 	DESIGN: '/design',
 	SITE_CONFIG: '/site-config',
+	UNMATCHED_IMAGE: '/unmatched-image',
+	PACK_COUNT: '/pack-count',
+	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
 } 
 
 export const API = new Proxy(api_paths, {
@@ -31,15 +34,6 @@ export const API = new Proxy(api_paths, {
 		return base ? base + path : path;
 	},
 });
-
-export const api = {
-	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
-	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
-	IMAGE: {
-		DELETE: '/api/admin/image',
-	},
-	PACK_COUNT: '/api/admin/pack-count',
-} as const;
 
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',
@@ -101,7 +95,6 @@ export const routeNames = {
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
-export const HTML_API_PATH = '/api/html';
 export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';
 export const NO_CARDS_OPENED_ID = 'no-cards-opened';

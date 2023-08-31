@@ -47,9 +47,6 @@ export function API({ app, stack }: StackContext) {
 			// RARITY
 			'POST /rarity': 'packages/functions/src/admin-api/rarity/post.handler',
 			'DELETE /rarity': 'packages/functions/src/admin-api/rarity/delete.handler',
-			// IMAGES
-			'DELETE /delete-unmatched-image':
-				'packages/functions/src/admin-api/delete-unmatched-image.handler',
 			// ADMIN USER
 			'POST /admin-user': 'packages/functions/src/admin-api/admin-user/post.handler',
 			'DELETE /admin-user': 'packages/functions/src/admin-api/admin-user/delete.handler',
@@ -66,14 +63,19 @@ export function API({ app, stack }: StackContext) {
 			'DELETE /design': 'packages/functions/src/admin-api/design/delete.handler',
 			// SITE-CONFIG
 			'POST /site-config': 'packages/functions/src/admin-api/site-config/post.handler',
+			// UNMATCHED IMAGE
+			'DELETE /unmatched-image':
+				'packages/functions/src/admin-api/unmatched-image/delete.handler',
+			// PACK COUNT
+			'GET /pack-count': 'packages/functions/src/admin-api/pack-count/get.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
-						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				  }
+					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+				}
 				: {}),
 		},
 		defaults: {
@@ -106,10 +108,10 @@ export function API({ app, stack }: StackContext) {
 			app.mode === 'dev'
 				? undefined
 				: {
-						domainName: `api.${baseDomain}`,
-						path: API_VERSION,
-						hostedZone: hostedZone,
-				  },
+					domainName: `api.${baseDomain}`,
+					path: API_VERSION,
+					hostedZone: hostedZone,
+				},
 	});
 
 	stack.addOutputs({

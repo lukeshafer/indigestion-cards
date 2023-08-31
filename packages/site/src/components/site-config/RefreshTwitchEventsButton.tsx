@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js';
 import { Form, SubmitButton } from '../form/Form';
-import { api } from '../../constants';
+import { API } from '../../constants';
 
 export default function RefreshTwitchEventsButton() {
 	const [buttonText, setButtonText] = createSignal('Refresh Twitch Events');
@@ -9,7 +9,13 @@ export default function RefreshTwitchEventsButton() {
 	const refreshTwitchEvents = async () => {
 		setIsDisabled(true);
 		setButtonText('Refreshing...');
-		const response = await fetch(api.REFRESH_TWITCH_EVENTS, { method: 'POST' });
+		const auth_token = localStorage.getItem('auth_token') || '';
+		const response = await fetch(API.REFRESH_TWITCH_EVENTS, {
+			method: 'POST',
+			headers: {
+				Authorization: auth_token ? `Bearer ${auth_token}` : '',
+			},
+		});
 
 		if (!response.ok) {
 			setButtonText('Error refreshing Twitch events');
