@@ -18,6 +18,7 @@ const api_paths = {
 	RARITY: '/rarity',
 	ADMIN_USER: '/admin-user',
 	PACK: '/pack',
+	CARD: '/card',
 } 
 
 export const API = new Proxy(api_paths, {
@@ -33,7 +34,6 @@ export const api = {
 	GET_PACK_TO_OPEN: '/api/html/get-pack-to-open',
 	SITE_CONFIG: '/api/admin/site-config',
 	REFRESH_TWITCH_EVENTS: '/api/admin/refresh-twitch-event-subscriptions?fetch=true',
-	CARD: '/api/admin/card',
 	DESIGN: '/api/admin/design',
 	IMAGE: {
 		DELETE: '/api/admin/image',

@@ -62,6 +62,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /pack': 'packages/functions/src/admin-api/pack/post.handler',
 			'PATCH /pack': 'packages/functions/src/admin-api/pack/patch.handler',
 			'DELETE /pack': 'packages/functions/src/admin-api/pack/delete.handler',
+			// CARD
+			'PATCH /card': 'packages/functions/src/admin-api/card/patch.handler',
 			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
@@ -93,9 +95,8 @@ export function API({ app, stack }: StackContext) {
 			},
 		},
 		cors: {
-			allowCredentials: true,
 			allowHeaders: ['content-type', 'authorization'],
-			allowMethods: ['DELETE', 'POST', 'GET', 'PUT', 'PATCH'],
+			allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 			allowOrigins:
 				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
 		},

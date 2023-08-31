@@ -1,6 +1,6 @@
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
 import { For, Show, createEffect, createRenderEffect, createSignal } from 'solid-js';
-import { api, routes } from '@/constants';
+import { API, routes } from '@/constants';
 import Card from '@/components/cards/Card';
 import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
@@ -320,7 +320,7 @@ function PackShowcase(props: {
 			</div>
 			<ul
 				style={{ gap: `${props.cardScale}rem` }}
-				classList={{ 'blur' : !!props.previewedCardId }}
+				classList={{ blur: !!props.previewedCardId }}
 				class="flex w-full flex-wrap items-center justify-center transition-[filter]"
 				ref={animateCardList}>
 				<For each={sortedCardDetails()}>
@@ -363,10 +363,15 @@ function ShowcaseCard(props: {
 			packId: props.packId,
 		}).toString();
 
+		const auth_token = localStorage.getItem('auth_token');
 		props.isTesting
 			? console.log('Card flipped: ', body)
-			: await fetch(api.CARD, {
+			: await fetch(API.CARD, {
 					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: auth_token ? `Bearer ${auth_token}` : '',
+					},
 					body,
 			  });
 	};
@@ -398,9 +403,7 @@ function ShowcaseCard(props: {
 					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
-					<button
-						class="block origin-top-left"
-						onClick={previewCard}>
+					<button class="block origin-top-left" onClick={previewCard}>
 						{props.isPreviewed ? (
 							<CardPreview close={closePreview}>
 								<Card {...props.card} scale={props.scale * 1.5} />
