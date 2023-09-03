@@ -24,8 +24,8 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1(prettier-plugin-astro@0.11.0)(prettier@3.0.0)
       sst:
-        specifier: 2.24.21
-        version: 2.24.21
+        specifier: 2.24.23
+        version: 2.24.23
       typescript:
         specifier: ^5.0.3
         version: 5.0.3
@@ -55,8 +55,8 @@ importers:
         specifier: ^18.15.11
         version: 18.15.11
       sst:
-        specifier: 2.24.21
-        version: 2.24.21
+        specifier: 2.24.23
+        version: 2.24.23
       vitest:
         specifier: ^0.29.8
         version: 0.29.8
@@ -86,8 +86,8 @@ importers:
         specifier: ^18.15.11
         version: 18.15.11
       sst:
-        specifier: 2.24.21
-        version: 2.24.21
+        specifier: 2.24.23
+        version: 2.24.23
 
   packages/site:
     dependencies:
@@ -116,8 +116,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0
       astro-sst:
-        specifier: 2.24.21
-        version: 2.24.21
+        specifier: 2.24.23
+        version: 2.24.23
       electrodb:
         specifier: ^2.5.1
         version: 2.5.1(@aws-sdk/client-dynamodb@3.398.0)(@aws-sdk/types@3.398.0)
@@ -131,8 +131,8 @@ importers:
         specifier: ^1.4.3
         version: 1.7.8
       sst:
-        specifier: 2.24.21
-        version: 2.24.21
+        specifier: 2.24.23
+        version: 2.24.23
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3
@@ -2101,6 +2101,9 @@ packages:
       '@babel/helper-validator-identifier': 7.22.5
       to-fast-properties: 2.0.0
 
+  /@balena/dockerignore@1.0.2:
+    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
+
   /@emmetio/abbreviation@2.3.3:
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
     dependencies:
@@ -4001,8 +4004,8 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /astro-sst@2.24.21:
-    resolution: {integrity: sha512-GbizlsAQ8dtNGmdtOQoF5v0pJSXNSgcQCGXzZmX+xIU6SDMVEIYMdJ/lb9Oji6biruaAr4RMVuGdmhUKTlH1CA==}
+  /astro-sst@2.24.23:
+    resolution: {integrity: sha512-h57MyfjmVBjdrIAJalfWLimHydUHGn+kasW+J1GX+66geXlxMAA+TquVrUhwjuEP5Fx68hjAedPH1AUpd1/Dig==}
     dependencies:
       '@astrojs/webapi': 2.2.0
       set-cookie-parser: 2.6.0
@@ -4134,7 +4137,17 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.200
       '@aws-cdk/asset-kubectl-v20': 2.1.2
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.166
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.2.69
+      fs-extra: 11.1.1
+      ignore: 5.2.4
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.3.0
+      semver: 7.5.4
+      table: 6.8.1
+      yaml: 1.10.2
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -4178,21 +4191,6 @@ packages:
       - bufferutil
       - supports-color
       - utf-8-validate
-
-  /aws-sdk@2.1420.0:
-    resolution: {integrity: sha512-BvGzkKGgOXNj9WAeazvOLu48sCbU52mKLGIY5AjBKX4EuY8APcKKvl1R54kdUoJDnMwv0HwQpGvrVvLTDdOv/A==}
-    engines: {node: '>= 10.0.0'}
-    dependencies:
-      buffer: 4.9.2
-      events: 1.1.1
-      ieee754: 1.1.13
-      jmespath: 0.16.0
-      querystring: 0.2.0
-      sax: 1.2.1
-      url: 0.10.3
-      util: 0.12.5
-      uuid: 8.0.0
-      xml2js: 0.5.0
 
   /aws-sdk@2.1449.0:
     resolution: {integrity: sha512-3AXg7S8mhOhUQDaqE8CpbkvRXCvVhzoLAGJ0Ngv7a6/m3JoZkGx7115HHcbiIqR13/AtMyid8MjIVHP0DPdwHw==}
@@ -4449,6 +4447,10 @@ packages:
 
   /caniuse-lite@1.0.30001517:
     resolution: {integrity: sha512-Vdhm5S11DaFVLlyiKu4hiUTkpZu+y1KA/rZZqVQfOD5YdDT/eQKlkt7NaE0WGOFgX32diqt9MiP9CAiFeRklaA==}
+
+  /case@1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
 
   /ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -5417,6 +5419,14 @@ packages:
   /fs-constants@1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
 
+  /fs-extra@11.1.1:
+    resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
+    engines: {node: '>=14.14'}
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+
   /fs-extra@5.0.0:
     resolution: {integrity: sha512-66Pm4RYbjzdyeuqudYqhFiNBbCIuI9kgRqLPSHIlXHidW8NIQtVdkM1yeZ4lXwuhbTETv3EUGMNHAAw6hiundQ==}
     dependencies:
@@ -5763,6 +5773,10 @@ packages:
   /ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
+  /ignore@5.2.4:
+    resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
+    engines: {node: '>= 4'}
+
   /immer@9.0.21:
     resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
 
@@ -6082,6 +6096,9 @@ packages:
   /jsonschema@1.2.7:
     resolution: {integrity: sha512-3dFMg9hmI9LdHag/BRIhMefCfbq1hicvYMy8YhZQorAdzOzWz7NjniSpn39yjpzUAMIWtGyyZuH2KNBloH7ZLw==}
     dev: false
+
+  /jsonschema@1.4.1:
+    resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
 
   /kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -7990,8 +8007,8 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.24.21:
-    resolution: {integrity: sha512-xFAT/9pRAhkA9xOWKD/AbQ/Ip1QZvrtPglHWgI9ooPjFJL7Kn85sPWHyGxw0f3StQ/F2KeuBdeaBr37R6scf6Q==}
+  /sst@2.24.23:
+    resolution: {integrity: sha512-TGhJ17icl0oT98FgKSEMNVxkadDmQVG6SnFbMUeBglfAjU1ixUvwSiCsSpIo9lgAvP4yR1xkJ6EpI2WzD0Sz2Q==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0
@@ -8031,7 +8048,7 @@ packages:
       adm-zip: 0.5.10
       aws-cdk-lib: 2.91.0(constructs@10.2.69)
       aws-iot-device-sdk: 2.2.12
-      aws-sdk: 2.1420.0
+      aws-sdk: 2.1449.0
       builtin-modules: 3.2.0
       cdk-assets: 2.91.0
       chalk: 5.3.0
