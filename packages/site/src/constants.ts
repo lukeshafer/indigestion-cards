@@ -24,14 +24,13 @@ const api_paths = {
 	UNMATCHED_IMAGE: '/unmatched-image',
 	PACK_COUNT: '/pack-count',
 	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
-} 
+};
 
 export const API = new Proxy(api_paths, {
 	get: (target, prop) => {
 		if (!(prop in target)) return undefined;
 		const path = target[prop as keyof typeof target];
-		const base = localStorage.getItem('api_url');
-		return base ? base + path : path;
+		return '/api/admin' + path;
 	},
 });
 
