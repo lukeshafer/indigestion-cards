@@ -1,5 +1,5 @@
 import { DeleteButton, Form } from '@/components/form/Form';
-import { api } from '@/constants';
+import { API, routes } from '@/constants';
 
 export default function DeleteDesignButton(props: {
 	designId: string;
@@ -8,9 +8,10 @@ export default function DeleteDesignButton(props: {
 }) {
 	return (
 		<Form
-			action={api.DESIGN}
+			action={API.DESIGN}
 			method="delete"
-			confirm="Are you sure you want to delete this card?">
+			confirm="Are you sure you want to delete this card?"
+			successRedirect={`${routes.DESIGNS}?alert=Card%20deleted!&type=success`}>
 			<input type="hidden" name="designId" value={props.designId} />
 			<input type="hidden" name="imgUrl" value={props.imgUrl} />
 			<input type="hidden" name="cardName" value={props.cardName} />

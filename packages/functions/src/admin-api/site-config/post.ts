@@ -1,32 +1,29 @@
-import type { APIRoute } from 'astro';
-import { z } from 'astro/zod';
+import { validateSearchParams, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
+import { useFormData } from 'sst/node/api';
+import { z } from 'zod';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import { updateBatchTwitchEvents, updateSiteConfig } from '@lil-indigestion-cards/core/site-config';
 
-export const post: APIRoute = async (ctx) => {
-	const params = new URLSearchParams(await ctx.request.text());
+export const handler = ProtectedApiHandler(async () => {
+	const params = useFormData();
 
-	const rarity = new URLSearchParams(params.get('base-rarity') || '');
-	const rarityId = rarity.get('rarityId');
-	if (!rarityId) return new Response('Missing rarityId', { status: 400 });
-	const rarityName = rarity.get('rarityName');
-	if (!rarityName) return new Response('Missing rarityName', { status: 400 });
-	const frameUrl = rarity.get('frameUrl');
-	if (!frameUrl) return new Response('Missing frameUrl', { status: 400 });
-	const rarityColor = rarity.get('rarityColor');
-	if (!rarityColor) return new Response('Missing rarityColor', { status: 400 });
+	const rarity = new URLSearchParams(params?.get('base-rarity') ?? '');
 
-	const rarityObject = {
-		rarityId,
-		rarityName,
-		frameUrl,
-		rarityColor,
-	};
+	const validationResult = validateSearchParams(rarity, {
+		rarityId: 'string',
+		rarityName: 'string',
+		frameUrl: 'string',
+		rarityColor: 'string',
+	});
+
+	if (!validationResult.success)
+		return { statusCode: 400, body: validationResult.errors.join(' ') };
+	const rarityObject = validationResult.value;
 
 	type Event = Parameters<typeof updateBatchTwitchEvents>[0][number];
 
 	const events: Event[] = [];
-	params.forEach((value, key) => {
+	params?.forEach((value, key) => {
 		if (key.startsWith('event-type-')) {
 			const eventId = key.replace('event-type-', '');
 			const { packTypeId, packTypeName } = parseEventValue(value);
@@ -48,8 +45,8 @@ export const post: APIRoute = async (ctx) => {
 
 	await Promise.all([siteConfig, batchTwitchEvents]);
 
-	return new Response('Site config saved.', { status: 200 });
-};
+	return { statusCode: 200, body: 'Site config saved.' };
+});
 
 function parseEventValue(value: any): {
 	packTypeId: string | undefined;

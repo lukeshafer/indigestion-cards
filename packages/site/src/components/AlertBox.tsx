@@ -1,9 +1,9 @@
-import { For, onMount } from 'solid-js';
+import { For, createEffect, onMount } from 'solid-js';
 import { alerts, setAlerts, type Alert } from '@/lib/client/state';
 import { useViewTransition } from '@/lib/client/utils';
 
 export default function AlertBox(props: { alerts: Alert[] }) {
-	setAlerts(props.alerts);
+	createEffect(() => setAlerts(props.alerts));
 
 	return (
 		<div>
@@ -28,9 +28,7 @@ function Alert(
 		setAlerts((alerts) => alerts.filter((_, i) => i !== props.index));
 	};
 	return (
-		<div
-			class="flex items-center gap-x-5 p-4"
-			classList={{ [alertStyles[props.type]]: true }}>
+		<div class="flex items-center gap-x-5 p-4" classList={{ [alertStyles[props.type]]: true }}>
 			<button onclick={() => useViewTransition(deleteAlert)}>
 				<span class="opacity-50">✕</span>
 			</button>

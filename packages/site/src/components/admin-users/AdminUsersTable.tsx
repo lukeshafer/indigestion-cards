@@ -3,7 +3,7 @@ import type { AdminEntity } from '@lil-indigestion-cards/core/user';
 import DeleteAdminUserButton from '@/components/admin-users/DeleteAdminUserButton';
 import { addingAdminUser, setAddingAdminUser } from '@/lib/client/state';
 import { createResource, createSignal } from 'solid-js';
-import { api } from '@/constants';
+import { API } from '@/constants';
 import { z } from 'astro/zod';
 import { TextInput, SubmitButton, Form } from '@/components/form/Form';
 
@@ -26,7 +26,11 @@ export function AddAdminButton() {
 export default function AdminUsersTable(props: { users: AdminEntity[]; currentUser: string }) {
 	const [adminUsers, { refetch }] = createResource(
 		async () => {
-			const res = await fetch(api.ADMIN.GET_ALL);
+			const res = await fetch(API.ADMIN_USER, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+				},
+			});
 			const data = await res.json();
 			return adminUsersSchema.parse(data);
 		},
@@ -41,7 +45,7 @@ export default function AdminUsersTable(props: { users: AdminEntity[]; currentUs
 		actions: (
 			<div class="mx-auto w-fit">
 				<Form
-					action={api.ADMIN.CREATE}
+					action={API.ADMIN_USER}
 					method="post"
 					onsuccess={() => {
 						refetch();

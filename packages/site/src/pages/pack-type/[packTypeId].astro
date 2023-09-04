@@ -6,6 +6,7 @@ import Page from '@/layouts/Page.astro';
 import { getPackTypeById } from '@lil-indigestion-cards/core/card';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
 import Table from '@/components/table/Table';
+import { Api } from 'sst/node/api';
 
 const packTypeId = Astro.params.packTypeId;
 if (!packTypeId) {
@@ -26,7 +27,7 @@ const cardPool = await getCardPoolFromType(packType);
 		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
 	]}>
 	<PageTitle>{packType.packTypeName}</PageTitle>
-	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
+	<DeletePackTypeButton packTypeId={packType.packTypeId} apiUrl={Api.api.url} client:load />
 	<section aria-label="Card Pool" class="mt-4 flex flex-col gap-4 max-w-2xl mx-auto">
 		<Heading>Card Pool</Heading>
 		<Table

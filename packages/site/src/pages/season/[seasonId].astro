@@ -9,6 +9,7 @@ import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import { routeNames, routes } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
+import { Api } from 'sst/node/api';
 
 const id = Astro.params.seasonId;
 
@@ -82,7 +83,8 @@ const {
 		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
 		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
 		<p class="ml-4">
-			<b>Percentage distributed:</b> {percentageDistributed}%
+			<b>Percentage distributed:</b>
+			{percentageDistributed}%
 		</p>
 
 		<div class="ml-4 mt-4">
@@ -122,5 +124,5 @@ const {
 		client:load
 	/>
 
-	<DeleteSeasonButton seasonId={season.seasonId} client:load />
+	<DeleteSeasonButton seasonId={season.seasonId} apiUrl={Api.api.url} client:load />
 </Page>

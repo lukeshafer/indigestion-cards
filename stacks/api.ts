@@ -4,7 +4,7 @@ import { Events } from './events';
 import { DesignBucket } from './bucket';
 import { ConfigStack } from './config';
 import { Auth } from './auth';
-import { API_VERSION, HOSTED_ZONE, getDomainName } from './constants';
+import { API_VERSION, getHostedZone, getDomainName } from './constants';
 
 export function API({ app, stack }: StackContext) {
 	const table = use(Database);
@@ -13,6 +13,7 @@ export function API({ app, stack }: StackContext) {
 	const config = use(ConfigStack);
 	const { siteAuth } = use(Auth);
 
+	const hostedZone = getHostedZone(app.stage);
 	const baseDomain = getDomainName(app.stage);
 
 	const twitchApi = new Api(stack, 'twitchApi', {
@@ -36,12 +37,38 @@ export function API({ app, stack }: StackContext) {
 
 	const api = new Api(stack, 'api', {
 		routes: {
-			'DELETE /delete-unmatched-image':
-				'packages/functions/src/admin-api/delete-unmatched-image.handler',
-			'DELETE /delete-rarity-frame':
-				'packages/functions/src/admin-api/delete-rarity-frame.handler',
-			'DELETE /delete-card-image':
-				'packages/functions/src/admin-api/delete-card-image.handler',
+			// PACK TYPE
+			'POST /pack-type': 'packages/functions/src/admin-api/pack-type/post.handler',
+			'DELETE /pack-type': 'packages/functions/src/admin-api/pack-type/delete.handler',
+			// SEASON
+			'POST /season': 'packages/functions/src/admin-api/season/post.handler',
+			'DELETE /season': 'packages/functions/src/admin-api/season/delete.handler',
+			'PATCH /season': 'packages/functions/src/admin-api/season/patch.handler',
+			// RARITY
+			'POST /rarity': 'packages/functions/src/admin-api/rarity/post.handler',
+			'DELETE /rarity': 'packages/functions/src/admin-api/rarity/delete.handler',
+			// ADMIN USER
+			'POST /admin-user': 'packages/functions/src/admin-api/admin-user/post.handler',
+			'DELETE /admin-user': 'packages/functions/src/admin-api/admin-user/delete.handler',
+			'GET /admin-user': 'packages/functions/src/admin-api/admin-user/get.handler',
+			// PACK
+			'POST /pack': 'packages/functions/src/admin-api/pack/post.handler',
+			'PATCH /pack': 'packages/functions/src/admin-api/pack/patch.handler',
+			'DELETE /pack': 'packages/functions/src/admin-api/pack/delete.handler',
+			// CARD
+			'PATCH /card': 'packages/functions/src/admin-api/card/patch.handler',
+			// DESIGN
+			'POST /design': 'packages/functions/src/admin-api/design/post.handler',
+			'PATCH /design': 'packages/functions/src/admin-api/design/patch.handler',
+			'DELETE /design': 'packages/functions/src/admin-api/design/delete.handler',
+			// SITE-CONFIG
+			'POST /site-config': 'packages/functions/src/admin-api/site-config/post.handler',
+			// UNMATCHED IMAGE
+			'DELETE /unmatched-image':
+				'packages/functions/src/admin-api/unmatched-image/delete.handler',
+			// PACK COUNT
+			'GET /pack-count': 'packages/functions/src/admin-api/pack-count/get.handler',
+			// OTHER
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
@@ -72,9 +99,8 @@ export function API({ app, stack }: StackContext) {
 			},
 		},
 		cors: {
-			allowCredentials: false,
-			allowHeaders: ['content-type'],
-			allowMethods: ['ANY'],
+			allowHeaders: ['content-type', 'authorization'],
+			allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 			allowOrigins:
 				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
 		},
@@ -84,7 +110,7 @@ export function API({ app, stack }: StackContext) {
 				: {
 					domainName: `api.${baseDomain}`,
 					path: API_VERSION,
-					hostedZone: HOSTED_ZONE,
+					hostedZone: hostedZone,
 				},
 	});
 
