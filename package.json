@@ -12,12 +12,12 @@
     "typecheck": "tsc --noEmit",
     "core:check": "pnpm --filter core run typecheck",
     "functions:check": "pnpm --filter functions run typecheck",
-    "site:check": "pnpm --filter admin-site run typecheck",
-    "admin:add": "pnpm --filter admin-site run astro add",
-    "admin:dev": "pnpm --filter admin-site run dev",
-    "admin:dev:host": "pnpm --filter admin-site run dev:host",
-    "admin:build": "pnpm --filter admin-site run build",
-    "admin:astro": "pnpm --filter admin-site run astro"
+    "site:check": "pnpm --filter site run typecheck",
+    "site:add": "pnpm --filter site run astro add",
+    "site:dev": "pnpm --filter site run dev",
+    "site:dev:host": "pnpm --filter site run dev:host",
+    "site:build": "pnpm --filter site run build",
+    "site:astro": "pnpm --filter site run astro"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",

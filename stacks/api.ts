@@ -35,7 +35,7 @@ export function API({ app, stack }: StackContext) {
 		},
 	});
 
-	const api = new Api(stack, 'api', {
+	const adminApi = new Api(stack, 'AdminApi', {
 		routes: {
 			// PACK TYPE
 			'POST /pack-type': 'packages/functions/src/admin-api/pack-type/post.handler',
@@ -115,9 +115,9 @@ export function API({ app, stack }: StackContext) {
 	});
 
 	stack.addOutputs({
-		ApiEndpoint: api.url,
+		ApiEndpoint: adminApi.url,
 		TwitchApiEndpoint: twitchApi.url,
 	});
 
-	return { api, twitchApi };
+	return { adminApi, twitchApi };
 }

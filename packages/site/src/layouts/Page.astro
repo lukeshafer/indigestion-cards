@@ -31,7 +31,7 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" id="page-layout-wrapper" data-api-url={Api.api.url}>
+	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" id="page-layout-wrapper" data-api-url={Api.AdminApi.url}>
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
