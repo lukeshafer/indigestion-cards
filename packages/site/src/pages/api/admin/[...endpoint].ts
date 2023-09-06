@@ -4,7 +4,7 @@ import { Api } from 'sst/node/api';
 
 // Re-route all API requests to the API server
 export const all: APIRoute = async (ctx) => {
-	const route = `${Api.AdminApi.url}/${ctx.params.endpoint}`;
+	const route = `${Api.AdminApi.url}/${ctx.params.endpoint}${ctx.url.search}`;
 	const token = ctx.cookies.get(AUTH_TOKEN);
 
 	console.log('Fetching from API: ', ctx.params.endpoint);
