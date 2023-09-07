@@ -298,7 +298,7 @@ export async function createPack(args: {
 		cardPool: undefined,
 	})
 
-	await db.transaction
+	const result = await db.transaction
 		.write(({ users, packs, cardInstances }) => [
 			...(user && args.userId && args.username
 				? [
@@ -334,6 +334,8 @@ export async function createPack(args: {
 			...cards.map((card) => cardInstances.create(card).commit()),
 		])
 		.go();
+
+	console.log(result)
 }
 
 interface RarityForComparison {
