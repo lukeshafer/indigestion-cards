@@ -1,10 +1,19 @@
+import {
+	For,
+	Show,
+	createEffect,
+	createRenderEffect,
+	createResource,
+	createSignal,
+} from 'solid-js';
+import { createStore, produce } from 'solid-js/store';
+import { createAutoAnimate } from '@formkit/auto-animate/solid';
+
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
-import { For, Show, createEffect, createRenderEffect, createSignal } from 'solid-js';
+
 import { API, routes } from '@/constants';
 import Card from '@/components/cards/Card';
-import { createStore, produce } from 'solid-js/store';
 import { setTotalPackCount } from '@/lib/client/state';
-import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
@@ -86,6 +95,9 @@ export default function OpenPacks(props: {
 					scale={state.cardScale}
 					setScale={(newScale: number) => setState('cardScale', newScale)}
 				/>
+			</div>
+			<div>
+				<Statistics activePack={state.activePack}></Statistics>
 			</div>
 			{props.canTest ? (
 				<>
@@ -367,13 +379,13 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						Authorization: auth_token ? `Bearer ${auth_token}` : '',
-					},
-					body,
-			  });
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					Authorization: auth_token ? `Bearer ${auth_token}` : '',
+				},
+				body,
+			});
 	};
 
 	const previewCard = () => {
@@ -415,5 +427,66 @@ function ShowcaseCard(props: {
 				</div>
 			</div>
 		</li>
+	);
+}
+
+function Statistics(props: { activePack: PackEntity | null }) {
+	const state = () => ({
+		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened),
+		cardsOpenedCount: props.activePack?.cardDetails.filter((card) => card.opened).length || 0,
+		totalCardCount: props.activePack?.cardDetails.length,
+		packTypeId: props.activePack?.packTypeId,
+		packId: props.activePack?.packId,
+	});
+
+	const [resource, { mutate, refetch }] = createResource(state, async (state) => {
+		console.log('fetching stats');
+		if (!state.totalCardCount || !state.packId) {
+			console.log('no stats to fetch');
+			return { shitPackOdds: 0 };
+		}
+
+		if (state.cardsOpened?.some((card) => card.totalOfType < 50))
+			// can't be a shit pack if any opened cards are not bronze
+			return { shitPackOdds: 0 };
+
+		const searchParams = new URLSearchParams({
+			remainingCardCount: (state.totalCardCount - state.cardsOpenedCount).toString(),
+			packTypeId: state.packTypeId || '0',
+		});
+
+		const body = await fetch(API.STATS + `?${searchParams.toString()}`).then((res) => {
+			return res.text();
+		});
+
+		console.log(body);
+		const json = JSON.parse(body);
+
+		return {
+			shitPackOdds: Number(json.shitPackOdds) || 0,
+		};
+	});
+
+	return (
+		<div>
+			<p>
+				Shit pack odds:{' '}
+				{resource.loading ? (
+					<span class="text-gray-500">Calculating...</span>
+				) : (
+					<Percentage value={resource()?.shitPackOdds || 0} />
+				)}
+			</p>
+		</div>
+	);
+}
+
+function Percentage(props: { value: number }) {
+	const formatted = () => `${Math.floor(props.value * 10000) / 100}%`;
+
+	return (
+		<div class="inline-flex items-center">
+			{formatted()} {props.value > 0.5 ? <img src="/lilindPB.gif" /> : null}
+		</div>
 	);
 }

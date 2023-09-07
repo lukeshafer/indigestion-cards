@@ -72,6 +72,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
+			// STATS
+			'GET /stats': 'packages/functions/src/admin-api/stats.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
