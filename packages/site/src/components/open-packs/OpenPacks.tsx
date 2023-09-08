@@ -5,6 +5,7 @@ import {
 	createRenderEffect,
 	createResource,
 	createSignal,
+	onMount,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -95,9 +96,6 @@ export default function OpenPacks(props: {
 					scale={state.cardScale}
 					setScale={(newScale: number) => setState('cardScale', newScale)}
 				/>
-			</div>
-			<div>
-				<Statistics activePack={state.activePack}></Statistics>
 			</div>
 			{props.canTest ? (
 				<>
@@ -349,6 +347,7 @@ function PackShowcase(props: {
 					)}
 				</For>
 			</ul>
+			<Statistics activePack={props.pack}></Statistics>
 			<div id="card-preview"></div>
 		</div>
 	);
@@ -379,13 +378,13 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: auth_token ? `Bearer ${auth_token}` : '',
-				},
-				body,
-			});
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: auth_token ? `Bearer ${auth_token}` : '',
+					},
+					body,
+			  });
 	};
 
 	const previewCard = () => {
@@ -432,17 +431,25 @@ function ShowcaseCard(props: {
 
 function Statistics(props: { activePack: PackEntity | null }) {
 	const state = () => ({
-		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened),
+		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened === true),
 		cardsOpenedCount: props.activePack?.cardDetails.filter((card) => card.opened).length || 0,
 		totalCardCount: props.activePack?.cardDetails.length,
 		packTypeId: props.activePack?.packTypeId,
 		packId: props.activePack?.packId,
 	});
 
+	const [isShitpackVisible, setIsShitpackVisible] = createSignal(false);
+
+	onMount(() => {
+		setIsShitpackVisible(localStorage.getItem('isShitpackVisible') === 'true');
+	});
+
+	createEffect(() => {
+		localStorage.setItem('isShitpackVisible', isShitpackVisible() ? 'true' : 'false');
+	});
+
 	const [resource, { mutate, refetch }] = createResource(state, async (state) => {
-		console.log('fetching stats');
 		if (!state.totalCardCount || !state.packId) {
-			console.log('no stats to fetch');
 			return { shitPackOdds: 0 };
 		}
 
@@ -450,10 +457,18 @@ function Statistics(props: { activePack: PackEntity | null }) {
 			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 
+		if (state.cardsOpenedCount === state.totalCardCount)
+			// returning a timeout to make sure the card is flipped before we see this number (for suspense)
+			return new Promise<{ shitPackOdds: number }>((res) =>
+				setTimeout(() => res({ shitPackOdds: 1 }), 500)
+			);
+
 		const searchParams = new URLSearchParams({
 			remainingCardCount: (state.totalCardCount - state.cardsOpenedCount).toString(),
 			packTypeId: state.packTypeId || '0',
 		});
+
+		console.log(searchParams.toString());
 
 		const body = await fetch(API.STATS + `?${searchParams.toString()}`).then((res) => {
 			return res.text();
@@ -468,16 +483,31 @@ function Statistics(props: { activePack: PackEntity | null }) {
 	});
 
 	return (
-		<div>
-			<p>
-				Shit pack odds:{' '}
-				{resource.loading ? (
-					<span class="text-gray-500">Calculating...</span>
-				) : (
-					<Percentage value={resource()?.shitPackOdds || 0} />
-				)}
-			</p>
-		</div>
+		<Show when={state().totalCardCount}>
+			<div class="group m-6 flex h-10 items-center gap-2">
+				<p
+					class="text-xl transition-opacity"
+					classList={{
+						'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100':
+							!isShitpackVisible(),
+					}}>
+					Shit pack:{' '}
+					{resource.loading ? (
+						<span class="text-gray-500">Calculating...</span>
+					) : (
+						<Percentage value={resource.latest?.shitPackOdds || 0} />
+					)}
+				</p>
+				<div class="cursor-pointer opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+					<Checkbox
+						value={isShitpackVisible()}
+						setValue={setIsShitpackVisible}
+						label=""
+						name="shit-pack-chances"
+					/>
+				</div>
+			</div>
+		</Show>
 	);
 }
 
@@ -485,8 +515,9 @@ function Percentage(props: { value: number }) {
 	const formatted = () => `${Math.floor(props.value * 10000) / 100}%`;
 
 	return (
-		<div class="inline-flex items-center">
-			{formatted()} {props.value > 0.5 ? <img src="/lilindPB.gif" /> : null}
+		<div class="inline-flex items-center gap-2">
+			{formatted()}{' '}
+			{props.value > 0.5 && props.value !== 1 ? <img src="/lilindPB.gif" width="30" /> : null}
 		</div>
 	);
 }
