@@ -126,6 +126,13 @@ export default function OpenPacks(props: {
 					cardScale={state.cardScale}
 					isTesting={(state.isTesting && props.canTest) || false}
 					previewCard={(id) => {
+						const index = state.activePack?.cardDetails.findIndex(
+							(card) => card.instanceId === id
+						);
+						const card = index ? state.activePack?.cardDetails[index!] : null;
+						if (card && card.stamps?.includes('new-stamp')) {
+							setState('activePack', 'cardDetails', index!, 'stamps', ['shit-pack']);
+						}
 						setState('previewedCardId', id);
 					}}
 					previewedCardId={state.previewedCardId}
