@@ -489,6 +489,11 @@ function Statistics(props: { activePack: PackEntity | null }) {
 		};
 	});
 
+	const shitPackOdds = () => resource()?.shitPackOdds || 0;
+	const formattedShitPack = () => `${Math.floor(shitPackOdds() * 10000) / 100}%`;
+	const hasOneMoreCard = (chance: number) =>
+		chance > 0 && chance < 1 && (state().totalCardCount || 0) - 1 === state().cardsOpenedCount;
+
 	return (
 		<Show when={state().totalCardCount}>
 			<div class="group m-6 flex h-10 items-center gap-2">
@@ -502,7 +507,12 @@ function Statistics(props: { activePack: PackEntity | null }) {
 					{resource.loading ? (
 						<span class="text-gray-500">Calculating...</span>
 					) : (
-						<Percentage value={resource.latest?.shitPackOdds || 0} />
+						<div class="inline-flex items-center gap-2">
+							{formattedShitPack()}{' '}
+							{hasOneMoreCard(shitPackOdds()) ? (
+								<img src="/lilindPB.gif" width="30" />
+							) : null}
+						</div>
 					)}
 				</p>
 				<div class="cursor-pointer opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
