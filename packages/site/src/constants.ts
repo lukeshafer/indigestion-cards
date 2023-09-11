@@ -24,6 +24,7 @@ const api_paths = {
 	UNMATCHED_IMAGE: '/unmatched-image',
 	PACK_COUNT: '/pack-count',
 	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
+	STATS: '/stats',
 };
 
 export const API = new Proxy(api_paths, {
