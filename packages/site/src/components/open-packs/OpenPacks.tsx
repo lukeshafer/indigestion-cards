@@ -412,11 +412,11 @@ function ShowcaseCard(props: {
 				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
 					onClick={flipCard}
-					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
+					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer outline-lime-500 outline"
 					title="Click to reveal">
-					<div style={{ scale: props.scale }} class="origin-top-left">
+					<div style={{ scale: 1 }} class="origin-top-left">
 						<TiltCardEffect>
-							<img src="/card-back.png" class="w-72" />
+							<img src="/card-back.png" class="w-72" style={{ width: `calc(18rem * ${props.scale})` }} />
 						</TiltCardEffect>
 					</div>
 				</button>
