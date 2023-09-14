@@ -412,7 +412,7 @@ function ShowcaseCard(props: {
 				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
 					onClick={flipCard}
-					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer outline-lime-500 outline"
+					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
 					title="Click to reveal">
 					<div style={{ scale: 1 }} class="origin-top-left">
 						<TiltCardEffect>
