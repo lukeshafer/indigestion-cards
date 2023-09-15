@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
-import { routeNames, routes } from '@/constants';
+import { ASSETS, routeNames, routes } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import CardDesignForm from '@/components/design/CardDesignForm';
@@ -22,7 +22,7 @@ const baseRarity = config?.baseRarity ??
 		rarityId: 'default',
 		rarityName: 'Default',
 		rarityColor: '#fff',
-		frameUrl: '/default-base-rarity.png',
+		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
 	};
 ---
 

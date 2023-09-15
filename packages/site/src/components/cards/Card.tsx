@@ -1,5 +1,5 @@
 import TiltCardEffect from './TiltCardEffect';
-import { FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
+import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
 import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
 import styles from './Card.module.css';
 
@@ -30,8 +30,8 @@ export default function Card(props: Props) {
 			: isSecret()
 			? '????? ??????????????? ?? ?? ? ?????? ??????'
 			: props.cardDescription;
-	const frameUrl = () => (isSecret() ? '/default-base-rarity.png' : props.frameUrl);
-	const imgUrl = () => (isSecret() ? '/hiddencard.png' : props.imgUrl);
+	const frameUrl = () => (isSecret() ? ASSETS.CARDS.DEFAULT_BASE_RARITY : props.frameUrl);
+	const imgUrl = () => (isSecret() ? ASSETS.CARDS.HIDDEN_CARD : props.imgUrl);
 
 	const isShitPack = () => props.stamps?.includes('shit-pack');
 
@@ -45,7 +45,10 @@ export default function Card(props: Props) {
 						'background-color': props.rarityColor,
 						'view-transition-name': `card-${props.instanceId ?? props.designId}`,
 					}}>
-					<img src={imgUrl()} alt={props.cardName} class="absolute inset-0" 
+					<img
+						src={imgUrl()}
+						alt={props.cardName}
+						class="absolute inset-0"
 						classList={{ 'blur contrast-50': isSecret() }}
 					/>
 					{isSecret() && (
@@ -53,11 +56,7 @@ export default function Card(props: Props) {
 							?
 						</p>
 					)}
-					<img
-						src={frameUrl()}
-						alt=""
-						class="absolute inset-0"
-					/>
+					<img src={frameUrl()} alt="" class="absolute inset-0" />
 					<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
 						{cardName()}
 					</h3>
@@ -84,7 +83,7 @@ export default function Card(props: Props) {
 					{isShitPack() && (
 						<div class="absolute left-[52%] top-1/2 block w-[15em] -translate-x-1/2 -translate-y-1/2 rotate-12">
 							<img
-								src="/shit_pack_brown.png"
+								src={ASSETS.CARDS.SHIT_PACK}
 								classList={{
 									[styles.animateStamp]: props.stamps?.includes('new-stamp'),
 									'opacity-80': !props.stamps?.includes('new-stamp'),

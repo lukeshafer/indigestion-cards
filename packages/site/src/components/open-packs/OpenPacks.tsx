@@ -417,7 +417,7 @@ function ShowcaseCard(props: {
 					<div style={{ scale: 1 }} class="origin-top-left">
 						<TiltCardEffect>
 							<img
-								src="/card-back.png"
+								src={ASSETS.CARDS.CARD_BACK}
 								class="w-72"
 								style={{ width: `calc(18rem * ${props.scale})` }}
 							/>

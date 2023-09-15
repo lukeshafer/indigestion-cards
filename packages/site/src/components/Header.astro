@@ -3,6 +3,7 @@ import AdminOnly from '@/components/AdminOnly.astro';
 import Hamburger from '@/components/Hamburger.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
+import { ASSETS } from '@/constants';
 
 const disableAnimations = Astro.cookies.get('disable-animations').boolean();
 
@@ -23,7 +24,7 @@ const headerLinks = [
 		</AdminOnly>
 		<nav class="flex-1 flex text-black items-center gap-2 md:gap-4 overflow-x-scroll scrollbar-hidden">
 			<a href="/" title="Home" class="flex items-center gap-4 w-fit min-w-[2rem] mr-4">
-				<img src="/logo.png" alt="logo" class="w-12 block" width="192" />
+				<img src={ASSETS.LOGO} alt="logo" class="w-12 block" width="192" />
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
 					<span class="-mt-2 text-lg text-gray-700">cards</span>

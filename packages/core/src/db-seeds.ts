@@ -50,7 +50,7 @@ export async function seedSiteConfig() {
 				rarityId: 'default',
 				rarityName: 'Default',
 				rarityColor: '#fff',
-				frameUrl: '/default-base-rarity.png',
+				frameUrl: '/assets/cards/default-base-rarity.png',
 			},
 			messages: [],
 		})
