@@ -1,6 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import FAQ from '@/content/faq.md';
+import { ASSETS } from '@/constants';
 ---
 
 <Page title="Indigestion Cards" pageType="public">
@@ -10,17 +11,17 @@ import FAQ from '@/content/faq.md';
 			class="flex flex-wrap min-h-[30rem] justify-center items-center justify-items-center flex-row-reverse gap-y-8 gap-4">
 			<div class="flex origin-top pb-24 -mx-12 -mr-20 justify-center">
 				<img
-					src="/hero_card_1.png"
+					src={ASSETS.CARDS.HERO_CARD_1}
 					width="200"
 					class="w-52 shadow-black/50 -rotate-12 shadow-xl origin-top-right translate-y-6 translate-x-12 hover:translate-y-2 transition-transform duration-500 ease-in-out"
 				/>
 				<img
-					src="/hero_card_2.png"
+					src={ASSETS.CARDS.HERO_CARD_2}
 					width="200"
 					class="w-52 shadow-black/50 rotate-6 shadow-xl origin-top-left hover:-translate-y-4 transition-transform duration-500 ease-in-out"
 				/>
 				<img
-					src="/hero_card_3.png"
+					src={ASSETS.CARDS.HERO_CARD_3}
 					width="200"
 					class="w-52 shadow-black/50 rotate-[18deg] shadow-xl origin-top-left translate-y-6 -translate-x-12 hover:translate-y-2 transition-transform duration-500 ease-in-out"
 				/>

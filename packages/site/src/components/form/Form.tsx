@@ -1,6 +1,7 @@
 import { For, JSX, ParentProps, Show, createSignal } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { setAlerts } from '@/lib/client/state';
+import { ASSETS } from '@/constants';
 
 export function Form(props: {
 	children: JSX.Element;
@@ -117,7 +118,7 @@ export function Form(props: {
 			onsubmit={handleSubmit}>
 			<Show when={isLoading()}>
 				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-50">
-					<img src="/lilindPB.gif" alt="" />
+					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
 					) : null}
