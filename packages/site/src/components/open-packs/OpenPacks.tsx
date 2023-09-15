@@ -12,7 +12,7 @@ import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
 
-import { API, routes } from '@/constants';
+import { API, routes, ASSETS } from '@/constants';
 import Card from '@/components/cards/Card';
 import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
@@ -416,7 +416,11 @@ function ShowcaseCard(props: {
 					title="Click to reveal">
 					<div style={{ scale: 1 }} class="origin-top-left">
 						<TiltCardEffect>
-							<img src="/card-back.png" class="w-72" style={{ width: `calc(18rem * ${props.scale})` }} />
+							<img
+								src="/card-back.png"
+								class="w-72"
+								style={{ width: `calc(18rem * ${props.scale})` }}
+							/>
 						</TiltCardEffect>
 					</div>
 				</button>
@@ -510,7 +514,11 @@ function Statistics(props: { activePack: PackEntity | null }) {
 						<div class="inline-flex items-center gap-2">
 							{formattedShitPack()}{' '}
 							{hasOneMoreCard(shitPackOdds()) ? (
-								<img src="/lilindPB.gif" width="30" />
+								<img src={ASSETS.EMOTES.LILINDPB} width="30" />
+							) : shitPackOdds() === 1 ? (
+								<img src={ASSETS.EMOTES.LILINDBLIF} width="30" />
+							) : shitPackOdds() === 0 ? (
+								<img src={ASSETS.EMOTES.LILINDDISBLIF} width="30" />
 							) : null}
 						</div>
 					)}
@@ -525,16 +533,5 @@ function Statistics(props: { activePack: PackEntity | null }) {
 				</div>
 			</div>
 		</Show>
-	);
-}
-
-function Percentage(props: { value: number }) {
-	const formatted = () => `${Math.floor(props.value * 10000) / 100}%`;
-
-	return (
-		<div class="inline-flex items-center gap-2">
-			{formatted()}{' '}
-			{props.value > 0.5 && props.value !== 1 ? <img src="/lilindPB.gif" width="30" /> : null}
-		</div>
 	);
 }

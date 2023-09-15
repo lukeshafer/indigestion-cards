@@ -94,6 +94,15 @@ export const routeNames = {
 	ADMIN_EDIT: 'Edit',
 } as const;
 
+export const ASSETS = {
+	EMOTES: {
+		LILINDDISBLIF: '/assets/emotes/lilinddisblif.png',
+		LILINDBLIF: '/assets/emotes/lilindblif.png',
+		LILINDPB: '/assets/emotes/lilindpb.gif',
+		LILINDOHNO: '/assets/emotes/lilindohno.gif',
+	},
+} as const;
+
 export const AUTH_TOKEN = 'sst_auth_token';
 export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';
