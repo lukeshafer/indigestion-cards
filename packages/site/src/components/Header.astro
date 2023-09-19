@@ -4,10 +4,13 @@ import Hamburger from '@/components/Hamburger.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
+import { getLoginLink } from '@/lib/utils';
 
 const disableAnimations = Astro.cookies.get('disable-animations').boolean();
 
 const currentPage = Astro.url.pathname;
+
+const username = Astro.locals.session?.properties.username;
 
 const headerLinks = [
 	{ href: '/card', title: 'Cards' },
@@ -22,7 +25,8 @@ const headerLinks = [
 				<Hamburger />
 			</div>
 		</AdminOnly>
-		<nav class="flex-1 flex text-black items-center gap-2 md:gap-4 overflow-x-scroll scrollbar-hidden">
+		<nav
+			class="flex-1 flex text-black items-center gap-2 md:gap-4 overflow-x-scroll scrollbar-hidden">
 			<a href="/" title="Home" class="flex items-center gap-4 w-fit min-w-[2rem] mr-4">
 				<img src={ASSETS.LOGO} alt="logo" class="w-12 block" width="192" />
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
@@ -51,6 +55,8 @@ const headerLinks = [
 		</nav>
 		<UserSearch client:load />
 		<UserConfig client:load {disableAnimations} />
+		{username ? <p class="text-black">{username}</p> : <a href={getLoginLink({ url: Astro.url })} class="text-brand-main text-xs underline">Login</a> }
+		
 	</header>
 </div>
 

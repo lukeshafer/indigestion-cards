@@ -3,8 +3,16 @@ import { Issuer } from 'openid-client';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
-import { getAdminUserById } from '@lil-indigestion-cards/core/user';
-import { setTwitchTokens } from '@lil-indigestion-cards/core/twitch-helpers';
+import {
+	createNewUserLogin,
+	getAdminUserById,
+	getUserLoginById,
+	setAdminEnvSession,
+} from '@lil-indigestion-cards/core/user';
+import {
+	setTwitchTokens,
+	getListOfTwitchUsersByIds,
+} from '@lil-indigestion-cards/core/twitch-helpers';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -44,22 +52,53 @@ export const handler = AuthHandler({
 
 			const adminUser = await getAdminUserById(claims.sub);
 
-			if (!adminUser)
+			if (adminUser) {
 				return {
 					type: 'session',
 					properties: {
-						type: 'public',
-						properties: {},
+						type: 'admin',
+						properties: {
+							userId: adminUser.userId,
+							username: adminUser.username,
+						},
 					},
 				};
+			}
+
+			const user = await getUserLoginById(claims.sub);
+
+			if (user)
+				return {
+					type: 'session',
+					properties: {
+						type: 'user',
+						properties: {
+							userId: user.userId,
+							username: user.username,
+						},
+					},
+				};
+
+			// If user isn't in the database, add them
+			const usernames = await getListOfTwitchUsersByIds([claims.sub]);
+			if (usernames.length === 0) throw new Error('No username found');
+
+			setAdminEnvSession("AuthHandler", "createNewUserLogin");
+
+			const newUser = await createNewUserLogin({
+				userId: claims.sub,
+				username: usernames[0].display_name,
+			});
+
+			if (!newUser) throw new Error('Failed to create new user');
 
 			return {
 				type: 'session',
 				properties: {
-					type: 'admin',
+					type: 'user',
 					properties: {
-						userId: adminUser.userId,
-						username: adminUser.username,
+						userId: newUser.userId,
+						username: newUser.username,
 					},
 				},
 			};

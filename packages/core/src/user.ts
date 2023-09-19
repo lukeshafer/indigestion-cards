@@ -104,36 +104,33 @@ export async function updateUsername(
 	const cards = await db.entities.cardInstances.query
 		.byOwnerId({ username: args.oldUsername })
 		.go();
-	
-	const packData = await db.entities.packs.query
-		.byUsername({ username: args.oldUsername })
-		.go();
+
+	const packData = await db.entities.packs.query.byUsername({ username: args.oldUsername }).go();
 
 	// TODO: get all minted cards and update those
 
-	const transactionResult = await db.transaction.write(({ users, cardInstances, packs }) => [
-		users.patch({ userId: args.userId }).set({ username: args.newUsername }).commit(),
-		...cards.data.map((card) =>
-			cardInstances
-				.patch({ designId: card.designId, instanceId: card.instanceId })
-				.set({
-					username: args.newUsername,
-					minterUsername:
-						card.minterUsername === args.oldUsername
-							? args.newUsername
-							: card.minterUsername,
-				})
-				.commit()
-		),
-		...packData.data.map((pack) =>
-			packs
-				.patch({ packId: pack.packId })
-				.set({ username: args.newUsername })
-				.commit()
-		),
-	]).go();
+	const transactionResult = await db.transaction
+		.write(({ users, cardInstances, packs }) => [
+			users.patch({ userId: args.userId }).set({ username: args.newUsername }).commit(),
+			...cards.data.map((card) =>
+				cardInstances
+					.patch({ designId: card.designId, instanceId: card.instanceId })
+					.set({
+						username: args.newUsername,
+						minterUsername:
+							card.minterUsername === args.oldUsername
+								? args.newUsername
+								: card.minterUsername,
+					})
+					.commit()
+			),
+			...packData.data.map((pack) =>
+				packs.patch({ packId: pack.packId }).set({ username: args.newUsername }).commit()
+			),
+		])
+		.go();
 
-	return transactionResult.data
+	return transactionResult.data;
 }
 
 export async function batchUpdateUsers(users: CreateEntityItem<User>[]) {
@@ -210,6 +207,29 @@ export async function getAdminUserById(userId: string) {
 		const result = await db.entities.admins.query.allAdmins({ userId }).go();
 		return result.data[0];
 	} catch {
+		return null;
+	}
+}
+
+export async function getUserLoginById(userId: string) {
+	try {
+		const result = await db.entities.userLogins.query.allLogins({ userId }).go();
+		return result.data[0] ?? null;
+	} catch {
+		return null;
+	}
+}
+
+export async function createNewUserLogin(args: { userId: string; username: string }) {
+	const { userId, username } = args;
+	console.log('Creating new user: ', { userId, username });
+
+	try {
+		const result = await db.entities.userLogins.create({ userId, username }).go();
+		console.log('Created new user: ', result);
+		return result.data;
+	} catch (err) {
+		console.error(err);
 		return null;
 	}
 }

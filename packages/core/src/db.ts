@@ -1,5 +1,5 @@
 import { Table } from 'sst/node/table';
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
 export const config = {
@@ -674,6 +674,53 @@ const admins = new Entity(
 	config
 );
 
+const userLogins = new Entity(
+	{
+		model: {
+			entity: 'userLogin',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			userId: {
+				type: 'string',
+				required: true,
+				label: 'userId',
+			},
+			username: {
+				type: 'string',
+				required: true,
+			},
+			...auditAttributes('admin'),
+		},
+		indexes: {
+			allLogins: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['userId'],
+				},
+			},
+			byUsername: {
+				index: 'gsi3',
+				collection: 'cardsByOwnerName',
+				pk: {
+					field: 'gsi3pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi3sk',
+					composite: [],
+				},
+			},
+		},
+	},
+	config
+);
+
 const packTypes = new Entity(
 	{
 		model: {
@@ -979,6 +1026,7 @@ export const db = new Service(
 		twitchEvents,
 		twitchEventMessageHistory,
 		siteConfig,
+		userLogins,
 	},
 	config
 );
