@@ -104,7 +104,7 @@ export function API({ app, stack }: StackContext) {
 			allowHeaders: ['content-type', 'authorization'],
 			allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 			allowOrigins:
-				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
+				app.mode === 'dev' ? ['http://localhost:4321'] : [`https://${baseDomain}`],
 		},
 		customDomain:
 			app.mode === 'dev'

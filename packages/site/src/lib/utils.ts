@@ -2,7 +2,7 @@ import { Auth } from 'sst/node/future/auth';
 import { authApi } from '@/constants';
 
 export function getLoginLink(ctx: { isStreamer?: boolean; url: URL }) {
-	const client_id = ctx.url.host === 'localhost:3000' ? 'local' : 'main';
+	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
 
 	const authParams = new URLSearchParams({
 		client_id: client_id,

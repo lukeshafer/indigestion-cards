@@ -29,7 +29,7 @@ declare module 'sst/node/future/auth' {
 
 export const handler = AuthHandler({
 	clients: async () => ({
-		local: 'http://localhost:3000',
+		local: 'http://localhost:4321',
 		main: `https://${Config.DOMAIN_NAME}`,
 	}),
 	providers: {

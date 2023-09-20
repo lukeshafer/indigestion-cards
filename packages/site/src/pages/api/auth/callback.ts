@@ -12,7 +12,7 @@ export async function get(ctx: APIContext) {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
-			client_id: ctx.url.host === 'localhost:3000' ? 'local' : 'main',
+			client_id: ctx.url.host === 'localhost:4321' ? 'local' : 'main',
 			code,
 			redirect_uri: `${ctx.url.origin}${ctx.url.pathname}`,
 		}),

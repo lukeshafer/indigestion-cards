@@ -20,7 +20,7 @@ export default function UserConfig(props: {
 	user?: TwitchUser | undefined;
 	login: string;
 }) {
-	const [isOpen, setIsOpen] = createSignal(true);
+	const [isOpen, setIsOpen] = createSignal(false);
 	const [disableAnimations, setDisableAnimations] = createSignal(
 		props.disableAnimations ?? false
 	);
