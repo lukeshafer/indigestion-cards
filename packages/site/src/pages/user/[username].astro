@@ -32,6 +32,7 @@ if (!data) {
 		data = {
 			users: [newUser],
 			cardInstances: [],
+			userLogins: [],
 		};
 		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`);
 	}
@@ -39,7 +40,10 @@ if (!data) {
 }
 
 const { users, cardInstances } = data;
-const user = users[0]!;
+const user = users[0] || {
+	username: id,
+	userId: twitchData?.id,
+}
 
 const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt);
 

@@ -5,6 +5,7 @@ import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
+import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 
 const disableAnimations = Astro.cookies.get('disable-animations').boolean();
 
@@ -16,10 +17,13 @@ const headerLinks = [
 	{ href: '/card', title: 'Cards' },
 	{ href: '/user', title: 'Users' },
 ];
+
+const twitchData = username ? await getUserByLogin(username) : null;
 ---
 
 <div class="border-b border-b-gray-300 bg-white">
-	<header class="max-w-main mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
+	<header
+		class="max-w-main mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4 relative">
 		<AdminOnly>
 			<div data-for-admin-panel class="toggle-btn z-100 px-2 py-2 text-lg">
 				<Hamburger />
@@ -54,9 +58,7 @@ const headerLinks = [
 			}
 		</nav>
 		<UserSearch client:load />
-		<UserConfig client:load {disableAnimations} />
-		{username ? <p class="text-black">{username}</p> : <a href={getLoginLink({ url: Astro.url })} class="text-brand-main text-xs underline">Login</a> }
-		
+		<UserConfig client:load {disableAnimations} user={twitchData} login={getLoginLink(Astro)} />
 	</header>
 </div>
 

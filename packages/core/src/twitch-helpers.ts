@@ -153,6 +153,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 	return parsed.data.data;
 }
 
+export type TwitchUser = NonNullable<Awaited<ReturnType<typeof getUserByLogin>>>;
 export async function getUserByLogin(login: string) {
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
