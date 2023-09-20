@@ -20,7 +20,7 @@ export default function UserConfig(props: {
 	user?: TwitchUser | undefined;
 	login: string;
 }) {
-	const [isOpen, setIsOpen] = createSignal(false);
+	const [isOpen, setIsOpen] = createSignal(true);
 	const [disableAnimations, setDisableAnimations] = createSignal(
 		props.disableAnimations ?? false
 	);
@@ -43,24 +43,24 @@ export default function UserConfig(props: {
 			/>
 			<Show when={isOpen()}>
 				<menu
-					class="bg-brand-main absolute right-0 mt-4 flex w-max flex-col items-end gap-3 px-4 py-2 text-white"
+					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-black/20 shadow-md"
 					use:clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
-							class="font-display text-shadow pt-2 text-center font-bold italic hover:underline"
+							class="font-display pt-2 text-center font-bold italic hover:underline text-gray-900"
 							href={`/user/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
 					) : (
 						<a
-							class="font-display text-shadow pt-2 text-center font-bold hover:underline"
+							class="font-display pt-2 text-center font-bold hover:underline"
 							href={props.login}>
 							Login with Twitch
 						</a>
 					)}
 					<ul class="flex w-max flex-col items-end gap-1">
 						<button
-							class="text-shadow flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-white"
+							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600"
 							classList={{
 								'before:content-["✔"]': disableAnimations(),
 								'before:content-[""]': !disableAnimations(),
@@ -74,7 +74,7 @@ export default function UserConfig(props: {
 						</button>
 						{props.user ? (
 							<a
-								class="text-shadow flex gap-4 font-medium hover:underline"
+								class="flex gap-4 font-medium hover:underline"
 								data-astro-reload
 								href="/api/auth/logout">
 								Logout
@@ -90,8 +90,7 @@ export default function UserConfig(props: {
 function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open?: boolean }) {
 	return (
 		<button
-			class="group flex h-full items-center justify-center transition-transform duration-300 hover:scale-110"
-			classList={{ 'scale-110': props.open }}
+			class="group flex h-full items-center justify-center transition-transform duration-300 hover:brightness-90"
 			onClick={(e) => {
 				console.log('click button');
 				props.onClick?.();
