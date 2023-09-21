@@ -10,6 +10,8 @@ export const PUBLIC_ROUTES = [
 	'/api/auth/*',
 	'/card',
 	'/card/*',
+	'/login',
+	'/logout',
 ] as const;
 
 const api_paths = {

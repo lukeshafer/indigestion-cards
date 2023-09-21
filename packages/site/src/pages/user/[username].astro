@@ -8,6 +8,7 @@ import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
+import UserLookingFor from '@/components/user/UserLookingFor';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -43,9 +44,11 @@ const { users, cardInstances } = data;
 const user = users[0] || {
 	username: id,
 	userId: twitchData?.id,
-}
+};
 
 const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt);
+
+const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 
 const packTypes = await getAllPackTypes();
 ---
@@ -55,30 +58,34 @@ const packTypes = await getAllPackTypes();
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
-	<header class="flex flex-col items-center gap-4 sm:gap-12 p-4 sm:flex-row sm:items-start">
+	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
 			src={twitchData?.profile_image_url}
-			width="200"
-			class="col-start-1 row-span-full rounded-full"
+			width="150"
+			height="150"
+			class="col-start-1 row-span-full rounded-full h-fit"
 		/>
-		<AdminOnly>
-			<section slot="fallback" class="flex flex-col gap-2">
-				<h1
-					class="font-display italic my-2 text-4xl font-bold text-gray-600"
-					style={{ 'view-transition-name': `${user.username}-username` }}>
-					{user.username}
-				</h1>
-			</section>
-			<section class="flex flex-col gap-2">
-				<h1
-					class="font-display italic my-2 text-4xl font-bold text-gray-600"
-					style={{ 'view-transition-name': `${user.username}-username` }}>
-					{user.username}
-				</h1>
-				<p class="-mt-5">User Id: {user.userId}</p>
-				<UserPackForms {user} {packTypes} client:load />
-			</section>
-		</AdminOnly>
+		<section class="flex flex-col mt-4">
+			<h1
+				class="font-display my-2 text-4xl font-bold italic text-gray-600"
+				style={{ 'view-transition-name': `${user.username}-username` }}>
+				{user.username}
+			</h1>
+			<AdminOnly>
+				<details>
+					<summary class="text-gray-500 -mt-4">Admin Stuff</summary>
+					<div class="bg-gray-100 p-3 rounded">
+						<p>User Id: {user.userId}</p>
+						<UserPackForms {user} {packTypes} client:load />
+					</div>
+				</details>
+			</AdminOnly>
+			<ul>
+				<li>
+					<UserLookingFor {user} {isLoggedInUser} client:load />
+				</li>
+			</ul>
+		</section>
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>

@@ -32,6 +32,10 @@ export default function UserConfig(props: {
 		document?.body.classList.toggle('disable-animations', disableAnimations());
 		localStorage.setItem('disableAnimations', disableAnimations().toString());
 		document.cookie = `disable-animations=${disableAnimations()}; path=/; max-age=31536000`;
+
+		if (disableAnimations()) {
+			document.body.dataset['astro-reload'] = 'true';
+		}
 	});
 
 	return (
@@ -54,7 +58,7 @@ export default function UserConfig(props: {
 					) : (
 						<a
 							class="font-display pt-2 text-center font-bold hover:underline"
-							href={props.login}>
+							href="/login">
 							Login with Twitch
 						</a>
 					)}
@@ -68,7 +72,6 @@ export default function UserConfig(props: {
 							aria-pressed={disableAnimations()}
 							onClick={() => {
 								setDisableAnimations((v) => !v);
-								window.location.reload();
 							}}>
 							Disable Animations
 						</button>

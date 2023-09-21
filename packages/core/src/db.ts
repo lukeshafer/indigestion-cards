@@ -390,6 +390,9 @@ const users = new Entity(
 				required: true,
 				default: 0,
 			},
+			lookingFor: {
+				type: 'string',
+			},
 			...auditAttributes('user'),
 		},
 		indexes: {

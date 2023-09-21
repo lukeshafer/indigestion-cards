@@ -27,10 +27,12 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
+const callbackPath = '/api/auth/callback'
+
 export const handler = AuthHandler({
 	clients: async () => ({
-		local: 'http://localhost:4321',
-		main: `https://${Config.DOMAIN_NAME}`,
+		local: 'http://localhost:4321' + callbackPath,
+		main: `https://${Config.DOMAIN_NAME}` + callbackPath,
 	}),
 	providers: {
 		twitchStreamer: OauthAdapter({
