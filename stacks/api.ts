@@ -35,7 +35,7 @@ export function API({ app, stack }: StackContext) {
 		},
 	});
 
-	const api = new Api(stack, 'api', {
+	const adminApi = new Api(stack, 'AdminApi', {
 		routes: {
 			// PACK TYPE
 			'POST /pack-type': 'packages/functions/src/admin-api/pack-type/post.handler',
@@ -72,6 +72,8 @@ export function API({ app, stack }: StackContext) {
 			'POST /refresh-twitch-event-subscriptions':
 				'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler',
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
+			// STATS
+			'GET /stats': 'packages/functions/src/admin-api/stats.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
@@ -102,7 +104,7 @@ export function API({ app, stack }: StackContext) {
 			allowHeaders: ['content-type', 'authorization'],
 			allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 			allowOrigins:
-				app.mode === 'dev' ? ['http://localhost:3000'] : [`https://${baseDomain}`],
+				app.mode === 'dev' ? ['http://localhost:4321'] : [`https://${baseDomain}`],
 		},
 		customDomain:
 			app.mode === 'dev'
@@ -115,9 +117,9 @@ export function API({ app, stack }: StackContext) {
 	});
 
 	stack.addOutputs({
-		ApiEndpoint: api.url,
+		ApiEndpoint: adminApi.url,
 		TwitchApiEndpoint: twitchApi.url,
 	});
 
-	return { api, twitchApi };
+	return { adminApi, twitchApi };
 }

@@ -30,46 +30,22 @@ export type SeasonEntity = EntityItem<Season>;
 export type PackTypeEntity = EntityItem<PackType>;
 export type PackEntity = EntityItem<Pack>;
 
-export async function generateCard(info: {
+function generateCard(info: {
 	userId?: string;
 	username?: string;
 	packId: string | undefined;
 	cardPool: CardPool;
 }) {
+	console.log('Generating card: ', { ...info, cardPool: [] });
 	// Steps:
 	// 1. Take all the designs and instances, and generate a list of remaining possible cards that can be generated
-	const { cardDesigns, cardInstances: existingInstances } = info.cardPool;
+	const { cardDesigns } = info.cardPool;
 
 	if (cardDesigns.length === 0) {
 		throw new Error('No designs found');
 	}
 
-	const possibleCardsList = [];
-	for (const design of cardDesigns) {
-		if (!design.rarityDetails) continue;
-		for (const rarity of design.rarityDetails) {
-			for (let i = 0; i < rarity.count; i++) {
-				possibleCardsList.push({
-					designId: design.designId,
-					rarityId: rarity.rarityId,
-					cardNumber: i + 1,
-				});
-			}
-		}
-	}
-
-	for (const card of existingInstances) {
-		// remove the card from the list of possible cards
-		const index = possibleCardsList.findIndex(
-			(possibleCard) =>
-				possibleCard.designId === card.designId &&
-				possibleCard.rarityId === card.rarityId &&
-				possibleCard.cardNumber === card.cardNumber
-		);
-		if (index !== -1) {
-			possibleCardsList.splice(index, 1);
-		}
-	}
+	const possibleCardsList = getRemainingPossibleCardsFromCardPool(info.cardPool);
 
 	if (possibleCardsList.length === 0) {
 		throw new Error('No possible cards found');
@@ -110,34 +86,58 @@ export async function generateCard(info: {
 		totalOfType,
 	} satisfies CardInstanceEntity;
 
-	if (info.packId) {
-		const result = await db.entities.cardInstances.create(cardDetails).go();
-		return result.data;
+	console.log('Generated card', {
+		seasonId: design.seasonId,
+		seasonName: design.seasonName,
+		designId: design.designId,
+		cardName: design.cardName,
+		rarityId: assignedRarityId,
+		rarityName: rarity.rarityName,
+		instanceId,
+		username: info.username,
+		userId: info.userId,
+		packId: info.packId,
+	});
+
+	return cardDetails;
+}
+
+export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
+	const { cardDesigns, cardInstances: existingInstances } = cardPool;
+
+	if (cardDesigns.length === 0) {
+		throw new Error('No designs found');
 	}
 
-	const user =
-		info.userId && info.username
-			? (await getUser(info.userId)) ??
-			(await createNewUser({ userId: info.userId, username: info.username }))
-			: null;
+	const possibleCardsList = [];
+	for (const design of cardDesigns) {
+		if (!design.rarityDetails) continue;
+		for (const rarity of design.rarityDetails) {
+			for (let i = 0; i < rarity.count; i++) {
+				possibleCardsList.push({
+					designId: design.designId,
+					rarityId: rarity.rarityId,
+					cardNumber: i + 1,
+					totalOfType: rarity.count,
+				});
+			}
+		}
+	}
 
-	const result = await db.transaction
-		.write(({ users, cardInstances }) => [
-			cardInstances.create(cardDetails).commit(),
-			...(user && info.userId && info.username
-				? [
-					users
-						.patch({ userId: info.userId })
-						.set({ cardCount: (user.cardCount ?? 0) + 1 })
-						.commit(),
-				]
-				: []),
-		])
-		.go();
+	for (const card of existingInstances) {
+		// remove the card from the list of possible cards
+		const index = possibleCardsList.findIndex(
+			(possibleCard) =>
+				possibleCard.designId === card.designId &&
+				possibleCard.rarityId === card.rarityId &&
+				possibleCard.cardNumber === card.cardNumber
+		);
+		if (index !== -1) {
+			possibleCardsList.splice(index, 1);
+		}
+	}
 
-	if (result.canceled || !result.data[0].item) throw new Error('Failed to create card instance');
-
-	return result.data[0].item;
+	return possibleCardsList;
 }
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
@@ -292,20 +292,27 @@ export async function createPack(args: {
 			: null;
 
 	const cards: EntityItem<Card>[] = [];
-	const cardPool = args.cardPool;
+	const cardPool = Object.assign(args.cardPool) as CardPool;
 	for (let i = 0; i < args.count; i++) {
-		const card = await generateCard({
+		const card = generateCard({
 			userId: user?.userId,
 			username: user?.username,
 			packId,
-			cardPool: args.cardPool,
+			cardPool,
 		});
 		cardPool.cardInstances.push(card);
 		cards.push(card);
 	}
 
-	await db.transaction
-		.write(({ users, packs }) => [
+	console.log('Creating pack: ', {
+		cards,
+		packId,
+		...args,
+		cardPool: undefined,
+	});
+
+	const result = await db.transaction
+		.write(({ users, packs, cardInstances }) => [
 			...(user && args.userId && args.username
 				? [
 					users
@@ -337,8 +344,11 @@ export async function createPack(args: {
 					})),
 				})
 				.commit(),
+			...cards.map((card) => cardInstances.create(card).commit()),
 		])
 		.go();
+
+	console.log(result)
 }
 
 interface RarityForComparison {
@@ -660,7 +670,7 @@ export async function deleteUnmatchedDesignImage(args: {
 // SEASONS //
 export async function getAllSeasons() {
 	const result = await db.entities.season.query.allSeasons({}).go({ pages: 'all' });
-return result.data;
+	return result.data;
 }
 
 export async function getSeasonById(id: string) {

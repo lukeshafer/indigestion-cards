@@ -13,6 +13,7 @@ export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
 	wide?: boolean;
+	'hide-breadcrumbs'?: boolean;
 }
 
 const isAdmin = Astro.locals.session?.type === 'admin';
@@ -27,11 +28,20 @@ const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
 	if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
 }
 
-let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
+let {
+	class: className,
+	breadcrumbs,
+	wide = false,
+	'hide-breadcrumbs': hideBreadcrumbs,
+	...baseProps
+} = Astro.props;
 ---
 
 <Base {...baseProps}>
-	<div class="md:grid-cols-[max-content_1fr] grid-cols-1 grid h-[100svh] overflow-hidden" id="page-layout-wrapper" data-api-url={Api.api.url}>
+	<div
+		class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
+		id="page-layout-wrapper"
+		data-api-url={Api.AdminApi.url}>
 		<AdminOnly>
 			<AdminPanel />
 		</AdminOnly>
@@ -40,13 +50,17 @@ let { class: className, breadcrumbs, wide = false, ...baseProps } = Astro.props;
 			id="page-scroll-wrapper">
 			<Header />
 			<AlertBox client:load {alerts} />
-			<div class="max-w-main mx-auto w-full">
-				<Breadcrumbs path={breadcrumbs ?? []} />
-			</div>
+			{
+				hideBreadcrumbs ? null : (
+					<div class="max-w-main mx-auto w-full">
+						<Breadcrumbs path={breadcrumbs ?? []} />
+					</div>
+				)
+			}
 			<main
 				transition:name={wide ? undefined : 'main'}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
-				class="col-start-2 mx-auto w-full flex-1 p-3 z-0 mb-8">
+				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1 p-3">
 				<slot />
 			</main>
 			<Footer />

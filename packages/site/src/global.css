@@ -103,10 +103,10 @@ body.disable-animations * {
 }
 
 @layer base {
-	html {
+	:root {
 		--base-font-sans: 'Montserrat Variable', Montserrat, Avenir, 'Avenir Next LT Pro', Corbel,
 			'URW Gothic', source-sans-pro, sans-serif;
-		--base-font-serif: font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+		--base-font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
 		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
 		--font-heading: var(--base-font-sans);
 		--card-aspect-ratio: 312 / 265;
