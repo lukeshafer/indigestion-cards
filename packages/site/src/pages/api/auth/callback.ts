@@ -3,7 +3,7 @@ import type { APIContext } from 'astro';
 import { Auth } from 'sst/node/future/auth';
 import { Session } from 'sst/node/future/auth';
 
-export async function get(ctx: APIContext) {
+export async function GET(ctx: APIContext) {
 	const code = ctx.url.searchParams.get('code');
 	if (!code) {
 		throw new Error('Code missing');

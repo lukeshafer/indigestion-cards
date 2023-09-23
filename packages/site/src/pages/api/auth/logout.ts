@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { AUTH_TOKEN } from '@/constants';
 
-export const get: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx) => {
 	console.log({
 		headers: Object.fromEntries([...ctx.request.headers.entries()]),
 		cookies: ctx.cookies,

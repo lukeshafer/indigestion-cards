@@ -6,12 +6,13 @@ import {
 	createResource,
 	createSignal,
 	onMount,
+	type Accessor,
+	type Setter,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
-
 import { API, routes, ASSETS } from '@/constants';
 import Card from '@/components/cards/Card';
 import { setTotalPackCount } from '@/lib/client/state';
@@ -20,8 +21,15 @@ import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
 import { useViewTransition } from '@/lib/client/utils';
 
+type PackEntityWithStamps = PackEntity & {
+	cardDetails: PackEntity['cardDetails'] &
+		{
+			stamps?: string[];
+		}[];
+};
+
 export default function OpenPacks(props: {
-	packs: PackEntity[];
+	packs: PackEntityWithStamps[];
 	startMargin?: number;
 	startCardScale?: number;
 	canTest?: boolean;
@@ -30,17 +38,19 @@ export default function OpenPacks(props: {
 
 	const [state, setState] = createStore({
 		packs: props.packs,
-		activePack: null as PackEntity | null,
+		activePack: null as PackEntityWithStamps | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
 		previewedCardId: null as string | null,
 	});
 
+	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
+
 	createEffect(() => {
 		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
 	});
 
-	const setActivePack = (pack: PackEntity) => {
+	const setActivePack = (pack: PackEntityWithStamps) => {
 		setState('activePack', { ...pack });
 		if (pack.packId === state.packs[0].packId) return;
 
@@ -79,7 +89,6 @@ export default function OpenPacks(props: {
 		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
 			setTimeout(
 				() =>
-					// @ts-expect-error
 					setState('activePack', 'cardDetails', index, 'stamps', [
 						'shit-pack',
 						'new-stamp',
@@ -88,15 +97,60 @@ export default function OpenPacks(props: {
 			);
 	};
 
+	const listHeightString = () => `${listHeight()}px`;
+
 	return (
-		<>
-			<div class="flex items-end">
-				<MarginAdjuster startMargin={props.startMargin} />
+		<div class="flex min-h-[80vh] flex-col">
+			<section
+				class="col-start-1 max-w-[20rem] overflow-y-scroll bg-gray-200 p-6"
+				id="pack-list"
+				style={{ height: listHeightString() }}>
+				<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
+					Coming up...
+				</h2>
+				<ul class="packs flex h-full w-full flex-col pb-2" ref={setAutoAnimate}>
+					<For each={state.packs}>
+						{(pack, index) => (
+							<PackToOpenItem
+								index={index()}
+								pack={pack}
+								activePackId={state.activePack?.packId || ''}
+								setAsActive={() => setActivePack(pack)}
+							/>
+						)}
+					</For>
+				</ul>
+			</section>
+			<div class="flex items-end h-1 gap-4">
+				<ListHeightAdjuster height={listHeight} setHeight={setListHeight} />
 				<CardScaleAdjuster
 					scale={state.cardScale}
 					setScale={(newScale: number) => setState('cardScale', newScale)}
 				/>
 			</div>
+			{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
+
+			<PackShowcase
+				pack={state.activePack}
+				removePack={removePack}
+				flipCard={flipCard}
+				setNextPack={setNextPack}
+				packsRemaining={packsRemaining()}
+				cardScale={state.cardScale}
+				isTesting={(state.isTesting && props.canTest) || false}
+				previewCard={(id) => {
+					const index = state.activePack?.cardDetails.findIndex(
+						(card) => card.instanceId === id
+					);
+					const card = index ? state.activePack?.cardDetails[index!] : null;
+					if (card && card.stamps?.includes('new-stamp')) {
+						setState('activePack', 'cardDetails', index!, 'stamps', ['shit-pack']);
+					}
+					setState('previewedCardId', id);
+				}}
+				previewedCardId={state.previewedCardId}
+			/>
+
 			{props.canTest ? (
 				<>
 					<Checkbox
@@ -104,69 +158,26 @@ export default function OpenPacks(props: {
 						label="Enable test mode (opening packs doesn't save)"
 						setValue={(value) => setState('isTesting', value && props.canTest)}
 					/>
-					{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
 				</>
 			) : null}
-			<div class="grid grid-cols-[auto_1fr] grid-rows-[minmax(80vh,auto)] ">
-				<section
-					class="col-start-1 h-full overflow-y-scroll bg-gray-200 p-6"
-					id="pack-list">
-					<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
-						Coming up...
-					</h2>
-					<ul class="packs flex h-[50vh] w-full flex-col pb-2" ref={setAutoAnimate}>
-						<For each={state.packs}>
-							{(pack, index) => (
-								<PackToOpenItem
-									index={index()}
-									pack={pack}
-									activePackId={state.activePack?.packId || ''}
-									setAsActive={() => setActivePack(pack)}
-								/>
-							)}
-						</For>
-					</ul>
-				</section>
-				<PackShowcase
-					pack={state.activePack}
-					removePack={removePack}
-					flipCard={flipCard}
-					setNextPack={setNextPack}
-					packsRemaining={packsRemaining()}
-					cardScale={state.cardScale}
-					isTesting={(state.isTesting && props.canTest) || false}
-					previewCard={(id) => {
-						const index = state.activePack?.cardDetails.findIndex(
-							(card) => card.instanceId === id
-						);
-						const card = index ? state.activePack?.cardDetails[index!] : null;
-						if (card && card.stamps?.includes('new-stamp')) {
-							setState('activePack', 'cardDetails', index!, 'stamps', ['shit-pack']);
-						}
-						setState('previewedCardId', id);
-					}}
-					previewedCardId={state.previewedCardId}
-				/>
-			</div>
-		</>
+		</div>
 	);
 }
 
-function MarginAdjuster(props: { startMargin?: number }) {
-	const [margin, setMargin] = createSignal(props.startMargin ?? 200);
-
+function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter<number> }) {
 	const handleMouseDown = (e: MouseEvent) => {
 		e.preventDefault();
 		let prevY = e.clientY / 1;
 		const handleMouseMove = (e: MouseEvent) => {
-			setMargin((prev) => prev + (e.clientY / 1 - prevY));
+			console.log('test');
+			props.setHeight((prev) => Math.max(prev + (e.clientY / 1 - prevY), 0));
 			prevY = e.clientY / 1;
 		};
 		const handleMouseUp = () => {
 			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseup', handleMouseUp);
 			// set the margin in a cookie
-			document.cookie = `openPacksMargin=${margin()}; path=/`;
+			document.cookie = `openPacksMargin=${props.height()}; path=/`;
 		};
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
@@ -174,9 +185,8 @@ function MarginAdjuster(props: { startMargin?: number }) {
 
 	return (
 		<button
-			class="font-heading w-full bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
-			onMouseDown={handleMouseDown}
-			style={{ 'margin-top': `${margin()}px` }}>
+			class="font-heading w-full max-w-[20rem] h-min bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
+			onMouseDown={handleMouseDown}>
 			=
 		</button>
 	);
@@ -188,7 +198,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex w-full items-center justify-center gap-x-2 opacity-0 transition-opacity hover:opacity-100">
+		<div class="flex w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100 h-min">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -205,7 +215,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 
 function PackToOpenItem(props: {
 	index: number;
-	pack: PackEntity;
+	pack: PackEntityWithStamps;
 	activePackId: string;
 	setAsActive: () => void;
 }) {
@@ -226,7 +236,7 @@ function PackToOpenItem(props: {
 }
 
 function PackShowcase(props: {
-	pack: PackEntity | null;
+	pack: PackEntityWithStamps | null;
 	removePack: () => void;
 	flipCard: (instanceId: string) => void;
 	setNextPack: () => void;
@@ -312,7 +322,7 @@ function PackShowcase(props: {
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
 	return (
-		<div class="bg-brand-100 relative flex h-full flex-col">
+		<div class="bg-brand-100 relative flex h-full flex-1 flex-col">
 			<div class="flex items-end justify-between pr-8">
 				<h2
 					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
@@ -361,8 +371,8 @@ function PackShowcase(props: {
 }
 
 function ShowcaseCard(props: {
-	card: PackEntity['cardDetails'][number];
-	packId: PackEntity['packId'];
+	card: PackEntityWithStamps['cardDetails'][number];
+	packId: PackEntityWithStamps['packId'];
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
@@ -440,7 +450,7 @@ function ShowcaseCard(props: {
 	);
 }
 
-function Statistics(props: { activePack: PackEntity | null }) {
+function Statistics(props: { activePack: PackEntityWithStamps | null }) {
 	const state = () => ({
 		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened === true),
 		cardsOpenedCount: props.activePack?.cardDetails.filter((card) => card.opened).length || 0,

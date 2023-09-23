@@ -27,7 +27,7 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
-const callbackPath = '/api/auth/callback'
+const callbackPath = '/api/auth/callback';
 
 export const handler = AuthHandler({
 	clients: async () => ({
