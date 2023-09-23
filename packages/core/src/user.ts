@@ -234,6 +234,16 @@ export async function createNewUserLogin(args: { userId: string; username: strin
 	}
 }
 
+export async function setUserProfile(args: { userId: string; lookingFor?: string }) {
+	const user = await getUser(args.userId);
+	if (!user) return null;
+	return db.entities.users
+		.patch({ userId: args.userId })
+		.set({ lookingFor: args.lookingFor ?? user.lookingFor })
+		.go()
+		.then((result) => result.data);
+}
+
 export function setAdminEnvSession(username: string, userId: string) {
 	process.env.SESSION_USER_ID = userId;
 	process.env.SESSION_TYPE = 'admin';

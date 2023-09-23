@@ -79,6 +79,10 @@ export function API({ app, stack }: StackContext) {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 				}
 				: {}),
+
+			// USER ENDPOINTS
+			// USER
+			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
 		},
 		defaults: {
 			function: {
