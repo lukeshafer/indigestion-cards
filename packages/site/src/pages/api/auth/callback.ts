@@ -3,7 +3,7 @@ import type { APIContext } from 'astro';
 import { Auth } from 'sst/node/future/auth';
 import { Session } from 'sst/node/future/auth';
 
-export async function get(ctx: APIContext) {
+export async function GET(ctx: APIContext) {
 	const code = ctx.url.searchParams.get('code');
 	if (!code) {
 		throw new Error('Code missing');
@@ -12,7 +12,7 @@ export async function get(ctx: APIContext) {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
-			client_id: ctx.url.host === 'localhost:3000' ? 'local' : 'main',
+			client_id: ctx.url.host === 'localhost:4321' ? 'local' : 'main',
 			code,
 			redirect_uri: `${ctx.url.origin}${ctx.url.pathname}`,
 		}),

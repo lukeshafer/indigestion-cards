@@ -22,7 +22,7 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
 
 	// @ts-expect-error
-	const session: Session = SSTSession.verify(cookie.value ?? '');
+	const session: Session = SSTSession.verify(cookie?.value ?? '');
 	const adminUser = await getAdminUserById(session?.properties.userId ?? '');
 	if (!adminUser) {
 		ctx.locals.session = null;
