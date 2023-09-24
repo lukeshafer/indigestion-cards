@@ -234,12 +234,32 @@ export async function createNewUserLogin(args: { userId: string; username: strin
 	}
 }
 
-export async function setUserProfile(args: { userId: string; lookingFor?: string }) {
+type PinnedCard = {
+	instanceId: string;
+	designId: string;
+};
+export async function setUserProfile(args: {
+	userId: string;
+	lookingFor?: string;
+	pinnedCard?: PinnedCard;
+}) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
+
+	const card = args.pinnedCard
+		? await db.entities.cardInstances.query
+				.byId(args.pinnedCard)
+				.go()
+				.then((result) =>
+					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+						? result.data[0]
+						: user.pinnedCard
+				)
+		: user.pinnedCard;
+
 	return db.entities.users
 		.patch({ userId: args.userId })
-		.set({ lookingFor: args.lookingFor ?? user.lookingFor })
+		.set({ lookingFor: args.lookingFor ?? user.lookingFor, pinnedCard: card })
 		.go()
 		.then((result) => result.data);
 }

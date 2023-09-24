@@ -393,6 +393,55 @@ const users = new Entity(
 			lookingFor: {
 				type: 'string',
 			},
+			pinnedCard: {
+				type: 'map',
+				properties: {
+					instanceId: {
+						type: 'string',
+						required: true,
+					},
+					designId: {
+						type: 'string',
+						required: true,
+					},
+					cardName: {
+						type: 'string',
+						required: true,
+					},
+					cardDescription: {
+						type: 'string',
+						required: true,
+					},
+					imgUrl: {
+						type: 'string',
+						required: true,
+					},
+					rarityId: {
+						type: 'string',
+						required: true,
+					},
+					rarityName: {
+						type: 'string',
+						required: true,
+					},
+					rarityColor: {
+						type: 'string',
+						required: true,
+					},
+					frameUrl: {
+						type: 'string',
+						required: true,
+					},
+					cardNumber: {
+						type: 'number',
+						required: true,
+					},
+					totalOfType: {
+						type: 'number',
+						required: true,
+					},
+				},
+			},
 			...auditAttributes('user'),
 		},
 		indexes: {

@@ -9,6 +9,7 @@ import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
 import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
+import Card from '@/components/cards/Card';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -46,6 +47,7 @@ const user = users[0] || {
 	userId: twitchData?.id,
 };
 
+const pinnedCard = user.pinnedCard;
 const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt);
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
@@ -63,9 +65,9 @@ const packTypes = await getAllPackTypes();
 			src={twitchData?.profile_image_url}
 			width="150"
 			height="150"
-			class="col-start-1 row-span-full rounded-full h-fit"
+			class="col-start-1 row-span-full h-fit rounded-full"
 		/>
-		<section class="flex flex-col mt-4">
+		<section class="mt-4 flex flex-col">
 			<h1
 				class="font-display my-2 text-4xl font-bold italic text-gray-600"
 				style={{ 'view-transition-name': `${user.username}-username` }}>
@@ -73,8 +75,8 @@ const packTypes = await getAllPackTypes();
 			</h1>
 			<AdminOnly>
 				<details>
-					<summary class="text-gray-500 -mt-4">Admin Stuff</summary>
-					<div class="bg-gray-100 p-3 rounded">
+					<summary class="-mt-4 text-gray-500">Admin Stuff</summary>
+					<div class="rounded bg-gray-100 p-3">
 						<p>User Id: {user.userId}</p>
 						<UserPackForms {user} {packTypes} client:load />
 					</div>
@@ -86,6 +88,14 @@ const packTypes = await getAllPackTypes();
 				</li>
 			</ul>
 		</section>
+		{
+			pinnedCard ? (
+				<div class="ml-auto">
+					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
+					<Card {...{ ...pinnedCard, instanceId: pinnedCard.instanceId + "1"}} client:load />
+				</div>
+			) : null
+		}
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
