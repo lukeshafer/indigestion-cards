@@ -31,7 +31,7 @@ export const handler = AuthHandler({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),
 			clientID: Config.TWITCH_CLIENT_ID,
 			clientSecret: Config.TWITCH_CLIENT_SECRET,
-			scope: 'openid channel:read:redemptions channel:read:subscriptions',
+			scope: 'openid channel:read:redemptions channel:read:subscriptions moderator:read:chatters',
 		}),
 		twitchUser: OauthAdapter({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),

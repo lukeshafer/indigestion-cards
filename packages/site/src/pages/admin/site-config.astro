@@ -7,6 +7,7 @@ import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro'
 import { PageTitle, PageHeader } from '@/components/text';
 import SiteConfigForm from '@/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
+import ShowChatters from '@/components/site-config/ShowChatters';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -59,4 +60,5 @@ const rewards = twitchEvents.data
 	</div>
 	<RefreshTwitchEventsButton client:load />
 	<TwitchLoginButton />
+	<ShowChatters client:load />
 </Page>
