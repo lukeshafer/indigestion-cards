@@ -5,6 +5,7 @@ on:
         branches:
             - dev
             - qa
+            - accounts
 
 jobs:
     deploy-dev:
