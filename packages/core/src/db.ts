@@ -2,8 +2,6 @@ import { Table } from 'sst/node/table';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
-console.log({ env: import.meta?.env })
-
 export const config = {
 	table: Table.data.tableName,
 	client: new DynamoDBClient(),
