@@ -7,7 +7,7 @@ import { ASSETS } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 
-const disableAnimations = Astro.cookies.get('disable-animations').boolean();
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 
 const currentPage = Astro.url.pathname;
 

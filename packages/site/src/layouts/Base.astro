@@ -16,7 +16,7 @@ const { title, pageType = 'private' } = Astro.props;
 
 const session = Astro.locals.session;
 
-const disableAnimations = Astro.cookies.get('disable-animations')?.boolean();
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 ---
 
 <html lang="en">
