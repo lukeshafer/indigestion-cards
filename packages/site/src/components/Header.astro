@@ -5,7 +5,7 @@ import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
 
-const disableAnimations = Astro.cookies.get('disable-animations').boolean();
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 
 const currentPage = Astro.url.pathname;
 
