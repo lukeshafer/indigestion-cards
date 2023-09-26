@@ -22,9 +22,14 @@ const headerLinks = [
 				<Hamburger />
 			</div>
 		</AdminOnly>
-		<nav class="flex-1 flex text-black items-center gap-2 md:gap-4 overflow-x-scroll scrollbar-hidden">
-			<a href="/" title="Home" class="flex items-center gap-4 w-fit min-w-[2rem] mr-4">
-				<img src={ASSETS.LOGO} alt="logo" class="w-12 block" width="192" />
+		<nav
+			class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
+			<a
+				href="/"
+				title="Home"
+				class="mr-4 flex w-fit min-w-[2rem] items-center gap-4"
+				transition:name="page-header-home-link">
+				<img src={ASSETS.LOGO} alt="logo" class="block w-12" width="192" />
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
 					<span class="-mt-2 text-lg text-gray-700">cards</span>
@@ -35,13 +40,14 @@ const headerLinks = [
 					<a
 						href={href}
 						title={title}
-						class="relative px-2 py-1 hover:bg-gray-200 text-gray-700 rounded transition-colors"
+						transition:name={`page-header-nav-${href}`}
+						class="relative rounded px-2 py-1 text-gray-700 transition-colors hover:bg-gray-200"
 						class:list={{
-							'font-bold text-brand-main bg-brand-100': currentPage.startsWith(href),
+							'text-brand-main bg-brand-100 font-bold': currentPage.startsWith(href),
 						}}>
 						<span
 							class:list={{
-								'font-bold text-brand-main': currentPage.startsWith(href),
+								'text-brand-main font-bold': currentPage.startsWith(href),
 							}}>
 							{title}
 						</span>

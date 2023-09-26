@@ -8,6 +8,7 @@ import {
 	onMount,
 	type Accessor,
 	type Setter,
+	type JSX,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -33,6 +34,7 @@ export default function OpenPacks(props: {
 	startMargin?: number;
 	startCardScale?: number;
 	canTest?: boolean;
+	children?: JSX.Element;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
 
@@ -101,27 +103,32 @@ export default function OpenPacks(props: {
 
 	return (
 		<div class="flex min-h-[80vh] flex-col">
-			<section
-				class="col-start-1 max-w-[20rem] overflow-y-scroll bg-gray-200 p-6"
-				id="pack-list"
-				style={{ height: listHeightString() }}>
-				<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
-					Coming up...
-				</h2>
-				<ul class="packs flex h-full w-full flex-col pb-2" ref={setAutoAnimate}>
-					<For each={state.packs}>
-						{(pack, index) => (
-							<PackToOpenItem
-								index={index()}
-								pack={pack}
-								activePackId={state.activePack?.packId || ''}
-								setAsActive={() => setActivePack(pack)}
-							/>
-						)}
-					</For>
-				</ul>
-			</section>
-			<div class="flex items-end h-1 gap-4">
+			<div class="flex">
+				<section
+					class="col-start-1 w-[15rem] overflow-y-scroll bg-gray-200 px-4 py-3"
+					id="pack-list"
+					style={{ height: listHeightString() }}>
+					<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700">
+						Coming up...
+					</h2>
+					<ul class="packs flex w-full flex-col pb-4" ref={setAutoAnimate}>
+						<For each={state.packs}>
+							{(pack, index) => (
+								<PackToOpenItem
+									index={index()}
+									pack={pack}
+									activePackId={state.activePack?.packId || ''}
+									setAsActive={() => setActivePack(pack)}
+								/>
+							)}
+						</For>
+					</ul>
+				</section>
+				<div class="flex-1">
+					{props.children}
+				</div>
+			</div>
+			<div class="flex h-1 items-end gap-4">
 				<ListHeightAdjuster height={listHeight} setHeight={setListHeight} />
 				<CardScaleAdjuster
 					scale={state.cardScale}
@@ -185,7 +192,7 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 
 	return (
 		<button
-			class="font-heading w-full max-w-[20rem] h-min bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
+			class="font-heading relative z-10 h-min w-full max-w-[20rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
 			onMouseDown={handleMouseDown}>
 			=
 		</button>
@@ -198,7 +205,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100 h-min">
+		<div class="flex h-min w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -224,7 +231,7 @@ function PackToOpenItem(props: {
 	return (
 		<li class="pack-list-item">
 			<button
-				class="font-display -mx-2 w-full p-1 pt-2 text-left text-lg italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				class="font-display -mx-2 w-[calc(100%+1rem)] px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 				}}
@@ -325,13 +332,13 @@ function PackShowcase(props: {
 		<div class="bg-brand-100 relative flex h-full flex-1 flex-col">
 			<div class="flex items-end justify-between pr-8">
 				<h2
-					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
+					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
-					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
+					{props.pack ? 'Opening for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
 						<a
 							href={`${routes.USERS}/${props.pack?.username}`}
-							class="font-display text-brand-main block py-4 text-5xl normal-case italic hover:underline"
+							class="font-display text-brand-main block pb-3 pt-1 text-5xl normal-case italic hover:underline"
 							style={{ 'view-transition-name': 'open-packs-title' }}>
 							{props.pack?.username}
 						</a>
