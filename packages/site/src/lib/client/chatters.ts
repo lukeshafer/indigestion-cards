@@ -1,19 +1,11 @@
 import { createResource } from 'solid-js';
-import { API } from '@/constants';
 
-export const [chatters, { refetch: refetchChatters }] = createResource<Chatter[]>(async () => {
-	console.log('fetching chatters')
-	const res = await fetch(API.TWITCH_CHATTERS);
-	const data = await res.json().catch(() => ({}));
-	return isChatters(data) ? data : [];
-});
-
-interface Chatter {
+export interface Chatter {
 	user_id: string;
 	user_login: string;
 	user_name: string;
 }
-function isChatters(data: unknown): data is Chatter[] {
+export function isChatters(data: unknown): data is Chatter[] {
 	return (
 		Array.isArray(data) &&
 		data.every(
