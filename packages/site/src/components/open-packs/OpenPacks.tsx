@@ -21,7 +21,7 @@ import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
-import { chatters, refetchChatters } from '@/lib/client/resources';
+import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = PackEntity & {
 	status?: 'online' | 'offline';
@@ -39,7 +39,15 @@ export default function OpenPacks(props: {
 	children?: JSX.Element;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
+
+	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
+		const res = await fetch(API.TWITCH_CHATTERS);
+		const data = await res.json().catch(() => ({}));
+		return isChatters(data) ? data : [];
+	});
+
 	const currentChatters = () => chatters()?.map((chatter) => chatter.user_name) || [];
+
 
 	const [state, setState] = createStore({
 		packs: props.packs,
