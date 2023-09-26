@@ -8,7 +8,7 @@ export const GET: APIRoute = async (ctx) => {
 	});
 
 	if (ctx.request.headers.get('purpose') === 'prefetch') {
-		return new Response(null, { status: 204 });
+		return new Response(null, { status: 400 });
 	}
 
 	ctx.cookies.delete(AUTH_TOKEN, { path: '/' })
