@@ -50,6 +50,7 @@ export const handler = AuthHandler({
 		}),
 	},
 	async onSuccess(input) {
+		setAdminEnvSession('AuthHandler', 'createNewUserLogin');
 		if (input.provider === 'twitchUser') {
 			const claims = input.tokenset.claims();
 
@@ -104,15 +105,13 @@ export const handler = AuthHandler({
 			const usernames = await getListOfTwitchUsersByIds([claims.sub]);
 			if (usernames.length === 0) throw new Error('No username found');
 
-			setAdminEnvSession('AuthHandler', 'createNewUserLogin');
-
 			const userId = claims.sub;
 			const username = usernames[0].display_name;
 
 			await createNewUser({
 				userId,
 				username,
-			})
+			});
 			const newUser = await createNewUserLogin({
 				userId,
 				username,
