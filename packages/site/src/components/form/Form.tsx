@@ -383,7 +383,7 @@ export function Anchor(props: { children: string; href: string; type?: 'submit' 
 	);
 }
 
-export function SubmitButton(props: { children?: string; onClick?: () => void }) {
+export function SubmitButton(props: { children?: JSX.Element; onClick?: () => void }) {
 	return (
 		<button
 			type="submit"

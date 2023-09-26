@@ -25,7 +25,7 @@ export const handler = SiteHandler(
 		});
 		return {
 			statusCode: 200,
-			body: `Updated user profile!`,
+			body: `Updated profile!`,
 		};
 	}
 );
