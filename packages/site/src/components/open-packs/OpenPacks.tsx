@@ -39,7 +39,7 @@ export default function OpenPacks(props: {
 	children?: JSX.Element;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
-	const currentChatters = chatters()?.map((chatter) => chatter.user_name) || [];
+	const currentChatters = () => chatters()?.map((chatter) => chatter.user_name) || [];
 
 	const [state, setState] = createStore({
 		packs: props.packs,
@@ -56,15 +56,15 @@ export default function OpenPacks(props: {
 
 		state.packs.forEach((pack, index) => {
 			if (!pack.username) return;
-			if (currentChatters.includes(pack.username) && pack.status !== 'online') {
+			if (currentChatters().includes(pack.username) && pack.status !== 'online') {
 				setState('packs', index, 'status', 'online');
 			}
 
-			if (!currentChatters.includes(pack.username) && pack.status !== 'offline') {
+			if (!currentChatters().includes(pack.username) && pack.status !== 'offline') {
 				setState('packs', index, 'status', 'offline');
 			}
 		});
-	})(chatters);
+	})(currentChatters);
 
 	onMount(() => setInterval(refetchChatters, 10000));
 
