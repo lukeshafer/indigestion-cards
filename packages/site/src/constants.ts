@@ -8,6 +8,7 @@ export const PUBLIC_ROUTES = [
 	'/api/get-all-usernames',
 	'/api/search',
 	'/api/auth/*',
+	'/api/user/*',
 	'/card',
 	'/card/*',
 	'/login',
