@@ -4,6 +4,7 @@ import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
 import {
+	createNewUser,
 	createNewUserLogin,
 	getAdminUserById,
 	getUserLoginById,
@@ -69,7 +70,14 @@ export const handler = AuthHandler({
 
 			const user = await getUserLoginById(claims.sub);
 
-			if (user)
+			if (user) {
+				if (!user.hasProfile) {
+					await createNewUser({
+						userId: user.userId,
+						username: user.username,
+					});
+				}
+
 				return {
 					type: 'session',
 					properties: {
@@ -80,16 +88,25 @@ export const handler = AuthHandler({
 						},
 					},
 				};
+			}
 
 			// If user isn't in the database, add them
 			const usernames = await getListOfTwitchUsersByIds([claims.sub]);
 			if (usernames.length === 0) throw new Error('No username found');
 
-			setAdminEnvSession("AuthHandler", "createNewUserLogin");
+			setAdminEnvSession('AuthHandler', 'createNewUserLogin');
 
+			const userId = claims.sub;
+			const username = usernames[0].display_name;
+
+			await createNewUser({
+				userId,
+				username,
+			})
 			const newUser = await createNewUserLogin({
-				userId: claims.sub,
-				username: usernames[0].display_name,
+				userId,
+				username,
+				hasProfile: true,
 			});
 
 			if (!newUser) throw new Error('Failed to create new user');

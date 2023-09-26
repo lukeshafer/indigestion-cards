@@ -743,6 +743,9 @@ const userLogins = new Entity(
 				type: 'string',
 				required: true,
 			},
+			hasProfile: {
+				type: 'boolean',
+			},
 			...auditAttributes('admin'),
 		},
 		indexes: {

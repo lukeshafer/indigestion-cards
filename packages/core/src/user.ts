@@ -4,8 +4,10 @@ import { getUserByLogin } from './twitch-helpers';
 
 type User = typeof db.entities.users;
 type Admin = typeof db.entities.admins;
+type UserLogin = typeof db.entities.userLogins;
 export type UserEntity = EntityItem<User>;
 export type AdminEntity = EntityItem<Admin>;
+export type UserLoginEntity = EntityItem<UserLogin>;
 
 export async function getUser(userId: string) {
 	const user = await db.entities.users.get({ userId }).go();
@@ -220,12 +222,11 @@ export async function getUserLoginById(userId: string) {
 	}
 }
 
-export async function createNewUserLogin(args: { userId: string; username: string }) {
-	const { userId, username } = args;
-	console.log('Creating new user: ', { userId, username });
+export async function createNewUserLogin(args: CreateEntityItem<UserLogin>) {
+	console.log('Creating new user: ', args);
 
 	try {
-		const result = await db.entities.userLogins.create({ userId, username }).go();
+		const result = await db.entities.userLogins.create(args).go();
 		console.log('Created new user: ', result);
 		return result.data;
 	} catch (err) {
