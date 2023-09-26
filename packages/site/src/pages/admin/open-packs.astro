@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import OpenPacksComponent from '@/components/open-packs/OpenPacks';
 import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import Header from '@/components/Header.astro';
 
 const allPacks = await getAllPacks();
 const packs = allPacks
@@ -12,12 +13,13 @@ const startMargin = Astro.cookies.get('openPacksMargin')?.value;
 const startCardScale = Astro.cookies.get('openPacksScale')?.value;
 ---
 
-<Page title="Open Packs" hide-breadcrumbs wide>
+<Page title="Open Packs" hide-breadcrumbs wide no-header>
 	<OpenPacksComponent
 		packs={packs}
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
 		startCardScale={startCardScale ? Number(startCardScale) : undefined}
-		client:load
-	/>
+		client:load>
+		<Header />
+	</OpenPacksComponent>
 </Page>

@@ -8,6 +8,8 @@ import {
 	onMount,
 	type Accessor,
 	type Setter,
+	type JSX,
+	createReaction,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -19,9 +21,10 @@ import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
-import { useViewTransition } from '@/lib/client/utils';
+import { isChatters } from '@/lib/client/chatters';
 
-type PackEntityWithStamps = PackEntity & {
+type PackEntityWithStatus = PackEntity & {
+	status?: 'online' | 'offline';
 	cardDetails: PackEntity['cardDetails'] &
 		{
 			stamps?: string[];
@@ -29,16 +32,26 @@ type PackEntityWithStamps = PackEntity & {
 };
 
 export default function OpenPacks(props: {
-	packs: PackEntityWithStamps[];
+	packs: PackEntityWithStatus[];
 	startMargin?: number;
 	startCardScale?: number;
 	canTest?: boolean;
+	children?: JSX.Element;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
 
+	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
+		const res = await fetch(API.TWITCH_CHATTERS);
+		const data = await res.json().catch(() => ({}));
+		return isChatters(data) ? data : [];
+	});
+
+	const currentChatters = () => chatters()?.map((chatter) => chatter.user_name) || [];
+
+
 	const [state, setState] = createStore({
 		packs: props.packs,
-		activePack: null as PackEntityWithStamps | null,
+		activePack: null as PackEntityWithStatus | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
 		previewedCardId: null as string | null,
@@ -46,11 +59,42 @@ export default function OpenPacks(props: {
 
 	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
 
+	createReaction(() => {
+		console.log('tracking for pack status');
+
+		state.packs.forEach((pack, index) => {
+			if (!pack.username) return;
+			if (currentChatters().includes(pack.username) && pack.status !== 'online') {
+				setState('packs', index, 'status', 'online');
+			}
+
+			if (!currentChatters().includes(pack.username) && pack.status !== 'offline') {
+				setState('packs', index, 'status', 'offline');
+			}
+		});
+	})(currentChatters);
+
+	onMount(() => setInterval(refetchChatters, 10000));
+
 	createEffect(() => {
 		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
 	});
 
-	const setActivePack = (pack: PackEntityWithStamps) => {
+	const moveOnlineToTop = () => {
+		console.log('moving online packs to top');
+		setState(
+			'packs',
+			produce((draft) => {
+				draft.sort((a, b) => {
+					if (a.status === 'online' && b.status !== 'online') return -1;
+					if (a.status !== 'online' && b.status === 'online') return 1;
+					return 0;
+				});
+			})
+		);
+	};
+
+	const setActivePack = (pack: PackEntityWithStatus) => {
 		setState('activePack', { ...pack });
 		if (pack.packId === state.packs[0].packId) return;
 
@@ -101,27 +145,32 @@ export default function OpenPacks(props: {
 
 	return (
 		<div class="flex min-h-[80vh] flex-col">
-			<section
-				class="col-start-1 max-w-[20rem] overflow-y-scroll bg-gray-200 p-6"
-				id="pack-list"
-				style={{ height: listHeightString() }}>
-				<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
-					Coming up...
-				</h2>
-				<ul class="packs flex h-full w-full flex-col pb-2" ref={setAutoAnimate}>
-					<For each={state.packs}>
-						{(pack, index) => (
-							<PackToOpenItem
-								index={index()}
-								pack={pack}
-								activePackId={state.activePack?.packId || ''}
-								setAsActive={() => setActivePack(pack)}
-							/>
-						)}
-					</For>
-				</ul>
-			</section>
-			<div class="flex items-end h-1 gap-4">
+			<div class="flex">
+				<section
+					class="col-start-1 w-[15rem] overflow-y-scroll bg-gray-200 px-4 py-3"
+					id="pack-list"
+					style={{ height: listHeightString() }}>
+					<button onClick={() => moveOnlineToTop()}>
+						<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline">
+							Coming up...
+						</h2>
+					</button>
+					<ul class="packs flex w-full flex-col pb-4" ref={setAutoAnimate}>
+						<For each={state.packs}>
+							{(pack, index) => (
+								<PackToOpenItem
+									index={index()}
+									pack={pack}
+									activePackId={state.activePack?.packId || ''}
+									setAsActive={() => setActivePack(pack)}
+								/>
+							)}
+						</For>
+					</ul>
+				</section>
+				<div class="flex-1">{props.children}</div>
+			</div>
+			<div class="flex h-1 items-end gap-4">
 				<ListHeightAdjuster height={listHeight} setHeight={setListHeight} />
 				<CardScaleAdjuster
 					scale={state.cardScale}
@@ -185,7 +234,7 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 
 	return (
 		<button
-			class="font-heading w-full max-w-[20rem] h-min bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
+			class="font-heading relative z-10 h-min w-full max-w-[20rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
 			onMouseDown={handleMouseDown}>
 			=
 		</button>
@@ -198,7 +247,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100 h-min">
+		<div class="flex h-min w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -215,20 +264,28 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 
 function PackToOpenItem(props: {
 	index: number;
-	pack: PackEntityWithStamps;
+	pack: PackEntityWithStatus;
 	activePackId: string;
 	setAsActive: () => void;
 }) {
 	const isActive = () => props.pack.packId === props.activePackId;
+	const isOnline = () => props.pack.status === 'online';
 
 	return (
 		<li class="pack-list-item">
 			<button
-				class="font-display -mx-2 w-full p-1 pt-2 text-left text-lg italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				class="font-display -mx-2 w-[calc(100%+1rem)] gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
+					'opacity-75': !isOnline() && !isActive(),
 				}}
 				onClick={props.setAsActive}>
+				<span
+					class="mb-1 mr-2 inline-block h-1 w-1 rounded-full outline outline-2"
+					classList={{
+						'bg-brand-main outline-brand-dark': isOnline(),
+						'bg-gray-400 outline-gray-700': !isOnline(),
+					}}></span>
 				{props.pack.username}
 			</button>
 		</li>
@@ -236,7 +293,7 @@ function PackToOpenItem(props: {
 }
 
 function PackShowcase(props: {
-	pack: PackEntityWithStamps | null;
+	pack: PackEntityWithStatus | null;
 	removePack: () => void;
 	flipCard: (instanceId: string) => void;
 	setNextPack: () => void;
@@ -325,13 +382,13 @@ function PackShowcase(props: {
 		<div class="bg-brand-100 relative flex h-full flex-1 flex-col">
 			<div class="flex items-end justify-between pr-8">
 				<h2
-					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
+					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
-					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
+					{props.pack ? 'Opening for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
 						<a
 							href={`${routes.USERS}/${props.pack?.username}`}
-							class="font-display text-brand-main block py-4 text-5xl normal-case italic hover:underline"
+							class="font-display text-brand-main block pb-3 pt-1 text-5xl normal-case italic hover:underline"
 							style={{ 'view-transition-name': 'open-packs-title' }}>
 							{props.pack?.username}
 						</a>
@@ -371,8 +428,8 @@ function PackShowcase(props: {
 }
 
 function ShowcaseCard(props: {
-	card: PackEntityWithStamps['cardDetails'][number];
-	packId: PackEntityWithStamps['packId'];
+	card: PackEntityWithStatus['cardDetails'][number];
+	packId: PackEntityWithStatus['packId'];
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
@@ -450,7 +507,7 @@ function ShowcaseCard(props: {
 	);
 }
 
-function Statistics(props: { activePack: PackEntityWithStamps | null }) {
+function Statistics(props: { activePack: PackEntityWithStatus | null }) {
 	const state = () => ({
 		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened === true),
 		cardsOpenedCount: props.activePack?.cardDetails.filter((card) => card.opened).length || 0,

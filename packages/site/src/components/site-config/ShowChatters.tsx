@@ -1,11 +1,13 @@
 import { createResource } from "solid-js";
 import { API } from "@/constants";
+import { isChatters } from '@/lib/client/chatters';
 
 export default function ShowChatters() {
-	const [chatters, { refetch }] = createResource(async () => {
-		const response = await fetch(API.TWITCH_CHATTERS);
-		return response.text();
-	})
+	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
+		const res = await fetch(API.TWITCH_CHATTERS);
+		const data = await res.json().catch(() => ({}));
+		return isChatters(data) ? data : [];
+	});
 
 	return (
 		<div class="p-4 bg-gray-200">
