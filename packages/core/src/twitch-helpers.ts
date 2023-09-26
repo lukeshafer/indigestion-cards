@@ -443,6 +443,8 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 		//console.error(result.error);
 		throw new Error('Failed to refresh user access token');
 	}
+
+	await setTwitchTokens({ streamer_access_token: result.data.access_token, streamer_refresh_token: result.data.refresh_token });
 	return result.data;
 }
 
@@ -649,13 +651,13 @@ export async function getTwitchChatters(cursor?: string): Promise<z.infer<typeof
 			method: 'GET',
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
-				Authorization: `Bearer ${newToken}`,
+				Authorization: `Bearer ${newToken.access_token}`,
 			},
 		});
 
 		if (!response.ok) {
 			console.error(response, await response.text());
-			throw new Error('Failed to fetch chatters');
+			throw new Error('Failed to fetch chatters after token refresh');
 		}
 	}
 
