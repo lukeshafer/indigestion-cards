@@ -54,8 +54,20 @@ export const handler = AuthHandler({
 			const claims = input.tokenset.claims();
 
 			const adminUser = await getAdminUserById(claims.sub);
+			const user = await getUserLoginById(claims.sub);
 
 			if (adminUser) {
+				if (!user) {
+					await createNewUser({
+						userId: adminUser.userId,
+						username: adminUser.username,
+					});
+					await createNewUserLogin({
+						userId: adminUser.userId,
+						username: adminUser.username,
+						hasProfile: true,
+					});
+				}
 				return {
 					type: 'session',
 					properties: {
@@ -67,8 +79,6 @@ export const handler = AuthHandler({
 					},
 				};
 			}
-
-			const user = await getUserLoginById(claims.sub);
 
 			if (user) {
 				if (!user.hasProfile) {
