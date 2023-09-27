@@ -48,7 +48,9 @@ const user = users[0] || {
 };
 
 const pinnedCard = user.pinnedCard;
-const cardsNotInPack = cardInstances.filter((card) => !!card.openedAt);
+const cardsNotInPack = cardInstances.filter(
+	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+);
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 
@@ -89,10 +91,16 @@ const packTypes = await getAllPackTypes();
 			</ul>
 		</section>
 		{
-			pinnedCard ? (
+			pinnedCard && pinnedCard.instanceId ? (
 				<div class="ml-auto">
 					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
-					<Card {...{ ...pinnedCard, instanceId: pinnedCard.instanceId + "1"}} client:load />
+					<a
+						rel="prefetch"
+						href={`${routes.INSTANCES}/${pinnedCard.designId}/${
+							pinnedCard.instanceId ?? ''
+						}`}>
+						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
+					</a>
 				</div>
 			) : null
 		}

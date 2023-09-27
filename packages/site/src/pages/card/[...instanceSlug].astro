@@ -1,6 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lil-indigestion-cards/core/card';
+import { getUser } from '@lil-indigestion-cards/core/user';
 import { routeNames, routes } from '@/constants';
 import { Heading, PageTitle } from '@/components/text';
 import Card from '@/components/cards/Card';
@@ -27,6 +28,9 @@ const instance = await getCardInstanceById({ designId, instanceId });
 if (!instance) {
 	return Astro.redirect(`${routes.DESIGNS}?error=No instance found with id ${instanceId}`);
 }
+
+const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
+const isPinned = user?.pinnedCard?.instanceId === instance.instanceId;
 
 const isOwnedByCurrentUser =
 	session?.properties.userId === instance.userId && session?.properties.userId;
@@ -68,10 +72,9 @@ const openDate = instance.openedAt
 					userId={session.properties.userId!}
 					instanceId={instance.instanceId}
 					designId={instance.designId}
+					isPinned={isPinned}
 					client:load
-				>
-					Pin to Profile
-				</PinCardToProfileButton>
+				/>
 			</div>
 		) : null
 	}

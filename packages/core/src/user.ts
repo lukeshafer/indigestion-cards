@@ -242,7 +242,7 @@ type PinnedCard = {
 export async function setUserProfile(args: {
 	userId: string;
 	lookingFor?: string;
-	pinnedCard?: PinnedCard;
+	pinnedCard?: PinnedCard | null;
 }) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
@@ -256,6 +256,24 @@ export async function setUserProfile(args: {
 						? result.data[0]
 						: user.pinnedCard
 				)
+		: args.pinnedCard === null
+		? ({
+				instanceId: '',
+				designId: '',
+				imgUrl: '',
+				userId: '',
+				username: '',
+				cardName: '',
+				frameUrl: '',
+				rarityId: '',
+				rarityName: '',
+				seasonId: '',
+				cardNumber: 0,
+				seasonName: '',
+				rarityColor: '',
+				totalOfType: 0,
+				cardDescription: '',
+		  } satisfies EntityItem<typeof db.entities.cardInstances>)
 		: user.pinnedCard;
 
 	return db.entities.users

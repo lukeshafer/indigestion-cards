@@ -12,16 +12,20 @@ export const handler = SiteHandler(
 		},
 	},
 	async (_, ctx) => {
+		const deletePinnedCard =
+			ctx.params.pinnedCardId === 'null' || ctx.params.pinnedCardDesignId === 'null';
+
 		await setUserProfile({
 			userId: ctx.params.userId,
 			lookingFor: ctx.params.lookingFor,
-			pinnedCard:
-				ctx.params.pinnedCardId && ctx.params.pinnedCardDesignId
-					? {
+			pinnedCard: deletePinnedCard
+				? null
+				: ctx.params.pinnedCardId && ctx.params.pinnedCardDesignId
+				? {
 						designId: ctx.params.pinnedCardDesignId,
 						instanceId: ctx.params.pinnedCardId,
-					}
-					: undefined,
+				  }
+				: undefined,
 		});
 		return {
 			statusCode: 200,
