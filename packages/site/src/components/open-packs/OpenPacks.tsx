@@ -63,11 +63,9 @@ export default function OpenPacks(props: {
 
 		state.packs.forEach((pack, index) => {
 			if (!pack.username) return;
-			if (currentChatters().includes(pack.username) && pack.status !== 'online') {
+			if (currentChatters().includes(pack.username)) {
 				setState('packs', index, 'status', 'online');
-			}
-
-			if (!currentChatters().includes(pack.username) && pack.status !== 'offline') {
+			} else {
 				setState('packs', index, 'status', 'offline');
 			}
 		});
