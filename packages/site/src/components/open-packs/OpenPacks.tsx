@@ -134,7 +134,7 @@ export default function OpenPacks(props: {
 		<div class="flex min-h-[80vh] flex-col">
 			<div class="flex">
 				<section
-					class="col-start-1 w-[15rem] overflow-y-scroll bg-gray-200 px-4 py-3"
+					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-scroll bg-gray-200 px-4 py-3"
 					id="pack-list"
 					style={{ height: listHeightString() }}>
 					<button onClick={() => moveOnlineToTop()}>
@@ -262,7 +262,7 @@ function PackToOpenItem(props: {
 		<li class="pack-list-item">
 			<button
 				title={props.isOnline ? 'Online' : 'Offline'}
-				class="font-display -mx-2 w-[calc(100%+1rem)] gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				class="font-display -mx-2 min-w-[calc(100%+1rem)] w-fit mr-2 gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800 whitespace-nowrap"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 					'opacity-75': !props.isOnline && !isActive(),
