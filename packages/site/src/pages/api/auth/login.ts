@@ -2,10 +2,10 @@ import { Auth } from 'sst/node/future/auth';
 import type { APIRoute } from 'astro';
 import { authApi } from '@/constants';
 
-export const get: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx) => {
 	const streamer = ctx.url.searchParams.get('streamer');
 
-	const client_id = ctx.url.host === 'localhost:3000' ? 'local' : 'main';
+	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
 
 	const authParams = new URLSearchParams({
 		client_id: client_id,

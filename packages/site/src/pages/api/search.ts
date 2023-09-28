@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user';
 import { routes } from '@/constants';
 
-export const get: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx) => {
 	const username = ctx.url.searchParams.get('username');
 
 	if (!username) return ctx.redirect(routes.USERS);

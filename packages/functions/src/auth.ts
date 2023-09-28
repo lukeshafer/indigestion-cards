@@ -19,17 +19,19 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
+const callbackPath = '/api/auth/callback';
+
 export const handler = AuthHandler({
 	clients: async () => ({
-		local: 'http://localhost:3000',
-		main: `https://${Config.DOMAIN_NAME}`,
+		local: 'http://localhost:4321' + callbackPath,
+		main: `https://${Config.DOMAIN_NAME}` + callbackPath,
 	}),
 	providers: {
 		twitchStreamer: OauthAdapter({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),
 			clientID: Config.TWITCH_CLIENT_ID,
 			clientSecret: Config.TWITCH_CLIENT_SECRET,
-			scope: 'openid channel:read:redemptions channel:read:subscriptions',
+			scope: 'openid channel:read:redemptions channel:read:subscriptions moderator:read:chatters',
 		}),
 		twitchUser: OauthAdapter({
 			issuer: await Issuer.discover('https://id.twitch.tv/oauth2'),

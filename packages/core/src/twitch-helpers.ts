@@ -443,6 +443,8 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 		//console.error(result.error);
 		throw new Error('Failed to refresh user access token');
 	}
+
+	await setTwitchTokens({ streamer_access_token: result.data.access_token, streamer_refresh_token: result.data.refresh_token });
 	return result.data;
 }
 
@@ -622,4 +624,69 @@ export async function deleteTwitchEventSubscription(id: string) {
 
 		return newResponse;
 	});
+}
+
+export async function getTwitchChatters(cursor?: string): Promise<z.infer<typeof chattersSchema>['data']> {
+	const { streamer_access_token, streamer_refresh_token } = await getTwitchTokens();
+	const fetchUrl = new URL('https://api.twitch.tv/helix/chat/chatters');
+	fetchUrl.searchParams.append('broadcaster_id', Config.STREAMER_USER_ID);
+	fetchUrl.searchParams.append('moderator_id', Config.STREAMER_USER_ID);
+	if (cursor) fetchUrl.searchParams.append('after', cursor);
+	let response = await fetch(fetchUrl.toString(), {
+		method: 'GET',
+		headers: {
+			'Client-ID': Config.TWITCH_CLIENT_ID,
+			Authorization: `Bearer ${streamer_access_token}`,
+		},
+	});
+
+	if (!response.ok) {
+		if (response.status !== 401) {
+			console.error(response, await response.text());
+			throw new Error('Failed to fetch chatters');
+		}
+
+		const newToken = await refreshUserAccessToken({ refresh_token: streamer_refresh_token });
+		response = await fetch(fetchUrl.toString(), {
+			method: 'GET',
+			headers: {
+				'Client-ID': Config.TWITCH_CLIENT_ID,
+				Authorization: `Bearer ${newToken.access_token}`,
+			},
+		});
+
+		if (!response.ok) {
+			console.error(response, await response.text());
+			throw new Error('Failed to fetch chatters after token refresh');
+		}
+	}
+
+	const body = await response.json();
+	const chattersSchema = z.object({
+		data: z.array(
+			z.object({
+				user_id: z.string(),
+				user_login: z.string(),
+				user_name: z.string(),
+			})
+		),
+		total: z.number(),
+		pagination: z.object({
+			cursor: z.string().optional(),
+		}),
+	});
+
+	const result = chattersSchema.safeParse(body);
+	if (!result.success) {
+		console.error(result.error);
+		throw new Error('Failed to parse chatters');
+	}
+
+	const { data, pagination } = result.data;
+	if (pagination?.cursor) {
+		const nextChatters = await getTwitchChatters(pagination.cursor);
+		return [...data, ...nextChatters];
+	}
+
+	return data;
 }

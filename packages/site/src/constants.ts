@@ -25,6 +25,7 @@ const api_paths = {
 	PACK_COUNT: '/pack-count',
 	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
 	STATS: '/stats',
+	TWITCH_CHATTERS: '/twitch/chatters',
 };
 
 export const API = new Proxy(api_paths, {
