@@ -24,7 +24,6 @@ import CardPreview from '../cards/CardPreview';
 import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = PackEntity & {
-	status?: 'online' | 'offline';
 	cardDetails: PackEntity['cardDetails'] &
 		{
 			stamps?: string[];
@@ -56,23 +55,10 @@ export default function OpenPacks(props: {
 
 	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
 
-	const track = createReaction(() => {
-		console.log('tracking for pack status');
-
-		state.packs.forEach((pack, index) => {
-			if (!pack.username) return;
-			if (
-				chatters()?.some(
-					(chatter) => chatter.user_name.toLowerCase() === pack.username?.toLowerCase()
-				)
-			) {
-				setState('packs', index, 'status', 'online');
-			} else {
-				setState('packs', index, 'status', 'offline');
-			}
-		});
-	});
-	track(() => chatters());
+	const getOnlineStatus = (username?: string) =>
+		chatters()?.some(
+			(chatter) => chatter.user_name.toLowerCase() === username?.toLowerCase()
+		) ?? false;
 
 	onMount(() => setInterval(refetchChatters, 10000));
 
@@ -81,13 +67,14 @@ export default function OpenPacks(props: {
 	});
 
 	const moveOnlineToTop = () => {
-		console.log('moving online packs to top');
 		setState(
 			'packs',
 			produce((draft) => {
 				draft.sort((a, b) => {
-					if (a.status === 'online' && b.status !== 'online') return -1;
-					if (a.status !== 'online' && b.status === 'online') return 1;
+					const aStatus = getOnlineStatus(a.username);
+					const bStatus = getOnlineStatus(b.username);
+					if (aStatus && !bStatus) return -1;
+					if (!aStatus && bStatus) return 1;
 					return 0;
 				});
 			})
@@ -162,6 +149,7 @@ export default function OpenPacks(props: {
 									index={index()}
 									pack={pack}
 									activePackId={state.activePack?.packId || ''}
+									isOnline={getOnlineStatus(pack.username)}
 									setAsActive={() => setActivePack(pack)}
 								/>
 							)}
@@ -218,7 +206,6 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 		e.preventDefault();
 		let prevY = e.clientY / 1;
 		const handleMouseMove = (e: MouseEvent) => {
-			console.log('test');
 			props.setHeight((prev) => Math.max(prev + (e.clientY / 1 - prevY), 0));
 			prevY = e.clientY / 1;
 		};
@@ -266,26 +253,26 @@ function PackToOpenItem(props: {
 	index: number;
 	pack: PackEntityWithStatus;
 	activePackId: string;
+	isOnline: boolean;
 	setAsActive: () => void;
 }) {
 	const isActive = () => props.pack.packId === props.activePackId;
-	const isOnline = () => props.pack.status === 'online';
 
 	return (
 		<li class="pack-list-item">
 			<button
-				title={isOnline() ? 'Online' : 'Offline'}
+				title={props.isOnline ? 'Online' : 'Offline'}
 				class="font-display -mx-2 w-[calc(100%+1rem)] gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
-					'opacity-75': !isOnline() && !isActive(),
+					'opacity-75': !props.isOnline && !isActive(),
 				}}
 				onClick={props.setAsActive}>
 				<span
 					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
 					classList={{
-						'bg-brand-main': isOnline(),
-						'': !isOnline(),
+						'bg-brand-main': props.isOnline,
+						'': !props.isOnline,
 					}}></span>
 				{props.pack.username}
 			</button>
@@ -547,13 +534,10 @@ function Statistics(props: { activePack: PackEntityWithStatus | null }) {
 			packTypeId: state.packTypeId || '0',
 		});
 
-		console.log(searchParams.toString());
-
 		const body = await fetch(API.STATS + `?${searchParams.toString()}`).then((res) => {
 			return res.text();
 		});
 
-		console.log(body);
 		const json = JSON.parse(body);
 
 		return {
