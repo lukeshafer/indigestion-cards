@@ -154,6 +154,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 }
 
 export async function getUserByLogin(login: string) {
+	console.log('Getting Twitch user by login: ', login);
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
 	let response = await fetch(fetchUrl, {
@@ -185,6 +186,8 @@ export async function getUserByLogin(login: string) {
 	}
 
 	const body = await response.json();
+
+	console.log("Twitch response body: ", body)
 
 	const schema = z.object({
 		data: z.array(
