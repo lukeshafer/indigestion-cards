@@ -46,8 +46,6 @@ export default function OpenPacks(props: {
 		return isChatters(data) ? data : [];
 	});
 
-	const currentChatters = () => chatters()?.map((chatter) => chatter.user_name) || [];
-
 	const [state, setState] = createStore({
 		packs: props.packs,
 		activePack: null as PackEntityWithStatus | null,
@@ -63,13 +61,13 @@ export default function OpenPacks(props: {
 
 		state.packs.forEach((pack, index) => {
 			if (!pack.username) return;
-			if (currentChatters().includes(pack.username)) {
+			if (chatters()?.some((chatter) => chatter.user_name.toLowerCase() === pack.username?.toLowerCase())) {
 				setState('packs', index, 'status', 'online');
 			} else {
 				setState('packs', index, 'status', 'offline');
 			}
 		});
-	})(currentChatters);
+	})(() => chatters());
 
 	onMount(() => setInterval(refetchChatters, 10000));
 
