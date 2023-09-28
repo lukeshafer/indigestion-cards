@@ -48,7 +48,6 @@ export default function OpenPacks(props: {
 
 	const currentChatters = () => chatters()?.map((chatter) => chatter.user_name) || [];
 
-
 	const [state, setState] = createStore({
 		packs: props.packs,
 		activePack: null as PackEntityWithStatus | null,
@@ -234,7 +233,7 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 
 	return (
 		<button
-			class="font-heading relative z-10 h-min w-full max-w-[20rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
+			class="font-heading relative z-10 h-min w-full max-w-[15rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
 			onMouseDown={handleMouseDown}>
 			=
 		</button>
@@ -274,6 +273,7 @@ function PackToOpenItem(props: {
 	return (
 		<li class="pack-list-item">
 			<button
+				title={isOnline() ? 'Online' : 'Offline'}
 				class="font-display -mx-2 w-[calc(100%+1rem)] gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
@@ -281,10 +281,10 @@ function PackToOpenItem(props: {
 				}}
 				onClick={props.setAsActive}>
 				<span
-					class="mb-1 mr-2 inline-block h-1 w-1 rounded-full outline outline-2"
+					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
 					classList={{
-						'bg-brand-main outline-brand-dark': isOnline(),
-						'bg-gray-400 outline-gray-700': !isOnline(),
+						'bg-brand-main': isOnline(),
+						'': !isOnline(),
 					}}></span>
 				{props.pack.username}
 			</button>
@@ -384,7 +384,7 @@ function PackShowcase(props: {
 				<h2
 					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
-					{props.pack ? 'Opening for ' : 'Select a pack to start'}
+					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
 						<a
 							href={`${routes.USERS}/${props.pack?.username}`}
