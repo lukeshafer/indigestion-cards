@@ -56,18 +56,23 @@ export default function OpenPacks(props: {
 
 	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
 
-	createReaction(() => {
+	const track = createReaction(() => {
 		console.log('tracking for pack status');
 
 		state.packs.forEach((pack, index) => {
 			if (!pack.username) return;
-			if (chatters()?.some((chatter) => chatter.user_name.toLowerCase() === pack.username?.toLowerCase())) {
+			if (
+				chatters()?.some(
+					(chatter) => chatter.user_name.toLowerCase() === pack.username?.toLowerCase()
+				)
+			) {
 				setState('packs', index, 'status', 'online');
 			} else {
 				setState('packs', index, 'status', 'offline');
 			}
 		});
-	})(() => chatters());
+	});
+	track(() => chatters());
 
 	onMount(() => setInterval(refetchChatters, 10000));
 
