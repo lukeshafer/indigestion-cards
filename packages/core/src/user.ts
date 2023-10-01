@@ -48,13 +48,14 @@ export async function getUserAndCardInstances(args: { username: string }) {
 }
 
 export async function createNewUser(args: CreateEntityItem<User>) {
+	// make sure this username isn't already in use
 	const existingUser = await getUserByUserName(args.username);
 	if (existingUser && existingUser.username === args.username) {
 		const twitchData = await getUserByLogin(args.username);
 		if (!twitchData) {
 			throw new Error(`Username ${args.username} is not a valid Twitch user`);
 		}
-		if (twitchData.login === args.username) {
+		if (twitchData.login.toLowerCase() === args.username.toLowerCase()) {
 			// we cannot update the username, as it is still taken
 			throw new Error(`Username ${args.username} is taken`);
 		}
@@ -235,6 +236,19 @@ export async function createNewUserLogin(args: CreateEntityItem<UserLogin>) {
 	}
 }
 
+export async function updateUserLogin(args: { userId: string; hasProfile: boolean }) {
+	try {
+		const result = await db.entities.userLogins
+			.update({ userId: args.userId })
+			.set({ hasProfile: args.hasProfile })
+			.go();
+		return result.data;
+	} catch (err) {
+		console.error(err);
+		return null;
+	}
+}
+
 type PinnedCard = {
 	instanceId: string;
 	designId: string;
@@ -249,15 +263,15 @@ export async function setUserProfile(args: {
 
 	const card = args.pinnedCard
 		? await db.entities.cardInstances.query
-				.byId(args.pinnedCard)
-				.go()
-				.then((result) =>
-					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
-						? result.data[0]
-						: user.pinnedCard
-				)
+			.byId(args.pinnedCard)
+			.go()
+			.then((result) =>
+				result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+					? result.data[0]
+					: user.pinnedCard
+			)
 		: args.pinnedCard === null
-		? ({
+			? ({
 				instanceId: '',
 				designId: '',
 				imgUrl: '',
@@ -273,8 +287,8 @@ export async function setUserProfile(args: {
 				rarityColor: '',
 				totalOfType: 0,
 				cardDescription: '',
-		  } satisfies EntityItem<typeof db.entities.cardInstances>)
-		: user.pinnedCard;
+			} satisfies EntityItem<typeof db.entities.cardInstances>)
+			: user.pinnedCard;
 
 	return db.entities.users
 		.patch({ userId: args.userId })

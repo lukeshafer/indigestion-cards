@@ -4,7 +4,7 @@ import { createSignal, type JSX } from 'solid-js';
 import { USER_API } from '@/constants';
 
 export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser: boolean }) {
-	const [lookingFor, setLookingFor] = createSignal(props.user.lookingFor || '???');
+	const [lookingFor, setLookingFor] = createSignal(props.user.lookingFor || '');
 	const [isEditing, setIsEditing] = createSignal(false);
 
 	return (
@@ -23,6 +23,7 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 							/>
 						</div>
 						<Button type="submit">Save</Button>
+						<Button onclick={() => setIsEditing(false)}>Cancel</Button>
 					</div>
 				</Form>
 			) : lookingFor().trim() ? (
@@ -31,7 +32,22 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 						Looking for: <span class="font-medium">{lookingFor() || '???'}</span>
 					</p>
 					{props.isLoggedInUser ? (
-						<Button onClick={() => setIsEditing(true)}>Edit</Button>
+						<>
+							<Button onClick={() => setIsEditing(true)}>Edit</Button>
+								<div class="w-min">
+									<Form
+										action={USER_API.USER}
+										method="patch"
+										onsuccess={() => {
+											setLookingFor('');
+											setIsEditing(false);
+										}}>
+										<input type="hidden" name="userId" value={props.user.userId} />
+										<input type="hidden" name="lookingFor" value=" " />
+										<Button type="submit">Delete</Button>
+									</Form>
+								</div>
+						</>
 					) : null}
 				</div>
 			) : props.isLoggedInUser ? (

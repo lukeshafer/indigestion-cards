@@ -7,8 +7,10 @@ import {
 	createNewUser,
 	createNewUserLogin,
 	getAdminUserById,
+	getUser,
 	getUserLoginById,
 	setAdminEnvSession,
+	updateUserLogin,
 } from '@lil-indigestion-cards/core/user';
 import {
 	setTwitchTokens,
@@ -55,14 +57,17 @@ export const handler = AuthHandler({
 			const claims = input.tokenset.claims();
 
 			const adminUser = await getAdminUserById(claims.sub);
-			const user = await getUserLoginById(claims.sub);
+			const userLogin = await getUserLoginById(claims.sub);
+			const userProfile = await getUser(claims.sub);
 
 			if (adminUser) {
-				if (!user) {
+				if (!userProfile) {
 					await createNewUser({
 						userId: adminUser.userId,
 						username: adminUser.username,
 					});
+				}
+				if (!userLogin) {
 					await createNewUserLogin({
 						userId: adminUser.userId,
 						username: adminUser.username,
@@ -81,11 +86,20 @@ export const handler = AuthHandler({
 				};
 			}
 
-			if (user) {
-				if (!user.hasProfile) {
+			if (userLogin) {
+				console.log('User login found');
+				if (!userProfile) {
+					console.log('User login found, but no profile');
 					await createNewUser({
-						userId: user.userId,
-						username: user.username,
+						userId: userLogin.userId,
+						username: userLogin.username,
+					});
+				}
+				if (!userLogin.hasProfile) {
+					// user has profile now, update login to reflect that
+					await updateUserLogin({
+						userId: userLogin.userId,
+						hasProfile: true,
 					});
 				}
 
@@ -94,8 +108,8 @@ export const handler = AuthHandler({
 					properties: {
 						type: 'user',
 						properties: {
-							userId: user.userId,
-							username: user.username,
+							userId: userLogin.userId,
+							username: userLogin.username,
 						},
 					},
 				};
@@ -108,10 +122,13 @@ export const handler = AuthHandler({
 			const userId = claims.sub;
 			const username = usernames[0].display_name;
 
-			await createNewUser({
-				userId,
-				username,
-			});
+			console.log(userProfile);
+			if (!userProfile)
+				await createNewUser({
+					userId,
+					username,
+				});
+
 			const newUser = await createNewUserLogin({
 				userId,
 				username,

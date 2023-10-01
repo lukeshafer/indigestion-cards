@@ -6,7 +6,6 @@ function clickOutside(el: Element, accessor: () => any) {
 	const onClick = (e: MouseEvent) => {
 		if (!el.contains(e.target as Element)) {
 			e.stopPropagation();
-			console.log('click outside');
 			accessor()?.();
 		}
 	};
@@ -47,18 +46,16 @@ export default function UserConfig(props: {
 			/>
 			<Show when={isOpen()}>
 				<menu
-					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-black/20 shadow-md"
+					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20"
 					use:clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
-							class="font-display pt-2 text-center font-bold italic hover:underline text-gray-900"
+							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline"
 							href={`/user/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
 					) : (
-						<a
-							class="font-display pt-2 text-center font-bold hover:underline"
-							href="/login">
+						<a class="font-display pt-2 text-center font-bold underline" href="/login" data-astro-reload>
 							Login with Twitch
 						</a>
 					)}
@@ -78,6 +75,10 @@ export default function UserConfig(props: {
 						{props.user ? (
 							<a
 								class="flex gap-4 font-medium hover:underline"
+								onClick={() => {
+									// change page manually to avoid using cached data from prefetch
+									window.location.href = `/api/auth/logout`;
+								}}
 								data-astro-reload
 								href="/api/auth/logout">
 								Logout
@@ -94,10 +95,7 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 	return (
 		<button
 			class="group flex h-full items-center justify-center transition-transform duration-300 hover:brightness-90"
-			onClick={(e) => {
-				console.log('click button');
-				props.onClick?.();
-			}}>
+			onClick={(e) => props.onClick?.()}>
 			{props.user ? (
 				<img
 					width="40"
