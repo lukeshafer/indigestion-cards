@@ -13,5 +13,5 @@ export const GET: APIRoute = async (ctx) => {
 
 	ctx.cookies.delete(AUTH_TOKEN, { path: '/' });
 
-	return ctx.redirect('/', 302);
+	return ctx.redirect('/?alert=Logged%20out!', 302);
 };

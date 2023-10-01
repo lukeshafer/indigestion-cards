@@ -2,6 +2,7 @@ import { For, JSX, ParentProps, Show, createSignal } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
+import { useViewTransition } from '@/lib/client/utils';
 
 export function Form(props: {
 	children: JSX.Element;
@@ -80,10 +81,12 @@ export function Form(props: {
 		const responseBody = await response.text();
 
 		if (response.ok) {
-			setAlerts((alerts) => [
-				...alerts,
-				{ message: responseBody || 'Success!', type: 'success' },
-			]);
+			useViewTransition(() => {
+				setAlerts((alerts) => [
+					...alerts,
+					{ message: responseBody || 'Success!', type: 'success' },
+				]);
+			});
 			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
@@ -92,10 +95,12 @@ export function Form(props: {
 			}
 			if (props.successRefresh) location.reload();
 		} else {
-			setAlerts((alerts) => [
-				...alerts,
-				{ message: responseBody || 'There was an error.', type: 'error' },
-			]);
+			useViewTransition(() => {
+				setAlerts((alerts) => [
+					...alerts,
+					{ message: responseBody || 'There was an error.', type: 'error' },
+				]);
+			});
 			if (props.errorRedirect) {
 				const redirectURL = new URL(props.errorRedirect, window.location.origin);
 				if (redirectURL.pathname !== location.pathname) {
