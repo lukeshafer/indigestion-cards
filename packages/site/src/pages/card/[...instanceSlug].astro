@@ -24,9 +24,12 @@ if (!instanceId) {
 }
 
 const instance = await getCardInstanceById({ designId, instanceId });
-
 if (!instance) {
-	return Astro.redirect(`${routes.DESIGNS}?error=No instance found with id ${instanceId}`);
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+}
+
+if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
 const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
@@ -81,29 +84,29 @@ const openDate = instance.openedAt
 	<section class="mx-auto text-lg">
 		<Heading>Stats:</Heading>
 		<p>
-			<b>Rarity:</b>
+			<b>Rarity:{' '}</b>
 			{instance.rarityName}
 		</p>
 		<p>
-			<b>Card:</b>
+			<b>Card:{' '}</b>
 			<a class="underline" href={`${routes.CARDS}/${instance.designId}`}
 				>{instance.cardName}</a
 			>
 		</p>
 		<p>
-			<b>Card Number:</b>
+			<b>Card Number:{' '}</b>
 			{instance.cardNumber}
 		</p>
 		<AdminOnly>
 			<p>
-				<b>Season:</b>
+				<b>Season:{' '}</b>
 				<a class="underline" href={`${routes.SEASONS}/${instance.seasonId}`}
 					>{instance.seasonName}</a
 				>
 			</p>
 		</AdminOnly>
 		<p>
-			<b>Owner:</b>
+			<b>Owner:{' '}</b>
 			{
 				instance.username ? (
 					<a class="underline" href={`${routes.USERS}/${instance.username}`}>
@@ -115,7 +118,7 @@ const openDate = instance.openedAt
 			}
 		</p>
 		<p>
-			<b>Minter:</b>
+			<b>Minter:{' '}</b>
 			{
 				instance.minterUsername ? (
 					<a class="underline" href={`${routes.USERS}/${instance.minterUsername}`}>
@@ -127,7 +130,7 @@ const openDate = instance.openedAt
 			}
 		</p>
 		<p>
-			<b>Opened at:</b>
+			<b>Opened at:{' '}</b>
 			{instance.openedAt ? <time datetime={openDate}>{openDate}</time> : 'Not opened yet'}
 		</p>
 	</section>

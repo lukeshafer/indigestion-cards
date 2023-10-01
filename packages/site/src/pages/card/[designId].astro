@@ -62,13 +62,13 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
-		<section class="text-lg mx-auto">
+		<section class="mx-auto text-lg">
 			<p>
-				<b>Season: </b>
+				<b>Season:{' '}</b>
 				{design.seasonName}
 			</p>
 			<p>
-				<b>Artist: </b>
+				<b>Artist:{' '}</b>
 				{design.artist}
 			</p>
 		</section>
@@ -76,7 +76,7 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 			<EditDesignForm {...design} client:load />
 		</AdminOnly>
 	</header>
-	<section class="text-center flex flex-col">
+	<section class="flex flex-col text-center">
 		<Heading>Cards Opened</Heading>
 		<CardList
 			cards={openedInstances}
@@ -88,7 +88,7 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 	<AdminOnly>
 		<details>
 			<summary class="font-heading text-xl">Stats for Admins</summary>
-			<p class="text-red-600 font-bold">
+			<p class="font-bold text-red-600">
 				This section is only visible to admins: not for stream!
 			</p>
 			<div class="my-4 flex flex-col gap-8">

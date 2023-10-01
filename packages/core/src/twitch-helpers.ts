@@ -155,6 +155,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 
 export type TwitchUser = NonNullable<Awaited<ReturnType<typeof getUserByLogin>>>;
 export async function getUserByLogin(login: string) {
+	console.log('Getting Twitch user by login: ', login);
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
 	let response = await fetch(fetchUrl, {
@@ -186,6 +187,8 @@ export async function getUserByLogin(login: string) {
 	}
 
 	const body = await response.json();
+
+	console.log("Twitch response body: ", body)
 
 	const schema = z.object({
 		data: z.array(
@@ -444,6 +447,8 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 		//console.error(result.error);
 		throw new Error('Failed to refresh user access token');
 	}
+
+	await setTwitchTokens({ streamer_access_token: result.data.access_token, streamer_refresh_token: result.data.refresh_token });
 	return result.data;
 }
 
@@ -650,13 +655,13 @@ export async function getTwitchChatters(cursor?: string): Promise<z.infer<typeof
 			method: 'GET',
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
-				Authorization: `Bearer ${newToken}`,
+				Authorization: `Bearer ${newToken.access_token}`,
 			},
 		});
 
 		if (!response.ok) {
 			console.error(response, await response.text());
-			throw new Error('Failed to fetch chatters');
+			throw new Error('Failed to fetch chatters after token refresh');
 		}
 	}
 
