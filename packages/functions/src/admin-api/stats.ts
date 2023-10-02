@@ -34,11 +34,26 @@ async function getShitPackOdds(args: {
 	if (args.remainingCardCount === 0) return 1;
 
 	// Get all the remaining cards for the pack type
-	const remainingCardsInPool = await getPackTypeById(args)
-		.then(getCardPoolFromType)
-		.then(getRemainingPossibleCardsFromCardPool);
+	const cardPool = await getPackTypeById(args).then(getCardPoolFromType);
+	const remainingCardsInPool = getRemainingPossibleCardsFromCardPool(cardPool);
+	const unopenedCards = cardPool.cardInstances
+		.filter((card) => !card.openedAt)
+		.map(
+			(card) =>
+				({
+					designId: card.designId,
+					rarityId: card.rarityId,
+					cardNumber: card.cardNumber,
+					totalOfType: card.totalOfType,
+				}) satisfies {
+					designId: string;
+					rarityId: string;
+					cardNumber: number;
+					totalOfType: number;
+				}
+		);
 
-	const bronzesRemaining = remainingCardsInPool.filter((card) => card.totalOfType >= 50);
+	const bronzesRemaining = remainingCardsInPool.filter((card) => card.totalOfType >= 50).concat(unopenedCards);
 
 	const oddsOfBronze = bronzesRemaining.length / remainingCardsInPool.length;
 
