@@ -51,6 +51,10 @@ export default function OpenPacks(props: {
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
 		previewedCardId: null as string | null,
+		draggingIndex: null as number | null,
+		hoveringIndex: null as number | null,
+		draggingY: null as number | null,
+		hidden: true,
 	});
 
 	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
@@ -64,10 +68,30 @@ export default function OpenPacks(props: {
 		const activePackId = window.localStorage.getItem('activePackId');
 		const activePackFromStorage = state.packs.find((pack) => pack.packId === activePackId);
 		if (activePackFromStorage) {
-			setActivePack(activePackFromStorage)
+			setActivePack(activePackFromStorage);
+		}
+
+		const packOrder = window.localStorage.getItem('packOrder');
+		let parsedOrder: string[] = [];
+		try {
+			parsedOrder = JSON.parse(packOrder || '[]');
+		} catch {
+			parsedOrder = [];
+		}
+		const storedSorted = parsedOrder.slice().sort();
+		const sorted = state.packs.map((pack) => pack.packId).sort();
+		if (JSON.stringify(storedSorted) === JSON.stringify(sorted)) {
+			setState(
+				'packs',
+				parsedOrder.map((packId) => state.packs.find((p) => p.packId === packId)!)
+			);
+		} else {
+			window.localStorage.removeItem('packOrder');
 		}
 
 		setInterval(refetchChatters, 10000);
+
+		setState('hidden', false);
 	});
 
 	createEffect(() => {
@@ -76,6 +100,13 @@ export default function OpenPacks(props: {
 
 	createEffect(() => {
 		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
+	});
+
+	createEffect(() => {
+		window.localStorage.setItem(
+			'packOrder',
+			JSON.stringify(state.packs.map((pack) => pack.packId))
+		);
 	});
 
 	const moveOnlineToTop = () => {
@@ -154,7 +185,39 @@ export default function OpenPacks(props: {
 							Coming up...
 						</h2>
 					</button>
-					<ul class="packs flex w-full flex-col pb-4" ref={setAutoAnimate}>
+					<ul
+						classList={{
+							'opacity-0': state.hidden,
+						}}
+						class="packs relative flex w-full flex-col"
+						ref={setAutoAnimate}
+						onMouseMove={(e) => {
+							if (state.draggingIndex === null) return;
+							const mouseY = e.y - e.currentTarget.offsetTop;
+							setState('draggingY', mouseY);
+						}}
+						onMouseUp={() => {
+							const draggingIndex = state.draggingIndex;
+							const hoveringIndex = state.hoveringIndex;
+
+							if (draggingIndex !== null && hoveringIndex !== null) {
+								const modifiedHoveringIndex =
+									hoveringIndex > draggingIndex
+										? hoveringIndex - 1
+										: hoveringIndex;
+
+								setState(
+									'packs',
+									produce((draft) => {
+										// move the dragging index to the hovering index
+										const draggingPack = draft.splice(draggingIndex, 1)[0];
+										draft.splice(modifiedHoveringIndex, 0, draggingPack);
+									})
+								);
+							}
+
+							setState('draggingIndex', null);
+						}}>
 						<For each={state.packs}>
 							{(pack, index) => (
 								<PackToOpenItem
@@ -163,9 +226,22 @@ export default function OpenPacks(props: {
 									activePackId={state.activePack?.packId || ''}
 									isOnline={getOnlineStatus(pack.username)}
 									setAsActive={() => setActivePack(pack)}
+									draggingIndex={state.draggingIndex}
+									setAsDragging={() => setState('draggingIndex', index())}
+									setAsHovering={() => setState('hoveringIndex', index())}
+									isHovering={state.hoveringIndex === index()}
+									draggingY={state.draggingY}
 								/>
 							)}
 						</For>
+						<div
+							class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic "
+							classList={{
+								'bg-gray-300/50':
+									state.hoveringIndex === state.packs.length &&
+									state.draggingIndex !== null,
+							}}
+							onMouseMove={() => setState('hoveringIndex', state.packs.length)}></div>
 					</ul>
 				</section>
 				<div class="flex-1">{props.children}</div>
@@ -267,19 +343,53 @@ function PackToOpenItem(props: {
 	activePackId: string;
 	isOnline: boolean;
 	setAsActive: () => void;
+	setAsDragging: () => void;
+	setAsHovering: () => void;
+	draggingIndex: number | null;
+	isHovering: boolean;
+	draggingY: number | null;
 }) {
 	const isActive = () => props.pack.packId === props.activePackId;
+	let timeout: number | NodeJS.Timeout;
+	const isDragging = () => props.draggingIndex === props.index;
+	let wasDragging = false;
 
 	return (
-		<li class="pack-list-item">
+		<li
+			onMouseMove={(e) => {
+				if (!isDragging()) {
+					props.setAsHovering();
+				}
+			}}>
+			<Show when={props.isHovering && props.draggingIndex !== null}>
+				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic"></div>
+			</Show>
 			<button
 				title={props.isOnline ? 'Online' : 'Offline'}
 				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 					'opacity-75': !props.isOnline && !isActive(),
+					'absolute top-0 opacity-50': isDragging(),
 				}}
-				onClick={props.setAsActive}>
+				style={{
+					'transform-origin': 'center left',
+					transform: isDragging() ? `translateY(${props.draggingY}px)` : '',
+				}}
+				onMouseDown={(e) => {
+					timeout = setTimeout(() => {
+						props.setAsDragging();
+						wasDragging = true;
+					}, 100);
+				}}
+				onClick={() => {
+					clearTimeout(timeout);
+					if (!isDragging() && wasDragging) {
+						wasDragging = false;
+						return;
+					}
+					props.setAsActive();
+				}}>
 				<span
 					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
 					classList={{
