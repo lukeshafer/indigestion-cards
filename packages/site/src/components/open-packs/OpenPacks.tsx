@@ -60,10 +60,22 @@ export default function OpenPacks(props: {
 			(chatter) => chatter.user_name.toLowerCase() === username?.toLowerCase()
 		) ?? false;
 
-	onMount(() => setInterval(refetchChatters, 10000));
+	onMount(() => {
+		const activePackId = window.localStorage.getItem('activePackId');
+		const activePackFromStorage = state.packs.find((pack) => pack.packId === activePackId);
+		if (activePackFromStorage) {
+			setActivePack(activePackFromStorage)
+		}
+
+		setInterval(refetchChatters, 10000);
+	});
 
 	createEffect(() => {
 		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
+	});
+
+	createEffect(() => {
+		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
 	});
 
 	const moveOnlineToTop = () => {
@@ -262,7 +274,7 @@ function PackToOpenItem(props: {
 		<li class="pack-list-item">
 			<button
 				title={props.isOnline ? 'Online' : 'Offline'}
-				class="font-display -mx-2 min-w-[calc(100%+1rem)] w-fit mr-2 gap-2 px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800 whitespace-nowrap"
+				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
 					'opacity-75': !props.isOnline && !isActive(),
