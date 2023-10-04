@@ -119,6 +119,11 @@ body.disable-animations * {
 		--spacing-main: 60rem;
 	}
 
+	:root * {
+		transition: color 50ms ease-in-out, background-color 50ms ease-in-out,
+			border-color 50ms ease-in-out, box-shadow 50ms ease-in-out;
+	}
+
 	*::selection {
 		background: theme('colors.accent.light');
 		color: #000;

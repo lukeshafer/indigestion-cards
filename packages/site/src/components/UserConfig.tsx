@@ -23,8 +23,15 @@ export default function UserConfig(props: {
 	const [disableAnimations, setDisableAnimations] = createSignal(
 		props.disableAnimations ?? false
 	);
+	const [colorTheme, setColorTheme] = createSignal<'light' | 'dark'>('light');
+
 	onMount(() => {
 		setDisableAnimations(localStorage.getItem('disableAnimations') === 'true');
+
+		let theme = localStorage.getItem('theme');
+		if (theme === 'dark' || theme === 'light') {
+			setColorTheme(theme);
+		}
 	});
 
 	createEffect(() => {
@@ -36,6 +43,11 @@ export default function UserConfig(props: {
 			document.body.dataset['astro-reload'] = 'true';
 		}
 	});
+
+	createEffect(() => {
+		document.documentElement.classList.toggle('dark', colorTheme() === 'dark');
+		localStorage.setItem('theme', colorTheme());
+	})
 
 	return (
 		<div class="relative z-10">
@@ -74,6 +86,18 @@ export default function UserConfig(props: {
 								setDisableAnimations((v) => !v);
 							}}>
 							Disable Animations
+						</button>
+						<button
+							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600 dark:before:border-gray-200"
+							classList={{
+								'before:content-["✔"]': colorTheme() === 'dark',
+								'before:content-[""]': colorTheme() === 'light',
+							}}
+							aria-pressed={colorTheme() === 'dark'}
+							onClick={() => {
+								setColorTheme((v) => v === 'dark' ? 'light' : 'dark');
+							}}>
+							Dark Mode
 						</button>
 						{props.user ? (
 							<a
