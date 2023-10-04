@@ -8,7 +8,7 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 	const [isEditing, setIsEditing] = createSignal(false);
 
 	return (
-		<div class="text-gray-800">
+		<div class="text-gray-800 dark:text-gray-100">
 			{isEditing() ? (
 				<Form action={USER_API.USER} method="patch" onsubmit={() => setIsEditing(false)}>
 					<input type="hidden" name="userId" value={props.user.userId} />

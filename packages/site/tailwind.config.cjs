@@ -31,6 +31,7 @@ module.exports = {
 					dark: '#bc40a0',
 					light: '#f9b7eb',
 					100: '#FFE0F9',
+					950: '#713965',
 				},
 				accent: {
 					main: '#31FFD6',

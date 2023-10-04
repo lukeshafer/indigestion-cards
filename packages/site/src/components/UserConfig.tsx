@@ -46,11 +46,11 @@ export default function UserConfig(props: {
 			/>
 			<Show when={isOpen()}>
 				<menu
-					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20"
+					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 dark:text-gray-100 shadow-md shadow-black/20"
 					use:clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
-							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline"
+							class="font-display pt-2 text-center font-bold italic text-gray-900 dark:text-gray-50 hover:underline"
 							href={`/user/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
@@ -64,7 +64,7 @@ export default function UserConfig(props: {
 					)}
 					<ul class="flex w-max flex-col items-end gap-1">
 						<button
-							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600"
+							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600 dark:before:border-gray-200"
 							classList={{
 								'before:content-["✔"]': disableAnimations(),
 								'before:content-[""]': !disableAnimations(),

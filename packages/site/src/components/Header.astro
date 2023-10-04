@@ -20,7 +20,7 @@ const headerLinks = [
 const twitchData = username ? await getUserByLogin(username) : null;
 ---
 
-<div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-black">
+<div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
 	<header
 		class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
 		<AdminOnly>
@@ -47,16 +47,14 @@ const twitchData = username ? await getUserByLogin(username) : null;
 						href={href}
 						title={title}
 						transition:name={`page-header-nav-${href}`}
-						class="relative rounded px-2 py-1 text-gray-700 transition-colors hover:bg-gray-200"
+						class="relative rounded px-2 py-1 transition-colors "
 						class:list={{
-							'text-brand-main bg-brand-100 font-bold': currentPage.startsWith(href),
+							'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
+								currentPage.startsWith(href),
+							'text-gray-700 hover:bg-gray-200 hover:text-black dark:font-medium dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white':
+								!currentPage.startsWith(href),
 						}}>
-						<span
-							class:list={{
-								'text-brand-main font-bold': currentPage.startsWith(href),
-							}}>
-							{title}
-						</span>
+						{title}
 					</a>
 				))
 			}
