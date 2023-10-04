@@ -1,4 +1,4 @@
-import { routes, NO_CARDS_OPENED_ID} from '@/constants';
+import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
 import styles from './CardList.module.css';
@@ -58,7 +58,8 @@ export default function CardList(props: {
 					<For each={sortedCards()}>
 						{(card) => (
 							<div class="w-fit">
-								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID || props.sessionType === 'admin' ? (
+								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID ||
+								props.sessionType === 'admin' ? (
 									<>
 										<a
 											rel="prefetch"
@@ -109,19 +110,9 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 					+a.cardNumber - +b.cardNumber
 			);
 		case 'rarest':
-			return cards.sort(
-				(a, b) =>
-					a.totalOfType - b.totalOfType ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
-			);
+			return cards.sort(rarestCardSort);
 		case 'common':
-			return cards.sort(
-				(a, b) =>
-					b.totalOfType - a.totalOfType ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
-			);
+			return cards.sort(rarestCardSort).reverse();
 		case 'open-date-desc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
@@ -157,4 +148,23 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 		default:
 			return cards;
 	}
+}
+
+function rarestCardSort(a: CardType, b: CardType) {
+	if (a.totalOfType !== b.totalOfType) {
+		return a.totalOfType - b.totalOfType;
+	}
+
+	if (a.rarityId === LEGACY_CARD_ID && b.rarityId !== LEGACY_CARD_ID) {
+		return -1;
+	} else if (b.rarityId === LEGACY_CARD_ID && a.rarityId !== LEGACY_CARD_ID) {
+		return 1;
+	}
+	if (a.rarityId === FULL_ART_ID && b.rarityId !== FULL_ART_ID) {
+		return -1;
+	} else if (b.rarityId === FULL_ART_ID && a.rarityId !== FULL_ART_ID) {
+		return 1;
+	}
+
+	return a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber;
 }

@@ -188,8 +188,6 @@ export async function getUserByLogin(login: string) {
 
 	const body = await response.json();
 
-	console.log("Twitch response body: ", body)
-
 	const schema = z.object({
 		data: z.array(
 			z
@@ -437,14 +435,14 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 	}
 
 	const rawBody = await response.json();
-	console.log('Twitch response to refresh request: ', rawBody);
+
 	const bodySchema = z.object({
 		access_token: z.string(),
 		refresh_token: z.string(),
 	});
 	const result = bodySchema.safeParse(rawBody);
 	if (!result.success) {
-		//console.error(result.error);
+		console.error(result.error);
 		throw new Error('Failed to refresh user access token');
 	}
 
