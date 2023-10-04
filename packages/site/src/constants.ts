@@ -8,8 +8,11 @@ export const PUBLIC_ROUTES = [
 	'/api/get-all-usernames',
 	'/api/search',
 	'/api/auth/*',
+	'/api/user/*',
 	'/card',
 	'/card/*',
+	'/login',
+	'/logout',
 ] as const;
 
 const api_paths = {
@@ -33,6 +36,18 @@ export const API = new Proxy(api_paths, {
 		if (!(prop in target)) return undefined;
 		const path = target[prop as keyof typeof target];
 		return '/api/admin' + path;
+	},
+});
+
+const user_api_paths = {
+	USER: '/user',
+};
+
+export const USER_API = new Proxy(user_api_paths, {
+	get: (target, prop) => {
+		if (!(prop in target)) return undefined;
+		const path = target[prop as keyof typeof target];
+		return '/api/user' + path;
 	},
 });
 
