@@ -25,6 +25,10 @@ export const handler = ProtectedApiHandler(async () => {
 	const userId = username ? paramUserId ?? (await getUserByLogin(username))?.id ?? null : null;
 	const packCount = rawCount || 1;
 
+	if (username && !userId) return { statusCode: 400, body: `User ${username} does not exist` };
+
+	console.log('Creating pack for user: ', { username, userId, packCount, packTypeString });
+
 	try {
 		const packType = JSON.parse(packTypeString);
 

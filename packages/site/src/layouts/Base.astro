@@ -16,7 +16,7 @@ const { title, pageType = 'private' } = Astro.props;
 
 const session = Astro.locals.session;
 
-const disableAnimations = Astro.cookies.get('disable-animations').boolean();
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 ---
 
 <html lang="en" class="bg-gray-50 dark:bg-gray-950 text-gray-950 dark:text-gray-50">
@@ -33,7 +33,13 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#ffffff" />
-		<title>{title || 'Indigestion Cards'}</title>
+		<title>
+			{
+				title && title !== 'Indigestion Cards'
+					? title + ' — Indigestion Cards'
+					: 'Indigestion Cards'
+			}
+		</title>
 		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>
 	<body>

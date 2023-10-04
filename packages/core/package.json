@@ -1,22 +1,21 @@
 {
-  "name": "@lil-indigestion-cards/core",
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "test": "sst bind vitest",
-    "typecheck": "tsc -noEmit"
-  },
-  "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.398.0",
-    "@aws-sdk/client-s3": "^3.398.0",
-    "@aws-sdk/client-secrets-manager": "^3.398.0",
-    "@types/node": "^18.15.11",
-    "sst": "2.26.2",
-    "vitest": "^0.29.8"
-  },
-  "dependencies": {
-    "electrodb": "^2.5.1",
-    "node-fetch": "^3.3.1",
-    "zod": "^3.21.4"
-  }
+	"name": "@lil-indigestion-cards/core",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"test": "sst bind vitest",
+		"typecheck": "tsc -noEmit"
+	},
+	"devDependencies": {
+		"@aws-sdk/client-dynamodb": "^3.398.0",
+		"@aws-sdk/client-s3": "^3.398.0",
+		"@aws-sdk/client-secrets-manager": "^3.398.0",
+		"@types/node": "^18.15.11",
+		"sst": "2.26.5"
+	},
+	"dependencies": {
+		"electrodb": "^2.5.1",
+		"node-fetch": "^3.3.1",
+		"zod": "^3.21.4"
+	}
 }

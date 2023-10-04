@@ -74,11 +74,17 @@ export function API({ app, stack }: StackContext) {
 			'POST /save-config': 'packages/functions/src/admin-api/save-config.handler',
 			// STATS
 			'GET /stats': 'packages/functions/src/admin-api/stats.handler',
+			// TWITCH
+			'GET /twitch/chatters': 'packages/functions/src/admin-api/twitch/chatters/get.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 				}
 				: {}),
+
+			// USER ENDPOINTS
+			// USER
+			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
 		},
 		defaults: {
 			function: {

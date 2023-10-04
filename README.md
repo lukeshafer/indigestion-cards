@@ -20,3 +20,4 @@ All TypeScript code for the site runs on **AWS Lambda**. We use **DynamoDB** for
 ### Website
 
 The website is built using [Astro](https://astro.build), a web framework for building server-rendered websites using JavaScript. Astro's focus on server-generated, content-based sites made it a natural fit for this project. Astro also provides integrations for a few libraries we use, like [SolidJS](https://solidjs.com) for client-side interaction and [TailwindCSS](https://tailwindcss.com) for styling with CSS.
+

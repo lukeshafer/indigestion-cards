@@ -28,7 +28,10 @@ export default function UserSearch() {
 	};
 
 	return (
-		<div class="relative w-40 md:w-auto" use:searchDirective>
+		<div
+			class="relative w-40 md:w-auto"
+			use:searchDirective
+			style={{ 'view-transition-name': 'user-search-bar' }}>
 			<Form action={publicApi.SEARCH} method="get">
 				<TextInput
 					list="users"

@@ -1,5 +1,5 @@
 import { Table } from 'sst/node/table';
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, EntityConfiguration, Entity, Service } from 'electrodb';
 
 export const config = {
@@ -390,6 +390,58 @@ const users = new Entity(
 				required: true,
 				default: 0,
 			},
+			lookingFor: {
+				type: 'string',
+			},
+			pinnedCard: {
+				type: 'map',
+				properties: {
+					instanceId: {
+						type: 'string',
+						required: true,
+					},
+					designId: {
+						type: 'string',
+						required: true,
+					},
+					cardName: {
+						type: 'string',
+						required: true,
+					},
+					cardDescription: {
+						type: 'string',
+						required: true,
+					},
+					imgUrl: {
+						type: 'string',
+						required: true,
+					},
+					rarityId: {
+						type: 'string',
+						required: true,
+					},
+					rarityName: {
+						type: 'string',
+						required: true,
+					},
+					rarityColor: {
+						type: 'string',
+						required: true,
+					},
+					frameUrl: {
+						type: 'string',
+						required: true,
+					},
+					cardNumber: {
+						type: 'number',
+						required: true,
+					},
+					totalOfType: {
+						type: 'number',
+						required: true,
+					},
+				},
+			},
 			...auditAttributes('user'),
 		},
 		indexes: {
@@ -667,6 +719,56 @@ const admins = new Entity(
 				sk: {
 					field: 'sk',
 					composite: ['userId', 'username', 'isStreamer'],
+				},
+			},
+		},
+	},
+	config
+);
+
+const userLogins = new Entity(
+	{
+		model: {
+			entity: 'userLogin',
+			version: '1',
+			service: 'card-app',
+		},
+		attributes: {
+			userId: {
+				type: 'string',
+				required: true,
+				label: 'userId',
+			},
+			username: {
+				type: 'string',
+				required: true,
+			},
+			hasProfile: {
+				type: 'boolean',
+			},
+			...auditAttributes('admin'),
+		},
+		indexes: {
+			allLogins: {
+				pk: {
+					field: 'pk',
+					composite: [],
+				},
+				sk: {
+					field: 'sk',
+					composite: ['userId'],
+				},
+			},
+			byUsername: {
+				index: 'gsi3',
+				collection: 'cardsByOwnerName',
+				pk: {
+					field: 'gsi3pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi3sk',
+					composite: [],
 				},
 			},
 		},
@@ -979,6 +1081,7 @@ export const db = new Service(
 		twitchEvents,
 		twitchEventMessageHistory,
 		siteConfig,
+		userLogins,
 	},
 	config
 );

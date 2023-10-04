@@ -8,6 +8,8 @@ import {
 	onMount,
 	type Accessor,
 	type Setter,
+	type JSX,
+	createReaction,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -19,9 +21,9 @@ import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
-import { useViewTransition } from '@/lib/client/utils';
+import { isChatters } from '@/lib/client/chatters';
 
-type PackEntityWithStamps = PackEntity & {
+type PackEntityWithStatus = PackEntity & {
 	cardDetails: PackEntity['cardDetails'] &
 		{
 			stamps?: string[];
@@ -29,28 +31,100 @@ type PackEntityWithStamps = PackEntity & {
 };
 
 export default function OpenPacks(props: {
-	packs: PackEntityWithStamps[];
+	packs: PackEntityWithStatus[];
 	startMargin?: number;
 	startCardScale?: number;
 	canTest?: boolean;
+	children?: JSX.Element;
 }) {
 	const [setAutoAnimate] = createAutoAnimate();
 
+	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
+		const res = await fetch(API.TWITCH_CHATTERS);
+		const data = await res.json().catch(() => ({}));
+		return isChatters(data) ? data : [];
+	});
+
 	const [state, setState] = createStore({
 		packs: props.packs,
-		activePack: null as PackEntityWithStamps | null,
+		activePack: null as PackEntityWithStatus | null,
 		isTesting: props.canTest ? false : undefined,
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
 		previewedCardId: null as string | null,
+		draggingIndex: null as number | null,
+		hoveringIndex: null as number | null,
+		draggingY: null as number | null,
+		hidden: true,
 	});
 
 	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
+
+	const getOnlineStatus = (username?: string) =>
+		chatters()?.some(
+			(chatter) => chatter.user_name.toLowerCase() === username?.toLowerCase()
+		) ?? false;
+
+	onMount(() => {
+		const activePackId = window.localStorage.getItem('activePackId');
+		const activePackFromStorage = state.packs.find((pack) => pack.packId === activePackId);
+		if (activePackFromStorage) {
+			setActivePack(activePackFromStorage);
+		}
+
+		const packOrder = window.localStorage.getItem('packOrder');
+		let parsedOrder: string[] = [];
+		try {
+			parsedOrder = JSON.parse(packOrder || '[]');
+		} catch {
+			parsedOrder = [];
+		}
+		const storedSorted = parsedOrder.slice().sort();
+		const sorted = state.packs.map((pack) => pack.packId).sort();
+		if (JSON.stringify(storedSorted) === JSON.stringify(sorted)) {
+			setState(
+				'packs',
+				parsedOrder.map((packId) => state.packs.find((p) => p.packId === packId)!)
+			);
+		} else {
+			window.localStorage.removeItem('packOrder');
+		}
+
+		setInterval(refetchChatters, 10000);
+
+		setState('hidden', false);
+	});
 
 	createEffect(() => {
 		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
 	});
 
-	const setActivePack = (pack: PackEntityWithStamps) => {
+	createEffect(() => {
+		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
+	});
+
+	createEffect(() => {
+		window.localStorage.setItem(
+			'packOrder',
+			JSON.stringify(state.packs.map((pack) => pack.packId))
+		);
+	});
+
+	const moveOnlineToTop = () => {
+		setState(
+			'packs',
+			produce((draft) => {
+				draft.sort((a, b) => {
+					const aStatus = getOnlineStatus(a.username);
+					const bStatus = getOnlineStatus(b.username);
+					if (aStatus && !bStatus) return -1;
+					if (!aStatus && bStatus) return 1;
+					return 0;
+				});
+			})
+		);
+	};
+
+	const setActivePack = (pack: PackEntityWithStatus) => {
 		setState('activePack', { ...pack });
 		if (pack.packId === state.packs[0].packId) return;
 
@@ -101,27 +175,78 @@ export default function OpenPacks(props: {
 
 	return (
 		<div class="flex min-h-[80vh] flex-col">
-			<section
-				class="col-start-1 max-w-[20rem] overflow-y-scroll bg-gray-200 p-6"
-				id="pack-list"
-				style={{ height: listHeightString() }}>
-				<h2 class="font-heading mb-2 text-2xl font-bold uppercase text-gray-700">
-					Coming up...
-				</h2>
-				<ul class="packs flex h-full w-full flex-col pb-2" ref={setAutoAnimate}>
-					<For each={state.packs}>
-						{(pack, index) => (
-							<PackToOpenItem
-								index={index()}
-								pack={pack}
-								activePackId={state.activePack?.packId || ''}
-								setAsActive={() => setActivePack(pack)}
-							/>
-						)}
-					</For>
-				</ul>
-			</section>
-			<div class="flex items-end h-1 gap-4">
+			<div class="flex">
+				<section
+					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-scroll bg-gray-200 px-4 py-3"
+					id="pack-list"
+					style={{ height: listHeightString() }}>
+					<button onClick={() => moveOnlineToTop()}>
+						<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline">
+							Coming up...
+						</h2>
+					</button>
+					<ul
+						classList={{
+							'opacity-0': state.hidden,
+						}}
+						class="packs relative flex w-full flex-col"
+						ref={setAutoAnimate}
+						onMouseMove={(e) => {
+							if (state.draggingIndex === null) return;
+							const mouseY = e.y - e.currentTarget.offsetTop;
+							setState('draggingY', mouseY);
+						}}
+						onMouseUp={() => {
+							const draggingIndex = state.draggingIndex;
+							const hoveringIndex = state.hoveringIndex;
+
+							if (draggingIndex !== null && hoveringIndex !== null) {
+								const modifiedHoveringIndex =
+									hoveringIndex > draggingIndex
+										? hoveringIndex - 1
+										: hoveringIndex;
+
+								setState(
+									'packs',
+									produce((draft) => {
+										// move the dragging index to the hovering index
+										const draggingPack = draft.splice(draggingIndex, 1)[0];
+										draft.splice(modifiedHoveringIndex, 0, draggingPack);
+									})
+								);
+							}
+
+							setState('draggingIndex', null);
+						}}>
+						<For each={state.packs}>
+							{(pack, index) => (
+								<PackToOpenItem
+									index={index()}
+									pack={pack}
+									activePackId={state.activePack?.packId || ''}
+									isOnline={getOnlineStatus(pack.username)}
+									setAsActive={() => setActivePack(pack)}
+									draggingIndex={state.draggingIndex}
+									setAsDragging={() => setState('draggingIndex', index())}
+									setAsHovering={() => setState('hoveringIndex', index())}
+									isHovering={state.hoveringIndex === index()}
+									draggingY={state.draggingY}
+								/>
+							)}
+						</For>
+						<div
+							class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic "
+							classList={{
+								'bg-gray-300/50':
+									state.hoveringIndex === state.packs.length &&
+									state.draggingIndex !== null,
+							}}
+							onMouseMove={() => setState('hoveringIndex', state.packs.length)}></div>
+					</ul>
+				</section>
+				<div class="flex-1">{props.children}</div>
+			</div>
+			<div class="flex h-1 items-end gap-4">
 				<ListHeightAdjuster height={listHeight} setHeight={setListHeight} />
 				<CardScaleAdjuster
 					scale={state.cardScale}
@@ -169,7 +294,6 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 		e.preventDefault();
 		let prevY = e.clientY / 1;
 		const handleMouseMove = (e: MouseEvent) => {
-			console.log('test');
 			props.setHeight((prev) => Math.max(prev + (e.clientY / 1 - prevY), 0));
 			prevY = e.clientY / 1;
 		};
@@ -185,7 +309,7 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 
 	return (
 		<button
-			class="font-heading w-full max-w-[20rem] h-min bg-transparent text-center text-3xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-75"
+			class="font-heading relative z-10 h-min w-full max-w-[15rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
 			onMouseDown={handleMouseDown}>
 			=
 		</button>
@@ -198,7 +322,7 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 	});
 
 	return (
-		<div class="flex w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100 h-min">
+		<div class="flex h-min w-full items-center justify-start gap-x-2 opacity-0 transition-opacity hover:opacity-100">
 			<label class="font-heading font-bold text-gray-700">Card Scale</label>
 			<input
 				type="range"
@@ -215,20 +339,63 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 
 function PackToOpenItem(props: {
 	index: number;
-	pack: PackEntityWithStamps;
+	pack: PackEntityWithStatus;
 	activePackId: string;
+	isOnline: boolean;
 	setAsActive: () => void;
+	setAsDragging: () => void;
+	setAsHovering: () => void;
+	draggingIndex: number | null;
+	isHovering: boolean;
+	draggingY: number | null;
 }) {
 	const isActive = () => props.pack.packId === props.activePackId;
+	let timeout: number | NodeJS.Timeout;
+	const isDragging = () => props.draggingIndex === props.index;
+	let wasDragging = false;
 
 	return (
-		<li class="pack-list-item">
+		<li
+			onMouseMove={(e) => {
+				if (!isDragging()) {
+					props.setAsHovering();
+				}
+			}}>
+			<Show when={props.isHovering && props.draggingIndex !== null}>
+				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic"></div>
+			</Show>
 			<button
-				class="font-display -mx-2 w-full p-1 pt-2 text-left text-lg italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				title={props.isOnline ? 'Online' : 'Offline'}
+				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
 				classList={{
 					'bg-gray-300 text-gray-800': isActive(),
+					'opacity-75': !props.isOnline && !isActive(),
+					'absolute top-0 opacity-50': isDragging(),
 				}}
-				onClick={props.setAsActive}>
+				style={{
+					'transform-origin': 'center left',
+					transform: isDragging() ? `translateY(${props.draggingY}px)` : '',
+				}}
+				onMouseDown={(e) => {
+					timeout = setTimeout(() => {
+						props.setAsDragging();
+						wasDragging = true;
+					}, 100);
+				}}
+				onClick={() => {
+					clearTimeout(timeout);
+					if (!isDragging() && wasDragging) {
+						wasDragging = false;
+						return;
+					}
+					props.setAsActive();
+				}}>
+				<span
+					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
+					classList={{
+						'bg-brand-main': props.isOnline,
+						'': !props.isOnline,
+					}}></span>
 				{props.pack.username}
 			</button>
 		</li>
@@ -236,7 +403,7 @@ function PackToOpenItem(props: {
 }
 
 function PackShowcase(props: {
-	pack: PackEntityWithStamps | null;
+	pack: PackEntityWithStatus | null;
 	removePack: () => void;
 	flipCard: (instanceId: string) => void;
 	setNextPack: () => void;
@@ -325,13 +492,13 @@ function PackShowcase(props: {
 		<div class="bg-brand-100 relative flex h-full flex-1 flex-col">
 			<div class="flex items-end justify-between pr-8">
 				<h2
-					class="font-heading m-6 mb-0 text-3xl font-bold uppercase text-gray-700"
+					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700"
 					ref={animateTitle}>
 					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
 						<a
 							href={`${routes.USERS}/${props.pack?.username}`}
-							class="font-display text-brand-main block py-4 text-5xl normal-case italic hover:underline"
+							class="font-display text-brand-main block pb-3 pt-1 text-5xl normal-case italic hover:underline"
 							style={{ 'view-transition-name': 'open-packs-title' }}>
 							{props.pack?.username}
 						</a>
@@ -371,8 +538,8 @@ function PackShowcase(props: {
 }
 
 function ShowcaseCard(props: {
-	card: PackEntityWithStamps['cardDetails'][number];
-	packId: PackEntityWithStamps['packId'];
+	card: PackEntityWithStatus['cardDetails'][number];
+	packId: PackEntityWithStatus['packId'];
 	setFlipped: () => void;
 	isTesting: boolean;
 	scale: number;
@@ -450,7 +617,7 @@ function ShowcaseCard(props: {
 	);
 }
 
-function Statistics(props: { activePack: PackEntityWithStamps | null }) {
+function Statistics(props: { activePack: PackEntityWithStatus | null }) {
 	const state = () => ({
 		cardsOpened: props.activePack?.cardDetails.filter((card) => card.opened === true),
 		cardsOpenedCount: props.activePack?.cardDetails.filter((card) => card.opened).length || 0,
@@ -489,13 +656,10 @@ function Statistics(props: { activePack: PackEntityWithStamps | null }) {
 			packTypeId: state.packTypeId || '0',
 		});
 
-		console.log(searchParams.toString());
-
 		const body = await fetch(API.STATS + `?${searchParams.toString()}`).then((res) => {
 			return res.text();
 		});
 
-		console.log(body);
 		const json = JSON.parse(body);
 
 		return {

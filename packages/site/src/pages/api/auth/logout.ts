@@ -1,8 +1,17 @@
-import type { APIRoute } from 'astro'
-import { AUTH_TOKEN } from '@/constants'
+import type { APIRoute } from 'astro';
+import { AUTH_TOKEN } from '@/constants';
 
 export const GET: APIRoute = async (ctx) => {
-	ctx.cookies.delete(AUTH_TOKEN, { path: '/' })
+	console.log('Logout request ', {
+		headers: Object.fromEntries([...ctx.request.headers.entries()]),
+		cookies: ctx.cookies,
+	});
 
-	return ctx.redirect('/', 302)
-}
+	if (ctx.request.headers.get('purpose') === 'prefetch') {
+		return new Response(null, { status: 204 });
+	}
+
+	ctx.cookies.delete(AUTH_TOKEN, { path: '/' });
+
+	return ctx.redirect('/?alert=Logged%20out!', 302);
+};
