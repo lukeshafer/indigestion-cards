@@ -12,6 +12,8 @@ export const handler = SiteHandler(
 		},
 	},
 	async (_, ctx) => {
+		console.log('lookingFor', ctx.params.lookingFor);
+
 		const deletePinnedCard =
 			ctx.params.pinnedCardId === 'null' || ctx.params.pinnedCardDesignId === 'null';
 
