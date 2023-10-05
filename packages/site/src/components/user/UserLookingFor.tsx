@@ -1,5 +1,5 @@
 import type { UserEntity } from '@lil-indigestion-cards/core/user';
-import { Form, TextInput } from '../form';
+import { Form, TextArea } from '../form';
 import { createSignal, type JSX } from 'solid-js';
 import { USER_API } from '@/constants';
 
@@ -12,42 +12,47 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 			{isEditing() ? (
 				<Form action={USER_API.USER} method="patch" onsubmit={() => setIsEditing(false)}>
 					<input type="hidden" name="userId" value={props.user.userId} />
-					<div class="flex items-center gap-2">
-						<p class="font-medium">Looking for </p>
+					<div class="flex gap-2">
+						<p class="flex-1 pt-1">Looking for: </p>
 						<div>
-							<TextInput
+							<TextArea
+								value={lookingFor()}
 								name="lookingFor"
 								inputOnly
-								label={lookingFor() || ''}
+								label={''}
 								setValue={setLookingFor}
+								height="2rem"
 							/>
 						</div>
+					</div>
+					<div class="flex items-center gap-2">
 						<Button type="submit">Save</Button>
 						<Button onclick={() => setIsEditing(false)}>Cancel</Button>
 					</div>
 				</Form>
 			) : lookingFor().trim() ? (
-				<div class="flex items-center gap-2">
+				<div class="flex flex-col gap-2">
 					<p>
-						Looking for: <span class="font-medium">{lookingFor() || '???'}</span>
+						Looking for:{' '}
+						<span class="whitespace-pre-line font-medium">{lookingFor() || '???'}</span>
 					</p>
 					{props.isLoggedInUser ? (
-						<>
+						<div class="flex items-center gap-2">
 							<Button onClick={() => setIsEditing(true)}>Edit</Button>
-								<div class="w-min">
-									<Form
-										action={USER_API.USER}
-										method="patch"
-										onsuccess={() => {
-											setLookingFor('');
-											setIsEditing(false);
-										}}>
-										<input type="hidden" name="userId" value={props.user.userId} />
-										<input type="hidden" name="lookingFor" value=" " />
-										<Button type="submit">Delete</Button>
-									</Form>
-								</div>
-						</>
+							<div class="w-min">
+								<Form
+									action={USER_API.USER}
+									method="patch"
+									onsuccess={() => {
+										setLookingFor('');
+										setIsEditing(false);
+									}}>
+									<input type="hidden" name="userId" value={props.user.userId} />
+									<input type="hidden" name="lookingFor" value=" " />
+									<Button type="submit">Delete</Button>
+								</Form>
+							</div>
+						</div>
 					) : null}
 				</div>
 			) : props.isLoggedInUser ? (
