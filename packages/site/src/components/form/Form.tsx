@@ -199,7 +199,7 @@ export function TextInput(props: InputProps<string>) {
 	);
 }
 
-export function TextArea(props: InputProps<string>) {
+export function TextArea(props: InputProps<string> & { height?: string }) {
 	return (
 		<InputGroup>
 			<Label {...props} />
@@ -208,6 +208,7 @@ export function TextArea(props: InputProps<string>) {
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' h-32'}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+				style={{ height: props.height || '8rem'}}
 				required={props.required}
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
