@@ -53,7 +53,9 @@ async function getShitPackOdds(args: {
 				}
 		);
 
-	const bronzesRemaining = remainingCardsInPool.filter((card) => card.totalOfType >= 50).concat(unopenedCards);
+	const bronzesRemaining = remainingCardsInPool
+		.concat(unopenedCards)
+		.filter((card) => card.totalOfType >= 50);
 
 	const oddsOfBronze = bronzesRemaining.length / remainingCardsInPool.length;
 
