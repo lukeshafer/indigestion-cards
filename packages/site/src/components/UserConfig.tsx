@@ -31,6 +31,10 @@ export default function UserConfig(props: {
 		let theme = localStorage.getItem('theme');
 		if (theme === 'dark' || theme === 'light') {
 			setColorTheme(theme);
+		} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			setColorTheme('dark');
+		} else {
+			setColorTheme('light');
 		}
 	});
 
@@ -47,7 +51,8 @@ export default function UserConfig(props: {
 	createEffect(() => {
 		document.documentElement.classList.toggle('dark', colorTheme() === 'dark');
 		localStorage.setItem('theme', colorTheme());
-	})
+		document.cookie = `theme=${colorTheme()}; path=/; max-age=31536000`;
+	});
 
 	return (
 		<div class="relative z-10">
@@ -58,11 +63,11 @@ export default function UserConfig(props: {
 			/>
 			<Show when={isOpen()}>
 				<menu
-					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 dark:text-gray-100 shadow-md shadow-black/20"
+					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20 dark:text-gray-100"
 					use:clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
-							class="font-display pt-2 text-center font-bold italic text-gray-900 dark:text-gray-50 hover:underline"
+							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
 							href={`/user/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
@@ -95,7 +100,7 @@ export default function UserConfig(props: {
 							}}
 							aria-pressed={colorTheme() === 'dark'}
 							onClick={() => {
-								setColorTheme((v) => v === 'dark' ? 'light' : 'dark');
+								setColorTheme((v) => (v === 'dark' ? 'light' : 'dark'));
 							}}>
 							Dark Mode
 						</button>
