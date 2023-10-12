@@ -32,7 +32,7 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 				</Form>
 			) : lookingFor().trim() ? (
 				<div class="flex flex-col gap-2">
-					<p>
+					<p class="max-w-sm">
 						Looking for:{' '}
 						<span class="whitespace-pre-line font-medium">{lookingFor() || '???'}</span>
 					</p>
