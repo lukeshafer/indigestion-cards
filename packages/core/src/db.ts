@@ -440,6 +440,12 @@ const users = new Entity(
 						type: 'number',
 						required: true,
 					},
+					stamps: {
+						type: 'list',
+						items: {
+							type: 'string',
+						},
+					},
 				},
 			},
 			...auditAttributes('user'),
