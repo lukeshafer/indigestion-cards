@@ -14,7 +14,9 @@
 			"env": {
 				"node": true
 			},
-			"files": [".eslintrc.{js,cjs}"],
+			"files": [
+				".eslintrc.{js,cjs}"
+			],
 			"parserOptions": {
 				"sourceType": "script"
 			}
@@ -25,9 +27,13 @@
 		"ecmaVersion": "latest",
 		"sourceType": "module"
 	},
-	"plugins": ["@typescript-eslint", "solid"],
+	"plugins": [
+		"@typescript-eslint",
+		"solid"
+	],
 	"rules": {
 		"prefer-const": "off",
-		"solid/style-prop": "off"
+		"solid/style-prop": "off",
+		"solid/self-closing-comp": "off"
 	}
 }

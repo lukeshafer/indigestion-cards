@@ -3,6 +3,7 @@ import {
 	getPackTypeById,
 	getRemainingPossibleCardsFromCardPool,
 } from '@lil-indigestion-cards/core/card';
+import { SHIT_PACK_RARITY_ID } from '@lil-indigestion-cards/core/constants';
 import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
 
 export const handler = ProtectedApiHandler(async (evt) => {
@@ -39,7 +40,9 @@ async function getShitPackOdds(args: {
 		...getRemainingPossibleCardsFromCardPool(cardPool),
 		...cardPool.cardInstances.filter((card) => !card.openedAt),
 	];
-	const bronzesRemaining = remainingCardsInPool.filter((card) => card.totalOfType >= 50);
+	const bronzesRemaining = remainingCardsInPool.filter(
+		(card) => card.rarityId === SHIT_PACK_RARITY_ID
+	);
 	const oddsOfBronze = bronzesRemaining.length / remainingCardsInPool.length;
 
 	const shitPackOdds = Math.pow(oddsOfBronze, args.remainingCardCount);
