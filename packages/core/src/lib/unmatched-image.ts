@@ -3,7 +3,7 @@ import {
 	type UnmatchedImageType,
 	type UnmatchedImage,
 	type CreateUnmatchedImage,
-} from 'src/db/unmatchedImages';
+} from '../db/unmatchedImages';
 
 export async function getUnmatchedDesignImages(type: UnmatchedImage['type']) {
 	const result = await unmatchedImages.query.byType({ type }).go();

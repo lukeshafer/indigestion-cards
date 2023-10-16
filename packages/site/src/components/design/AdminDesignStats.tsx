@@ -1,5 +1,5 @@
 import { Index, createSignal } from 'solid-js';
-import type { RarityStats } from '@lil-indigestion-cards/core/rarity';
+import type { RarityStats } from '@lil-indigestion-cards/core/lib/stats';
 import Table from '@/components/table/Table';
 import { routes } from '@/constants';
 import { Checkbox } from '@/components/form';

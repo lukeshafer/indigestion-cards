@@ -3,13 +3,12 @@ import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
 import styles from './CardList.module.css';
 import { Select } from '../form';
-import type { CardDesignEntity, CardInstanceEntity } from '@lil-indigestion-cards/core/card';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';
 import type { Session } from '@/env';
 
-type CardType = Parameters<typeof Card>[0] &
-	Partial<CardInstanceEntity> &
-	Partial<CardDesignEntity>;
+type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
 const sortTypes = [
 	{ value: 'rarest', label: 'Most to Least Rare' },
@@ -59,13 +58,12 @@ export default function CardList(props: {
 						{(card) => (
 							<div class="w-fit">
 								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID ||
-								props.sessionType === 'admin' ? (
+									props.sessionType === 'admin' ? (
 									<>
 										<a
 											rel="prefetch"
-											href={`${routes.INSTANCES}/${card.designId}/${
-												card.instanceId ?? ''
-											}`}>
+											href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''
+												}`}>
 											<Card {...card} scale="var(--card-scale)" />
 										</a>
 										<Show when={props.showUsernames}>
@@ -118,32 +116,32 @@ function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) })
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'open-date-asc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'owner-asc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: a.username.localeCompare(b.username) ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
 			);
 		case 'owner-desc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: b.username.localeCompare(a.username) ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+					a.cardName.localeCompare(b.cardName) ||
+					+a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;

@@ -1,6 +1,6 @@
-import { getPackTypeContents } from '@lil-indigestion-cards/core/pack-type';
-import { createPackType } from '@lil-indigestion-cards/core/card';
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
+import { parsePackTypeContents } from '@lil-indigestion-cards/core/lib/entity-schemas';
+import { createPackType } from '@lil-indigestion-cards/core/lib/pack-type';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({
@@ -28,7 +28,7 @@ export const handler = ProtectedApiHandler(async () => {
 		params,
 	});
 
-	const contents = getPackTypeContents(params);
+	const contents = parsePackTypeContents(params);
 	if (!contents.success) return { statusCode: 400, body: contents.error };
 
 	const season = contents.season;

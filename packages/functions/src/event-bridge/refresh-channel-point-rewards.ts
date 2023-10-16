@@ -1,11 +1,11 @@
+import { Config } from 'sst/node/config';
 import {
 	refreshChannelPointRewards,
 	addMessageToSiteConfig,
 	removeMessageFromSiteConfig,
-} from '@lil-indigestion-cards/core/site-config';
-import { getAllChannelPointRewards } from '@lil-indigestion-cards/core/twitch-helpers';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
-import { Config } from 'sst/node/config';
+} from '@lil-indigestion-cards/core/lib/site-config';
+import { getAllChannelPointRewards } from '@lil-indigestion-cards/core/lib/twitch';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 
 export async function handler() {
 	setAdminEnvSession(

@@ -1,4 +1,4 @@
-import { For, JSX, ParentProps, Show, createSignal } from 'solid-js';
+import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
@@ -7,16 +7,16 @@ import { useViewTransition } from '@/lib/client/utils';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-		| 'get'
-		| 'post'
-		| 'dialog'
-		| 'put'
-		| 'delete'
-		| 'options'
-		| 'head'
-		| 'trace'
-		| 'connect'
-		| 'patch';
+	| 'get'
+	| 'post'
+	| 'dialog'
+	| 'put'
+	| 'delete'
+	| 'options'
+	| 'head'
+	| 'trace'
+	| 'connect'
+	| 'patch';
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
@@ -208,7 +208,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' h-32'}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-				style={{ height: props.height || '8rem'}}
+				style={{ height: props.height || '8rem' }}
 				required={props.required}
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
@@ -286,7 +286,7 @@ export function FileInput(props: {
 		<InputGroup>
 			<Label {...props} />
 			<input
-				use:showPreview
+				use: showPreview
 				id={props.name}
 				name={props.name}
 				type="file"

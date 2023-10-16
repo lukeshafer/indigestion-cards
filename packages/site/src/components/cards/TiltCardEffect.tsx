@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { JSX, createSignal, onMount } from 'solid-js';
+import { type JSX, createSignal, onMount } from 'solid-js';
 import styles from './TiltCardEffect.module.css';
 
 export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: boolean }) {

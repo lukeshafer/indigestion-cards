@@ -1,5 +1,5 @@
 import { SQSEvent } from 'aws-lambda';
-import { addMessageToSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { addMessageToSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 export async function handler(event: SQSEvent) {
 	await Promise.all(

@@ -1,6 +1,6 @@
 import { admins } from './db/admins';
 import { siteConfig } from './db/siteConfig';
-import { getUserByLogin } from './twitch-helpers';
+import { getUserByLogin } from './lib/twitch';
 import { createAdminUser } from './lib/admin-user';
 
 export async function seedAdmins() {

@@ -1,6 +1,6 @@
 import { S3Handler } from 'aws-lambda';
-import { createUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
+import { createUnmatchedDesignImage } from '@lil-indigestion-cards/core/lib/unmatched-image';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 
 export const handler: S3Handler = async (event) => {
 	setAdminEnvSession('S3 Event', 's3_event');

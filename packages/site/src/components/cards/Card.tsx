@@ -1,9 +1,9 @@
 import TiltCardEffect from './TiltCardEffect';
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
-import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import styles from './Card.module.css';
 
-interface Props extends Partial<CardInstanceEntity> {
+interface Props extends Partial<CardInstance> {
 	rarityName: string;
 	frameUrl: string;
 	imgUrl: string;

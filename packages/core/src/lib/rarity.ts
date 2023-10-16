@@ -1,6 +1,6 @@
 import { ElectroError } from 'electrodb';
-import { rarities, type Rarity, type CreateRarity, type UpdateRarity } from 'src/db/rarities';
-import { DBResult } from 'src/types';
+import { rarities, type Rarity, type CreateRarity, type UpdateRarity } from '../db/rarities';
+import type { DBResult } from '../types';
 import { getAllCardDesigns } from './design';
 
 export async function getRarityById(args: { rarityId: string }) {
@@ -8,7 +8,7 @@ export async function getRarityById(args: { rarityId: string }) {
 	return result.data[0];
 }
 
-export async function getAllRarities() {
+export async function getAllRarities(): Promise<Rarity[]> {
 	const result = await rarities.query.allRarities({}).go();
 	return result.data.sort((a, b) => b.defaultCount - a.defaultCount);
 }

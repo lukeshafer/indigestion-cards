@@ -1,8 +1,9 @@
-import { type CreateSeason, season, type Season, UpdateSeason } from 'src/db/season';
-import { cardDesigns } from 'src/db/cardDesigns';
 import { ElectroError, Service } from 'electrodb';
-import { config } from 'src/db/_utils';
-import { DBResult } from 'src/types';
+import { type CreateSeason, season, type Season, type UpdateSeason } from '../db/season';
+import { cardDesigns } from '../db/cardDesigns';
+import { config } from '../db/_utils';
+import type { DBResult } from '../types';
+import { cardInstances } from 'src/db/cardInstances';
 
 export async function getAllSeasons() {
 	const result = await season.query.allSeasons({}).go({ pages: 'all' });
@@ -19,6 +20,7 @@ export async function getSeasonAndDesignsBySeasonId(id: string) {
 		{
 			season,
 			cardDesigns,
+			cardInstances,
 		},
 		config
 	);

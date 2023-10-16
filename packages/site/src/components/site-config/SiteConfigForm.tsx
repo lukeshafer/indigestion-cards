@@ -1,16 +1,17 @@
 import { Form, Select, SubmitButton } from '@/components/form/Form';
-import type { PackTypeEntity, RarityEntity } from '@lil-indigestion-cards/core/card';
-import type { TwitchEventEntity } from '@lil-indigestion-cards/core/site-config';
+import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
+import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
+import type { TwitchEvent } from '@lil-indigestion-cards/core/db/twitchEvents';
 import { API } from '@/constants';
 import { Show, createSignal } from 'solid-js';
 import Table from '../table/Table';
 
 export default function SiteConfigForm(props: {
 	baseRarityValue: string;
-	rarities: RarityEntity[];
-	twitchEvents: TwitchEventEntity[];
-	packTypes: PackTypeEntity[];
-	giftSubEvent: TwitchEventEntity;
+	rarities: Rarity[];
+	twitchEvents: TwitchEvent[];
+	packTypes: PackType[];
+	giftSubEvent: TwitchEvent;
 }) {
 	const [isEdited, setIsEdited] = createSignal(false);
 	const [rarity, setRarity] = createSignal(props.baseRarityValue);
@@ -94,8 +95,8 @@ export default function SiteConfigForm(props: {
 }
 
 function TwitchEventSelect(props: {
-	twitchEvent: TwitchEventEntity;
-	packTypes: PackTypeEntity[];
+	twitchEvent: TwitchEvent;
+	packTypes: PackType[];
 	onChange?: (val: string) => void;
 }) {
 	const value = () =>

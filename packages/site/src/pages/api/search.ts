@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/user';
+import { getAllUsers, getUserByUserName } from '@lil-indigestion-cards/core/lib/user';
 import { routes } from '@/constants';
 
 export const GET: APIRoute = async (ctx) => {

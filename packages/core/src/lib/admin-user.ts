@@ -1,5 +1,5 @@
 import { ElectroError } from 'electrodb';
-import { admins } from 'src/db/admins';
+import { type Admin, admins } from '../db/admins';
 
 export async function createAdminUser(args: { userId: string; username: string }) {
 	try {
@@ -49,7 +49,7 @@ export async function deleteAdminUser(args: {
 	}
 }
 
-export async function getAllAdminUsers() {
+export async function getAllAdminUsers(): Promise<Admin[]> {
 	try {
 		const result = await admins.query.allAdmins({}).go();
 		return result.data;

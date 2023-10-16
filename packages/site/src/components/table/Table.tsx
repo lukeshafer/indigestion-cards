@@ -1,4 +1,4 @@
-import { type ParentProps, createSignal, For, createEffect, JSX } from 'solid-js';
+import { type ParentProps, createSignal, For, createEffect, type JSX } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { TextInput } from '../form/Form';
 
@@ -20,9 +20,9 @@ type Cell =
 	| string
 	| number
 	| {
-			element: JSX.Element;
-			value: string | number;
-	  };
+		element: JSX.Element;
+		value: string | number;
+	};
 
 export default function Table(props: {
 	id?: string;
@@ -69,7 +69,9 @@ export default function Table(props: {
 					? Number(aVal) - Number(bVal)
 					: Number(bVal) - Number(aVal);
 
-			return mode === 'ascending' ? String(aVal).localeCompare(String(bVal)) : String(bVal).localeCompare(String(aVal));
+			return mode === 'ascending'
+				? String(aVal).localeCompare(String(bVal))
+				: String(bVal).localeCompare(String(aVal));
 		});
 	};
 
@@ -138,7 +140,7 @@ export default function Table(props: {
 										const newMode = sortModes.at(
 											((column.startDescending ? sortModes.length - 1 : 1) +
 												currentModeIndex) %
-												sortModes.length
+											sortModes.length
 										) as (typeof sortModes)[number];
 										setState('sortMode', newMode);
 									}}

@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import { BsPersonFill } from 'solid-icons/bs';
-import type { TwitchUser } from '@lil-indigestion-cards/core/twitch-helpers';
+import type { TwitchUser } from '@lil-indigestion-cards/core/lib/twitch';
 
 function clickOutside(el: Element, accessor: () => any) {
 	const onClick = (e: MouseEvent) => {

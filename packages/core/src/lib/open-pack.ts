@@ -1,13 +1,13 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, SHIT_PACK_RARITY_ID } from 'src/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID, SHIT_PACK_RARITY_ID } from '../constants';
 import { getCardDesignAndInstancesById } from './design';
 import { getPackById } from './pack';
 import { getUser } from './user';
 import { Service } from 'electrodb';
-import { packs } from 'src/db/packs';
-import { users } from 'src/db/users';
-import { cardDesigns } from 'src/db/cardDesigns';
-import { config } from 'src/db/_utils';
-import { cardInstances } from 'src/db/cardInstances';
+import { packs } from '../db/packs';
+import { users } from '../db/users';
+import { cardDesigns } from '../db/cardDesigns';
+import { config } from '../db/_utils';
+import { cardInstances } from '../db/cardInstances';
 
 interface RarityForComparison {
 	rarityId: string;

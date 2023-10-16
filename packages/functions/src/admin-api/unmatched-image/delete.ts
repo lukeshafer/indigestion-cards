@@ -1,6 +1,6 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
 import { S3 } from '@aws-sdk/client-s3';
-import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/card';
+import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/lib/unmatched-image';
 import { Bucket } from 'sst/node/bucket';
 
 export const handler = ProtectedApiHandler(async () => {

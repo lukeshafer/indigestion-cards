@@ -1,6 +1,6 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import { deleteRarityById } from '@lil-indigestion-cards/core/card';
-import { deleteS3ObjectByUrl } from '@lil-indigestion-cards/core/utils';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { deleteRarityById } from '@lil-indigestion-cards/core/lib/rarity';
+import { deleteS3ObjectByUrl } from '@lil-indigestion-cards/core/lib/images';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validationResult = useValidateFormData({

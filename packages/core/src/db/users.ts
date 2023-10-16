@@ -1,4 +1,4 @@
-import { CreateEntityItem, Entity, type EntityItem } from 'electrodb';
+import { type CreateEntityItem, Entity, type EntityItem } from 'electrodb';
 import { config, auditAttributes } from './_utils';
 
 export type User = EntityItem<typeof users>;

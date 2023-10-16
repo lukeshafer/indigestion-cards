@@ -1,6 +1,6 @@
 import { setTotalPackCount, totalPackCount } from '@/lib/client/state';
 import { API } from '@/constants';
-import type { PackEntity } from '@lil-indigestion-cards/core/card';
+import type { Pack } from '@lil-indigestion-cards/core/db/packs';
 import { Show, createEffect, createResource } from 'solid-js';
 
 export default function TotalPackCount(props: { count: number }) {

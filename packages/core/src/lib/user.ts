@@ -1,10 +1,11 @@
-import { users, type CreateUser } from 'src/db/users';
-import { userLogins } from 'src/db/userLogins';
-import { CardInstance, cardInstances } from 'src/db/cardInstances';
 import { Service } from 'electrodb';
-import { config } from 'src/db/_utils';
-import { getUserByLogin } from 'src/twitch-helpers';
-import { packs } from 'src/db/packs';
+
+import { users, type CreateUser, type User } from '../db/users';
+import { type UserLogin, userLogins } from '../db/userLogins';
+import { cardInstances, type CardInstance } from '../db/cardInstances';
+import { config } from '../db/_utils';
+import { getUserByLogin } from '../lib/twitch';
+import { packs } from '../db/packs';
 
 export async function getUser(userId: string) {
 	const user = await users.get({ userId }).go();
@@ -20,7 +21,7 @@ export async function getUserByUserName(username: string) {
 	}
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(): Promise<User[]> {
 	try {
 		let { data } = await users.find({}).go({ pages: 'all' });
 		return data ?? [];
@@ -29,7 +30,11 @@ export async function getAllUsers() {
 	}
 }
 
-export async function getUserAndCardInstances(args: { username: string }) {
+export async function getUserAndCardInstances(args: { username: string }): Promise<{
+	users: User[];
+	userLogins: UserLogin[];
+	cardInstances: CardInstance[];
+} | null> {
 	const service = new Service(
 		{
 			users,
@@ -194,7 +199,7 @@ export async function setUserProfile(args: {
 				rarityColor: '',
 				totalOfType: 0,
 				cardDescription: '',
-		} satisfies CardInstance)
+		  } satisfies CardInstance)
 		: user.pinnedCard;
 
 	return users

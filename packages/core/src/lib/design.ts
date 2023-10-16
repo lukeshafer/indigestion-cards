@@ -1,9 +1,14 @@
-import { CardDesign, CreateCardDesign, UpdateCardDesign, cardDesigns } from 'src/db/cardDesigns';
-import { getAllSeasons } from './season';
-import { cardInstances } from 'src/db/cardInstances';
-import { config } from 'src/db/_utils';
 import { ElectroError, Service } from 'electrodb';
-import { DBResult } from 'src/types';
+import {
+	type CardDesign,
+	type CreateCardDesign,
+	type UpdateCardDesign,
+	cardDesigns,
+} from '../db/cardDesigns';
+import { getAllSeasons } from './season';
+import { cardInstances } from '../db/cardInstances';
+import { config } from '../db/_utils';
+import type { DBResult } from '../types';
 
 export async function getAllCardDesigns() {
 	const seasons = await getAllSeasons();

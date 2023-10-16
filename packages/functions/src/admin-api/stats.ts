@@ -1,10 +1,7 @@
-import { validateSearchParams, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import {
-	getPackTypeById,
-	getRemainingPossibleCardsFromCardPool,
-} from '@lil-indigestion-cards/core/card';
+import { validateSearchParams, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
+import { getRemainingPossibleCardsFromCardPool, getCardPoolFromType } from '@lil-indigestion-cards/core/lib/card-pool';
 import { SHIT_PACK_RARITY_ID } from '@lil-indigestion-cards/core/constants';
-import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
 
 export const handler = ProtectedApiHandler(async (evt) => {
 	const validatedParams = await validateSearchParams(new URLSearchParams(evt.rawQueryString), {

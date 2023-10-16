@@ -1,4 +1,4 @@
-import { userLogins, type CreateUserLogin } from "src/db/userLogins";
+import { userLogins, type CreateUserLogin } from "../db/userLogins";
 
 export async function getUserLoginById(userId: string) {
 	try {

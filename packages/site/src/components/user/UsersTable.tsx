@@ -1,10 +1,10 @@
 import Table from '@/components/table/Table';
-import type { UserEntity } from '@lil-indigestion-cards/core/user';
+import type { User } from '@lil-indigestion-cards/core/db/users';
 import { TbCards } from 'solid-icons/tb';
 import { FaSolidGift } from 'solid-icons/fa';
 import { routes } from '@/constants';
 
-export default function UsersTable(props: { users: UserEntity[] }) {
+export default function UsersTable(props: { users: User[] }) {
 	return (
 		<Table
 			search={{

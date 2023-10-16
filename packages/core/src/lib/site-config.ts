@@ -4,11 +4,11 @@ import {
 	type CreateTwitchEvent,
 	type UpdateTwitchEvent,
 	twitchEventTypes,
-} from 'src/db/twitchEvents';
-import { siteConfig, type SiteConfig, type CreateSiteConfig } from 'src/db/siteConfig';
-import { twitchEventMessageHistory } from 'src/db/twitchEventMessageHistory';
+} from '../db/twitchEvents';
+import { siteConfig, type SiteConfig, type CreateSiteConfig } from '../db/siteConfig';
+import { twitchEventMessageHistory } from '../db/twitchEventMessageHistory';
 import { Service } from 'electrodb';
-import { config } from 'src/db/_utils';
+import { config } from '../db/_utils';
 
 export async function updateBatchTwitchEvents(
 	events: (UpdateTwitchEvent & {

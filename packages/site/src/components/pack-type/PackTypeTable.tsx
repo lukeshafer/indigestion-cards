@@ -1,9 +1,9 @@
 import Table from '@/components/table/Table';
 import { routes } from '@/constants';
-import type { PackTypeEntity } from '@lil-indigestion-cards/core/card';
+import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
 import { TbCards } from 'solid-icons/tb';
 
-export default function PackTypeTable(props: { packTypes: PackTypeEntity[] }) {
+export default function PackTypeTable(props: { packTypes: PackType[] }) {
 	return (
 		<Table
 			columns={[

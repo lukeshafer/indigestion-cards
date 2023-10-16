@@ -14,7 +14,7 @@ import {
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
-import type { PackEntity } from '@lil-indigestion-cards/core/pack';
+import type { Pack } from '@lil-indigestion-cards/core/db/packs';
 import { API, routes, ASSETS, SHIT_PACK_RARITY_ID } from '@/constants';
 import Card from '@/components/cards/Card';
 import { setTotalPackCount } from '@/lib/client/state';
@@ -23,8 +23,8 @@ import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
 import { isChatters } from '@/lib/client/chatters';
 
-type PackEntityWithStatus = PackEntity & {
-	cardDetails: PackEntity['cardDetails'] &
+type PackEntityWithStatus = Pack & {
+	cardDetails: Pack['cardDetails'] &
 	{
 		stamps?: string[];
 	}[];

@@ -1,7 +1,7 @@
 import type { CardDesign } from '../db/cardDesigns';
 import type { CardInstance } from '../db/cardInstances';
-import { PackDetails } from './entity-schemas';
-import { db } from 'src/db/db-service';
+import type { PackDetails } from './entity-schemas';
+import { db } from '../db/db-service';
 
 export type CardPool = {
 	cardDesigns: CardDesign[];

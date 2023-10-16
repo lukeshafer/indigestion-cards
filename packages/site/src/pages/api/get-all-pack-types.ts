@@ -1,4 +1,4 @@
-import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async () => {

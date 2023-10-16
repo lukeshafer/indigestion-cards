@@ -3,19 +3,15 @@ import { Issuer } from 'openid-client';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
+import { createNewUser, getUser } from '@lil-indigestion-cards/core/lib/user';
+import { getAdminUserById } from '@lil-indigestion-cards/core/lib/admin-user';
 import {
-	createNewUser,
 	createNewUserLogin,
-	getAdminUserById,
-	getUser,
 	getUserLoginById,
-	setAdminEnvSession,
 	updateUserLogin,
-} from '@lil-indigestion-cards/core/user';
-import {
-	setTwitchTokens,
-	getListOfTwitchUsersByIds,
-} from '@lil-indigestion-cards/core/twitch-helpers';
+} from '@lil-indigestion-cards/core/lib/user-login';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lil-indigestion-cards/core/lib/twitch';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
