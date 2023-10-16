@@ -127,7 +127,7 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 	return (
 		<button
 			class="group flex h-full items-center justify-center transition-transform duration-300 hover:brightness-90"
-			onClick={(e) => props.onClick?.()}>
+			onClick={() => props.onClick?.()}>
 			{props.user ? (
 				<img
 					width="40"
@@ -135,7 +135,7 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 					class="col-start-1 row-span-full rounded-full"
 				/>
 			) : (
-				<BsPersonFill size="25" class="w-8 fill-gray-700 text-gray-700 " />
+				<BsPersonFill size="25" class="w-8 fill-gray-700 text-gray-700 dark:fill-gray-300 dark:text-gray-300" />
 			)}
 		</button>
 	);
