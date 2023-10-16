@@ -1,33 +1,35 @@
-import { db, twitchEventTypes } from './db';
-import type { CreateEntityItem, EntityItem, UpdateEntityItem } from 'electrodb';
-import { ChannelPointReward } from './twitch-helpers';
-
-type TwitchEvent = typeof db.entities.twitchEvents;
-type SiteConfig = typeof db.entities.siteConfig;
-
-export type TwitchEventEntity = EntityItem<TwitchEvent>;
-export type SiteConfigEntity = EntityItem<SiteConfig>;
+import type { ChannelPointReward } from './twitch';
+import {
+	twitchEvents,
+	type CreateTwitchEvent,
+	type UpdateTwitchEvent,
+	twitchEventTypes,
+} from 'src/db/twitchEvents';
+import { siteConfig, type SiteConfig, type CreateSiteConfig } from 'src/db/siteConfig';
+import { twitchEventMessageHistory } from 'src/db/twitchEventMessageHistory';
+import { Service } from 'electrodb';
+import { config } from 'src/db/_utils';
 
 export async function updateBatchTwitchEvents(
-	events: (UpdateEntityItem<TwitchEvent> & {
+	events: (UpdateTwitchEvent & {
 		eventId: string;
-		eventType: CreateEntityItem<TwitchEvent>['eventType'];
+		eventType: CreateTwitchEvent['eventType'];
 	})[]
 ) {
 	await Promise.all(
 		events.map(async (event) => {
 			const { eventId, eventType, ...rest } = event;
-			return db.entities.twitchEvents.update({ eventId, eventType }).set(rest).go();
+			return twitchEvents.update({ eventId, eventType }).set(rest).go();
 		})
 	);
 }
 
 export async function getTwitchEvents() {
-	return await db.entities.twitchEvents.query.byEventId({}).go();
+	return await twitchEvents.query.byEventId({}).go();
 }
 
 export async function getTwitchEventById(args: { eventId: string }) {
-	const result = await db.entities.twitchEvents.query.byEventId(args).go();
+	const result = await twitchEvents.query.byEventId(args).go();
 	return result.data[0];
 }
 
@@ -38,7 +40,7 @@ export function checkIsValidTwitchEventType(
 }
 
 export async function refreshChannelPointRewards(newRewards: ChannelPointReward[]) {
-	const existingRewards = await db.entities.twitchEvents.query
+	const existingRewards = await twitchEvents.query
 		.byEventId({ eventType: 'channel.channel_points_custom_reward_redemption.add' })
 		.go()
 		.then((result) => result.data);
@@ -70,6 +72,8 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
 	const rewardsToUpdate = newRewards.filter((newReward) =>
 		existingRewards.some((reward) => reward.eventId === newReward.id)
 	);
+
+	const db = new Service({ twitchEvents }, config);
 
 	const result = await db.transaction
 		.write(({ twitchEvents }) => [
@@ -108,7 +112,7 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
 }
 
 export async function checkIsDuplicateTwitchEventMessage(args: { message_id: string }) {
-	const result = await db.entities.twitchEventMessageHistory.query
+	const result = await twitchEventMessageHistory.query
 		.byMessageId({ message_id: args.message_id })
 		.go()
 		.then((result) => result.data)
@@ -117,16 +121,16 @@ export async function checkIsDuplicateTwitchEventMessage(args: { message_id: str
 	return result.length > 0;
 }
 
-export async function updateSiteConfig(config: CreateEntityItem<SiteConfig>) {
-	await db.entities.siteConfig.upsert(config).go();
+export async function updateSiteConfig(config: CreateSiteConfig) {
+	await siteConfig.upsert(config).go();
 }
 
-export async function getSiteConfig(): Promise<EntityItem<SiteConfig>> {
-	const result = await db.entities.siteConfig.query.primary({}).go();
+export async function getSiteConfig(): Promise<SiteConfig> {
+	const result = await siteConfig.query.primary({}).go();
 	return result.data[0];
 }
 
-export async function addMessageToSiteConfig(args: EntityItem<SiteConfig>['messages'][number]) {
+export async function addMessageToSiteConfig(args: SiteConfig['messages'][number]) {
 	const siteConfig = await getSiteConfig();
 	const existingMessages = siteConfig.messages ?? [];
 	if (existingMessages.some((message) => message.message === args.message)) return;

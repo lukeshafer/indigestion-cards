@@ -1,15 +1,38 @@
 import { z } from 'zod';
 
-export type Category = z.infer<typeof validCategories>;
-const validCategories = z.enum(['season', 'custom']);
+export type PackDetails = z.infer<typeof packSchema>;
+export type PackDetailsWithoutUser = z.infer<typeof packSchemaWithoutUser>;
+export const packSchema = z.object({
+	userId: z.string(),
+	username: z.string(),
+	packCount: z.number(),
+	packType: z.object({
+		packTypeId: z.string(),
+		packTypeName: z.string(),
+		packTypeCategory: z.enum(['season', 'custom']),
+		cardCount: z.number(),
+		designs: z
+			.array(
+				z.object({
+					designId: z.string(),
+					cardName: z.string(),
+					imgUrl: z.string(),
+				})
+			)
+			.optional(),
+		seasonId: z.string().optional(),
+		seasonName: z.string().optional(),
+	}),
+});
+export const packSchemaWithoutUser = packSchema.omit({ userId: true, username: true });
 
-type Season = z.infer<typeof seasonSchema>;
+export type Season = z.infer<typeof seasonSchema>;
 const seasonSchema = z.object({
 	seasonId: z.string(),
 	seasonName: z.string(),
 });
 
-type CardDesignElement = z.infer<typeof cardDesignsSchema>[number];
+export type CardDesignElement = z.infer<typeof cardDesignsSchema>[number];
 const cardDesignsSchema = z.array(
 	z.object({
 		designId: z.string(),
@@ -18,7 +41,10 @@ const cardDesignsSchema = z.array(
 	})
 );
 
-export function getPackTypeContents(options: {
+export type Category = z.infer<typeof validCategories>;
+const validCategories = z.enum(['season', 'custom']);
+
+export function parsePackTypeContents(options: {
 	category: string;
 	season?: string | null;
 	cardDesigns?: string | null;

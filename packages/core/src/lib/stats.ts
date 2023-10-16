@@ -1,4 +1,5 @@
-import type { CardInstanceEntity, CardDesignEntity } from './card';
+import type { CardInstance } from 'src/db/cardInstances';
+import type { CardDesign } from 'src/db/cardDesigns';
 
 export interface RarityStats {
 	rarityId: string;
@@ -8,12 +9,12 @@ export interface RarityStats {
 	opened: number;
 	notGivenOut: number;
 	total: number;
-	instances: Array<CardInstanceEntity | null>;
+	instances: Array<CardInstance | null>;
 }
 
 export function getRarityStatsOverviewFromDesignAndInstances(
-	design: CardDesignEntity,
-	cardInstances: Array<CardInstanceEntity>
+	design: CardDesign,
+	cardInstances: Array<CardInstance>
 ) {
 	const rarityStats = {} as Record<string, RarityStats>;
 	design.rarityDetails?.forEach((rarity) => {
@@ -25,7 +26,7 @@ export function getRarityStatsOverviewFromDesignAndInstances(
 			opened: 0,
 			notGivenOut: rarity.count,
 			total: rarity.count,
-			instances: new Array<CardInstanceEntity | null>(rarity.count).fill(null),
+			instances: new Array<CardInstance | null>(rarity.count).fill(null),
 		};
 	});
 
