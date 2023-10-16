@@ -42,6 +42,8 @@ function Alert(
 			window.history.replaceState({}, '', url.toString());
 		}
 
+		// This function is called by a user event, so it does not need to be reactive
+		// eslint-disable-next-line solid/reactivity
 		useViewTransition(() => setAlerts((alerts) => alerts.filter((_, i) => i !== props.index)));
 	};
 
@@ -54,7 +56,7 @@ function Alert(
 			style={{ 'view-transition-name': `alert-${props.length - props.index}` }}
 			classList={{ [alertStyles[props.type]]: true }}>
 			<div>{props.message}</div>
-			<button onclick={deleteAlert}>
+			<button onClick={() => deleteAlert()}>
 				<span class="opacity-50">✕</span>
 			</button>
 		</div>

@@ -3,7 +3,7 @@ import type { EntityItem, CreateEntityItem, UpdateEntityItem } from 'electrodb';
 import { ElectroError } from 'electrodb';
 import { createNewUser, getUser } from './user';
 import { CardPool } from './pack';
-import { FULL_ART_ID, LEGACY_CARD_ID } from './constants';
+import { FULL_ART_ID, LEGACY_CARD_ID, SHIT_PACK_RARITY_ID } from './constants';
 
 type Result<T> =
 	| {
@@ -482,7 +482,7 @@ export async function openCardFromPack(args: {
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
 	const deletePack = newCardDetails.every((c) => c.opened);
-	const isShitPack = deletePack ? newCardDetails.every((c) => c.totalOfType >= 50) : false;
+	const isShitPack = deletePack ? newCardDetails.every((c) => c.rarityId === SHIT_PACK_RARITY_ID) : false;
 
 	const updateRarity = checkIsRarityBetter(
 		{ rarityId: instance.rarityId, count: instance.totalOfType },
