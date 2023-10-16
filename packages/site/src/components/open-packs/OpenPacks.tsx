@@ -15,7 +15,7 @@ import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import type { PackEntity } from '@lil-indigestion-cards/core/pack';
-import { API, routes, ASSETS } from '@/constants';
+import { API, routes, ASSETS, SHIT_PACK_RARITY_ID } from '@/constants';
 import Card from '@/components/cards/Card';
 import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
@@ -25,9 +25,9 @@ import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = PackEntity & {
 	cardDetails: PackEntity['cardDetails'] &
-		{
-			stamps?: string[];
-		}[];
+	{
+		stamps?: string[];
+	}[];
 };
 
 export default function OpenPacks(props: {
@@ -160,7 +160,11 @@ export default function OpenPacks(props: {
 		if (index === undefined) return;
 		setState('activePack', 'cardDetails', index, 'opened', true);
 
-		if (state.activePack?.cardDetails.every((card) => card.opened && card.totalOfType >= 50))
+		if (
+			state.activePack?.cardDetails.every(
+				(card) => card.opened && card.rarityId === SHIT_PACK_RARITY_ID
+			)
+		)
 			setTimeout(
 				() =>
 					setState('activePack', 'cardDetails', index, 'stamps', [
@@ -241,7 +245,8 @@ export default function OpenPacks(props: {
 									state.hoveringIndex === state.packs.length &&
 									state.draggingIndex !== null,
 							}}
-							onMouseMove={() => setState('hoveringIndex', state.packs.length)}></div>
+							onMouseMove={() => setState('hoveringIndex', state.packs.length)}
+						/>
 					</ul>
 				</section>
 				<div class="flex-1">{props.children}</div>
@@ -356,13 +361,13 @@ function PackToOpenItem(props: {
 
 	return (
 		<li
-			onMouseMove={(e) => {
+			onMouseMove={() => {
 				if (!isDragging()) {
 					props.setAsHovering();
 				}
 			}}>
 			<Show when={props.isHovering && props.draggingIndex !== null}>
-				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic"></div>
+				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic" />
 			</Show>
 			<button
 				title={props.isOnline ? 'Online' : 'Offline'}
@@ -376,7 +381,7 @@ function PackToOpenItem(props: {
 					'transform-origin': 'center left',
 					transform: isDragging() ? `translateY(${props.draggingY}px)` : '',
 				}}
-				onMouseDown={(e) => {
+				onMouseDown={() => {
 					timeout = setTimeout(() => {
 						props.setAsDragging();
 						wasDragging = true;
@@ -413,7 +418,7 @@ function PackShowcase(props: {
 	previewCard: (cardId: string) => void;
 	previewedCardId: string | null;
 }) {
-	const [animateTitle] = createAutoAnimate((el, action, oldCoords, newCoords) => {
+	const [animateTitle] = createAutoAnimate((el, action) => {
 		let keyframes: Keyframe[] = [];
 
 		if (action === 'add') {
@@ -507,7 +512,7 @@ function PackShowcase(props: {
 				<Show when={allCardsOpened() && props.packsRemaining}>
 					<button
 						class="bg-brand-main font-display mb-4 ml-auto block p-4 pb-2 text-3xl italic text-white"
-						onClick={props.setNextPack}>
+						onClick={() => props.setNextPack()}>
 						Next
 					</button>
 				</Show>
@@ -546,6 +551,7 @@ function ShowcaseCard(props: {
 	previewCard: (cardId: string) => void;
 	isPreviewed: boolean;
 }) {
+	// eslint-disable-next-line solid/reactivity
 	const [flipped, setFlipped] = createSignal(props.card.opened);
 
 	const flipCard = async () => {
@@ -562,13 +568,13 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						Authorization: auth_token ? `Bearer ${auth_token}` : '',
-					},
-					body,
-			  });
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					Authorization: auth_token ? `Bearer ${auth_token}` : '',
+				},
+				body,
+			});
 	};
 
 	const previewCard = () => {
@@ -582,7 +588,7 @@ function ShowcaseCard(props: {
 
 	return (
 		<li>
-			<p class="error-text"></p>
+			<p class="error-text" />
 			<div
 				classList={{ flipped: flipped() }}
 				style={{ width: props.scale * 18 + 'rem' }}
@@ -641,7 +647,7 @@ function Statistics(props: { activePack: PackEntityWithStatus | null }) {
 			return { shitPackOdds: 0 };
 		}
 
-		if (state.cardsOpened?.some((card) => card.totalOfType < 50))
+		if (state.cardsOpened?.some((card) => card.rarityId.toLowerCase() !== SHIT_PACK_RARITY_ID))
 			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 
