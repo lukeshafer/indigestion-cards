@@ -2,14 +2,12 @@ import {
 	For,
 	Show,
 	createEffect,
-	createRenderEffect,
 	createResource,
 	createSignal,
 	onMount,
 	type Accessor,
 	type Setter,
 	type JSX,
-	createReaction,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -25,9 +23,9 @@ import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = Pack & {
 	cardDetails: Pack['cardDetails'] &
-	{
-		stamps?: string[];
-	}[];
+		{
+			stamps?: string[];
+		}[];
 };
 
 export default function OpenPacks(props: {
@@ -568,13 +566,13 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: auth_token ? `Bearer ${auth_token}` : '',
-				},
-				body,
-			});
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: auth_token ? `Bearer ${auth_token}` : '',
+					},
+					body,
+			  });
 	};
 
 	const previewCard = () => {
@@ -642,7 +640,7 @@ function Statistics(props: { activePack: PackEntityWithStatus | null }) {
 		localStorage.setItem('isShitpackVisible', isShitpackVisible() ? 'true' : 'false');
 	});
 
-	const [resource, { mutate, refetch }] = createResource(state, async (state) => {
+	const [resource] = createResource(state, async (state) => {
 		if (!state.totalCardCount || !state.packId) {
 			return { shitPackOdds: 0 };
 		}

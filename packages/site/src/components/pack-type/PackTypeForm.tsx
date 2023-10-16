@@ -9,7 +9,7 @@ import {
 	Fieldset,
 	Checkbox,
 } from '@/components/form/Form';
-import { createEffect, createSignal, For, Match, Switch } from 'solid-js';
+import { createSignal, For, Match, Switch } from 'solid-js';
 import type { Season } from '@lil-indigestion-cards/core/db/season';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 

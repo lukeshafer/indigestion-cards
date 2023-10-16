@@ -1,15 +1,14 @@
-import { publicApi, routes } from '@/constants';
+import { publicApi } from '@/constants';
 import { Form, TextInput } from '@/components/form/Form';
-import { Index, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 import { AiOutlineSearch } from 'solid-icons/ai';
 
 export default function UserSearch() {
 	const [users, setUsers] = createSignal<string[]>([]);
-	const [searchResults, setSearchResults] = createSignal<string[]>([]);
 	const [isFetching, setIsFetching] = createSignal(false);
-	const [focusedIndex, setFocusedIndex] = createSignal(-1);
 
-	const searchDirective = (el: HTMLElement) => {
+	// ts-expect-error - This function IS used
+	function searchDirective(el: HTMLElement) {
 		const fetchUsernames = async () => {
 			if (users().length > 0 || isFetching()) return;
 			setIsFetching(true);
@@ -25,7 +24,7 @@ export default function UserSearch() {
 
 		el.addEventListener('focus', fetchUsernames, { once: true, capture: true });
 		el.addEventListener('mouseover', fetchUsernames, { once: true, capture: true });
-	};
+	}
 
 	return (
 		<div

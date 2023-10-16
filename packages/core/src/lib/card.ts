@@ -1,4 +1,4 @@
-import { config } from 'src/db/_utils';
+import { config } from '../db/_utils';
 import { cardInstances } from '../db/cardInstances';
 import { users } from '../db/users';
 import { Service } from 'electrodb';

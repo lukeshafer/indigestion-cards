@@ -1,6 +1,5 @@
 import type { MiddlewareResponseHandler } from 'astro';
 import { sequence } from 'astro/middleware';
-import { html } from './lib/api';
 import { getAdminUserById } from '@lil-indigestion-cards/core/lib/admin-user';
 import { AUTH_TOKEN, PUBLIC_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';

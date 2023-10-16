@@ -1,10 +1,9 @@
 import { setTotalPackCount, totalPackCount } from '@/lib/client/state';
 import { API } from '@/constants';
-import type { Pack } from '@lil-indigestion-cards/core/db/packs';
 import { Show, createEffect, createResource } from 'solid-js';
 
 export default function TotalPackCount(props: { count: number }) {
-	const [packCountResource, { refetch }] = createResource(
+	const [packCountResource] = createResource(
 		totalPackCount,
 		async () => {
 			const auth_token = localStorage.getItem('auth_token') || '';

@@ -2,6 +2,7 @@ import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import { BsPersonFill } from 'solid-icons/bs';
 import type { TwitchUser } from '@lil-indigestion-cards/core/lib/twitch';
 
+// @ts-expect-error - This function IS used
 function clickOutside(el: Element, accessor: () => any) {
 	const onClick = (e: MouseEvent) => {
 		if (!el.contains(e.target as Element)) {
@@ -47,7 +48,7 @@ export default function UserConfig(props: {
 			<Show when={isOpen()}>
 				<menu
 					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20"
-					use:clickOutside={() => setIsOpen(false)}>
+					use: clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
 							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline"
@@ -55,7 +56,10 @@ export default function UserConfig(props: {
 							{props.user.display_name}
 						</a>
 					) : (
-						<a class="font-display pt-2 text-center font-bold underline" href="/login" data-astro-reload>
+						<a
+							class="font-display pt-2 text-center font-bold underline"
+							href="/login"
+							data-astro-reload>
 							Login with Twitch
 						</a>
 					)}
@@ -95,7 +99,7 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 	return (
 		<button
 			class="group flex h-full items-center justify-center transition-transform duration-300 hover:brightness-90"
-			onClick={(e) => props.onClick?.()}>
+			onClick={() => props.onClick?.()}>
 			{props.user ? (
 				<img
 					width="40"

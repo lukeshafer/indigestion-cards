@@ -1,5 +1,4 @@
 import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
 import { useViewTransition } from '@/lib/client/utils';
@@ -270,6 +269,8 @@ export function FileInput(props: {
 	accept?: string;
 }) {
 	const [preview, setPreview] = createSignal<string | null>(null);
+
+	// @ts-expect-error Solid directive
 	const showPreview = (el: HTMLInputElement) => {
 		el.addEventListener('change', () => {
 			const file = el.files?.[0];
@@ -286,7 +287,7 @@ export function FileInput(props: {
 		<InputGroup>
 			<Label {...props} />
 			<input
-				use: showPreview
+				use:showPreview
 				id={props.name}
 				name={props.name}
 				type="file"

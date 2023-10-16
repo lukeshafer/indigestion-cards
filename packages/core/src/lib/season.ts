@@ -3,7 +3,7 @@ import { type CreateSeason, season, type Season, type UpdateSeason } from '../db
 import { cardDesigns } from '../db/cardDesigns';
 import { config } from '../db/_utils';
 import type { DBResult } from '../types';
-import { cardInstances } from 'src/db/cardInstances';
+import { cardInstances } from '../db/cardInstances';
 
 export async function getAllSeasons() {
 	const result = await season.query.allSeasons({}).go({ pages: 'all' });
@@ -31,7 +31,7 @@ export async function getSeasonAndDesignsBySeasonId(id: string) {
 	return result.data;
 }
 
-export async function deleteSeasonById(id: string): Promise<DBResult<CreateSeason>> {
+export async function deleteSeasonById(id: string) {
 	const seasonData = await getSeasonAndDesignsBySeasonId(id);
 	if (seasonData.cardDesigns.length > 0)
 		return {
@@ -43,7 +43,7 @@ export async function deleteSeasonById(id: string): Promise<DBResult<CreateSeaso
 	return { success: true, data: result.data };
 }
 
-export async function createSeason(inputSeason: CreateSeason): Promise<DBResult<Season>> {
+export async function createSeason(inputSeason: CreateSeason) {
 	try {
 		const result = await season.create({ ...inputSeason }).go();
 		return {

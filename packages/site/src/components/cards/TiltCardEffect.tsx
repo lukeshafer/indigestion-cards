@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { type JSX, createSignal, onMount } from 'solid-js';
+import { type JSX, createSignal, } from 'solid-js';
 import styles from './TiltCardEffect.module.css';
 
 export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: boolean }) {
@@ -14,6 +14,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 
 	const [outerEl, setOuterEl] = createSignal<HTMLDivElement>();
 
+	// @ts-expect-error Solid directive
 	function cardTilt(el: HTMLDivElement) {
 		el.addEventListener('mouseenter', handleEnterEvent);
 		el.addEventListener('touchstart', handleEnterEvent);

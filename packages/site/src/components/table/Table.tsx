@@ -1,4 +1,4 @@
-import { type ParentProps, createSignal, For, createEffect, type JSX } from 'solid-js';
+import { For, type JSX } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { TextInput } from '../form/Form';
 

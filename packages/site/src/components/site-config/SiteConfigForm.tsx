@@ -65,7 +65,7 @@ export default function SiteConfigForm(props: {
 								<TwitchEventSelect
 									twitchEvent={props.giftSubEvent}
 									packTypes={props.packTypes}
-									onChange={(val) => {
+									onChange={() => {
 										setIsEdited(true);
 									}}
 								/>
@@ -80,7 +80,7 @@ export default function SiteConfigForm(props: {
 								<TwitchEventSelect
 									twitchEvent={event}
 									packTypes={props.packTypes}
-									onChange={(val) => {
+									onChange={() => {
 										setIsEdited(true);
 									}}
 								/>

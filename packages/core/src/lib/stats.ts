@@ -1,5 +1,5 @@
-import type { CardInstance } from 'src/db/cardInstances';
-import type { CardDesign } from 'src/db/cardDesigns';
+import type { CardInstance } from '../db/cardInstances';
+import type { CardDesign } from '../db/cardDesigns';
 
 export interface RarityStats {
 	rarityId: string;

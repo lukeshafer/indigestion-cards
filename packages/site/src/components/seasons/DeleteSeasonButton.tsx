@@ -1,6 +1,5 @@
 import { API, routes } from '@/constants';
 import { Form, DeleteButton } from '@/components/form/Form';
-import { createSignal, } from 'solid-js';
 
 export default function DeleteSeasonButton(props: { seasonId: string }) {
 	return (

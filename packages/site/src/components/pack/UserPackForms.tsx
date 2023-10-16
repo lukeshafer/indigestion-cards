@@ -1,4 +1,4 @@
-import { Form, Select, SubmitButton, TextInput, DeleteButton } from '@/components/form/Form';
+import { Form, Select, SubmitButton, DeleteButton } from '@/components/form/Form';
 import { API } from '@/constants';
 import { setTotalPackCount } from '@/lib/client/state';
 import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';

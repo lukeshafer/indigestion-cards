@@ -18,7 +18,7 @@ const headerLinks = [
 	{ href: '/user', title: 'Users' },
 ];
 
-const twitchData = username ? await getUserByLogin(username) : null;
+const twitchData = username ? await getUserByLogin(username) : undefined;
 ---
 
 <div class="border-b border-b-gray-300 bg-white">
