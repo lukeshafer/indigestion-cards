@@ -8,7 +8,6 @@ import { getLoginLink } from '@/lib/utils';
 import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
-
 const currentPage = Astro.url.pathname;
 
 const username = Astro.locals.session?.properties.username;
@@ -21,7 +20,7 @@ const headerLinks = [
 const twitchData = username ? await getUserByLogin(username) : null;
 ---
 
-<div class="border-b border-b-gray-300 bg-white">
+<div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
 	<header
 		class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
 		<AdminOnly>
@@ -36,10 +35,10 @@ const twitchData = username ? await getUserByLogin(username) : null;
 				title="Home"
 				class="mr-4 flex w-fit min-w-[2rem] items-center gap-4"
 				transition:name="page-header-home-link">
-				<img src={ASSETS.LOGO} alt="logo" class="block w-12" width="192" />
+				<img src={ASSETS.LOGO} alt="logo" class="block w-12 dark:invert" width="192" />
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
-					<span class="-mt-2 text-lg text-gray-700">cards</span>
+					<span class="-mt-2 text-lg text-gray-700 dark:text-gray-200">cards</span>
 				</div>
 			</a>
 			{
@@ -48,16 +47,14 @@ const twitchData = username ? await getUserByLogin(username) : null;
 						href={href}
 						title={title}
 						transition:name={`page-header-nav-${href}`}
-						class="relative rounded px-2 py-1 text-gray-700 transition-colors hover:bg-gray-200"
+						class="relative rounded px-2 py-1 transition-colors "
 						class:list={{
-							'text-brand-main bg-brand-100 font-bold': currentPage.startsWith(href),
+							'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
+								currentPage.startsWith(href),
+							'text-gray-700 hover:bg-gray-200 hover:text-black dark:font-medium dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white':
+								!currentPage.startsWith(href),
 						}}>
-						<span
-							class:list={{
-								'text-brand-main font-bold': currentPage.startsWith(href),
-							}}>
-							{title}
-						</span>
+						{title}
 					</a>
 				))
 			}

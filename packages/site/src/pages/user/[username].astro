@@ -71,14 +71,14 @@ const packTypes = await getAllPackTypes();
 		/>
 		<section class="mt-4 flex flex-col">
 			<h1
-				class="font-display my-2 text-4xl font-bold italic text-gray-600"
+				class="font-display my-2 text-4xl font-bold italic text-gray-600 dark:text-gray-200"
 				style={{ 'view-transition-name': `${user.username}-username` }}>
 				{user.username}
 			</h1>
 			<AdminOnly>
 				<details>
-					<summary class="-mt-4 text-gray-500">Admin Stuff</summary>
-					<div class="rounded bg-gray-100 p-3">
+					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
+					<div class="rounded bg-gray-100 dark:bg-gray-800 p-3">
 						<p>User Id: {user.userId}</p>
 						<UserPackForms {user} {packTypes} client:load />
 					</div>

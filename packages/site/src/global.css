@@ -104,31 +104,6 @@ body.disable-animations * {
 
 @layer base {
 	:root {
-		--bg-color-light: #fcfcfd;
-		--bg-color-dark: #08050a;
-		--bg-color: var(--bg-color-light);
-		background-color: var(--bg-color);
-
-		--text-light: #090b0e;
-		--text-dark: #f7f7fd;
-		--text-color: var(--text-light);
-		color: var(--text-color);
-
-		--color-main: #fd94e6;
-		--color-secondary: #f66efa;
-		--color-tertiary: #ef6dd9;
-		--color-main-dark: #bc40a0;
-		--color-main-light: #f9b7eb;
-
-		--dark-main: #ce008a;
-		--dark-secondary: #7f19f8;
-
-		--accent-main: #31ffd6;
-		--accent-secondary: ##1fdeb8;
-		--accent-tertiary: #08fccc;
-		--accent-main-dark: #1eb395;
-		--accent-main-light: #8afff8;
-
 		--base-font-sans: 'Montserrat Variable', Montserrat, Avenir, 'Avenir Next LT Pro', Corbel,
 			'URW Gothic', source-sans-pro, sans-serif;
 		--base-font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
@@ -144,8 +119,13 @@ body.disable-animations * {
 		--spacing-main: 60rem;
 	}
 
+	:root * {
+		transition: color 50ms ease-in-out, background-color 50ms ease-in-out,
+			border-color 50ms ease-in-out, box-shadow 50ms ease-in-out;
+	}
+
 	*::selection {
-		background: var(--accent-main-light, default);
+		background: theme('colors.accent.light');
 		color: #000;
 	}
 }

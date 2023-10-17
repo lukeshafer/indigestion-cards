@@ -42,7 +42,7 @@ export default function UserSearch() {
 				/>
 				<button
 					type="submit"
-					class="absolute right-0 top-0 h-full bg-white px-1 text-gray-500">
+					class="absolute right-0 top-0 h-full bg-white dark:bg-black px-1 text-gray-500 fill-black dark:fill-white">
 					<span class="sr-only">Search</span>
 					<AiOutlineSearch size="1.4rem" />
 				</button>

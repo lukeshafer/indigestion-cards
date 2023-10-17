@@ -19,7 +19,10 @@ const session = Astro.locals.session;
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 ---
 
-<html lang="en">
+<html
+	lang="en"
+	class:list={{ 'dark': Astro.cookies.get('theme')?.value === 'dark' }}
+	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 	<!--
 Oh, hello beautiful people of the internet!
 
@@ -33,6 +36,19 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#ffffff" />
+		<script is:inline>
+			if (
+				localStorage.theme === 'dark' ||
+				(!('theme' in localStorage) &&
+					window.matchMedia('(prefers-color-scheme: dark)').matches)
+			) {
+				document.documentElement.classList.add('dark');
+				localStorage.theme = 'dark';
+			} else {
+				document.documentElement.classList.remove('dark');
+				localStorage.theme = 'light'
+			}
+		</script>
 		<title>
 			{
 				title && title !== 'Indigestion Cards'
@@ -42,7 +58,8 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		</title>
 		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>
-	<body>
+	<body
+	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />
