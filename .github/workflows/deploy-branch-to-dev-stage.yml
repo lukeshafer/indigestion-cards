@@ -1,14 +1,9 @@
-name: Deploy Dev and QA
+name: Deploy a branch to dev stage
 
-on:
-    push:
-        branches:
-            - dev
-            - accounts
-            - dark-mode
+on: workflow_dispatch
 
 jobs:
-    deploy-dev:
+    deploy-stage:
         runs-on: ubuntu-latest
 
         steps:
@@ -29,7 +24,7 @@ jobs:
               run: pnpm install
 
             - name: Deploy SST app
-              run: pnpm run deploy --stage "${GITHUB_REF##*/}"
+              run: pnpm run deploy --stage dev
               env:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
