@@ -8,6 +8,7 @@ import {
 	type Accessor,
 	type Setter,
 	type JSX,
+    onCleanup,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -87,7 +88,8 @@ export default function OpenPacks(props: {
 			window.localStorage.removeItem('packOrder');
 		}
 
-		setInterval(refetchChatters, 10000);
+		const interval = setInterval(refetchChatters, 10000);
+		onCleanup(() => clearInterval(interval));
 
 		setState('hidden', false);
 	});
