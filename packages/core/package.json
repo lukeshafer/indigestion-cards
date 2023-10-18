@@ -11,7 +11,7 @@
     "@aws-sdk/client-s3": "^3.398.0",
     "@aws-sdk/client-secrets-manager": "^3.398.0",
     "@types/node": "^18.15.11",
-    "sst": "2.29.2"
+    "sst": "2.30.3"
   },
   "dependencies": {
     "electrodb": "^2.5.1",
