@@ -52,6 +52,15 @@ export default function UserConfig(props: {
 		document.documentElement.classList.toggle('dark', colorTheme() === 'dark');
 		localStorage.setItem('theme', colorTheme());
 		document.cookie = `theme=${colorTheme()}; path=/; max-age=31536000`;
+
+		const colors = {
+			light: '#ffffff',
+			dark: '#030712',
+		};
+
+		document
+			.querySelector('meta[name="theme-color"]')
+			?.setAttribute('content', colors[colorTheme()]);
 	});
 
 	return (
@@ -135,7 +144,10 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 					class="col-start-1 row-span-full rounded-full"
 				/>
 			) : (
-				<BsPersonFill size="25" class="w-8 fill-gray-700 text-gray-700 dark:fill-gray-300 dark:text-gray-300" />
+				<BsPersonFill
+					size="25"
+					class="w-8 fill-gray-700 text-gray-700 dark:fill-gray-300 dark:text-gray-300"
+				/>
 			)}
 		</button>
 	);
