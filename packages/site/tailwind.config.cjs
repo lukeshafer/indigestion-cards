@@ -3,6 +3,8 @@ const { fontFamily } = require('tailwindcss/defaultTheme');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+	plugins: [require('@tailwindcss/typography')],
+	darkMode: 'class',
 	theme: {
 		extend: {
 			spacing: {
@@ -16,6 +18,14 @@ module.exports = {
 				heading: ['var(--font-heading)', ...fontFamily.sans],
 			},
 			colors: {
+				background: {
+					light: '#fcfcfd',
+					dark: '#08050a',
+				},
+				text: {
+					light: '#090b0e',
+					dark: '#f7f7fd',
+				},
 				brand: {
 					main: '#EF6EDA',
 					secondary: '#f66efa',
@@ -23,6 +33,7 @@ module.exports = {
 					dark: '#bc40a0',
 					light: '#f9b7eb',
 					100: '#FFE0F9',
+					950: '#713965',
 				},
 				accent: {
 					main: '#31FFD6',
@@ -34,5 +45,4 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require('@tailwindcss/typography')],
 };

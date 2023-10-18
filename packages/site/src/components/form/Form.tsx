@@ -121,7 +121,7 @@ export function Form(props: {
 			enctype={props.enctype}
 			onsubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-50">
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-black bg-opacity-50">
 					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
@@ -134,7 +134,7 @@ export function Form(props: {
 }
 
 const BASE_INPUT_CLASS =
-	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-brand-main focus:ring-4';
+	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white dark:bg-black p-1 text-black dark:text-gray-50 outline outline-2 outline-gray-300 dark:outline-gray-700 focus:outline-brand-main focus:ring-4';
 
 function InputGroup(props: ParentProps) {
 	return <div class="flex w-full flex-col items-start">{props.children}</div>;
@@ -374,7 +374,7 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow font-heading rounded border border-gray-300 px-4 py-2 font-bold uppercase text-white transition-colors';
+	'text-shadow font-heading rounded border border-gray-300 dark:border-gray-800 px-4 py-2 font-bold uppercase text-white transition-colors';
 
 export function Anchor(props: { children: string; href: string; type?: 'submit' | 'delete' }) {
 	return (
@@ -382,7 +382,7 @@ export function Anchor(props: { children: string; href: string; type?: 'submit' 
 			href={props.href}
 			class={BUTTON_CLASS}
 			classList={{
-				'bg-brand-main hover:bg-brand-dark': !props.type || props.type === 'submit',
+				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark': !props.type || props.type === 'submit',
 				'bg-red-500 hover:bg-red-800': props.type === 'delete',
 			}}>
 			{props.children}
@@ -394,7 +394,7 @@ export function SubmitButton(props: { children?: JSX.Element; onClick?: () => vo
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark`}
+			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
 			onClick={props.onClick}>
 			{props.children ?? 'Submit'}
 		</button>
@@ -405,7 +405,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void })
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800`}
+			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 `}
 			onClick={props.onClick}>
 			{props.children ?? 'Delete'}
 		</button>

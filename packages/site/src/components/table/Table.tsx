@@ -152,7 +152,7 @@ export default function Table(props: {
 				<tbody>
 					<For each={props.search ? filteredRows() : sortedRows()}>
 						{(row) => (
-							<tr class="even:bg-brand-100 group odd:bg-gray-300">
+							<tr class="even:bg-brand-100 dark:even:bg-brand-dark/50 group odd:bg-gray-300 dark:odd:bg-gray-800">
 								<For each={props.columns}>
 									{(column) => (
 										<TableCell
@@ -194,7 +194,7 @@ function TableHeading(
 			data-mode={props.mode}
 			onClick={props.sort === false ? undefined : props.onClick}
 			style={{ width: props.width }}
-			class="px-6 py-2 hover:bg-gray-200"
+			class="px-6 py-2 hover:bg-gray-200 dark:hover:bg-gray-700"
 			classList={{
 				'cursor-pointer': props.sort ?? true,
 				hidden: props.showOnBreakpoint !== undefined,
@@ -231,7 +231,7 @@ function TableCell(props: {
 				'font-display': props.font === 'title',
 				'text-xl': props.font === 'title',
 				italic: props.font === 'title',
-				'text-gray-700': props.font === 'title',
+				'text-gray-700 dark:text-gray-50': props.font === 'title',
 				'font-body': props.font === 'default',
 				'text-base': props.font === 'default',
 				'text-left': props.align === 'left',

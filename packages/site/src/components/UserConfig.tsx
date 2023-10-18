@@ -24,8 +24,19 @@ export default function UserConfig(props: {
 	const [disableAnimations, setDisableAnimations] = createSignal(
 		props.disableAnimations ?? false
 	);
+	const [colorTheme, setColorTheme] = createSignal<'light' | 'dark'>('light');
+
 	onMount(() => {
 		setDisableAnimations(localStorage.getItem('disableAnimations') === 'true');
+
+		let theme = localStorage.getItem('theme');
+		if (theme === 'dark' || theme === 'light') {
+			setColorTheme(theme);
+		} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			setColorTheme('dark');
+		} else {
+			setColorTheme('light');
+		}
 	});
 
 	createEffect(() => {
@@ -38,6 +49,21 @@ export default function UserConfig(props: {
 		}
 	});
 
+	createEffect(() => {
+		document.documentElement.classList.toggle('dark', colorTheme() === 'dark');
+		localStorage.setItem('theme', colorTheme());
+		document.cookie = `theme=${colorTheme()}; path=/; max-age=31536000`;
+
+		const colors = {
+			light: '#ffffff',
+			dark: '#030712',
+		};
+
+		document
+			.querySelector('meta[name="theme-color"]')
+			?.setAttribute('content', colors[colorTheme()]);
+	});
+
 	return (
 		<div class="relative z-10">
 			<UserConfigButton
@@ -47,11 +73,11 @@ export default function UserConfig(props: {
 			/>
 			<Show when={isOpen()}>
 				<menu
-					class="bg-brand-100 absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20"
-					use: clickOutside={() => setIsOpen(false)}>
+					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20 dark:text-gray-100"
+					use:clickOutside={() => setIsOpen(false)}>
 					{props.user ? (
 						<a
-							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline"
+							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
 							href={`/user/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
@@ -65,7 +91,7 @@ export default function UserConfig(props: {
 					)}
 					<ul class="flex w-max flex-col items-end gap-1">
 						<button
-							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600"
+							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600 dark:before:border-gray-200"
 							classList={{
 								'before:content-["✔"]': disableAnimations(),
 								'before:content-[""]': !disableAnimations(),
@@ -75,6 +101,18 @@ export default function UserConfig(props: {
 								setDisableAnimations((v) => !v);
 							}}>
 							Disable Animations
+						</button>
+						<button
+							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600 dark:before:border-gray-200"
+							classList={{
+								'before:content-["✔"]': colorTheme() === 'dark',
+								'before:content-[""]': colorTheme() === 'light',
+							}}
+							aria-pressed={colorTheme() === 'dark'}
+							onClick={() => {
+								setColorTheme((v) => (v === 'dark' ? 'light' : 'dark'));
+							}}>
+							Dark Mode
 						</button>
 						{props.user ? (
 							<a
@@ -107,7 +145,10 @@ function UserConfigButton(props: { onClick?: () => void; user?: TwitchUser; open
 					class="col-start-1 row-span-full rounded-full"
 				/>
 			) : (
-				<BsPersonFill size="25" class="w-8 fill-gray-700 text-gray-700 " />
+				<BsPersonFill
+					size="25"
+					class="w-8 fill-gray-700 text-gray-700 dark:fill-gray-300 dark:text-gray-300"
+				/>
 			)}
 		</button>
 	);

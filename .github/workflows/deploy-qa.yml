@@ -3,12 +3,10 @@ name: Deploy Dev and QA
 on:
     push:
         branches:
-            - dev
-            - accounts
-            - dark-mode
+            - qa
 
 jobs:
-    deploy-dev:
+    deploy-qa:
         runs-on: ubuntu-latest
 
         steps:
