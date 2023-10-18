@@ -382,4 +382,19 @@ body.disable-animations * {
 		-ms-overflow-style: none; /* IE and Edge */
 		scrollbar-width: none; /* Firefox */
 	}
+
+	.scrollbar-narrow::-webkit-scrollbar {
+		width: 0.5rem;
+		height: 0.5rem;
+	}
+
+	.scrollbar-narrow::-webkit-scrollbar-thumb {
+		background-color: theme('colors.gray.400');
+		cursor: pointer;
+		border-radius: 0.25rem;
+	}
+
+	html.dark .scrollbar-narrow::-webkit-scrollbar-thumb {
+		background-color: theme('colors.gray.600');
+	}
 }

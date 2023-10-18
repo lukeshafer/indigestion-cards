@@ -181,7 +181,7 @@ export default function OpenPacks(props: {
 		<div class="flex min-h-[80vh] flex-col">
 			<div class="flex">
 				<section
-					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800"
+					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-y-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800 scrollbar-narrow"
 					id="pack-list"
 					style={{ height: listHeightString() }}>
 					<button onClick={() => moveOnlineToTop()}>
@@ -494,7 +494,7 @@ function PackShowcase(props: {
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
 	return (
-		<div class="bg-brand-100 relative flex h-full flex-1 flex-col dark:bg-gray-950">
+		<div class="bg-brand-100 relative flex h-full flex-1 flex-col dark:bg-gray-900">
 			<div class="flex items-end justify-between pr-8">
 				<h2
 					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700 dark:text-gray-300"
