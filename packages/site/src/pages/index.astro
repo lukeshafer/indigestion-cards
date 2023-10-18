@@ -6,7 +6,7 @@ import { ASSETS } from '@/constants';
 
 <Page title="Indigestion Cards" pageType="public">
 	<h1 class="sr-only">Indigestion Cards</h1>
-	<div class="flex flex-col gap-28">
+	<div class="flex flex-col gap-28 overflow-x-hidden">
 		<section
 			class="flex flex-wrap min-h-[30rem] justify-center items-center justify-items-center flex-row-reverse gap-y-8 gap-4">
 			<div class="flex origin-top pb-24 -mx-12 -mr-20 justify-center">
@@ -26,14 +26,14 @@ import { ASSETS } from '@/constants';
 					class="w-52 shadow-black/50 rotate-[18deg] shadow-xl origin-top-left translate-y-6 -translate-x-12 hover:translate-y-2 transition-transform duration-500 ease-in-out"
 				/>
 			</div>
-			<h2 class="font-heading font-semibold text-[2.5rem] text-gray-600 leading-none w-max">
+			<h2 class="font-heading font-semibold text-[2.5rem] text-gray-600 dark:text-gray-300 leading-none w-max">
 				Trading cards<br />for the <s class="font-bold">cult</s><span
 					class="block font-bold text-brand-main text-shadow">community</span
 				>
 			</h2>
 		</section>
 		<article
-			class="prose max-w-3xl mx-auto text-lg prose-h2:uppercase prose-h2:text-center prose-h2:text-gray-600 prose-h2:font-bold prose-h2:text-3xl prose-h3:font-heading prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-gray-700">
+			class="prose max-w-3xl mx-auto text-lg text-gray-900 dark:text-gray-100 prose-h2:uppercase prose-h2:text-center prose-h2:text-gray-600 dark:prose-h2:text-gray-300 prose-h2:font-bold prose-h2:text-3xl prose-h3:font-heading prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-gray-700 dark:prose-h3:text-gray-200">
 			<FAQ />
 		</article>
 	</div>

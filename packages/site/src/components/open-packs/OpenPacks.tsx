@@ -25,9 +25,9 @@ import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = PackEntity & {
 	cardDetails: PackEntity['cardDetails'] &
-	{
-		stamps?: string[];
-	}[];
+		{
+			stamps?: string[];
+		}[];
 };
 
 export default function OpenPacks(props: {
@@ -181,11 +181,11 @@ export default function OpenPacks(props: {
 		<div class="flex min-h-[80vh] flex-col">
 			<div class="flex">
 				<section
-					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-scroll bg-gray-200 px-4 py-3"
+					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-y-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800 scrollbar-narrow"
 					id="pack-list"
 					style={{ height: listHeightString() }}>
 					<button onClick={() => moveOnlineToTop()}>
-						<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline">
+						<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline dark:text-gray-200">
 							Coming up...
 						</h2>
 					</button>
@@ -367,13 +367,13 @@ function PackToOpenItem(props: {
 				}
 			}}>
 			<Show when={props.isHovering && props.draggingIndex !== null}>
-				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic" />
+				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic dark:bg-gray-500/50" />
 			</Show>
 			<button
 				title={props.isOnline ? 'Online' : 'Offline'}
-				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800"
+				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
 				classList={{
-					'bg-gray-300 text-gray-800': isActive(),
+					'bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-200': isActive(),
 					'opacity-75': !props.isOnline && !isActive(),
 					'absolute top-0 opacity-50': isDragging(),
 				}}
@@ -494,10 +494,10 @@ function PackShowcase(props: {
 	const allCardsOpened = () => props.pack?.cardDetails.every((card) => card.opened);
 
 	return (
-		<div class="bg-brand-100 relative flex h-full flex-1 flex-col">
+		<div class="bg-brand-100 relative flex h-full flex-1 flex-col dark:bg-gray-900">
 			<div class="flex items-end justify-between pr-8">
 				<h2
-					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700"
+					class="font-heading m-6 mb-0 mt-3 text-2xl font-bold uppercase text-gray-700 dark:text-gray-300"
 					ref={animateTitle}>
 					{props.pack ? 'Opening pack for ' : 'Select a pack to start'}
 					<Show when={props.pack?.packId} keyed>
@@ -568,13 +568,13 @@ function ShowcaseCard(props: {
 		props.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: auth_token ? `Bearer ${auth_token}` : '',
-				},
-				body,
-			});
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: auth_token ? `Bearer ${auth_token}` : '',
+					},
+					body,
+			  });
 	};
 
 	const previewCard = () => {

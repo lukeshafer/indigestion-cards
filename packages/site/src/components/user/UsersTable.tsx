@@ -50,12 +50,12 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 						<>
 							<TbCards
 								aria-hidden="true"
-								fill="white"
-								stroke="white"
 								size={50}
-								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900"
 							/>
-							<span class="relative rounded-full bg-white p-1">{user.cardCount}</span>
+							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
+								{user.cardCount}
+							</span>
 						</>
 					),
 					value: user.cardCount,
@@ -65,12 +65,12 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 						<>
 							<FaSolidGift
 								aria-hidden="true"
-								fill="white"
-								stroke="white"
 								size={40}
-								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900"
 							/>
-							<span class="relative rounded-full bg-white p-1">{user.packCount}</span>
+							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
+								{user.packCount}
+							</span>
 						</>
 					),
 					value: user.packCount,
