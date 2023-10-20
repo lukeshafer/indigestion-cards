@@ -7,6 +7,7 @@ import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances'
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';
 import type { Session } from '@/env';
+import { css } from '@acab/ecsstatic';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
@@ -22,6 +23,14 @@ const sortTypes = [
 ] as const;
 
 type SortType = (typeof sortTypes)[number]['value'];
+
+const cardListStyles = css`
+	grid-template-columns: repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr));
+	--card-scale: 0.75;
+	@media (min-width: 640px) {
+		--card-scale: 1;
+	}
+`;
 
 export default function CardList(props: {
 	cards: CardType[];
@@ -52,7 +61,7 @@ export default function CardList(props: {
 			)}
 			<ul
 				class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 md:gap-x-6"
-				classList={{ [styles.cardList]: true }}>
+				classList={{ [cardListStyles]: true }}>
 				<Show when={sortedCards().length > 0} fallback={<p>No cards found</p>}>
 					<For each={sortedCards()}>
 						{(card) => (
