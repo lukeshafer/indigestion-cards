@@ -1,7 +1,7 @@
 import { publicApi } from '@/constants';
 import { Form, TextInput } from '@/components/form/Form';
 import { createSignal } from 'solid-js';
-import { AiOutlineSearch } from 'solid-icons/ai';
+import SearchIcon from './icons/SearchIcon';
 
 export default function UserSearch() {
 	const [users, setUsers] = createSignal<string[]>([]);
@@ -29,7 +29,7 @@ export default function UserSearch() {
 	return (
 		<div
 			class="relative w-40 md:w-auto"
-			use:searchDirective
+			ref={searchDirective}
 			style={{ 'view-transition-name': 'user-search-bar' }}>
 			<Form action={publicApi.SEARCH} method="get">
 				<TextInput
@@ -41,9 +41,9 @@ export default function UserSearch() {
 				/>
 				<button
 					type="submit"
-					class="absolute right-0 top-0 h-full bg-white dark:bg-black px-1 text-gray-500 fill-black dark:fill-white">
+					class="absolute right-0 top-0 h-full bg-white fill-gray-800 px-1 text-gray-500 dark:bg-black dark:fill-gray-300">
 					<span class="sr-only">Search</span>
-					<AiOutlineSearch size="1.4rem" />
+					<SearchIcon size="1.4rem" />
 				</button>
 				<datalist id="users">
 					{users().map((username) => (

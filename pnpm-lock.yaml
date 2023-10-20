@@ -133,9 +133,6 @@ importers:
       electrodb:
         specifier: ^2.10.3
         version: 2.10.3(@aws-sdk/client-dynamodb@3.431.0)
-      solid-icons:
-        specifier: ^1.0.12
-        version: 1.0.12(solid-js@1.8.3)
       solid-js:
         specifier: ^1.8.3
         version: 1.8.3
@@ -9439,15 +9436,6 @@ packages:
     dependencies:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 4.0.0
-
-  /solid-icons@1.0.12(solid-js@1.8.3):
-    resolution: {integrity: sha512-HOIQ2nFGLEH9/QHnMiu6CZkEMrRlrEvxpX3V3XikvQQ/CQNhOKl2vLQALaJYgz3MvfPP5wkid+q79tTdIw5YGQ==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      solid-js: '*'
-    dependencies:
-      solid-js: 1.8.3
-    dev: false
 
   /solid-js@1.8.3:
     resolution: {integrity: sha512-S7ztgPI6X4tUaWmhZe3aDx0E9F6FGxXVU8NsocrPqqUbxHoFi8eTPlDMcenOlXuo2ITQ97j2URaj0StfJci4KQ==}

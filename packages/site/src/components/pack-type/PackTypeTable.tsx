@@ -1,7 +1,7 @@
 import Table from '@/components/table/Table';
 import { routes } from '@/constants';
 import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
-import { TbCards } from 'solid-icons/tb';
+import CardsIcon from '../icons/CardsIcon';
 
 export default function PackTypeTable(props: { packTypes: PackType[] }) {
 	return (
@@ -41,14 +41,12 @@ export default function PackTypeTable(props: { packTypes: PackType[] }) {
 				cards: {
 					element: (
 						<>
-							<TbCards
+							<div
 								aria-hidden="true"
-								fill="white"
-								stroke="white"
-								size={50}
-								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-							/>
-							<span class="relative rounded-full bg-white p-1">
+								class="absolute left-1/2 top-1/2 w-12 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
+								<CardsIcon size={50} />
+							</div>
+							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900">
 								{packType.cardCount}
 							</span>
 						</>
