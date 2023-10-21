@@ -4,11 +4,11 @@ import {
 	createEffect,
 	createResource,
 	createSignal,
+	createContext,
 	onMount,
-	type Accessor,
-	type Setter,
 	type JSX,
-    onCleanup,
+	onCleanup,
+	useContext,
 } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
@@ -24,10 +24,47 @@ import { isChatters } from '@/lib/client/chatters';
 
 type PackEntityWithStatus = Pack & {
 	cardDetails: Pack['cardDetails'] &
-	{
-		stamps?: string[];
-	}[];
+		{
+			stamps?: string[];
+		}[];
 };
+
+type OpenPacksState = {
+	isTesting: boolean | undefined;
+	isHidden: boolean;
+
+	packs: PackEntityWithStatus[];
+	activePack: PackEntityWithStatus | null;
+	packsRemaining: number;
+	setActivePack(pack: PackEntityWithStatus): void;
+	removeNewStampStamp(instanceId: string): void;
+	removePack(): void;
+	setNextPack(): void;
+
+	cardScale: number;
+	setCardScale(scale: number): void;
+
+	previewedCardId: string | null;
+	setPreviewedCardId(id: string): void;
+
+	flipCard(instanceId: string): void;
+
+	draggingIndex: number | null;
+	setDraggingIndex(index: number | null): void;
+
+	hoveringIndex: number | null;
+	setHoveringIndex(index: number | null): void;
+
+	draggingY: number | null;
+	getIsOnline(username?: string): boolean;
+	moveOnlineToTop(): void;
+
+	listHeight: number;
+	listHeightString: string;
+	setListHeight(height: number): void;
+};
+
+export const OpenPacksContext = createContext<OpenPacksState>();
 
 export default function OpenPacks(props: {
 	packs: PackEntityWithStatus[];
@@ -44,30 +81,138 @@ export default function OpenPacks(props: {
 		return isChatters(data) ? data : [];
 	});
 
-	const [state, setState] = createStore({
+	const [state, setState] = createStore<OpenPacksState>({
+		// eslint-disable-next-line solid/reactivity
+		isTesting: props.canTest ? false : undefined,
+		isHidden: true,
+
+		// eslint-disable-next-line solid/reactivity
 		packs: props.packs,
 		activePack: null as PackEntityWithStatus | null,
-		isTesting: props.canTest ? false : undefined,
+		get packsRemaining() {
+			return this.packs.length;
+		},
+		setActivePack(pack) {
+			setState('activePack', { ...pack });
+			if (pack.packId === state.packs[0].packId) return;
+
+			setState(
+				'packs',
+				produce((draft) => {
+					const index = draft.findIndex((p) => p.packId === pack.packId);
+					draft.splice(index, 1);
+					draft.unshift(pack);
+				})
+			);
+		},
+		removeNewStampStamp(instanceId) {
+			const index = state.activePack?.cardDetails.findIndex(
+				(card) => card.instanceId === instanceId
+			);
+			if (!index) return;
+			setState(
+				'activePack',
+				'cardDetails',
+				index,
+				'stamps',
+				(stamps) => stamps?.filter((s) => s !== 'new-stamp')
+			);
+		},
+		removePack() {
+			setState(
+				'packs',
+				produce((draft) => {
+					const index = draft.findIndex((p) => p.packId === state.activePack?.packId);
+					draft.splice(index, 1);
+				})
+			);
+			setTotalPackCount((val) => val - 1);
+		},
+		setNextPack() {
+			setState('activePack', { ...state.packs[0] } ?? null);
+		},
+
+		// eslint-disable-next-line solid/reactivity
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
+		setCardScale(scale) {
+			setState('cardScale', scale);
+		},
+
 		previewedCardId: null as string | null,
+		setPreviewedCardId(id) {
+			setState('previewedCardId', id);
+		},
+
+		flipCard(instanceId) {
+			const index = state.activePack?.cardDetails.findIndex(
+				(card) => card.instanceId === instanceId
+			);
+			if (index === undefined) return;
+			setState('activePack', 'cardDetails', index, 'opened', true);
+
+			if (
+				state.activePack?.cardDetails.every(
+					(card) => card.opened && card.rarityId === SHIT_PACK_RARITY_ID
+				)
+			)
+				setTimeout(
+					() =>
+						setState('activePack', 'cardDetails', index, 'stamps', [
+							'shit-pack',
+							'new-stamp',
+						]),
+					500
+				);
+		},
+
 		draggingIndex: null as number | null,
-		hoveringIndex: null as number | null,
+		setDraggingIndex(index: number | null) {
+			setState('draggingIndex', index);
+		},
 		draggingY: null as number | null,
-		hidden: true,
+
+		hoveringIndex: null as number | null,
+		setHoveringIndex(index: number | null) {
+			setState('hoveringIndex', index);
+		},
+
+		getIsOnline(username) {
+			return (
+				chatters()?.some(
+					(chatter) => chatter.user_name.toLowerCase() === username?.toLowerCase()
+				) ?? false
+			);
+		},
+		moveOnlineToTop() {
+			setState(
+				'packs',
+				produce((draft) => {
+					draft.sort((a, b) => {
+						const aStatus = state.getIsOnline(a.username);
+						const bStatus = state.getIsOnline(b.username);
+						if (aStatus && !bStatus) return -1;
+						if (!aStatus && bStatus) return 1;
+						return 0;
+					});
+				})
+			);
+		},
+
+		// eslint-disable-next-line solid/reactivity
+		listHeight: props.startMargin ?? 200,
+		get listHeightString() {
+			return `${this.listHeight}px`;
+		},
+		setListHeight(height) {
+			setState('listHeight', height);
+		},
 	});
-
-	const [listHeight, setListHeight] = createSignal(props.startMargin ?? 200);
-
-	const getOnlineStatus = (username?: string) =>
-		chatters()?.some(
-			(chatter) => chatter.user_name.toLowerCase() === username?.toLowerCase()
-		) ?? false;
 
 	onMount(() => {
 		const activePackId = window.localStorage.getItem('activePackId');
 		const activePackFromStorage = state.packs.find((pack) => pack.packId === activePackId);
 		if (activePackFromStorage) {
-			setActivePack(activePackFromStorage);
+			state.setActivePack(activePackFromStorage);
 		}
 
 		const packOrder = window.localStorage.getItem('packOrder');
@@ -91,11 +236,11 @@ export default function OpenPacks(props: {
 		const interval = setInterval(refetchChatters, 10000);
 		onCleanup(() => clearInterval(interval));
 
-		setState('hidden', false);
+		setState('isHidden', false);
 	});
 
 	createEffect(() => {
-		if (state.activePack?.cardDetails.every((card) => card.opened)) removePack();
+		if (state.activePack?.cardDetails.every((card) => card.opened)) state.removePack();
 	});
 
 	createEffect(() => {
@@ -109,204 +254,103 @@ export default function OpenPacks(props: {
 		);
 	});
 
-	const moveOnlineToTop = () => {
-		setState(
-			'packs',
-			produce((draft) => {
-				draft.sort((a, b) => {
-					const aStatus = getOnlineStatus(a.username);
-					const bStatus = getOnlineStatus(b.username);
-					if (aStatus && !bStatus) return -1;
-					if (!aStatus && bStatus) return 1;
-					return 0;
-				});
-			})
-		);
-	};
-
-	const setActivePack = (pack: PackEntityWithStatus) => {
-		setState('activePack', { ...pack });
-		if (pack.packId === state.packs[0].packId) return;
-
-		setState(
-			'packs',
-			produce((draft) => {
-				const index = draft.findIndex((p) => p.packId === pack.packId);
-				draft.splice(index, 1);
-				draft.unshift(pack);
-			})
-		);
-	};
-
-	const removePack = () => {
-		setState(
-			'packs',
-			produce((draft) => {
-				const index = draft.findIndex((p) => p.packId === state.activePack?.packId);
-				draft.splice(index, 1);
-			})
-		);
-		setTotalPackCount((val) => val - 1);
-	};
-
-	const packsRemaining = () => state.packs.length;
-
-	const setNextPack = () => setState('activePack', { ...state.packs[0] } ?? null);
-
-	const flipCard = (instanceId: string) => {
-		const index = state.activePack?.cardDetails.findIndex(
-			(card) => card.instanceId === instanceId
-		);
-		if (index === undefined) return;
-		setState('activePack', 'cardDetails', index, 'opened', true);
-
-		if (
-			state.activePack?.cardDetails.every(
-				(card) => card.opened && card.rarityId === SHIT_PACK_RARITY_ID
-			)
-		)
-			setTimeout(
-				() =>
-					setState('activePack', 'cardDetails', index, 'stamps', [
-						'shit-pack',
-						'new-stamp',
-					]),
-				500
-			);
-	};
-
-	const listHeightString = () => `${listHeight()}px`;
-
 	return (
-		<div class="flex min-h-[80vh] flex-col">
-			<div class="flex">
-				<section
-					class="col-start-1 min-w-[15rem] max-w-[20rem] overflow-y-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800 scrollbar-narrow"
-					id="pack-list"
-					style={{ height: listHeightString() }}>
-					<button onClick={() => moveOnlineToTop()}>
-						<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline dark:text-gray-200">
-							Coming up...
-						</h2>
-					</button>
-					<ul
-						classList={{
-							'opacity-0': state.hidden,
-						}}
-						class="packs relative flex w-full flex-col"
-						ref={setAutoAnimate}
-						onMouseMove={(e) => {
-							if (state.draggingIndex === null) return;
-							const mouseY = e.y - e.currentTarget.offsetTop;
-							setState('draggingY', mouseY);
-						}}
-						onMouseUp={() => {
-							const draggingIndex = state.draggingIndex;
-							const hoveringIndex = state.hoveringIndex;
-
-							if (draggingIndex !== null && hoveringIndex !== null) {
-								const modifiedHoveringIndex =
-									hoveringIndex > draggingIndex
-										? hoveringIndex - 1
-										: hoveringIndex;
-
-								setState(
-									'packs',
-									produce((draft) => {
-										// move the dragging index to the hovering index
-										const draggingPack = draft.splice(draggingIndex, 1)[0];
-										draft.splice(modifiedHoveringIndex, 0, draggingPack);
-									})
-								);
-							}
-
-							setState('draggingIndex', null);
-						}}>
-						<For each={state.packs}>
-							{(pack, index) => (
-								<PackToOpenItem
-									index={index()}
-									pack={pack}
-									activePackId={state.activePack?.packId || ''}
-									isOnline={getOnlineStatus(pack.username)}
-									setAsActive={() => setActivePack(pack)}
-									draggingIndex={state.draggingIndex}
-									setAsDragging={() => setState('draggingIndex', index())}
-									setAsHovering={() => setState('hoveringIndex', index())}
-									isHovering={state.hoveringIndex === index()}
-									draggingY={state.draggingY}
-								/>
-							)}
-						</For>
-						<div
-							class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic "
+		<OpenPacksContext.Provider value={state}>
+			<div class="flex min-h-[80vh] flex-col">
+				<div class="flex">
+					<section
+						class="scrollbar-narrow col-start-1 min-w-[15rem] max-w-[20rem] overflow-y-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800"
+						id="pack-list"
+						style={{ height: state.listHeightString }}>
+						<button onClick={() => state.moveOnlineToTop()}>
+							<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline dark:text-gray-200">
+								Coming up...
+							</h2>
+						</button>
+						<ul
 							classList={{
-								'bg-gray-300/50':
-									state.hoveringIndex === state.packs.length &&
-									state.draggingIndex !== null,
+								'opacity-0': state.isHidden,
 							}}
-							onMouseMove={() => setState('hoveringIndex', state.packs.length)}
+							class="packs relative flex w-full flex-col"
+							ref={setAutoAnimate}
+							onMouseMove={(e) => {
+								if (state.draggingIndex === null) return;
+								const mouseY = e.y - e.currentTarget.offsetTop;
+								setState('draggingY', mouseY);
+							}}
+							onMouseUp={() => {
+								const draggingIndex = state.draggingIndex;
+								const hoveringIndex = state.hoveringIndex;
+
+								if (draggingIndex !== null && hoveringIndex !== null) {
+									const modifiedHoveringIndex =
+										hoveringIndex > draggingIndex
+											? hoveringIndex - 1
+											: hoveringIndex;
+
+									setState(
+										'packs',
+										produce((draft) => {
+											// move the dragging index to the hovering index
+											const draggingPack = draft.splice(draggingIndex, 1)[0];
+											draft.splice(modifiedHoveringIndex, 0, draggingPack);
+										})
+									);
+								}
+
+								setState('draggingIndex', null);
+							}}>
+							<For each={state.packs}>
+								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
+							</For>
+							<div
+								class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic "
+								classList={{
+									'bg-gray-300/50':
+										state.hoveringIndex === state.packs.length &&
+										state.draggingIndex !== null,
+								}}
+								onMouseMove={() => setState('hoveringIndex', state.packs.length)}
+							/>
+						</ul>
+					</section>
+					<div class="flex-1">{props.children}</div>
+				</div>
+				<div class="flex h-1 items-end gap-4">
+					<ListHeightAdjuster />
+					<CardScaleAdjuster />
+				</div>
+				{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
+				<PackShowcase pack={state.activePack} />
+				{props.canTest ? (
+					<>
+						<Checkbox
+							name="testmode"
+							label="Enable test mode (opening packs doesn't save)"
+							setValue={(value) => setState('isTesting', value && props.canTest)}
 						/>
-					</ul>
-				</section>
-				<div class="flex-1">{props.children}</div>
+					</>
+				) : null}
 			</div>
-			<div class="flex h-1 items-end gap-4">
-				<ListHeightAdjuster height={listHeight} setHeight={setListHeight} />
-				<CardScaleAdjuster
-					scale={state.cardScale}
-					setScale={(newScale: number) => setState('cardScale', newScale)}
-				/>
-			</div>
-			{state.isTesting ? <p class="text-lg">Test mode enabled</p> : null}
-
-			<PackShowcase
-				pack={state.activePack}
-				removePack={removePack}
-				flipCard={flipCard}
-				setNextPack={setNextPack}
-				packsRemaining={packsRemaining()}
-				cardScale={state.cardScale}
-				isTesting={(state.isTesting && props.canTest) || false}
-				previewCard={(id) => {
-					const index = state.activePack?.cardDetails.findIndex(
-						(card) => card.instanceId === id
-					);
-					const card = index ? state.activePack?.cardDetails[index!] : null;
-					if (card && card.stamps?.includes('new-stamp')) {
-						setState('activePack', 'cardDetails', index!, 'stamps', ['shit-pack']);
-					}
-					setState('previewedCardId', id);
-				}}
-				previewedCardId={state.previewedCardId}
-			/>
-
-			{props.canTest ? (
-				<>
-					<Checkbox
-						name="testmode"
-						label="Enable test mode (opening packs doesn't save)"
-						setValue={(value) => setState('isTesting', value && props.canTest)}
-					/>
-				</>
-			) : null}
-		</div>
+		</OpenPacksContext.Provider>
 	);
 }
 
-function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter<number> }) {
+function ListHeightAdjuster() {
+	const state = useContext(OpenPacksContext);
+
 	const handleMouseDown = (e: MouseEvent) => {
 		e.preventDefault();
 		let prevY = e.clientY / 1;
 		const handleMouseMove = (e: MouseEvent) => {
-			props.setHeight((prev) => Math.max(prev + (e.clientY / 1 - prevY), 0));
+			state?.setListHeight(Math.max(state.listHeight + (e.clientY / 1 - prevY), 0));
 			prevY = e.clientY / 1;
 		};
 		const handleMouseUp = () => {
 			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseup', handleMouseUp);
 			// set the margin in a cookie
-			document.cookie = `openPacksMargin=${props.height()}; path=/`;
+			document.cookie = `openPacksMargin=${state?.listHeight ?? ''}; path=/`;
 		};
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
@@ -321,9 +365,11 @@ function ListHeightAdjuster(props: { height: Accessor<number>; setHeight: Setter
 	);
 }
 
-function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => void }) {
+function CardScaleAdjuster() {
+	const state = useContext(OpenPacksContext);
+
 	createEffect(() => {
-		document.cookie = `openPacksScale=${props.scale}; path=/`;
+		document.cookie = `openPacksScale=${state?.cardScale}; path=/`;
 	});
 
 	return (
@@ -334,56 +380,50 @@ function CardScaleAdjuster(props: { scale: number; setScale: (scale: number) => 
 				min="0.25"
 				max="2"
 				step="0.001"
-				value={props.scale}
+				value={state?.cardScale}
 				class="w-1/2"
-				onInput={(e) => props.setScale(parseFloat((e.target as HTMLInputElement).value))}
+				onInput={(e) =>
+					state?.setCardScale(parseFloat((e.target as HTMLInputElement).value))
+				}
 			/>
 		</div>
 	);
 }
 
-function PackToOpenItem(props: {
-	index: number;
-	pack: PackEntityWithStatus;
-	activePackId: string;
-	isOnline: boolean;
-	setAsActive: () => void;
-	setAsDragging: () => void;
-	setAsHovering: () => void;
-	draggingIndex: number | null;
-	isHovering: boolean;
-	draggingY: number | null;
-}) {
-	const isActive = () => props.pack.packId === props.activePackId;
+function PackToOpenItem(props: { index: number; pack: PackEntityWithStatus }) {
+	const state = useContext(OpenPacksContext);
+
 	let timeout: number | NodeJS.Timeout;
-	const isDragging = () => props.draggingIndex === props.index;
 	let wasDragging = false;
+	const isActive = () => props.pack.packId === state?.activePack?.packId;
+	const isDragging = () => state?.draggingIndex === props.index;
+	const isOnline = () => state?.getIsOnline(props.pack.username);
 
 	return (
 		<li
 			onMouseMove={() => {
 				if (!isDragging()) {
-					props.setAsHovering();
+					state?.setHoveringIndex(props.index);
 				}
 			}}>
-			<Show when={props.isHovering && props.draggingIndex !== null}>
+			<Show when={state?.hoveringIndex === props.index && state?.draggingIndex !== null}>
 				<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap bg-gray-300/50 px-1 pt-1 text-left italic dark:bg-gray-500/50" />
 			</Show>
 			<button
-				title={props.isOnline ? 'Online' : 'Offline'}
+				title={isOnline() ? 'Online' : 'Offline'}
 				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
 				classList={{
 					'bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-200': isActive(),
-					'opacity-75': !props.isOnline && !isActive(),
+					'opacity-75': !isOnline() && !isActive(),
 					'absolute top-0 opacity-50': isDragging(),
 				}}
 				style={{
 					'transform-origin': 'center left',
-					transform: isDragging() ? `translateY(${props.draggingY}px)` : '',
+					transform: isDragging() ? `translateY(${state?.draggingY}px)` : '',
 				}}
 				onMouseDown={() => {
 					timeout = setTimeout(() => {
-						props.setAsDragging();
+						state?.setDraggingIndex(props.index);
 						wasDragging = true;
 					}, 100);
 				}}
@@ -393,13 +433,13 @@ function PackToOpenItem(props: {
 						wasDragging = false;
 						return;
 					}
-					props.setAsActive();
+					state?.setActivePack(props.pack);
 				}}>
 				<span
 					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
 					classList={{
-						'bg-brand-main': props.isOnline,
-						'': !props.isOnline,
+						'bg-brand-main': isOnline(),
+						'': !isOnline(),
 					}}></span>
 				{props.pack.username}
 			</button>
@@ -407,17 +447,9 @@ function PackToOpenItem(props: {
 	);
 }
 
-function PackShowcase(props: {
-	pack: PackEntityWithStatus | null;
-	removePack: () => void;
-	flipCard: (instanceId: string) => void;
-	setNextPack: () => void;
-	packsRemaining: number;
-	isTesting: boolean;
-	cardScale: number;
-	previewCard: (cardId: string) => void;
-	previewedCardId: string | null;
-}) {
+function PackShowcase(props: { pack: PackEntityWithStatus | null }) {
+	const state = useContext(OpenPacksContext);
+
 	const [animateTitle] = createAutoAnimate((el, action) => {
 		let keyframes: Keyframe[] = [];
 
@@ -509,31 +541,21 @@ function PackShowcase(props: {
 						</a>
 					</Show>
 				</h2>
-				<Show when={allCardsOpened() && props.packsRemaining}>
+				<Show when={allCardsOpened() && state?.packsRemaining}>
 					<button
 						class="bg-brand-main font-display mb-4 ml-auto block p-4 pb-2 text-3xl italic text-white"
-						onClick={() => props.setNextPack()}>
+						onClick={() => state?.setNextPack()}>
 						Next
 					</button>
 				</Show>
 			</div>
 			<ul
-				style={{ gap: `${props.cardScale}rem` }}
-				classList={{ blur: !!props.previewedCardId }}
+				style={{ gap: `${state?.cardScale}rem` }}
+				classList={{ blur: !!state?.previewedCardId }}
 				class="flex w-full flex-wrap items-center justify-center transition-[filter]"
 				ref={animateCardList}>
 				<For each={sortedCardDetails()}>
-					{(card) => (
-						<ShowcaseCard
-							card={card}
-							packId={props.pack!.packId}
-							setFlipped={() => props.flipCard(card.instanceId)}
-							isTesting={props.isTesting}
-							scale={props.cardScale}
-							previewCard={(val) => props.previewCard(val)}
-							isPreviewed={props.previewedCardId === card.instanceId}
-						/>
-					)}
+					{(card) => <ShowcaseCard card={card} packId={props.pack!.packId} />}
 				</For>
 			</ul>
 			<Statistics activePack={props.pack}></Statistics>
@@ -545,18 +567,16 @@ function PackShowcase(props: {
 function ShowcaseCard(props: {
 	card: PackEntityWithStatus['cardDetails'][number];
 	packId: PackEntityWithStatus['packId'];
-	setFlipped: () => void;
-	isTesting: boolean;
-	scale: number;
-	previewCard: (cardId: string) => void;
-	isPreviewed: boolean;
 }) {
+	const state = useContext(OpenPacksContext);
+
 	// eslint-disable-next-line solid/reactivity
 	const [flipped, setFlipped] = createSignal(props.card.opened);
+	const isPreviewed = () => state?.previewedCardId === props.card.instanceId;
 
 	const flipCard = async () => {
 		setFlipped(true);
-		props.setFlipped();
+		state?.flipCard(props.card.instanceId);
 
 		const body = new URLSearchParams({
 			instanceId: props.card.instanceId,
@@ -565,25 +585,26 @@ function ShowcaseCard(props: {
 		}).toString();
 
 		const auth_token = localStorage.getItem('auth_token');
-		props.isTesting
+		state?.isTesting
 			? console.log('Card flipped: ', body)
 			: await fetch(API.CARD, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: auth_token ? `Bearer ${auth_token}` : '',
-				},
-				body,
-			});
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: auth_token ? `Bearer ${auth_token}` : '',
+					},
+					body,
+			  });
 	};
 
 	const previewCard = () => {
 		if (!flipped()) return;
-		props.previewCard(props.card.instanceId);
+		state?.setPreviewedCardId(props.card.instanceId);
+		state?.removeNewStampStamp(props.card.instanceId);
 	};
 
 	const closePreview = () => {
-		props.previewCard('');
+		state?.setPreviewedCardId('');
 	};
 
 	return (
@@ -591,7 +612,7 @@ function ShowcaseCard(props: {
 			<p class="error-text" />
 			<div
 				classList={{ flipped: flipped() }}
-				style={{ width: props.scale * 18 + 'rem' }}
+				style={{ width: (state?.cardScale ?? 0) * 18 + 'rem' }}
 				class="perspective preserve-3d card-aspect-ratio relative block w-72 origin-center transition-transform duration-500">
 				<button
 					onClick={flipCard}
@@ -602,19 +623,19 @@ function ShowcaseCard(props: {
 							<img
 								src={ASSETS.CARDS.CARD_BACK}
 								class="w-72"
-								style={{ width: `calc(18rem * ${props.scale})` }}
+								style={{ width: `calc(18rem * ${state?.cardScale ?? 0})` }}
 							/>
 						</TiltCardEffect>
 					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
 					<button class="block origin-top-left" onClick={previewCard}>
-						{props.isPreviewed ? (
+						{isPreviewed() ? (
 							<CardPreview close={closePreview}>
-								<Card {...props.card} scale={props.scale * 1.5} />
+								<Card {...props.card} scale={(state?.cardScale ?? 0) * 1.5} />
 							</CardPreview>
 						) : (
-							<Card {...props.card} scale={props.scale} />
+							<Card {...props.card} scale={state?.cardScale ?? 0} />
 						)}
 					</button>
 				</div>

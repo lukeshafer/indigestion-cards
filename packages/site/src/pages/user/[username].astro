@@ -24,7 +24,7 @@ if (!id) {
 
 let data = await getUserAndCardInstances({ username: id });
 
-const twitchData = await getUserByLogin(id);
+const twitchData = await getUserByLogin(id).catch(() => null);
 if (!data) {
 	if (twitchData) {
 		const newUser = await createNewUser({

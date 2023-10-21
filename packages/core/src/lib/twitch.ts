@@ -116,8 +116,8 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 
 	if (!response.ok) {
 		if (response.status !== 401) {
-			console.error(response, await response.text());
-			throw new Error('Failed to get user from Twitch');
+			console.error(response, await response.text(), { ids });
+			throw new Error('Failed to get list of users from Twitch');
 		}
 
 		const newToken = await refreshAppAccessToken();
@@ -167,8 +167,9 @@ export async function getUserByLogin(login: string) {
 
 	if (!response.ok) {
 		if (response.status !== 401) {
-			console.error(response, await response.text());
-			throw new Error('Failed to get user from Twitch');
+			console.log('getUserByLogin');
+			console.error(response, await response.text(), { login });
+			throw new Error('Failed to get user from Twitch by login.');
 		}
 
 		const newToken = await refreshAppAccessToken();
@@ -181,8 +182,9 @@ export async function getUserByLogin(login: string) {
 		});
 
 		if (!response.ok) {
-			console.error(response, await response.text());
-			throw new Error('Failed to get user from Twitch');
+			console.log('getUserByLogin');
+			console.error(response, await response.text(), { login });
+			throw new Error('Failed to get user from Twitch after refresh');
 		}
 	}
 
@@ -446,7 +448,10 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 		throw new Error('Failed to refresh user access token');
 	}
 
-	await setTwitchTokens({ streamer_access_token: result.data.access_token, streamer_refresh_token: result.data.refresh_token });
+	await setTwitchTokens({
+		streamer_access_token: result.data.access_token,
+		streamer_refresh_token: result.data.refresh_token,
+	});
 	return result.data;
 }
 
@@ -628,7 +633,9 @@ export async function deleteTwitchEventSubscription(id: string) {
 	});
 }
 
-export async function getTwitchChatters(cursor?: string): Promise<z.infer<typeof chattersSchema>['data']> {
+export async function getTwitchChatters(
+	cursor?: string
+): Promise<z.infer<typeof chattersSchema>['data']> {
 	const { streamer_access_token, streamer_refresh_token } = await getTwitchTokens();
 	const fetchUrl = new URL('https://api.twitch.tv/helix/chat/chatters');
 	fetchUrl.searchParams.append('broadcaster_id', Config.STREAMER_USER_ID);
