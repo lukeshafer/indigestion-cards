@@ -1,5 +1,5 @@
 import type { User } from '@lil-indigestion-cards/core/db/users';
-import { Form, TextArea } from '../form';
+import { Form, TextArea } from '../form/Form';
 import { createSignal, type JSX } from 'solid-js';
 import { USER_API } from '@/constants';
 

@@ -1,7 +1,7 @@
 import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import Card from '@/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
-import { Select } from '../form';
+import { Select } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';

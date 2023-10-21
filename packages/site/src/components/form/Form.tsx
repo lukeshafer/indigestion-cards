@@ -6,16 +6,16 @@ import { useViewTransition } from '@/lib/client/utils';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-	| 'get'
-	| 'post'
-	| 'dialog'
-	| 'put'
-	| 'delete'
-	| 'options'
-	| 'head'
-	| 'trace'
-	| 'connect'
-	| 'patch';
+		| 'get'
+		| 'post'
+		| 'dialog'
+		| 'put'
+		| 'delete'
+		| 'options'
+		| 'head'
+		| 'trace'
+		| 'connect'
+		| 'patch';
 	action: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
@@ -121,7 +121,7 @@ export function Form(props: {
 			enctype={props.enctype}
 			onSubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 bg-opacity-50">
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 bg-opacity-50 dark:bg-black/50">
 					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
@@ -164,37 +164,41 @@ interface InputProps<T extends number | string> extends JSX.InputHTMLAttributes<
 }
 
 export function TextInput(props: InputProps<string>) {
-	return props.inputOnly ? (
-		<input
-			{...props}
-			id={props.name}
-			name={props.name}
-			type="text"
-			class={BASE_INPUT_CLASS}
-			classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-			required={props.required}
-			placeholder={props.placeholder ?? props.label}
-			readOnly={props.readOnly}
-			value={props.value ?? ''}
-			onInput={(e) => props.setValue?.(e.target.value ?? '')}
-		/>
-	) : (
-		<InputGroup>
-			<Label {...props} />
-			{props.children}
-			<input
-				id={props.name}
-				name={props.name}
-				type="text"
-				class={BASE_INPUT_CLASS}
-				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-				required={props.required}
-				placeholder={props.placeholder}
-				readOnly={props.readOnly}
-				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
-			/>
-		</InputGroup>
+	return (
+		<>
+			{props.inputOnly ? (
+				<input
+					{...props}
+					id={props.name}
+					name={props.name}
+					type="text"
+					class={BASE_INPUT_CLASS}
+					classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+					required={props.required}
+					placeholder={props.placeholder ?? props.label}
+					readOnly={props.readOnly}
+					value={props.value ?? ''}
+					onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				/>
+			) : (
+				<InputGroup>
+					<Label {...props} />
+					{props.children}
+					<input
+						id={props.name}
+						name={props.name}
+						type="text"
+						class={BASE_INPUT_CLASS}
+						classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+						required={props.required}
+						placeholder={props.placeholder}
+						readOnly={props.readOnly}
+						value={props.value ?? ''}
+						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+					/>
+				</InputGroup>
+			)}
+		</>
 	);
 }
 
@@ -255,7 +259,7 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 			<button
 				hidden={!isReadOnly()}
 				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black opacity-50 hover:opacity-100"
-				onclick={handleEditClick}>
+				onClick={handleEditClick}>
 				Edit
 			</button>
 		</div>
@@ -382,7 +386,8 @@ export function Anchor(props: { children: string; href: string; type?: 'submit' 
 			href={props.href}
 			class={BUTTON_CLASS}
 			classList={{
-				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark': !props.type || props.type === 'submit',
+				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark':
+					!props.type || props.type === 'submit',
 				'bg-red-500 hover:bg-red-800': props.type === 'delete',
 			}}>
 			{props.children}
@@ -395,7 +400,7 @@ export function SubmitButton(props: { children?: JSX.Element; onClick?: () => vo
 		<button
 			type="submit"
 			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
-			onClick={props.onClick}>
+			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Submit'}
 		</button>
 	);
@@ -406,7 +411,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void })
 		<button
 			type="submit"
 			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 `}
-			onClick={props.onClick}>
+			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Delete'}
 		</button>
 	);

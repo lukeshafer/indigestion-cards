@@ -1,7 +1,7 @@
 import Table from '@/components/table/Table';
 import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
 import DeleteRarityButton from './DeleteRarityButton';
-import { SubmitButton } from '../form';
+import { SubmitButton } from '../form/Form';
 import { Show, createSignal } from 'solid-js';
 
 export default function RarityTable(props: { rarities: Rarity[] }) {

@@ -31,26 +31,33 @@ export default function PackTable(props: { packs: Pack[] }) {
 
 function PackRow(props: Pack) {
 	const [isEditing, setIsEditing] = createSignal(false);
+	// eslint-disable-next-line solid/reactivity
 	const [username, setUsername] = createSignal(props.username);
 
 	return {
 		get username() {
-			return isEditing()
-				? {
-					element: (
-						<TextInput
-							inputOnly
-							name="username"
-							label="Username"
-							value={username()}
-							setValue={setUsername}
-						/>
-					),
-					value: username() ?? 'None',
-				}
-				: username() ?? 'None';
+			return (
+				<>
+					{isEditing()
+						? {
+								element: (
+									<TextInput
+										inputOnly
+										name="username"
+										label="Username"
+										value={username()}
+										setValue={setUsername}
+									/>
+								),
+								value: username() ?? 'None',
+							}
+						: username() ?? 'None'}
+				</>
+			);
 		},
-		packTypeName: props.packTypeName,
+		get packTypeName() {
+			return props.packTypeName;
+		},
 		actions: {
 			element: (
 				<div>

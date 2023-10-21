@@ -1,4 +1,4 @@
-import { Form, SubmitButton, TextArea } from '@/components/form';
+import { Form, SubmitButton, TextArea } from '@/components/form/Form';
 import { API } from '@/constants';
 import { Show, createSignal } from 'solid-js';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';

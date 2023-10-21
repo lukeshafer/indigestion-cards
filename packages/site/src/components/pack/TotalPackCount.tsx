@@ -15,6 +15,7 @@ export default function TotalPackCount(props: { count: number }) {
 			if (!responseBody.packCount || typeof responseBody.packCount !== 'number') return 0;
 			return responseBody.packCount as number;
 		},
+		// eslint-disable-next-line solid/reactivity
 		{ initialValue: props.count }
 	);
 

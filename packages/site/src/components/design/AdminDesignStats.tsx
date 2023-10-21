@@ -2,7 +2,7 @@ import { Index, createSignal } from 'solid-js';
 import type { RarityStats } from '@lil-indigestion-cards/core/lib/stats';
 import Table from '@/components/table/Table';
 import { routes } from '@/constants';
-import { Checkbox } from '@/components/form';
+import { Checkbox } from '@/components/form/Form';
 
 export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[] }) {
 	const [hideUnowned, setHideUnowned] = createSignal(false);
