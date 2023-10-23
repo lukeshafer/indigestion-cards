@@ -3,8 +3,8 @@ import { PageTitle, Heading } from '@/components/text';
 import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
 import { routeNames } from '@/constants';
 import Page from '@/layouts/Page.astro';
-import { getPackTypeById } from '@lil-indigestion-cards/core/card';
-import { getCardPoolFromType } from '@lil-indigestion-cards/core/pack';
+import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
+import { getCardPoolFromType } from '@lil-indigestion-cards/core/lib/card-pool';
 import Table from '@/components/table/Table';
 
 const packTypeId = Astro.params.packTypeId;
@@ -27,7 +27,7 @@ const cardPool = await getCardPoolFromType(packType);
 	]}>
 	<PageTitle>{packType.packTypeName}</PageTitle>
 	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
-	<section aria-label="Card Pool" class="mt-4 flex flex-col gap-4 max-w-2xl mx-auto">
+	<section aria-label="Card Pool" class="mx-auto mt-4 flex max-w-2xl flex-col gap-4">
 		<Heading>Card Pool</Heading>
 		<Table
 			columns={[

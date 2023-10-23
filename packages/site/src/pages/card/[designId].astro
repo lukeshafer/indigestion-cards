@@ -2,8 +2,8 @@
 import Page from '@/layouts/Page.astro';
 import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
-import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/card';
-import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { getCardDesignAndInstancesById } from '@lil-indigestion-cards/core/lib/design';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { PageTitle } from '@/components/text';
@@ -12,7 +12,7 @@ import DesignOverviewTable from '@/components/design/DesignOverviewTable';
 import DeleteDesignButton from '@/components/design/DeleteDesignButton';
 import EditDesignForm from '@/components/design/EditDesignForm';
 import { Heading } from '@/components/text';
-import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/rarity';
+import { getRarityStatsOverviewFromDesignAndInstances } from '@lil-indigestion-cards/core/lib/stats';
 
 const designId = Astro.params.designId;
 

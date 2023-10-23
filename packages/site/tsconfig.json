@@ -1,15 +1,14 @@
 {
 	"extends": "astro/tsconfigs/strict",
+	"exclude": ["dist"],
 	"compilerOptions": {
 		"allowJs": true,
 		"baseUrl": ".",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"paths": {
-			"@/*": [
-				"src/*"
-			],
-			"@lil-indigestion-cards/core/*": [
-				"../core/src/*"
-			]
+			"@/*": ["src/*"],
+			"@lil-indigestion-cards/core/*": ["../core/src/*"]
 		},
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js"

@@ -226,6 +226,19 @@ body.disable-animations * {
 	}
 }
 
+@keyframes stamp {
+	0% {
+		scale: 4;
+		opacity: 0%;
+		filter: blur(6px);
+	}
+	100% {
+		scale: 1;
+		opacity: 80%;
+		filter: blur(0px);
+	}
+}
+
 @layer components {
 	.slide-forward {
 		view-transition-name: slide-forward;

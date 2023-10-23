@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lil-indigestion-cards/core/api';
-import { setUserProfile } from '@lil-indigestion-cards/core/user';
+import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
+import { setUserProfile } from '@lil-indigestion-cards/core/lib/user';
 
 export const handler = SiteHandler(
 	{

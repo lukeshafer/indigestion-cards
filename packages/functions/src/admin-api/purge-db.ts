@@ -1,7 +1,7 @@
 import { ApiHandler, useFormValue } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
-import { db } from '@lil-indigestion-cards/core/db';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
+import { db } from '@lil-indigestion-cards/core/db/db-service';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();

@@ -1,9 +1,9 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import { deleteCardDesignById } from '@lil-indigestion-cards/core/card';
-import { deleteS3ObjectByUrl } from '@lil-indigestion-cards/core/utils';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { deleteCardDesignById } from '@lil-indigestion-cards/core/lib/design';
+import { deleteS3ObjectByUrl } from '@lil-indigestion-cards/core/lib/images';
 
 export const handler = ProtectedApiHandler(async () => {
-	const validateResult = useValidateFormData({
+	const validateResult = useValidateFormData({  
 		designId: 'string',
 		imgUrl: 'string',
 		cardName: ['string', 'optional'],

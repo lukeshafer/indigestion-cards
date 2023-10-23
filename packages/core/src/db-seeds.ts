@@ -1,6 +1,7 @@
-import { db } from './db';
-import { getUserByLogin } from './twitch-helpers';
-import { createAdminUser } from './user';
+import { admins } from './db/admins';
+import { siteConfig } from './db/siteConfig';
+import { getUserByLogin } from './lib/twitch';
+import { createAdminUser } from './lib/admin-user';
 
 export async function seedAdmins() {
 	console.log('Seeding admins...');
@@ -9,7 +10,7 @@ export async function seedAdmins() {
 	let finalResult = true;
 	for (const username of requiredAdmins) {
 		console.log(`Seeding admin ${username}...`);
-		const existingAdmin = await db.entities.admins.query.allAdmins({ username: username }).go();
+		const existingAdmin = await admins.query.allAdmins({ username: username }).go();
 		if (existingAdmin.data.length > 0) {
 			console.log(`Admin ${username} already exists, skipping...`);
 			console.log(existingAdmin.data);
@@ -37,14 +38,14 @@ export async function seedAdmins() {
 }
 
 export async function seedSiteConfig() {
-	const siteConfig = await db.entities.siteConfig.query.primary({}).go();
-	if (siteConfig.data.length > 0) {
+	const config = await siteConfig.query.primary({}).go();
+	if (config.data.length > 0) {
 		console.log('Site config already exists, skipping...');
 		return true;
 	}
 
 	console.log('Seeding site config...');
-	const result = await db.entities.siteConfig
+	const result = await siteConfig
 		.create({
 			baseRarity: {
 				rarityId: 'default',

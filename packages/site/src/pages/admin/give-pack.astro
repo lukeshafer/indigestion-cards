@@ -1,7 +1,7 @@
 ---
 import { PageTitle } from '@/components/text';
 import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
 import GivePackForm from '@/components/pack/GivePackForm';
 
 const packTypes = await getAllPackTypes();

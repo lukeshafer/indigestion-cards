@@ -1,4 +1,5 @@
 import { Api, ApiHandler } from 'sst/node/api';
+import { Config } from 'sst/node/config';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
@@ -8,9 +9,8 @@ import {
 	SUBSCRIPTION_TYPE,
 	type SubscriptionType,
 	deleteTwitchEventSubscription,
-} from '@lil-indigestion-cards/core/twitch-helpers';
-import { Config } from 'sst/node/config';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
+} from '@lil-indigestion-cards/core/lib/twitch';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {

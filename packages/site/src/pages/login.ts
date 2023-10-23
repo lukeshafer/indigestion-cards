@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { Auth } from 'sst/node/future/auth';
 import { authApi } from '@/constants';
 
-export const ALL: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx) => {
 	console.log("login.ts: GET")
 	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
 	console.log({client_id})

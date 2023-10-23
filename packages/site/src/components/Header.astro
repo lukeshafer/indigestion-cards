@@ -5,7 +5,7 @@ import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
-import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
+import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 const currentPage = Astro.url.pathname;
@@ -17,7 +17,7 @@ const headerLinks = [
 	{ href: '/user', title: 'Users' },
 ];
 
-const twitchData = username ? await getUserByLogin(username) : null;
+const twitchData = username ? await getUserByLogin(username) : undefined;
 ---
 
 <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">

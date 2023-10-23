@@ -1,5 +1,5 @@
-import { batchUpdateUsers, getAllUsers, getUserAndCardInstances } from '@lil-indigestion-cards/core/user';
-import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import { batchUpdateUsers, getAllUsers, getUserAndCardInstances } from '@lil-indigestion-cards/core/lib/user';
+import { getAllPacks } from '@lil-indigestion-cards/core/lib/pack';
 
 export async function handler() {
 	const users = await getAllUsers();

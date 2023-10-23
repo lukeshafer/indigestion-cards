@@ -1,5 +1,5 @@
-import { getListOfTwitchUsersByIds } from '@lil-indigestion-cards/core/twitch-helpers';
-import { getAllUsers, updateUsername } from '@lil-indigestion-cards/core/user';
+import { getListOfTwitchUsersByIds } from '@lil-indigestion-cards/core/lib/twitch';
+import { getAllUsers, updateUsername } from '@lil-indigestion-cards/core/lib/user';
 
 export async function handler() {
 	const users = await getAllUsers();

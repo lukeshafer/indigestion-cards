@@ -1,5 +1,5 @@
 import Table from '@/components/table/Table';
-import type { AdminEntity } from '@lil-indigestion-cards/core/user';
+import type { Admin } from '@lil-indigestion-cards/core/db/admins';
 import DeleteAdminUserButton from '@/components/admin-users/DeleteAdminUserButton';
 import { addingAdminUser, setAddingAdminUser } from '@/lib/client/state';
 import { createResource, createSignal } from 'solid-js';
@@ -23,7 +23,7 @@ export function AddAdminButton() {
 	);
 }
 
-export default function AdminUsersTable(props: { users: AdminEntity[]; currentUser: string }) {
+export default function AdminUsersTable(props: { users: Admin[]; currentUser: string }) {
 	const [adminUsers, { refetch }] = createResource(
 		async () => {
 			const res = await fetch(API.ADMIN_USER, {

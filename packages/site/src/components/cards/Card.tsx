@@ -1,9 +1,9 @@
 import TiltCardEffect from './TiltCardEffect';
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
-import type { CardInstanceEntity } from '@lil-indigestion-cards/core/card';
-import styles from './Card.module.css';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { css } from '@acab/ecsstatic';
 
-interface Props extends Partial<CardInstanceEntity> {
+interface Props extends Partial<CardInstance> {
 	rarityName: string;
 	frameUrl: string;
 	imgUrl: string;
@@ -19,6 +19,11 @@ interface Props extends Partial<CardInstanceEntity> {
 	username?: string;
 }
 
+const stampAnimationStyles = css`
+	animation: stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards;
+	transform-origin: center;
+`;
+
 export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
 	const isLegacy = () => props.rarityId === LEGACY_CARD_ID;
@@ -28,8 +33,8 @@ export default function Card(props: Props) {
 		isFullArt() || isLegacy()
 			? ''
 			: isSecret()
-			? '????? ??????????????? ?? ?? ? ?????? ??????'
-			: props.cardDescription;
+				? '????? ??????????????? ?? ?? ? ?????? ??????'
+				: props.cardDescription;
 	const frameUrl = () => (isSecret() ? ASSETS.CARDS.DEFAULT_BASE_RARITY : props.frameUrl);
 	const imgUrl = () => (isSecret() ? ASSETS.CARDS.HIDDEN_CARD : props.imgUrl);
 
@@ -85,7 +90,7 @@ export default function Card(props: Props) {
 							<img
 								src={ASSETS.CARDS.SHIT_PACK}
 								classList={{
-									[styles.animateStamp]: props.stamps?.includes('new-stamp'),
+									[stampAnimationStyles]: props.stamps?.includes('new-stamp'),
 									'opacity-80': !props.stamps?.includes('new-stamp'),
 								}}
 								width="350"

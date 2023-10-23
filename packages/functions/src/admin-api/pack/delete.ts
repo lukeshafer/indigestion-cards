@@ -1,5 +1,5 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/card';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { deleteFirstPackForUser } from '@lil-indigestion-cards/core/lib/pack';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({ username: 'string', userId: 'string' });

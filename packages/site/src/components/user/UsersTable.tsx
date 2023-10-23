@@ -1,10 +1,10 @@
 import Table from '@/components/table/Table';
-import type { UserEntity } from '@lil-indigestion-cards/core/user';
-import { TbCards } from 'solid-icons/tb';
-import { FaSolidGift } from 'solid-icons/fa';
+import type { User } from '@lil-indigestion-cards/core/db/users';
 import { routes } from '@/constants';
+import CardsIcon from '../icons/CardsIcon';
+import PacksIcon from '../icons/PacksIcon';
 
-export default function UsersTable(props: { users: UserEntity[] }) {
+export default function UsersTable(props: { users: User[] }) {
 	return (
 		<Table
 			search={{
@@ -48,11 +48,11 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 				cardCount: {
 					element: (
 						<>
-							<TbCards
+							<div
 								aria-hidden="true"
-								size={50}
-								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900"
-							/>
+								class="absolute left-1/2 top-1/2 w-12 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
+								<CardsIcon size={50} />
+							</div>
 							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
 								{user.cardCount}
 							</span>
@@ -63,11 +63,11 @@ export default function UsersTable(props: { users: UserEntity[] }) {
 				packCount: {
 					element: (
 						<>
-							<FaSolidGift
+							<div
 								aria-hidden="true"
-								size={40}
-								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900"
-							/>
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
+								<PacksIcon size={40} />
+							</div>
 							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
 								{user.packCount}
 							</span>

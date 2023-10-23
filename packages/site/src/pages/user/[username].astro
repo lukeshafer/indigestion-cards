@@ -1,11 +1,11 @@
 ---
 import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
-import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/user';
-import { getUserByLogin } from '@lil-indigestion-cards/core/twitch-helpers';
+import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/lib/user';
+import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/card';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
 import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
@@ -24,7 +24,7 @@ if (!id) {
 
 let data = await getUserAndCardInstances({ username: id });
 
-const twitchData = await getUserByLogin(id);
+const twitchData = await getUserByLogin(id).catch(() => null);
 if (!data) {
 	if (twitchData) {
 		const newUser = await createNewUser({

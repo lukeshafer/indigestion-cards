@@ -1,6 +1,5 @@
 import { USER_API } from '@/constants';
-import { Form, SubmitButton } from '../form';
-import { BsPin, BsPinFill } from 'solid-icons/bs';
+import { Form, SubmitButton } from '../form/Form';
 import { createSignal } from 'solid-js';
 
 export default function PinCardToProfileButton(props: {

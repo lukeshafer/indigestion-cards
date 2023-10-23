@@ -1,5 +1,4 @@
 import type { JSX } from 'solid-js';
-import { createEffect } from 'solid-js';
 import { Portal } from 'solid-js/web';
 
 export default function CardPreview(props: { children?: JSX.Element; close: () => void }) {

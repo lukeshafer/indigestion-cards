@@ -1,8 +1,8 @@
+import { Api } from 'sst/node/api';
 import {
 	getActiveTwitchEventSubscriptions,
 	deleteTwitchEventSubscription,
-} from '@lil-indigestion-cards/core/twitch-helpers';
-import { Api } from 'sst/node/api';
+} from '@lil-indigestion-cards/core/lib/twitch';
 
 export async function handler() {
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();

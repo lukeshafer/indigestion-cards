@@ -1,10 +1,10 @@
 import Table from '@/components/table/Table';
-import type { PackEntity } from '@lil-indigestion-cards/core/pack';
+import type { Pack } from '@lil-indigestion-cards/core/db/packs';
 import { Form, SubmitButton, TextInput } from '@/components/form/Form';
 import { createSignal } from 'solid-js';
 import { API } from '@/constants';
 
-export default function PackTable(props: { packs: PackEntity[] }) {
+export default function PackTable(props: { packs: Pack[] }) {
 	return (
 		<Table
 			columns={[
@@ -29,28 +29,35 @@ export default function PackTable(props: { packs: PackEntity[] }) {
 	);
 }
 
-function PackRow(props: PackEntity) {
+function PackRow(props: Pack) {
 	const [isEditing, setIsEditing] = createSignal(false);
+	// eslint-disable-next-line solid/reactivity
 	const [username, setUsername] = createSignal(props.username);
 
 	return {
 		get username() {
-			return isEditing()
-				? {
-						element: (
-							<TextInput
-								inputOnly
-								name="username"
-								label="Username"
-								value={username()}
-								setValue={setUsername}
-							/>
-						),
-						value: username() ?? 'None',
-				  }
-				: username() ?? 'None';
+			return (
+				<>
+					{isEditing()
+						? {
+								element: (
+									<TextInput
+										inputOnly
+										name="username"
+										label="Username"
+										value={username()}
+										setValue={setUsername}
+									/>
+								),
+								value: username() ?? 'None',
+							}
+						: username() ?? 'None'}
+				</>
+			);
 		},
-		packTypeName: props.packTypeName,
+		get packTypeName() {
+			return props.packTypeName;
+		},
 		actions: {
 			element: (
 				<div>
