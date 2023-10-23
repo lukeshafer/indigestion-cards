@@ -1,7 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllPackTypes, getAllRarities } from '@lil-indigestion-cards/core/card';
-import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
+import { getAllRarities } from '@lil-indigestion-cards/core/lib/rarity';
+import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
 import { PageTitle, PageHeader } from '@/components/text';
@@ -48,7 +49,7 @@ const rewards = twitchEvents.data
 		<PageTitle>Site Config</PageTitle>
 	</PageHeader>
 
-	<div class="max-w-2xl mx-auto my-6">
+	<div class="mx-auto my-6 max-w-2xl">
 		<SiteConfigForm
 			{rarities}
 			{packTypes}

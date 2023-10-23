@@ -1,5 +1,4 @@
-import { createStore } from 'solid-js/store';
-import { createSignal, createResource } from 'solid-js';
+import { createSignal } from 'solid-js';
 
 export interface Alert {
 	message: string;

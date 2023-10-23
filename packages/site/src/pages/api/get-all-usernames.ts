@@ -1,4 +1,4 @@
-import { getAllUsers } from '@lil-indigestion-cards/core/user';
+import { getAllUsers } from '@lil-indigestion-cards/core/lib/user';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async () => {

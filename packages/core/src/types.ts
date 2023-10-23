@@ -23,3 +23,13 @@ interface AdminSession {
 		username: string;
 	};
 }
+
+export type DBResult<T> =
+	| {
+		success: true;
+		data: T;
+	}
+	| {
+		success: false;
+		error: string;
+	};

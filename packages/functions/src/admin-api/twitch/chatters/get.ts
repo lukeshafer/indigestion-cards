@@ -1,5 +1,5 @@
-import { ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import { getTwitchChatters } from '@lil-indigestion-cards/core/twitch-helpers';
+import { ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { getTwitchChatters } from '@lil-indigestion-cards/core/lib/twitch';
 
 export const handler = ProtectedApiHandler(async () => {
 	const chatters = await getTwitchChatters();

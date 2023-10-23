@@ -1,0 +1,30 @@
+name: Deploy a branch to dev stage
+
+on: workflow_dispatch
+
+jobs:
+    deploy-stage:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2.2.4
+              with:
+                  version: 8.7.6
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Deploy SST app
+              run: pnpm run deploy --stage dev
+              env:
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

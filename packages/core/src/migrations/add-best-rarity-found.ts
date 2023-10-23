@@ -1,11 +1,11 @@
+import { cardDesigns } from '../db/cardDesigns';
+import { season } from '../db/season';
+import { cardInstances } from '../db/cardInstances';
 import { FULL_ART_ID, NO_CARDS_OPENED_ID } from '../constants';
-import { db } from '../db';
 
 export async function migration({ force = false } = {}) {
-	const designs = db.entities.cardDesigns;
-
-	const seasons = await db.entities.season.query.allSeasons({}).go();
-	const results = await Promise.all(seasons.data.map((season) => db.entities.cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()));
+	const seasons = await season.query.allSeasons({}).go();
+	const results = await Promise.all(seasons.data.map((season) => cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go()));
 	const cards = results.flatMap((result) => result.data);
 	let count = 0;
 	for (const card of cards) {
@@ -18,7 +18,7 @@ export async function migration({ force = false } = {}) {
 		console.log('Updating card with bestRarityFound');
 
 		const instances = (
-			await db.entities.cardInstances.query.byId({ designId: card.designId }).go()
+			await cardInstances.query.byId({ designId: card.designId }).go()
 		).data;
 
 		const bestRarityFound = instances.length
@@ -51,6 +51,6 @@ export async function migration({ force = false } = {}) {
 					frameUrl: '',
 			  };
 
-		await designs.update({ designId: card.designId }).set({ bestRarityFound }).go();
+		await cardDesigns.update({ designId: card.designId }).set({ bestRarityFound }).go();
 	}
 }

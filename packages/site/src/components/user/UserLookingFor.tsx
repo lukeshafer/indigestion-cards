@@ -1,14 +1,14 @@
-import type { UserEntity } from '@lil-indigestion-cards/core/user';
-import { Form, TextArea } from '../form';
+import type { User } from '@lil-indigestion-cards/core/db/users';
+import { Form, TextArea } from '../form/Form';
 import { createSignal, type JSX } from 'solid-js';
 import { USER_API } from '@/constants';
 
-export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser: boolean }) {
+export default function UserLookingFor(props: { user: User; isLoggedInUser: boolean }) {
 	const [lookingFor, setLookingFor] = createSignal(props.user.lookingFor || '');
 	const [isEditing, setIsEditing] = createSignal(false);
 
 	return (
-		<div class="text-gray-800">
+		<div class="text-gray-800 dark:text-gray-100">
 			{isEditing() ? (
 				<Form action={USER_API.USER} method="patch" onsubmit={() => setIsEditing(false)}>
 					<input type="hidden" name="userId" value={props.user.userId} />
@@ -32,7 +32,7 @@ export default function UserLookingFor(props: { user: UserEntity; isLoggedInUser
 				</Form>
 			) : lookingFor().trim() ? (
 				<div class="flex flex-col gap-2">
-					<p>
+					<p class="max-w-sm">
 						Looking for:{' '}
 						<span class="whitespace-pre-line font-medium">{lookingFor() || '???'}</span>
 					</p>

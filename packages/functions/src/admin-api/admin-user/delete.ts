@@ -1,5 +1,5 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/api';
-import { deleteAdminUser } from '@lil-indigestion-cards/core/user';
+import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { deleteAdminUser } from '@lil-indigestion-cards/core/lib/admin-user';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({

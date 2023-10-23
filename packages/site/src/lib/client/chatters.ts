@@ -1,5 +1,3 @@
-import { createResource } from 'solid-js';
-
 export interface Chatter {
 	user_id: string;
 	user_login: string;

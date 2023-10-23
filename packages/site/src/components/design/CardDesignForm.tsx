@@ -13,14 +13,15 @@ import {
 import Card from '@/components/cards/Card';
 import DeleteImageButton from '@/components/image/DeleteImageButton';
 import { For, createSignal } from 'solid-js';
-import type { SeasonEntity, RarityEntity } from '@lil-indigestion-cards/core/card';
+import type { Season } from '@lil-indigestion-cards/core/db/season';
+import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
 
 export default function CardDesignForm(props: {
 	imgUrl: string;
 	key: string;
-	seasons: SeasonEntity[];
-	rarities: RarityEntity[];
-	baseRarity: Omit<RarityEntity, 'defaultCount'>;
+	seasons: Season[];
+	rarities: Rarity[];
+	baseRarity: Omit<Rarity, 'defaultCount'>;
 }) {
 	const [cardName, setCardName] = createSignal('');
 	const [cardDescription, setCardDescription] = createSignal('');

@@ -6,14 +6,14 @@ import {
 	parseRequestBody,
 	MESSAGE_TYPE,
 	getHeaders,
-} from '@lil-indigestion-cards/core/twitch-helpers';
+} from '@lil-indigestion-cards/core/lib/twitch';
 import {
 	getTwitchEventById,
 	checkIsDuplicateTwitchEventMessage,
-} from '@lil-indigestion-cards/core/site-config';
-import { getPackTypeById } from '@lil-indigestion-cards/core/card';
+} from '@lil-indigestion-cards/core/lib/site-config';
+import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/user';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event)) {
@@ -107,7 +107,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 			break;
 		case 'channel.channel_points_custom_reward_redemption.add':
 			console.log(
-				`Channel point reward redeemed by ${body.event.user_name
+				`Channel point reward redeemed by ${
+					body.event.user_name
 				}. Reward info: ${JSON.stringify(
 					{
 						rewardId: body.event.reward.id,

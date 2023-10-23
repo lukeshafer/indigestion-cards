@@ -1,10 +1,11 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllSeasons, getAllRarities } from '@lil-indigestion-cards/core/card';
 import { ASSETS, routeNames, routes } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
-import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
 import CardDesignForm from '@/components/design/CardDesignForm';
+import { getAllSeasons, } from '@lil-indigestion-cards/core/lib/season';
+import { getAllRarities } from '@lil-indigestion-cards/core/lib/rarity';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');

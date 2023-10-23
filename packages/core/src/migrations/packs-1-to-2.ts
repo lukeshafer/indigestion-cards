@@ -1,9 +1,10 @@
 import { Entity } from 'electrodb';
-import { config, auditAttributes, db } from '../db';
+
+import { config, auditAttributes } from '../db/_utils';
+import { packs } from '../db/packs';
+import { cardInstances } from '../db/cardInstances';
 
 export async function migration() {
-	const packs = db.entities.packs;
-
 	const toMove = await oldPacks.scan.go();
 	let count = 0;
 	for (const pack of toMove.data) {
@@ -13,7 +14,7 @@ export async function migration() {
 			cardDetails: await Promise.all(
 				pack.cardDetails.map(async (card, index) => {
 					console.log(`Processing card ${index + 1} of ${pack.cardDetails.length}`);
-					const cardEntity = await db.entities.cardInstances.query
+					const cardEntity = await cardInstances  .query
 						.byId({ designId: card.designId, instanceId: card.instanceId })
 						.go();
 					console.log({

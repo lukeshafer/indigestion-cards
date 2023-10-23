@@ -6,7 +6,7 @@ import AdminPanel from '@/components/AdminPanel.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
-import { getSiteConfig } from '@lil-indigestion-cards/core/site-config';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 import { Api } from 'sst/node/api';
 
 export interface Props extends BaseProps {
@@ -48,7 +48,7 @@ let {
 			<AdminPanel />
 		</AdminOnly>
 		<div
-			class="relative flex flex-col overflow-y-scroll md:col-start-2"
+			class="relative flex flex-col overflow-y-scroll md:col-start-2 bg-gray-50 dark:bg-gray-950"
 			id="page-scroll-wrapper">
 			{noHeader ? null : <Header />}
 			<AlertBox client:load {alerts} />
@@ -61,8 +61,8 @@ let {
 			}
 			<main
 				transition:name={wide ? undefined : 'main'}
-				class:list={{ 'max-w-main': !wide, [className ?? '']: true }}
-				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1 p-3">
+				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
+				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1">
 				<slot />
 			</main>
 			<Footer />

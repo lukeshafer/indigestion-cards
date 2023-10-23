@@ -1,11 +1,11 @@
-import { Form, Select, SubmitButton, TextInput, DeleteButton } from '@/components/form/Form';
+import { Form, Select, SubmitButton, DeleteButton } from '@/components/form/Form';
 import { API } from '@/constants';
 import { setTotalPackCount } from '@/lib/client/state';
-import type { PackTypeEntity } from '@lil-indigestion-cards/core/card';
-import type { UserEntity } from '@lil-indigestion-cards/core/user';
+import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
+import type { User } from '@lil-indigestion-cards/core/db/users';
 import { createResource } from 'solid-js';
 
-export default function UserPackForms(props: { packTypes: PackTypeEntity[]; user: UserEntity }) {
+export default function UserPackForms(props: { packTypes: PackType[]; user: User }) {
 	const [packCount, { refetch }] = createResource(async () => {
 		const auth_token = localStorage.getItem('auth_token');
 		const response = await fetch(API.PACK_COUNT + '?userId=' + props.user.userId, {

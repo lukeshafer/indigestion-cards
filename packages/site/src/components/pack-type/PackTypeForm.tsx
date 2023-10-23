@@ -9,13 +9,11 @@ import {
 	Fieldset,
 	Checkbox,
 } from '@/components/form/Form';
-import { createEffect, createSignal, For, Match, Switch } from 'solid-js';
-import type { CardDesignEntity, SeasonEntity } from '@lil-indigestion-cards/core/card';
+import { createSignal, For, Match, Switch } from 'solid-js';
+import type { Season } from '@lil-indigestion-cards/core/db/season';
+import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 
-export default function PackTypeForm(props: {
-	seasons: SeasonEntity[];
-	cardDesigns: CardDesignEntity[];
-}) {
+export default function PackTypeForm(props: { seasons: Season[]; cardDesigns: CardDesign[] }) {
 	const [packTypeName, setPackTypeName] = createSignal('');
 	const [category, setCategory] = createSignal('season');
 
@@ -67,7 +65,7 @@ export default function PackTypeForm(props: {
 	);
 }
 
-function CustomCardPool(props: { cards: CardDesignEntity[] }) {
+function CustomCardPool(props: { cards: CardDesign[] }) {
 	interface DesignDetails {
 		designId: string;
 		cardName: string;

@@ -1,9 +1,9 @@
 import { Form, Select, SubmitButton, TextInput } from '@/components/form/Form';
 import { setTotalPackCount } from '@/lib/client/state';
 import { API } from '@/constants';
-import type { PackTypeEntity } from '@lil-indigestion-cards/core/card';
+import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
 
-export default function GivePackForm(props: { packTypes: PackTypeEntity[] }) {
+export default function GivePackForm(props: { packTypes: PackType[] }) {
 	return (
 		<Form action={API.PACK} method="post" onsubmit={() => setTotalPackCount((val) => val - 1)}>
 			<TextInput name="username" label="Username">

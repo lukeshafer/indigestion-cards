@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import OpenPacksComponent from '@/components/open-packs/OpenPacks';
-import { getAllPacks } from '@lil-indigestion-cards/core/card';
+import { getAllPacks } from '@lil-indigestion-cards/core/lib/pack';
 import Header from '@/components/Header.astro';
 
 const allPacks = await getAllPacks();

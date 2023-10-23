@@ -1,10 +1,10 @@
 import Table from '@/components/table/Table';
-import type { RarityEntity } from '@lil-indigestion-cards/core/card';
+import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
 import DeleteRarityButton from './DeleteRarityButton';
-import { SubmitButton } from '../form';
+import { SubmitButton } from '../form/Form';
 import { Show, createSignal } from 'solid-js';
 
-export default function RarityTable(props: { rarities: RarityEntity[] }) {
+export default function RarityTable(props: { rarities: Rarity[] }) {
 	return (
 		<Table
 			columns={[
@@ -45,7 +45,7 @@ export default function RarityTable(props: { rarities: RarityEntity[] }) {
 	);
 }
 
-function RarityPreview(props: { rarity: RarityEntity }) {
+function RarityPreview(props: { rarity: Rarity }) {
 	const [isPreviewing, setIsPreviewing] = createSignal(false);
 	const text = () => (isPreviewing() ? 'Hide' : 'Preview');
 

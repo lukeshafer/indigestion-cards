@@ -1,5 +1,4 @@
-import { For, JSX, ParentProps, Show, createSignal } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
+import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
 import { useViewTransition } from '@/lib/client/utils';
@@ -120,9 +119,9 @@ export function Form(props: {
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
 			enctype={props.enctype}
-			onsubmit={handleSubmit}>
+			onSubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-50">
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 bg-opacity-50 dark:bg-black/50">
 					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
@@ -135,7 +134,7 @@ export function Form(props: {
 }
 
 const BASE_INPUT_CLASS =
-	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white p-1 text-black outline outline-2 outline-gray-300 focus:outline-brand-main focus:ring-4';
+	'focus:border-brand-main focus:ring-brand-main block w-full rounded-none bg-white dark:bg-black p-1 text-black dark:text-gray-50 outline outline-2 outline-gray-300 dark:outline-gray-700 focus:outline-brand-main focus:ring-4';
 
 function InputGroup(props: ParentProps) {
 	return <div class="flex w-full flex-col items-start">{props.children}</div>;
@@ -165,37 +164,41 @@ interface InputProps<T extends number | string> extends JSX.InputHTMLAttributes<
 }
 
 export function TextInput(props: InputProps<string>) {
-	return props.inputOnly ? (
-		<input
-			{...props}
-			id={props.name}
-			name={props.name}
-			type="text"
-			class={BASE_INPUT_CLASS}
-			classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-			required={props.required}
-			placeholder={props.placeholder ?? props.label}
-			readOnly={props.readOnly}
-			value={props.value ?? ''}
-			onInput={(e) => props.setValue?.(e.target.value ?? '')}
-		/>
-	) : (
-		<InputGroup>
-			<Label {...props} />
-			{props.children}
-			<input
-				id={props.name}
-				name={props.name}
-				type="text"
-				class={BASE_INPUT_CLASS}
-				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-				required={props.required}
-				placeholder={props.placeholder}
-				readOnly={props.readOnly}
-				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
-			/>
-		</InputGroup>
+	return (
+		<>
+			{props.inputOnly ? (
+				<input
+					{...props}
+					id={props.name}
+					name={props.name}
+					type="text"
+					class={BASE_INPUT_CLASS}
+					classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+					required={props.required}
+					placeholder={props.placeholder ?? props.label}
+					readOnly={props.readOnly}
+					value={props.value ?? ''}
+					onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				/>
+			) : (
+				<InputGroup>
+					<Label {...props} />
+					{props.children}
+					<input
+						id={props.name}
+						name={props.name}
+						type="text"
+						class={BASE_INPUT_CLASS}
+						classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+						required={props.required}
+						placeholder={props.placeholder}
+						readOnly={props.readOnly}
+						value={props.value ?? ''}
+						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+					/>
+				</InputGroup>
+			)}
+		</>
 	);
 }
 
@@ -208,7 +211,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' h-32'}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-				style={{ height: props.height || '8rem'}}
+				style={{ height: props.height || '8rem' }}
 				required={props.required}
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
@@ -256,7 +259,7 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 			<button
 				hidden={!isReadOnly()}
 				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black opacity-50 hover:opacity-100"
-				onclick={handleEditClick}>
+				onClick={handleEditClick}>
 				Edit
 			</button>
 		</div>
@@ -270,6 +273,8 @@ export function FileInput(props: {
 	accept?: string;
 }) {
 	const [preview, setPreview] = createSignal<string | null>(null);
+
+	// @ts-expect-error Solid directive
 	const showPreview = (el: HTMLInputElement) => {
 		el.addEventListener('change', () => {
 			const file = el.files?.[0];
@@ -373,7 +378,7 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow font-heading rounded border border-gray-300 px-4 py-2 font-bold uppercase text-white transition-colors';
+	'text-shadow font-heading rounded border border-gray-300 dark:border-gray-800 px-4 py-2 font-bold uppercase text-white transition-colors';
 
 export function Anchor(props: { children: string; href: string; type?: 'submit' | 'delete' }) {
 	return (
@@ -381,7 +386,8 @@ export function Anchor(props: { children: string; href: string; type?: 'submit' 
 			href={props.href}
 			class={BUTTON_CLASS}
 			classList={{
-				'bg-brand-main hover:bg-brand-dark': !props.type || props.type === 'submit',
+				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark':
+					!props.type || props.type === 'submit',
 				'bg-red-500 hover:bg-red-800': props.type === 'delete',
 			}}>
 			{props.children}
@@ -393,8 +399,8 @@ export function SubmitButton(props: { children?: JSX.Element; onClick?: () => vo
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark`}
-			onClick={props.onClick}>
+			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
+			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Submit'}
 		</button>
 	);
@@ -404,8 +410,8 @@ export function DeleteButton(props: { children?: string; onClick?: () => void })
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800`}
-			onClick={props.onClick}>
+			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 `}
+			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Delete'}
 		</button>
 	);

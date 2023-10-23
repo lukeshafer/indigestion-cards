@@ -1,6 +1,6 @@
 import { ApiHandler, useFormData } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
-import { setAdminEnvSession } from './user';
+import { setAdminEnvSession } from './session';
 
 declare module 'sst/node/future/auth' {
 	export interface SessionTypes {
@@ -146,15 +146,23 @@ type SiteHandlerContext<T extends Schema> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
 };
 
-type SiteHandlerCallback<S extends Schema = {}> =
-	(evt: Parameters<Callback>[0], ctx: SiteHandlerContext<S>) => ReturnType<Callback>
+type SiteHandlerCallback<S extends Schema = {}> = (
+	evt: Parameters<Callback>[0],
+	ctx: SiteHandlerContext<S>
+) => ReturnType<Callback>;
 type SiteHandlerOptions<S extends Schema> = {
 	authorizationType?: 'public' | 'user' | 'admin';
 	schema?: S;
 };
-export function SiteHandler<T extends Schema>(options: SiteHandlerOptions<T>, callback: SiteHandlerCallback<T>): ReturnType<typeof ApiHandler>;
+export function SiteHandler<T extends Schema>(
+	options: SiteHandlerOptions<T>,
+	callback: SiteHandlerCallback<T>
+): ReturnType<typeof ApiHandler>;
 export function SiteHandler(options: SiteHandlerCallback): ReturnType<typeof ApiHandler>;
-export function SiteHandler<T extends Schema>(options: SiteHandlerOptions<T> | SiteHandlerCallback, callback?: SiteHandlerCallback<T>) {
+export function SiteHandler<T extends Schema>(
+	options: SiteHandlerOptions<T> | SiteHandlerCallback,
+	callback?: SiteHandlerCallback<T>
+) {
 	if (typeof options === 'function') {
 		callback = options;
 		options = {};
@@ -169,7 +177,10 @@ export function SiteHandler<T extends Schema>(options: SiteHandlerOptions<T> | S
 		if (authorizationType !== 'public') {
 			const session = useSession();
 
-			if (!authorizationMap[authorizationType].includes(session.type) || session.type === 'public') {
+			if (
+				!authorizationMap[authorizationType].includes(session.type) ||
+				session.type === 'public'
+			) {
 				console.log('Unauthorized', { session });
 				return {
 					statusCode: 401,
@@ -192,11 +203,11 @@ export function SiteHandler<T extends Schema>(options: SiteHandlerOptions<T> | S
 		}
 
 		return callback!(evt, ctx);
-	})
+	});
 }
 
 const authorizationMap = {
 	public: ['public', 'user', 'admin'],
 	user: ['user', 'admin'],
 	admin: ['admin'],
-}
+};
