@@ -14,6 +14,7 @@ export default function SiteConfigForm(props: {
 	giftSubEvent: TwitchEvent;
 }) {
 	const [isEdited, setIsEdited] = createSignal(false);
+	// eslint-disable-next-line solid/reactivity
 	const [rarity, setRarity] = createSignal(props.baseRarityValue);
 
 	return (

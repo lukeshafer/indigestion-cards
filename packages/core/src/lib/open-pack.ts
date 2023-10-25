@@ -99,37 +99,37 @@ export async function openCardFromPack(args: {
 				deletePack
 					? packs.delete({ packId: args.packId }).commit()
 					: packs
-							.patch({ packId: args.packId })
-							.set({ cardDetails: newCardDetails })
-							.commit(),
+						.patch({ packId: args.packId })
+						.set({ cardDetails: newCardDetails })
+						.commit(),
 				...(user
 					? [
-							users
-								.patch({ userId: user.userId })
-								.set({
-									cardCount: (user.cardCount ?? 0) + 1,
-									packCount: deletePack
-										? (user.packCount ?? 1) - 1
-										: user.packCount,
-								})
-								.commit(),
-					  ]
+						users
+							.patch({ userId: user.userId })
+							.set({
+								cardCount: (user.cardCount ?? 0) + 1,
+								packCount: deletePack
+									? (user.packCount ?? 1) - 1
+									: user.packCount,
+							})
+							.commit(),
+					]
 					: []),
 				...(updateRarity
 					? [
-							cardDesigns
-								.patch({ designId: args.designId })
-								.set({
-									bestRarityFound: {
-										rarityId: instance.rarityId,
-										rarityName: instance.rarityName,
-										count: instance.totalOfType,
-										frameUrl: instance.frameUrl,
-										rarityColor: instance.rarityColor,
-									},
-								})
-								.commit(),
-					  ]
+						cardDesigns
+							.patch({ designId: args.designId })
+							.set({
+								bestRarityFound: {
+									rarityId: instance.rarityId,
+									rarityName: instance.rarityName,
+									count: instance.totalOfType,
+									frameUrl: instance.frameUrl,
+									rarityColor: instance.rarityColor,
+								},
+							})
+							.commit(),
+					]
 					: []),
 			])
 			.go();
@@ -188,19 +188,19 @@ export async function openCardFromPack(args: {
 				: packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
 			...(updateRarity
 				? [
-						cardDesigns
-							.patch({ designId: args.designId })
-							.set({
-								bestRarityFound: {
-									rarityId: instance.rarityId,
-									rarityName: instance.rarityName,
-									count: instance.totalOfType,
-									frameUrl: instance.frameUrl,
-									rarityColor: instance.rarityColor,
-								},
-							})
-							.commit(),
-				  ]
+					cardDesigns
+						.patch({ designId: args.designId })
+						.set({
+							bestRarityFound: {
+								rarityId: instance.rarityId,
+								rarityName: instance.rarityName,
+								count: instance.totalOfType,
+								frameUrl: instance.frameUrl,
+								rarityColor: instance.rarityColor,
+							},
+						})
+						.commit(),
+				]
 				: []),
 		])
 		.go();

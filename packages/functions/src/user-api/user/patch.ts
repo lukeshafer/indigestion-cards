@@ -23,11 +23,11 @@ export const handler = SiteHandler(
 			pinnedCard: deletePinnedCard
 				? null
 				: ctx.params.pinnedCardId && ctx.params.pinnedCardDesignId
-				? {
+					? {
 						designId: ctx.params.pinnedCardDesignId,
 						instanceId: ctx.params.pinnedCardId,
-				  }
-				: undefined,
+					}
+					: undefined,
 		});
 		return {
 			statusCode: 200,

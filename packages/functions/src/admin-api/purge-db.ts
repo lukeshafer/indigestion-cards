@@ -54,7 +54,7 @@ async function deleteEntity(entity: Entity) {
 	const deleteResults = entityData.data.map(
 		async (item) =>
 			await entity
-				// @ts-ignore
+				// @ts-expect-error - All entities will have a delete method
 				.delete(item)
 				.go()
 	);

@@ -49,7 +49,7 @@ export const handler = ProtectedApiHandler(async () => {
 	return { statusCode: 200, body: 'Site config saved.' };
 });
 
-function parseEventValue(value: any): {
+function parseEventValue(value: string): {
 	packTypeId: string | undefined;
 	packTypeName: string | undefined;
 } {

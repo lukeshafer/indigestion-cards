@@ -175,15 +175,15 @@ export async function setUserProfile(args: {
 
 	const card = args.pinnedCard
 		? await cardInstances.query
-				.byId(args.pinnedCard)
-				.go()
-				.then((result) =>
-					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
-						? result.data[0]
-						: user.pinnedCard
-				)
+			.byId(args.pinnedCard)
+			.go()
+			.then((result) =>
+				result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+					? result.data[0]
+					: user.pinnedCard
+			)
 		: args.pinnedCard === null
-		? ({
+			? ({
 				instanceId: '',
 				designId: '',
 				imgUrl: '',
@@ -199,8 +199,8 @@ export async function setUserProfile(args: {
 				rarityColor: '',
 				totalOfType: 0,
 				cardDescription: '',
-		  } satisfies CardInstance)
-		: user.pinnedCard;
+			} satisfies CardInstance)
+			: user.pinnedCard;
 
 	return users
 		.patch({ userId: args.userId })

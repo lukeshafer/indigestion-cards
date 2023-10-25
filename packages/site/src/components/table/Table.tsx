@@ -16,7 +16,7 @@ interface Column {
 	font?: 'default' | 'title';
 }
 
-type Cell =
+export type Cell =
 	| string
 	| number
 	| {

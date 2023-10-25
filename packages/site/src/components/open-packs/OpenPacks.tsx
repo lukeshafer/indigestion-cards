@@ -137,6 +137,7 @@ export default function OpenPacks(props: {
 			setState(
 				'packs',
 				produce((draft) => {
+					// eslint-disable-next-line solid/reactivity
 					draft.sort((a, b) => {
 						const aStatus = state.getIsOnline(a.username);
 						const bStatus = state.getIsOnline(b.username);

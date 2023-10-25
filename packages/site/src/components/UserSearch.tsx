@@ -1,6 +1,6 @@
 import { publicApi } from '@/constants';
 import { Form, TextInput } from '@/components/form/Form';
-import { createSignal } from 'solid-js';
+import { For, createSignal } from 'solid-js';
 import SearchIcon from './icons/SearchIcon';
 
 export default function UserSearch() {
@@ -46,9 +46,7 @@ export default function UserSearch() {
 					<SearchIcon size="1.4rem" />
 				</button>
 				<datalist id="users">
-					{users().map((username) => (
-						<option value={username} />
-					))}
+					<For each={users()}>{(username) => <option value={username} />}</For>
 				</datalist>
 			</Form>
 		</div>
