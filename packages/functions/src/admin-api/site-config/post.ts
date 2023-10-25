@@ -1,12 +1,9 @@
 import { useFormData } from 'sst/node/api';
 import { z } from 'zod';
 
-import { validateSearchParams, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { validateSearchParams, ProtectedApiHandler } from '@lib/api';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import {
-	updateBatchTwitchEvents,
-	updateSiteConfig,
-} from '@lil-indigestion-cards/core/lib/site-config';
+import { updateBatchTwitchEvents, updateSiteConfig } from '@lib/site-config';
 
 export const handler = ProtectedApiHandler(async () => {
 	const params = useFormData();

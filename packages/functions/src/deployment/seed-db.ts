@@ -1,5 +1,5 @@
 import { seedAdmins, seedSiteConfig } from '@lil-indigestion-cards/core/db-seeds';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { setAdminEnvSession } from '@lib/session';
 
 export async function handler() {
 	setAdminEnvSession('Deployment Script', 'deployment_script');

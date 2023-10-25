@@ -1,9 +1,9 @@
 import { Bucket } from 'sst/node/bucket';
 
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { createRarity, } from '@lil-indigestion-cards/core/lib/rarity';
-import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/lib/unmatched-image';
-import { moveImageBetweenBuckets, createS3Url } from '@lil-indigestion-cards/core/lib/images';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { createRarity, } from '@lib/rarity';
+import { deleteUnmatchedDesignImage } from '@lib/unmatched-image';
+import { moveImageBetweenBuckets, createS3Url } from '@lib/images';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validationResult = useValidateFormData({

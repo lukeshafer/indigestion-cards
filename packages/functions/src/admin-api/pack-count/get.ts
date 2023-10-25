@@ -1,7 +1,7 @@
 import { useQueryParam } from 'sst/node/api';
-import { ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { getUser } from '@lil-indigestion-cards/core/lib/user';
-import { getAllPacks } from '@lil-indigestion-cards/core/lib/pack';
+import { ProtectedApiHandler } from '@lib/api';
+import { getUser } from '@lib/user';
+import { getAllPacks } from '@lib/pack';
 
 export const handler = ProtectedApiHandler(async () => {
 	const userId = useQueryParam('userId');

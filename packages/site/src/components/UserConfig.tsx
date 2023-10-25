@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
-import type { TwitchUser } from '@lil-indigestion-cards/core/lib/twitch';
+import type { TwitchUser } from '@lib/twitch';
 import UserIcon from './icons/UserIcon';
 
 // @ts-expect-error - This function IS used

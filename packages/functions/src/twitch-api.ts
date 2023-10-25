@@ -6,14 +6,14 @@ import {
 	parseRequestBody,
 	MESSAGE_TYPE,
 	getHeaders,
-} from '@lil-indigestion-cards/core/lib/twitch';
+} from '@lib/twitch';
 import {
 	getTwitchEventById,
 	checkIsDuplicateTwitchEventMessage,
-} from '@lil-indigestion-cards/core/lib/site-config';
-import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
+} from '@lib/site-config';
+import { getPackTypeById } from '@lib/pack-type';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { setAdminEnvSession } from '@lib/session';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event)) {

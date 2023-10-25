@@ -1,8 +1,8 @@
 import { SQSEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { givePackToUser } from '@lil-indigestion-cards/core/lib/pack';
-import { packSchema } from '@lil-indigestion-cards/core/lib/entity-schemas';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { givePackToUser } from '@lib/pack';
+import { packSchema } from '@lib/entity-schemas';
+import { setAdminEnvSession } from '@lib/session';
 
 export async function handler(event: SQSEvent) {
 	console.log('Received event to give pack to user');

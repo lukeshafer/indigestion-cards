@@ -1,6 +1,6 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { createAdminUser } from '@lil-indigestion-cards/core/lib/admin-user';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { createAdminUser } from '@lib/admin-user';
+import { getUserByLogin } from '@lib/twitch';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({
