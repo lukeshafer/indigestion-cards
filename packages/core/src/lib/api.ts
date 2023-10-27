@@ -15,7 +15,10 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
-type SchemaType = 'string' | 'number' | 'boolean';
+type SchemaType =
+	| 'string' | 'string?'
+	| 'number' | 'number?'
+	| 'boolean' | 'boolean?';
 
 interface Schema {
 	[key: string]: SchemaType | [SchemaType, 'optional'];
@@ -24,7 +27,7 @@ interface Schema {
 type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: SchemaToCheck[key] extends [SchemaType, 'optional']
 	? Types[SchemaToCheck[key][0]] | undefined
-	: // @ts-ignore
+	: // @ts-expect-error - key is a key of SchemaToCheck
 	Types[SchemaToCheck[key]];
 };
 
@@ -56,7 +59,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 	const errors: string[] = [];
 	for (const key in schema) {
 		let type = schema[key] as SchemaType | [SchemaType, 'optional'];
-		const value = params.get(key);
+		const value = params.get(key) || undefined;
 
 		if (Array.isArray(type)) {
 			if (!value) {
@@ -64,7 +67,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 				continue;
 			}
 			type = type[0];
-		} else if (!value) {
+		} else if (!value && !type.endsWith('?')) {
 			errors.push(`Missing ${key}.`);
 			continue;
 		}
@@ -88,12 +91,23 @@ interface Types {
 	string: string;
 	number: number;
 	boolean: boolean;
+	'string?': string | undefined;
+	'number?': number | undefined;
+	'boolean?': boolean | undefined;
 }
 
 function parseType<TypeToCheck extends SchemaType>(
-	value: string,
+	value: string | undefined,
 	type: TypeToCheck
 ): Types[TypeToCheck] {
+	const optional = type.endsWith('?');
+	if (optional) type = type.slice(0, -1) as TypeToCheck;
+
+	if (value === undefined) {
+		if (optional) return undefined as Types[TypeToCheck];
+		throw new Error('Missing value');
+	}
+
 	switch (type) {
 		case 'string':
 			return value as Types[TypeToCheck];
@@ -146,6 +160,7 @@ type SiteHandlerContext<T extends Schema> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type SiteHandlerCallback<S extends Schema = {}> = (
 	evt: Parameters<Callback>[0],
 	ctx: SiteHandlerContext<S>
@@ -194,6 +209,7 @@ export function SiteHandler<T extends Schema>(
 		if (schema) {
 			const params = useValidateFormData(schema);
 			if (!params.success) {
+				console.error('Invalid params', { params });
 				return {
 					statusCode: 400,
 					body: params.errors.join(' '),

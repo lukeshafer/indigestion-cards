@@ -85,6 +85,8 @@ export function API({ app, stack }: StackContext) {
 			// USER ENDPOINTS
 			// USER
 			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
+			// TRADE
+			'POST /user-api/trade': 'packages/functions/src/user-api/trade/post.handler',
 		},
 		defaults: {
 			function: {
