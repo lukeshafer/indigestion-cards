@@ -72,6 +72,7 @@ export const routes = {
 	PACKS: '/packs',
 	INSTANCES: '/card',
 	CARDS: '/card',
+	TRADES: '/trades',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',
@@ -108,6 +109,7 @@ export const routeNames = {
 	ADMIN: 'Admin',
 	ADMIN_CREATE: 'Create',
 	ADMIN_EDIT: 'Edit',
+	TRADES: 'Trades',
 } as const;
 
 export const ASSETS = {

@@ -1,9 +1,27 @@
 import { z } from 'zod';
-import { trades, type CreateTrade } from '../db/trades'
+import { trades, type CreateTrade } from '../db/trades';
 
 export async function createTrade(trade: CreateTrade) {
 	const result = await trades.create(trade).go();
 	return result;
+}
+
+export async function getOutgoingTradesByUserId(senderUserId: string) {
+	const result = await trades.query.bySenderId({ senderUserId }).go();
+	return result.data;
+}
+
+export async function getIncomingTradesByUserId(receiverUserId: string) {
+	const result = await trades.query.byReceiverId({ receiverUserId }).go();
+	return result.data;
+}
+
+export async function getAllTradesForUser(userId: string) {
+	const [outgoing, incoming] = await Promise.all([
+		getOutgoingTradesByUserId(userId),
+		getIncomingTradesByUserId(userId),
+	]);
+	return { outgoing, incoming };
 }
 
 const cardsSchema = z.object({
@@ -18,7 +36,7 @@ const cardsSchema = z.object({
 	frameUrl: z.string(),
 	cardNumber: z.number(),
 	totalOfType: z.number(),
-})
+});
 
 export function parseCardListString(cardsString: string) {
 	let cards: unknown;

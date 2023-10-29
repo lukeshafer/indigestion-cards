@@ -14,8 +14,10 @@
     "sst": "2.30.3"
   },
   "dependencies": {
+    "@trpc/server": "^10.43.0",
     "openid-client": "^5.6.1",
     "parse-multipart-data": "^1.5.0",
+    "superjson": "^2.2.0",
     "zod": "^3.22.4"
   }
 }

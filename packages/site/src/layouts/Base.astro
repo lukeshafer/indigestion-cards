@@ -4,6 +4,7 @@ import '@fontsource-variable/montserrat';
 //import 'open-props/colors';
 import { ViewTransitions } from 'astro:transitions';
 import { ASSETS } from '@/constants';
+import { Api } from 'sst/node/api';
 
 interface Props {
 	title: string;
@@ -22,7 +23,7 @@ const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
 
 <html
 	lang="en"
-	class:list={{ 'dark': colorTheme === 'dark' }}
+	class:list={{ dark: colorTheme === 'dark' }}
 	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 	<!--
 Oh, hello beautiful people of the internet!
@@ -37,18 +38,25 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
+		<meta name="indigestion-cards:trpc_url" content={Api.trpcApi.url} />
 		<script is:inline>
-			if (
-				localStorage.theme === 'dark' ||
-				(!('theme' in localStorage) &&
-					window.matchMedia('(prefers-color-scheme: dark)').matches)
-			) {
-				document.documentElement.classList.add('dark');
-				localStorage.theme = 'dark';
-			} else {
-				document.documentElement.classList.remove('dark');
-				localStorage.theme = 'light'
-			}
+		if (
+			localStorage.theme === 'dark' ||
+			(!('theme' in localStorage) &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			document.documentElement.classList.add('dark');
+			localStorage.theme = 'dark';
+		} else {
+			document.documentElement.classList.remove('dark');
+			localStorage.theme = 'light';
+		}
+		</script>
+		<script>
+			const trpcUrl = document.querySelector<HTMLMetaElement>(
+				'meta[name="indigestion-cards:trpc_url"]'
+			)?.content;
+			localStorage.TRPC_URL = trpcUrl;
 		</script>
 		<title>
 			{
@@ -59,8 +67,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		</title>
 		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>
-	<body
-	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
+	<body class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 		{
 			session?.type === 'admin' || pageType === 'public' ? (
 				<slot />

@@ -15,6 +15,7 @@ const username = Astro.locals.session?.properties.username;
 const headerLinks = [
 	{ href: '/card', title: 'Cards' },
 	{ href: '/user', title: 'Users' },
+	{ href: '/trades', title: 'Trades' },
 ];
 
 const twitchData = username ? await getUserByLogin(username) : undefined;

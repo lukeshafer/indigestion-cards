@@ -8,7 +8,7 @@ import { getHostedZone, getDomainName } from './constants';
 
 export function Sites({ app, stack }: StackContext) {
 	const table = use(Database);
-	const { adminApi, twitchApi } = use(API);
+	const { adminApi, twitchApi, trpcApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
 	const config = use(ConfigStack);
@@ -22,6 +22,7 @@ export function Sites({ app, stack }: StackContext) {
 			table,
 			adminApi,
 			twitchApi,
+			trpcApi,
 			frameBucket,
 			cardDesignBucket,
 			frameDraftBucket,

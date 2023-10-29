@@ -1,0 +1,25 @@
+---
+// DATA
+import { getAllTradesForUser } from '@lil-indigestion-cards/core/lib/trades';
+
+// UI
+import { PageHeader, PageTitle } from '@/components/text';
+import { routeNames, routes } from '@/constants';
+import Page from '@/layouts/Page.astro';
+import { Anchor } from '@/components/text';
+
+const userId = Astro.locals.user?.properties.userId;
+
+if (!userId) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+//const trades = await getAllTradesForUser(userId);
+---
+
+<Page title="Trades" breadcrumbs={[{ label: routeNames.TRADES }]}>
+	<PageHeader>
+		<PageTitle>Trades</PageTitle>
+	</PageHeader>
+	<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
+</Page>

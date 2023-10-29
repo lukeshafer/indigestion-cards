@@ -78,12 +78,18 @@ importers:
 
   packages/functions:
     dependencies:
+      '@trpc/server':
+        specifier: ^10.43.0
+        version: 10.43.0
       openid-client:
         specifier: ^5.6.1
         version: 5.6.1
       parse-multipart-data:
         specifier: ^1.5.0
         version: 1.5.0
+      superjson:
+        specifier: ^2.2.0
+        version: 2.2.0
       zod:
         specifier: ^3.22.4
         version: 3.22.4
@@ -121,6 +127,9 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.7.0
         version: 0.7.0
+      '@trpc/client':
+        specifier: ^10.43.0
+        version: 10.43.0(@trpc/server@10.43.0)
       astro:
         specifier: ^3.3.2
         version: 3.3.2(typescript@5.2.2)
@@ -133,12 +142,18 @@ importers:
       electrodb:
         specifier: ^2.10.3
         version: 2.10.3(@aws-sdk/client-dynamodb@3.431.0)
+      fuse.js:
+        specifier: ^7.0.0
+        version: 7.0.0
       solid-js:
         specifier: ^1.8.3
         version: 1.8.3
       sst:
         specifier: 2.30.3
         version: 2.30.3
+      superjson:
+        specifier: ^2.2.0
+        version: 2.2.0
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3
@@ -4515,6 +4530,18 @@ packages:
       tailwindcss: 3.3.3
     dev: true
 
+  /@trpc/client@10.43.0(@trpc/server@10.43.0):
+    resolution: {integrity: sha512-8LbSpPHmIseb/Ke+GzL45y0itkKunGQWfxqHf2uy69RSRvER0vj+Gu67L8YD86FBgc/nsX/6GBuJiUet5lIDIw==}
+    peerDependencies:
+      '@trpc/server': 10.43.0
+    dependencies:
+      '@trpc/server': 10.43.0
+    dev: false
+
+  /@trpc/server@10.43.0:
+    resolution: {integrity: sha512-1/h9KCPkTNNmpN5VKfKO4kPcl/W4Y9VQla4YGg4pydSh/+4b//0IPfvk3Oz4tz/tvWyAUlBKkBVhD3GfDLcAQA==}
+    dev: false
+
   /@trpc/server@9.16.0:
     resolution: {integrity: sha512-IENsJs41ZR4oeFUJhsNNTSgEOtuRN0m9u7ec4u3eG/qOc7bIoo1nDoYtx4bl6OJJSQYEytG9tlcVz9G8OAaHbg==}
     dependencies:
@@ -5826,6 +5853,13 @@ packages:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
 
+  /copy-anything@3.0.5:
+    resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
+    engines: {node: '>=12.13'}
+    dependencies:
+      is-what: 4.1.15
+    dev: false
+
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
@@ -6827,6 +6861,11 @@ packages:
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /fuse.js@7.0.0:
+    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -10036,6 +10075,13 @@ packages:
     dependencies:
       s.color: 0.0.15
     dev: true
+
+  /superjson@2.2.0:
+    resolution: {integrity: sha512-vSr6kwT/LY3T1+JaZllIGFp5+qEYyCw/s6EMgR8TulTwRbKETuVIqN4RTurPBTU/HlEpP0ytN3srB2vjjeBRoQ==}
+    engines: {node: '>=16'}
+    dependencies:
+      copy-anything: 3.0.5
+    dev: false
 
   /supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}

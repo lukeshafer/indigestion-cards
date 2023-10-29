@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 
 export type Trade = EntityItem<typeof trades>;
 export type CreateTrade = CreateEntityItem<typeof trades>;
+export type TradeCard = Trade['offeredCards'][number];
 const tradeCardsProperties = {
 	instanceId: {
 		type: 'string',

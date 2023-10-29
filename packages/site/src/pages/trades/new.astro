@@ -1,0 +1,28 @@
+---
+// CONFIG
+import { Api } from 'sst/node/api';
+
+// UI
+import { PageHeader, PageTitle } from '@/components/text';
+import { routeNames, routes } from '@/constants';
+import Page from '@/layouts/Page.astro';
+import NewTrade from '@/components/trades/NewTrade';
+import { getUserAndCardInstances } from '@lil-indigestion-cards/core/lib/user';
+
+const { userId, username } = Astro.locals.user?.properties || {};
+
+if (!userId || !username) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+const { cardInstances } = (await getUserAndCardInstances({ username })) ?? {};
+---
+
+<Page
+	title="New Trade"
+	breadcrumbs={[{ label: 'New Trade', href: routes.TRADES }, { label: routeNames.TRADES }]}>
+	<PageHeader>
+		<PageTitle>New Trade</PageTitle>
+	</PageHeader>
+	<NewTrade {userId} {username} apiURL={Api.trpcApi.url} {cardInstances} client:load />
+</Page>

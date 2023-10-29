@@ -4,6 +4,8 @@
 		"packages"
 	],
 	"compilerOptions": {
+		"module": "exnext",
+		"moduleResolution": "node",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true

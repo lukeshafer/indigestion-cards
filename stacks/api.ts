@@ -35,6 +35,22 @@ export function API({ app, stack }: StackContext) {
 		},
 	});
 
+	const trpcApi = new Api(stack, 'trpcApi', {
+		routes: {
+			'POST /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
+			'GET /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
+		},
+		defaults: {
+			function: {
+				bind: [table, siteAuth],
+				runtime: 'nodejs18.x',
+			},
+		},
+		cors: {
+			allowMethods: ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
+		},
+	});
+
 	const adminApi = new Api(stack, 'AdminApi', {
 		routes: {
 			// PACK TYPE
@@ -78,8 +94,8 @@ export function API({ app, stack }: StackContext) {
 			'GET /twitch/chatters': 'packages/functions/src/admin-api/twitch/chatters/get.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
-					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				}
+						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+				  }
 				: {}),
 
 			// USER ENDPOINTS
@@ -118,16 +134,17 @@ export function API({ app, stack }: StackContext) {
 			app.mode === 'dev'
 				? undefined
 				: {
-					domainName: `api.${baseDomain}`,
-					path: API_VERSION,
-					hostedZone: hostedZone,
-				},
+						domainName: `api.${baseDomain}`,
+						path: API_VERSION,
+						hostedZone: hostedZone,
+				  },
 	});
 
 	stack.addOutputs({
 		ApiEndpoint: adminApi.url,
 		TwitchApiEndpoint: twitchApi.url,
+		TRPCApiEndpoint: trpcApi.url,
 	});
 
-	return { adminApi, twitchApi };
+	return { adminApi, twitchApi, trpcApi };
 }
