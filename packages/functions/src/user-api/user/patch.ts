@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
-import { setUserProfile } from '@lil-indigestion-cards/core/lib/user';
+import { SiteHandler } from '@lib/api';
+import { setUserProfile } from '@lib/user';
 
 export const handler = SiteHandler(
 	{
@@ -23,11 +23,11 @@ export const handler = SiteHandler(
 			pinnedCard: deletePinnedCard
 				? null
 				: ctx.params.pinnedCardId && ctx.params.pinnedCardDesignId
-				? {
+					? {
 						designId: ctx.params.pinnedCardDesignId,
 						instanceId: ctx.params.pinnedCardId,
-				  }
-				: undefined,
+					}
+					: undefined,
 		});
 		return {
 			statusCode: 200,

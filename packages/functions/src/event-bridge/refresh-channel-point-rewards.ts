@@ -3,9 +3,9 @@ import {
 	refreshChannelPointRewards,
 	addMessageToSiteConfig,
 	removeMessageFromSiteConfig,
-} from '@lil-indigestion-cards/core/lib/site-config';
-import { getAllChannelPointRewards } from '@lil-indigestion-cards/core/lib/twitch';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+} from '@lib/site-config';
+import { getAllChannelPointRewards } from '@lib/twitch';
+import { setAdminEnvSession } from '@lib/session';
 
 export async function handler() {
 	setAdminEnvSession(

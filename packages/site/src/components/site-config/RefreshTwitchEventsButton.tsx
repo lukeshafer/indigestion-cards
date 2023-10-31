@@ -4,10 +4,11 @@ import { API } from '../../constants';
 
 export default function RefreshTwitchEventsButton() {
 	const [buttonText, setButtonText] = createSignal('Refresh Twitch Events');
-	const [, setIsDisabled] = createSignal(false);
+	let isDisabled = false;
 
 	const refreshTwitchEvents = async () => {
-		setIsDisabled(true);
+		if (isDisabled) return;
+		isDisabled = true;
 		setButtonText('Refreshing...');
 		const auth_token = localStorage.getItem('auth_token') || '';
 		const response = await fetch(API.REFRESH_TWITCH_EVENTS, {
@@ -23,7 +24,7 @@ export default function RefreshTwitchEventsButton() {
 			setButtonText('Refreshed Twitch events');
 		}
 
-		setIsDisabled(false);
+		isDisabled = false;
 		setTimeout(() => {
 			setButtonText('Refresh Twitch Events');
 		}, 2000);

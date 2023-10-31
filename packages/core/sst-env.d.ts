@@ -1,3 +1,4 @@
+/* eslint-disable */
 /// <reference path="../../.sst/types/index.ts" />
 
 type Union2IntersectionFn<T> = (T extends unknown ? (k: () => T) => void : never) extends (

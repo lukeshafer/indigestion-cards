@@ -9,7 +9,7 @@ import { Auth } from './stacks/auth';
 import { AfterDeployStack } from './stacks/script';
 
 export default {
-	config(_input) {
+	config() {
 		return {
 			name: 'lil-indigestion-cards',
 			region: 'us-east-2',

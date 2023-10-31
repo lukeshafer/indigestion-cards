@@ -24,7 +24,7 @@ interface Schema {
 type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: SchemaToCheck[key] extends [SchemaType, 'optional']
 	? Types[SchemaToCheck[key][0]] | undefined
-	: // @ts-ignore
+	: // @ts-expect-error - Key is a key of SchemaToCheck
 	Types[SchemaToCheck[key]];
 };
 
@@ -146,6 +146,7 @@ type SiteHandlerContext<T extends Schema> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type SiteHandlerCallback<S extends Schema = {}> = (
 	evt: Parameters<Callback>[0],
 	ctx: SiteHandlerContext<S>

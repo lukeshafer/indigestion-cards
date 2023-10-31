@@ -3,15 +3,11 @@ import { Issuer } from 'openid-client';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
-import { createNewUser, getUser } from '@lil-indigestion-cards/core/lib/user';
-import { getAdminUserById } from '@lil-indigestion-cards/core/lib/admin-user';
-import {
-	createNewUserLogin,
-	getUserLoginById,
-	updateUserLogin,
-} from '@lil-indigestion-cards/core/lib/user-login';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
-import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lil-indigestion-cards/core/lib/twitch';
+import { createNewUser, getUser } from '@lib/user';
+import { getAdminUserById } from '@lib/admin-user';
+import { createNewUserLogin, getUserLoginById, updateUserLogin } from '@lib/user-login';
+import { setAdminEnvSession } from '@lib/session';
+import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lib/twitch';
 import { sessions } from './sessions';
 
 declare module 'sst/node/future/auth' {
@@ -44,7 +40,8 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onError() {
+	async onError(error) {
+		console.error('An error occurred', { error });
 		return {
 			statusCode: 400,
 			headers: {
@@ -54,6 +51,10 @@ export const handler = AuthHandler({
 		};
 	},
 	callbacks: {
+		async error(err) {
+			console.error('callbacks.error', { err });
+			return undefined
+		},
 		auth: {
 			async allowClient(clientID, redirect) {
 				switch (clientID) {
@@ -64,6 +65,10 @@ export const handler = AuthHandler({
 					default:
 						return false;
 				}
+			},
+			async error(error) {
+				console.error('An unknown error occurred', { error });
+				return undefined;
 			},
 			async success(input, response) {
 				setAdminEnvSession('AuthHandler', 'createNewUserLogin');
@@ -184,11 +189,11 @@ export const handler = AuthHandler({
 					});
 
 					return response.session({
-							type: 'admin',
-							properties: {
-								userId: adminUser.userId,
-								username: adminUser.username,
-							},
+						type: 'admin',
+						properties: {
+							userId: adminUser.userId,
+							username: adminUser.username,
+						},
 					});
 				}
 

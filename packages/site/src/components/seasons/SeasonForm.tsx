@@ -3,6 +3,7 @@ import { Form, TextInput, IdInput, SubmitButton } from '@/components/form/Form';
 import { createSignal } from 'solid-js';
 
 export default function SeasonForm(props: { seasonName?: string }) {
+	// eslint-disable-next-line solid/reactivity
 	const [seasonName, setSeasonName] = createSignal(props.seasonName ?? '');
 
 	return (

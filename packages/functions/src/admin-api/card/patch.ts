@@ -1,5 +1,5 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { openCardFromPack } from '@lil-indigestion-cards/core/lib/open-pack';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { openCardFromPack } from '@lib/open-pack';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({

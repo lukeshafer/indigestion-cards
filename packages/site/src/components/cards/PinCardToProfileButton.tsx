@@ -8,11 +8,13 @@ export default function PinCardToProfileButton(props: {
 	designId: string;
 	isPinned?: boolean;
 }) {
-	const [isPinned, setIsPinned] = createSignal(props.isPinned);
+	const [isPinnedUI, setIsPinnedUI] = createSignal(undefined as boolean | undefined);
+	const isPinned = () => isPinnedUI() ?? props.isPinned;
+	// eslint-disable-next-line solid/reactivity
 	const text = () => (isPinned() ? 'Unpin from profile' : 'Pin to profile');
 
 	return (
-		<Form action={USER_API.USER} method="patch" onsuccess={() => setIsPinned((v) => !v)}>
+		<Form action={USER_API.USER} method="patch" onsuccess={() => setIsPinnedUI(!isPinned())}>
 			<input type="hidden" name="userId" value={props.userId} />
 			<input
 				type="hidden"

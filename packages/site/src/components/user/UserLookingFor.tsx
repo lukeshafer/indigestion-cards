@@ -4,6 +4,7 @@ import { createSignal, type JSX } from 'solid-js';
 import { USER_API } from '@/constants';
 
 export default function UserLookingFor(props: { user: User; isLoggedInUser: boolean }) {
+	// eslint-disable-next-line solid/reactivity
 	const [lookingFor, setLookingFor] = createSignal(props.user.lookingFor || '');
 	const [isEditing, setIsEditing] = createSignal(false);
 

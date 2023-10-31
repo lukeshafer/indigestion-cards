@@ -1,6 +1,6 @@
-import { parsePackTypeContents } from '@lil-indigestion-cards/core/lib/entity-schemas';
-import { createPackType } from '@lil-indigestion-cards/core/lib/pack-type';
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
+import { parsePackTypeContents } from '@lib/entity-schemas';
+import { createPackType } from '@lib/pack-type';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({

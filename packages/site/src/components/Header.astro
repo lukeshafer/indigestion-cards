@@ -5,7 +5,7 @@ import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { getUserByLogin } from '@lib/twitch';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 const currentPage = Astro.url.pathname;
