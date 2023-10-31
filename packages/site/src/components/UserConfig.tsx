@@ -115,16 +115,11 @@ export default function UserConfig(props: {
 							Dark Mode
 						</button>
 						{props.user ? (
-							<a
-								class="flex gap-4 font-medium hover:underline"
-								onClick={() => {
-									// change page manually to avoid using cached data from prefetch
-									window.location.href = `/api/auth/logout`;
-								}}
-								data-astro-reload
-								href="/api/auth/logout">
-								Logout
-							</a>
+							<form method="post" action="/api/auth/logout">
+								<button class="flex gap-4 font-medium hover:underline">
+									Logout
+								</button>
+							</form>
 						) : null}
 					</ul>
 				</menu>
