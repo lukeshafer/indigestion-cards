@@ -40,7 +40,8 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onError() {
+	async onError(error) {
+		console.error("An error occurred", { error })
 		return {
 			statusCode: 400,
 			headers: {
@@ -60,6 +61,10 @@ export const handler = AuthHandler({
 					default:
 						return false;
 				}
+			},
+			async error(error) {
+				console.error("An unknown error occurred", { error })
+				return undefined;
 			},
 			async success(input, response) {
 				setAdminEnvSession('AuthHandler', 'createNewUserLogin');
