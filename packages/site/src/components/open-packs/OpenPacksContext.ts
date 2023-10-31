@@ -9,32 +9,26 @@ export const OpenPacksContext = createContext<OpenPacksState>({
 	packs: [],
 	activePack: null,
 	packsRemaining: 0,
-	setActivePack: () => {},
-	removeNewStampStamp: () => {},
-	removePack: () => {},
-	setNextPack: () => {},
+	setActivePack: () => { },
+	removeNewStampStamp: () => { },
+	setNextPack: () => { },
 	cardScale: 1,
-	setCardScale: () => {},
+	setCardScale: () => { },
 	previewedCardId: null,
-	setPreviewedCardId: () => {},
-	flipCard: () => {},
-	draggingIndex: null,
-	setDraggingIndex: () => {},
-	hoveringIndex: null,
-	setHoveringIndex: () => {},
-	draggingY: null,
+	setPreviewedCardId: () => { },
+	flipCard: () => { },
 	getIsOnline: () => false,
-	moveOnlineToTop: () => {},
 	listHeight: 0,
 	listHeightString: '0px',
-	setListHeight: () => {},
+	setListHeight: () => { },
+	movePackToIndex: () => { },
 });
 
 export type PackEntityWithStatus = Pack & {
 	cardDetails: Pack['cardDetails'] &
-		{
-			stamps?: string[];
-		}[];
+	{
+		stamps?: string[];
+	}[];
 };
 
 export type OpenPacksState = {
@@ -46,7 +40,6 @@ export type OpenPacksState = {
 	packsRemaining: number;
 	setActivePack(pack: PackEntityWithStatus): void;
 	removeNewStampStamp(instanceId: string): void;
-	removePack(): void;
 	setNextPack(): void;
 
 	cardScale: number;
@@ -57,17 +50,11 @@ export type OpenPacksState = {
 
 	flipCard(instanceId: string): void;
 
-	draggingIndex: number | null;
-	setDraggingIndex(index: number | null): void;
-
-	hoveringIndex: number | null;
-	setHoveringIndex(index: number | null): void;
-
-	draggingY: number | null;
 	getIsOnline(username?: string): boolean;
-	moveOnlineToTop(): void;
 
 	listHeight: number;
 	listHeightString: string;
 	setListHeight(height: number): void;
+
+	movePackToIndex(fromIndex: number, toIndex: number): void;
 };

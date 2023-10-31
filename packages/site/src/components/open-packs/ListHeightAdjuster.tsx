@@ -23,7 +23,7 @@ export function ListHeightAdjuster() {
 
 	return (
 		<button
-			class="font-heading relative z-10 h-min w-full max-w-[15rem] translate-y-1/2 bg-transparent pb-1 text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
+			class="font-heading relative z-10 h-min w-full max-w-[15rem] translate-y-3/4 bg-transparent pb-1 leading-none text-center text-2xl font-bold opacity-0 transition-opacity hover:cursor-ns-resize hover:opacity-50"
 			onMouseDown={handleMouseDown}>
 			=
 		</button>
