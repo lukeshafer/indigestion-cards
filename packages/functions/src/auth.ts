@@ -41,7 +41,7 @@ export const handler = AuthHandler({
 		}),
 	},
 	async onError(error) {
-		console.error("An error occurred", { error })
+		console.error('An error occurred', { error });
 		return {
 			statusCode: 400,
 			headers: {
@@ -63,7 +63,7 @@ export const handler = AuthHandler({
 				}
 			},
 			async error(error) {
-				console.error("An unknown error occurred", { error })
+				console.error('An unknown error occurred', { error });
 				return undefined;
 			},
 			async success(input, response) {

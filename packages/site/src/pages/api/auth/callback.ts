@@ -16,7 +16,14 @@ export async function GET(ctx: APIContext) {
 			code,
 			redirect_uri: `${ctx.url.origin}${ctx.url.pathname}`,
 		}),
-	}).then((r) => r.json());
+	})
+		.then((r) => r.text())
+		.then((r) => {
+			console.log(r);
+			return JSON.parse(r)
+		}).catch((err) => {
+			console.error('An error occurred parsing the JSON.', { err })
+		});
 
 	if (!response.access_token) {
 		throw new Error('No access token');
