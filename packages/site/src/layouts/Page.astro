@@ -48,64 +48,8 @@ let {
 			<AdminPanel />
 		</AdminOnly>
 		<div
-			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
+			class="relative flex flex-col overflow-y-scroll md:col-start-2 bg-gray-50 dark:bg-gray-950"
 			id="page-scroll-wrapper">
-			<loading-bar
-				transition:persist="loading-bar"
-				class="bg-brand-main absolute top-0 h-1 w-full origin-top-left transition-all duration-1000"
-				style={{ transform: 'scale(var(--x), var(--y))' }}>
-				<script>
-					class LoadingBar extends HTMLElement {
-						timeout: NodeJS.Timeout | undefined;
-						constructor() {
-							super();
-							this.loading = 0.1;
-							console.log('constructed')
-						}
-
-						handleLinkClick(e: MouseEvent) {
-							if (e.target instanceof HTMLAnchorElement) {
-								this.loading = 0.1;
-								this.show();
-								document.removeEventListener('click', this.handleLinkClick);
-							}
-						}
-
-						connectedCallback() {
-							console.log('connected')
-							document.addEventListener('click', this.handleLinkClick.bind(this));
-							document.addEventListener('astro:after-swap', () => {
-								this.loading = Math.max(0.2, Math.min(this.loading + 0.1, 0.7));
-								this.timeout = setTimeout(() => this.hide(), 2000);
-							});
-							document.addEventListener('astro:page-load', () => {
-								this.loading = 1;
-								if (this.timeout) clearTimeout(this.timeout);
-								setTimeout(() => this.hide(), 500);
-							});
-						}
-
-						#__loading = 0;
-						get loading() {
-							return this.#__loading;
-						}
-						set loading(value: number) {
-							this.#__loading = value;
-							this.style.setProperty('--x', String(value));
-						}
-
-						show() {
-							this.style.setProperty('--y', '1');
-						}
-						hide() {
-							this.style.setProperty('--y', '0');
-						}
-					}
-
-					if (!customElements.get('loading-bar'))
-						customElements.define('loading-bar', LoadingBar);
-				</script>
-			</loading-bar>
 			{noHeader ? null : <Header />}
 			<AlertBox client:load {alerts} />
 			{
