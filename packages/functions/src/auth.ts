@@ -51,6 +51,10 @@ export const handler = AuthHandler({
 		};
 	},
 	callbacks: {
+		async error(err) {
+			console.error('callbacks.error', { err });
+			return undefined
+		},
 		auth: {
 			async allowClient(clientID, redirect) {
 				switch (clientID) {
