@@ -33,7 +33,7 @@ export default function Card(props: Props) {
 		isFullArt() || isLegacy()
 			? ''
 			: isSecret()
-				? '????? ??????????????? ?? ?? ? ?????? ??????'
+				? randomDescription()
 				: props.cardDescription;
 	const frameUrl = () => (isSecret() ? ASSETS.CARDS.DEFAULT_BASE_RARITY : props.frameUrl);
 	const imgUrl = () => (isSecret() ? ASSETS.CARDS.HIDDEN_CARD : props.imgUrl);
@@ -102,3 +102,23 @@ export default function Card(props: Props) {
 		</div>
 	);
 }
+
+function randomDescription() {
+	const len = Math.ceil(Math.random() * 70 + 50);
+
+	let str = "";
+	for (let i = 0; i < len; i++) {
+		const value = Math.random();
+		const char =
+			value < 0.1 ? 'i'
+			: value < 0.2 ? 'O'
+			: value < 0.3 ? 'e'
+			: value < 0.4 ? 'A'
+			: value < 0.5 ? '?' 
+			: ' '
+		str = str + char
+	}
+
+	return str
+}
+

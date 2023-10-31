@@ -12,7 +12,7 @@ if (Astro.url.hostname !== 'localhost') {
 		You are about to purge the database. This will delete <b>ALL</b> data in the database. This action
 		cannot be undone.
 	</p>
-	<form id="purge-form" action="/api/admin/purge-db">
+	<form id="purge-form" action="/api/admin/purge-db" method="post">
 		<p class="mt-4 text-lg">
 			To confirm, type
 			<code class="px-2 py-1 text-sm font-mono bg-gray-100 rounded-md" data-first-code-text
