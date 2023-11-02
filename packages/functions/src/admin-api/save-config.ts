@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { useSession } from 'sst/node/future/auth';
 import { ApiHandler, useJsonBody } from 'sst/node/api';
-import { updateBatchTwitchEvents } from '@lil-indigestion-cards/core/lib/site-config';
+import { updateBatchTwitchEvents } from '@lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { setAdminEnvSession } from '@lib/session';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();

@@ -1,11 +1,11 @@
 ---
 import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
-import { getUserAndCardInstances, createNewUser } from '@lil-indigestion-cards/core/lib/user';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { getUserAndCardInstances, createNewUser } from '@lib/user';
+import { getUserByLogin } from '@lib/twitch';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
+import { getAllPackTypes } from '@lib/pack-type';
 import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
@@ -78,7 +78,7 @@ const packTypes = await getAllPackTypes();
 			<AdminOnly>
 				<details>
 					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
-					<div class="rounded bg-gray-100 dark:bg-gray-800 p-3">
+					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
 						<p>User Id: {user.userId}</p>
 						<UserPackForms {user} {packTypes} client:load />
 					</div>
@@ -95,6 +95,15 @@ const packTypes = await getAllPackTypes();
 				<div class="ml-auto">
 					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
 					<a
+						transition:name={
+							pinnedCard.designId === 'lilindheart'
+								? 'lilindheart-hero-card'
+								: pinnedCard.designId === 'lilindcult'
+								? 'lilindcult-hero-card'
+								: pinnedCard.designId === 'ryan-of-the-wild'
+								? 'ryan-of-the-wild-hero-card'
+								: undefined
+						}
 						rel="prefetch"
 						href={`${routes.INSTANCES}/${pinnedCard.designId}/${
 							pinnedCard.instanceId ?? ''

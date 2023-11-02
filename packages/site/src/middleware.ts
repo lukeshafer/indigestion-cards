@@ -1,6 +1,6 @@
 import type { MiddlewareResponseHandler } from 'astro';
 import { sequence } from 'astro/middleware';
-import { getAdminUserById } from '@lil-indigestion-cards/core/lib/admin-user';
+import { getAdminUserById } from '@lib/admin-user';
 import { AUTH_TOKEN, PUBLIC_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
@@ -20,7 +20,7 @@ const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
 const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
 
-	// @ts-expect-error
+	// @ts-expect-error - cookie string is a fine input for this function
 	const session: Session = SSTSession.verify(cookie?.value ?? '');
 	ctx.locals.session = session;
 

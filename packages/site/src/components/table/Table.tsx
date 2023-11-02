@@ -16,7 +16,7 @@ interface Column {
 	font?: 'default' | 'title';
 }
 
-type Cell =
+export type Cell =
 	| string
 	| number
 	| {
@@ -87,6 +87,7 @@ export default function Table(props: {
 				if (!cellValue) return false;
 				return String(cellValue).toLowerCase().includes(filter);
 			})
+			// eslint-disable-next-line solid/reactivity 
 			.sort((a, b) => {
 				const aVal = getCellValue(a[props.search?.column ?? '']);
 				const bVal = getCellValue(b[props.search?.column ?? '']);
@@ -192,7 +193,7 @@ function TableHeading(
 	return (
 		<th
 			data-mode={props.mode}
-			onClick={props.sort === false ? undefined : props.onClick}
+			onClick={() => props.sort === false ? undefined : props.onClick?.()}
 			style={{ width: props.width }}
 			class="px-6 py-2 hover:bg-gray-200 dark:hover:bg-gray-700"
 			classList={{

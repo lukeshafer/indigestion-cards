@@ -1,9 +1,9 @@
 ---
 import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
-import { getPackTypesBySeasonId } from '@lil-indigestion-cards/core/lib/pack-type';
-import { getSeasonAndDesignsBySeasonId } from '@lil-indigestion-cards/core/lib/season';
-import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { getPackTypesBySeasonId } from '@lib/pack-type';
+import { getSeasonAndDesignsBySeasonId } from '@lib/season';
+import { getSiteConfig } from '@lib/site-config';
 import { routeNames, routes } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';

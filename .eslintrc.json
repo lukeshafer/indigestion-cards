@@ -4,6 +4,7 @@
 		"es2021": true,
 		"node": true
 	},
+	"ignorePatterns": ["dist/", "node_modules/"],
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
@@ -14,9 +15,7 @@
 			"env": {
 				"node": true
 			},
-			"files": [
-				".eslintrc.{js,cjs}"
-			],
+			"files": [".eslintrc.{js,cjs}"],
 			"parserOptions": {
 				"sourceType": "script"
 			}
@@ -27,13 +26,11 @@
 		"ecmaVersion": "latest",
 		"sourceType": "module"
 	},
-	"plugins": [
-		"@typescript-eslint",
-		"solid"
-	],
+	"plugins": ["@typescript-eslint", "solid"],
 	"rules": {
 		"prefer-const": "off",
 		"solid/style-prop": "off",
-		"solid/self-closing-comp": "off"
+		"solid/self-closing-comp": "off",
+		"@typescript-eslint/triple-slash-reference": "off"
 	}
 }

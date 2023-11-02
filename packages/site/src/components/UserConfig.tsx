@@ -1,13 +1,12 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
-import type { TwitchUser } from '@lil-indigestion-cards/core/lib/twitch';
+import type { TwitchUser } from '@lib/twitch';
 import UserIcon from './icons/UserIcon';
 
-// @ts-expect-error - This function IS used
-function clickOutside(el: Element, accessor: () => any) {
+function clickOutside(el: Element, close: () => void) {
 	const onClick = (e: MouseEvent) => {
 		if (!el.contains(e.target as Element)) {
 			e.stopPropagation();
-			accessor()?.();
+			close();
 		}
 	};
 	document.body.addEventListener('click', onClick);
@@ -22,6 +21,7 @@ export default function UserConfig(props: {
 }) {
 	const [isOpen, setIsOpen] = createSignal(false);
 	const [disableAnimations, setDisableAnimations] = createSignal(
+		// eslint-disable-next-line solid/reactivity
 		props.disableAnimations ?? false
 	);
 	const [colorTheme, setColorTheme] = createSignal<'light' | 'dark'>('light');
@@ -74,7 +74,7 @@ export default function UserConfig(props: {
 			<Show when={isOpen()}>
 				<menu
 					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20 dark:text-gray-100"
-					use: clickOutside={() => setIsOpen(false)}>
+					ref={(el) => clickOutside(el, () => setIsOpen(false))}>
 					{props.user ? (
 						<a
 							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
@@ -84,7 +84,7 @@ export default function UserConfig(props: {
 					) : (
 						<a
 							class="font-display pt-2 text-center font-bold underline"
-							href="/login"
+							href="/api/auth/login"
 							data-astro-reload>
 							Login with Twitch
 						</a>
@@ -115,16 +115,11 @@ export default function UserConfig(props: {
 							Dark Mode
 						</button>
 						{props.user ? (
-							<a
-								class="flex gap-4 font-medium hover:underline"
-								onClick={() => {
-									// change page manually to avoid using cached data from prefetch
-									window.location.href = `/api/auth/logout`;
-								}}
-								data-astro-reload
-								href="/api/auth/logout">
-								Logout
-							</a>
+							<form method="post" action="/api/auth/logout">
+								<button class="flex gap-4 font-medium hover:underline">
+									Logout
+								</button>
+							</form>
 						) : null}
 					</ul>
 				</menu>

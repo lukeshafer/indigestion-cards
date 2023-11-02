@@ -1,4 +1,4 @@
-import Table from '@/components/table/Table';
+import Table, { type Cell } from '@/components/table/Table';
 import type { Admin } from '@lil-indigestion-cards/core/db/admins';
 import DeleteAdminUserButton from '@/components/admin-users/DeleteAdminUserButton';
 import { addingAdminUser, setAddingAdminUser } from '@/lib/client/state';
@@ -25,25 +25,32 @@ export function AddAdminButton() {
 
 export default function AdminUsersTable(props: { users: Admin[]; currentUser: string }) {
 	const [adminUsers, { refetch }] = createResource(
-		async () => {
-			const res = await fetch(API.ADMIN_USER, {
+		() =>
+			fetch(API.ADMIN_USER, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
 				},
-			});
-			const data = await res.json();
-			return adminUsersSchema.parse(data);
-		},
+			})
+				.then((res) => res.json())
+				.then((data) => adminUsersSchema.parse(data)),
+		// eslint-disable-next-line solid/reactivity
 		{ initialValue: props.users }
 	);
 
 	const [newUsername, setNewUsername] = createSignal('');
 	const newUser = () => ({
-		username: (
-			<TextInput inputOnly name="username" label="Username" setValue={setNewUsername} />
-		),
-		actions: (
-			<div class="mx-auto w-fit">
+		username: {
+			element:
+				<TextInput
+					inputOnly
+					name="username"
+					label="Username"
+					setValue={setNewUsername}
+				/>,
+			value: newUsername()
+		} as Cell,
+		actions: {
+			element: <div class="mx-auto w-fit">
 				<Form
 					action={API.ADMIN_USER}
 					method="post"
@@ -54,8 +61,9 @@ export default function AdminUsersTable(props: { users: Admin[]; currentUser: st
 					<input type="hidden" name="username" value={newUsername()} />
 					<SubmitButton>Add</SubmitButton>
 				</Form>
-			</div>
-		),
+			</div>,
+			value: '',
+		},
 	});
 
 	const isCurrentUser = (userId: string) => userId === props.currentUser;
@@ -82,19 +90,18 @@ export default function AdminUsersTable(props: { users: Admin[]; currentUser: st
 			]}
 			rows={adminUsers()
 				.map((user) => ({
-					username: user.username,
+					username: user.username as Cell,
 					actions: isCurrentUser(user.userId)
 						? ''
 						: {
-								element: (
-									<div class="m-auto w-fit">
-										<DeleteAdminUserButton {...user} onSuccess={refetch} />
-									</div>
-								),
-								value: '',
-						  },
+							element: (
+								<div class="m-auto w-fit">
+									<DeleteAdminUserButton {...user} onSuccess={refetch} />
+								</div>
+							),
+							value: '',
+						} as Cell,
 				}))
-				// @ts-ignore
 				.concat(addingAdminUser() === true ? [newUser()] : [])}
 		/>
 	);

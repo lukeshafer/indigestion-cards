@@ -1,5 +1,5 @@
-import { ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { getAllAdminUsers } from '@lil-indigestion-cards/core/lib/admin-user';
+import { ProtectedApiHandler } from '@lib/api';
+import { getAllAdminUsers } from '@lib/admin-user';
 
 export const handler = ProtectedApiHandler(async () => {
 	const users = await getAllAdminUsers();

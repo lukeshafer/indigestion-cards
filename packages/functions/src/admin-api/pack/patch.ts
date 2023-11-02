@@ -1,8 +1,8 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { updatePackUser } from '@lil-indigestion-cards/core/lib/pack';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
-import { getUserByUserName } from '@lil-indigestion-cards/core/lib/user';
-import { getPackById } from '@lil-indigestion-cards/core/lib/pack';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { updatePackUser } from '@lib/pack';
+import { getUserByLogin } from '@lib/twitch';
+import { getUserByUserName } from '@lib/user';
+import { getPackById } from '@lib/pack';
 
 export const handler = ProtectedApiHandler(async () => {
 	const validateResult = useValidateFormData({

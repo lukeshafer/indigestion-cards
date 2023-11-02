@@ -1,19 +1,11 @@
 import { type APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
-import {
-	verifyDiscordRequest,
-	parseRequestBody,
-	MESSAGE_TYPE,
-	getHeaders,
-} from '@lil-indigestion-cards/core/lib/twitch';
-import {
-	getTwitchEventById,
-	checkIsDuplicateTwitchEventMessage,
-} from '@lil-indigestion-cards/core/lib/site-config';
-import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
+import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@lib/twitch';
+import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@lib/site-config';
+import { getPackTypeById } from '@lib/pack-type';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import { setAdminEnvSession } from '@lib/session';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 	if (!verifyDiscordRequest(event)) {
@@ -61,7 +53,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 
 	const eventBridge = new EventBridge();
 	switch (body.type) {
-		case 'channel.subscription.gift':
+		case 'channel.subscription.gift': {
 			console.log(`Sub gifted by ${body.event.user_name}. Subs gifted: ${body.event.total}`);
 
 			const SUBS_PER_PACK = 5;
@@ -105,10 +97,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				],
 			});
 			break;
-		case 'channel.channel_points_custom_reward_redemption.add':
+		}
+		case 'channel.channel_points_custom_reward_redemption.add': {
 			console.log(
-				`Channel point reward redeemed by ${
-					body.event.user_name
+				`Channel point reward redeemed by ${body.event.user_name
 				}. Reward info: ${JSON.stringify(
 					{
 						rewardId: body.event.reward.id,
@@ -146,9 +138,10 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				],
 			});
 			break;
+		}
 		case 'channel.channel_points_custom_reward.add':
 		case 'channel.channel_points_custom_reward.update':
-		case 'channel.channel_points_custom_reward.remove':
+		case 'channel.channel_points_custom_reward.remove': {
 			console.log(`Channel point reward updated. Event type: ${body.type}`);
 			await eventBridge.putEvents({
 				Entries: [
@@ -161,6 +154,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				],
 			});
 			break;
+		}
 	}
 	return { statusCode: 200 };
 };

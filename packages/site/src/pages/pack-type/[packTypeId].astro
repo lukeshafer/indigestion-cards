@@ -3,8 +3,8 @@ import { PageTitle, Heading } from '@/components/text';
 import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
 import { routeNames } from '@/constants';
 import Page from '@/layouts/Page.astro';
-import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
-import { getCardPoolFromType } from '@lil-indigestion-cards/core/lib/card-pool';
+import { getPackTypeById } from '@lib/pack-type';
+import { getCardPoolFromType } from '@lib/card-pool';
 import Table from '@/components/table/Table';
 
 const packTypeId = Astro.params.packTypeId;

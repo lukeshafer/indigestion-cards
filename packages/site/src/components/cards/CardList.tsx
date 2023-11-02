@@ -42,6 +42,7 @@ export default function CardList(props: {
 		props.sortOnlyBy?.length
 			? sortTypes.filter((type) => props.sortOnlyBy?.includes(type.value))
 			: sortTypes.slice();
+	// eslint-disable-next-line solid/reactivity
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
 
 	const sortedCards = () => sortCards({ cards: props.cards, sort: sort() });
@@ -97,8 +98,9 @@ export default function CardList(props: {
 	);
 }
 
-function sortCards(props: { cards: CardType[]; sort: SortType | (string & {}) }) {
-	const { cards, sort } = props;
+// eslint-disable-next-line @typescript-eslint/ban-types
+function sortCards(args: { cards: CardType[]; sort: SortType | (string & {}) }) {
+	const { cards, sort } = args;
 
 	switch (sort) {
 		case 'card-name-asc':

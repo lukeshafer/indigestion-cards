@@ -1,5 +1,5 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lil-indigestion-cards/core/lib/api';
-import { createSeason } from '@lil-indigestion-cards/core/lib/season';
+import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { createSeason } from '@lib/season';
 
 export const handler = ProtectedApiHandler(async () => {
 	const result = useValidateFormData({

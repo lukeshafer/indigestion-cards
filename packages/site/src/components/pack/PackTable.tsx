@@ -34,26 +34,18 @@ function PackRow(props: Pack) {
 	// eslint-disable-next-line solid/reactivity
 	const [username, setUsername] = createSignal(props.username);
 
+	const usernameElement = <Username
+		username={username()}
+		isEditing={isEditing()}
+		setUsername={setUsername}
+	/>
+
 	return {
 		get username() {
-			return (
-				<>
-					{isEditing()
-						? {
-								element: (
-									<TextInput
-										inputOnly
-										name="username"
-										label="Username"
-										value={username()}
-										setValue={setUsername}
-									/>
-								),
-								value: username() ?? 'None',
-							}
-						: username() ?? 'None'}
-				</>
-			);
+			return {
+				element: usernameElement,
+				value: username() ?? 'None',
+			};
 		},
 		get packTypeName() {
 			return props.packTypeName;
@@ -68,7 +60,9 @@ function PackRow(props: Pack) {
 							onsuccess={() => setIsEditing(false)}>
 							<input type="hidden" name="packId" value={props.packId} />
 							<input type="hidden" name="username" value={username()} />
-							<SubmitButton>Save</SubmitButton>
+							<div class="mx-auto">
+								<SubmitButton>Save</SubmitButton>
+							</div>
 						</Form>
 					) : (
 						<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
@@ -78,4 +72,23 @@ function PackRow(props: Pack) {
 			value: '',
 		},
 	};
+}
+
+function Username(props: {
+	username: string | undefined;
+	isEditing: boolean;
+	setUsername: (value: string) => void;
+}) {
+	console.log('test')
+
+	return <>{
+		props.isEditing ?
+			<TextInput
+				inputOnly
+				name="username"
+				label="Username"
+				value={props.username ?? ''}
+				setValue={(value) => props.setUsername(value)}
+			/> : (props.username ?? 'None')
+	}</>
 }

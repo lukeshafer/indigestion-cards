@@ -9,8 +9,8 @@ import {
 	SUBSCRIPTION_TYPE,
 	type SubscriptionType,
 	deleteTwitchEventSubscription,
-} from '@lil-indigestion-cards/core/lib/twitch';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+} from '@lib/twitch';
+import { setAdminEnvSession } from '@lib/session';
 import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {

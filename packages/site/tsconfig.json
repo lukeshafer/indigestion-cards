@@ -8,7 +8,8 @@
 		"noUnusedParameters": true,
 		"paths": {
 			"@/*": ["src/*"],
-			"@lil-indigestion-cards/core/*": ["../core/src/*"]
+			"@lil-indigestion-cards/core/*": ["../core/src/*"],
+			"@lib/*": ["../core/src/lib/*"]
 		},
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js"

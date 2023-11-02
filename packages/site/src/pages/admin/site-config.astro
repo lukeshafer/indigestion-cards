@@ -1,8 +1,8 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
-import { getAllRarities } from '@lil-indigestion-cards/core/lib/rarity';
-import { getTwitchEvents, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { getAllPackTypes } from '@lib/pack-type';
+import { getAllRarities } from '@lib/rarity';
+import { getTwitchEvents, getSiteConfig } from '@lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
 import { PageTitle, PageHeader } from '@/components/text';

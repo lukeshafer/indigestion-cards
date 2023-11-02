@@ -32,6 +32,7 @@ export function Sites({ app, stack }: StackContext) {
 			config.TWITCH_CLIENT_SECRET,
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_ARN,
+			config.DOMAIN_NAME,
 		],
 		customDomain:
 			app.mode === 'dev'

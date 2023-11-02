@@ -7,9 +7,8 @@
 		"noUnusedParameters": true,
 		"strict": true,
 		"paths": {
-			"@lil-indigestion-cards/core/*": [
-				"../core/src/*"
-			]
+			"@lil-indigestion-cards/core/*": ["../core/src/*"],
+			"@lib/*": ["../core/src/lib/*"]
 		}
 	}
 }
