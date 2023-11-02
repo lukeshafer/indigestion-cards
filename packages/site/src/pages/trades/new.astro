@@ -1,7 +1,4 @@
 ---
-// CONFIG
-import { Api } from 'sst/node/api';
-
 // UI
 import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
@@ -24,5 +21,5 @@ const { cardInstances } = (await getUserAndCardInstances({ username })) ?? {};
 	<PageHeader>
 		<PageTitle>New Trade</PageTitle>
 	</PageHeader>
-	<NewTrade {userId} {username} apiURL={Api.trpcApi.url} {cardInstances} client:load />
+	<NewTrade {userId} {username} {cardInstances} client:load />
 </Page>

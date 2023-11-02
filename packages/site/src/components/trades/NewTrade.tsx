@@ -16,7 +16,6 @@ type TradeState = {
 export default function NewTrade(props: {
 	userId: string;
 	username: string;
-	apiURL: string;
 	cardInstances?: CardInstance[];
 }) {
 	const [state, setState] = createStore<TradeState>({

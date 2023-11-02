@@ -4,7 +4,6 @@ import '@fontsource-variable/montserrat';
 //import 'open-props/colors';
 import { ViewTransitions } from 'astro:transitions';
 import { ASSETS } from '@/constants';
-import { Api } from 'sst/node/api';
 
 interface Props {
 	title: string;
@@ -38,7 +37,6 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
-		<meta name="indigestion-cards:trpc_url" content={Api.trpcApi.url} />
 		<script is:inline>
 		if (
 			localStorage.theme === 'dark' ||
@@ -51,12 +49,6 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 			document.documentElement.classList.remove('dark');
 			localStorage.theme = 'light';
 		}
-		</script>
-		<script>
-			const trpcUrl = document.querySelector<HTMLMetaElement>(
-				'meta[name="indigestion-cards:trpc_url"]'
-			)?.content;
-			localStorage.TRPC_URL = trpcUrl;
 		</script>
 		<title>
 			{

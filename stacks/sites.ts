@@ -22,7 +22,6 @@ export function Sites({ app, stack }: StackContext) {
 			table,
 			adminApi,
 			twitchApi,
-			trpcApi,
 			frameBucket,
 			cardDesignBucket,
 			frameDraftBucket,
@@ -34,6 +33,9 @@ export function Sites({ app, stack }: StackContext) {
 			config.TWITCH_TOKENS_ARN,
 			config.DOMAIN_NAME,
 		],
+		environment: {
+			PUBLIC_TRPC_URL: trpcApi.url,
+		},
 		customDomain:
 			app.mode === 'dev'
 				? undefined
