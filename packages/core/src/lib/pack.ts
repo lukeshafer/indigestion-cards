@@ -7,6 +7,7 @@ import { users } from '../db/users';
 import { type CardInstance, cardInstances } from '../db/cardInstances';
 import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
 import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
+import { PackTypeIsOutOfCardsError } from './errors';
 
 export async function getAllPacks(): Promise<Pack[]> {
 	const result = await packs.query.allPacks({}).go();
@@ -49,6 +50,7 @@ export async function givePackToUser(packDetails: PackDetails) {
 
 	const cardPool = await getCardPoolFromType(packDetails.packType);
 
+	let errors: PackTypeIsOutOfCardsError[] = []
 	for (let i = 0; i < packDetails.packCount; i++) {
 		await createPack({
 			username: packDetails.username,
@@ -59,7 +61,14 @@ export async function givePackToUser(packDetails: PackDetails) {
 				packTypeId: packDetails.packType.packTypeId,
 				packTypeName: packDetails.packType.packTypeName,
 			},
+		}).catch((err) => {
+			if (err instanceof PackTypeIsOutOfCardsError) errors.push(err)
+			else throw err;
 		});
+	}
+
+	if (errors.length) {
+		throw new PackTypeIsOutOfCardsError(errors[0].reason, errors.length)
 	}
 }
 
@@ -137,15 +146,15 @@ export async function deleteFirstPackForUser(args: {
 				packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-						users
-							.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({
-								packCount: (user?.packCount || 1) - 1,
-								cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
-							})
-							.commit(),
-					]
+							users
+								.patch({ userId: pack.userId })
+								// if packCount is null OR 0, set it to 0, otherwise subtract 1
+								.set({
+									packCount: (user?.packCount || 1) - 1,
+									cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
+								})
+								.commit(),
+					  ]
 					: []),
 				...(pack.cardDetails?.map((card) =>
 					cardInstances
@@ -196,15 +205,15 @@ export async function deletePack(args: { packId: string }) {
 			packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-					users
-						.patch({ userId: pack.userId })
-						// if packCount is null OR 0, set it to 0, otherwise subtract 1
-						.set({
-							packCount: (user?.packCount || 1) - 1,
-							cardCount: user?.cardCount ? user.cardCount - openCount : 0,
-						})
-						.commit(),
-				]
+						users
+							.patch({ userId: pack.userId })
+							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+							.set({
+								packCount: (user?.packCount || 1) - 1,
+								cardCount: user?.cardCount ? user.cardCount - openCount : 0,
+							})
+							.commit(),
+				  ]
 				: []),
 			...(pack.cardDetails?.map((card) =>
 				cardInstances
@@ -244,7 +253,7 @@ export async function createPack(args: {
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			(await createNewUser({ userId: args.userId, username: args.username }))
+			  (await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: CardInstance[] = [];
@@ -271,11 +280,11 @@ export async function createPack(args: {
 		.write(({ users, packs, cardInstances }) => [
 			...(user && args.userId && args.username
 				? [
-					users
-						.patch({ userId: user.userId })
-						.set({ packCount: (user.packCount ?? 0) + 1 })
-						.commit(),
-				]
+						users
+							.patch({ userId: user.userId })
+							.set({ packCount: (user.packCount ?? 0) + 1 })
+							.commit(),
+				  ]
 				: []),
 			packs
 				.create({
