@@ -2,13 +2,12 @@
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lib/pack-type';
 import { getAllRarities } from '@lib/rarity';
-import { getTwitchEvents, getSiteConfig } from '@lib/site-config';
+import { getTwitchEvents, getSiteConfig, getRarityRanking } from '@lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
 import { PageTitle, PageHeader } from '@/components/text';
 import SiteConfigForm from '@/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
-import ShowChatters from '@/components/site-config/ShowChatters';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),
@@ -23,6 +22,9 @@ const baseRarityValue = new URLSearchParams(
 		frameUrl: rarities[0].frameUrl,
 	}
 ).toString();
+
+console.log('siteConfig', siteConfig);
+const initialRanking = getRarityRanking(siteConfig);
 
 const giftSubEvent = twitchEvents.data.find(
 	(event) =>
@@ -56,10 +58,10 @@ const rewards = twitchEvents.data
 			twitchEvents={rewards}
 			{giftSubEvent}
 			{baseRarityValue}
+			{initialRanking}
 			client:load
 		/>
 	</div>
 	<RefreshTwitchEventsButton client:load />
 	<TwitchLoginButton />
-	<ShowChatters client:load />
 </Page>

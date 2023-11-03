@@ -3,7 +3,10 @@ import { z } from 'zod';
 
 import { validateSearchParams, ProtectedApiHandler } from '@lib/api';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import { updateBatchTwitchEvents, updateSiteConfig } from '@lib/site-config';
+
+type RarityRanking = NonNullable<SiteConfig['rarityRanking']>;
 
 export const handler = ProtectedApiHandler(async () => {
 	const params = useFormData();
@@ -41,7 +44,9 @@ export const handler = ProtectedApiHandler(async () => {
 		}
 	});
 
-	const siteConfig = updateSiteConfig({ baseRarity: rarityObject, messages: [] });
+	const rarityRanking = parseRanking(params?.get('rarityRanking') ?? '{}');
+
+	const siteConfig = updateSiteConfig({ baseRarity: rarityObject, messages: [], rarityRanking });
 	const batchTwitchEvents = updateBatchTwitchEvents(events);
 
 	await Promise.all([siteConfig, batchTwitchEvents]);
@@ -75,5 +80,25 @@ function parseEventValue(value: string): {
 			packTypeId: undefined,
 			packTypeName: undefined,
 		};
+	}
+}
+
+function parseRanking(value: string) {
+	const rankingSchema = z.array(
+		z.object({
+			rarityId: z.string(),
+			rarityName: z.string(),
+		})
+	);
+
+	try {
+		const parsed = rankingSchema.parse(JSON.parse(value));
+		return parsed.map((rarity, index) => ({
+			rarityId: rarity.rarityId,
+			rarityName: rarity.rarityName,
+			ranking: index + 1,
+		})) satisfies RarityRanking;
+	} catch {
+		return [];
 	}
 }

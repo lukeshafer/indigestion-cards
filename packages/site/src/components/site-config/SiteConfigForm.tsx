@@ -5,6 +5,7 @@ import type { TwitchEvent } from '@lil-indigestion-cards/core/db/twitchEvents';
 import { API } from '@/constants';
 import { Show, createSignal } from 'solid-js';
 import Table from '../table/Table';
+import RarityRanking, { type RarityRankingRecord } from './RarityRanking';
 
 export default function SiteConfigForm(props: {
 	baseRarityValue: string;
@@ -12,6 +13,7 @@ export default function SiteConfigForm(props: {
 	twitchEvents: TwitchEvent[];
 	packTypes: PackType[];
 	giftSubEvent: TwitchEvent;
+	initialRanking: Record<string, RarityRankingRecord[number]>;
 }) {
 	const [isEdited, setIsEdited] = createSignal(false);
 	// eslint-disable-next-line solid/reactivity
@@ -39,6 +41,11 @@ export default function SiteConfigForm(props: {
 					}).toString();
 					return { value, label: rarity.rarityName };
 				})}
+			/>
+			<RarityRanking
+				rarities={props.rarities}
+				initialRanking={props.initialRanking}
+				setIsEdited={() => setIsEdited(true)}
 			/>
 			<Table
 				search={{
