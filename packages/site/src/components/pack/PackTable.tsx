@@ -6,26 +6,34 @@ import { API } from '@/constants';
 
 export default function PackTable(props: { packs: Pack[] }) {
 	return (
-		<Table
-			columns={[
-				{
-					name: 'username',
-					label: 'Owner',
-					width: '50%',
-					font: 'title',
-				},
-				{
-					name: 'packTypeName',
-					label: 'Pack Type',
-				},
-				{
-					name: 'actions',
-					label: 'Actions',
-					sort: false,
-				},
-			]}
-			rows={props.packs.map(PackRow)}
-		/>
+		<>
+			{props.packs.length > 0 ? (
+			<Table
+				columns={[
+					{
+						name: 'username',
+						label: 'Owner',
+						width: '50%',
+						font: 'title',
+					},
+					{
+						name: 'packTypeName',
+						label: 'Pack Type',
+					},
+					{
+						name: 'actions',
+						label: 'Actions',
+						sort: false,
+					},
+				]}
+				rows={props.packs.map(PackRow)}
+			/>
+			) : (
+				<div class="text-center">
+					<p class="text-lg">No packs found.</p>
+				</div>
+			)}
+		</>
 	);
 }
 
@@ -79,8 +87,6 @@ function Username(props: {
 	isEditing: boolean;
 	setUsername: (value: string) => void;
 }) {
-	console.log('test')
-
 	return <>{
 		props.isEditing ?
 			<TextInput

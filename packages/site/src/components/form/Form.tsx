@@ -94,10 +94,18 @@ export function Form(props: {
 			}
 			if (props.successRefresh) location.reload();
 		} else {
+			const contentType = response.headers.get('content-type');
+			const isHTML = contentType?.startsWith('text/html');
+
 			useViewTransition(() => {
 				setAlerts((alerts) => [
 					...alerts,
-					{ message: responseBody || 'There was an error.', type: 'error' },
+					{
+						message: isHTML
+							? 'There was an error'
+							: responseBody || 'There was an error.',
+						type: 'error',
+					},
 				]);
 			});
 			if (props.errorRedirect) {
@@ -395,10 +403,16 @@ export function Anchor(props: { children: string; href: string; type?: 'submit' 
 	);
 }
 
-export function SubmitButton(props: { children?: JSX.Element; onClick?: () => void }) {
+export function SubmitButton(props: {
+	children?: JSX.Element;
+	onClick?: () => void;
+	disabled?: boolean;
+}) {
 	return (
 		<button
 			type="submit"
+			disabled={props.disabled}
+			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
 			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Submit'}

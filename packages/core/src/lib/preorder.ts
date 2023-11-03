@@ -1,5 +1,5 @@
 import { ElectroError } from 'electrodb';
-import { preorders, type CreatePreorder } from '../db/preorders';
+import { preorders, type CreatePreorder, type Preorder } from '../db/preorders';
 
 export async function createPreorder(args: CreatePreorder) {
 	console.log('Creating preorder', args);
@@ -15,7 +15,7 @@ export async function createPreorder(args: CreatePreorder) {
 			// aws error, rarity already exists
 			return {
 				success: false,
-				error: 'Rarity already exists',
+				error: 'Preorder already exists',
 			};
 
 		// default
@@ -31,6 +31,13 @@ export async function getAllPreorders() {
 
 	const result = await preorders.query.primary({}).go();
 	return result.data.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+}
+
+export async function deletePreorder(preorder: Preorder) {
+	console.log('Deleting preorder');
+
+	const result = await preorders.delete(preorder).go();
+	return result.data;
 }
 
 export async function getPreordersByUser(args: { username: string }) {

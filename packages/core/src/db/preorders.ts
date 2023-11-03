@@ -35,7 +35,7 @@ export const preorders = new Entity(
 				},
 				sk: {
 					field: 'sk',
-					composite: ['username', 'id'],
+					composite: ['username', 'id', 'createdAt'],
 				},
 			},
 		},
