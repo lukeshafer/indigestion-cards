@@ -81,6 +81,11 @@ export function API({ app, stack }: StackContext) {
 					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
 				}
 				: {}),
+			// PREORDER
+			'POST /preorder': 'packages/functions/src/admin-api/preorder/post.handler',
+			// CONVERT-PREORDERS-TO-PACKS
+			'POST /convert-all-preorders-to-pack':
+				'packages/functions/src/admin-api/convert-all-preorders-to-pack/post.handler',
 
 			// USER ENDPOINTS
 			// USER

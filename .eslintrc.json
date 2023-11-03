@@ -31,6 +31,7 @@
 		"prefer-const": "off",
 		"solid/style-prop": "off",
 		"solid/self-closing-comp": "off",
+		"no-mixed-spaces-and-tabs": "off",
 		"@typescript-eslint/triple-slash-reference": "off"
 	}
 }
