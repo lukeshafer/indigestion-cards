@@ -6,12 +6,15 @@ import Card from '../cards/Card';
 import { TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { getCardSearcher } from '@/lib/client/search';
+import { Heading } from '@/components/text';
 
 type TradeState = {
 	offeredCards: TradeCard[];
 	requestedCards: TradeCard[];
 	search: string;
 };
+
+type TradeCardUi = CardInstance & { checked: boolean };
 
 export default function NewTrade(props: {
 	userId: string;
@@ -28,6 +31,7 @@ export default function NewTrade(props: {
 		() => {
 			return trpc.cards.byUserId.query({ username: props.username });
 		},
+		// eslint-disable-next-line solid/reactivity
 		{ initialValue: props.cardInstances ?? [] }
 	);
 
@@ -37,7 +41,7 @@ export default function NewTrade(props: {
 			get checked() {
 				return state.offeredCards.some((offered) => offered.instanceId === card.instanceId);
 			},
-		}));
+		})) satisfies TradeCardUi[];
 
 	const searcher = createMemo(() => getCardSearcher(cards()));
 	const searchResults = () => {
@@ -46,8 +50,8 @@ export default function NewTrade(props: {
 	};
 
 	return (
-		<div>
-			Your offer:
+		<section>
+			<Heading>Your offer</Heading>
 			<ul>
 				<For each={state.offeredCards}>
 					{(card) => (
@@ -65,53 +69,75 @@ export default function NewTrade(props: {
 					setState('search', value);
 				}}
 			/>
-			<ul>
-				<For each={searchResults()}>
-					{(card) => (
-						<li>
-							<CardCheckbox
-								card={card}
-								addCard={() => {
-									setState(
-										'offeredCards',
-										produce((draft) => draft.push(card))
-									);
-								}}
-								removeCard={() => {
-									setState(
-										'offeredCards',
-										produce((draft) => {
-											const index = draft.findIndex(
-												(c) => c.instanceId === card.instanceId
-											);
-											if (index !== -1) draft.splice(index, 1);
-										})
-									);
-								}}
-							/>
-						</li>
-					)}
-				</For>
-			</ul>
-		</div>
+			<CardList
+				cards={searchResults()}
+				addCard={(card) => {
+					setState(
+						'offeredCards',
+						produce((draft) => draft.push(card))
+					);
+				}}
+				removeCard={(card) => {
+					setState(
+						'offeredCards',
+						produce((draft) => {
+							let index = draft.findIndex((c) => c.instanceId === card.instanceId);
+							while (index !== -1) {
+								draft.splice(index, 1);
+								index = draft.findIndex((c) => c.instanceId === card.instanceId);
+							}
+							//if (index !== -1) draft.splice(index, 1);
+						})
+					);
+				}}
+			/>
+		</section>
 	);
 }
 
-function CardCheckbox(props: { card: TradeCard; addCard: () => void; removeCard: () => void }) {
+function CardList(props: {
+	cards: TradeCardUi[];
+	addCard: (card: TradeCardUi) => void;
+	removeCard: (card: TradeCardUi) => void;
+}) {
 	return (
-		<label class="cursor-pointer">
-			<Card {...props.card} scale={0.5} />
-			<input
-				type="checkbox"
-				onInput={(e) => {
-					if (e.currentTarget.checked) {
-						props.addCard();
-					} else {
-						props.removeCard();
-					}
-				}}
-			/>
-			{props.card.cardName}, {props.card.rarityName}, {props.card.cardNumber}
-		</label>
+		<ul class="flex flex-wrap gap-4">
+			<For each={props.cards}>
+				{(card) => (
+					<CardCheckbox
+						card={card}
+						addCard={() => props.addCard(card)}
+						removeCard={() => props.removeCard(card)}
+					/>
+				)}
+			</For>
+		</ul>
+	);
+}
+
+function CardCheckbox(props: { card: TradeCardUi; addCard: () => void; removeCard: () => void }) {
+	return (
+		<li class="m-2" classList={{ 'outline outline-4 outline-brand-main': props.card.checked }}>
+			<label class="cursor-pointer text-center">
+				<Card {...props.card} scale={0.5} />
+				<input
+					class="sr-only"
+					checked={props.card.checked}
+					type="checkbox"
+					onInput={(e) => {
+						if (e.currentTarget.checked) {
+							props.addCard();
+						} else {
+							props.removeCard();
+						}
+					}}
+				/>
+				<p class="font-bold">{props.card.cardName}</p>
+				<p>{props.card.rarityName}</p>
+				<p>
+					{props.card.cardNumber} / {props.card.totalOfType}
+				</p>
+			</label>
+		</li>
 	);
 }

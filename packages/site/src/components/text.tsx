@@ -29,6 +29,10 @@ export function PageTitle(
 	);
 }
 
+/**
+ * A heading component that is styled to be used as a section header.
+ * @param props.heading The heading level to use. Defaults to h2.
+ */
 export function Heading(
 	props: ParentProps<
 		{

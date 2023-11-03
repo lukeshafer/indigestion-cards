@@ -1,7 +1,7 @@
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import Fuse from 'fuse.js';
 
-export function getCardSearcher(cards: CardInstance[]) {
+export function getCardSearcher(cards: ( CardInstance & { checked: boolean } )[]) {
 	const fuse = new Fuse(cards, {
 		keys: [
 			{

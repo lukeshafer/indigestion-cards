@@ -16,8 +16,9 @@ const { cardInstances } = (await getUserAndCardInstances({ username })) ?? {};
 ---
 
 <Page
+	wide
 	title="New Trade"
-	breadcrumbs={[{ label: 'New Trade', href: routes.TRADES }, { label: routeNames.TRADES }]}>
+	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'New Trade' }]}>
 	<PageHeader>
 		<PageTitle>New Trade</PageTitle>
 	</PageHeader>
