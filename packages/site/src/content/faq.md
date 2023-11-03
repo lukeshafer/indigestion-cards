@@ -53,3 +53,6 @@ Great! Go to the #indigestion-cards channel in discord and tell us your idea :)
 
 If you encounter a problem, you can either DM Ryan on discord or post in the
 #indigestion-cards channel on discord with a description of what’s happening!
+
+### Did you come up with this all by yourself?
+Not at all! Streamer Dan Gheesling launched his "dangPacks" at https://dangpacks.com/ and originated the whole idea/concept of trading cards based around channel lore. And our web developer Luke S. built every part of the functionality of Indigestion Cards and our website. Check out him here: 
