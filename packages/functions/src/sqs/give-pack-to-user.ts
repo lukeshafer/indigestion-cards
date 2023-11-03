@@ -32,9 +32,15 @@ export async function handler(event: SQSEvent) {
 				)
 			);
 			await givePackToUser(packDetails).catch((error) => {
+				console.log('Error giving pack to user: ', error?.message);
 				if (error instanceof PackTypeIsOutOfCardsError) {
+					console.log('Pack type is out of cards, creating preorder(s) instead', { error })
+
 					for (let i = 0; i < error.count; i++) {
-						createPreorder({ username: packDetails.username });
+						createPreorder({
+							username: packDetails.username,
+							userId: packDetails.userId,
+						});
 					}
 				} else throw error;
 			});
