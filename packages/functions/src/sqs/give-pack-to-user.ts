@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { givePackToUser } from '@lib/pack';
 import { packSchema } from '@lib/entity-schemas';
 import { setAdminEnvSession } from '@lib/session';
+import { createPreorder } from '@lib/preorder';
+import { PackTypeIsOutOfCardsError } from '@lil-indigestion-cards/core/lib/errors';
 
 export async function handler(event: SQSEvent) {
 	console.log('Received event to give pack to user');
@@ -29,12 +31,23 @@ export async function handler(event: SQSEvent) {
 					2
 				)
 			);
-			await givePackToUser(packDetails);
+			await givePackToUser(packDetails).catch((error) => {
+				console.log('Error giving pack to user: ', error?.message);
+				if (error instanceof PackTypeIsOutOfCardsError) {
+					console.log('Pack type is out of cards, creating preorder(s) instead', { error })
+
+					for (let i = 0; i < error.count; i++) {
+						createPreorder({
+							username: packDetails.username,
+							userId: packDetails.userId,
+						});
+					}
+				} else throw error;
+			});
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				throw new Error('Invalid event');
-			}
-			if (error instanceof Error) {
+			} else if (error instanceof Error) {
 				console.error(error.message);
 				throw error;
 			}

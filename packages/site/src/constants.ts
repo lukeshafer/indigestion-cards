@@ -29,6 +29,8 @@ const api_paths = {
 	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
 	STATS: '/stats',
 	TWITCH_CHATTERS: '/twitch/chatters',
+	PREORDER: '/preorder',
+	CONVERT_PREORDERS: '/convert-all-preorders-to-pack',
 };
 
 export const API = new Proxy(api_paths, {

@@ -52,6 +52,26 @@ export const siteConfig = new Entity(
 					},
 				},
 			},
+			rarityRanking: {
+				type: 'list',
+				items: {
+					type: 'map',
+					properties: {
+						rarityId: {
+							type: 'string',
+							required: true,
+						},
+						rarityName: {
+							type: 'string',
+							required: true,
+						},
+						ranking: {
+							type: 'number',
+							required: true,
+						}
+					},
+				},
+			},
 			...auditAttributes('siteConfig'),
 		},
 		indexes: {

@@ -1,11 +1,13 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllUsers } from '@lib/user';
+import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
 
 const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.username));
+const preorders = await getAllPreorders();
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
@@ -13,6 +15,6 @@ const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.us
 		<PageTitle>Users</PageTitle>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
-		<UsersTable users={users} client:load />
+		<UsersTable {users} {preorders} client:load />
 	</div>
 </Page>

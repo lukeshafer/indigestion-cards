@@ -1,10 +1,19 @@
 import Table from '@/components/table/Table';
 import type { User } from '@lil-indigestion-cards/core/db/users';
+import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
 import { routes } from '@/constants';
 import CardsIcon from '../icons/CardsIcon';
 import PacksIcon from '../icons/PacksIcon';
+import { createMemo } from 'solid-js';
 
-export default function UsersTable(props: { users: User[] }) {
+export default function UsersTable(props: { users: User[]; preorders?: Preorder[] }) {
+	const users = createMemo(() =>
+		props.users.map((user) => ({
+			...user,
+			preorders: props.preorders?.filter((preorder) => preorder.userId === user.userId) ?? [],
+		}))
+	);
+
 	return (
 		<Table
 			search={{
@@ -33,7 +42,7 @@ export default function UsersTable(props: { users: User[] }) {
 					startDescending: true,
 				},
 			]}
-			rows={props.users.map((user) => ({
+			rows={users().map((user) => ({
 				username: {
 					element: (
 						<a
@@ -69,7 +78,7 @@ export default function UsersTable(props: { users: User[] }) {
 								<PacksIcon size={40} />
 							</div>
 							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
-								{user.packCount}
+								{user.packCount + user.preorders.length}
 							</span>
 						</>
 					),

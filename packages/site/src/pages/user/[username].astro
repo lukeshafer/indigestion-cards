@@ -3,6 +3,7 @@ import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
+import { getRarityRanking } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lib/pack-type';
@@ -22,16 +23,19 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-let data = await getUserAndCardInstances({ username: id });
+let [userData, rarityRanking] = await Promise.all([
+	getUserAndCardInstances({ username: id }),
+	getRarityRanking(),
+]);
 
 const twitchData = await getUserByLogin(id).catch(() => null);
-if (!data) {
+if (!userData) {
 	if (twitchData) {
 		const newUser = await createNewUser({
 			username: twitchData.display_name,
 			userId: twitchData.id,
 		});
-		data = {
+		userData = {
 			users: [newUser],
 			cardInstances: [],
 			userLogins: [],
@@ -41,7 +45,7 @@ if (!data) {
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
 
-const { users, cardInstances } = data;
+const { users, cardInstances } = userData;
 const user = users[0] || {
 	username: id,
 	userId: twitchData?.id,
@@ -118,6 +122,7 @@ const packTypes = await getAllPackTypes();
 		<Heading>Cards</Heading>
 		<CardList
 			cards={cardsNotInPack}
+			rarityRanking={rarityRanking}
 			client:load
 			sortOnlyBy={[
 				'rarest',

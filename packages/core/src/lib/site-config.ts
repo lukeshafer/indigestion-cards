@@ -144,3 +144,9 @@ export async function removeMessageFromSiteConfig(args: { message: string }) {
 	const newMessages = existingMessages.filter(({ message }) => message !== args.message);
 	await updateSiteConfig({ ...siteConfig, messages: newMessages });
 }
+
+export async function getRarityRanking(siteConfig?: SiteConfig) {
+	if (!siteConfig) siteConfig = await getSiteConfig();
+	const rarityRanking = siteConfig.rarityRanking ?? [];
+	return Object.fromEntries(rarityRanking.map((r) => [r.rarityId, r] as const)) || {};
+}

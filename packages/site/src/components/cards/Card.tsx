@@ -53,6 +53,7 @@ export default function Card(props: Props) {
 					<img
 						src={imgUrl()}
 						alt={props.cardName}
+						loading="lazy"
 						class="absolute inset-0"
 						classList={{ 'blur contrast-50': isSecret() }}
 					/>
