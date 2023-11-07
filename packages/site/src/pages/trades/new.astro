@@ -5,6 +5,7 @@ import { routeNames, routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import NewTrade from '@/components/trades/NewTrade';
 import { getUserAndCardInstances } from '@lil-indigestion-cards/core/lib/user';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
@@ -12,7 +13,33 @@ if (!userId || !username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
 }
 
-const { cardInstances } = (await getUserAndCardInstances({ username })) ?? {};
+const searchParams = Astro.url.searchParams;
+const offeredCardIds = searchParams.get('offeredCards');
+const requestedCardIds = searchParams.get('requestedCards');
+const initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
+
+const { cardInstances = [] } = (await getUserAndCardInstances({ username })) ?? {};
+const { cardInstances: initialReceiverCards = [] } = initialReceiverUsername
+	? (await getUserAndCardInstances({ username: initialReceiverUsername })) ?? {}
+	: {};
+
+const initialOfferedCards = offeredCardIds
+	? parseCardIdListFromString(offeredCardIds, cardInstances)
+	: undefined;
+const initialRequestedCards = requestedCardIds
+	? parseCardIdListFromString(requestedCardIds, initialReceiverCards)
+	: undefined;
+
+function parseCardIdListFromString(cardIdListString: string, cardInstances: CardInstance[]) {
+	console.log({ cardIdListString });
+	const cards = [];
+	const cardIdList = cardIdListString.split(',');
+	for (const cardId of cardIdList) {
+		const card = cardInstances.find((cardInstance) => cardInstance.instanceId === cardId);
+		if (card) cards.push(card);
+	}
+	return cards;
+}
 ---
 
 <Page
@@ -22,5 +49,14 @@ const { cardInstances } = (await getUserAndCardInstances({ username })) ?? {};
 	<PageHeader>
 		<PageTitle>New Trade</PageTitle>
 	</PageHeader>
-	<NewTrade {userId} {username} {cardInstances} client:load />
+	<NewTrade
+		{userId}
+		{username}
+		{cardInstances}
+		{initialOfferedCards}
+		{initialRequestedCards}
+		{initialReceiverUsername}
+		{initialReceiverCards}
+		client:load
+	/>
 </Page>

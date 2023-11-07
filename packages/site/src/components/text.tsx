@@ -6,7 +6,7 @@ export { Anchor } from '@/components/form/Form';
 
 export function PageHeader(props: ParentProps) {
 	return (
-		<header class="max-w-main mb-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-1">
+		<header class="max-w-main mb-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-1 mx-auto">
 			{props.children}
 		</header>
 	);
