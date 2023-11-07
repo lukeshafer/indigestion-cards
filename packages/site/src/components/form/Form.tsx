@@ -129,15 +129,21 @@ export function Form(props: {
 			enctype={props.enctype}
 			onSubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 bg-opacity-50 dark:bg-black/50">
-					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
-					{props.loadingText ? (
-						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
-					) : null}
-				</div>
+				<Loading loadingText={props.loadingText} />
 			</Show>
 			{props.children}
 		</form>
+	);
+}
+
+export function Loading(props: { loadingText?: string }) {
+	return (
+		<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 bg-opacity-50 dark:bg-black/50">
+			<img src={ASSETS.EMOTES.LILINDPB} alt="" />
+			{props.loadingText ? (
+				<p class="font-heading font-bold uppercase">{props.loadingText}</p>
+			) : null}
+		</div>
 	);
 }
 
@@ -175,24 +181,30 @@ export function TextInput(props: InputProps<string>) {
 	return (
 		<>
 			{props.inputOnly ? (
-				<input
-					{...props}
-					id={props.name}
-					name={props.name}
-					type="text"
-					class={BASE_INPUT_CLASS}
-					classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-					required={props.required}
-					placeholder={props.placeholder ?? props.label}
-					readOnly={props.readOnly}
-					value={props.value ?? ''}
-					onInput={(e) => props.setValue?.(e.target.value ?? '')}
-				/>
+				<>
+					<label class="sr-only" for={props.name}>
+						{props.label}
+					</label>
+					<input
+						{...props}
+						id={props.name}
+						name={props.name}
+						type="text"
+						class={BASE_INPUT_CLASS}
+						classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+						required={props.required}
+						placeholder={props.placeholder ?? props.label}
+						readOnly={props.readOnly}
+						value={props.value ?? ''}
+						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+					/>
+				</>
 			) : (
 				<InputGroup>
 					<Label {...props} />
 					{props.children}
 					<input
+						{...props}
 						id={props.name}
 						name={props.name}
 						type="text"

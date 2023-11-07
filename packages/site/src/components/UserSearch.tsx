@@ -1,35 +1,15 @@
 import { publicApi } from '@/constants';
 import { Form, TextInput } from '@/components/form/Form';
-import { For, createSignal } from 'solid-js';
+import { For, } from 'solid-js';
+import { users, fetchUsers } from '@/lib/client/state';
 import SearchIcon from './icons/SearchIcon';
 
 export default function UserSearch() {
-	const [users, setUsers] = createSignal<string[]>([]);
-	const [isFetching, setIsFetching] = createSignal(false);
-
-	// ts-expect-error - This function IS used
-	function searchDirective(el: HTMLElement) {
-		const fetchUsernames = async () => {
-			if (users().length > 0 || isFetching()) return;
-			setIsFetching(true);
-			const response = await fetch(publicApi.GET_ALL_USERNAMES);
-			const usernames = await response.json();
-			if (!Array.isArray(usernames)) throw new Error('Invalid response from server');
-			setUsers(usernames.sort((a, b) => a.localeCompare(b)));
-			setIsFetching(false);
-
-			el.removeEventListener('focus', fetchUsernames);
-			el.removeEventListener('mouseover', fetchUsernames);
-		};
-
-		el.addEventListener('focus', fetchUsernames, { once: true, capture: true });
-		el.addEventListener('mouseover', fetchUsernames, { once: true, capture: true });
-	}
-
 	return (
 		<div
 			class="relative w-40 md:w-auto"
-			ref={searchDirective}
+			onFocus={fetchUsers}
+			onMouseOver={fetchUsers}
 			style={{ 'view-transition-name': 'user-search-bar' }}>
 			<Form action={publicApi.SEARCH} method="get">
 				<TextInput
