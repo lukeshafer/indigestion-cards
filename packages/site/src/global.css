@@ -402,12 +402,20 @@ body.disable-animations * {
 	}
 
 	.scrollbar-narrow::-webkit-scrollbar-thumb {
-		background-color: theme('colors.gray.400');
+		background-color: var(--custom-scrollbar-color, theme('colors.gray.400'));
 		cursor: pointer;
 		border-radius: 0.25rem;
 	}
 
 	html.dark .scrollbar-narrow::-webkit-scrollbar-thumb {
-		background-color: theme('colors.gray.600');
+		--custom-scrollbar-color: theme('colors.gray.600');
+	}
+
+	.scrollbar-brand::-webkit-scrollbar-thumb {
+		--custom-scrollbar-color: theme('colors.brand.main');
+	}
+
+	html.dark .scrollbar-brand::-webkit-scrollbar-thumb {
+		--custom-scrollbar-color: theme('colors.brand.dark');
 	}
 }

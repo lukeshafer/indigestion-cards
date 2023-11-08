@@ -190,7 +190,7 @@ const updateUrlFromState = (state: TradeState) => {
 
 function Section(props: { heading: string; children: JSX.Element }) {
 	return (
-		<section class="w-1/2" style={{ 'min-width': "min(35rem, 100vw)"}}>
+		<section class="w-1/2" style={{ 'min-width': 'min(35rem, 100vw)' }}>
 			<Heading classList={{ 'text-center': true }}>{props.heading}</Heading>
 			{props.children}
 		</section>
@@ -212,7 +212,7 @@ function OfferWindow(props: {
 	setCards: (setter: (cards: TradeCard[]) => TradeCard[]) => void;
 }) {
 	return (
-		<ul class="m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-300 p-2 dark:bg-gray-700">
+		<ul class="m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-300 p-2 dark:bg-gray-700 scrollbar-narrow">
 			<For each={props.cards}>
 				{(card) => (
 					<li
@@ -272,9 +272,11 @@ function CardSearchList(props: {
 	};
 
 	return (
-		<details class="bg-brand-100 dark:bg-brand-950 m-4 max-h-screen overflow-y-scroll">
-			<summary class="bg-brand-100 sticky top-0 z-10 h-14 p-4 text-lg">{props.label}</summary>
-			<div class="bg-brand-100 border-b-brand-main sticky top-14 z-10 border-b p-4 pt-0">
+		<details class="bg-brand-100 dark:bg-brand-950 m-4 max-h-screen overflow-y-scroll scrollbar-narrow scrollbar-brand">
+			<summary class="bg-brand-100 dark:bg-brand-950 sticky top-0 z-10 h-14 p-4 text-lg">
+				{props.label}
+			</summary>
+			<div class="bg-brand-100 dark:bg-brand-950 border-b-brand-main sticky top-14 z-10 border-b p-4 pt-0">
 				<TextInput label="Search" name="search" setValue={setSearchText} />
 			</div>
 			<ul class="flex flex-wrap justify-center gap-4 py-4">
