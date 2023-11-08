@@ -3,8 +3,7 @@ import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getPackTypesBySeasonId } from '@lib/pack-type';
 import { getSeasonAndDesignsBySeasonId } from '@lib/season';
-import { getSiteConfig } from '@lib/site-config';
-import { routeNames, routes } from '@/constants';
+import { NO_CARDS_OPENED_ID, routeNames, routes } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
 
@@ -53,10 +52,6 @@ const packTypesWithCardPools = await Promise.all(
 		};
 	})
 );
-
-const {
-	baseRarity: { frameUrl, rarityId, rarityColor, rarityName },
-} = await getSiteConfig();
 ---
 
 <Page
@@ -105,18 +100,34 @@ const {
 	<Heading>Designs:</Heading>
 	<CardList
 		sessionType={Astro.locals.session?.type}
-		cards={cardDesigns.map((card) => ({
-			cardName: card.cardName,
-			designId: card.designId,
-			frameUrl,
-			imgUrl: card.imgUrl,
-			cardNumber: 0,
-			rarityName,
-			rarityColor: rarityColor || '#FFF',
-			rarityId,
-			cardDescription: card.cardDescription,
-			totalOfType: 0,
-		}))}
+		cards={cardDesigns.map((card, index) => {
+			const rarity = card.bestRarityFound;
+
+			if (rarity?.rarityId === NO_CARDS_OPENED_ID && Astro.locals.session?.type !== 'admin') {
+				return {
+					...rarity,
+					...card,
+					cardName: 'zzz' + index,
+					artist: '?????',
+					designId: 'zzz' + index,
+					seasonId: '',
+					seasonName: '',
+					imgUrl: '',
+					cardNumber: 1,
+					totalOfType: rarity.count,
+				};
+			}
+
+			return {
+				...card,
+				rarityName: rarity?.rarityName ?? '',
+				rarityId: rarity?.rarityId ?? '',
+				frameUrl: rarity?.frameUrl ?? '',
+				rarityColor: rarity?.rarityColor ?? '',
+				totalOfType: rarity?.count ?? 1,
+				cardNumber: 1,
+			};
+		})}
 		sortOnlyBy={['card-name-asc', 'card-name-desc']}
 		client:load
 	/>

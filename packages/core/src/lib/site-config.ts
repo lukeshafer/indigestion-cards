@@ -145,8 +145,14 @@ export async function removeMessageFromSiteConfig(args: { message: string }) {
 	await updateSiteConfig({ ...siteConfig, messages: newMessages });
 }
 
-export async function getRarityRanking(siteConfig?: SiteConfig) {
-	if (!siteConfig) siteConfig = await getSiteConfig();
+export function getRarityRanking(): Promise<ReturnType<typeof transformRarityRanking>>;
+export function getRarityRanking(siteConfig: SiteConfig): ReturnType<typeof transformRarityRanking>;
+export function getRarityRanking(siteConfig?: SiteConfig) {
+	if (!siteConfig) return getSiteConfig().then(transformRarityRanking);
+	return transformRarityRanking(siteConfig);
+}
+
+function transformRarityRanking(siteConfig: SiteConfig) {
 	const rarityRanking = siteConfig.rarityRanking ?? [];
 	return Object.fromEntries(rarityRanking.map((r) => [r.rarityId, r] as const)) || {};
 }
