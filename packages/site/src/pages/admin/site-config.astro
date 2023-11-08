@@ -5,7 +5,6 @@ import { getAllRarities } from '@lib/rarity';
 import { getTwitchEvents, getSiteConfig, getRarityRanking } from '@lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
-import { PageTitle, PageHeader } from '@/components/text';
 import SiteConfigForm from '@/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
 
@@ -47,10 +46,6 @@ const rewards = twitchEvents.data
 ---
 
 <Page breadcrumbs={[{ label: 'Config' }]} title="Site Config">
-	<PageHeader>
-		<PageTitle>Site Config</PageTitle>
-	</PageHeader>
-
 	<div class="mx-auto my-6 max-w-2xl">
 		<SiteConfigForm
 			{rarities}
