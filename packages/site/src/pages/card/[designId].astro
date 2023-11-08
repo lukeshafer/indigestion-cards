@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lib/design';
-import { getSiteConfig } from '@lib/site-config';
+import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { PageTitle } from '@/components/text';
@@ -32,6 +32,7 @@ if (!design) {
 }
 
 const siteConfig = await getSiteConfig();
+const rarityRanking = getRarityRanking(siteConfig);
 
 const baseRarity = design.bestRarityFound ||
 	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
@@ -83,6 +84,7 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 			showUsernames
 			client:load
 			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
+			rarityRanking={rarityRanking}
 		/>
 	</section>
 	<AdminOnly>
