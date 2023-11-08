@@ -1,32 +1,32 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getCardInstanceById } from '@lib/card';
+import { getCardInstanceByUsername } from '@lib/card';
 import { getUser } from '@lib/user';
 import { routeNames, routes } from '@/constants';
 import CardPage from '@/layouts/CardPage.astro';
 
 const session = Astro.locals.session;
 
-const slug = Astro.params.instanceSlug;
+const slug = Astro.params.userInstanceSlug;
 if (!slug) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No instance route provided');
 }
-const [designId, instanceId] = slug.split('/');
+const [username, instanceId] = slug.split('/');
 
-if (!designId) {
-	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
+if (!username) {
+	return Astro.redirect(routes.USERS + '?alert=No username provided');
 }
 if (!instanceId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No instance id provided');
 }
 
-const instance = await getCardInstanceById({ designId, instanceId });
+const instance = await getCardInstanceByUsername({ username, instanceId });
 if (!instance) {
-	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+	return Astro.redirect(`${routes.USERS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
 if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
-	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+	return Astro.redirect(`${routes.USERS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
 const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
@@ -37,8 +37,8 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 	class="flex flex-col gap-6"
 	pageType="public"
 	breadcrumbs={[
-		{ label: routeNames.CARDS, href: routes.DESIGNS },
-		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
+		{ label: routeNames.USER, href: routes.USERS },
+		{ label: username, href: `${routes.USERS}/${username}` },
 		{ label: `${instance.rarityName} #${instance.cardNumber}` },
 	]}>
 	<CardPage card={instance} user={user ?? undefined} />

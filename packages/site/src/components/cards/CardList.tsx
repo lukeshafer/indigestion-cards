@@ -38,6 +38,7 @@ export default function CardList(props: {
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
 	sessionType?: Session['type'];
+	isUserPage?: boolean;
 	rarityRanking?: RarityRankingRecord;
 }) {
 	const allowedSortTypes = () =>
@@ -74,9 +75,15 @@ export default function CardList(props: {
 									<>
 										<a
 											rel="prefetch"
-											href={`${routes.INSTANCES}/${card.designId}/${
-												card.instanceId ?? ''
-											}`}>
+											href={
+												props.isUserPage && card.username
+													? `${routes.USERS}/${card.username}/${
+															card.instanceId ?? ''
+													  } `
+													: `${routes.INSTANCES}/${card.designId}/${
+															card.instanceId ?? ''
+													  }`
+											}>
 											<Card {...card} scale="var(--card-scale)" />
 										</a>
 										<Show when={props.showUsernames}>
