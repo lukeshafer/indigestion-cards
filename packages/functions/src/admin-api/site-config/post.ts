@@ -45,6 +45,7 @@ export const handler = ProtectedApiHandler(async () => {
 	});
 
 	const rarityRanking = parseRanking(params?.get('rarityRanking') ?? '{}');
+	console.log({ rarityRanking });
 
 	const siteConfig = updateSiteConfig({ baseRarity: rarityObject, messages: [], rarityRanking });
 	const batchTwitchEvents = updateBatchTwitchEvents(events);

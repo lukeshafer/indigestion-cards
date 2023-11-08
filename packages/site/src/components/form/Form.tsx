@@ -129,7 +129,7 @@ export function Form(props: {
 			enctype={props.enctype}
 			onSubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/50 bg-opacity-50 dark:bg-black/50">
+				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-50/50 bg-opacity-50 dark:bg-gray-950/50">
 					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
 					{props.loadingText ? (
 						<p class="font-heading font-bold uppercase">{props.loadingText}</p>

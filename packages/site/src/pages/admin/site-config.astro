@@ -24,7 +24,7 @@ const baseRarityValue = new URLSearchParams(
 ).toString();
 
 console.log('siteConfig', siteConfig);
-const initialRanking = getRarityRanking(siteConfig);
+const initialRanking = await getRarityRanking(siteConfig);
 
 const giftSubEvent = twitchEvents.data.find(
 	(event) =>
