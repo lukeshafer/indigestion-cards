@@ -4,7 +4,7 @@ import { getCardInstanceById } from '@lib/card';
 import { getUser } from '@lib/user';
 import { routeNames, routes } from '@/constants';
 import { Heading, PageTitle } from '@/components/text';
-import Card from '@/components/cards/Card';
+import PreviewableCard from '@/components/cards/PreviewableCard';
 import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
 import AdminOnly from '@/components/AdminOnly.astro';
 
@@ -65,7 +65,7 @@ const openDate = instance.openedAt
 			{instance.cardName}, {instance.rarityName} #{instance.cardNumber}
 		</PageTitle>
 		<div class="mx-4">
-			<Card {...instance} client:load />
+			<PreviewableCard card={instance} client:load />
 		</div>
 	</header>
 	{
