@@ -14,14 +14,21 @@ if (!userId || !username) {
 }
 
 const searchParams = Astro.url.searchParams;
-const offeredCardIds = searchParams.get('offeredCards');
-const requestedCardIds = searchParams.get('requestedCards');
-const initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
+const offeredCardIds = searchParams.getAll('offeredCards');
+const requestedCardIds = searchParams.getAll('requestedCards');
+let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
 
 const { cardInstances = [] } = (await getUserAndCardInstances({ username })) ?? {};
-const { cardInstances: initialReceiverCards = [] } = initialReceiverUsername
-	? (await getUserAndCardInstances({ username: initialReceiverUsername })) ?? {}
-	: {};
+const { cardInstances: initialReceiverCards = [], users: initialReceiverUser = [] } =
+	initialReceiverUsername
+		? (await getUserAndCardInstances({ username: initialReceiverUsername })) ?? {}
+		: {};
+
+let invalidUsername = false;
+if (initialReceiverUsername && !initialReceiverUser.length) {
+	invalidUsername = true;
+	initialReceiverUsername = undefined;
+}
 
 const initialOfferedCards = offeredCardIds
 	? parseCardIdListFromString(offeredCardIds, cardInstances)
@@ -30,10 +37,8 @@ const initialRequestedCards = requestedCardIds
 	? parseCardIdListFromString(requestedCardIds, initialReceiverCards)
 	: undefined;
 
-function parseCardIdListFromString(cardIdListString: string, cardInstances: CardInstance[]) {
-	console.log({ cardIdListString });
+function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInstance[]) {
 	const cards = [];
-	const cardIdList = cardIdListString.split(',');
 	for (const cardId of cardIdList) {
 		const card = cardInstances.find((cardInstance) => cardInstance.instanceId === cardId);
 		if (card) cards.push(card);
@@ -45,6 +50,7 @@ function parseCardIdListFromString(cardIdListString: string, cardInstances: Card
 <Page
 	wide
 	title="New Trade"
+	alerts={invalidUsername ? [{ type: 'error', message: 'Invalid username.' }] : []}
 	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'New Trade' }]}>
 	<PageHeader>
 		<PageTitle>New Trade</PageTitle>

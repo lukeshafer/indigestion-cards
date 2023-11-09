@@ -13,6 +13,7 @@ export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
 	wide?: boolean;
+	alerts?: { type: 'success' | 'error'; message: string }[];
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
 }
@@ -35,8 +36,11 @@ let {
 	wide = false,
 	'hide-breadcrumbs': hideBreadcrumbs,
 	'no-header': noHeader = false,
+	alerts: alertsProp,
 	...baseProps
 } = Astro.props;
+
+alerts.push(...(alertsProp ?? []));
 ---
 
 <Base {...baseProps}>
@@ -62,10 +66,10 @@ let {
 			<main
 				transition:name={wide ? undefined : 'main'}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
-				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1 ">
+				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1">
 				<slot />
 			</main>
-				<div id="card-preview"></div>
+			<div id="card-preview"></div>
 			<Footer />
 		</div>
 	</div>

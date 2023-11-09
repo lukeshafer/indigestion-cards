@@ -3,7 +3,8 @@ import { alerts, setAlerts, type Alert } from '@/lib/client/state';
 import { useViewTransition } from '@/lib/client/utils';
 
 export default function AlertBox(props: { alerts: Alert[] }) {
-	createEffect(() => (() => setAlerts(props.alerts))());
+	setAlerts(props.alerts);
+	createEffect(() => setAlerts(props.alerts));
 
 	return (
 		<div class="max-w-main relative z-50 mx-auto flex w-full flex-col gap-2">
