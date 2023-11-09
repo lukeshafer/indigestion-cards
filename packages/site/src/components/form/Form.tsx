@@ -419,11 +419,13 @@ export function SubmitButton(props: {
 	children?: JSX.Element;
 	onClick?: () => void;
 	disabled?: boolean;
+	transitionId?: string;
 }) {
 	return (
 		<button
 			type="submit"
 			disabled={props.disabled}
+			style={{ 'view-transition-name': props.transitionId }}
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
 			onClick={() => props.onClick?.()}>

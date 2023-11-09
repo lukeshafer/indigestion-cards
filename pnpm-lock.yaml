@@ -42,8 +42,8 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6(prettier-plugin-astro@0.12.0)(prettier@3.0.3)
       sst:
-        specifier: 2.33.2
-        version: 2.33.2
+        specifier: 2.36.0
+        version: 2.36.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -73,8 +73,8 @@ importers:
         specifier: ^18.18.6
         version: 18.18.6
       sst:
-        specifier: 2.33.2
-        version: 2.33.2
+        specifier: 2.36.0
+        version: 2.36.0
 
   packages/functions:
     dependencies:
@@ -107,8 +107,8 @@ importers:
         specifier: ^18.18.6
         version: 18.18.6
       sst:
-        specifier: 2.33.2
-        version: 2.33.2
+        specifier: 2.36.0
+        version: 2.36.0
 
   packages/site:
     dependencies:
@@ -137,8 +137,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       astro-sst:
-        specifier: 2.33.2
-        version: 2.33.2
+        specifier: 2.36.0
+        version: 2.36.0
       electrodb:
         specifier: ^2.10.3
         version: 2.10.3(@aws-sdk/client-dynamodb@3.441.0)
@@ -149,11 +149,8 @@ importers:
         specifier: ^1.8.3
         version: 1.8.3
       sst:
-        specifier: 2.33.2
-        version: 2.33.2
-      superjson:
-        specifier: ^2.2.0
-        version: 2.2.0
+        specifier: 2.36.0
+        version: 2.36.0
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3
@@ -5826,8 +5823,8 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /astro-sst@2.33.2:
-    resolution: {integrity: sha512-uW12xlIXwToNagKwF4rjH0eiV2gcGFqcMkyJIwJmrAqhphCDykQ1qKwzJ4UBTtxkH4lV+JNarXQYBBjOxfGyQQ==}
+  /astro-sst@2.36.0:
+    resolution: {integrity: sha512-gmObQT7LWkKzoZB6ItH60abZUhLrFtrrux7PoV9QuV5DXvdF1BNHx+zq1Sh5EPDA6bRPiOHAC8MUBaHSuEjo6g==}
     dependencies:
       '@astrojs/webapi': 3.0.0
       set-cookie-parser: 2.6.0
@@ -10498,8 +10495,8 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.33.2:
-    resolution: {integrity: sha512-2BlFcWK2Zgwyib6uO0B0j3izAZ235GmIT1r+r5C60tEnaDiPmwGqV0aXApgB73kpHeHC58qbXaym2BUQG4LGgA==}
+  /sst@2.36.0:
+    resolution: {integrity: sha512-Gz7OZAtGNVmLwKeuroXxaCUPITB59zw6F1YfFzDg8dOIZK3pyuJyp0DI2IO7w5/X1HT8wFfI9ZA/82FoUa5WHw==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0

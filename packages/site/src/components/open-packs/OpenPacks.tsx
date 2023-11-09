@@ -1,5 +1,14 @@
-import { For, createEffect, createResource, onMount, type JSX, onCleanup, type Resource } from 'solid-js';
-import { createStore, produce } from 'solid-js/store';
+import {
+	For,
+	createEffect,
+	createResource,
+	onMount,
+	type JSX,
+	onCleanup,
+	type Resource,
+	untrack,
+} from 'solid-js';
+import { createStore, produce, type SetStoreFunction } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, SHIT_PACK_RARITY_ID } from '@/constants';
@@ -22,7 +31,7 @@ type Props = {
 	startCardScale?: number;
 	canTest?: boolean;
 	children?: JSX.Element;
-}
+};
 
 export default function OpenPacks(props: Props) {
 	const [setAutoAnimate] = createAutoAnimate();
@@ -33,22 +42,23 @@ export default function OpenPacks(props: Props) {
 		return isChatters(data) ? data : [];
 	});
 
-	const [state, setState] = (createState(props, chatters));
+	const [state, setState] = createState(props, chatters);
 
 	onMount(() => {
-		const savedActivePack =
-			state.packs.find((pack) => pack.packId === window.localStorage.getItem('activePackId'));
+		const savedActivePack = state.packs.find(
+			(pack) => pack.packId === window.localStorage.getItem('activePackId')
+		);
 		if (savedActivePack) state.setActivePack(savedActivePack);
 
 		const savedPackOrder = getSavedPackOrderFromStorage();
-		const listHasChanged = checkIfListHasChangedFromStorage(state.packs, savedPackOrder)
+		const listHasChanged = checkIfListHasChangedFromStorage(state.packs, savedPackOrder);
 
 		if (listHasChanged) window.localStorage.removeItem('packOrder');
 		else
 			setState(
 				'packs',
 				savedPackOrder.map((packId) => state.packs.find((p) => p.packId === packId)!)
-			)
+			);
 
 		const interval = setInterval(refetchChatters, 10000);
 		onCleanup(() => clearInterval(interval));
@@ -56,62 +66,33 @@ export default function OpenPacks(props: Props) {
 		setState('isHidden', false);
 	});
 
-	//// SIDE EFFECTS ////
-	createEffect(() => {
-		// When the active pack details update, 
-		// 	check if every card is opened
-		// 		if so, remove the pack from the list
-		if (state.activePack?.cardDetails.every((card) => card.opened)) {
-			setState(
-				'packs',
-				produce((draft) => {
-					const index = draft.findIndex((p) => p.packId === state.activePack?.packId);
-					draft.splice(index, 1);
-				})
-			);
-			setTotalPackCount((val) => val - 1);
-		}
-	});
-
-	createEffect(() => {
-		// When the active pack changes
-		// 	save the pack id to 
-		// 		local storage
-		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
-	});
-
-	createEffect(() => {
-		// When the saved pack state changes
-		// 	save the new pack order
-		// 		in local storage
-		window.localStorage.setItem(
-			'packOrder',
-			JSON.stringify(state.packs.map((pack) => pack.packId))
-		);
-	});
+	useSideEffects(state, setState);
 
 	return (
 		<OpenPacksContext.Provider value={state}>
-			<div class="flex min-h-[80vh] flex-col">
+			<div class="relative flex min-h-[80vh] flex-col">
+				<div id="card-preview"></div>
 				<div class="flex">
 					<section
 						class="scrollbar-narrow col-start-1 min-w-[15rem] max-w-[20rem] overflow-y-scroll bg-gray-200 px-4 py-3 dark:bg-gray-800"
 						id="pack-list"
 						style={{ height: state.listHeightString }}>
-						<button onClick={() => setState(
-							'packs',
-							// Sort online users' packs to the top
-							produce((draft) => {
-								draft.sort((a, b) => {
-									const aStatus = state.getIsOnline(a.username);
-									const bStatus = state.getIsOnline(b.username);
-									if (aStatus && !bStatus) return -1;
-									if (!aStatus && bStatus) return 1;
-									return 0;
-								});
-							})
-						)
-						}>
+						<button
+							onClick={() =>
+								setState(
+									'packs',
+									// Sort online users' packs to the top
+									produce((draft) => {
+										draft.sort((a, b) => {
+											const aStatus = state.getIsOnline(a.username);
+											const bStatus = state.getIsOnline(b.username);
+											if (aStatus && !bStatus) return -1;
+											if (!aStatus && bStatus) return 1;
+											return 0;
+										});
+									})
+								)
+							}>
 							<h2 class="font-heading mb-2 text-xl font-bold uppercase text-gray-700 hover:underline dark:text-gray-200">
 								Coming up...
 							</h2>
@@ -121,13 +102,11 @@ export default function OpenPacks(props: Props) {
 								'opacity-0': state.isHidden,
 							}}
 							class="packs relative flex w-full flex-col"
-							ref={setAutoAnimate} >
+							ref={setAutoAnimate}>
 							<For each={state.packs}>
 								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
 							</For>
-							<div
-								class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic "
-							/>
+							<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic " />
 						</ul>
 					</section>
 					<div class="flex-1">{props.children}</div>
@@ -146,8 +125,46 @@ export default function OpenPacks(props: Props) {
 					/>
 				) : null}
 			</div>
-		</OpenPacksContext.Provider >
+		</OpenPacksContext.Provider>
 	);
+}
+
+//// SIDE EFFECTS ////
+function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPacksState>) {
+	createEffect(() => {
+		// When the active pack details update,
+		// 	check if every card is opened
+		// 		if so, remove the pack from the list
+		if (state.activePack?.cardDetails.every((card) => card.opened)) {
+			untrack(() => {
+				setState(
+					'packs',
+					produce((draft) => {
+						const index = draft.findIndex((p) => p.packId === state.activePack?.packId);
+						draft.splice(index, 1);
+					})
+				);
+				setTotalPackCount((val) => val - 1);
+			});
+		}
+	});
+
+	createEffect(() => {
+		// When the active pack changes
+		// 	save the pack id to
+		// 		local storage
+		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
+	});
+
+	createEffect(() => {
+		// When the saved pack state changes
+		// 	save the new pack order
+		// 		in local storage
+		window.localStorage.setItem(
+			'packOrder',
+			JSON.stringify(state.packs.map((pack) => pack.packId))
+		);
+	});
 }
 
 function createState(props: Props, chatters: Resource<Chatter[]>) {
@@ -239,7 +256,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 		},
 
 		movePackToIndex(fromIndex, toIndex) {
-			if (fromIndex === toIndex) return
+			if (fromIndex === toIndex) return;
 			setState(
 				'packs',
 				produce((draft) => {
@@ -247,10 +264,10 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 					draft.splice(toIndex, 0, draggingPack);
 				})
 			);
-		}
-	})
+		},
+	});
 
-	return [state, setState] as const
+	return [state, setState] as const;
 }
 
 function getSavedPackOrderFromStorage() {
@@ -262,13 +279,16 @@ function getSavedPackOrderFromStorage() {
 		parsedOrder = [];
 	}
 
-	return parsedOrder
+	return parsedOrder;
 }
 
-function checkIfListHasChangedFromStorage(currentPacks: PackEntityWithStatus[], storedPacks: string[]) {
+function checkIfListHasChangedFromStorage(
+	currentPacks: PackEntityWithStatus[],
+	storedPacks: string[]
+) {
 	const storedSorted = storedPacks.slice().sort();
 	const sorted = currentPacks.map((pack) => pack.packId).sort();
 
 	const hasChanged = JSON.stringify(storedSorted) !== JSON.stringify(sorted);
-	return hasChanged
+	return hasChanged;
 }

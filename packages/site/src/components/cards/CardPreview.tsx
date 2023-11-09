@@ -5,7 +5,7 @@ export default function CardPreview(props: { children?: JSX.Element; close: () =
 	return (
 		<Portal mount={document.getElementById('card-preview') ?? undefined}>
 			<div
-				class="absolute inset-0 z-50 m-auto flex justify-center pt-4"
+				class="absolute inset-0 z-50 m-auto flex h-full w-full items-center justify-center pt-4 backdrop-blur-sm"
 				onClick={() => props.close()}>
 				{props.children}
 			</div>

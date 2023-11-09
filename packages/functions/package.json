@@ -1,23 +1,23 @@
 {
-  "name": "@lil-indigestion-cards/functions",
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "test": "sst bind vitest",
-    "typecheck": "tsc -noEmit"
-  },
-  "devDependencies": {
-    "@aws-sdk/client-eventbridge": "^3.398.0",
-    "@aws-sdk/client-s3": "^3.398.0",
-    "@types/aws-lambda": "^8.10.125",
-    "@types/node": "^18.18.6",
-    "sst": "2.33.2"
-  },
-  "dependencies": {
-    "@trpc/server": "^10.43.0",
-    "openid-client": "^5.6.1",
-    "parse-multipart-data": "^1.5.0",
-    "superjson": "^2.2.0",
-    "zod": "^3.22.4"
-  }
+	"name": "@lil-indigestion-cards/functions",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"test": "sst bind vitest",
+		"typecheck": "tsc -noEmit"
+	},
+	"devDependencies": {
+		"@aws-sdk/client-eventbridge": "^3.398.0",
+		"@aws-sdk/client-s3": "^3.398.0",
+		"@types/aws-lambda": "^8.10.125",
+		"@types/node": "^18.18.6",
+		"sst": "2.36.0"
+	},
+	"dependencies": {
+		"@trpc/server": "^10.43.0",
+		"openid-client": "^5.6.1",
+		"parse-multipart-data": "^1.5.0",
+		"superjson": "^2.2.0",
+		"zod": "^3.22.4"
+	}
 }
