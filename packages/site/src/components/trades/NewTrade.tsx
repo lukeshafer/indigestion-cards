@@ -216,10 +216,8 @@ function Section(props: { heading: string; children: JSX.Element }) {
 
 function Username(props: { children: JSX.Element }) {
 	return (
-		<div class="flex h-12 items-end justify-center">
-			<p class="flex h-12 items-end justify-center text-center text-xl font-semibold">
-				{props.children}
-			</p>
+		<div class="flex h-12 items-end justify-center text-center text-xl font-semibold">
+			{props.children}
 		</div>
 	);
 }
