@@ -65,6 +65,7 @@ alerts.push(...(alertsProp ?? []));
 			}
 			<main
 				transition:name={wide ? undefined : 'main'}
+				style={{ 'container-name': 'main', 'container-type': 'inline-size' }}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
 				class="z-0 col-start-2 mx-auto mb-8 w-full flex-1">
 				<slot />

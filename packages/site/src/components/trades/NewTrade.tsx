@@ -2,12 +2,13 @@ import { createStore } from 'solid-js/store';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { Suspense, createResource, onMount, type JSX, Show, createEffect, on } from 'solid-js';
 import { trpc } from '@/lib/trpc';
-import { Loading, TextInput } from '../form/Form';
+import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { Heading } from '@/components/text';
 import { users, fetchUsers } from '@/lib/client/state';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
+import { css } from '@acab/ecsstatic';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -83,7 +84,13 @@ export default function NewTrade(props: {
 			<form
 				method="post"
 				ref={(el) => setState('form', el)}
-				class="flex flex-wrap justify-center">
+				class={css`
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					@container main (max-width: 600px) {
+						grid-template-columns: 1fr;
+					}
+				`}>
 				<Section heading="Offer">
 					<input type="hidden" name="senderUsername" value={props.username} />
 					<Username>{props.username}</Username>
@@ -173,6 +180,14 @@ export default function NewTrade(props: {
 						</Suspense>
 					</Show>
 				</Section>
+				<div class="col-span-full grid grid-cols-[minmax(auto,30rem)] flex-col justify-center justify-items-start gap-2">
+					<TextArea
+						name="message"
+						label="Message"
+						placeholder="Write a message to the other user"
+					/>
+					<SubmitButton />
+				</div>
 			</form>
 		</>
 	);
@@ -207,7 +222,7 @@ const updateUrlFromState = (state: TradeState) => {
 
 function Section(props: { heading: string; children: JSX.Element }) {
 	return (
-		<section class="w-1/2" style={{ 'min-width': 'min(35rem, 100vw)' }}>
+		<section class="w-full">
 			<Heading classList={{ 'text-center': true }}>{props.heading}</Heading>
 			{props.children}
 		</section>
