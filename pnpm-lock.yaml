@@ -79,8 +79,8 @@ importers:
   packages/functions:
     dependencies:
       '@trpc/server':
-        specifier: ^10.43.0
-        version: 10.43.0
+        specifier: ^10.43.1
+        version: 10.43.1
       openid-client:
         specifier: ^5.6.1
         version: 5.6.1
@@ -5161,10 +5161,6 @@ packages:
       '@trpc/server': 10.43.1
     dependencies:
       '@trpc/server': 10.43.1
-    dev: false
-
-  /@trpc/server@10.43.0:
-    resolution: {integrity: sha512-1/h9KCPkTNNmpN5VKfKO4kPcl/W4Y9VQla4YGg4pydSh/+4b//0IPfvk3Oz4tz/tvWyAUlBKkBVhD3GfDLcAQA==}
     dev: false
 
   /@trpc/server@10.43.1:
