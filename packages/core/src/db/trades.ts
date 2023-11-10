@@ -101,8 +101,22 @@ export const trades = new Entity(
 				type: 'list',
 				required: true,
 				items: {
-					type: "string",
-					required: true,
+					type: 'map',
+					readOnly: true,
+					properties: {
+						userId: {
+							type: 'string',
+							required: true,
+						},
+						type: {
+							type: ['offer', 'response'] as const,
+							required: true,
+						},
+						message: {
+							type: 'string',
+							required: true,
+						},
+					},
 				},
 			},
 			status: {
@@ -138,4 +152,3 @@ export const trades = new Entity(
 	},
 	config
 );
-

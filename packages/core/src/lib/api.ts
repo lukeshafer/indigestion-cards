@@ -15,10 +15,7 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
-type SchemaType =
-	| 'string' | 'string?'
-	| 'number' | 'number?'
-	| 'boolean' | 'boolean?';
+type SchemaType = keyof Types
 
 interface Schema {
 	[key: string]: SchemaType | [SchemaType, 'optional'];
@@ -59,7 +56,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 	const errors: string[] = [];
 	for (const key in schema) {
 		let type = schema[key] as SchemaType | [SchemaType, 'optional'];
-		const value = params.get(key) || undefined;
+		const value = params.getAll(key) || undefined;
 
 		if (Array.isArray(type)) {
 			if (!value) {
@@ -67,7 +64,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 				continue;
 			}
 			type = type[0];
-		} else if (!value && !type.endsWith('?')) {
+		} else if (!value.length && !type.endsWith('?')) {
 			errors.push(`Missing ${key}.`);
 			continue;
 		}
@@ -94,28 +91,40 @@ interface Types {
 	'string?': string | undefined;
 	'number?': number | undefined;
 	'boolean?': boolean | undefined;
+	'string[]': string[];
+	'number[]': number[];
+	'boolean[]': boolean[];
 }
 
 function parseType<TypeToCheck extends SchemaType>(
-	value: string | undefined,
+	value: string[],
 	type: TypeToCheck
 ): Types[TypeToCheck] {
-	const optional = type.endsWith('?');
-	if (optional) type = type.slice(0, -1) as TypeToCheck;
+	const isOptional = type.endsWith('?');
+	if (isOptional) type = type.slice(0, -1) as TypeToCheck;
 
-	if (value === undefined) {
-		if (optional) return undefined as Types[TypeToCheck];
+	const isArray = type.endsWith('[]');
+	if (isArray) type = type.slice(0, -2) as TypeToCheck;
+
+	if (!value.length) {
+		// @ts-expect-error - [] is a valid type if isArray is true
+		if (isArray) return [] as Types[TypeToCheck];
+		if (isOptional) return undefined as Types[TypeToCheck];
 		throw new Error('Missing value');
+	}
+
+	if (isArray) {
+		return value.map((v) => parseType([v], type)) as Types[TypeToCheck];
 	}
 
 	switch (type) {
 		case 'string':
-			return value as Types[TypeToCheck];
+			return value[0] as Types[TypeToCheck];
 		case 'number':
-			if (isNaN(Number(value))) throw new Error('Not a number');
-			return Number(value) as Types[TypeToCheck];
+			if (isNaN(Number(value[0]))) throw new Error('Not a number');
+			return Number(value[0]) as Types[TypeToCheck];
 		case 'boolean':
-			return (value === 'true') as Types[TypeToCheck];
+			return (value[0] === 'true') as Types[TypeToCheck];
 	}
 
 	throw new Error('Invalid type');

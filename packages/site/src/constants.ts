@@ -43,6 +43,7 @@ export const API = new Proxy(api_paths, {
 
 const user_api_paths = {
 	USER: '/user',
+	TRADE: '/trade',
 };
 
 export const USER_API = new Proxy(user_api_paths, {

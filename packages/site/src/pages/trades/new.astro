@@ -9,6 +9,9 @@ import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances'
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
+const body = await Astro.request.text().then((text) => new URLSearchParams(text));
+console.log(body);
+
 if (!userId || !username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
 }

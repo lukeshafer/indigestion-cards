@@ -14,7 +14,7 @@ if (!userId) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
 }
 
-//const trades = await getAllTradesForUser(userId);
+const trades = await getAllTradesForUser(userId);
 ---
 
 <Page title="Trades" breadcrumbs={[{ label: routeNames.TRADES }]}>
@@ -22,4 +22,6 @@ if (!userId) {
 		<PageTitle>Trades</PageTitle>
 	</PageHeader>
 	<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
+
+	<pre>{JSON.stringify(trades, null, 2)}</pre>
 </Page>

@@ -4,6 +4,7 @@ import { Suspense, createResource, onMount, type JSX, Show, createEffect, on } f
 import { trpc } from '@/lib/trpc';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { USER_API } from "@/constants"
 import { Heading } from '@/components/text';
 import { users, fetchUsers } from '@/lib/client/state';
 import CardSearchList from './CardSearchList';
@@ -83,6 +84,7 @@ export default function NewTrade(props: {
 			<form class="sr-only" id="reset-form"></form>
 			<form
 				method="post"
+				action={USER_API.TRADE}
 				ref={(el) => setState('form', el)}
 				class={css`
 					display: grid;
@@ -114,6 +116,10 @@ export default function NewTrade(props: {
 									inputOnly
 									name="receiverUsername"
 									label="Search for User"
+									onInvalid={(e) =>
+										e.currentTarget.setCustomValidity('Please select a user')
+									}
+									required
 									list="users"
 									onChange={(e) => {
 										if (
@@ -198,11 +204,11 @@ const updateUrlFromState = (state: TradeState) => {
 		on(
 			[
 				() => state.offeredCards.length,
-				() => state.requestedCards,
+				() => state.requestedCards.length,
 				() => state.receiverUsername,
 			],
 			() => {
-				console.log('updating url');
+				//console.log('updating url');
 				const form = state.form;
 				if (!form) return;
 				const formData = new FormData(form);
