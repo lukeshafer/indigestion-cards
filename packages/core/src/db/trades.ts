@@ -148,6 +148,17 @@ export const trades = new Entity(
 					composite: ['tradeId'],
 				},
 			},
+			byId: {
+				index: 'gsi2',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['tradeId'],
+				},
+				sk: {
+					field: 'gsi2sk',
+					composite: [],
+				},
+			},
 		},
 	},
 	config

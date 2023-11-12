@@ -15,7 +15,7 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
-type SchemaType = keyof Types
+type SchemaType = keyof Types;
 
 interface Schema {
 	[key: string]: SchemaType | [SchemaType, 'optional'];
@@ -23,20 +23,20 @@ interface Schema {
 
 type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: SchemaToCheck[key] extends [SchemaType, 'optional']
-	? Types[SchemaToCheck[key][0]] | undefined
-	: // @ts-expect-error - key is a key of SchemaToCheck
-	Types[SchemaToCheck[key]];
+		? Types[SchemaToCheck[key][0]] | undefined
+		: // @ts-expect-error - key is a key of SchemaToCheck
+		  Types[SchemaToCheck[key]];
 };
 
 type Result<SchemaToCheck extends Schema> =
 	| {
-		success: true;
-		value: ParsedOutput<SchemaToCheck>;
-	}
+			success: true;
+			value: ParsedOutput<SchemaToCheck>;
+	  }
 	| {
-		success: false;
-		errors: string[];
-	};
+			success: false;
+			errors: string[];
+	  };
 
 export function useValidateFormData<SchemaToCheck extends Schema>(
 	schema: SchemaToCheck
@@ -64,7 +64,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 				continue;
 			}
 			type = type[0];
-		} else if (!value.length && !type.endsWith('?')) {
+		} else if (!type.endsWith('[]') && !value.length && !type.endsWith('?')) {
 			errors.push(`Missing ${key}.`);
 			continue;
 		}
@@ -114,6 +114,7 @@ function parseType<TypeToCheck extends SchemaType>(
 	}
 
 	if (isArray) {
+		// @ts-expect-error - this is fine
 		return value.map((v) => parseType([v], type)) as Types[TypeToCheck];
 	}
 

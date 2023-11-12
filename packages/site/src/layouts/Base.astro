@@ -7,12 +7,12 @@ import { ASSETS } from '@/constants';
 
 interface Props {
 	title: string;
-	pageType?: 'public' | 'private';
+	pageType?: 'public' | 'user' | 'admin';
 }
 
 export type BaseProps = Props;
 
-const { title, pageType = 'private' } = Astro.props;
+const { title, pageType = 'admin' } = Astro.props;
 
 const session = Astro.locals.session;
 
@@ -38,17 +38,17 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
 		<script is:inline>
-		if (
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches)
-		) {
-			document.documentElement.classList.add('dark');
-			localStorage.theme = 'dark';
-		} else {
-			document.documentElement.classList.remove('dark');
-			localStorage.theme = 'light';
-		}
+			if (
+				localStorage.theme === 'dark' ||
+				(!('theme' in localStorage) &&
+					window.matchMedia('(prefers-color-scheme: dark)').matches)
+			) {
+				document.documentElement.classList.add('dark');
+				localStorage.theme = 'dark';
+			} else {
+				document.documentElement.classList.remove('dark');
+				localStorage.theme = 'light';
+			}
 		</script>
 		<title>
 			{
@@ -61,7 +61,9 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 	</head>
 	<body class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 		{
-			session?.type === 'admin' || pageType === 'public' ? (
+			session?.type === 'admin' ||
+			(session?.type === 'user' && pageType === 'user') ||
+			pageType === 'public' ? (
 				<slot />
 			) : (
 				<script> window.location.href = '/' </script>

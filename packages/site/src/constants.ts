@@ -15,6 +15,8 @@ export const PUBLIC_ROUTES = [
 	'/logout',
 ] as const;
 
+export const USER_ROUTES = ['/trades', '/trades/*'];
+
 const api_paths = {
 	PACK_TYPE: '/pack-type',
 	SEASON: '/season',

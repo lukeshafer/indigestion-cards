@@ -1,7 +1,7 @@
 import type { MiddlewareResponseHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { getAdminUserById } from '@lib/admin-user';
-import { AUTH_TOKEN, PUBLIC_ROUTES } from './constants';
+import { AUTH_TOKEN, PUBLIC_ROUTES, USER_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
 
@@ -23,6 +23,7 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	// @ts-expect-error - cookie string is a fine input for this function
 	const session: Session = SSTSession.verify(cookie?.value ?? '');
 	ctx.locals.session = session;
+	//console.log({ session });
 
 	if (session.type === 'admin') {
 		const adminUser = await getAdminUserById(session?.properties.userId ?? '');
@@ -33,13 +34,16 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 		}
 	}
 
+	const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
+		routeList.some((route) =>
+			route.endsWith('*')
+				? currentRoute.startsWith(route.slice(0, -1))
+				: currentRoute === route
+		);
+
 	const currentRoute = ctx.url.pathname;
-	const isPublicRoute = PUBLIC_ROUTES.some((route) => {
-		if (route.endsWith('*')) {
-			return currentRoute.startsWith(route.slice(0, -1));
-		}
-		return currentRoute === route;
-	});
+	const isPublicRoute = checkIncludesCurrentRoute(PUBLIC_ROUTES);
+	const isUserRoute = isPublicRoute || checkIncludesCurrentRoute(USER_ROUTES);
 
 	process.env.SESSION_USER_ID = session?.properties.userId ?? undefined;
 	process.env.SESSION_USERNAME = session?.properties.username ?? undefined;
@@ -52,11 +56,13 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 			: null;
 
 	if (!isPublicRoute) {
+		console.log('is not public route');
+		const isUserOnUserRoute = isUserRoute && ctx.locals.session?.type === 'user';
 		const isAdmin = ctx.locals.session?.type === 'admin';
-		if (!isAdmin && ctx.url.pathname !== '/404') {
+		if (!isAdmin && !isUserOnUserRoute && ctx.url.pathname !== '/404') {
 			//console.log("Not admin, redirecting to '/404'");
 			return ctx.redirect('/404');
-		} 
+		}
 	}
 
 	return next();

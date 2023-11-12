@@ -24,6 +24,25 @@ export async function getAllTradesForUser(userId: string) {
 	return { outgoing, incoming };
 }
 
+export async function getSentTradeById(args: { tradeId: string; senderUserId: string }) {
+	const result = await trades.query
+		.bySenderId({ tradeId: args.tradeId, senderUserId: args.senderUserId })
+		.go();
+	return result.data[0];
+}
+
+export async function getReceivedTradeById(args: { tradeId: string; receiverUserId: string }) {
+	const result = await trades.query
+		.byReceiverId({ tradeId: args.tradeId, receiverUserId: args.receiverUserId })
+		.go();
+	return result.data[0];
+}
+
+export async function getTrade(tradeId: string) {
+	const result = await trades.query.byId({ tradeId }).go();
+	return result.data[0];
+}
+
 const cardsSchema = z.object({
 	instanceId: z.string(),
 	designId: z.string(),

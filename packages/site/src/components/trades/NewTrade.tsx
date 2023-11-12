@@ -97,7 +97,6 @@ export default function NewTrade(props: {
 					<input type="hidden" name="senderUsername" value={props.username} />
 					<Username>{props.username}</Username>
 					<OfferWindow
-						type="offer"
 						cards={state.offeredCards}
 						setCards={(setter) => setState('offeredCards', setter)}
 					/>
@@ -166,7 +165,6 @@ export default function NewTrade(props: {
 						)}
 					</Username>
 					<OfferWindow
-						type="request"
 						cards={state.requestedCards}
 						setCards={(setter) => setState('requestedCards', setter)}
 					/>

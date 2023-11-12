@@ -7,21 +7,29 @@ import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { Anchor } from '@/components/text';
+import TradesTable from '@/components/trades/TradesTable';
 
 const userId = Astro.locals.user?.properties.userId;
+const username = Astro.locals.user?.properties.username;
 
-if (!userId) {
+if (!userId || !username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
 }
 
 const trades = await getAllTradesForUser(userId);
 ---
 
-<Page title="Trades" breadcrumbs={[{ label: routeNames.TRADES }]}>
+<Page title="Trades" pageType="user" breadcrumbs={[{ label: routeNames.TRADES }]}>
 	<PageHeader>
 		<PageTitle>Trades</PageTitle>
 	</PageHeader>
 	<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
 
-	<pre>{JSON.stringify(trades, null, 2)}</pre>
+	<TradesTable
+		incomingTrades={trades.incoming}
+		outgoingTrades={trades.outgoing}
+		loggedInUsername={username}
+		client:load
+	/>
+	<br/>
 </Page>

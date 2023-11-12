@@ -1,0 +1,53 @@
+---
+import { Heading } from '@/components/text';
+import OfferWindow from '@/components/trades/OfferWindow';
+import { routeNames, routes } from '@/constants';
+import Page from '@/layouts/Page.astro';
+
+import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
+import { Code } from 'astro:components';
+
+const tradeId = Astro.params.tradeId;
+if (!tradeId) {
+	return Astro.redirect('/trades?alert=Invalid trade ID&type=error');
+}
+
+const trade = await getTrade(tradeId);
+if (!trade) {
+	return Astro.redirect('/trades?alert=Trade not found&type=error');
+}
+
+const username = Astro.locals.user?.properties.username;
+const isSender = trade.senderUsername === username;
+const isReceiver = trade.receiverUsername === username;
+---
+
+<Page
+	title="Trades"
+	pageType="user"
+	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'Trade' }]}>
+	<br />
+	<div class="grid-wrapper">
+		<div class="text-center">
+			<Heading>{isSender ? 'Your offer' : `${trade.senderUsername}'s offer`}</Heading>
+			<OfferWindow cards={trade.offeredCards} client:load />
+		</div>
+		<div class="text-center">
+			<Heading>
+				{isReceiver ? 'Requested from you' : `Requested from ${trade.receiverUsername}`}
+			</Heading>
+			<OfferWindow cards={trade.requestedCards} client:load />
+		</div>
+	</div>
+	<Code code={JSON.stringify(trade, null, 2)} lang="json" />
+</Page>
+
+<style>
+	.grid-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		@container main (max-width: 600px) {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
