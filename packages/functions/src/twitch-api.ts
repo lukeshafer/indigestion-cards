@@ -1,4 +1,4 @@
-import { type APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@lib/twitch';
