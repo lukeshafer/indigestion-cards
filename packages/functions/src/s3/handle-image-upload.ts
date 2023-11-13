@@ -1,4 +1,4 @@
-import { S3Handler } from 'aws-lambda';
+import type { S3Handler } from 'aws-lambda';
 import { createUnmatchedDesignImage } from '@lib/unmatched-image';
 import { setAdminEnvSession } from '@lib/session';
 

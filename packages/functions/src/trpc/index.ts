@@ -3,7 +3,7 @@ import {
 	awsLambdaRequestHandler,
 	type CreateAWSLambdaContextOptions,
 } from '@trpc/server/adapters/aws-lambda';
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { trades } from './routes/trades';
 import { cards } from './routes/cards';
 

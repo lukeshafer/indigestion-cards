@@ -20,7 +20,7 @@ export default function OfferWindow(props: {
 								title="Remove Card"
 								class="absolute left-2 top-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-white p-1 font-black text-red-600 hover:brightness-75"
 								onClick={() => {
-									props.setCards(
+									props.setCards?.(
 										produce((draft) => {
 											let index = draft.findIndex(
 												(c) => c.instanceId === card.instanceId

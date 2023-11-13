@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { trades, type CreateTrade, UpdateTrade } from '../db/trades';
+import { trades, type CreateTrade, type UpdateTrade } from '../db/trades';
 
 export async function createTrade(trade: CreateTrade) {
 	const result = await trades.create(trade).go();

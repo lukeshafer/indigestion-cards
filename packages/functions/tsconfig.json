@@ -6,6 +6,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true,
+		"verbatimModuleSyntax": true,
 		"paths": {
 			"@lil-indigestion-cards/core/*": ["../core/src/*"],
 			"@lib/*": ["../core/src/lib/*"]

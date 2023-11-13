@@ -1,5 +1,5 @@
-import { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { CreateTrade } from '@lil-indigestion-cards/core/db/trades';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import type { CreateTrade } from '@lil-indigestion-cards/core/db/trades';
 import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
 import { createTrade } from '@lil-indigestion-cards/core/lib/trades';
 import { getUserAndCardInstances } from '@lil-indigestion-cards/core/lib/user';
