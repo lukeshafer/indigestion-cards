@@ -35,6 +35,8 @@ const tradeStatus = (() => {
 			else return `${trade.receiverUsername} accepted the trade`;
 		case 'canceled':
 			return `Canceled by ${isSender ? 'you' : trade.senderUsername}`;
+		case 'completed':
+			return 'Trade completed';
 	}
 })();
 ---
@@ -59,7 +61,8 @@ const tradeStatus = (() => {
 				<span
 					class="text-xl"
 					class:list={{
-						'text-brand-dark dark:text-brand-main': trade.status === 'accepted',
+						'text-brand-dark dark:text-brand-main':
+							trade.status === 'accepted' || trade.status === 'completed',
 						'text-gray-500 dark:text-gray-400': trade.status === 'pending',
 						'text-red-700 dark:text-red-500':
 							trade.status === 'rejected' || trade.status === 'canceled',
