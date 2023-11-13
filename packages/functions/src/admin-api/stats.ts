@@ -1,9 +1,9 @@
-import { validateSearchParams, ProtectedApiHandler } from '@lib/api';
+import { validateSearchParams, SiteHandler } from '@lib/api';
 import { getPackTypeById } from '@lib/pack-type';
 import { getRemainingPossibleCardsFromCardPool, getCardPoolFromType } from '@lib/card-pool';
 import { SHIT_PACK_RARITY_ID } from '@lil-indigestion-cards/core/constants';
 
-export const handler = ProtectedApiHandler(async (evt) => {
+export const handler = SiteHandler({ authorizationType: 'admin' }, async (evt) => {
 	const validatedParams = await validateSearchParams(new URLSearchParams(evt.rawQueryString), {
 		remainingCardCount: 'number',
 		packTypeId: 'string',

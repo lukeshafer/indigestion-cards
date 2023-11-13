@@ -1,16 +1,15 @@
 import { useFormData } from 'sst/node/api';
 import { z } from 'zod';
 
-import { validateSearchParams, ProtectedApiHandler } from '@lib/api';
+import { validateSearchParams, SiteHandler } from '@lib/api';
 import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
 import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import { updateBatchTwitchEvents, updateSiteConfig } from '@lib/site-config';
 
 type RarityRanking = NonNullable<SiteConfig['rarityRanking']>;
 
-export const handler = ProtectedApiHandler(async () => {
+export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
 	const params = useFormData();
-
 	const rarity = new URLSearchParams(params?.get('base-rarity') ?? '');
 
 	const validationResult = validateSearchParams(rarity, {
