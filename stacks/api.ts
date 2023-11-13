@@ -108,6 +108,7 @@ export function API({ app, stack }: StackContext) {
 			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
 			// TRADE
 			'POST /user-api/trade': 'packages/functions/src/user-api/trade/post.handler',
+			'PATCH /user-api/trade': 'packages/functions/src/user-api/trade/patch.handler',
 		},
 		defaults: {
 			function: {

@@ -1,6 +1,6 @@
 export type Session = UserSession | AdminSession | PublicSession;
 
-interface PublicSession {
+export interface PublicSession {
 	type: 'public';
 	properties: {
 		userId?: null | undefined;
@@ -8,7 +8,7 @@ interface PublicSession {
 	};
 }
 
-interface UserSession {
+export interface UserSession {
 	type: 'user';
 	properties: {
 		userId: string;
@@ -16,7 +16,7 @@ interface UserSession {
 	};
 }
 
-interface AdminSession {
+export interface AdminSession {
 	type: 'admin';
 	properties: {
 		userId: string;

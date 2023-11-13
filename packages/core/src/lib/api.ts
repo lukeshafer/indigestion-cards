@@ -23,20 +23,20 @@ interface Schema {
 
 type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: SchemaToCheck[key] extends [SchemaType, 'optional']
-		? Types[SchemaToCheck[key][0]] | undefined
-		: // @ts-expect-error - key is a key of SchemaToCheck
-		  Types[SchemaToCheck[key]];
+	? Types[SchemaToCheck[key][0]] | undefined
+	: // @ts-expect-error - key is a key of SchemaToCheck
+	Types[SchemaToCheck[key]];
 };
 
 type Result<SchemaToCheck extends Schema> =
 	| {
-			success: true;
-			value: ParsedOutput<SchemaToCheck>;
-	  }
+		success: true;
+		value: ParsedOutput<SchemaToCheck>;
+	}
 	| {
-			success: false;
-			errors: string[];
-	  };
+		success: false;
+		errors: string[];
+	};
 
 export function useValidateFormData<SchemaToCheck extends Schema>(
 	schema: SchemaToCheck
@@ -166,29 +166,38 @@ export const UserProtectedApiHandler: typeof ApiHandler = (callback) => {
 };
 
 type Callback = Parameters<typeof ApiHandler>[0];
-type SiteHandlerContext<T extends Schema> = Parameters<Callback>[1] & {
+type SiteHandlerContext<T extends Schema, A extends AuthorizationType> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
+	session: A extends 'public'
+	? undefined
+	: {
+		userId: string;
+		username: string;
+	};
 };
 
+type AuthorizationType = 'public' | 'user' | 'admin';
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SiteHandlerCallback<S extends Schema = {}> = (
+type SiteHandlerCallback<S extends Schema = {}, A extends AuthorizationType = 'public'> = (
 	evt: Parameters<Callback>[0],
-	ctx: SiteHandlerContext<S>
+	ctx: SiteHandlerContext<S, A>
 ) => ReturnType<Callback>;
-type SiteHandlerOptions<S extends Schema> = {
-	authorizationType?: 'public' | 'user' | 'admin';
+type SiteHandlerOptions<S extends Schema, A extends AuthorizationType> = {
+	authorizationType?: A;
 	schema?: S;
 };
-export function SiteHandler<T extends Schema>(
-	options: SiteHandlerOptions<T>,
-	callback: SiteHandlerCallback<T>
+export function SiteHandler<T extends Schema, A extends AuthorizationType>(
+	options: SiteHandlerOptions<T, A>,
+	callback: SiteHandlerCallback<T, A>
 ): ReturnType<typeof ApiHandler>;
 export function SiteHandler(options: SiteHandlerCallback): ReturnType<typeof ApiHandler>;
-export function SiteHandler<T extends Schema>(
-	options: SiteHandlerOptions<T> | SiteHandlerCallback,
-	callback?: SiteHandlerCallback<T>
+export function SiteHandler<T extends Schema, A extends AuthorizationType>(
+	options: SiteHandlerOptions<T, A> | SiteHandlerCallback,
+	callback?: SiteHandlerCallback<T, A>
 ) {
 	if (typeof options === 'function') {
+		// @ts-expect-error - this is okay, handled by function overload
 		callback = options;
 		options = {};
 	}
@@ -198,7 +207,7 @@ export function SiteHandler<T extends Schema>(
 	const { authorizationType = 'public', schema } = options;
 
 	return ApiHandler(async (evt, ctxOrig) => {
-		const ctx = ctxOrig as SiteHandlerContext<T>;
+		const ctx = ctxOrig as SiteHandlerContext<T, A>;
 		if (authorizationType !== 'public') {
 			const session = useSession();
 
@@ -213,6 +222,8 @@ export function SiteHandler<T extends Schema>(
 				};
 			}
 
+			// @ts-expect-error - the session properties are verified in the above statement
+			ctx.session = session.properties;
 			setAdminEnvSession(session.properties.username, session.properties.userId);
 		}
 

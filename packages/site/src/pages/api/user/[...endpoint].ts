@@ -3,12 +3,12 @@ import type { APIRoute } from 'astro';
 import { Api } from 'sst/node/api';
 
 // Re-route all API requests to the API server
-export const all: APIRoute = async (ctx) => {
+export const ALL: APIRoute = async (ctx) => {
 	const route = `${Api.AdminApi.url}/user-api/${ctx.params.endpoint}${ctx.url.search}`;
 	const token = ctx.cookies.get(AUTH_TOKEN);
 	if (!token) return new Response('Unauthorized', { status: 401 });
 
-	console.log('Fetching from API: ', ctx.params.endpoint);
+	console.log('Fetching from user API: ', ctx.params.endpoint);
 
 	return fetch(route, {
 		body: ctx.request.body ?? undefined,

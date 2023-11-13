@@ -82,8 +82,8 @@ export function Form(props: {
 		if (response.ok) {
 			useViewTransition(() => {
 				setAlerts((alerts) => [
-					...alerts,
 					{ message: responseBody || 'Success!', type: 'success' },
+					...alerts,
 				]);
 			});
 			if (props.onsuccess) props.onsuccess();
@@ -99,13 +99,13 @@ export function Form(props: {
 
 			useViewTransition(() => {
 				setAlerts((alerts) => [
-					...alerts,
 					{
 						message: isHTML
 							? 'There was an error'
 							: responseBody || 'There was an error.',
 						type: 'error',
 					},
+					...alerts,
 				]);
 			});
 			if (props.errorRedirect) {

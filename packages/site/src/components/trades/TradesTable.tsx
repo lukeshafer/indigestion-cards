@@ -24,7 +24,7 @@ export default function TradesTable(props: {
 				tradeType: isLoggedInUsername(trade.senderUsername) ? 'Outgoing' : 'Incoming',
 				from: trade.senderUsername,
 				to: trade.receiverUsername,
-				status: trade.status,
+				status: trade.status.charAt(0).toUpperCase() + trade.status.slice(1),
 				actions: {
 					value: '',
 					element: <Anchor href={`/trades/${trade.tradeId}`}>View</Anchor>,

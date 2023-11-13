@@ -8,7 +8,6 @@ export const handler = SiteHandler(
 	{
 		authorizationType: 'user',
 		schema: {
-			senderUsername: 'string',
 			receiverUsername: 'string',
 			offeredCards: 'string[]',
 			requestedCards: 'string[]',
@@ -16,8 +15,18 @@ export const handler = SiteHandler(
 		},
 	},
 	async (_, ctx) => {
-		const { params } = ctx;
-		const senderData = await getUserAndCardInstances({ username: params.senderUsername });
+		const { params, session } = ctx;
+
+		if (session.username === params.receiverUsername) {
+			return {
+				statusCode: 400,
+				body: JSON.stringify({
+					error: 'Cannot trade with yourself',
+				}),
+			};
+		}
+
+		const senderData = await getUserAndCardInstances({ username: session.username });
 		const receiverData = await getUserAndCardInstances({ username: params.receiverUsername });
 
 		const sender = senderData?.users[0];
@@ -39,20 +48,20 @@ export const handler = SiteHandler(
 		}
 
 		const tradeOptions: CreateTrade = {
+			senderUsername: session.username,
 			senderUserId: sender.userId,
-			senderUsername: params.senderUsername,
 			receiverUserId: receiver.userId,
 			receiverUsername: params.receiverUsername,
 			offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
 			requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
 			messages: params.message
 				? [
-					{
-						userId: sender.userId,
-						type: 'offer',
-						message: params.message,
-					},
-				]
+						{
+							userId: sender.userId,
+							type: 'offer',
+							message: params.message,
+						},
+				  ]
 				: [],
 		};
 

@@ -8,7 +8,7 @@ export default function OfferWindow(props: {
 	setCards?: (setter: (cards: TradeCard[]) => TradeCard[]) => void;
 }) {
 	return (
-		<ul class="scrollbar-narrow m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-300 p-2 dark:bg-gray-700">
+		<ul class="scrollbar-narrow m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-200 p-2 dark:bg-gray-700">
 			<For each={props.cards}>
 				{(card) => (
 					<li

@@ -55,8 +55,9 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 			? ctx.locals.session
 			: null;
 
+
+	//console.log({ currentRoute, isPublicRoute, isUserRoute, session })
 	if (!isPublicRoute) {
-		console.log('is not public route');
 		const isUserOnUserRoute = isUserRoute && ctx.locals.session?.type === 'user';
 		const isAdmin = ctx.locals.session?.type === 'admin';
 		if (!isAdmin && !isUserOnUserRoute && ctx.url.pathname !== '/404') {

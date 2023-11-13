@@ -21,9 +21,9 @@ const trades = await getAllTradesForUser(userId);
 
 <Page title="Trades" pageType="user" breadcrumbs={[{ label: routeNames.TRADES }]}>
 	<PageHeader>
-		<PageTitle>Trades</PageTitle>
+		<PageTitle>My Trades</PageTitle>
+		<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
 	</PageHeader>
-	<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
 
 	<TradesTable
 		incomingTrades={trades.incoming}
@@ -31,5 +31,5 @@ const trades = await getAllTradesForUser(userId);
 		loggedInUsername={username}
 		client:load
 	/>
-	<br/>
+	<br />
 </Page>

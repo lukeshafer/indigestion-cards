@@ -1,9 +1,10 @@
-import { type CreateEntityItem, Entity, type EntityItem } from 'electrodb';
+import { type CreateEntityItem, Entity, type EntityItem, type UpdateEntityItem } from 'electrodb';
 import { config, auditAttributes } from './_utils';
 import { randomUUID } from 'crypto';
 
 export type Trade = EntityItem<typeof trades>;
 export type CreateTrade = CreateEntityItem<typeof trades>;
+export type UpdateTrade = UpdateEntityItem<typeof trades>;
 export type TradeCard = Trade['offeredCards'][number];
 const tradeCardsProperties = {
 	instanceId: {
@@ -120,43 +121,43 @@ export const trades = new Entity(
 				},
 			},
 			status: {
-				type: ['pending', 'accepted', 'rejected'] as const,
+				type: ['pending', 'accepted', 'rejected', 'canceled', 'completed'] as const,
 				required: true,
 				default: 'pending',
 			},
 			...auditAttributes('trade'),
 		},
 		indexes: {
-			bySenderId: {
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: ['senderUserId'],
+					composite: ['tradeId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['tradeId'],
+					composite: [],
 				},
 			},
-			byReceiverId: {
+			bySenderId: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['receiverUserId'],
+					composite: ['senderUserId'],
 				},
 				sk: {
 					field: 'gsi1sk',
 					composite: ['tradeId'],
 				},
 			},
-			byId: {
+			byReceiverId: {
 				index: 'gsi2',
 				pk: {
 					field: 'gsi2pk',
-					composite: ['tradeId'],
+					composite: ['receiverUserId'],
 				},
 				sk: {
 					field: 'gsi2sk',
-					composite: [],
+					composite: ['tradeId'],
 				},
 			},
 		},

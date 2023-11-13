@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { trades, type CreateTrade } from '../db/trades';
+import { trades, type CreateTrade, UpdateTrade } from '../db/trades';
 
 export async function createTrade(trade: CreateTrade) {
 	const result = await trades.create(trade).go();
@@ -39,8 +39,13 @@ export async function getReceivedTradeById(args: { tradeId: string; receiverUser
 }
 
 export async function getTrade(tradeId: string) {
-	const result = await trades.query.byId({ tradeId }).go();
+	const result = await trades.query.primary({ tradeId }).go();
 	return result.data[0];
+}
+
+export async function updateTrade(tradeId: string, updates: UpdateTrade) {
+	const result = await trades.update({ tradeId }).set(updates).go();
+	return result;
 }
 
 const cardsSchema = z.object({
