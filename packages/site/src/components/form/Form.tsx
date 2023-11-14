@@ -398,18 +398,13 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow font-heading rounded border border-gray-300 dark:border-gray-800 px-4 py-2 font-bold uppercase text-white transition-colors';
+	'text-shadow font-heading border border-gray-300/50 dark:border-gray-800 px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
 
-export function Anchor(props: { children: string; href: string; type?: 'submit' | 'delete' }) {
+export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={BUTTON_CLASS}
-			classList={{
-				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark':
-					!props.type || props.type === 'submit',
-				'bg-red-500 hover:bg-red-800': props.type === 'delete',
-			}}>
+			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:bg-brand-950`}>
 			{props.children}
 		</a>
 	);
@@ -438,7 +433,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void })
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 `}
+			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 dark:hover:bg-red-900`}
 			onClick={() => props.onClick?.()}>
 			{props.children ?? 'Delete'}
 		</button>

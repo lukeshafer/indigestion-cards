@@ -7,7 +7,7 @@ import { getRarityRanking } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lib/pack-type';
-import { Heading } from '@/components/text';
+import { Anchor, Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
@@ -92,6 +92,15 @@ const packTypes = await getAllPackTypes();
 				<li>
 					<UserLookingFor {user} {isLoggedInUser} client:load />
 				</li>
+				{
+					isLoggedInUser ? null : (
+						<li>
+							<Anchor href={`${routes.TRADES}/new?receiverUsername=${user.username}`}>
+								Start Trade
+							</Anchor>
+						</li>
+					)
+				}
 			</ul>
 		</section>
 		{
