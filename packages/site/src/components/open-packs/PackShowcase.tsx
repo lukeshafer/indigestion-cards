@@ -117,7 +117,6 @@ export function PackShowcase() {
 				</For>
 			</ul>
 			<Statistics />
-			<div id="card-preview"></div>
 		</div>
 	);
 }

@@ -3,6 +3,7 @@ import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
+import { getRarityRanking } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lib/pack-type';
@@ -22,16 +23,19 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-let data = await getUserAndCardInstances({ username: id });
+let [userData, rarityRanking] = await Promise.all([
+	getUserAndCardInstances({ username: id }),
+	getRarityRanking(),
+]);
 
 const twitchData = await getUserByLogin(id).catch(() => null);
-if (!data) {
+if (!userData) {
 	if (twitchData) {
 		const newUser = await createNewUser({
 			username: twitchData.display_name,
 			userId: twitchData.id,
 		});
-		data = {
+		userData = {
 			users: [newUser],
 			cardInstances: [],
 			userLogins: [],
@@ -41,7 +45,7 @@ if (!data) {
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
 
-const { users, cardInstances } = data;
+const { users, cardInstances } = userData;
 const user = users[0] || {
 	username: id,
 	userId: twitchData?.id,
@@ -78,7 +82,7 @@ const packTypes = await getAllPackTypes();
 			<AdminOnly>
 				<details>
 					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
-					<div class="rounded bg-gray-100 dark:bg-gray-800 p-3">
+					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
 						<p>User Id: {user.userId}</p>
 						<UserPackForms {user} {packTypes} client:load />
 					</div>
@@ -95,10 +99,17 @@ const packTypes = await getAllPackTypes();
 				<div class="ml-auto">
 					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
 					<a
+						transition:name={
+							pinnedCard.designId === 'lilindheart'
+								? 'lilindheart-hero-card'
+								: pinnedCard.designId === 'lilindcult'
+								? 'lilindcult-hero-card'
+								: pinnedCard.designId === 'ryan-of-the-wild'
+								? 'ryan-of-the-wild-hero-card'
+								: undefined
+						}
 						rel="prefetch"
-						href={`${routes.INSTANCES}/${pinnedCard.designId}/${
-							pinnedCard.instanceId ?? ''
-						}`}>
+						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
 						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
 					</a>
 				</div>
@@ -109,7 +120,9 @@ const packTypes = await getAllPackTypes();
 		<Heading>Cards</Heading>
 		<CardList
 			cards={cardsNotInPack}
+			rarityRanking={rarityRanking}
 			client:load
+			isUserPage
 			sortOnlyBy={[
 				'rarest',
 				'common',

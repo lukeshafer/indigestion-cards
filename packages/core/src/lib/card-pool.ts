@@ -2,6 +2,7 @@ import type { CardDesign } from '../db/cardDesigns';
 import type { CardInstance } from '../db/cardInstances';
 import type { PackDetails } from './entity-schemas';
 import { db } from '../db/db-service';
+import { PackTypeIsOutOfCardsError } from './errors';
 
 export type CardPool = {
 	cardDesigns: CardDesign[];
@@ -20,13 +21,13 @@ export function generateCard(info: {
 	const { cardDesigns } = info.cardPool;
 
 	if (cardDesigns.length === 0) {
-		throw new Error('No designs found');
+		throw new PackTypeIsOutOfCardsError('No designs found');
 	}
 
 	const possibleCardsList = getRemainingPossibleCardsFromCardPool(info.cardPool);
 
 	if (possibleCardsList.length === 0) {
-		throw new Error('No possible cards found');
+		throw new PackTypeIsOutOfCardsError('No cards remaining');
 	}
 
 	const {
@@ -37,7 +38,7 @@ export function generateCard(info: {
 	const design = cardDesigns.find((design) => design.designId === assignedDesignId)!;
 	const rarity = design.rarityDetails?.find((rarity) => rarity.rarityId === assignedRarityId);
 
-	if (!rarity) throw new Error('No rarity found');
+	if (!rarity) throw new PackTypeIsOutOfCardsError('No rarity found');
 
 	const totalOfType = rarity?.count;
 	const instanceId = `${design.seasonId}-${design.designId}-${assignedRarityId}-${assignedCardNumber}`;

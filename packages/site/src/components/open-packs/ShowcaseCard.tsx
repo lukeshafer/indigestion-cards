@@ -35,7 +35,7 @@ export function ShowcaseCard(props: {
 						Authorization: auth_token ? `Bearer ${auth_token}` : '',
 					},
 					body,
-				});
+			  });
 	};
 
 	const previewCard = () => {

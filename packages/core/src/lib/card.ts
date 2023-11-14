@@ -40,3 +40,8 @@ export async function getCardInstanceById(args: { instanceId: string; designId: 
 	const result = await cardInstances.query.byId(args).go();
 	return result.data[0];
 }
+
+export async function getCardInstanceByUsername(args: { username: string; instanceId: string }) {
+	const result = await cardInstances.query.byOwnerId(args).go();
+	return result.data[0];
+}

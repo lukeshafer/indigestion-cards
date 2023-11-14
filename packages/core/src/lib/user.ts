@@ -53,6 +53,35 @@ export async function getUserAndCardInstances(args: { username: string }): Promi
 	}
 }
 
+export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
+	user: User;
+	userLogin: UserLogin;
+	card: CardInstance;
+} | null> {
+	const service = new Service(
+		{
+			users,
+			userLogins,
+			cardInstances,
+		},
+		config
+	);
+
+	try {
+		const data = await service.collections.cardsByOwnerName({ username: args.username }).go();
+		const card = data.data.cardInstances.find((card) => card.instanceId === args.instanceId);
+		if (!card) throw new Error('Card not found');
+		return {
+			user: data.data.users[0],
+			userLogin: data.data.userLogins[0],
+			card,
+		}
+	} catch {
+		console.error('Error while retrieving user and card instance data for user', args.username);
+		return null;
+	}
+}
+
 export async function createNewUser(args: CreateUser) {
 	// make sure this username isn't already in use
 	const existingUser = await getUserByUserName(args.username);
@@ -175,15 +204,15 @@ export async function setUserProfile(args: {
 
 	const card = args.pinnedCard
 		? await cardInstances.query
-			.byId(args.pinnedCard)
-			.go()
-			.then((result) =>
-				result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
-					? result.data[0]
-					: user.pinnedCard
-			)
+				.byId(args.pinnedCard)
+				.go()
+				.then((result) =>
+					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+						? result.data[0]
+						: user.pinnedCard
+				)
 		: args.pinnedCard === null
-			? ({
+		? ({
 				instanceId: '',
 				designId: '',
 				imgUrl: '',
@@ -199,8 +228,8 @@ export async function setUserProfile(args: {
 				rarityColor: '',
 				totalOfType: 0,
 				cardDescription: '',
-			} satisfies CardInstance)
-			: user.pinnedCard;
+		  } satisfies CardInstance)
+		: user.pinnedCard;
 
 	return users
 		.patch({ userId: args.userId })

@@ -7,6 +7,7 @@ import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';
 import type { Session } from '@/env';
 import { css } from '@acab/ecsstatic';
+import type { RarityRankingRecord } from '../site-config/RarityRanking';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
@@ -37,6 +38,8 @@ export default function CardList(props: {
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
 	sessionType?: Session['type'];
+	isUserPage?: boolean;
+	rarityRanking?: RarityRankingRecord;
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
@@ -45,7 +48,8 @@ export default function CardList(props: {
 	// eslint-disable-next-line solid/reactivity
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
 
-	const sortedCards = () => sortCards({ cards: props.cards, sort: sort() });
+	const sortedCards = () =>
+		sortCards({ cards: props.cards, sort: sort(), rarityRanking: props.rarityRanking });
 
 	return (
 		<div class="flex flex-col gap-3">
@@ -67,12 +71,19 @@ export default function CardList(props: {
 						{(card) => (
 							<div class="w-fit">
 								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID ||
-									props.sessionType === 'admin' ? (
+								props.sessionType === 'admin' ? (
 									<>
 										<a
 											rel="prefetch"
-											href={`${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''
-												}`}>
+											href={
+												props.isUserPage && card.username
+													? `${routes.USERS}/${card.username}/${
+															card.instanceId ?? ''
+													  } `
+													: `${routes.INSTANCES}/${card.designId}/${
+															card.instanceId ?? ''
+													  }`
+											}>
 											<Card {...card} scale="var(--card-scale)" />
 										</a>
 										<Show when={props.showUsernames}>
@@ -98,8 +109,12 @@ export default function CardList(props: {
 	);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function sortCards(args: { cards: CardType[]; sort: SortType | (string & {}) }) {
+function sortCards(args: {
+	cards: CardType[];
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	sort: SortType | (string & {});
+	rarityRanking?: RarityRankingRecord;
+}) {
 	const { cards, sort } = args;
 
 	switch (sort) {
@@ -118,47 +133,53 @@ function sortCards(args: { cards: CardType[]; sort: SortType | (string & {}) }) 
 					+a.cardNumber - +b.cardNumber
 			);
 		case 'rarest':
-			return cards.sort(rarestCardSort);
+			return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking));
 		case 'common':
-			return cards.sort(rarestCardSort).reverse();
+			return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking)).reverse();
 		case 'open-date-desc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'open-date-asc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'owner-asc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: a.username.localeCompare(b.username) ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'owner-desc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: b.username.localeCompare(a.username) ||
-					a.cardName.localeCompare(b.cardName) ||
-					+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;
 	}
 }
 
-function rarestCardSort(a: CardType, b: CardType) {
+function rarestCardSort(a: CardType, b: CardType, rarityRanking?: RarityRankingRecord) {
+	if (rarityRanking) {
+		const aRank = rarityRanking[a.rarityId]?.ranking ?? Infinity;
+		const bRank = rarityRanking[b.rarityId]?.ranking ?? Infinity;
+		return aRank - bRank;
+	}
+
 	if (a.totalOfType !== b.totalOfType) {
 		return a.totalOfType - b.totalOfType;
 	}

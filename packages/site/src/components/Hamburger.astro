@@ -1,6 +1,6 @@
 ---
 interface Props {
-	open?: boolean
+	open?: boolean;
 }
 ---
 
@@ -37,7 +37,14 @@ interface Props {
 		position: relative;
 		background-color: var(--color, #000);
 		transform-origin: center;
-		transition: transform 250ms, filter 100ms, background-color 250ms;
+		transition:
+			transform 250ms,
+			filter 100ms,
+			background-color 250ms;
+	}
+
+	html.dark button span {
+		--color: #fff;
 	}
 
 	button[aria-pressed='true'] span {
