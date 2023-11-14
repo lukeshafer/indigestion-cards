@@ -79,8 +79,6 @@ alerts.push(...(alertsProp ?? []));
 		const params = new URLSearchParams(window.location.search);
 		const auth_token = params.get('auth_token');
 		if (auth_token) {
-			// set auth_token in local storage
-			localStorage.setItem('auth_token', auth_token);
 			// remove auth_token from url
 			params.delete('auth_token');
 			window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);

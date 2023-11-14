@@ -58,12 +58,10 @@ export function Form(props: {
 			props.method.toUpperCase() === 'GET' ? `${props.action}?${data}` : props.action;
 		const body = props.method.toUpperCase() === 'GET' ? undefined : data;
 
-		const auth_token = localStorage.getItem('auth_token');
 		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
-				Authorization: auth_token ? `Bearer ${auth_token}` : '',
 			},
 			body,
 		})

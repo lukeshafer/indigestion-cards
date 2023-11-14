@@ -6,10 +6,7 @@ export default function TotalPackCount(props: { count: number }) {
 	const [packCountResource] = createResource(
 		totalPackCount,
 		async () => {
-			const auth_token = localStorage.getItem('auth_token') || '';
-			const response = await fetch(API.PACK_COUNT, {
-				headers: { Authorization: auth_token ? `Bearer ${auth_token}` : '' },
-			});
+			const response = await fetch(API.PACK_COUNT);
 			if (!response?.ok) return 0;
 			const responseBody = await response.json();
 			if (!responseBody.packCount || typeof responseBody.packCount !== 'number') return 0;

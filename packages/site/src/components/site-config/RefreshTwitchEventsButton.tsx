@@ -10,12 +10,8 @@ export default function RefreshTwitchEventsButton() {
 		if (isDisabled) return;
 		isDisabled = true;
 		setButtonText('Refreshing...');
-		const auth_token = localStorage.getItem('auth_token') || '';
 		const response = await fetch(API.REFRESH_TWITCH_EVENTS, {
 			method: 'POST',
-			headers: {
-				Authorization: auth_token ? `Bearer ${auth_token}` : '',
-			},
 		});
 
 		if (!response.ok) {

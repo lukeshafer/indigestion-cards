@@ -7,10 +7,7 @@ import { createResource } from 'solid-js';
 
 export default function UserPackForms(props: { packTypes: PackType[]; user: User }) {
 	const [packCount, { refetch }] = createResource(async () => {
-		const auth_token = localStorage.getItem('auth_token');
-		const response = await fetch(API.PACK_COUNT + '?userId=' + props.user.userId, {
-			headers: { Authorization: auth_token ? `Bearer ${auth_token}` : '' },
-		});
+		const response = await fetch(`${API.PACK_COUNT}?userId=${props.user.userId}`);
 		if (!response.ok) return 0;
 		const responseBody = await response.json();
 		if (!responseBody.packCount || typeof responseBody.packCount !== 'number') return 0;

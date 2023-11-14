@@ -45,7 +45,7 @@ export async function GET(ctx: APIContext) {
 	const session = Session.verify(response.access_token);
 
 	if (session.type === 'admin' || session.type === 'user') {
-		return ctx.redirect(`/?alert=Logged in!&auth_token=${response.access_token}`, 302);
+		return ctx.redirect(`/?alert=Logged in!`, 302);
 	}
 	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }
