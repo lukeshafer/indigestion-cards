@@ -188,14 +188,14 @@ export default function NewTrade(props: {
 							</Suspense>
 						</Show>
 					</Section>
-				</div>
-				<div class="col-span-full grid grid-cols-[minmax(auto,30rem)] flex-col justify-center justify-items-start gap-2">
-					<TextArea
-						name="message"
-						label="Message"
-						placeholder="Write a message to the other user"
-					/>
-					<SubmitButton />
+					<div class="col-span-full grid grid-cols-[minmax(auto,30rem)] flex-col justify-center justify-items-start gap-2">
+						<TextArea
+							name="message"
+							label="Message"
+							placeholder="Write a message to the other user"
+						/>
+						<SubmitButton />
+					</div>
 				</div>
 			</Form>
 		</>

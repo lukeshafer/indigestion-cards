@@ -1,6 +1,6 @@
 ---
 import { routes } from '@/constants';
-import { Heading, PageTitle } from '@/components/text';
+import { Anchor, Heading, PageTitle } from '@/components/text';
 import PreviewableCard from '@/components/cards/PreviewableCard';
 import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
 import AdminOnly from '@/components/AdminOnly.astro';
@@ -52,7 +52,14 @@ const openDate = card.openedAt
 				client:load
 			/>
 		</div>
-	) : null
+	) : (
+		<div class="mx-auto">
+			<Anchor
+				href={`${routes.TRADES}/new?receiverUsername=${card.username}&requestedCards=${card.instanceId}`}>
+				Request Trade
+			</Anchor>
+		</div>
+	)
 }
 <section class="mx-auto text-lg">
 	<Heading>Stats:</Heading>
