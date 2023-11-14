@@ -1,15 +1,13 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { Suspense, createResource, onMount, type JSX, Show, createEffect, on } from 'solid-js';
-import { trpc } from '@/lib/trpc';
-import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
+import { Form, Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { USER_API } from '@/constants';
+import { USER_API, routes } from '@/constants';
 import { Heading } from '@/components/text';
 import { users, fetchUsers } from '@/lib/client/state';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
-import { css } from '@acab/ecsstatic';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -52,7 +50,13 @@ export default function NewTrade(props: {
 
 	const [receiverCards] = createResource(
 		() => state.receiverUsername,
-		(receiverUsername) => trpc.cards.byUserId.query({ username: receiverUsername }),
+		(receiverUsername) =>
+			fetch(`${USER_API.CARD}?username=${receiverUsername}`, {
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+			}).then((res) => res.json() as Promise<CardInstance[]>),
 		{
 			initialValue: props.initialReceiverCards ?? [],
 			ssrLoadFrom: 'initial',
@@ -84,108 +88,107 @@ export default function NewTrade(props: {
 	return (
 		<>
 			<form class="sr-only" id="reset-form"></form>
-			<form
+			<Form
 				method="post"
 				action={USER_API.TRADE}
 				ref={(el) => setState('form', el)}
-				class={css`
-					display: grid;
-					grid-template-columns: 1fr 1fr;
-					@container main (max-width: 600px) {
-						grid-template-columns: 1fr;
-					}
-				`}>
-				<Section heading="Offer">
-					<input type="hidden" name="senderUsername" value={props.username} />
-					<Username>{props.username}</Username>
-					<OfferWindow
-						cards={state.offeredCards}
-						setCards={(setter) => setState('offeredCards', setter)}
-					/>
-					<CardSearchList
-						type="offer"
-						label="Your Cards"
-						cards={yourCards()}
-						setCards={(setter) => setState('offeredCards', setter)}
-					/>
-				</Section>
-				<Section heading="Request">
-					<Username>
-						{state.receiverUsername === null ? (
-							<div>
-								<TextInput
-									inputOnly
-									name="receiverUsername"
-									label="Search for User"
-									onInvalid={(e) =>
-										e.currentTarget.setCustomValidity('Please select a user')
-									}
-									required
-									list="users"
-									onChange={(e) => {
-										if (
-											users()?.includes(e.target.value) &&
-											e.target.value !== props.username
-										)
-											setState('receiverUsername', e.target.value);
-									}}
-								/>
-								<button
-									type="submit"
-									class="sr-only"
-									formMethod="get"
-									onClick={(e) => {
-										e.preventDefault();
-										const input = e.target.previousSibling as HTMLInputElement;
-										if (
-											users()?.includes(input.value) &&
-											input.value !== props.username
-										)
-											setState('receiverUsername', input.value);
-									}}>
-									Submit
-								</button>
-							</div>
-						) : (
-							<>
-								<input
-									type="hidden"
-									name="receiverUsername"
-									value={state.receiverUsername}
-								/>
-								{state.receiverUsername}
-								<button
-									class="px-4 text-red-500"
-									type="submit"
-									form="reset-form"
-									onClick={() => {
-										setState('receiverUsername', null);
-									}}>
-									X
-								</button>
-							</>
-						)}
-					</Username>
-					<OfferWindow
-						cards={state.requestedCards}
-						setCards={(setter) => setState('requestedCards', setter)}
-					/>
-					<Show when={state.receiverUsername !== null}>
-						<Suspense
-							fallback={
-								<div class="relative">
-									<Loading />
+				successRedirect={routes.TRADES}>
+				<div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
+					<Section heading="Offer">
+						<input type="hidden" name="senderUsername" value={props.username} />
+						<Username>{props.username}</Username>
+						<OfferWindow
+							cards={state.offeredCards}
+							setCards={(setter) => setState('offeredCards', setter)}
+						/>
+						<CardSearchList
+							type="offer"
+							label="Your Cards"
+							cards={yourCards()}
+							setCards={(setter) => setState('offeredCards', setter)}
+						/>
+					</Section>
+					<Section heading="Request">
+						<Username>
+							{state.receiverUsername === null ? (
+								<div>
+									<TextInput
+										inputOnly
+										name="receiverUsername"
+										label="Search for User"
+										onInvalid={(e) =>
+											e.currentTarget.setCustomValidity(
+												'Please select a user'
+											)
+										}
+										required
+										list="users"
+										onChange={(e) => {
+											if (
+												users()?.includes(e.target.value) &&
+												e.target.value !== props.username
+											)
+												setState('receiverUsername', e.target.value);
+										}}
+									/>
+									<button
+										type="submit"
+										class="sr-only"
+										formMethod="get"
+										onClick={(e) => {
+											e.preventDefault();
+											const input = e.target
+												.previousSibling as HTMLInputElement;
+											if (
+												users()?.includes(input.value) &&
+												input.value !== props.username
+											)
+												setState('receiverUsername', input.value);
+										}}>
+										Submit
+									</button>
 								</div>
-							}>
-							<CardSearchList
-								type="request"
-								label={`${state.receiverUsername}'s cards`}
-								cards={receiverCardsUi() ?? []}
-								setCards={(setter) => setState('requestedCards', setter)}
-							/>
-						</Suspense>
-					</Show>
-				</Section>
+							) : (
+								<>
+									<input
+										type="hidden"
+										name="receiverUsername"
+										value={state.receiverUsername}
+									/>
+									{state.receiverUsername}
+									<button
+										class="px-4 text-red-500"
+										type="submit"
+										form="reset-form"
+										onClick={() => {
+											setState('receiverUsername', null);
+										}}>
+										X
+									</button>
+								</>
+							)}
+						</Username>
+						<OfferWindow
+							cards={state.requestedCards}
+							setCards={(setter) => setState('requestedCards', setter)}
+						/>
+						<Show when={state.receiverUsername !== null}>
+							<Suspense
+								fallback={
+									<div class="relative">
+										<Loading />
+									</div>
+								}>
+								<CardSearchList
+									type="request"
+									label={`${state.receiverUsername}'s cards`}
+									cards={receiverCardsUi() ?? []}
+									setCards={(setter) => setState('requestedCards', setter)}
+								/>
+							</Suspense>
+						</Show>
+					</Section>
+				</div>
 				<div class="col-span-full grid grid-cols-[minmax(auto,30rem)] flex-col justify-center justify-items-start gap-2">
 					<TextArea
 						name="message"
@@ -194,7 +197,7 @@ export default function NewTrade(props: {
 					/>
 					<SubmitButton />
 				</div>
-			</form>
+			</Form>
 		</>
 	);
 }

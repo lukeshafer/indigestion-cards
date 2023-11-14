@@ -292,18 +292,6 @@ body.disable-animations * {
 }
 
 @layer utilities {
-	.absolute-center {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		translate: -50% -50%;
-		/*transform: translate(-50%, -50%);*/
-	}
-
-	.spin {
-		animation: spin 3s linear infinite;
-	}
-
 	.shine {
 		position: relative;
 	}

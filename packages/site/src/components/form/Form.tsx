@@ -25,6 +25,7 @@ export function Form(props: {
 	successRedirect?: string;
 	errorRedirect?: string;
 	successRefresh?: boolean;
+	ref?: (el: HTMLFormElement) => void;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -84,7 +85,7 @@ export function Form(props: {
 					...alerts,
 				]);
 			});
-			if (props.onsuccess) props.onsuccess();
+			if (props.onsuccess) await props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
 				if (responseBody) redirectURL.searchParams.set('alert', responseBody);
@@ -121,6 +122,7 @@ export function Form(props: {
 
 	return (
 		<form
+			ref={(el) => props.ref?.(el)}
 			class="relative flex w-full flex-col items-start gap-6"
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}

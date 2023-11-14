@@ -63,7 +63,7 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 				))
 			}
 		</nav>
-		<UserSearch client:load />
+		<UserSearch client:load transition:persist />
 		<UserConfig client:load {disableAnimations} user={twitchData} login={getLoginLink(Astro)} />
 	</header>
 </div>

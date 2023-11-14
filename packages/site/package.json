@@ -17,6 +17,7 @@
 		"@astrojs/tailwind": "^5.0.2",
 		"@fontsource-variable/montserrat": "^5.0.14",
 		"@formkit/auto-animate": "^0.7.0",
+		"@tailwindcss/container-queries": "^0.1.1",
 		"@trpc/client": "^10.43.1",
 		"astro": "^3.4.4",
 		"astro-icon": "^0.8.1",

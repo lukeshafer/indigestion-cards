@@ -71,9 +71,7 @@ const openDate = card.openedAt
 	<AdminOnly>
 		<p>
 			<b>Season:{' '}</b>
-			<a class="underline" href={`${routes.SEASONS}/${card.seasonId}`}
-				>{card.seasonName}</a
-			>
+			<a class="underline" href={`${routes.SEASONS}/${card.seasonId}`}>{card.seasonName}</a>
 		</p>
 	</AdminOnly>
 	<p>
@@ -104,4 +102,9 @@ const openDate = card.openedAt
 		<b>Opened at:{' '}</b>
 		{card.openedAt ? <time datetime={openDate}>{openDate}</time> : 'Not opened yet'}
 	</p>
+</section>
+
+<section>
+	<Heading>Trade History</Heading>
+	{card.tradeHistory?.map((trade) => <pre>{JSON.stringify(trade, null, 2)}</pre>)}
 </section>

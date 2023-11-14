@@ -127,6 +127,9 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.7.0
         version: 0.7.0
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.3.3)
       '@trpc/client':
         specifier: ^10.43.1
         version: 10.43.1(@trpc/server@10.43.1)
@@ -5142,6 +5145,14 @@ packages:
       '@smithy/abort-controller': 2.0.5
       '@smithy/types': 2.2.2
       tslib: 2.6.1
+
+  /@tailwindcss/container-queries@0.1.1(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
+    dependencies:
+      tailwindcss: 3.3.3
+    dev: false
 
   /@tailwindcss/typography@0.5.10(tailwindcss@3.3.3):
     resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}

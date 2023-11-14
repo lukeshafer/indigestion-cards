@@ -96,31 +96,52 @@ export async function processTrade(trade: Trade) {
 			})
 		) satisfies CardInstance[];
 
-		const newSenderCardCount =
-			sender.user.cardCount + trade.requestedCards.length - trade.offeredCards.length;
-		const newReceiverCardCount =
-			receiver.user.cardCount + trade.offeredCards.length - trade.requestedCards.length;
-
 		await service.transaction
 			.write(({ cardInstances, users, trades }) => [
 				users
 					.update({ userId: sender.user.userId })
-					.set({ cardCount: newSenderCardCount })
+					.add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
 					.commit(),
 				users
-					.update({ userId: receiver.user.userId })
-					.set({ cardCount: newReceiverCardCount })
+					.patch({ userId: receiver.user.userId })
+					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
 					.commit(),
 				...offeredCardsMoveToReceiver.map((card) =>
 					cardInstances
 						.update({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
+						.append({
+							tradeHistory: [
+								{
+									tradeId: trade.tradeId,
+									senderUserId: sender.user.userId,
+									receiverUserId: receiver.user.userId,
+									senderUsername: sender.user.username,
+									receiverUsername: receiver.user.username,
+									status: 'completed',
+									completedAt: Date.now(),
+								},
+							],
+						})
 						.commit()
 				),
 				...requestedCardsMoveToSender.map((card) =>
 					cardInstances
 						.update({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
+						.append({
+							tradeHistory: [
+								{
+									tradeId: trade.tradeId,
+									senderUserId: sender.user.userId,
+									receiverUserId: receiver.user.userId,
+									senderUsername: sender.user.username,
+									receiverUsername: receiver.user.username,
+									status: 'completed',
+									completedAt: Date.now(),
+								},
+							],
+						})
 						.commit()
 				),
 				trades.update({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),

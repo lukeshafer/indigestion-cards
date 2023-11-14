@@ -53,6 +53,22 @@ export async function getUserAndCardInstances(args: { username: string }): Promi
    }
 }
 
+export async function getUserAndOpenedCardInstances(args: { username: string }): Promise<{
+	users: User[];
+	userLogins: UserLogin[];
+	cardInstances: CardInstance[];
+} | null> {
+	const data = await getUserAndCardInstances(args);
+
+	if (!data) return null;
+
+	return {
+		users: data.users,
+		userLogins: data.userLogins,
+		cardInstances: data.cardInstances.filter((card) => card.openedAt),
+	}
+}
+
 export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
    user: User;
    userLogin: UserLogin;

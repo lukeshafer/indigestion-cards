@@ -86,6 +86,42 @@ export const cardInstances = new Entity(
 					type: 'string',
 				},
 			},
+			tradeHistory: {
+				type: 'list',
+				items: {
+					type: 'map',
+					properties: {
+						tradeId: {
+							type: 'string',
+							required: true,
+						},
+						senderUserId: {
+							type: 'string',
+							required: true,
+						},
+						senderUsername: {
+							type: 'string',
+							required: true,
+						},
+						receiverUserId: {
+							type: 'string',
+							required: true,
+						},
+						receiverUsername: {
+							type: 'string',
+							required: true,
+						},
+						completedAt: {
+							type: 'number',
+							required: true,
+						},
+						status: {
+							type: ['rejected', 'canceled', 'completed', 'failed'] as const,
+							required: true,
+						},
+					},
+				},
+			},
 			...auditAttributes('cardInstance'),
 		},
 		indexes: {

@@ -3,7 +3,7 @@ const { fontFamily } = require('tailwindcss/defaultTheme');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
-	plugins: [require('@tailwindcss/typography')],
+	plugins: [require('@tailwindcss/typography'), require('@tailwindcss/container-queries')],
 	darkMode: 'class',
 	theme: {
 		extend: {
@@ -16,6 +16,9 @@ module.exports = {
 			fontFamily: {
 				display: ['var(--font-display)', ...fontFamily.sans],
 				heading: ['var(--font-heading)', ...fontFamily.sans],
+			},
+			animation: {
+				stamp: 'stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards'
 			},
 			colors: {
 				background: {

@@ -59,4 +59,15 @@ const rewards = twitchEvents.data
 	</div>
 	<RefreshTwitchEventsButton client:load />
 	<TwitchLoginButton />
+	<ul class="my-4">
+		<h2 class="text-lg">Messages</h2>
+		{
+			siteConfig.messages.map((message) => (
+				<li>
+					<p class="font-bold">{message.type}</p>
+					<pre class="whitespace-pre-wrap">{message.message}</pre>
+				</li>
+			)) || 'No messages'
+		}
+	</ul>
 </Page>

@@ -109,6 +109,8 @@ export function API({ app, stack }: StackContext) {
 			// TRADE
 			'POST /user-api/trade': 'packages/functions/src/user-api/trade/post.handler',
 			'PATCH /user-api/trade': 'packages/functions/src/user-api/trade/patch.handler',
+			// CARD
+			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
 		},
 		defaults: {
 			function: {
