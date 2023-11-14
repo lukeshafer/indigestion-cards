@@ -4,7 +4,7 @@ import { Suspense, createResource, onMount, type JSX, Show, createEffect, on } f
 import { trpc } from '@/lib/trpc';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { USER_API } from "@/constants"
+import { USER_API } from '@/constants';
 import { Heading } from '@/components/text';
 import { users, fetchUsers } from '@/lib/client/state';
 import CardSearchList from './CardSearchList';
@@ -60,14 +60,16 @@ export default function NewTrade(props: {
 	);
 
 	const receiverCardsUi = () =>
-		receiverCards().map((card) => ({
-			...card,
-			get checked() {
-				return state.requestedCards.some(
-					(requested) => requested.instanceId === card.instanceId
-				);
-			},
-		})) satisfies TradeCardUi[];
+		receiverCards()
+			.map((card) => ({
+				...card,
+				get checked() {
+					return state.requestedCards.some(
+						(requested) => requested.instanceId === card.instanceId
+					);
+				},
+			}))
+			.filter((card) => card.openedAt) satisfies TradeCardUi[];
 
 	const yourCards = () =>
 		props.cardInstances.map((card) => ({
