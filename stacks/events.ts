@@ -55,12 +55,27 @@ export function Events({ stack }: StackContext) {
       },
    });
 
+   const tradeDlq = new Queue(stack, 'tradeDlq', {
+      consumer: {
+         function: {
+            bind: [table],
+            handler: 'packages/functions/src/sqs/handle-failed-trade.handler',
+            environment: {
+               SESSION_USER_ID: 'trade-dlq',
+               SESSION_USERNAME: 'trade-DLQ',
+               SESSION_TYPE: 'admin',
+            },
+            runtime: 'nodejs18.x',
+         },
+      },
+   });
+
    const tradeQueue = new Queue(stack, 'tradeQueue', {
       cdk: {
          queue: {
             deadLetterQueue: {
                maxReceiveCount: 5,
-               queue: dlq.cdk.queue,
+               queue: tradeDlq.cdk.queue,
             },
          },
       },

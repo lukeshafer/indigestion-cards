@@ -41,7 +41,7 @@ export const handler = SiteHandler(
 			const cards: CardInstance[] = [];
 			for (const id of providedCardIds) {
 				const card = userCardMap.get(id);
-				if (card) cards.push(card);
+				if (card && card.openedAt) cards.push(card);
 			}
 
 			return cards;
