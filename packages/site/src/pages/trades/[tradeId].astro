@@ -30,7 +30,7 @@ const tradeStatus = (() => {
 		case 'rejected':
 			return 'Rejected by receiver';
 		case 'accepted':
-			if (isReceiver) return 'Accepted, trade complete!';
+			if (isReceiver) return 'Accepted, trade processing...';
 			else if (isSender) return `${trade.receiverUsername} accepted your trade!`;
 			else return `${trade.receiverUsername} accepted the trade`;
 		case 'canceled':
