@@ -2,18 +2,61 @@
 // UI
 import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
-import Page from '@/layouts/Page.astro';
+import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import NewTrade from '@/components/trades/NewTrade';
 import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
+import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
+import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
 const body = await Astro.request.text().then((text) => new URLSearchParams(text));
-console.log(body);
 
 if (!userId || !username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+const alerts: PageProps['alerts'] = [];
+
+if (Astro.request.method === 'POST') {
+	const result = validateSearchParams(body, {
+		receiverUsername: 'string',
+		offeredCards: 'string[]',
+		requestedCards: 'string[]',
+		message: 'string?',
+	});
+
+	if (!result.success) {
+		result.errors.map((error) => alerts.push({ type: 'error', message: error }));
+	} else {
+		const { receiverUsername, offeredCards, requestedCards, message } = result.value;
+		try {
+			const trade = await createTradeFromApi({
+				senderUsername: username,
+				receiverUsername,
+				offeredCards,
+				requestedCards,
+				message,
+			});
+
+			return Astro.redirect(`/trades/${trade.data.tradeId}?alert=Trade Created`);
+		} catch (error) {
+			if (error instanceof InputValidationError) {
+				alerts.push({ type: 'error', message: error.message });
+			} else if (error instanceof ServerError) {
+				console.error(error);
+				alerts.push({
+					type: 'error',
+					message: 'An internal server error occurred while creating the trade.',
+				});
+			} else {
+				console.error(error);
+				throw error;
+			}
+		}
+	}
 }
 
 const searchParams = Astro.url.searchParams;
@@ -27,9 +70,8 @@ const { cardInstances: initialReceiverCards = [], users: initialReceiverUser = [
 		? (await getUserAndOpenedCardInstances({ username: initialReceiverUsername })) ?? {}
 		: {};
 
-let invalidUsername = false;
 if (initialReceiverUsername && !initialReceiverUser.length) {
-	invalidUsername = true;
+	alerts.push({ type: 'error', message: 'Invalid username.' });
 	initialReceiverUsername = undefined;
 }
 
@@ -53,7 +95,7 @@ function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInst
 <Page
 	wide
 	title="New Trade"
-	alerts={invalidUsername ? [{ type: 'error', message: 'Invalid username.' }] : []}
+	{alerts}
 	pageType="user"
 	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'New Trade' }]}>
 	<PageHeader>

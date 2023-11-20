@@ -1,16 +1,50 @@
 ---
-import { DeleteButton, Form, SubmitButton } from '@/components/form/Form';
+import { DeleteButton, SubmitButton } from '@/components/form/Form';
 import { Heading } from '@/components/text';
 import OfferWindow from '@/components/trades/OfferWindow';
-import { USER_API, routeNames, routes } from '@/constants';
-import Page from '@/layouts/Page.astro';
+import { routeNames, routes } from '@/constants';
+import Page, { type Props as PageProps } from '@/layouts/Page.astro';
+import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
 
-import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
+import { getTrade, updateTradeStatus } from '@lil-indigestion-cards/core/lib/trades';
 import { Show } from 'solid-js';
+
+const alerts: PageProps['alerts'] = [];
+
+const username = Astro.locals.user?.properties.username;
+const userId = Astro.locals.user?.properties.userId;
+if (!username || !userId) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
 
 const tradeId = Astro.params.tradeId;
 if (!tradeId) {
 	return Astro.redirect('/trades?alert=Invalid trade ID&type=error');
+}
+
+if (Astro.request.method === 'POST') {
+	console.log('POST')
+	const body = new URLSearchParams(await Astro.request.text());
+	const status = body.get('status');
+	if (!status) alerts.push({ type: 'error', message: 'No update status provided.' });
+	else
+		try {
+			await updateTradeStatus({
+				tradeId,
+				status,
+				loggedInUserId: userId,
+			});
+		} catch (err) {
+			if (err instanceof InputValidationError) {
+				alerts.push({ type: 'error', message: err.message });
+			} else {
+				console.error(err);
+				alerts.push({
+					type: 'error',
+					message: 'An error occurred while updating the trade.',
+				});
+			}
+		}
 }
 
 const trade = await getTrade(tradeId);
@@ -18,7 +52,6 @@ if (!trade) {
 	return Astro.redirect('/trades?alert=Trade not found&type=error');
 }
 
-const username = Astro.locals.user?.properties.username;
 const isSender = trade.senderUsername === username;
 const isReceiver = trade.receiverUsername === username;
 
@@ -128,23 +161,23 @@ const tradeStatus = (() => {
 			<div class="col-span-full justify-self-center">
 				{
 					isSender ? (
-						<Form action={USER_API.TRADE} method="patch" client:load>
+						<form method="post">
 							<input type="hidden" name="tradeId" value={trade.tradeId} />
 							<input type="hidden" name="status" value="canceled" />
 							<DeleteButton>Cancel offer</DeleteButton>
-						</Form>
+						</form>
 					) : isReceiver ? (
 						<>
-							<Form action={USER_API.TRADE} method="patch" client:load>
+							<form method="post">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="accepted" />
 								<SubmitButton>Accept offer</SubmitButton>
-							</Form>
-							<Form action={USER_API.TRADE} method="patch" client:load>
+							</form>
+							<form method="post">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="rejected" />
 								<DeleteButton>Reject offer</DeleteButton>
-							</Form>
+							</form>
 						</>
 					) : null
 				}

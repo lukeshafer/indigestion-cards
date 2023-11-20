@@ -10,10 +10,71 @@ import { cardInstances, type CardInstance } from '../db/cardInstances';
 import { users, type User } from '../db/users';
 import { Service } from 'electrodb';
 import { config } from '../db/_utils';
+import { InputValidationError, NotFoundError, ServerError, UnauthorizedError } from './errors';
+import { sendTradeAcceptedEvent } from '../events/trades';
 
 export async function createTrade(trade: CreateTrade) {
 	const result = await trades.create(trade).go();
 	return result;
+}
+
+export async function createTradeFromApi(params: {
+	senderUsername: string;
+	receiverUsername: string;
+	offeredCards: string[];
+	requestedCards: string[];
+	message?: string;
+}) {
+	if (params.senderUsername === params.receiverUsername) {
+		throw new InputValidationError('Cannot trade with yourself');
+	}
+
+	const senderData = await getUserAndCardInstances({ username: params.senderUsername });
+	const receiverData = await getUserAndCardInstances({ username: params.receiverUsername });
+
+	const sender = senderData?.users[0];
+	const receiver = receiverData?.users[0];
+	if (!sender || !receiver) {
+		throw new InputValidationError('Invalid users provided');
+	}
+
+	const getCardData = (providedCardIds: string[], userCards: CardInstance[]) => {
+		const userCardMap = new Map(userCards.map((card) => [card.instanceId, card]));
+
+		const cards: CardInstance[] = [];
+		for (const id of providedCardIds) {
+			const card = userCardMap.get(id);
+			if (card && card.openedAt) cards.push(card);
+		}
+
+		return cards;
+	};
+
+	const tradeOptions: CreateTrade = {
+		senderUsername: params.senderUsername,
+		senderUserId: sender.userId,
+		receiverUserId: receiver.userId,
+		receiverUsername: params.receiverUsername,
+		offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
+		requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
+		messages: params.message
+			? [
+				{
+					userId: sender.userId,
+					type: 'offer',
+					message: params.message,
+				},
+			]
+			: [],
+	};
+
+	try {
+		console.log({ tradeOptions });
+		return createTrade(tradeOptions);
+	} catch (e) {
+		console.error(e);
+		throw new ServerError('Internal server error');
+	}
 }
 
 export async function getOutgoingTradesByUserId(senderUserId: string) {
@@ -56,6 +117,51 @@ export async function getTrade(tradeId: string) {
 export async function updateTrade(tradeId: string, updates: UpdateTrade) {
 	const result = await trades.update({ tradeId }).set(updates).go();
 	return result;
+}
+
+export async function updateTradeStatus(params: {
+	tradeId: string;
+	status: string;
+	loggedInUserId: string;
+}): Promise<Partial<Trade>> {
+	const trade = await getTrade(params.tradeId);
+	if (!trade) throw new NotFoundError('Trade not found');
+
+	if (
+		trade.senderUserId !== params.loggedInUserId &&
+		trade.receiverUserId !== params.loggedInUserId
+	) {
+		throw new UnauthorizedError('Unauthorized');
+	}
+
+	switch (params.status) {
+		case 'accepted':
+			if (trade.receiverUserId !== params.loggedInUserId)
+				throw new InputValidationError('Only the receiver can accept a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot accept a trade that is not pending');
+
+			return updateTrade(trade.tradeId, { status: 'accepted' }).then(async (res) => {
+				await sendTradeAcceptedEvent({ tradeId: trade.tradeId });
+				return res.data;
+			});
+		case 'rejected':
+			if (trade.receiverUserId !== params.loggedInUserId)
+				throw new InputValidationError('Only the receiver can reject a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot reject a trade that is not pending');
+
+			return updateTrade(trade.tradeId, { status: 'rejected' }).then((res) => res.data);
+		case 'canceled':
+			if (trade.senderUserId !== params.loggedInUserId)
+				throw new InputValidationError('Only the sender can cancel a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot cancel a trade that is not pending');
+
+			return updateTrade(trade.tradeId, { status: 'canceled' }).then((res) => res.data);
+		default:
+			throw new InputValidationError('Invalid status');
+	}
 }
 
 export async function processTrade(trade: Trade) {

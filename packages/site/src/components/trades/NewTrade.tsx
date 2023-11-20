@@ -1,11 +1,11 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
-import { Suspense, createResource, onMount, type JSX, Show, createEffect, on } from 'solid-js';
+import { Suspense, createResource, type JSX, Show, createEffect, on } from 'solid-js';
 import { Form, Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { USER_API, routes } from '@/constants';
 import { Heading } from '@/components/text';
-import { users, fetchUsers } from '@/lib/client/state';
+import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 
@@ -34,6 +34,8 @@ export default function NewTrade(props: {
 		form: null,
 	});
 
+	const [users] = createResource(async () => get('usernames'));
+
 	createEffect(
 		// When receiverUsername changes, reset requestedCards
 		on(
@@ -43,10 +45,6 @@ export default function NewTrade(props: {
 			}
 		)
 	);
-
-	onMount(() => {
-		fetchUsers();
-	});
 
 	const [receiverCards] = createResource(
 		() => state.receiverUsername,
@@ -88,11 +86,7 @@ export default function NewTrade(props: {
 	return (
 		<>
 			<form class="sr-only" id="reset-form"></form>
-			<Form
-				method="post"
-				action={USER_API.TRADE}
-				ref={(el) => setState('form', el)}
-				successRedirect={routes.TRADES}>
+			<form method="post" ref={(el) => setState('form', el)}>
 				<div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
 					<Section heading="Offer">
 						<input type="hidden" name="senderUsername" value={props.username} />
@@ -122,7 +116,7 @@ export default function NewTrade(props: {
 											)
 										}
 										required
-										list="users"
+										list="usernames"
 										onChange={(e) => {
 											if (
 												users()?.includes(e.target.value) &&
@@ -197,7 +191,7 @@ export default function NewTrade(props: {
 						<SubmitButton />
 					</div>
 				</div>
-			</Form>
+			</form>
 		</>
 	);
 }

@@ -13,6 +13,7 @@ export const PUBLIC_ROUTES = [
 	'/card/*',
 	'/login',
 	'/logout',
+	'/data/usernames',
 ] as const;
 
 export const USER_ROUTES = ['/trades', '/trades/*'];
