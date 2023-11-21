@@ -2,6 +2,7 @@
 import { DeleteButton, SubmitButton } from '@/components/form/Form';
 import { Heading } from '@/components/text';
 import OfferWindow from '@/components/trades/OfferWindow';
+import TradeMessageHistory from '@/components/trades/TradeMessageHistory'
 import { routeNames, routes } from '@/constants';
 import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
@@ -23,7 +24,6 @@ if (!tradeId) {
 }
 
 if (Astro.request.method === 'POST') {
-	console.log('POST')
 	const body = new URLSearchParams(await Astro.request.text());
 	const status = body.get('status');
 	if (!status) alerts.push({ type: 'error', message: 'No update status provided.' });
@@ -61,7 +61,8 @@ const tradeStatus = (() => {
 			if (isReceiver) return 'Awaiting your response';
 			else return `Awaiting ${trade.receiverUsername}'s response`;
 		case 'rejected':
-			return 'Rejected by receiver';
+			if (isReceiver) return 'Rejected by you'
+			return `Rejected by ${trade.receiverUsername}`;
 		case 'accepted':
 			if (isReceiver) return 'Accepted, trade processing...';
 			else if (isSender) return `${trade.receiverUsername} accepted your trade!`;
@@ -79,7 +80,7 @@ const tradeStatus = (() => {
 	pageType="user"
 	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'Trade' }]}>
 	<br />
-	<div class="grid-wrapper grid">
+	<div class="grid-wrapper grid gap-2">
 		<style>
 			.grid-wrapper {
 				grid-template-columns: 1fr 1fr;
@@ -115,48 +116,7 @@ const tradeStatus = (() => {
 			</h2>
 			<OfferWindow cards={trade.requestedCards} client:load />
 		</div>
-		<ul
-			class="col-span-full grid min-h-[8rem] w-[32rem] max-w-full gap-3 justify-self-center rounded-lg bg-gray-200 px-6 py-4 dark:bg-gray-900">
-			{
-				trade.messages.map((msg) => {
-					const isFromSender = msg.userId === trade.senderUserId;
-					const username = isFromSender ? trade.senderUsername : trade.receiverUsername;
-					return (
-						<li
-							class="min-h-[5rem] w-fit max-w-[15rem] rounded-md bg-gray-50 px-3 py-2 dark:bg-gray-800"
-							class:list={{
-								'justify-self-start': isFromSender,
-								'justify-self-end': !isFromSender,
-							}}>
-							<p
-								class="font-semibold text-gray-600 dark:text-gray-400"
-								class:list={{ 'text-right': !isFromSender }}>
-								{username}
-							</p>
-							<p
-								class="pb-1 "
-								class:list={{
-									'text-right': !isFromSender,
-									'text-red-600 dark:text-red-400':
-										!isFromSender && trade.status === 'rejected',
-									'text-brand-dark dark:text-brand-main':
-										!isFromSender && trade.status !== 'rejected',
-									'text-blue-600 dark:text-blue-400': isFromSender,
-								}}>
-								{isFromSender
-									? 'Request'
-									: trade.status === 'rejected'
-									? 'Rejected'
-									: trade.status === 'accepted'
-									? 'Accepted'
-									: 'Response'}
-							</p>
-							<p class="message">{msg.message}</p>
-						</li>
-					);
-				})
-			}
-		</ul>
+		<TradeMessageHistory {trade} client:load />
 		<Show when={trade.status === 'pending'}>
 			<div class="col-span-full justify-self-center">
 				{

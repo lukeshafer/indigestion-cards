@@ -4,6 +4,7 @@ import { API } from './api';
 import { DesignBucket } from './bucket';
 import { Auth } from './auth';
 import { ConfigStack } from './config';
+import { Events } from './events';
 import { getHostedZone, getDomainName } from './constants';
 
 export function Sites({ app, stack }: StackContext) {
@@ -11,6 +12,7 @@ export function Sites({ app, stack }: StackContext) {
 	const { adminApi, twitchApi, trpcApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
+	const bus = use(Events)
 	const config = use(ConfigStack);
 	const hostedZone = getHostedZone(stack.stage);
 
@@ -32,6 +34,7 @@ export function Sites({ app, stack }: StackContext) {
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_ARN,
 			config.DOMAIN_NAME,
+			bus,
 		],
 		environment: {
 			PUBLIC_TRPC_URL: trpcApi.url,
