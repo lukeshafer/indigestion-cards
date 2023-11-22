@@ -1,4 +1,4 @@
-import { StackContext, AstroSite, use } from 'sst/constructs';
+import { StackContext, AstroSite, SolidStartSite, use } from 'sst/constructs';
 import { Database } from './database';
 import { API } from './api';
 import { DesignBucket } from './bucket';
@@ -12,7 +12,7 @@ export function Sites({ app, stack }: StackContext) {
 	const { adminApi, twitchApi, trpcApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
-	const bus = use(Events)
+	const bus = use(Events);
 	const config = use(ConfigStack);
 	const hostedZone = getHostedZone(stack.stage);
 
@@ -43,14 +43,36 @@ export function Sites({ app, stack }: StackContext) {
 			app.mode === 'dev'
 				? undefined
 				: {
-					domainName: baseDomain,
-					hostedZone: hostedZone,
-				},
+						domainName: baseDomain,
+						hostedZone: hostedZone,
+				  },
 		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
 		runtime: 'nodejs18.x',
 	});
 
+	const frontend = new SolidStartSite(stack, 'frontend', {
+		path: 'packages/frontend',
+		bind: [
+			table,
+			adminApi,
+			twitchApi,
+			frameBucket,
+			cardDesignBucket,
+			frameDraftBucket,
+			cardDraftBucket,
+			siteAuth,
+			config.TWITCH_CLIENT_ID,
+			config.TWITCH_CLIENT_SECRET,
+			config.STREAMER_USER_ID,
+			config.TWITCH_TOKENS_ARN,
+			config.DOMAIN_NAME,
+			bus,
+		],
+		permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+	});
+
 	stack.addOutputs({
 		AdminUrl: site.url,
+		FrontendUrl: frontend.url,
 	});
 }
