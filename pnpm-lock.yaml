@@ -42,8 +42,8 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6(prettier-plugin-astro@0.12.0)(prettier@3.0.3)
       sst:
-        specifier: 2.36.0
-        version: 2.36.0
+        specifier: 2.36.2
+        version: 2.36.2
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -73,8 +73,8 @@ importers:
         specifier: ^18.18.6
         version: 18.18.6
       sst:
-        specifier: 2.36.0
-        version: 2.36.0
+        specifier: 2.36.2
+        version: 2.36.2
 
   packages/functions:
     dependencies:
@@ -101,8 +101,8 @@ importers:
         specifier: ^18.18.6
         version: 18.18.6
       sst:
-        specifier: 2.36.0
-        version: 2.36.0
+        specifier: 2.36.2
+        version: 2.36.2
 
   packages/site:
     dependencies:
@@ -128,8 +128,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1
       astro-sst:
-        specifier: 2.36.0
-        version: 2.36.0
+        specifier: 2.36.2
+        version: 2.36.2
       electrodb:
         specifier: ^2.10.3
         version: 2.10.3(@aws-sdk/client-dynamodb@3.431.0)
@@ -137,8 +137,8 @@ importers:
         specifier: ^1.8.3
         version: 1.8.3
       sst:
-        specifier: 2.36.0
-        version: 2.36.0
+        specifier: 2.36.2
+        version: 2.36.2
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3
@@ -5154,8 +5154,8 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /astro-sst@2.36.0:
-    resolution: {integrity: sha512-gmObQT7LWkKzoZB6ItH60abZUhLrFtrrux7PoV9QuV5DXvdF1BNHx+zq1Sh5EPDA6bRPiOHAC8MUBaHSuEjo6g==}
+  /astro-sst@2.36.2:
+    resolution: {integrity: sha512-b2R3qmfB1mGtNA/JIaOjpm5Rk17V4+zJdpZLovdYgOgePG0HRYMavKSV3xz6B13yMcCbMt2j3r0t9wJCnDUKQA==}
     dependencies:
       '@astrojs/webapi': 3.0.0
       set-cookie-parser: 2.6.0
@@ -5313,7 +5313,7 @@ packages:
       '@httptoolkit/websocket-stream': 6.0.1
       axios: 0.24.0
       buffer: 6.0.3
-      crypto-js: 4.1.1
+      crypto-js: 4.2.0
       mqtt: 4.3.7
       process: 0.11.10
     transitivePeerDependencies:
@@ -5827,9 +5827,6 @@ packages:
 
   /crypt@0.0.2:
     resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
-
-  /crypto-js@4.1.1:
-    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
 
   /crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
@@ -9780,8 +9777,8 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.36.0:
-    resolution: {integrity: sha512-Gz7OZAtGNVmLwKeuroXxaCUPITB59zw6F1YfFzDg8dOIZK3pyuJyp0DI2IO7w5/X1HT8wFfI9ZA/82FoUa5WHw==}
+  /sst@2.36.2:
+    resolution: {integrity: sha512-6uGJlM7/1mUYTVJxcnmqAjKkELkKtOGewLFeEwdEZRpTnN/mu9Y+K1qr96oDE8FaLKwRfx9lpOl/Ejf3GxC0qg==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0
