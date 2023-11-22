@@ -16,8 +16,15 @@
 		"vite": "^4.4.9"
 	},
 	"dependencies": {
+		"@fontsource-variable/montserrat": "^5.0.14",
+		"@kobalte/core": "^0.11.2",
+		"@solid-primitives/context": "^0.2.1",
+		"@solid-primitives/map": "^0.4.8",
+		"@solid-primitives/set": "^0.4.8",
 		"@solidjs/meta": "^0.29.1",
 		"@solidjs/router": "^0.8.3",
+		"@tailwindcss/container-queries": "^0.1.1",
+		"@tailwindcss/typography": "^0.5.10",
 		"solid-js": "^1.8.5",
 		"solid-start": "^0.3.10"
 	},

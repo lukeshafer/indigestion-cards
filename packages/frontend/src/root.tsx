@@ -1,20 +1,11 @@
 // @refresh reload
 import { Suspense } from 'solid-js';
-import {
-	useLocation,
-	A,
-	Body,
-	ErrorBoundary,
-	FileRoutes,
-	Head,
-	Html,
-	Meta,
-	Routes,
-	Scripts,
-	Title,
-} from 'solid-start';
+import { useLocation, A, Routes } from '@solidjs/router';
+import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Scripts, Title } from 'solid-start';
 import './root.css';
+import '@fontsource-variable/montserrat';
 import { color_theme } from '~/lib/page-config';
+import PageLayout from './components/PageLayout';
 
 export default function Root() {
 	const location = useLocation();
@@ -37,19 +28,11 @@ export default function Root() {
 			<Body>
 				<Suspense>
 					<ErrorBoundary>
-						<nav class="bg-sky-800">
-							<ul class="container flex items-center p-3 text-gray-200">
-								<li class={`border-b-2 ${active('/')} mx-1.5 sm:mx-6`}>
-									<A href="/">Home</A>
-								</li>
-								<li class={`border-b-2 ${active('/about')} mx-1.5 sm:mx-6`}>
-									<A href="/about">About</A>
-								</li>
-							</ul>
-						</nav>
-						<Routes>
-							<FileRoutes />
-						</Routes>
+						<PageLayout>
+							<Routes>
+								<FileRoutes />
+							</Routes>
+						</PageLayout>
 					</ErrorBoundary>
 				</Suspense>
 				<Scripts />
