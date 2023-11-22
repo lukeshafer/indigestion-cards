@@ -18,7 +18,8 @@
 		"site:dev": "pnpm --filter site run dev",
 		"site:dev:host": "pnpm --filter site run dev:host",
 		"site:build": "pnpm --filter site run build",
-		"site:astro": "pnpm --filter site run astro"
+		"site:astro": "pnpm --filter site run astro",
+		"frontend:dev": "pnpm --filter frontend run dev"
 	},
 	"devDependencies": {
 		"@tsconfig/node16": "^1.0.3",
