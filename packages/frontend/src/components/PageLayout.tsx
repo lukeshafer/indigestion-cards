@@ -1,9 +1,9 @@
 import AlertBox, { AlertsProvider } from './AlertBox';
-import Breadcrumbs, { BreadcrumbProps } from './Breadcrumbs';
-import { type ParentProps, Show } from 'solid-js';
+import Breadcrumbs from './Breadcrumbs';
+import { type ParentProps, Show, Suspense } from 'solid-js';
 import { PageContextProvider } from '~/lib/page-context';
-import { useLocation } from 'solid-start';
 import Header from './Header';
+import Footer from './Footer';
 
 export default function PageLayout(
 	props: ParentProps<{
@@ -13,16 +13,6 @@ export default function PageLayout(
 		hideBreadcrumbs?: boolean;
 	}>
 ) {
-	const location = useLocation();
-	const paths = () =>
-		location.pathname.split('/').map((location, index, arr) => ({
-			label: location.charAt(0).toUpperCase() + location.slice(1),
-			href: index + 1 < arr.length ? location : undefined,
-			current: index + 1 === arr.length,
-		})) satisfies BreadcrumbProps[];
-
-	const Footer = () => <footer>ffffff{/* TODO: create header component */}</footer>;
-
 	return (
 		<div
 			class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
@@ -40,7 +30,7 @@ export default function PageLayout(
 						<AlertBox />
 						<Show when={!props.hideBreadcrumbs}>
 							<div class="max-w-main mx-auto w-full">
-								<Breadcrumbs paths={paths()} />
+								<Breadcrumbs />
 							</div>
 						</Show>
 						<main
@@ -51,7 +41,9 @@ export default function PageLayout(
 								'p-3': !props.noHeader,
 							}}
 							class="@container/main z-0 col-start-2 mx-auto mb-8 w-full flex-1">
-							{props.children}
+              <Suspense fallback="loading">
+                {props.children}
+              </Suspense>
 						</main>
 						<div id="card-preview"></div>
 						<Footer />

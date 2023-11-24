@@ -2,6 +2,9 @@ import { ElectroError } from 'electrodb';
 import { rarities, type Rarity, type CreateRarity, type UpdateRarity } from '../db/rarities';
 import type { DBResult } from '../types';
 import { getAllCardDesigns } from './design';
+import type { CardDesign } from '../db/cardDesigns';
+import type { SiteConfig } from '../db/siteConfig';
+import { LEGACY_CARD_ID } from '../constants';
 
 export async function getRarityById(args: { rarityId: string }) {
 	const result = await rarities.query.allRarities(args).go();
@@ -55,4 +58,17 @@ export async function deleteRarityById(id: string): Promise<DBResult<Partial<Rar
 
 	const result = await rarities.delete({ rarityId: id }).go();
 	return { success: true, data: result.data };
+}
+
+export function getBaseRarity(args: { design: CardDesign; siteConfig?: SiteConfig }) {
+	return (
+		args.design.bestRarityFound ||
+		args.design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
+		args.siteConfig?.baseRarity || {
+			rarityId: 'default',
+			rarityName: 'Default',
+			frameUrl: '/assets/cards/default-base-rarity.png',
+			rarityColor: '#fff',
+		}
+	);
 }

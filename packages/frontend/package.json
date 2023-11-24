@@ -16,6 +16,7 @@
 		"vite": "^4.4.9"
 	},
 	"dependencies": {
+		"@acab/ecsstatic": "^0.7.1",
 		"@fontsource-variable/montserrat": "^5.0.14",
 		"@kobalte/core": "^0.11.2",
 		"@solid-primitives/context": "^0.2.1",
@@ -25,7 +26,10 @@
 		"@solidjs/router": "^0.8.3",
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/typography": "^0.5.10",
+		"@tanstack/solid-query": "^5.8.4",
+		"solid-icons": "^1.1.0",
 		"solid-js": "^1.8.5",
+		"solid-markdown": "^2.0.0",
 		"solid-start": "^0.3.10"
 	},
 	"engines": {
