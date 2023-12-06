@@ -1,41 +1,41 @@
 {
-	"name": "lil-indigestion-cards",
-	"version": "0.0.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "sst dev",
-		"build": "sst build",
-		"deploy": "sst deploy",
-		"remove": "sst remove",
-		"console": "sst console",
-		"check": "pnpm run root:check & pnpm run core:check & pnpm run functions:check & pnpm run site:check",
-		"root:check": "tsc --noEmit",
-		"core:check": "pnpm --filter core run typecheck",
-		"functions:check": "pnpm --filter functions run typecheck",
-		"site:check": "pnpm --filter site run typecheck",
-		"site:add": "pnpm --filter site run astro add",
-		"site:dev": "pnpm --filter site run dev",
-		"site:dev:host": "pnpm --filter site run dev:host",
-		"site:build": "pnpm --filter site run build",
-		"site:astro": "pnpm --filter site run astro"
-	},
-	"devDependencies": {
-		"@tsconfig/node16": "^1.0.3",
-		"@tsconfig/node18": "^18.2.2",
-		"@typescript-eslint/eslint-plugin": "^6.8.0",
-		"@typescript-eslint/parser": "^6.8.0",
-		"aws-cdk-lib": "2.101.1",
-		"constructs": "10.2.69",
-		"eslint": "^8.51.0",
-		"eslint-plugin-solid": "^0.13.0",
-		"graphql": "16.8.1",
-		"prettier-plugin-astro": "^0.12.0",
-		"prettier-plugin-tailwindcss": "^0.5.6",
-		"sst": "2.36.0",
-		"typescript": "^5.2.2"
-	},
-	"workspaces": [
-		"packages/*"
-	]
+  "name": "lil-indigestion-cards",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "check": "pnpm run root:check & pnpm run core:check & pnpm run functions:check & pnpm run site:check",
+    "root:check": "tsc --noEmit",
+    "core:check": "pnpm --filter core run typecheck",
+    "functions:check": "pnpm --filter functions run typecheck",
+    "site:check": "pnpm --filter site run typecheck",
+    "site:add": "pnpm --filter site run astro add",
+    "site:dev": "pnpm --filter site run dev",
+    "site:dev:host": "pnpm --filter site run dev:host",
+    "site:build": "pnpm --filter site run build",
+    "site:astro": "pnpm --filter site run astro"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node18": "^18.2.2",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "aws-cdk-lib": "2.101.1",
+    "constructs": "10.2.69",
+    "eslint": "^8.51.0",
+    "eslint-plugin-solid": "^0.13.0",
+    "graphql": "16.8.1",
+    "prettier-plugin-astro": "^0.12.0",
+    "prettier-plugin-tailwindcss": "^0.5.6",
+    "sst": "2.36.0",
+    "typescript": "^5.2.2"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
