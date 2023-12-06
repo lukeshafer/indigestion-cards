@@ -2,7 +2,7 @@
 import { DeleteButton, SubmitButton } from '@/components/form/Form';
 import { Heading } from '@/components/text';
 import OfferWindow from '@/components/trades/OfferWindow';
-import TradeMessageHistory from '@/components/trades/TradeMessageHistory'
+import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
 import { routeNames, routes } from '@/constants';
 import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
@@ -61,7 +61,7 @@ const tradeStatus = (() => {
 			if (isReceiver) return 'Awaiting your response';
 			else return `Awaiting ${trade.receiverUsername}'s response`;
 		case 'rejected':
-			if (isReceiver) return 'Rejected by you'
+			if (isReceiver) return 'Rejected by you';
 			return `Rejected by ${trade.receiverUsername}`;
 		case 'accepted':
 			if (isReceiver) return 'Accepted, trade processing...';
@@ -127,18 +127,26 @@ const tradeStatus = (() => {
 							<DeleteButton>Cancel offer</DeleteButton>
 						</form>
 					) : isReceiver ? (
-						<>
+						<div class="flex flex-wrap gap-2">
 							<form method="post">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="accepted" />
-								<SubmitButton>Accept offer</SubmitButton>
+								<SubmitButton
+									confirm="Are you sure you want to accept this trade? Once accepted, the trade is final and cannot be reversed."
+									client:idle>
+									<div class="min-w-[8rem]">Accept offer</div>
+								</SubmitButton>
 							</form>
 							<form method="post">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="rejected" />
-								<DeleteButton>Reject offer</DeleteButton>
+								<DeleteButton
+									confirm="Are you sure you want to reject this trade?"
+									client:idle>
+									<div class="min-w-[8rem]">Reject offer</div>
+								</DeleteButton>
 							</form>
-						</>
+						</div>
 					) : null
 				}
 			</div>

@@ -98,6 +98,18 @@ export const trades = new Entity(
 					properties: tradeCardsProperties,
 				},
 			},
+			notificationsForSender: {
+				type: 'list',
+				items: {
+					type: 'string',
+				},
+			},
+			notificationsForReceiver: {
+				type: 'list',
+				items: {
+					type: 'string',
+				},
+			},
 			messages: {
 				type: 'list',
 				required: true,
@@ -110,7 +122,7 @@ export const trades = new Entity(
 							required: true,
 						},
 						type: {
-							type: ['offer', 'response'] as const,
+							type: ['offer', 'response', 'status-update'] as const,
 							required: true,
 						},
 						message: {
