@@ -402,13 +402,13 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow font-heading border border-gray-300/50 dark:border-gray-800 px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
+	'text-shadow dark:text-shadow-dark font-heading rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
 
 export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:bg-brand-950`}>
+			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}>
 			{props.children}
 		</a>
 	);
@@ -427,7 +427,7 @@ export function SubmitButton(props: {
 			disabled={props.disabled}
 			style={{ 'view-transition-name': props.transitionId }}
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
-			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
+			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
 			onClick={(e) => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();

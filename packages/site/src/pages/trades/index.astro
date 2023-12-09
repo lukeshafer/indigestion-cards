@@ -22,7 +22,9 @@ const trades = await getAllTradesForUser(userId);
 <Page title="Trades" pageType="user" breadcrumbs={[{ label: routeNames.TRADES }]}>
 	<PageHeader>
 		<PageTitle>My Trades</PageTitle>
-		<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
+    <div class="flex w-full justify-center sm:w-auto sm:absolute right-0 top-0">
+      <Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
+    </div>
 	</PageHeader>
 
 	<TradesTable

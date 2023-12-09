@@ -120,8 +120,11 @@ body.disable-animations * {
 	}
 
 	:root * {
-		transition: color 50ms ease-in-out, background-color 50ms ease-in-out,
-			border-color 50ms ease-in-out, box-shadow 50ms ease-in-out;
+		transition:
+			color 50ms ease-in-out,
+			background-color 50ms ease-in-out,
+			border-color 50ms ease-in-out,
+			box-shadow 50ms ease-in-out;
 	}
 
 	*::selection {
@@ -322,7 +325,21 @@ body.disable-animations * {
 	}
 
 	.text-shadow {
-		text-shadow: var(--brand-shadow);
+		text-shadow:
+			1px 1px 0 theme('colors.gray.500'),
+			-1px 1px 0 theme('colors.gray.500'),
+			1px -1px 0 theme('colors.gray.500'),
+			-1px -1px 0 theme('colors.gray.500');
+		/*text-shadow: var(--brand-shadow);*/
+	}
+
+	.text-shadow-dark {
+		text-shadow:
+			1px 1px 0 theme('colors.gray.600'),
+			-1px 1px 0 theme('colors.gray.600'),
+			1px -1px 0 theme('colors.gray.600'),
+			-1px -1px 0 theme('colors.gray.600');
+		/*text-shadow: var(--brand-shadow);*/
 	}
 
 	.no-text-shadow {
