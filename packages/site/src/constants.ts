@@ -14,10 +14,14 @@ export const PUBLIC_ROUTES = [
 	'/login',
 	'/logout',
 	'/data/usernames',
+  '/trades/*',
+  '/data/trades/*',
 ] as const;
 
-export const USER_ROUTES = ['/trades', '/trades/*'];
+/** Routes that aren't admin only, but require a user login */
+export const USER_ROUTES = ['/trades'];
 
+/** Admin Api routes */
 const api_paths = {
 	PACK_TYPE: '/pack-type',
 	SEASON: '/season',
@@ -44,6 +48,7 @@ export const API = new Proxy(api_paths, {
 	},
 });
 
+/** User API Routes */
 const user_api_paths = {
 	USER: '/user',
 	TRADE: '/trade',
@@ -58,6 +63,7 @@ export const USER_API = new Proxy(user_api_paths, {
 	},
 });
 
+/** Public API routes */
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',
 	SEARCH: '/api/search',

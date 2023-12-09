@@ -50,6 +50,21 @@ export async function createTradeFromApi(params: {
 		return cards;
 	};
 
+	const messages: CreateTrade['messages'] = [
+		{
+			userId: sender.userId,
+			type: 'status-update',
+			message: 'pending',
+		},
+	];
+	if (params.message) {
+		messages.push({
+			userId: sender.userId,
+			type: 'offer',
+			message: params.message,
+		});
+	}
+
 	const tradeOptions: CreateTrade = {
 		senderUsername: params.senderUsername,
 		senderUserId: sender.userId,
@@ -57,15 +72,7 @@ export async function createTradeFromApi(params: {
 		receiverUsername: params.receiverUsername,
 		offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
 		requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
-		messages: params.message
-			? [
-				{
-					userId: sender.userId,
-					type: 'offer',
-					message: params.message,
-				},
-			]
-			: [],
+    messages,
 	};
 
 	try {
@@ -114,8 +121,22 @@ export async function getTrade(tradeId: string) {
 	return result.data[0];
 }
 
-export async function updateTrade(tradeId: string, updates: UpdateTrade) {
-	const result = await trades.update({ tradeId }).set(updates).go();
+export async function updateTrade(tradeId: string, updates: UpdateTrade, userId?: string) {
+	const set = trades.patch({ tradeId }).set(updates);
+	const status = updates.status;
+	const result = status
+		? set
+				.append({
+					messages: [
+						{
+							type: 'status-update',
+							message: status,
+							userId: userId ?? '',
+						},
+					],
+				})
+				.go()
+		: set.go();
 	return result;
 }
 
@@ -141,7 +162,13 @@ export async function updateTradeStatus(params: {
 			else if (trade.status !== 'pending')
 				throw new InputValidationError('Cannot accept a trade that is not pending');
 
-			return updateTrade(trade.tradeId, { status: 'accepted' }).then(async (res) => {
+			return updateTrade(
+				trade.tradeId,
+				{
+					status: 'accepted',
+				},
+				params.loggedInUserId
+			).then(async (res) => {
 				await sendTradeAcceptedEvent({ tradeId: trade.tradeId });
 				return res.data;
 			});
@@ -151,17 +178,41 @@ export async function updateTradeStatus(params: {
 			else if (trade.status !== 'pending')
 				throw new InputValidationError('Cannot reject a trade that is not pending');
 
-			return updateTrade(trade.tradeId, { status: 'rejected' }).then((res) => res.data);
+			return updateTrade(trade.tradeId, { status: 'rejected' }, params.loggedInUserId).then(
+				(res) => res.data
+			);
 		case 'canceled':
 			if (trade.senderUserId !== params.loggedInUserId)
 				throw new InputValidationError('Only the sender can cancel a trade');
 			else if (trade.status !== 'pending')
 				throw new InputValidationError('Cannot cancel a trade that is not pending');
 
-			return updateTrade(trade.tradeId, { status: 'canceled' }).then((res) => res.data);
+			return updateTrade(trade.tradeId, { status: 'canceled' }, params.loggedInUserId).then(
+				(res) => res.data
+			);
 		default:
 			throw new InputValidationError('Invalid status');
 	}
+}
+
+export async function addMessageToTrade(params: {
+	tradeId: string;
+	message: Trade['messages'][number];
+	loggedInUserId: string;
+}) {
+	const trade = await getTrade(params.tradeId);
+	if (!trade) throw new NotFoundError('Trade not found');
+
+	if (
+		trade.senderUserId !== params.loggedInUserId &&
+		trade.receiverUserId !== params.loggedInUserId
+	) {
+		throw new UnauthorizedError('Unauthorized');
+	}
+	return trades
+		.patch({ tradeId: params.tradeId })
+		.append({ messages: [params.message] })
+		.go();
 }
 
 export async function processTrade(trade: Trade) {

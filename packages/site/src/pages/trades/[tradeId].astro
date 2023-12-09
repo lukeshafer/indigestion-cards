@@ -6,17 +6,18 @@ import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
 import { routeNames, routes } from '@/constants';
 import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
-
-import { getTrade, updateTradeStatus } from '@lil-indigestion-cards/core/lib/trades';
+import { validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
+import {
+	getTrade,
+	updateTradeStatus,
+	addMessageToTrade,
+} from '@lil-indigestion-cards/core/lib/trades';
 import { Show } from 'solid-js';
 
 const alerts: PageProps['alerts'] = [];
 
 const username = Astro.locals.user?.properties.username;
 const userId = Astro.locals.user?.properties.userId;
-if (!username || !userId) {
-	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
-}
 
 const tradeId = Astro.params.tradeId;
 if (!tradeId) {
@@ -24,27 +25,56 @@ if (!tradeId) {
 }
 
 if (Astro.request.method === 'POST') {
+	if (!username || !userId) {
+		return new Response('You must be logged in to update a trade.', {
+			status: 401,
+		});
+	}
 	const body = new URLSearchParams(await Astro.request.text());
-	const status = body.get('status');
-	if (!status) alerts.push({ type: 'error', message: 'No update status provided.' });
-	else
-		try {
-			await updateTradeStatus({
-				tradeId,
-				status,
-				loggedInUserId: userId,
-			});
-		} catch (err) {
-			if (err instanceof InputValidationError) {
-				alerts.push({ type: 'error', message: err.message });
-			} else {
-				console.error(err);
-				alerts.push({
-					type: 'error',
-					message: 'An error occurred while updating the trade.',
+	const result = validateSearchParams(body, {
+		status: 'string?',
+		message: 'string?',
+	});
+
+	if (!result.success) {
+		alerts.push({ type: 'error', message: 'No data provided in request.' });
+	} else if (Object.values(result.value).every((v) => v === undefined)) {
+		alerts.push({ type: 'error', message: 'No update status provided.' });
+	} else {
+		const { status, message } = result.value;
+
+		if (status)
+			try {
+				await updateTradeStatus({
+					tradeId,
+					status,
+					loggedInUserId: userId,
 				});
+			} catch (err) {
+				if (err instanceof InputValidationError) {
+					alerts.push({ type: 'error', message: err.message });
+				} else {
+					console.error(err);
+					alerts.push({
+						type: 'error',
+						message: 'An error occurred while updating the trade.',
+					});
+				}
 			}
+
+		if (message) {
+			await addMessageToTrade({
+				loggedInUserId: userId,
+				tradeId,
+				message: {
+					message,
+					userId,
+					type: 'message',
+				},
+			});
+			// add message to the trade data
 		}
+	}
 }
 
 const trade = await getTrade(tradeId);
@@ -77,8 +107,10 @@ const tradeStatus = (() => {
 
 <Page
 	title="Trades"
-	pageType="user"
-	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'Trade' }]}>
+	pageType="public"
+	breadcrumbs={userId
+		? [{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'Trade' }]
+		: [{ label: routeNames.TRADES }, { label: 'Trade' }]}>
 	<br />
 	<div class="grid-wrapper grid gap-2">
 		<style>
@@ -116,7 +148,7 @@ const tradeStatus = (() => {
 			</h2>
 			<OfferWindow cards={trade.requestedCards} client:load />
 		</div>
-		<TradeMessageHistory {trade} client:load />
+		<TradeMessageHistory {trade} loggedInUserId={userId} client:load />
 		<Show when={trade.status === 'pending'}>
 			<div class="col-span-full justify-self-center">
 				{

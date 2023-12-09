@@ -47,6 +47,21 @@ export const handler = SiteHandler(
 			return cards;
 		}
 
+		const messages: CreateTrade['messages'] = [
+			{
+				userId: sender.userId,
+				type: 'status-update',
+				message: 'pending',
+			},
+		];
+		if (params.message) {
+			messages.push({
+				userId: sender.userId,
+				type: 'offer',
+				message: params.message,
+			});
+		}
+
 		const tradeOptions: CreateTrade = {
 			senderUsername: session.username,
 			senderUserId: sender.userId,
@@ -54,15 +69,7 @@ export const handler = SiteHandler(
 			receiverUsername: params.receiverUsername,
 			offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
 			requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
-			messages: params.message
-				? [
-						{
-							userId: sender.userId,
-							type: 'offer',
-							message: params.message,
-						},
-				  ]
-				: [],
+			messages,
 		};
 
 		try {

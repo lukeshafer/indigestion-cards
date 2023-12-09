@@ -16,16 +16,17 @@ export function Form(props: {
 		| 'trace'
 		| 'connect'
 		| 'patch';
-	action: string;
+	action?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
-	onsubmit?: () => void;
+	onsubmit?: (e: SubmitEvent) => void;
 	loadingText?: string;
 	successRedirect?: string;
 	errorRedirect?: string;
 	successRefresh?: boolean;
 	ref?: (el: HTMLFormElement) => void;
+	noAlert?: boolean;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -36,10 +37,10 @@ export function Form(props: {
 		let formURL: URL;
 		let isLocal = false;
 		try {
-			formURL = new URL(props.action);
+			formURL = new URL(props.action || window.location.pathname);
 		} catch {
 			isLocal = true;
-			formURL = new URL(props.action, 'http://localhost');
+			formURL = new URL(props.action || window.location.pathname, 'http://localhost');
 		}
 
 		formURL.searchParams.set('formmethod', props.method);
@@ -48,7 +49,7 @@ export function Form(props: {
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
-		if (props.onsubmit) props.onsubmit();
+		if (props.onsubmit) props.onsubmit(e);
 		if (props.confirm && !confirm(props.confirm)) return;
 		const form = e.target as HTMLFormElement;
 		const formData = new FormData(form);
@@ -56,7 +57,9 @@ export function Form(props: {
 
 		setIsLoading(true);
 		const action =
-			props.method.toUpperCase() === 'GET' ? `${props.action}?${data}` : props.action;
+			props.method.toUpperCase() === 'GET'
+				? `${props.action || window.location.href}?${data}`
+				: props.action || window.location.href;
 		const body = props.method.toUpperCase() === 'GET' ? undefined : data;
 
 		const response = await fetch(action, {
@@ -78,13 +81,16 @@ export function Form(props: {
 
 		const responseBody = await response.text();
 
+		const contentType = response.headers.get('content-type');
+		const isHTML = contentType?.startsWith('text/html');
+		console.log({ contentType });
+
 		if (response.ok) {
-			useViewTransition(() => {
-				setAlerts((alerts) => [
-					{ message: responseBody || 'Success!', type: 'success' },
-					...alerts,
-				]);
-			});
+			if (!props.noAlert)
+				useViewTransition(() => {
+					const alertMessage = isHTML ? 'Success!' : responseBody || 'Success!';
+					setAlerts((alerts) => [{ message: alertMessage, type: 'success' }, ...alerts]);
+				});
 			if (props.onsuccess) await props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
@@ -93,20 +99,18 @@ export function Form(props: {
 			}
 			if (props.successRefresh) location.reload();
 		} else {
-			const contentType = response.headers.get('content-type');
-			const isHTML = contentType?.startsWith('text/html');
-
-			useViewTransition(() => {
-				setAlerts((alerts) => [
-					{
-						message: isHTML
-							? 'There was an error'
-							: responseBody || 'There was an error.',
-						type: 'error',
-					},
-					...alerts,
-				]);
-			});
+			if (!props.noAlert)
+				useViewTransition(() => {
+					setAlerts((alerts) => [
+						{
+							message: isHTML
+								? 'There was an error'
+								: responseBody || 'There was an error.',
+							type: 'error',
+						},
+						...alerts,
+					]);
+				});
 			if (props.errorRedirect) {
 				const redirectURL = new URL(props.errorRedirect, window.location.origin);
 				if (redirectURL.pathname !== location.pathname) {
