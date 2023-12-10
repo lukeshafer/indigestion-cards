@@ -60,9 +60,9 @@ export default function UsersTable(props: { users: User[]; preorders?: Preorder[
 							<div
 								aria-hidden="true"
 								class="absolute left-1/2 top-1/2 w-12 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
-								<CardsIcon size={50} />
+								<CardsIcon class="drop-shadow" size={50} />
 							</div>
-							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
+							<span class="relative rounded-full bg-white/75 p-1 dark:bg-gray-900 dark:font-semibold">
 								{user.cardCount}
 							</span>
 						</>
@@ -75,9 +75,9 @@ export default function UsersTable(props: { users: User[]; preorders?: Preorder[
 							<div
 								aria-hidden="true"
 								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
-								<PacksIcon size={40} />
+								<PacksIcon class="drop-shadow" size={30} />
 							</div>
-							<span class="relative rounded-full bg-white p-1 dark:bg-gray-900 dark:font-semibold">
+							<span class="relative rounded-full bg-white/75 p-1 dark:bg-gray-900 dark:font-semibold">
 								{user.packCount + user.preorders.length}
 							</span>
 						</>

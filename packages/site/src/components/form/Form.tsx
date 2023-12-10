@@ -402,7 +402,7 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow dark:text-shadow-dark font-heading rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
+	'text-outline dark:text-outline-dark font-heading rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
 
 export function Anchor(props: { children: string; href: string }) {
 	return (
