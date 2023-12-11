@@ -316,46 +316,36 @@ function getToUser(args: { card: CardInstance; trade: Trade }): {
   userId: string;
   username: string;
 } {
-  if (
-    args.card.userId !== args.trade.senderUserId ||
-    args.card.userId !== args.trade.receiverUserId
-  ) {
-    throw new Error('Card cannot be traded between these two users.');
-  }
-
   if (args.card.userId === args.trade.receiverUserId)
     return {
       userId: args.trade.senderUserId,
       username: args.trade.senderUsername,
     };
-  else
+  else if (args.card.userId === args.trade.senderUserId)
     return {
       userId: args.trade.receiverUserId,
       username: args.trade.receiverUsername,
     };
+  else 
+    throw new Error('Card cannot be traded between these two users.');
 }
 
 function getFromUser(args: { card: CardInstance; trade: Trade }): {
   userId: string;
   username: string;
 } {
-  if (
-    args.card.userId !== args.trade.senderUserId ||
-    args.card.userId !== args.trade.receiverUserId
-  ) {
-    throw new Error('Card cannot be traded between these two users.');
-  }
-
   if (args.card.userId === args.trade.receiverUserId)
     return {
       userId: args.trade.receiverUserId,
       username: args.trade.receiverUsername,
     };
-  else
+  else if (args.card.userId === args.trade.senderUserId)
     return {
       userId: args.trade.senderUserId,
       username: args.trade.senderUsername,
     };
+  else 
+    throw new Error('Card cannot be traded between these two users.');
 }
 
 async function getAndValidateUserAndCardInstances(username: string) {

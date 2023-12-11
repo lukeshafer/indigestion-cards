@@ -184,4 +184,38 @@ const tradeStatus = (() => {
 			</div>
 		</Show>
 	</div>
+	<Show when={true}>
+		<trade-fetcher trade-id={trade.tradeId} status={trade.status}></trade-fetcher>
+		<script>
+			import { get } from '@/lib/client/data';
+
+			customElements.define(
+				'trade-fetcher',
+				class TradeFetcher extends HTMLElement {
+					tradeId: string;
+					status: string;
+					constructor() {
+						super();
+						this.tradeId = this.getAttribute('trade-id') || '';
+						this.status = this.getAttribute('status') || '';
+					}
+
+					connectedCallback() {
+						const createTimeout = (time = 1000) => {
+							setTimeout(() => {
+								this.refreshIfTradeStatusUpdated();
+								if (time < 128000) createTimeout(time * 2);
+							}, time);
+						};
+						createTimeout();
+					}
+
+					async refreshIfTradeStatusUpdated() {
+						const trade = await get('trades', [this.tradeId]);
+						if (this.status !== trade.status) location.reload();
+					}
+				}
+			);
+		</script>
+	</Show>
 </Page>
