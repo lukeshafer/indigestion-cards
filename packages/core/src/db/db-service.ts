@@ -1,18 +1,20 @@
 import { Service } from 'electrodb';
-import { config } from './_utils';
-import { cardDesigns } from './cardDesigns';
-import { season } from './season';
-import { cardInstances } from './cardInstances';
-import { packs } from './packs';
-import { packTypes } from './packTypes';
-import { users } from './users';
-import { unmatchedImages } from './unmatchedImages';
-import { rarities } from './rarities';
 import { admins } from './admins';
-import { twitchEvents } from './twitchEvents';
-import { twitchEventMessageHistory } from './twitchEventMessageHistory';
+import { cardDesigns } from './cardDesigns';
+import { cardInstances } from './cardInstances';
+import { config } from './_utils';
+import { packTypes } from './packTypes';
+import { packs } from './packs';
+import { preorders } from './preorders';
+import { rarities } from './rarities';
+import { season } from './season';
 import { siteConfig } from './siteConfig';
+import { trades } from './trades';
+import { twitchEventMessageHistory } from './twitchEventMessageHistory';
+import { twitchEvents } from './twitchEvents';
+import { unmatchedImages } from './unmatchedImages';
 import { userLogins } from './userLogins';
+import { users } from './users';
 
 export const db = new Service(
 	{
@@ -29,6 +31,8 @@ export const db = new Service(
 		twitchEventMessageHistory,
 		siteConfig,
 		userLogins,
+    preorders,
+    trades,
 	},
 	config
 );

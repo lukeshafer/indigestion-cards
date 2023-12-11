@@ -38,6 +38,9 @@ export const handler = ApiHandler(async () => {
 		...(await deleteEntity(db.entities.twitchEvents)),
 		...(await deleteEntity(db.entities.twitchEventMessageHistory)),
 		...(await deleteEntity(db.entities.users)),
+    ...(await deleteEntity(db.entities.userLogins)),
+    ...(await deleteEntity(db.entities.trades)),
+    ...(await deleteEntity(db.entities.preorders)),
 	]);
 
 	return {

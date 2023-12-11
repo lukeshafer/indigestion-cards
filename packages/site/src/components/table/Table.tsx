@@ -154,7 +154,7 @@ export default function Table(props: {
         <tbody class="w-full justify-stretch justify-items-stretch gap-2">
           <For each={props.search ? filteredRows() : sortedRows()}>
             {(row) => (
-              <tr class="group bg-yellow-100 dark:bg-gray-800">
+              <tr class="group bg-amber-100 dark:bg-gray-800">
                 <For each={props.columns}>
                   {(column) => (
                     <TableCell

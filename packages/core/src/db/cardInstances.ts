@@ -95,19 +95,19 @@ export const cardInstances = new Entity(
 							type: 'string',
 							required: true,
 						},
-						senderUserId: {
+						fromUserId: {
 							type: 'string',
 							required: true,
 						},
-						senderUsername: {
+						fromUsername: {
 							type: 'string',
 							required: true,
 						},
-						receiverUserId: {
+						toUserId: {
 							type: 'string',
 							required: true,
 						},
-						receiverUsername: {
+						toUsername: {
 							type: 'string',
 							required: true,
 						},
