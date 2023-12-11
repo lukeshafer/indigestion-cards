@@ -33,7 +33,7 @@ if (Astro.request.method === 'POST') {
 	} else {
 		const { receiverUsername, offeredCards, requestedCards, message } = result.value;
 		try {
-			const trade = await createTradeFromApi({
+			await createTradeFromApi({
 				senderUsername: username,
 				receiverUsername,
 				offeredCards,

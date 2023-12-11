@@ -253,12 +253,3 @@ export async function setUserProfile(args: {
       .go()
       .then((result) => result.data);
 }
-
-export async function setUserIsTrading(args: { userId: string; isTrading: boolean }) {
-   const result = await users
-      .update({ userId: args.userId })
-      .set({ isTrading: args.isTrading })
-      .go();
-
-   return result.data;
-}

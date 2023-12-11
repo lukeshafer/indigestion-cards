@@ -1,6 +1,6 @@
 import type { User } from '@lil-indigestion-cards/core/db/users';
 import { Form, TextArea, SubmitButton, DeleteButton } from '../form/Form';
-import { createSignal, type JSX } from 'solid-js';
+import { createSignal } from 'solid-js';
 import { USER_API } from '@/constants';
 
 export default function UserLookingFor(props: { user: User; isLoggedInUser: boolean }) {
@@ -29,10 +29,6 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 					<div class="flex items-center gap-2">
 						<SubmitButton>Save</SubmitButton>
 						<DeleteButton onClick={() => setIsEditing(false)}>Cancel</DeleteButton>
-						{
-							//<Button type="submit">Save</Button>
-							//<Button onclick={() => setIsEditing(false)}>Cancel</Button>
-						}
 					</div>
 				</Form>
 			) : lookingFor().trim() ? (
@@ -57,9 +53,6 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 									}}>
 									<input type="hidden" name="userId" value={props.user.userId} />
 									<input type="hidden" name="lookingFor" value=" " />
-									{
-										//<Button type="submit">Delete</Button>
-									}
 									<DeleteButton>Delete</DeleteButton>
 								</Form>
 							</div>
@@ -69,20 +62,9 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 			) : props.isLoggedInUser ? (
 				<>
 					<p class="font-medium">What cards are you looking for?</p>
-							<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
-              {
-                //<Button onClick={() => setIsEditing(true)}>Edit</Button>
-              }
+					<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
 				</>
 			) : null}
 		</div>
-	);
-}
-
-function Button(props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) {
-	return (
-		<button {...props} class="bg-brand-main px-2 py-1 font-semibold text-white">
-			{props.children}
-		</button>
 	);
 }

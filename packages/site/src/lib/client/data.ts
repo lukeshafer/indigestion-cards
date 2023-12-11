@@ -8,6 +8,10 @@ interface ParamPath {
 		params: [tradeId: string];
 		output: typeof import('../../pages/data/trades/[tradeId]');
 	};
+	user: {
+		params: [username: string];
+		output: typeof import('../../pages/data/user/[username]');
+	};
 }
 
 type NoParamPathResponse<PathName extends keyof Path> = Awaited<ReturnType<Path[PathName]['GET']>>;
@@ -38,7 +42,7 @@ export async function get<PathName extends PathKey>(
 	path: PathName,
 	params?: Params<PathName>
 ): Promise<PathData<PathName>> {
-	const pathParams = params ? `/${params.join('/')}` : ''
+	const pathParams = params ? `/${params.join('/')}` : '';
 	const res = await fetch(`/data/${path}${pathParams}`);
 	if (!res.ok) {
 		console.error(res);

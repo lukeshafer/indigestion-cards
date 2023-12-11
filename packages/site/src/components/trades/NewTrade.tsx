@@ -1,9 +1,9 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { Suspense, createResource, type JSX, Show, createEffect, on } from 'solid-js';
-import { Form, Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
+import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { USER_API, routes } from '@/constants';
+import { USER_API } from '@/constants';
 import { Heading } from '@/components/text';
 import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';

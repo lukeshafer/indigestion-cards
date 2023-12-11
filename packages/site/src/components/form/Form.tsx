@@ -91,7 +91,7 @@ export function Form(props: {
 					const alertMessage = isHTML ? 'Success!' : responseBody || 'Success!';
 					setAlerts((alerts) => [{ message: alertMessage, type: 'success' }, ...alerts]);
 				});
-			if (props.onsuccess) await props.onsuccess();
+			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
 				if (responseBody) redirectURL.searchParams.set('alert', responseBody);

@@ -1,14 +1,16 @@
 ---
 import AdminOnly from '@/components/AdminOnly.astro';
 import Hamburger from '@/components/Hamburger.astro';
+import HeaderLink from '@/components/HeaderLink.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
 import { getUserByLogin } from '@lib/twitch';
+import { Show } from 'solid-js';
+import TradeNotificationCount from './TradeNotificationCount.astro';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
-const currentPage = Astro.url.pathname;
 
 const username = Astro.locals.session?.properties.username;
 
@@ -16,6 +18,9 @@ const headerLinks = [
 	{ href: '/card', title: 'Cards' },
 	{ href: '/user', title: 'Users' },
 ];
+
+const canSeeTradesLink =
+	Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin';
 
 if (Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin') {
 	headerLinks.push({ href: '/trades', title: 'Trades' });
@@ -45,23 +50,14 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 					<span class="-mt-2 text-lg text-gray-700 dark:text-gray-200">cards</span>
 				</div>
 			</a>
-			{
-				headerLinks.map(({ href, title }) => (
-					<a
-						href={href}
-						title={title}
-						transition:name={`page-header-nav-${href}`}
-						class="relative rounded px-2 py-1 transition-colors "
-						class:list={{
-							'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
-								currentPage.startsWith(href),
-							'text-gray-700 hover:bg-gray-200 hover:text-black dark:font-medium dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white':
-								!currentPage.startsWith(href),
-						}}>
-						{title}
-					</a>
-				))
-			}
+			<HeaderLink href="/card" title="Cards">Cards</HeaderLink>
+			<HeaderLink href="/user" title="Users">Users</HeaderLink>
+			<Show when={canSeeTradesLink}>
+				<HeaderLink href="/trades" title="Trades">
+					<TradeNotificationCount username={username!} transition:persist />
+					 Trades
+				</HeaderLink>
+			</Show>
 		</nav>
 		<UserSearch client:load transition:persist />
 		<UserConfig client:load {disableAnimations} user={twitchData} login={getLoginLink(Astro)} />

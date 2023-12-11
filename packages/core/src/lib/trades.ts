@@ -1,11 +1,11 @@
 import {
-  trades,
-  type CreateTrade,
-  type UpdateTrade,
-  type Trade,
-  type TradeCard,
+	trades,
+	type CreateTrade,
+	type UpdateTrade,
+	type Trade,
+	type TradeCard,
 } from '../db/trades';
-import { getUserAndCardInstances, setUserIsTrading } from './user';
+import { getUserAndCardInstances } from './user';
 import { cardInstances, type CardInstance } from '../db/cardInstances';
 import { users, type User } from '../db/users';
 import { Service } from 'electrodb';
@@ -14,385 +14,434 @@ import { InputValidationError, NotFoundError, ServerError, UnauthorizedError } f
 import { sendTradeAcceptedEvent } from '../events/trades';
 
 export async function createTrade(trade: CreateTrade) {
-  const result = await trades.create(trade).go();
-  return result;
+	const result = await trades.create(trade).go();
+	return result;
 }
 
 export async function createTradeFromApi(params: {
-  senderUsername: string;
-  receiverUsername: string;
-  offeredCards: string[];
-  requestedCards: string[];
-  message?: string;
+	senderUsername: string;
+	receiverUsername: string;
+	offeredCards: string[];
+	requestedCards: string[];
+	message?: string;
 }) {
-  if (params.senderUsername === params.receiverUsername) {
-    throw new InputValidationError('Cannot trade with yourself');
-  }
+	if (params.senderUsername === params.receiverUsername) {
+		throw new InputValidationError('Cannot trade with yourself');
+	}
 
-  const senderData = await getUserAndCardInstances({ username: params.senderUsername });
-  const receiverData = await getUserAndCardInstances({ username: params.receiverUsername });
+	const senderData = await getUserAndCardInstances({ username: params.senderUsername });
+	const receiverData = await getUserAndCardInstances({ username: params.receiverUsername });
 
-  const sender = senderData?.users[0];
-  const receiver = receiverData?.users[0];
-  if (!sender || !receiver) {
-    throw new InputValidationError('Invalid users provided');
-  }
+	const sender = senderData?.users[0];
+	const receiver = receiverData?.users[0];
+	if (!sender || !receiver) {
+		throw new InputValidationError('Invalid users provided');
+	}
 
-  const getCardData = (providedCardIds: string[], userCards: CardInstance[]) => {
-    const userCardMap = new Map(userCards.map((card) => [card.instanceId, card]));
+	const getCardData = (providedCardIds: string[], userCards: CardInstance[]) => {
+		const userCardMap = new Map(userCards.map((card) => [card.instanceId, card]));
 
-    const cards: CardInstance[] = [];
-    for (const id of providedCardIds) {
-      const card = userCardMap.get(id);
-      if (card && card.openedAt) cards.push(card);
-    }
+		const cards: CardInstance[] = [];
+		for (const id of providedCardIds) {
+			const card = userCardMap.get(id);
+			if (card && card.openedAt) cards.push(card);
+		}
 
-    return cards;
-  };
+		return cards;
+	};
 
-  const messages: CreateTrade['messages'] = [
-    {
-      userId: sender.userId,
-      type: 'status-update',
-      message: 'pending',
-    },
-  ];
-  if (params.message) {
-    messages.push({
-      userId: sender.userId,
-      type: 'offer',
-      message: params.message,
-    });
-  }
+	const messages: CreateTrade['messages'] = [
+		{
+			userId: sender.userId,
+			type: 'status-update',
+			message: 'pending',
+		},
+	];
+	if (params.message) {
+		messages.push({
+			userId: sender.userId,
+			type: 'offer',
+			message: params.message,
+		});
+	}
 
-  const tradeOptions: CreateTrade = {
-    senderUsername: params.senderUsername,
-    senderUserId: sender.userId,
-    receiverUserId: receiver.userId,
-    receiverUsername: params.receiverUsername,
-    offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
-    requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
-    messages,
-  };
+	const tradeOptions: CreateTrade = {
+		senderUsername: params.senderUsername,
+		senderUserId: sender.userId,
+		receiverUserId: receiver.userId,
+		receiverUsername: params.receiverUsername,
+		offeredCards: getCardData(params.offeredCards, senderData.cardInstances),
+		requestedCards: getCardData(params.requestedCards, receiverData.cardInstances),
+		messages,
+	};
 
-  try {
-    console.log({ tradeOptions });
-    return createTrade(tradeOptions);
-  } catch (e) {
-    console.error(e);
-    throw new ServerError('Internal server error');
-  }
+	try {
+		console.log({ tradeOptions });
+		return createTrade(tradeOptions);
+	} catch (e) {
+		console.error(e);
+		throw new ServerError('Internal server error');
+	}
 }
 
 export async function getOutgoingTradesByUserId(senderUserId: string) {
-  const result = await trades.query.bySenderId({ senderUserId }).go();
-  return result.data;
+	const result = await trades.query.bySenderId({ senderUserId }).go();
+	return result.data;
 }
 
 export async function getIncomingTradesByUserId(receiverUserId: string) {
-  const result = await trades.query.byReceiverId({ receiverUserId }).go();
-  return result.data;
+	const result = await trades.query.byReceiverId({ receiverUserId }).go();
+	return result.data;
 }
 
 export async function getAllTradesForUser(userId: string) {
-  const [outgoing, incoming] = await Promise.all([
-    getOutgoingTradesByUserId(userId),
-    getIncomingTradesByUserId(userId),
-  ]);
-  return { outgoing, incoming };
+	const [outgoing, incoming] = await Promise.all([
+		getOutgoingTradesByUserId(userId),
+		getIncomingTradesByUserId(userId),
+	]);
+	return { outgoing, incoming };
 }
 
 export async function getSentTradeById(args: { tradeId: string; senderUserId: string }) {
-  const result = await trades.query
-    .bySenderId({ tradeId: args.tradeId, senderUserId: args.senderUserId })
-    .go();
-  return result.data[0];
+	const result = await trades.query
+		.bySenderId({ tradeId: args.tradeId, senderUserId: args.senderUserId })
+		.go();
+	return result.data[0];
 }
 
 export async function getReceivedTradeById(args: { tradeId: string; receiverUserId: string }) {
-  const result = await trades.query
-    .byReceiverId({ tradeId: args.tradeId, receiverUserId: args.receiverUserId })
-    .go();
-  return result.data[0];
+	const result = await trades.query
+		.byReceiverId({ tradeId: args.tradeId, receiverUserId: args.receiverUserId })
+		.go();
+	return result.data[0];
 }
 
 export async function getTrade(tradeId: string) {
-  const result = await trades.query.primary({ tradeId }).go();
-  return result.data[0];
+	const result = await trades.query.primary({ tradeId }).go();
+	return result.data[0];
 }
 
 export async function updateTrade(tradeId: string, updates: UpdateTrade, userId?: string) {
-  const set = trades.patch({ tradeId }).set(updates);
-  const status = updates.status;
-  const result = status
-    ? set
-      .append({
-        messages: [
-          {
-            type: 'status-update',
-            message: status,
-            userId: userId ?? '',
-          },
-        ],
-      })
-      .go()
-    : set.go();
-  return result;
+	const set = trades.patch({ tradeId }).set(updates);
+	const status = updates.status;
+	const result = status
+		? set
+				.append({
+					messages: [
+						{
+							type: 'status-update',
+							message: status,
+							userId: userId ?? '',
+						},
+					],
+				})
+				.go()
+		: set.go();
+	return result;
 }
 
-export async function updateTradeStatus(params: {
-  tradeId: string;
-  status: string;
-  loggedInUserId: string;
-}): Promise<Partial<Trade>> {
-  const trade = await getTrade(params.tradeId);
-  if (!trade) throw new NotFoundError('Trade not found');
+export async function updateTradeStatus({
+	tradeId,
+	status,
+	loggedInUserId,
+}: {
+	tradeId: string;
+	status: string;
+	loggedInUserId: string;
+}): Promise<Partial<Trade> | null> {
+	const trade = await getTrade(tradeId);
+	if (!trade) throw new NotFoundError('Trade not found');
 
-  if (
-    trade.senderUserId !== params.loggedInUserId &&
-    trade.receiverUserId !== params.loggedInUserId
-  ) {
-    throw new UnauthorizedError('Unauthorized');
-  }
+	if (trade.senderUserId !== loggedInUserId && trade.receiverUserId !== loggedInUserId) {
+		throw new UnauthorizedError('Unauthorized');
+	}
 
-  switch (params.status) {
-    case 'accepted':
-      if (trade.receiverUserId !== params.loggedInUserId)
-        throw new InputValidationError('Only the receiver can accept a trade');
-      else if (trade.status !== 'pending')
-        throw new InputValidationError('Cannot accept a trade that is not pending');
+	const otherUserId =
+		trade.senderUserId === loggedInUserId ? trade.receiverUserId : trade.senderUserId;
 
-      return updateTrade(
-        trade.tradeId,
-        {
-          status: 'accepted',
-        },
-        params.loggedInUserId
-      ).then(async (res) => {
-        await sendTradeAcceptedEvent({ tradeId: trade.tradeId });
-        return res.data;
-      });
-    case 'rejected':
-      if (trade.receiverUserId !== params.loggedInUserId)
-        throw new InputValidationError('Only the receiver can reject a trade');
-      else if (trade.status !== 'pending')
-        throw new InputValidationError('Cannot reject a trade that is not pending');
+	const service = new Service({ trades, users }, config);
+	const newStatus = checkIsValidStatus({ status, trade, loggedInUserId });
 
-      return updateTrade(trade.tradeId, { status: 'rejected' }, params.loggedInUserId).then(
-        (res) => res.data
-      );
-    case 'canceled':
-      if (trade.senderUserId !== params.loggedInUserId)
-        throw new InputValidationError('Only the sender can cancel a trade');
-      else if (trade.status !== 'pending')
-        throw new InputValidationError('Cannot cancel a trade that is not pending');
+	const result = await service.transaction
+		.write(({ users, trades }) => [
+			trades
+				.patch({ tradeId: trade.tradeId })
+				.set({ status: newStatus })
+				.append({
+					messages: [
+						{
+							type: 'status-update',
+							message: newStatus,
+							userId: loggedInUserId,
+						},
+					],
+				})
+				.commit(),
+			users
+				.patch({ userId: otherUserId })
+				.append({
+					tradeNotifications: [
+						{
+							tradeId: trade.tradeId,
+							status: 'statusUpdated',
+							text: newStatus,
+						},
+					],
+				})
+				.commit(),
+		])
+		.go();
 
-      return updateTrade(trade.tradeId, { status: 'canceled' }, params.loggedInUserId).then(
-        (res) => res.data
-      );
-    default:
-      throw new InputValidationError('Invalid status');
-  }
+	if (newStatus === 'accepted') await sendTradeAcceptedEvent({ tradeId: trade.tradeId });
+
+	return result.data[0].item;
+}
+
+function checkIsValidStatus({
+	status,
+	trade,
+	loggedInUserId,
+}: {
+	status: string;
+	trade: Trade;
+	loggedInUserId: string;
+}) {
+	switch (status) {
+		case 'accepted':
+			if (trade.receiverUserId !== loggedInUserId)
+				throw new InputValidationError('Only the receiver can accept a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot accept a trade that is not pending');
+			break;
+		case 'rejected':
+			if (trade.receiverUserId !== loggedInUserId)
+				throw new InputValidationError('Only the receiver can reject a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot reject a trade that is not pending');
+			break;
+		case 'canceled':
+			if (trade.senderUserId !== loggedInUserId)
+				throw new InputValidationError('Only the sender can cancel a trade');
+			else if (trade.status !== 'pending')
+				throw new InputValidationError('Cannot cancel a trade that is not pending');
+			break;
+		default:
+			throw new InputValidationError('Invalid status');
+	}
+	return status;
 }
 
 export async function addMessageToTrade(params: {
-  tradeId: string;
-  message: Trade['messages'][number];
-  loggedInUserId: string;
+	tradeId: string;
+	message: Trade['messages'][number];
+	loggedInUserId: string;
 }) {
-  const trade = await getTrade(params.tradeId);
-  if (!trade) throw new NotFoundError('Trade not found');
+	const trade = await getTrade(params.tradeId);
+	if (!trade) throw new NotFoundError('Trade not found');
 
-  if (
-    trade.senderUserId !== params.loggedInUserId &&
-    trade.receiverUserId !== params.loggedInUserId
-  ) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-  return trades
-    .patch({ tradeId: params.tradeId })
-    .append({ messages: [params.message] })
-    .go();
+	if (
+		trade.senderUserId !== params.loggedInUserId &&
+		trade.receiverUserId !== params.loggedInUserId
+	) {
+		throw new UnauthorizedError('Unauthorized');
+	}
+
+	const otherUserId =
+		trade.senderUserId === params.loggedInUserId ? trade.receiverUserId : trade.senderUserId;
+
+	const service = new Service({ users, trades }, config);
+
+	const result = await service.transaction
+		.write(({ users, trades }) => [
+			trades
+				.patch({ tradeId: params.tradeId })
+				.append({ messages: [params.message] })
+				.commit(),
+			users
+				.patch({ userId: otherUserId })
+				.append({
+					tradeNotifications: [
+						{
+							tradeId: trade.tradeId,
+							status: 'newMessage',
+						},
+					],
+				})
+				.commit(),
+		])
+		.go();
+
+	return result.data[0].item;
 }
 
 export async function processTrade(trade: Trade) {
-  if (trade.status !== 'accepted') {
-    console.log('Trade not accepted, should not process.', { trade });
-    throw new Error('Trade not accepted, should not process.');
-  }
+	if (trade.status !== 'accepted') {
+		console.log('Trade not accepted, should not process.', { trade });
+		throw new Error('Trade not accepted, should not process.');
+	}
 
-  const sender = await getAndValidateUserAndCardInstances(trade.senderUsername);
-  const receiver = await getAndValidateUserAndCardInstances(trade.receiverUsername);
+	const sender = await getAndValidateUserAndCardInstances(trade.senderUsername);
+	const receiver = await getAndValidateUserAndCardInstances(trade.receiverUsername);
 
-  const service = new Service(
-    {
-      users,
-      cardInstances,
-      trades,
-    },
-    config
-  );
+	const service = new Service(
+		{
+			users,
+			cardInstances,
+			trades,
+		},
+		config
+	);
 
-  try {
-    await Promise.all([
-      setUserIsTrading({ userId: sender.user.userId, isTrading: true }),
-      setUserIsTrading({ userId: receiver.user.userId, isTrading: true }),
-    ]);
+	try {
+		await service.transaction.write(({ users }) => [
+			users.update({ userId: sender.user.userId }).set({ isTrading: true }).commit(),
+			users.update({ userId: receiver.user.userId }).set({ isTrading: true }).commit(),
+		]);
 
-    const offeredCardsMoveToReceiver = trade.offeredCards.map(
-      moveCardsBetweenUsers({
-        previous: sender,
-        next: receiver,
-      })
-    ) satisfies CardInstance[];
+		const offeredCardsMoveToReceiver = trade.offeredCards.map(
+			stageCardTransactionBetweenUsers({
+				previous: sender,
+				next: receiver,
+			})
+		) satisfies CardInstance[];
 
-    const requestedCardsMoveToSender = trade.requestedCards.map(
-      moveCardsBetweenUsers({
-        previous: receiver,
-        next: sender,
-      })
-    ) satisfies CardInstance[];
+		const requestedCardsMoveToSender = trade.requestedCards.map(
+			stageCardTransactionBetweenUsers({
+				previous: receiver,
+				next: sender,
+			})
+		) satisfies CardInstance[];
 
-    await service.transaction
-      .write(({ cardInstances, users, trades }) => [
-        users
-          .update({ userId: sender.user.userId })
-          .add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
-          .commit(),
-        users
-          .patch({ userId: receiver.user.userId })
-          .add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
-          .commit(),
-        ...offeredCardsMoveToReceiver.map((card) =>
-          cardInstances
-            .update({ instanceId: card.instanceId, designId: card.designId })
-            .set({ username: card.username, userId: card.userId })
-            .append({
-              tradeHistory: [
-                {
-                  tradeId: trade.tradeId,
-                  fromUserId: getFromUser({ card, trade }).userId,
-                  fromUsername: getFromUser({ card, trade }).username,
-                  toUserId: getToUser({ card, trade }).userId,
-                  toUsername: getToUser({ card, trade }).username,
-                  status: 'completed',
-                  completedAt: Date.now(),
-                },
-              ],
-            })
-            .commit()
-        ),
-        ...requestedCardsMoveToSender.map((card) =>
-          cardInstances
-            .update({ instanceId: card.instanceId, designId: card.designId })
-            .set({ username: card.username, userId: card.userId })
-            .append({
-              tradeHistory: [
-                {
-                  tradeId: trade.tradeId,
-                  fromUserId: getFromUser({ card, trade }).userId,
-                  fromUsername: getFromUser({ card, trade }).username,
-                  toUserId: getToUser({ card, trade }).userId,
-                  toUsername: getToUser({ card, trade }).username,
-                  status: 'completed',
-                  completedAt: Date.now(),
-                },
-              ],
-            })
-            .commit()
-        ),
-        trades.update({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
-      ])
-      .go();
-  } finally {
-    await Promise.all([
-      setUserIsTrading({ userId: sender.user.userId, isTrading: false }),
-      setUserIsTrading({ userId: receiver.user.userId, isTrading: false }),
-    ]);
-  }
+		await service.transaction
+			.write(({ cardInstances, users, trades }) => [
+				users
+					.update({ userId: sender.user.userId })
+					.add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
+					.append({
+						tradeNotifications: [
+							{
+								status: 'statusUpdated',
+								tradeId: trade.tradeId,
+								text: `${receiver.user.username} accepted your trade.`,
+							},
+						],
+					})
+					.commit(),
+				users
+					.patch({ userId: receiver.user.userId })
+					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
+					.commit(),
+				...offeredCardsMoveToReceiver.map((card) =>
+					cardInstances
+						.update({ instanceId: card.instanceId, designId: card.designId })
+						.set({ username: card.username, userId: card.userId })
+						.append({
+							tradeHistory: [
+								{
+									tradeId: trade.tradeId,
+									status: 'completed',
+									completedAt: Date.now(),
+									...formatToAndFromUsers({ card, trade }),
+								},
+							],
+						})
+						.commit()
+				),
+				...requestedCardsMoveToSender.map((card) =>
+					cardInstances
+						.update({ instanceId: card.instanceId, designId: card.designId })
+						.set({ username: card.username, userId: card.userId })
+						.append({
+							tradeHistory: [
+								{
+									tradeId: trade.tradeId,
+									status: 'completed',
+									completedAt: Date.now(),
+									...formatToAndFromUsers({ card, trade }),
+								},
+							],
+						})
+						.commit()
+				),
+				trades.update({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
+			])
+			.go();
+	} finally {
+		await service.transaction.write(({ users }) => [
+			users.update({ userId: sender.user.userId }).set({ isTrading: false }).commit(),
+			users.update({ userId: receiver.user.userId }).set({ isTrading: false }).commit(),
+		]);
+	}
 }
 
-function getToUser(args: { card: CardInstance; trade: Trade }): {
-  userId: string;
-  username: string;
+function formatToAndFromUsers(args: { card: CardInstance; trade: Trade }): {
+	fromUserId: string;
+	fromUsername: string;
+	toUserId: string;
+	toUsername: string;
 } {
-  if (args.card.userId === args.trade.receiverUserId)
-    return {
-      userId: args.trade.senderUserId,
-      username: args.trade.senderUsername,
-    };
-  else if (args.card.userId === args.trade.senderUserId)
-    return {
-      userId: args.trade.receiverUserId,
-      username: args.trade.receiverUsername,
-    };
-  else 
-    throw new Error('Card cannot be traded between these two users.');
-}
-
-function getFromUser(args: { card: CardInstance; trade: Trade }): {
-  userId: string;
-  username: string;
-} {
-  if (args.card.userId === args.trade.receiverUserId)
-    return {
-      userId: args.trade.receiverUserId,
-      username: args.trade.receiverUsername,
-    };
-  else if (args.card.userId === args.trade.senderUserId)
-    return {
-      userId: args.trade.senderUserId,
-      username: args.trade.senderUsername,
-    };
-  else 
-    throw new Error('Card cannot be traded between these two users.');
+	if (args.card.userId === args.trade.receiverUserId)
+		return {
+			toUserId: args.trade.senderUserId,
+			toUsername: args.trade.senderUsername,
+			fromUserId: args.trade.receiverUserId,
+			fromUsername: args.trade.receiverUsername,
+		};
+	else if (args.card.userId === args.trade.senderUserId)
+		return {
+			toUserId: args.trade.receiverUserId,
+			toUsername: args.trade.receiverUsername,
+			fromUserId: args.trade.senderUserId,
+			fromUsername: args.trade.senderUsername,
+		};
+	else throw new Error('Card cannot be traded between these two users.');
 }
 
 async function getAndValidateUserAndCardInstances(username: string) {
-  const userdata = await getUserAndCardInstances({ username });
+	const userdata = await getUserAndCardInstances({ username });
 
-  const user = userdata?.users[0];
-  const cards = userdata?.cardInstances;
+	const user = userdata?.users[0];
+	const cards = userdata?.cardInstances;
 
-  if (!user || cards === undefined) {
-    throw new Error(`User not found: ${username}`);
-  }
+	if (!user || cards === undefined) {
+		throw new Error(`User not found: ${username}`);
+	}
 
-  if (user.isTrading) {
-    console.error('User is currently trading and cannot do another trade.', user);
-    throw new Error('User is currently trading and cannot trade.');
-  }
+	if (user.isTrading) {
+		console.error('User is currently trading and cannot do another trade.', user);
+		throw new Error('User is currently trading and cannot trade.');
+	}
 
-  return { user, cards };
+	return { user, cards };
 }
 
-function moveCardsBetweenUsers({
-  previous,
-  next,
+function stageCardTransactionBetweenUsers({
+	previous,
+	next,
 }: {
-  previous: { cards: CardInstance[]; user: User };
-  next: { user: User };
+	previous: { cards: CardInstance[]; user: User };
+	next: { user: User };
 }) {
-  const previousCards = new Map(previous.cards.map((card) => [card.instanceId, card]));
+	const previousCards = new Map(previous.cards.map((card) => [card.instanceId, card]));
 
-  return (cardToMove: TradeCard) => {
-    const card = previousCards.get(cardToMove.instanceId);
-    if (!card || !card.openedAt) {
-      if (card) console.error('Card is not open and cannot be traded');
-      console.error(`User does not own card ${cardToMove.instanceId}`, {
-        instanceId: cardToMove.instanceId,
-        previousCards: [...previousCards],
-        prevOwner: previous.user,
-      });
-      throw new Error(
-        `User ${previous.user.username} does not own card ${cardToMove.instanceId}`
-      );
-    }
+	return (cardToMove: TradeCard) => {
+		const card = previousCards.get(cardToMove.instanceId);
+		if (!card || !card.openedAt) {
+			if (card) console.error('Card is not open and cannot be traded');
+			console.error(`User does not own card ${cardToMove.instanceId}`, {
+				instanceId: cardToMove.instanceId,
+				previousCards: [...previousCards],
+				prevOwner: previous.user,
+			});
+			throw new Error(
+				`User ${previous.user.username} does not own card ${cardToMove.instanceId}`
+			);
+		}
 
-    return {
-      ...card,
-      username: next.user.username,
-      userId: next.user.userId,
-    };
-  };
+		return {
+			...card,
+			username: next.user.username,
+			userId: next.user.userId,
+		};
+	};
 }
