@@ -59,8 +59,8 @@ export default function UsersTable(props: { users: User[]; preorders?: Preorder[
 						<>
 							<div
 								aria-hidden="true"
-								class="absolute left-1/2 top-1/2 w-12 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
-								<CardsIcon class="drop-shadow" size={50} />
+								class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fill-white stroke-white dark:fill-gray-900 dark:stroke-gray-900">
+								<CardsIcon class="drop-shadow" size={35} />
 							</div>
 							<span class="relative rounded-full bg-white/75 p-1 dark:bg-gray-900 dark:font-semibold">
 								{user.cardCount}

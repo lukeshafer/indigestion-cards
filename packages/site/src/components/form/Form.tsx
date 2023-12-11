@@ -427,7 +427,7 @@ export function SubmitButton(props: {
       disabled={props.disabled}
       style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
       classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
-      class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
+      class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}
       onClick={(e) => {
         if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
           e.preventDefault();
@@ -443,7 +443,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void; c
   return (
     <button
       type="submit"
-      class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 dark:hover:bg-red-900`}
+      class={`${BUTTON_CLASS} bg-red-400 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-800`}
       onClick={(e) => {
         if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
           e.preventDefault();

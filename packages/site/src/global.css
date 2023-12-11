@@ -330,18 +330,18 @@ body.disable-animations * {
 
 	.text-outline {
 		text-shadow:
-			0px 0px 1px theme('colors.gray.500'),
-      0px 0px 1px theme('colors.gray.500'),
-      1px 1px 0px theme('colors.gray.500'),
-      -0px 1px 0px theme('colors.gray.500');
+			1px -1px 1px theme('colors.gray.500'),
+      -1px 1px 1px theme('colors.gray.500'),
+      1px 1px 1px theme('colors.gray.500'),
+      -1px -1px 1px theme('colors.gray.500');
 	}
 
 	.text-outline-dark {
 		text-shadow:
-			0px 0px 1px theme('colors.gray.600'),
-      0px 0px 1px theme('colors.gray.600'),
-      1px 1px 0px theme('colors.gray.600'),
-      -0px 1px 0px theme('colors.gray.600');
+			1px -1px 1px theme('colors.gray.600'),
+      -1px 1px 1px theme('colors.gray.600'),
+      1px 1px 1px theme('colors.gray.600'),
+      -1px -1px 1px theme('colors.gray.600');
 	}
 
 	.no-text-shadow {
