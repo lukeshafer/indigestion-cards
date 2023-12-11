@@ -23,11 +23,11 @@ const message = Astro.url.searchParams.get('message') || '';
 	</PageHeader>
 	<CardList
 		cards={designs.map((card, index) => {
-			const rarity = card.bestRarityFound;
+			const bestRarity = card.bestRarityFound;
 
-			if (rarity?.rarityId === NO_CARDS_OPENED_ID && Astro.locals.session?.type !== 'admin') {
+			if (bestRarity?.rarityId === NO_CARDS_OPENED_ID && Astro.locals.session?.type !== 'admin') {
 				return {
-					...rarity,
+					...bestRarity,
 					...card,
 					cardName: 'zzz' + index,
 					artist: '?????',
@@ -36,17 +36,17 @@ const message = Astro.url.searchParams.get('message') || '';
 					seasonName: '',
 					imgUrl: '',
 					cardNumber: 1,
-					totalOfType: rarity.count,
+					totalOfType: bestRarity.count,
 				};
 			}
 
 			return {
 				...card,
-				rarityName: rarity?.rarityName ?? '',
-				rarityId: rarity?.rarityId ?? '',
-				frameUrl: rarity?.frameUrl ?? '',
-				rarityColor: rarity?.rarityColor ?? '',
-				totalOfType: rarity?.count ?? 1,
+				rarityName: bestRarity?.rarityName ?? '',
+				rarityId: bestRarity?.rarityId ?? '',
+				frameUrl: bestRarity?.frameUrl ?? '',
+				rarityColor: bestRarity?.rarityColor ?? '',
+				totalOfType: bestRarity?.count ?? 1,
 				cardNumber: 1,
 			};
 		})}
