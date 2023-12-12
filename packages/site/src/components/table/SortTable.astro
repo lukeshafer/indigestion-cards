@@ -1,0 +1,141 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { twMerge } from 'tailwind-merge';
+type Props = HTMLAttributes<'table'>;
+
+const { class: className = '', ...props } = Astro.props;
+---
+
+<sort-table class="grid gap-0">
+	<table
+		class={twMerge(
+			`w-full table-fixed border-separate border-spacing-y-3 text-center`,
+			className
+		)}
+		{...props}>
+		<slot />
+	</table>
+</sort-table>
+
+<script>
+	const sortModes = ['none', 'ascending', 'descending'] as const;
+
+	type Column = {
+		element: HTMLTableCellElement;
+		startDescending: boolean;
+		name: string;
+		label: string;
+		type: 'text' | 'number' | 'date';
+		sort: boolean;
+	};
+
+	type Row = {
+		element: HTMLTableRowElement;
+		cells: Map<
+			string,
+			{
+				element: HTMLTableCellElement;
+				value: string;
+			}
+		>;
+	};
+
+	class SortTable extends HTMLElement {
+		sortedColumn: string | null = null;
+		sortMode: (typeof sortModes)[number] = 'none';
+		filter: string = '';
+
+		tbody: HTMLTableSectionElement | null = null;
+		columns: Array<Column> | null = null;
+		rows: Array<Row> | null = null;
+
+		connectedCallback() {
+			this.tbody = this.querySelector('tbody');
+			this.columns = queryAndFormatColumns(this);
+			this.rows = queryAndFormatRows(this);
+
+			this.columns?.forEach(
+				(column) =>
+					column.sort &&
+					column.element.addEventListener('click', () => {
+						this.#updateSortMode(column);
+
+						this.rows
+							?.slice()
+							.sort((a, b) => {
+								if (this.sortMode === 'none') return 0;
+								const aVal = a.cells.get(column.name)?.value ?? '';
+								const bVal = b.cells.get(column.name)?.value ?? '';
+								if (!aVal && !bVal) return 0;
+								if (!aVal) return this.sortMode === 'ascending' ? -1 : 1;
+								if (!bVal) return this.sortMode === 'ascending' ? 1 : -1;
+								if (aVal === bVal) return 0;
+								if (column.type === 'number')
+									return this.sortMode === 'ascending'
+										? Number(aVal) - Number(bVal)
+										: Number(bVal) - Number(aVal);
+
+								return this.sortMode === 'ascending'
+									? String(aVal).localeCompare(String(bVal))
+									: String(bVal).localeCompare(String(aVal));
+							})
+							.map((e) => {
+								return e;
+							})
+							.reduce((prev, curr) => {
+								prev.element.after(curr.element);
+								return curr;
+							});
+					})
+			);
+		}
+
+		#updateSortMode(column: Column) {
+			if (column.name !== this.sortedColumn) {
+				this.sortedColumn = column.name;
+				this.sortMode = column.startDescending ? 'descending' : 'ascending';
+			} else {
+				const currentModeIndex = sortModes.indexOf(this.sortMode);
+				this.sortMode = sortModes.at(
+					((column.startDescending ? sortModes.length - 1 : 1) + currentModeIndex) %
+						sortModes.length
+				) as (typeof sortModes)[number];
+			}
+
+      column.element.dataset.mode = this.sortMode;
+		}
+	}
+	customElements.define('sort-table', SortTable);
+
+	function queryAndFormatColumns(el: HTMLElement): Array<Column> {
+		return [...el.querySelectorAll<HTMLTableCellElement>('thead th')].map((th) => ({
+			element: th,
+			name: th.dataset.name || '',
+			label: th.dataset.label || th.textContent || '',
+			sort: th.dataset.sort !== 'false',
+			startDescending: th.dataset.startDescending === 'true',
+			type:
+				th.dataset.type === 'number' || th.dataset.type === 'date'
+					? th.dataset.type
+					: 'text',
+		}));
+	}
+
+	function queryAndFormatRows(el: HTMLElement): Array<Row> {
+		return [...el.querySelectorAll<HTMLTableRowElement>('tbody tr')].map((row) => ({
+			element: row,
+			cells: new Map(
+				[...row.querySelectorAll('td')].map(
+					(cell) =>
+						[
+							cell.dataset.column!,
+							{
+								element: cell,
+								value: cell.dataset.value || '',
+							},
+						] as const
+				)
+			),
+		}));
+	}
+</script>

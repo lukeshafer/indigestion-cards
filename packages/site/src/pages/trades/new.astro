@@ -33,15 +33,15 @@ if (Astro.request.method === 'POST') {
 	} else {
 		const { receiverUsername, offeredCards, requestedCards, message } = result.value;
 		try {
-			await createTradeFromApi({
+			const trade = await createTradeFromApi({
 				senderUsername: username,
 				receiverUsername,
 				offeredCards,
 				requestedCards,
 				message,
 			});
-
-			return Astro.redirect(`/trades/${trade.data.tradeId}?alert=Trade Created`);
+      const tradeId = trade.data.tradeId
+			return Astro.redirect(`/trades/${tradeId}?alert=Trade Created`);
 		} catch (error) {
 			if (error instanceof InputValidationError) {
 				alerts.push({ type: 'error', message: error.message });

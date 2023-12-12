@@ -5,6 +5,8 @@ import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllRarities } from '@lib/rarity';
 import { routes, routeNames } from '@/constants';
 import RarityTable from '@/components/rarities/RarityTable';
+import RarityTableAstro from '@/components/rarities/RarityTable.astro';
+
 
 const rarities = await getAllRarities();
 ---
@@ -15,6 +17,12 @@ const rarities = await getAllRarities();
 		<PageTitle>Rarities</PageTitle>
 		<Anchor href={routes.ADMIN.CREATE.RARITY}>Add New Rarity</Anchor>
 	</PageHeader>
+	<div class="mx-auto max-w-2xl">
+		<RarityTableAstro {rarities} />
+	</div>
+
+  <br />
+  Old Table
 	<div class="mx-auto max-w-2xl">
 		<RarityTable {rarities} client:load />
 	</div>

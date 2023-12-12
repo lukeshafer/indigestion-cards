@@ -1,0 +1,43 @@
+---
+import SortTable from '../table/SortTable.astro';
+import SortTableHead from '../table/SortTableHead.astro';
+import SortTableColumn from '../table/SortTableColumn.astro';
+import SortTableBody from '../table/SortTableBody.astro';
+import SortTableRow from '../table/SortTableRow.astro';
+import SortTableCell from '../table/SortTableCell.astro';
+import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
+import DeleteRarityButton from './DeleteRarityButton';
+import RarityPreviewButton from './RarityPreviewButton.astro';
+
+interface Props {
+	rarities: Array<Rarity>;
+}
+
+const { rarities } = Astro.props;
+---
+
+<SortTable>
+	<SortTableHead>
+		<SortTableColumn name="name" width="40%">Name</SortTableColumn>
+		<SortTableColumn name="count" showOnBreakpoint="sm" type="number" startDescending>
+			Default Count
+		</SortTableColumn>
+		<SortTableColumn name="actions" sort={false}>Actions</SortTableColumn>
+	</SortTableHead>
+	<SortTableBody>
+		{
+			rarities.map(({ rarityName, defaultCount, rarityId, frameUrl }) => (
+				<SortTableRow>
+					<SortTableCell column="name" value={rarityName} />
+					<SortTableCell column="count" value={defaultCount} showOnBreakpoint="sm" />
+					<SortTableCell column="actions" value="" showOnBreakpoint="sm">
+						<div>
+							<DeleteRarityButton {rarityId} {frameUrl} />
+							<RarityPreviewButton {frameUrl} />
+						</div>
+					</SortTableCell>
+				</SortTableRow>
+			))
+		}
+	</SortTableBody>
+</SortTable>
