@@ -31,8 +31,8 @@ const { rarities } = Astro.props;
 					<SortTableCell column="name" value={rarityName} />
 					<SortTableCell column="count" value={defaultCount} showOnBreakpoint="sm" />
 					<SortTableCell column="actions" value="" showOnBreakpoint="sm">
-						<div>
-							<DeleteRarityButton {rarityId} {frameUrl} />
+						<div class="grid gap-2">
+							<DeleteRarityButton {rarityId} {frameUrl} client:idle />
 							<RarityPreviewButton {frameUrl} />
 						</div>
 					</SortTableCell>

@@ -420,9 +420,11 @@ export function SubmitButton(props: {
 	disabled?: boolean;
 	transitionId?: string;
 	confirm?: string;
+  name?: string;
 }) {
 	return (
 		<button
+      name={props.name}
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}

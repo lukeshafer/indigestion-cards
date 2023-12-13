@@ -1,0 +1,90 @@
+---
+import SortTable from '@/components/table/SortTable.astro';
+import SortTableHead from '../table/SortTableHead.astro';
+import SortTableColumn from '../table/SortTableColumn.astro';
+import SortTableBody from '../table/SortTableBody.astro';
+import SortTableRow from '../table/SortTableRow.astro';
+import SortTableCell from '../table/SortTableCell.astro';
+import type { Admin } from '@lil-indigestion-cards/core/db/admins';
+import DeleteAdminUserButton from './DeleteAdminUserButton';
+import SortTableSearchBar from '../table/SortTableSearchBar.astro';
+import { Form, SubmitButton, TextInput } from '../form/Form';
+import { API } from '@/constants';
+
+interface Props {
+	admins: Array<Admin>;
+	currentUser: string;
+}
+
+const { admins, currentUser } = Astro.props;
+---
+
+<admin-users-table>
+	<SubmitButton name="add-admin-button">Add user</SubmitButton>
+	<SortTableSearchBar for="admin-users-table" label="Search users" />
+	<SortTable id="admin-users-table" search-column="username">
+		<SortTableHead>
+			<SortTableColumn name="username" width="65%" align="left">Username</SortTableColumn>
+			<SortTableColumn name="actions" sort={false}>Actions</SortTableColumn>
+		</SortTableHead>
+		<SortTableBody>
+			{
+				admins.map((admin) => (
+					<SortTableRow>
+						<SortTableCell
+							column="username"
+							value={admin.username}
+							font="title"
+							align="left">
+							{admin.username}
+						</SortTableCell>
+						<SortTableCell column="actions" value="">
+							{currentUser !== admin.userId ? (
+								<div class="m-auto w-fit">
+									<DeleteAdminUserButton client:load {...admin} />
+								</div>
+							) : null}
+						</SortTableCell>
+					</SortTableRow>
+				))
+			}
+		</SortTableBody>
+	</SortTable>
+
+	<template class="row-template">
+		<SortTableRow>
+			<SortTableCell column="username" value="">
+				<TextInput inputOnly name="username" label="Username" />
+			</SortTableCell>
+			<SortTableCell column="actions" value="">
+				<div class="mx-auto w-fit">
+					<Form action={API.ADMIN_USER} method="post">
+						<input type="hidden" name="username" />
+						<SubmitButton>Add</SubmitButton>
+					</Form>
+				</div>
+			</SortTableCell>
+		</SortTableRow>
+	</template>
+</admin-users-table>
+<script>
+	class AdminUsersTable extends HTMLElement {
+		connectedCallback() {
+			const tbody = this.querySelector('tbody');
+			if (!tbody) return;
+
+			const button = this.querySelector('button[name=add-admin-button]');
+			if (!(button instanceof HTMLButtonElement)) return;
+
+			const template = this.querySelector<HTMLTemplateElement>('template.row-template');
+			if (!template) return;
+
+			button.addEventListener('click', () => {
+				const node = template.content.cloneNode(true);
+				tbody.appendChild(node);
+			});
+		}
+	}
+
+	customElements.define('admin-users-table', AdminUsersTable);
+</script>

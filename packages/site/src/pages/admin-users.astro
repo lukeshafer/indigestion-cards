@@ -4,6 +4,7 @@ import { getAllAdminUsers } from '@lib/admin-user';
 import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
 import AdminUsersTable, { AddAdminButton } from '@/components/admin-users/AdminUsersTable';
+import AdminUsersTableAstro from '@/components/admin-users/AdminUsersTable.astro';
 
 const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
@@ -24,6 +25,10 @@ const users = unsortedUsers.sort((a, b) => {
 		<AddAdminButton client:load />
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
+		<AdminUsersTableAstro admins={users} currentUser={currentUser ?? ''} />
+	</div>
+	<div class="mx-auto max-w-2xl">
+    OLD TABLE
 		<AdminUsersTable {users} currentUser={currentUser ?? ''} client:load />
 	</div>
 </Page>
