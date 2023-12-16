@@ -1,0 +1,19 @@
+{
+  "name": "admin-site",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "sst bind vite",
+    "build": "tsc && sst bind vite build",
+    "preview": "sst bind vite preview"
+  },
+  "dependencies": {
+    "simpledotcss": "^2.2.1",
+    "solid-js": "^1.8.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vite-plugin-solid": "^2.8.0"
+  }
+}
