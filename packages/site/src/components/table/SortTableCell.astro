@@ -14,7 +14,7 @@ const { column, value, showOnBreakpoint, hideOnBreakpoint, font, align } = Astro
 <td
   data-column={column}
   data-value={value}
-	class="relative px-5 py-3 font-medium group-[compact]:p-2"
+	class="relative px-5 py-3 group-[compact]:p-2"
 	class:list={{
 		hidden: !!showOnBreakpoint,
 		'sm:table-cell': showOnBreakpoint === 'sm',

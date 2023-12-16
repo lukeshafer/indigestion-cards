@@ -8,8 +8,6 @@ import SortTableCell from '../table/SortTableCell.astro';
 import type { Admin } from '@lil-indigestion-cards/core/db/admins';
 import DeleteAdminUserButton from './DeleteAdminUserButton';
 import SortTableSearchBar from '../table/SortTableSearchBar.astro';
-import { Form, SubmitButton, TextInput } from '../form/Form';
-import { API } from '@/constants';
 
 interface Props {
 	admins: Array<Admin>;
@@ -20,7 +18,6 @@ const { admins, currentUser } = Astro.props;
 ---
 
 <admin-users-table>
-	<SubmitButton name="add-admin-button">Add user</SubmitButton>
 	<SortTableSearchBar for="admin-users-table" label="Search users" />
 	<SortTable id="admin-users-table" search-column="username">
 		<SortTableHead>
@@ -50,22 +47,6 @@ const { admins, currentUser } = Astro.props;
 			}
 		</SortTableBody>
 	</SortTable>
-
-	<template class="row-template">
-		<SortTableRow>
-			<SortTableCell column="username" value="">
-				<TextInput inputOnly name="username" label="Username" />
-			</SortTableCell>
-			<SortTableCell column="actions" value="">
-				<div class="mx-auto w-fit">
-					<Form action={API.ADMIN_USER} method="post">
-						<input type="hidden" name="username" />
-						<SubmitButton>Add</SubmitButton>
-					</Form>
-				</div>
-			</SortTableCell>
-		</SortTableRow>
-	</template>
 </admin-users-table>
 <script>
 	class AdminUsersTable extends HTMLElement {

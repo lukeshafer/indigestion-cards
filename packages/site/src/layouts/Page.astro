@@ -8,12 +8,13 @@ import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lib/site-config';
 import { Api } from 'sst/node/api';
+import type { Alert } from '@/lib/client/state';
 
 export interface Props extends BaseProps {
 	class?: string;
 	breadcrumbs?: Path[];
 	wide?: boolean;
-	alerts?: { type: 'success' | 'error'; message: string }[];
+	alerts?: Alert[];
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
 }

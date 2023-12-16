@@ -1,10 +1,49 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllAdminUsers } from '@lib/admin-user';
+import { getAllAdminUsers, createAdminUser } from '@lib/admin-user';
 import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
-import AdminUsersTable, { AddAdminButton } from '@/components/admin-users/AdminUsersTable';
 import AdminUsersTableAstro from '@/components/admin-users/AdminUsersTable.astro';
+import AddAdminUserForm from '@/components/admin-users/AddAdminUserForm.astro';
+import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { Action } from '@/lib/action';
+import { createAlerts } from '@/lib/alert';
+
+const { output } = await Action(
+	Astro,
+	{
+		method: 'POST',
+		authorizationType: 'user',
+		schema: {
+			username: 'string',
+		},
+	},
+	async ({ username }) => {
+		const user = await getUserByLogin(username);
+		if (!user) return {
+        error: `User ${username} is not a valid Twitch user.`
+    }
+
+		const result = await createAdminUser({
+			userId: user.id,
+			username: user.display_name,
+		});
+
+    if (!result.success) {
+      return {
+        error: result.error
+      }
+    }
+
+    return;
+	}
+);
+
+console.log(output)
+const alerts = output?.error ? createAlerts({
+  type: 'error',
+  message: output.error,
+}) : undefined
 
 const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
@@ -19,16 +58,12 @@ const users = unsortedUsers.sort((a, b) => {
 });
 ---
 
-<Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]}>
+<Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]} {alerts}>
 	<PageHeader>
 		<PageTitle>Add Admin</PageTitle>
-		<AddAdminButton client:load />
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
+		<AddAdminUserForm />
 		<AdminUsersTableAstro admins={users} currentUser={currentUser ?? ''} />
-	</div>
-	<div class="mx-auto max-w-2xl">
-    OLD TABLE
-		<AdminUsersTable {users} currentUser={currentUser ?? ''} client:load />
 	</div>
 </Page>

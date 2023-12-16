@@ -6,13 +6,11 @@ import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import NewTrade from '@/components/trades/NewTrade';
 import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
 import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
 import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
+import { Action } from '@/lib/action';
 
 const { userId, username } = Astro.locals.user?.properties || {};
-
-const body = await Astro.request.text().then((text) => new URLSearchParams(text));
 
 if (!userId || !username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
@@ -20,18 +18,19 @@ if (!userId || !username) {
 
 const alerts: PageProps['alerts'] = [];
 
-if (Astro.request.method === 'POST') {
-	const result = validateSearchParams(body, {
-		receiverUsername: 'string',
-		offeredCards: 'string[]',
-		requestedCards: 'string[]',
-		message: 'string?',
-	});
-
-	if (!result.success) {
-		result.errors.map((error) => alerts.push({ type: 'error', message: error }));
-	} else {
-		const { receiverUsername, offeredCards, requestedCards, message } = result.value;
+const { output } = await Action(
+	Astro,
+	{
+		method: 'POST',
+		authorizationType: 'user',
+		schema: {
+			receiverUsername: 'string',
+			offeredCards: 'string[]',
+			requestedCards: 'string[]',
+			message: 'string?',
+		},
+	},
+	async ({ receiverUsername, offeredCards, requestedCards, message }) => {
 		try {
 			const trade = await createTradeFromApi({
 				senderUsername: username,
@@ -40,7 +39,7 @@ if (Astro.request.method === 'POST') {
 				requestedCards,
 				message,
 			});
-      const tradeId = trade.data.tradeId
+			const tradeId = trade.data.tradeId;
 			return Astro.redirect(`/trades/${tradeId}?alert=Trade Created`);
 		} catch (error) {
 			if (error instanceof InputValidationError) {
@@ -57,7 +56,9 @@ if (Astro.request.method === 'POST') {
 			}
 		}
 	}
-}
+);
+
+if (output instanceof Response) return output;
 
 const searchParams = Astro.url.searchParams;
 const offeredCardIds = searchParams.getAll('offeredCards');

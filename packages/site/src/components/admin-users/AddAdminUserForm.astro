@@ -1,0 +1,41 @@
+---
+import { TextInput } from '@/components/form/Form';
+import Button from '@/components/form/Button.astro';
+---
+
+<add-admin-user-form class="flex flex-wrap gap-2">
+	<Button name="add-admin-button">New Admin</Button>
+	<form hidden method="post" class="gap-2">
+		<TextInput inputOnly name="username" label="Username" />
+		<Button>Add</Button>
+	</form>
+</add-admin-user-form>
+
+<script>
+	import { signal, effect } from '@preact/signals-core';
+
+	class AddAdminUserForm extends HTMLElement {
+		connectedCallback() {
+			const form = this.querySelector('form');
+			const addAdminButton = this.querySelector<HTMLButtonElement>(
+				'button[name=add-admin-button]'
+			);
+			if (!form || !addAdminButton) return;
+
+			const formIsVisible = signal(false);
+			const originalButtonText = addAdminButton.textContent;
+      const originalButtonTheme = addAdminButton.dataset.theme;
+			addAdminButton.addEventListener('click', () => (formIsVisible.value = !formIsVisible.value));
+
+			effect(() => {
+				form.hidden = !formIsVisible.value;
+				form.style.display = formIsVisible.value ? 'flex' : 'none';
+
+				addAdminButton.dataset.theme = formIsVisible.value ? 'red' : originalButtonTheme;
+				addAdminButton.textContent = formIsVisible.value ? 'Cancel' : originalButtonText;
+			});
+		}
+	}
+
+	customElements.define('add-admin-user-form', AddAdminUserForm);
+</script>

@@ -17,11 +17,11 @@ declare module 'sst/node/future/auth' {
 
 type SchemaType = keyof Types;
 
-interface Schema {
+export type Schema = {
 	[key: string]: SchemaType;
 }
 
-type ParsedOutput<SchemaToCheck extends Schema> = {
+export type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: Types[SchemaToCheck[key]];
 };
 
@@ -45,9 +45,13 @@ function useValidateFormData<SchemaToCheck extends Schema>(
 }
 
 export function validateSearchParams<SchemaToCheck extends Schema>(
-	params: URLSearchParams,
+	params: URLSearchParams | string,
 	schema: SchemaToCheck
 ): Result<SchemaToCheck> {
+  if (typeof params === "string") {
+    params = new URLSearchParams(params);
+  }
+
 	console.log('Validating search params', { params, schema });
 	const result: Record<string, Types[SchemaType] | undefined> = {};
 	const errors: string[] = [];
