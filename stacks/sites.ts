@@ -1,4 +1,4 @@
-import { StackContext, AstroSite, use } from 'sst/constructs';
+import { StackContext, AstroSite, use, StaticSite } from 'sst/constructs';
 import { Database } from './database';
 import { API } from './api';
 import { DesignBucket } from './bucket';
@@ -47,7 +47,21 @@ export function Sites({ app, stack }: StackContext) {
 		runtime: 'nodejs18.x',
 	});
 
+	const adminSite = new StaticSite(stack, 'admin-site', {
+		path: 'packages/admin-site',
+		buildOutput: 'dist',
+		buildCommand: 'pnpm run build',
+    environment: {
+      VITE_API_URL: adminApi.url,
+    },
+		customDomain: {
+			domainName: `admin.${baseDomain}`,
+			hostedZone,
+		},
+	});
+
 	stack.addOutputs({
-		AdminUrl: site.url,
+		SiteUrl: site.url,
+		AdminUrl: adminSite.url,
 	});
 }

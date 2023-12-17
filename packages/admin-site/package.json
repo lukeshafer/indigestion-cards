@@ -4,10 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "sst bind vite",
-    "build": "tsc && sst bind vite build",
+    "build": "sst bind vite build",
     "preview": "sst bind vite preview"
   },
   "dependencies": {
+    "@solidjs/router": "^0.10.3",
+    "@trpc/client": "^10.43.1",
     "simpledotcss": "^2.2.1",
     "solid-js": "^1.8.7"
   },

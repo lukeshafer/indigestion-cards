@@ -2,11 +2,11 @@
 	"extends": "@tsconfig/node16/tsconfig.json",
 	"compilerOptions": {
 		"module": "esnext",
-		"baseUrl": ".",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true,
 		"verbatimModuleSyntax": true,
+		"baseUrl": ".",
 		"paths": {
 			"@lil-indigestion-cards/core/*": ["../core/src/*"],
 			"@lib/*": ["../core/src/lib/*"]
