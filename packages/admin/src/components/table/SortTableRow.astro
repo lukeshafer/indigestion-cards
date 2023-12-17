@@ -1,0 +1,18 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { twMerge } from 'tailwind-merge';
+type Props = HTMLAttributes<'tr'> & {
+	highlighted?: boolean;
+};
+
+const { highlighted, class: className, ...attrs } = Astro.props;
+
+const baseClass = /*tw*/
+	highlighted
+		? 'group bg-brand-100 dark:bg-gray-800 font-semibold'
+		: 'group bg-amber-100 dark:bg-gray-800 font-medium';
+---
+
+<tr class={className ? twMerge(baseClass, className) : baseClass} {...attrs}>
+	<slot />
+</tr>

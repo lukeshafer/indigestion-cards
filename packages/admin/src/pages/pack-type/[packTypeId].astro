@@ -1,0 +1,51 @@
+---
+import { PageTitle, Heading } from '@/components/text';
+import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
+import { routeNames } from '@/constants';
+import Page from '@/layouts/Page.astro';
+import { getPackTypeById } from '@lib/pack-type';
+import { getCardPoolFromType } from '@lib/card-pool';
+import Table from '@/components/table/Table';
+
+const packTypeId = Astro.params.packTypeId;
+if (!packTypeId) {
+	return Astro.redirect('/pack-type?alert=Missing pack type ID');
+}
+
+const packType = await getPackTypeById({ packTypeId });
+if (!packType) {
+	return Astro.redirect('/404?alert=Invalid pack type ID');
+}
+const cardPool = await getCardPoolFromType(packType);
+---
+
+<Page
+	title={`Pack Type: ${packType.packTypeName}`}
+	breadcrumbs={[
+		{ label: routeNames.PACK_TYPES, href: '/pack-type' },
+		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
+	]}>
+	<PageTitle>{packType.packTypeName}</PageTitle>
+	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
+	<section aria-label="Card Pool" class="mx-auto mt-4 flex max-w-2xl flex-col gap-4">
+		<Heading>Card Pool</Heading>
+		<Table
+			columns={[
+				{
+					name: 'cardName',
+					label: 'Card Name',
+					width: '75%',
+					font: 'title',
+				},
+				{
+					name: 'seasonName',
+					label: 'Season Name',
+				},
+			]}
+			rows={cardPool.cardDesigns.map((card) => ({
+				cardName: card.cardName,
+				seasonName: card.seasonName,
+			}))}
+		/>
+	</section>
+</Page>

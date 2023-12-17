@@ -1,0 +1,117 @@
+---
+import { routes } from '@/constants';
+import { Anchor, Heading, PageTitle } from '@/components/text';
+import PreviewableCard from '@/components/cards/PreviewableCard';
+import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
+import AdminOnly from '@/components/AdminOnly.astro';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import type { User } from '@lil-indigestion-cards/core/db/users';
+
+const session = Astro.locals.session;
+
+interface Props {
+	card: CardInstance;
+	user?: User;
+}
+
+const { card, user } = Astro.props;
+
+const isPinned = user?.pinnedCard?.instanceId === card.instanceId;
+const isOwnedByCurrentUser =
+	session?.properties.userId === card.userId && session?.properties.userId;
+
+const openDate = card.openedAt
+	? new Date(card.openedAt).toLocaleString('en-US', {
+			timeZone: 'America/New_York',
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric',
+			timeZoneName: 'short',
+	  })
+	: 'Not opened yet';
+---
+
+<header class="flex flex-col items-center gap-4">
+	<PageTitle>
+		{card.cardName}, {card.rarityName} #{card.cardNumber}
+	</PageTitle>
+	<div class="mx-4">
+		<PreviewableCard card={card} client:load />
+	</div>
+</header>
+{
+	isOwnedByCurrentUser ? (
+		<div class="mx-auto">
+			<PinCardToProfileButton
+				userId={session.properties.userId!}
+				instanceId={card.instanceId}
+				designId={card.designId}
+				isPinned={isPinned}
+				client:load
+			/>
+		</div>
+	) : (
+		<div class="mx-auto">
+			<Anchor
+				href={`${routes.TRADES}/new?receiverUsername=${card.username}&requestedCards=${card.instanceId}`}>
+				Request Trade
+			</Anchor>
+		</div>
+	)
+}
+<section class="mx-auto text-lg">
+	<Heading>Stats:</Heading>
+	<p>
+		<b>Rarity:{' '}</b>
+		{card.rarityName}
+	</p>
+	<p>
+		<b>Card:{' '}</b>
+		<a class="underline" href={`${routes.CARDS}/${card.designId}`}>{card.cardName}</a>
+	</p>
+	<p>
+		<b>Card Number:{' '}</b>
+		{card.cardNumber}
+	</p>
+	<AdminOnly>
+		<p>
+			<b>Season:{' '}</b>
+			<a class="underline" href={`${routes.SEASONS}/${card.seasonId}`}>{card.seasonName}</a>
+		</p>
+	</AdminOnly>
+	<p>
+		<b>Owner:{' '}</b>
+		{
+			card.username ? (
+				<a class="underline" href={`${routes.USERS}/${card.username}`}>
+					{card.username}
+				</a>
+			) : (
+				'None'
+			)
+		}
+	</p>
+	<p>
+		<b>Minter:{' '}</b>
+		{
+			card.minterUsername ? (
+				<a class="underline" href={`${routes.USERS}/${card.minterUsername}`}>
+					{card.minterUsername}
+				</a>
+			) : (
+				'None'
+			)
+		}
+	</p>
+	<p>
+		<b>Opened at:{' '}</b>
+		{card.openedAt ? <time datetime={openDate}>{openDate}</time> : 'Not opened yet'}
+	</p>
+</section>
+
+<section>
+	<Heading>Trade History</Heading>
+	{card.tradeHistory?.map((trade) => <pre>{JSON.stringify(trade, null, 2)}</pre>)}
+</section>

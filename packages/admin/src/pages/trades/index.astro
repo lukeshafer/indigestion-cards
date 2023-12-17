@@ -1,0 +1,36 @@
+---
+// DATA
+import { getAllTradesForUser } from '@lil-indigestion-cards/core/lib/trades';
+
+// UI
+import { PageHeader, PageTitle } from '@/components/text';
+import { routeNames, routes } from '@/constants';
+import Page from '@/layouts/Page.astro';
+import { Anchor } from '@/components/text';
+import TradesTable from '@/components/trades/TradesTable';
+import TradesTableAstro from '@/components/trades/TradesTable.astro';
+import { getUser } from '@lil-indigestion-cards/core/lib/user';
+
+const userId = Astro.locals.user?.properties.userId;
+const username = Astro.locals.user?.properties.username;
+
+if (!userId || !username) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+const trades = await getAllTradesForUser(userId);
+const user = await getUser(userId);
+---
+
+<Page title="Trades" pageType="user" breadcrumbs={[{ label: routeNames.TRADES }]}>
+	<PageHeader>
+		<PageTitle>My Trades</PageTitle>
+		<div class="right-4 flex w-full justify-center sm:absolute sm:w-auto">
+			<Anchor href={`${routes.TRADES}/new`}>New Trade</Anchor>
+		</div>
+	</PageHeader>
+
+	<pre>{JSON.stringify(user?.tradeNotifications, null, 2)}</pre>
+
+	<TradesTableAstro incomingTrades={trades.incoming} outgoingTrades={trades.outgoing} />
+</Page>

@@ -1,0 +1,35 @@
+---
+import Page from '@/layouts/Page.astro';
+import { routeNames, routes } from '@/constants';
+import { PageTitle, PageHeader } from '@/components/text';
+import RarityForm from '@/components/rarities/RarityForm';
+import DeleteImageButton from '@/components/image/DeleteImageButton';
+
+const bucket = Astro.url.searchParams.get('bucket');
+const key = Astro.url.searchParams.get('key');
+
+if (!bucket || !key) {
+	return Astro.redirect('/?alert=Please upload an image first');
+}
+
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
+---
+
+<Page
+	title="Add Rarity Details"
+	breadcrumbs={[
+		{ label: routeNames.RARITIES, href: routes.RARITIES },
+		{ label: 'New Rarity', href: routes.ADMIN.CREATE.RARITY },
+		{ label: 'Details' },
+	]}>
+	<PageHeader>
+		<PageTitle>Add Rarity</PageTitle>
+	</PageHeader>
+	<div class="flex max-w-4xl flex-col gap-8 pt-8">
+		<div>
+			<img src={imgUrl} class="mb-4 h-auto w-60 object-contain" id="rarity-frame-preview" />
+			<DeleteImageButton {key} type="frame" client:load />
+		</div>
+		<RarityForm client:load {imgUrl} {key} {bucket} />
+	</div>
+</Page>

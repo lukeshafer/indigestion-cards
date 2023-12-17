@@ -1,0 +1,115 @@
+---
+// UI
+import { PageHeader, PageTitle } from '@/components/text';
+import { routeNames, routes } from '@/constants';
+import Page, { type Props as PageProps } from '@/layouts/Page.astro';
+import NewTrade from '@/components/trades/NewTrade';
+import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
+import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
+import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
+import { Action } from '@/lib/action';
+
+const { userId, username } = Astro.locals.user?.properties || {};
+
+if (!userId || !username) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+const alerts: PageProps['alerts'] = [];
+
+const { output } = await Action(
+	Astro,
+	{
+		method: 'POST',
+		authorizationType: 'user',
+		schema: {
+			receiverUsername: 'string',
+			offeredCards: 'string[]',
+			requestedCards: 'string[]',
+			message: 'string?',
+		},
+	},
+	async ({ receiverUsername, offeredCards, requestedCards, message }) => {
+		try {
+			const trade = await createTradeFromApi({
+				senderUsername: username,
+				receiverUsername,
+				offeredCards,
+				requestedCards,
+				message,
+			});
+			const tradeId = trade.data.tradeId;
+			return Astro.redirect(`/trades/${tradeId}?alert=Trade Created`);
+		} catch (error) {
+			if (error instanceof InputValidationError) {
+				alerts.push({ type: 'error', message: error.message });
+			} else if (error instanceof ServerError) {
+				console.error(error);
+				alerts.push({
+					type: 'error',
+					message: 'An internal server error occurred while creating the trade.',
+				});
+			} else {
+				console.error(error);
+				throw error;
+			}
+		}
+	}
+);
+
+if (output instanceof Response) return output;
+
+const searchParams = Astro.url.searchParams;
+const offeredCardIds = searchParams.getAll('offeredCards');
+const requestedCardIds = searchParams.getAll('requestedCards');
+let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
+
+const { cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
+const { cardInstances: initialReceiverCards = [], users: initialReceiverUser = [] } =
+	initialReceiverUsername
+		? (await getUserAndOpenedCardInstances({ username: initialReceiverUsername })) ?? {}
+		: {};
+
+if (initialReceiverUsername && !initialReceiverUser.length) {
+	alerts.push({ type: 'error', message: 'Invalid username.' });
+	initialReceiverUsername = undefined;
+}
+
+const initialOfferedCards = offeredCardIds
+	? parseCardIdListFromString(offeredCardIds, cardInstances)
+	: undefined;
+const initialRequestedCards = requestedCardIds
+	? parseCardIdListFromString(requestedCardIds, initialReceiverCards)
+	: undefined;
+
+function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInstance[]) {
+	const cards = [];
+	for (const cardId of cardIdList) {
+		const card = cardInstances.find((cardInstance) => cardInstance.instanceId === cardId);
+		if (card) cards.push(card);
+	}
+	return cards;
+}
+---
+
+<Page
+	wide
+	title="New Trade"
+	{alerts}
+	pageType="user"
+	breadcrumbs={[{ label: routeNames.TRADES, href: routes.TRADES }, { label: 'New Trade' }]}>
+	<PageHeader>
+		<PageTitle>New Trade</PageTitle>
+	</PageHeader>
+	<NewTrade
+		{userId}
+		{username}
+		{cardInstances}
+		{initialOfferedCards}
+		{initialRequestedCards}
+		{initialReceiverUsername}
+		{initialReceiverCards}
+		client:load
+	/>
+</Page>

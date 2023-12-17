@@ -1,0 +1,65 @@
+---
+interface Props {
+	open?: boolean;
+}
+---
+
+<button aria-pressed={`${Astro.props.open ?? false}`}>
+	<span class="line one"></span>
+	<span class="line two"></span>
+	<span class="line three"></span>
+</button>
+
+<style>
+	button {
+		--line-spacing: var(--spacing, 0.3em);
+		--line-width: var(--width, 1em);
+		--line-height: var(--thickness, 0.3em);
+
+		z-index: 11;
+		display: flex;
+		font-size: var(--size, 1em);
+		flex-direction: column;
+		justify-content: center;
+		border-style: none;
+		gap: var(--line-spacing);
+		/*padding: var(--line-spacing);*/
+		background-color: transparent;
+	}
+
+	button span {
+		--translate-amount: calc(var(--line-spacing) + var(--line-height));
+
+		display: block;
+		width: var(--line-width);
+		text-align: center;
+		height: var(--line-height);
+		position: relative;
+		background-color: var(--color, #000);
+		transform-origin: center;
+		transition:
+			transform 250ms,
+			filter 100ms,
+			background-color 250ms;
+	}
+
+	html.dark button span {
+		--color: #fff;
+	}
+
+	button[aria-pressed='true'] span {
+		background-color: var(--open-color);
+	}
+
+	button[aria-pressed='true'] span.line.one {
+		transform: translateY(var(--translate-amount)) rotate(0.125turn);
+	}
+
+	button[aria-pressed='true'] span.line.three {
+		transform: translateY(calc(-1 * var(--translate-amount))) rotate(-0.125turn);
+	}
+
+	button[aria-pressed='true'] span.line.two {
+		transform: scale(0, 1);
+	}
+</style>

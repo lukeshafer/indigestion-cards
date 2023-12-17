@@ -1,0 +1,21 @@
+---
+import Page from '@/layouts/Page.astro';
+import { routeNames, routes } from '@/constants';
+import { getAllSeasons } from '@lib/season';
+import { getAllCardDesigns } from '@lib/design';
+import { PageTitle } from '@/components/text';
+import PackTypeForm from '@/components/pack-type/PackTypeForm';
+
+const seasons = await getAllSeasons();
+const cardDesigns = await getAllCardDesigns();
+---
+
+<Page
+	title="Create Pack Type"
+	breadcrumbs={[
+		{ label: routeNames.PACK_TYPES, href: routes.PACK_TYPES },
+		{ label: 'Create Pack Type' },
+	]}>
+	<PageTitle>Create Pack Type</PageTitle>
+	<PackTypeForm client:load {seasons} {cardDesigns} />
+</Page>

@@ -1,0 +1,46 @@
+---
+import { getUnmatchedDesignImages } from '@lib/unmatched-image';
+import { Bucket } from 'sst/node/bucket';
+import { routes } from '@/constants';
+
+type UnmatchedImageType = NonNullable<Parameters<typeof getUnmatchedDesignImages>[0]>;
+interface Props {
+	type: UnmatchedImageType;
+}
+
+const unmatchedImages = await getUnmatchedDesignImages(Astro.props.type);
+
+const entityNames = {
+	frame: 'frame drafts',
+	cardDesign: 'card design drafts',
+	default: 'drafts',
+};
+
+const name = entityNames[Astro.props.type ?? 'default'];
+
+const urlByType = {
+	frame: `${routes.ADMIN.CREATE.RARITY_DETAILS}?bucket=${Bucket.FrameDrafts.bucketName}&key=`,
+	cardDesign: `${routes.ADMIN.CREATE.CARD_DESIGN_DETAILS}?bucket=${Bucket.CardDrafts.bucketName}&key=`,
+} as const satisfies Record<UnmatchedImageType, string>;
+---
+
+{
+	unmatchedImages.length > 0 ? (
+		<div class="bg-red-200 p-8">
+			<h2 class="mb-4 text-xl">Heads up! There are {name} without details!</h2>
+			<ul class="flex flex-wrap gap-4">
+				{unmatchedImages.map((image) => (
+					<li>
+						<a rel="prefetch" href={`${urlByType[image.type]}${image.imageId}`}>
+							<img
+								src={image.url}
+								width="300"
+								class="max-w-64 max-h-64 object-contain"
+							/>
+						</a>
+					</li>
+				))}
+			</ul>
+		</div>
+	) : null
+}

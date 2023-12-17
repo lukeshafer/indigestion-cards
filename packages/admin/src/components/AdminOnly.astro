@@ -1,0 +1,9 @@
+---
+interface Props {
+	fallback?: any;
+}
+
+const isAdmin = Astro.locals.session?.type === 'admin';
+---
+
+{isAdmin ? <slot /> : <slot name="fallback" />}

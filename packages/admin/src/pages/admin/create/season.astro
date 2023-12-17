@@ -1,0 +1,18 @@
+---
+import Page from '@/layouts/Page.astro';
+import { routeNames, routes } from '@/constants';
+import { PageTitle, PageHeader } from '@/components/text';
+import SeasonForm from '@/components/seasons/SeasonForm';
+---
+
+<Page
+	title="Create New Season"
+	breadcrumbs={[{ label: routeNames.SEASONS, href: routes.SEASONS }, { label: 'New Season' }]}>
+	<PageHeader>
+		<PageTitle>Create New Season</PageTitle>
+	</PageHeader>
+
+	<SeasonForm client:load />
+</Page>
+
+<script></script>
