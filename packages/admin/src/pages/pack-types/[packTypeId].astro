@@ -1,7 +1,6 @@
 ---
 import { PageTitle, Heading } from '@/components/text';
 import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
-import { routeNames } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { getPackTypeById } from '@lib/pack-type';
 import { getCardPoolFromType } from '@lib/card-pool';
@@ -19,12 +18,7 @@ if (!packType) {
 const cardPool = await getCardPoolFromType(packType);
 ---
 
-<Page
-	title={`Pack Type: ${packType.packTypeName}`}
-	breadcrumbs={[
-		{ label: routeNames.PACK_TYPES, href: '/pack-type' },
-		{ label: packType.packTypeName, href: `/pack-type/${packType.packTypeId}` },
-	]}>
+<Page title={`Pack Type: ${packType.packTypeName}`}>
 	<PageTitle>{packType.packTypeName}</PageTitle>
 	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
 	<section aria-label="Card Pool" class="mx-auto mt-4 flex max-w-2xl flex-col gap-4">

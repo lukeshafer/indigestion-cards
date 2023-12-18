@@ -4,10 +4,10 @@ import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking } from '@lib/site-config';
-import { routes, routeNames } from '@/constants';
+import { routes } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lib/pack-type';
-import { Anchor, Heading } from '@/components/text';
+import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
@@ -56,16 +56,10 @@ const cardsNotInPack = cardInstances.filter(
 	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
 );
 
-const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
-
 const packTypes = await getAllPackTypes();
 ---
 
-<Page
-	title={user.username}
-	class="flex flex-col gap-4"
-	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
-	pageType="public">
+<Page title={user.username} class="flex flex-col gap-4" pageType="public">
 	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
 			src={twitchData?.profile_image_url}
@@ -90,17 +84,8 @@ const packTypes = await getAllPackTypes();
 			</AdminOnly>
 			<ul>
 				<li>
-					<UserLookingFor {user} {isLoggedInUser} client:load />
+					<UserLookingFor {user} isLoggedInUser={false} client:load />
 				</li>
-				{
-					isLoggedInUser ? null : (
-						<li>
-							<Anchor href={`${routes.TRADES}/new?receiverUsername=${user.username}`}>
-								New Trade
-							</Anchor>
-						</li>
-					)
-				}
 			</ul>
 		</section>
 		{

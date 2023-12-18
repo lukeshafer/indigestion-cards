@@ -26,10 +26,7 @@ type SortType = (typeof sortTypes)[number]['value'];
 
 const cardListStyles = css`
 	grid-template-columns: repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr));
-	--card-scale: 0.75;
-	@media (min-width: 640px) {
-		--card-scale: 1;
-	}
+	--card-scale: 0.5;
 `;
 
 export default function CardList(props: {
@@ -75,6 +72,7 @@ export default function CardList(props: {
 									<>
 										<a
 											rel="prefetch"
+											class="text-center hover:underline"
 											href={
 												props.isUserPage && card.username
 													? `${routes.USERS}/${card.username}/${
@@ -85,6 +83,11 @@ export default function CardList(props: {
 													  }`
 											}>
 											<Card {...card} scale="var(--card-scale)" />
+											<p>{card.cardName}</p>
+											<p>{card.seasonName}</p>
+											<p>
+												{card.cardNumber} / {card.totalOfType}
+											</p>
 										</a>
 										<Show when={props.showUsernames}>
 											<p class="mt-2">

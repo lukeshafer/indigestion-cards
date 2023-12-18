@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lib/pack-type';
-import { routeNames, routes } from '@/constants';
+import { routes } from '@/constants';
 
 import { PageHeader, PageTitle, Anchor } from '@/components/text';
 
@@ -10,7 +10,7 @@ import PackTypeTable from '@/components/pack-type/PackTypeTable';
 const packTypes = await getAllPackTypes();
 ---
 
-<Page title="Pack Types" breadcrumbs={[{ label: routeNames.PACK_TYPES }]}>
+<Page title="Pack Types">
 	<PageHeader>
 		<PageTitle>Pack Types</PageTitle>
 		<Anchor href={routes.ADMIN.CREATE.PACK_TYPE}>Add Pack Type</Anchor>

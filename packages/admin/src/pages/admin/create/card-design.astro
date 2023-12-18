@@ -5,7 +5,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import Page from '@/layouts/Page.astro';
 import { Form, FileInput, SubmitButton } from '@/components/form/Form';
-import { routeNames, routes } from '@/constants';
+import { routes } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 
 const s3 = new S3Client({ region: 'us-east-2' });
@@ -19,12 +19,7 @@ const presigned = await createPresignedPost(s3, {
 });
 ---
 
-<Page
-	title="Create New Card"
-	breadcrumbs={[
-		{ label: routeNames.CARDS, href: routes.DESIGNS },
-		{ label: 'New Card', href: routes.ADMIN.CREATE.CARD_DESIGN },
-	]}>
+<Page title="Create New Card">
 	<PageHeader>
 		<PageTitle>Create New Card</PageTitle>
 	</PageHeader>

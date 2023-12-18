@@ -13,7 +13,7 @@ const startMargin = Astro.cookies.get('openPacksMargin')?.value;
 const startCardScale = Astro.cookies.get('openPacksScale')?.value;
 ---
 
-<Page title="Open Packs" hide-breadcrumbs wide no-header>
+<Page title="Open Packs" wide no-header>
 	<OpenPacksComponent
 		packs={packs}
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}

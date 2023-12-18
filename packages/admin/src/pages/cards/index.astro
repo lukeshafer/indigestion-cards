@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import CardList from '@/components/cards/CardList';
 import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
 import { getAllCardDesigns } from '@lib/design';
-import { routeNames, routes, NO_CARDS_OPENED_ID } from '@/constants';
+import { routes, NO_CARDS_OPENED_ID } from '@/constants';
 import { PageTitle, PageHeader, Anchor } from '@/components/text';
 import AdminOnly from '@/components/AdminOnly.astro';
 
@@ -12,7 +12,7 @@ const designs = await getAllCardDesigns();
 const message = Astro.url.searchParams.get('message') || '';
 ---
 
-<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]}>
+<Page title="All Cards">
 	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<PageHeader>

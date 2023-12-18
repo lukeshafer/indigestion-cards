@@ -1,9 +1,9 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { ASSETS, routeNames, routes } from '@/constants';
+import { ASSETS } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 import CardDesignForm from '@/components/design/CardDesignForm';
-import { getAllSeasons, } from '@lib/season';
+import { getAllSeasons } from '@lib/season';
 import { getAllRarities } from '@lib/rarity';
 import { getSiteConfig } from '@lib/site-config';
 
@@ -27,13 +27,7 @@ const baseRarity = config?.baseRarity ??
 	};
 ---
 
-<Page
-	title="Add Card Design"
-	breadcrumbs={[
-		{ href: routes.DESIGNS, label: routeNames.CARDS },
-		{ href: routes.ADMIN.CREATE.CARD_DESIGN, label: 'New Card' },
-		{ label: 'Details' },
-	]}>
+<Page title="Add Card Design">
 	<PageHeader>
 		<PageTitle>Add Card Design</PageTitle>
 	</PageHeader>

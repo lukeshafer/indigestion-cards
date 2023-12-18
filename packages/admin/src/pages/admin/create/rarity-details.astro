@@ -1,6 +1,5 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { routeNames, routes } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 import RarityForm from '@/components/rarities/RarityForm';
 import DeleteImageButton from '@/components/image/DeleteImageButton';
@@ -15,13 +14,7 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 ---
 
-<Page
-	title="Add Rarity Details"
-	breadcrumbs={[
-		{ label: routeNames.RARITIES, href: routes.RARITIES },
-		{ label: 'New Rarity', href: routes.ADMIN.CREATE.RARITY },
-		{ label: 'Details' },
-	]}>
+<Page title="Add Rarity Details">
 	<PageHeader>
 		<PageTitle>Add Rarity</PageTitle>
 	</PageHeader>

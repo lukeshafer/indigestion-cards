@@ -20,30 +20,33 @@ const { output } = await Action(
 	},
 	async ({ username }) => {
 		const user = await getUserByLogin(username);
-		if (!user) return {
-        error: `User ${username} is not a valid Twitch user.`
-    }
+		if (!user)
+			return {
+				error: `User ${username} is not a valid Twitch user.`,
+			};
 
 		const result = await createAdminUser({
 			userId: user.id,
 			username: user.display_name,
 		});
 
-    if (!result.success) {
-      return {
-        error: result.error
-      }
-    }
+		if (!result.success) {
+			return {
+				error: result.error,
+			};
+		}
 
-    return;
+		return;
 	}
 );
 
-console.log(output)
-const alerts = output?.error ? createAlerts({
-  type: 'error',
-  message: output.error,
-}) : undefined
+console.log(output);
+const alerts = output?.error
+	? createAlerts({
+			type: 'error',
+			message: output.error,
+	  })
+	: undefined;
 
 const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
@@ -58,7 +61,7 @@ const users = unsortedUsers.sort((a, b) => {
 });
 ---
 
-<Page title="Admin Users" breadcrumbs={[{ label: routeNames.ADMIN_USERS }]} {alerts}>
+<Page title="Admin Users" {alerts}>
 	<PageHeader>
 		<PageTitle>Add Admin</PageTitle>
 	</PageHeader>

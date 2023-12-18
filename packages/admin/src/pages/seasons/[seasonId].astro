@@ -3,7 +3,7 @@ import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getPackTypesBySeasonId } from '@lib/pack-type';
 import { getSeasonAndDesignsBySeasonId } from '@lib/season';
-import { NO_CARDS_OPENED_ID, routeNames, routes } from '@/constants';
+import { NO_CARDS_OPENED_ID } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
 
@@ -54,13 +54,7 @@ const packTypesWithCardPools = await Promise.all(
 );
 ---
 
-<Page
-	title={season.seasonName}
-	class="flex flex-col gap-4"
-	breadcrumbs={[
-		{ label: routeNames.SEASONS, href: routes.SEASONS },
-		{ label: season.seasonName },
-	]}>
+<Page title={season.seasonName} class="flex flex-col gap-4">
 	<header>
 		<PageHeader>
 			<PageTitle id="season-name">{season.seasonName}</PageTitle>

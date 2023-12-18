@@ -1,7 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllPreorders } from '@lib/preorder';
-import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
 
@@ -11,7 +10,7 @@ const { data: users } = await getUsers();
 const preorders = await getAllPreorders();
 ---
 
-<Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} >
+<Page title="Users">
 	<PageHeader>
 		<PageTitle>Users</PageTitle>
 	</PageHeader>

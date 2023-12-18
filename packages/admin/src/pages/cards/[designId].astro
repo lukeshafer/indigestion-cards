@@ -4,7 +4,7 @@ import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lib/design';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
-import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
+import { LEGACY_CARD_ID, ASSETS } from '@/constants';
 import AdminOnly from '@/components/AdminOnly.astro';
 import { PageTitle } from '@/components/text';
 import AdminDesignStats from '@/components/design/AdminDesignStats';
@@ -55,10 +55,7 @@ const rarityStatsArray = getRarityStatsOverviewFromDesignAndInstances(design, in
 const openedInstances = instances.filter((instance) => instance.openedAt);
 ---
 
-<Page
-	title={`${design.cardName} - ${design.seasonName}`}
-	class="flex flex-col gap-9"
-	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
+<Page title={`${design.cardName} - ${design.seasonName}`} class="flex flex-col gap-9">
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
 		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />

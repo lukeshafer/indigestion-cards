@@ -2,7 +2,6 @@
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceByUsername } from '@lib/card';
 import { getUser } from '@lib/user';
-import { routeNames, routes } from '@/constants';
 import CardPage from '@/layouts/CardPage.astro';
 
 const session = Astro.locals.session;
@@ -34,11 +33,6 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 
 <Page
 	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
-	class="flex flex-col gap-6"
-	breadcrumbs={[
-		{ label: routeNames.USER, href: routes.USERS },
-		{ label: username, href: `${routes.USERS}/${username}` },
-		{ label: `${instance.rarityName} #${instance.cardNumber}` },
-	]}>
+	class="flex flex-col gap-6">
 	<CardPage card={instance} user={user ?? undefined} />
 </Page>

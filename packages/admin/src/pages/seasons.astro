@@ -1,13 +1,13 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getAllSeasons } from '@lib/season';
-import { routes, routeNames } from '@/constants';
+import { routes } from '@/constants';
 import { PageTitle, PageHeader, Anchor } from '@/components/text';
 
 const seasons = await getAllSeasons();
 ---
 
-<Page title="All Seasons" breadcrumbs={[{ label: routeNames.SEASONS }]}>
+<Page title="All Seasons">
 	<PageHeader>
 		<PageTitle>All Seasons</PageTitle>
 		<Anchor href={routes.ADMIN.CREATE.SEASON}>Add New Season</Anchor>

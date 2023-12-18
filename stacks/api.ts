@@ -92,8 +92,6 @@ export function API({ app, stack }: StackContext) {
 			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
 			// CARD
 			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
-			// TRPC
-			'GET /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
 		},
 		defaults: {
 			function: {
@@ -136,7 +134,6 @@ export function API({ app, stack }: StackContext) {
 	stack.addOutputs({
 		ApiEndpoint: adminApi.url,
 		TwitchApiEndpoint: twitchApi.url,
-		//TRPCApiEndpoint: trpcApi.url,
 	});
 
 	return { adminApi, twitchApi };
