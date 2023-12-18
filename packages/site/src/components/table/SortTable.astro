@@ -135,7 +135,7 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 			element: th,
 			name: th.dataset.name || '',
 			label: th.dataset.label || th.textContent || '',
-			sort: th.dataset.sort !== 'false',
+			sort: th.dataset.nosort === undefined,
 			startDescending: th.dataset.startDescending === 'true',
 			type:
 				th.dataset.type === 'number' || th.dataset.type === 'date'

@@ -22,7 +22,7 @@ const { admins, currentUser } = Astro.props;
 	<SortTable id="admin-users-table" search-column="username">
 		<SortTableHead>
 			<SortTableColumn name="username" width="65%" align="left">Username</SortTableColumn>
-			<SortTableColumn name="actions" sort={false}>Actions</SortTableColumn>
+			<SortTableColumn name="actions" no-sort>Actions</SortTableColumn>
 		</SortTableHead>
 		<SortTableBody>
 			{

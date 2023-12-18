@@ -5,7 +5,7 @@ export type ColumnProps = Props;
 interface Props {
 	name: string;
 	label?: string;
-	sort?: boolean;
+	'no-sort'?: boolean;
 	width?: string;
 	type?: 'text' | 'number' | 'date';
 	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
@@ -18,7 +18,7 @@ interface Props {
 const {
 	name,
 	label,
-	sort = true,
+	'no-sort': noSort = false,
 	width,
 	type,
 	showOnBreakpoint,
@@ -33,13 +33,13 @@ const {
 	data-name={name}
 	data-label={label}
 	data-type={type}
-	data-sort={String(sort)}
+	data-nosort={noSort}
 	data-start-descending={String(startDescending)}
 	style={{ width }}
 	class:list={[
-		twMerge('px-6 py-2 hover:bg-gray-200 dark:hover:bg-gray-700', className),
+		twMerge('px-6 py-2', className),
 		{
-			'cursor-pointer': sort ?? true,
+			'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700': !noSort,
 			hidden: showOnBreakpoint !== undefined,
 			'sm:table-cell': showOnBreakpoint === 'sm',
 			'md:table-cell': showOnBreakpoint === 'md',

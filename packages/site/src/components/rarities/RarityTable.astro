@@ -22,7 +22,7 @@ const { rarities } = Astro.props;
 		<SortTableColumn name="count" showOnBreakpoint="sm" type="number" startDescending>
 			Default Count
 		</SortTableColumn>
-		<SortTableColumn name="actions" sort={false}>Actions</SortTableColumn>
+		<SortTableColumn name="actions" no-sort>Actions</SortTableColumn>
 	</SortTableHead>
 	<SortTableBody>
 		{

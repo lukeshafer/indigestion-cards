@@ -6,6 +6,7 @@ import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
 import AdminOnly from '@/components/AdminOnly.astro';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { User } from '@lil-indigestion-cards/core/db/users';
+import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
 
 const session = Astro.locals.session;
 
@@ -111,7 +112,4 @@ const openDate = card.openedAt
 	</p>
 </section>
 
-<section>
-	<Heading>Trade History</Heading>
-	{card.tradeHistory?.map((trade) => <pre>{JSON.stringify(trade, null, 2)}</pre>)}
-</section>
+{card.tradeHistory ? <CardTradeHistory history={card.tradeHistory} /> : null}
