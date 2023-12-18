@@ -1,5 +1,6 @@
 ---
 import type { Trade } from '@lil-indigestion-cards/core/db/trades';
+import type { User } from '@lil-indigestion-cards/core/db/users';
 import SortTable from '../table/SortTable.astro';
 import SortTableCell from '../table/SortTableCell.astro';
 import SortTableRow from '../table/SortTableRow.astro';
@@ -10,15 +11,23 @@ import { routes } from '@/constants';
 import { Anchor } from '../text';
 
 interface Props {
-	incomingTrades: Trade[];
-	outgoingTrades: Trade[];
+	incomingTrades: Array<Trade>;
+	outgoingTrades: Array<Trade>;
+	userTradeNotifications: User['tradeNotifications'];
 }
 
-const { incomingTrades, outgoingTrades } = Astro.props;
+const { incomingTrades, outgoingTrades, userTradeNotifications } = Astro.props;
 
 const trades = [...incomingTrades, ...outgoingTrades].sort(
 	(a, b) => (a.createdAt || 0) - (b.createdAt || 0)
 );
+
+const notifications = userTradeNotifications?.reduce((acc, notif) => {
+	const tradenotif = acc.get(notif.tradeId);
+	if (!tradenotif) return acc.set(notif.tradeId, notif);
+	if (notif.status === 'statusUpdated') return acc.set(notif.tradeId, notif);
+	return acc;
+}, new Map<string, NonNullable<User['tradeNotifications']>[number]>());
 
 const isLoggedInUsername = (name: string) =>
 	name.toUpperCase() === Astro.locals.user?.properties.username.toUpperCase();
@@ -41,7 +50,7 @@ const isLoggedInUsername = (name: string) =>
 	<SortTableBody>
 		{
 			trades.map((trade) => (
-				<SortTableRow highlighted={trade.status === 'failed'}>
+				<SortTableRow highlighted={notifications?.has(trade.tradeId)}>
 					<SortTableCell column="dateCreated" value={trade.createdAt || 0}>
 						{trade.createdAt ? (
 							<time datetime={new Date(trade.createdAt).toISOString()}>
@@ -94,7 +103,15 @@ const isLoggedInUsername = (name: string) =>
 					<SortTableCell
 						showOnBreakpoint="sm"
 						column="status"
-						value={trade.status.charAt(0).toUpperCase() + trade.status.slice(1)}
+						value={
+							notifications?.get(trade.tradeId)?.status === 'newMessage'
+								? 'New Message'
+								: (notifications?.get(trade.tradeId)?.status === 'statusUpdated'
+										? 'New Status: '
+										: '') +
+								  trade.status.charAt(0).toUpperCase() +
+								  trade.status.slice(1)
+						}
 					/>
 					<SortTableCell column="actions" value="">
 						<Anchor href={`/trades/${trade.tradeId}`}>View</Anchor>

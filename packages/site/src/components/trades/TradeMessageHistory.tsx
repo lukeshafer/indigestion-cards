@@ -46,7 +46,11 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 					props.loggedInUserId
 				}>
 				{(loggedInUserId) => (
-					<MessageInput actions={messagesActions} loggedInUserId={loggedInUserId()} />
+					<MessageInput
+						actions={messagesActions}
+						loggedInUserId={loggedInUserId()}
+						messages={messages()}
+					/>
 				)}
 			</Show>
 		</ul>
@@ -56,40 +60,62 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 function MessageInput(props: {
 	actions: ResourceActions<Trade['messages']>;
 	loggedInUserId: string;
+	messages: Trade['messages'];
 }) {
+	const messageCount = () => props.messages.filter((m) => m.type === 'message').length;
+	const MESSAGE_LIMIT = 20;
+	const MESSAGE_LIMIT_WARNING_THRESHOLD = 12;
 	return (
-		<form
-			method="post"
-			onSubmit={async (e) => {
-				e.preventDefault();
-				const data = new FormData(e.currentTarget);
-				const message = data.get('message');
+		<Show
+			when={messageCount() < MESSAGE_LIMIT}
+			fallback={
+				<p class="text-red-500">
+					You've reached the message limit of {messageCount()}/{MESSAGE_LIMIT}. Please
+					continue this conversation on Discord or Twitch, if necessary.
+				</p>
+			}>
+			<form
+				method="post"
+				onSubmit={async (e) => {
+					e.preventDefault();
+					const data = new FormData(e.currentTarget);
+					const message = data.get('message');
 
-				// eslint-disable-next-line
-				props.actions.mutate((msgs) =>
-					msgs.concat([
-						{
-							message: message?.toString() ?? '',
-							type: 'message',
-							userId: props.loggedInUserId,
-						},
-					])
-				);
+					// eslint-disable-next-line
+					props.actions.mutate((msgs) =>
+						msgs.concat([
+							{
+								message: message?.toString() ?? '',
+								type: 'message',
+								userId: props.loggedInUserId,
+							},
+						])
+					);
 
-				e.currentTarget.message.value = '';
+					e.currentTarget.message.value = '';
 
-				await fetch(window.location.href, {
-					method: 'post',
-					body: new URLSearchParams(data as unknown as string),
-				});
+					await fetch(window.location.href, {
+						method: 'post',
+						body: new URLSearchParams(data as unknown as string),
+					});
 
-				props.actions.refetch();
-			}}>
-			<div class="flex w-full gap-1">
-				<TextInput name="message" label="Send a message." inputOnly required />
-				<SubmitButton>Send</SubmitButton>
-			</div>
-		</form>
+					props.actions.refetch();
+				}}>
+				<div class="flex w-full gap-1">
+					<TextInput name="message" label="Send a message." inputOnly required />
+					<SubmitButton>Send</SubmitButton>
+				</div>
+				<Show when={messageCount() >= MESSAGE_LIMIT_WARNING_THRESHOLD}>
+					<p class="text-xs text-red-600">
+						Heads up, you're at {messageCount()} / {MESSAGE_LIMIT} messages! Consider moving this
+						conversation to Twitch or Discord messages!
+					</p>
+				</Show>
+				<p class="text-xs text-gray-600">
+					Reminder: all messages sent here are public and visible to anybody!
+				</p>
+			</form>
+		</Show>
 	);
 }
 
@@ -122,20 +148,6 @@ function Message(props: { message: Trade['messages'][number]; trade: Trade }) {
 					message={props.message.message}
 					senderUsername={props.trade.senderUsername}
 					receiverUsername={props.trade.receiverUsername}
-				/>
-			</Match>
-			<Match when={props.message.type === 'offer'}>
-				<UserMessage
-					message={props.message.message}
-					type="left"
-					username={props.trade.senderUsername}
-				/>
-			</Match>
-			<Match when={props.message.type === 'response'}>
-				<UserMessage
-					message={props.message.message}
-					type="right"
-					username={props.trade.receiverUsername}
 				/>
 			</Match>
 		</Switch>

@@ -408,7 +408,7 @@ export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}>
+			class={`${BUTTON_CLASS} outline-gray-200 dark:outline-gray-800 outline bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}>
 			{props.children}
 		</a>
 	);

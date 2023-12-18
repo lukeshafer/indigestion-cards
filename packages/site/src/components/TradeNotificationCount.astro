@@ -34,7 +34,12 @@ const { username } = Astro.props;
 
 				const user = await get('user', [username]);
 
-				return this.setCount(user?.tradeNotifications?.length || 0);
+				const count = user?.tradeNotifications?.reduce(
+					(acc, notif) => acc.add(notif.tradeId),
+					new Set<string>()
+				).size;
+
+				return this.setCount(count || 0);
 			}
 
 			setCount(count: number) {

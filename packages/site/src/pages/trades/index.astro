@@ -7,8 +7,7 @@ import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { Anchor } from '@/components/text';
-import TradesTable from '@/components/trades/TradesTable';
-import TradesTableAstro from '@/components/trades/TradesTable.astro';
+import TradesTable from '@/components/trades/TradesTable.astro';
 import { getUser } from '@lil-indigestion-cards/core/lib/user';
 
 const userId = Astro.locals.user?.properties.userId;
@@ -30,7 +29,9 @@ const user = await getUser(userId);
 		</div>
 	</PageHeader>
 
-	<pre>{JSON.stringify(user?.tradeNotifications, null, 2)}</pre>
-
-	<TradesTableAstro incomingTrades={trades.incoming} outgoingTrades={trades.outgoing} />
+	<TradesTable
+		incomingTrades={trades.incoming}
+		outgoingTrades={trades.outgoing}
+		userTradeNotifications={user?.tradeNotifications}
+	/>
 </Page>
