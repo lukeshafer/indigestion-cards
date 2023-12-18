@@ -1,7 +1,0 @@
----
-interface Props {
-	when: any;
-}
----
-
-{Boolean(Astro.props.when) === true ? <slot /> : <slot name="fallback" />}

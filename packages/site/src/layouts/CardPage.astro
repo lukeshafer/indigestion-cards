@@ -3,7 +3,6 @@ import { routes } from '@/constants';
 import { Anchor, Heading, PageTitle } from '@/components/text';
 import PreviewableCard from '@/components/cards/PreviewableCard';
 import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
-import AdminOnly from '@/components/AdminOnly.astro';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { User } from '@lil-indigestion-cards/core/db/users';
 import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
@@ -76,12 +75,9 @@ const openDate = card.openedAt
 		<b>Card Number:{' '}</b>
 		{card.cardNumber}
 	</p>
-	<AdminOnly>
-		<p>
-			<b>Season:{' '}</b>
-			<a class="underline" href={`${routes.SEASONS}/${card.seasonId}`}>{card.seasonName}</a>
-		</p>
-	</AdminOnly>
+	<p>
+		<b>Season: {card.seasonName}</b>
+	</p>
 	<p>
 		<b>Owner:{' '}</b>
 		{

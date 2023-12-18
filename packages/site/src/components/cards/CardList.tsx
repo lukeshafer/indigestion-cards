@@ -7,7 +7,7 @@ import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';
 import type { Session } from '@/env';
 import { css } from '@acab/ecsstatic';
-import type { RarityRankingRecord } from '../site-config/RarityRanking';
+import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 

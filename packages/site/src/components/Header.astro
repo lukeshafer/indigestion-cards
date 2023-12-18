@@ -1,14 +1,13 @@
 ---
-import AdminOnly from '@/components/AdminOnly.astro';
-import Hamburger from '@/components/Hamburger.astro';
 import HeaderLink from '@/components/HeaderLink.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
-import { ASSETS } from '@/constants';
+import { ASSETS, routes } from '@/constants';
 import { getLoginLink } from '@/lib/utils';
 import { getUserByLogin } from '@lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount.astro';
+import TotalPackCount from './pack/TotalPackCount.astro';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 
@@ -32,11 +31,6 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
 	<header
 		class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
-		<AdminOnly>
-			<div data-for-admin-panel class="toggle-btn z-100 px-2 py-2 text-lg">
-				<Hamburger />
-			</div>
-		</AdminOnly>
 		<nav
 			class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
 			<a
@@ -50,10 +44,18 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 					<span class="-mt-2 text-lg text-gray-700 dark:text-gray-200">cards</span>
 				</div>
 			</a>
-			<HeaderLink href="/card" title="Cards">Cards</HeaderLink>
-			<HeaderLink href="/user" title="Users">Users</HeaderLink>
+			{
+				Astro.locals.session?.type === 'admin' ? (
+					<HeaderLink href={routes.ADMIN.OPEN_PACKS} title="Open Packs">
+						Open Packs
+						<TotalPackCount count={0} />
+					</HeaderLink>
+				) : null
+			}
+			<HeaderLink href={routes.CARDS} title="Cards">Cards</HeaderLink>
+			<HeaderLink href={routes.USERS} title="Users">Users</HeaderLink>
 			<Show when={canSeeTradesLink}>
-				<HeaderLink href="/trades" title="Trades">
+				<HeaderLink href={routes.TRADES} title="Trades">
 					<TradeNotificationCount username={username!} transition:persist />
 					 Trades
 				</HeaderLink>

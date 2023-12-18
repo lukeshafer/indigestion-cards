@@ -5,10 +5,7 @@ import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
-import AdminOnly from '@/components/AdminOnly.astro';
-import { getAllPackTypes } from '@lib/pack-type';
 import { Anchor, Heading } from '@/components/text';
-import UserPackForms from '@/components/pack/UserPackForms';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
 
@@ -57,8 +54,6 @@ const cardsNotInPack = cardInstances.filter(
 );
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
-
-const packTypes = await getAllPackTypes();
 ---
 
 <Page
@@ -79,15 +74,6 @@ const packTypes = await getAllPackTypes();
 				style={{ 'view-transition-name': `${user.username}-username` }}>
 				{user.username}
 			</h1>
-			<AdminOnly>
-				<details>
-					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
-					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
-						<p>User Id: {user.userId}</p>
-						<UserPackForms {user} {packTypes} client:load />
-					</div>
-				</details>
-			</AdminOnly>
 			<ul>
 				<li>
 					<UserLookingFor {user} {isLoggedInUser} client:load />

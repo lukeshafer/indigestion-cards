@@ -1,6 +1,7 @@
 interface Path {
 	users: typeof import('../../pages/data/users');
 	usernames: typeof import('../../pages/data/usernames');
+  "pack-count": typeof import('../../pages/data/pack-count');
 }
 
 interface ParamPath {
