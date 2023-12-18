@@ -1,10 +1,7 @@
 ---
 import Base, { type BaseProps } from './Base.astro';
-import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
 import AdminOnly from '@/components/AdminOnly.astro';
-import AdminPanel from '@/components/AdminPanel.astro';
 import Header from '@/components/Header.astro';
-import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lib/site-config';
 import { Api } from 'sst/node/api';
@@ -12,11 +9,9 @@ import type { Alert } from '@/lib/client/state';
 
 export interface Props extends BaseProps {
 	class?: string;
-	breadcrumbs?: Path[];
 	wide?: boolean;
 	alerts?: Alert[];
 	'no-header'?: boolean;
-	'hide-breadcrumbs'?: boolean;
 }
 
 const isAdmin = Astro.locals.session?.type === 'admin';
@@ -33,9 +28,7 @@ const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
 
 let {
 	class: className,
-	breadcrumbs,
 	wide = false,
-	'hide-breadcrumbs': hideBreadcrumbs,
 	'no-header': noHeader = false,
 	alerts: alertsProp,
 	...baseProps
@@ -49,36 +42,21 @@ alerts.push(...(alertsProp ?? []));
 		class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
 		id="page-layout-wrapper"
 		data-api-url={Api.AdminApi.url}>
-		<AdminOnly>
-			<AdminPanel />
-		</AdminOnly>
 		<div
 			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
 			id="page-scroll-wrapper">
-			{noHeader ? null : <Header />}
-			<data-lists></data-lists>
+      <AdminOnly>
+        <Header />
+      </AdminOnly>
 			<AlertBox client:load {alerts} />
-			{
-				hideBreadcrumbs ? null : (
-					<div class="max-w-main mx-auto w-full">
-						<Breadcrumbs path={breadcrumbs ?? []} />
-					</div>
-				)
-			}
 			<main
 				transition:name={wide ? undefined : 'main'}
 				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
 				class="@container/main z-0 col-start-2 mx-auto mb-8 w-full flex-1">
 				<slot />
 			</main>
-			<div id="card-preview"></div>
-			<Footer />
 		</div>
 	</div>
-	<script>
-		// import custom elements
-		import '../lib/client/elements/data-lists';
-	</script>
 </Base>
 
 <style>

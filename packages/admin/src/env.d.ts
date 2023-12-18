@@ -5,8 +5,6 @@ declare global {
 	namespace App {
 		interface Locals {
 			session: Session | null;
-			admin: AdminSession | null;
-			user: UserSession | AdminSession | null;
 		}
 	}
 }
@@ -20,14 +18,6 @@ interface PublicSession {
 	properties: {
 		userId?: null | undefined;
 		username?: null | undefined;
-	};
-}
-
-interface UserSession {
-	type: 'user';
-	properties: {
-		userId: string;
-		username: string;
 	};
 }
 

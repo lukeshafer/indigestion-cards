@@ -1,26 +1,3 @@
-/** Only routes that are accessible without logging in */
-export const PUBLIC_ROUTES = [
-	'/',
-	'/user',
-	'/user/*',
-	'/404',
-	'/admin',
-	'/api/get-all-usernames',
-	'/api/search',
-	'/api/auth/*',
-	'/api/user/*',
-	'/card',
-	'/card/*',
-	'/login',
-	'/logout',
-	'/data/usernames',
-  '/trades/*',
-  '/data/trades/*',
-] as const;
-
-/** Routes that aren't admin only, but require a user login */
-export const USER_ROUTES = ['/trades'];
-
 /** Admin Api routes */
 const api_paths = {
 	PACK_TYPE: '/pack-type',
@@ -48,27 +25,6 @@ export const API = new Proxy(api_paths, {
 	},
 });
 
-/** User API Routes */
-const user_api_paths = {
-	USER: '/user',
-	TRADE: '/trade',
-	CARD: '/card',
-};
-
-export const USER_API = new Proxy(user_api_paths, {
-	get: (target, prop) => {
-		if (!(prop in target)) return undefined;
-		const path = target[prop as keyof typeof target];
-		return '/api/user' + path;
-	},
-});
-
-/** Public API routes */
-export const publicApi = {
-	GET_ALL_USERNAMES: '/api/get-all-usernames',
-	SEARCH: '/api/search',
-} as const;
-
 export const authApi = {
 	CALLBACK: '/api/auth/callback',
 	LOGIN: '/api/auth/login',
@@ -76,22 +32,22 @@ export const authApi = {
 } as const;
 
 export const routes = {
-	USERS: '/user',
-	DESIGNS: '/card',
-	SEASONS: '/season',
-	RARITIES: '/rarity',
+	USERS: '/users',
+	DESIGNS: '/cards',
+	SEASONS: '/seasons',
+	RARITIES: '/rarities',
 	ADMIN_USERS: '/admin-users',
-	PACK_TYPES: '/pack-type',
+	PACK_TYPES: '/pack-types',
 	PACKS: '/packs',
-	INSTANCES: '/card',
-	CARDS: '/card',
+	INSTANCES: '/cards',
+	CARDS: '/cards',
 	TRADES: '/trades',
+	SITE_CONFIG: '/admin/site-config',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',
 		GIVE_PACK: '/admin/give-pack',
 		OPEN_PACKS: '/admin/open-packs',
-		SITE_CONFIG: '/admin/site-config',
 		CREATE: {
 			ADMIN: '/admin/create/admin',
 			CARD_DESIGN: '/admin/create/card-design',

@@ -58,7 +58,6 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 <Page
 	title={`${design.cardName} - ${design.seasonName}`}
 	class="flex flex-col gap-9"
-	pageType="public"
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>

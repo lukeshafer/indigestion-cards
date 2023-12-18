@@ -78,6 +78,6 @@ export function Sites({ app, stack }: StackContext) {
 
   stack.addOutputs({
     SiteUrl: site.url,
-    //AdminUrl: adminSite.url,
+    AdminUrl: admin.url,
   });
 }

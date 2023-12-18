@@ -1,7 +1,7 @@
 import type { MiddlewareResponseHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { getAdminUserById } from '@lib/admin-user';
-import { AUTH_TOKEN, PUBLIC_ROUTES, USER_ROUTES } from './constants';
+import { AUTH_TOKEN } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
 
@@ -23,74 +23,21 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	// @ts-expect-error - cookie string is a fine input for this function
 	const session: Session = SSTSession.verify(cookie?.value ?? '');
 	ctx.locals.session = session;
-	//console.log({ session });
 
 	if (session.type === 'admin') {
 		const adminUser = await getAdminUserById(session?.properties.userId ?? '');
 		if (!adminUser) {
 			ctx.locals.session = null;
 			ctx.cookies.delete(AUTH_TOKEN);
-			//console.error('No admin user found for session:', session);
+		} else {
+      if (ctx.url.pathname === '/login') return ctx.redirect('/')
+			return next();
 		}
 	}
 
-	const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
-		routeList.some((route) =>
-			route.endsWith('*')
-				? currentRoute.startsWith(route.slice(0, -1))
-				: currentRoute === route
-		);
-
-	const currentRoute = ctx.url.pathname;
-	const isPublicRoute = checkIncludesCurrentRoute(PUBLIC_ROUTES);
-	const isUserRoute = isPublicRoute || checkIncludesCurrentRoute(USER_ROUTES);
-
-	process.env.SESSION_USER_ID = session?.properties.userId ?? undefined;
-	process.env.SESSION_USERNAME = session?.properties.username ?? undefined;
-	process.env.SESSION_TYPE = session?.type ?? undefined;
-
-	ctx.locals.admin = ctx.locals.session?.type === 'admin' ? ctx.locals.session : null;
-	ctx.locals.user =
-		ctx.locals.session?.type === 'user' || ctx.locals.session?.type === 'admin'
-			? ctx.locals.session
-			: null;
-
-
-	//console.log({ currentRoute, isPublicRoute, isUserRoute, session })
-	if (!isPublicRoute) {
-		const isUserOnUserRoute = isUserRoute && ctx.locals.session?.type === 'user';
-		const isAdmin = ctx.locals.session?.type === 'admin';
-		if (!isAdmin && !isUserOnUserRoute && ctx.url.pathname !== '/404') {
-			//console.log("Not admin, redirecting to '/404'");
-			return ctx.redirect('/404');
-		}
-	}
-
-	return next();
+  console.log(ctx.url.pathname)
+	if (ctx.url.pathname === '/login' || ctx.url.pathname === '/api/auth/callback') return next();
+	else return ctx.redirect('/login' + ctx.url.search);
 };
-
-//const passwordProtection: MiddlewareResponseHandler = async (ctx, next) => {
-//if (ctx.cookies.get('lilind_code').value === 'pants') return next();
-
-//const body = await ctx.request.text();
-//const params = new URLSearchParams(body);
-
-//if (params.get('password') === 'pants') return next();
-
-//return html`
-//<head>
-//<link rel="stylesheet" href="https://unpkg.com/marx-css/css/marx.min.css" />
-//</head>
-//<body>
-//<main>
-//<form method="post" action="/">
-//<label for="password">Password</label>
-//<input type="password" name="password" id="password" />
-//<button type="submit">Submit</button>
-//</form>
-//</main>
-//</body>
-//`;
-//};
 
 export const onRequest = sequence(auth, transformMethod);

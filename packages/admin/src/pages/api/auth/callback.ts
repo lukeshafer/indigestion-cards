@@ -12,7 +12,6 @@ export async function GET(ctx: APIContext) {
 
 	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
 	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
-	//console.log({ client_id, origin })
 
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
 		method: 'POST',

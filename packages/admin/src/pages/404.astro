@@ -3,14 +3,14 @@ import Page from '@/layouts/Page.astro';
 import { ASSETS } from '@/constants';
 ---
 
-<Page title="Page not found" class="flex flex-col items-center" pageType="public">
-	<h1 class="text-7xl font-display italic text-red-500 my-5">404</h1>
+<Page title="Page not found" class="flex flex-col items-center">
+	<h1 class="font-display my-5 text-7xl italic text-red-500">404</h1>
 	<img
 		src={ASSETS.EMOTES.LILINDOHNO}
 		width="100"
 		alt="Ryan shaking his head in panic"
-		class="OHNO text-4xl text-center font-mono w-40 h-40"
+		class="OHNO h-40 w-40 text-center font-mono text-4xl"
 	/>
-	<p class="my-2 text-3xl font-display italic text-brand-secondary">OH NO</p>
-	<p class="mt-12 text-center text-3xl font-mono">The page you're looking for doesn't exist!!</p>
+	<p class="font-display text-brand-secondary my-2 text-3xl italic">OH NO</p>
+	<p class="mt-12 text-center font-mono text-3xl">The page you're looking for doesn't exist!!</p>
 </Page>

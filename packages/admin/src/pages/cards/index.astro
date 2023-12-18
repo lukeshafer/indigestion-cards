@@ -12,7 +12,7 @@ const designs = await getAllCardDesigns();
 const message = Astro.url.searchParams.get('message') || '';
 ---
 
-<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
+<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]}>
 	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<UnmatchedImageList type="cardDesign" />
 	<PageHeader>
@@ -25,7 +25,10 @@ const message = Astro.url.searchParams.get('message') || '';
 		cards={designs.map((card, index) => {
 			const bestRarity = card.bestRarityFound;
 
-			if (bestRarity?.rarityId === NO_CARDS_OPENED_ID && Astro.locals.session?.type !== 'admin') {
+			if (
+				bestRarity?.rarityId === NO_CARDS_OPENED_ID &&
+				Astro.locals.session?.type !== 'admin'
+			) {
 				return {
 					...bestRarity,
 					...card,
