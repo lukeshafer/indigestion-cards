@@ -7,6 +7,7 @@ import { routeNames, routes } from '@/constants';
 import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
 import { validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
+import { removeTradeNotification } from '@lil-indigestion-cards/core/lib/user';
 import {
 	getTrade,
 	updateTradeStatus,
@@ -84,6 +85,11 @@ if (!trade) {
 
 const isSender = trade.senderUsername === username;
 const isReceiver = trade.receiverUsername === username;
+
+if (userId && (isSender || isReceiver)) {
+	console.log('removing trade notification');
+	await removeTradeNotification({ userId, tradeId });
+}
 
 const tradeStatus = (() => {
 	switch (trade.status) {

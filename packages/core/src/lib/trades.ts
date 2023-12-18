@@ -60,7 +60,7 @@ export async function createTradeFromApi(params: {
 	if (params.message) {
 		messages.push({
 			userId: sender.userId,
-			type: 'offer',
+			type: 'message',
 			message: params.message,
 		});
 	}

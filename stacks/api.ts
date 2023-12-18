@@ -35,22 +35,6 @@ export function API({ app, stack }: StackContext) {
 		},
 	});
 
-	//const trpcApi = new Api(stack, 'trpcApi', {
-	//routes: {
-	//'POST /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
-	//'GET /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
-	//},
-	//defaults: {
-	//function: {
-	//bind: [table, siteAuth],
-	//runtime: 'nodejs18.x',
-	//},
-	//},
-	//cors: {
-	//allowMethods: ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
-	//},
-	//});
-
 	const adminApi = new Api(stack, 'AdminApi', {
 		routes: {
 			// PACK TYPE
@@ -106,12 +90,8 @@ export function API({ app, stack }: StackContext) {
 			// USER ENDPOINTS
 			// USER
 			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
-			// TRADE
-			'POST /user-api/trade': 'packages/functions/src/user-api/trade/post.handler',
-			'PATCH /user-api/trade': 'packages/functions/src/user-api/trade/patch.handler',
 			// CARD
 			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
-
 			// TRPC
 			'GET /trpc/{proxy+}': 'packages/functions/src/trpc/index.handler',
 		},
