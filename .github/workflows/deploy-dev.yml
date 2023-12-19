@@ -5,7 +5,7 @@ on:
         branches:
             - dev
             - accounts
-            - dark-mode
+            - admin-site
 
 jobs:
     deploy-dev:
