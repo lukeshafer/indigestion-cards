@@ -86,8 +86,11 @@ if (!trade) {
 const isSender = trade.senderUsername === username;
 const isReceiver = trade.receiverUsername === username;
 
-if (userId && (isSender || isReceiver)) {
-	console.log('removing trade notification');
+if (
+	userId &&
+	(isSender || isReceiver) &&
+	Astro.request.headers.get('purpose')?.toLowerCase() !== 'prefetch'
+) {
 	await removeTradeNotification({ userId, tradeId });
 }
 
@@ -107,6 +110,8 @@ const tradeStatus = (() => {
 			return `Canceled by ${isSender ? 'you' : trade.senderUsername}`;
 		case 'completed':
 			return 'Trade completed';
+		case 'failed':
+			return 'Trade failed';
 	}
 })();
 ---
@@ -137,9 +142,27 @@ const tradeStatus = (() => {
 							trade.status === 'accepted' || trade.status === 'completed',
 						'text-gray-500 dark:text-gray-400': trade.status === 'pending',
 						'text-red-700 dark:text-red-500':
-							trade.status === 'rejected' || trade.status === 'canceled',
+							trade.status === 'rejected' ||
+							trade.status === 'canceled' ||
+							trade.status === 'failed',
 					}}>{tradeStatus}</span
 				>
+				{
+					trade.statusMessage ? (
+						<p
+							class:list={{
+								'text-brand-dark dark:text-brand-main':
+									trade.status === 'accepted' || trade.status === 'completed',
+								'text-gray-500 dark:text-gray-400': trade.status === 'pending',
+								'text-red-700 dark:text-red-500':
+									trade.status === 'rejected' ||
+									trade.status === 'canceled' ||
+									trade.status === 'failed',
+							}}>
+							{trade.statusMessage}
+						</p>
+					) : null
+				}
 			</Heading>
 		</div>
 		<div class="text-center">

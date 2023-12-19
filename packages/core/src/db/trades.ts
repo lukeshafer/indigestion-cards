@@ -143,6 +143,9 @@ export const trades = new Entity(
         required: true,
         default: 'pending',
       },
+      statusMessage: {
+        type: 'string',
+      },
       completedAt: {
         type: 'number',
         watch: ['status'] as const,

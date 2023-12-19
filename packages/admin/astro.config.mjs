@@ -9,7 +9,7 @@ import { ecsstatic } from '@acab/ecsstatic/vite';
 export default defineConfig({
   output: 'server',
   adapter: aws({
-    serverRoutes: ['api/*', 'trades/*'],
+    serverRoutes: ['api/*'],
   }),
   integrations: [tailwind(), solid()],
   vite: {

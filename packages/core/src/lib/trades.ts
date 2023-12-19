@@ -10,13 +10,14 @@ import { cardInstances, type CardInstance } from '../db/cardInstances';
 import { users, type User } from '../db/users';
 import { Service } from 'electrodb';
 import { config } from '../db/_utils';
-import { InputValidationError, NotFoundError, ServerError, UnauthorizedError } from './errors';
+import {
+	InputValidationError,
+	NotFoundError,
+	ServerError,
+	UnauthorizedError,
+	UserDoesNotOwnCardError,
+} from './errors';
 import { sendTradeAcceptedEvent } from '../events/trades';
-
-export async function createTrade(trade: CreateTrade) {
-	const result = await trades.create(trade).go();
-	return result;
-}
 
 export async function createTradeFromApi(params: {
 	senderUsername: string;
@@ -77,7 +78,18 @@ export async function createTradeFromApi(params: {
 
 	try {
 		console.log({ tradeOptions });
-		return createTrade(tradeOptions);
+		const trade = await trades.create(tradeOptions).go();
+		const user = await users.patch({ userId: tradeOptions.receiverUserId }).append({
+			tradeNotifications: [
+				{
+					tradeId: trade.data.tradeId,
+					status: 'statusUpdated',
+					text: 'New Trade',
+				},
+			],
+		}).go();
+    console.log(user)
+    return trade;
 	} catch (e) {
 		console.error(e);
 		throw new ServerError('Internal server error');
@@ -126,16 +138,16 @@ export async function updateTrade(tradeId: string, updates: UpdateTrade, userId?
 	const status = updates.status;
 	const result = status
 		? set
-				.append({
-					messages: [
-						{
-							type: 'status-update',
-							message: status,
-							userId: userId ?? '',
-						},
-					],
-				})
-				.go()
+			.append({
+				messages: [
+					{
+						type: 'status-update',
+						message: status,
+						userId: userId ?? '',
+					},
+				],
+			})
+			.go()
 		: set.go();
 	return result;
 }
@@ -144,10 +156,12 @@ export async function updateTradeStatus({
 	tradeId,
 	status,
 	loggedInUserId,
+	statusMessage,
 }: {
 	tradeId: string;
 	status: string;
 	loggedInUserId: string;
+	statusMessage?: string;
 }): Promise<Partial<Trade> | null> {
 	const trade = await getTrade(tradeId);
 	if (!trade) throw new NotFoundError('Trade not found');
@@ -166,7 +180,7 @@ export async function updateTradeStatus({
 		.write(({ users, trades }) => [
 			trades
 				.patch({ tradeId: trade.tradeId })
-				.set({ status: newStatus })
+				.set({ status: newStatus, statusMessage })
 				.append({
 					messages: [
 						{
@@ -302,6 +316,7 @@ export async function processTrade(trade: Trade) {
 			stageCardTransactionBetweenUsers({
 				previous: sender,
 				next: receiver,
+				tradeId: trade.tradeId,
 			})
 		) satisfies CardInstance[];
 
@@ -309,6 +324,7 @@ export async function processTrade(trade: Trade) {
 			stageCardTransactionBetweenUsers({
 				previous: receiver,
 				next: sender,
+				tradeId: trade.tradeId,
 			})
 		) satisfies CardInstance[];
 
@@ -418,9 +434,11 @@ async function getAndValidateUserAndCardInstances(username: string) {
 function stageCardTransactionBetweenUsers({
 	previous,
 	next,
+	tradeId,
 }: {
 	previous: { cards: CardInstance[]; user: User };
 	next: { user: User };
+	tradeId: string;
 }) {
 	const previousCards = new Map(previous.cards.map((card) => [card.instanceId, card]));
 
@@ -433,8 +451,9 @@ function stageCardTransactionBetweenUsers({
 				previousCards: [...previousCards],
 				prevOwner: previous.user,
 			});
-			throw new Error(
-				`User ${previous.user.username} does not own card ${cardToMove.instanceId}`
+			throw new UserDoesNotOwnCardError(
+				`User ${previous.user.username} does not own card ${cardToMove.instanceId}`,
+				{ username: previous.user.username, card: cardToMove, tradeId }
 			);
 		}
 
@@ -444,4 +463,59 @@ function stageCardTransactionBetweenUsers({
 			userId: next.user.userId,
 		};
 	};
+}
+
+export async function setTradeStatusToFailed(tradeId: string, statusMessage: string) {
+	const trade = await getTrade(tradeId);
+	if (!trade) throw new NotFoundError('Trade not found');
+
+	if (trade.status !== 'accepted') {
+		throw new Error('Cannot set a trade to failed unless accepted.');
+	}
+
+	const service = new Service({ trades, users }, config);
+
+	const result = await service.transaction
+		.write(({ users, trades }) => [
+			trades
+				.patch({ tradeId: trade.tradeId })
+				.set({ status: 'failed', statusMessage })
+				.append({
+					messages: [
+						{
+							type: 'status-update',
+							message: 'failed',
+							userId: 'AUTOMATED',
+						},
+					],
+				})
+				.commit(),
+			users
+				.patch({ userId: trade.senderUserId })
+				.append({
+					tradeNotifications: [
+						{
+							tradeId: trade.tradeId,
+							status: 'statusUpdated',
+							text: 'failed',
+						},
+					],
+				})
+				.commit(),
+			users
+				.patch({ userId: trade.receiverUserId })
+				.append({
+					tradeNotifications: [
+						{
+							tradeId: trade.tradeId,
+							status: 'statusUpdated',
+							text: 'failed',
+						},
+					],
+				})
+				.commit(),
+		])
+		.go();
+
+	return result.data[0].item;
 }
