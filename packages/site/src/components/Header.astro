@@ -3,7 +3,6 @@ import HeaderLink from '@/components/HeaderLink.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
 import { ASSETS, routes } from '@/constants';
-import { getLoginLink } from '@/lib/utils';
 import { getUserByLogin } from '@lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount.astro';
@@ -53,7 +52,7 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 			</Show>
 		</nav>
 		<UserSearch client:load transition:persist />
-		<UserConfig client:load {disableAnimations} user={twitchData} login={getLoginLink(Astro)} />
+		<UserConfig client:load {disableAnimations} user={twitchData} />
 	</header>
 </div>
 

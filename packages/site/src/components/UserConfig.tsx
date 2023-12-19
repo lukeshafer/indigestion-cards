@@ -1,6 +1,7 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import type { TwitchUser } from '@lib/twitch';
 import UserIcon from './icons/UserIcon';
+import { authApi } from '@/constants';
 
 function clickOutside(el: Element, close: () => void) {
 	const onClick = (e: MouseEvent) => {
@@ -17,7 +18,6 @@ function clickOutside(el: Element, close: () => void) {
 export default function UserConfig(props: {
 	disableAnimations?: boolean;
 	user?: TwitchUser | undefined;
-	login: string;
 }) {
 	const [isOpen, setIsOpen] = createSignal(false);
 	const [disableAnimations, setDisableAnimations] = createSignal(
@@ -84,7 +84,7 @@ export default function UserConfig(props: {
 					) : (
 						<a
 							class="font-display pt-2 text-center font-bold underline"
-							href="/api/auth/login"
+							href={authApi.LOGIN}
 							data-astro-reload>
 							Login with Twitch
 						</a>
