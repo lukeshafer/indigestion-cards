@@ -10,7 +10,7 @@ export async function GET(ctx: APIContext) {
 		throw new Error('Code missing');
 	}
 
-	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
+	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'admin';
 	const origin = client_id === 'local' ? ctx.url.origin : 'https://admin.' + Config.DOMAIN_NAME;
 
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
