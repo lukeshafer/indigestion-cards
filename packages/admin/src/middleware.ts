@@ -36,7 +36,7 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	}
 
   console.log(ctx.url.pathname)
-	if (ctx.url.pathname === '/login' || ctx.url.pathname === '/api/auth/callback') return next();
+	if (ctx.url.pathname === '/login' || ctx.url.pathname.startsWith('/api/auth/')) return next();
 	else return ctx.redirect('/login' + ctx.url.search);
 };
 
