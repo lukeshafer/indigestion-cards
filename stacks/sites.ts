@@ -69,7 +69,7 @@ export function Sites({ app, stack }: StackContext) {
       app.mode === 'dev'
         ? undefined
         : {
-          domainName: baseDomain,
+          domainName: `admin.${baseDomain}`,
           hostedZone: hostedZone,
         },
     permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
