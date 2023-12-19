@@ -41,14 +41,14 @@ export const handler = AuthHandler({
 		}),
 	},
 	//async onError(error) {
-		//console.error('An error occurred', { error });
-		//return {
-			//statusCode: 400,
-			//headers: {
-				//'Content-Type': 'text/plain',
-			//},
-			//body: 'Auth failed',
-		//};
+	//console.error('An error occurred', { error });
+	//return {
+	//statusCode: 400,
+	//headers: {
+	//'Content-Type': 'text/plain',
+	//},
+	//body: 'Auth failed',
+	//};
 	//},
 	callbacks: {
 		async error(err) {
@@ -96,6 +96,8 @@ export const handler = AuthHandler({
 					const userLogin = await getUserLoginById(claims.sub);
 					const userProfile = await getUser(claims.sub);
 
+					console.log({ adminUser, userLogin, userProfile });
+
 					if (adminUser) {
 						if (!userProfile) {
 							await createNewUser({
@@ -110,6 +112,8 @@ export const handler = AuthHandler({
 								hasProfile: true,
 							});
 						}
+
+						console.log('returning admin');
 						return response.session({
 							type: 'admin',
 							properties: {
@@ -119,6 +123,7 @@ export const handler = AuthHandler({
 						});
 					}
 
+					console.log('not admin');
 					if (userLogin) {
 						console.log('User login found');
 						if (!userProfile) {
@@ -145,6 +150,8 @@ export const handler = AuthHandler({
 						});
 					}
 
+					console.log('user is not in database');
+
 					// If user isn't in the database, add them
 					const usernames = await getListOfTwitchUsersByIds([claims.sub]);
 					if (usernames.length === 0) throw new Error('No username found');
@@ -152,7 +159,7 @@ export const handler = AuthHandler({
 					const userId = claims.sub;
 					const username = usernames[0].display_name;
 
-					console.log(userProfile);
+					console.log({ userProfile });
 					if (!userProfile)
 						await createNewUser({
 							userId,
@@ -167,6 +174,7 @@ export const handler = AuthHandler({
 
 					if (!newUser) throw new Error('Failed to create new user');
 
+					console.log('returning session');
 					return response.session({
 						type: 'user',
 						properties: {
