@@ -11,9 +11,9 @@ export async function GET(ctx: APIContext) {
 	}
 
 	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
-	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
+	const origin = client_id === 'local' ? ctx.url.origin : 'https://admin.' + Config.DOMAIN_NAME;
 
-	const bodyText = await fetch(Auth.AdminSiteAuth.url + '/token', {
+	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
@@ -21,7 +21,17 @@ export async function GET(ctx: APIContext) {
 			code,
 			redirect_uri: `${origin}${ctx.url.pathname}`,
 		}),
-	}).then((r) => r.text());
+	});
+
+	const bodyText = await response.text();
+
+	if (!response.ok) {
+		const params = new URLSearchParams({
+			alert: `An error occurred logging in: ${bodyText}`,
+			type: 'error',
+		});
+		return ctx.redirect(`/login?${params}`);
+	}
 
 	const body = ((text: string) => {
 		try {
