@@ -63,7 +63,7 @@ export const handler = AuthHandler({
 					case 'main':
 						return redirect.startsWith('https://' + Config.DOMAIN_NAME);
           case 'admin':
-            return redirect.startsWith('https://admin' + Config.DOMAIN_NAME);
+            return redirect.startsWith('https://admin.' + Config.DOMAIN_NAME);
 					default:
 						return false;
 				}
