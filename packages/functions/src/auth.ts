@@ -51,6 +51,15 @@ export const handler = AuthHandler({
 	//};
 	//},
 	callbacks: {
+		connect: {
+			async start(session, evt) {
+				console.log('start', { session, evt });
+			},
+			async error(session) {
+				console.log('start', { session });
+				return undefined;
+			},
+		},
 		async error(err) {
 			console.error('callbacks.error', { err });
 			return undefined;
