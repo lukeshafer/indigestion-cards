@@ -40,16 +40,16 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onError(error) {
-		console.error('An error occurred', { error });
-		return {
-			statusCode: 400,
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			body: 'Auth failed',
-		};
-	},
+	//async onError(error) {
+		//console.error('An error occurred', { error });
+		//return {
+			//statusCode: 400,
+			//headers: {
+				//'Content-Type': 'text/plain',
+			//},
+			//body: 'Auth failed',
+		//};
+	//},
 	callbacks: {
 		async error(err) {
 			console.error('callbacks.error', { err });
@@ -61,7 +61,7 @@ export const handler = AuthHandler({
 				const main = 'https://' + Config.DOMAIN_NAME;
 				console.log('Checking redirect', {
 					redirect,
-          clientID,
+					clientID,
 					admin,
 					isAdmin: redirect.startsWith(admin),
 					main,
@@ -78,11 +78,16 @@ export const handler = AuthHandler({
 						return false;
 				}
 			},
+			async start(evt) {
+				console.log('Start', { evt });
+			},
 			async error(error) {
+				console.log('Error', { error });
 				console.error('An unknown error occurred', { error });
 				return undefined;
 			},
 			async success(input, response) {
+				console.log('Success', { input, response });
 				setAdminEnvSession('AuthHandler', 'createNewUserLogin');
 				if (input.provider === 'twitchUser') {
 					const claims = input.tokenset.claims();
