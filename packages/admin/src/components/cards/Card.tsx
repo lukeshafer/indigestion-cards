@@ -1,4 +1,3 @@
-import TiltCardEffect from './TiltCardEffect';
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { css } from '@acab/ecsstatic';

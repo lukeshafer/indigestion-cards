@@ -1,10 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lib/card';
-import { getUser } from '@lib/user';
 import CardPage from '@/layouts/CardPage.astro';
-
-const session = Astro.locals.session;
 
 const slug = Astro.params.instanceSlug;
 if (!slug) {
@@ -27,12 +24,10 @@ if (!instance) {
 if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
 	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
 }
-
-const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
 ---
 
 <Page
 	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
 	class="flex flex-col gap-6">
-	<CardPage card={instance} user={user ?? undefined} />
+	<CardPage card={instance} />
 </Page>

@@ -9,7 +9,6 @@ import AdminOnly from '@/components/AdminOnly.astro';
 import { getAllPackTypes } from '@lib/pack-type';
 import { Heading } from '@/components/text';
 import UserPackForms from '@/components/pack/UserPackForms';
-import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -84,7 +83,20 @@ const packTypes = await getAllPackTypes();
 			</AdminOnly>
 			<ul>
 				<li>
-					<UserLookingFor {user} isLoggedInUser={false} client:load />
+					<div class="text-gray-800 dark:text-gray-100">
+						{
+							user.lookingFor?.trim() ? (
+								<div class="flex flex-col gap-2">
+									<p class="max-w-sm">
+										Looking for:{' '}
+										<span class="whitespace-pre-line font-medium">
+											{user.lookingFor || '???'}
+										</span>
+									</p>
+								</div>
+							) : null
+						}
+					</div>
 				</li>
 			</ul>
 		</section>
