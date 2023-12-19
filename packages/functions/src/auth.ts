@@ -57,14 +57,22 @@ export const handler = AuthHandler({
 		},
 		auth: {
 			async allowClient(clientID, redirect) {
-				console.log('Checking redirect', { redirect });
+				const admin = 'https://admin.' + Config.DOMAIN_NAME;
+				const main = 'https://' + Config.DOMAIN_NAME;
+				console.log('Checking redirect', {
+					redirect,
+					admin,
+					isAdmin: redirect.startsWith(admin),
+					main,
+					isMain: redirect.startsWith(main),
+				});
 				switch (clientID) {
 					case 'local':
 						return true;
 					case 'main':
-						return redirect.startsWith('https://' + Config.DOMAIN_NAME);
+						return redirect.startsWith(main);
 					case 'admin':
-						return redirect.startsWith('https://admin.' + Config.DOMAIN_NAME);
+						return redirect.startsWith(admin);
 					default:
 						return false;
 				}
