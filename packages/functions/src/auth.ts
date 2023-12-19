@@ -61,6 +61,7 @@ export const handler = AuthHandler({
 				const main = 'https://' + Config.DOMAIN_NAME;
 				console.log('Checking redirect', {
 					redirect,
+          clientID,
 					admin,
 					isAdmin: redirect.startsWith(admin),
 					main,
