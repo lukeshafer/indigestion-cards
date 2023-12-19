@@ -53,17 +53,18 @@ export const handler = AuthHandler({
 	callbacks: {
 		async error(err) {
 			console.error('callbacks.error', { err });
-			return undefined
+			return undefined;
 		},
 		auth: {
 			async allowClient(clientID, redirect) {
+				console.log('Checking redirect', { redirect });
 				switch (clientID) {
 					case 'local':
 						return true;
 					case 'main':
 						return redirect.startsWith('https://' + Config.DOMAIN_NAME);
-          case 'admin':
-            return redirect.startsWith('https://admin.' + Config.DOMAIN_NAME);
+					case 'admin':
+						return redirect.startsWith('https://admin.' + Config.DOMAIN_NAME);
 					default:
 						return false;
 				}
