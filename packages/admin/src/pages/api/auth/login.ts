@@ -8,7 +8,7 @@ export const GET: APIRoute = async (ctx) => {
 	const isAdmin = ctx.locals.session?.type === 'admin';
 
 	console.log("redirect_uri: ", 'https://admin.' + Config.DOMAIN_NAME + authApi.CALLBACK, { origin: ctx.url.origin, ConfigUrl: Config.DOMAIN_NAME })
-	const redirect_uri = client_id === 'local' ? ctx.url.origin + authApi.CALLBACK : 'https://admin' + Config.DOMAIN_NAME + authApi.CALLBACK;
+	const redirect_uri = client_id === 'local' ? ctx.url.origin + authApi.CALLBACK : 'https://admin.' + Config.DOMAIN_NAME + authApi.CALLBACK;
 
 	const authParams = new URLSearchParams({
 		client_id,
