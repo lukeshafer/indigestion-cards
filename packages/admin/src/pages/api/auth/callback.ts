@@ -26,8 +26,10 @@ export async function GET(ctx: APIContext) {
   });
 
   const bodyText = await response.text();
+  console.log({ response, bodyText });
 
   if (!response.ok) {
+    console.log('response not okay, redirecting to home', { bodyText });
     const params = new URLSearchParams({
       alert: `An error occurred logging in: ${bodyText}`,
       type: 'error',
@@ -44,6 +46,7 @@ export async function GET(ctx: APIContext) {
   })(bodyText);
 
   if (!body.access_token) {
+    console.log('No access token', { body });
     throw new Error('No access token');
   }
 
@@ -57,7 +60,10 @@ export async function GET(ctx: APIContext) {
   const session = Session.verify(body.access_token);
 
   if (session.type === 'admin' || session.type === 'user') {
+    console.log('logged in', { session });
     return ctx.redirect(`/?alert=Logged in!`, 302);
   }
+
+  console.log('not authorized', { session });
   return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }
