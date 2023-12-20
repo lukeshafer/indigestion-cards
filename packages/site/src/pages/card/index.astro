@@ -16,26 +16,8 @@ const message = Astro.url.searchParams.get('message') || '';
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
-		cards={designs.map((card, index) => {
+		cards={designs.map((card) => {
 			const bestRarity = card.bestRarityFound;
-
-			if (
-				bestRarity?.rarityId === NO_CARDS_OPENED_ID &&
-				Astro.locals.session?.type !== 'admin'
-			) {
-				return {
-					...bestRarity,
-					...card,
-					cardName: 'zzz' + index,
-					artist: '?????',
-					designId: 'zzz' + index,
-					seasonId: '',
-					seasonName: '',
-					imgUrl: '',
-					cardNumber: 1,
-					totalOfType: bestRarity.count,
-				};
-			}
 
 			return {
 				...card,

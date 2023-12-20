@@ -4,6 +4,7 @@ import { getAdminUserById } from '@lib/admin-user';
 import { AUTH_TOKEN, PUBLIC_ROUTES, USER_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
 	const formMethod = ctx.url.searchParams.get('formmethod');
@@ -45,6 +46,16 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	const isPublicRoute = checkIncludesCurrentRoute(PUBLIC_ROUTES);
 	const isUserRoute = isPublicRoute || checkIncludesCurrentRoute(USER_ROUTES);
 
+	if (currentRoute.startsWith('/trade')) {
+    console.log("checking if trading is enabled")
+		const siteConfig = await getSiteConfig();
+    if (!siteConfig.tradingIsEnabled) {
+      console.log("trading is not enabled, not a valid route")
+      return ctx.redirect('/404');
+    }
+	}
+
+
 	process.env.SESSION_USER_ID = session?.properties.userId ?? undefined;
 	process.env.SESSION_USERNAME = session?.properties.username ?? undefined;
 	process.env.SESSION_TYPE = session?.type ?? undefined;
@@ -54,7 +65,6 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 		ctx.locals.session?.type === 'user' || ctx.locals.session?.type === 'admin'
 			? ctx.locals.session
 			: null;
-
 
 	//console.log({ currentRoute, isPublicRoute, isUserRoute, session })
 	if (!isPublicRoute) {

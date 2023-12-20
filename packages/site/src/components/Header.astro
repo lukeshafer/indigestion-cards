@@ -7,13 +7,16 @@ import { getUserByLogin } from '@lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount.astro';
 import TotalPackCount from './pack/TotalPackCount.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 
 const username = Astro.locals.session?.properties.username;
 
+const siteConfig = await getSiteConfig();
 const canSeeTradesLink =
-	Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin';
+	(Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin') &&
+	siteConfig.tradingIsEnabled;
 
 const twitchData = username ? await getUserByLogin(username) : undefined;
 ---
@@ -47,7 +50,7 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 			<Show when={canSeeTradesLink}>
 				<HeaderLink href={routes.TRADES} title="Trades">
 					<TradeNotificationCount username={username!} transition:persist />
-          My Trades
+					 My Trades
 				</HeaderLink>
 			</Show>
 		</nav>

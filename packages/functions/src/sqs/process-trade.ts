@@ -1,6 +1,10 @@
 import type { SQSEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { getTrade, processTrade, setTradeStatusToFailed } from '@lil-indigestion-cards/core/lib/trades';
+import {
+  getTrade,
+  processTrade,
+  setTradeStatusToFailed,
+} from '@lil-indigestion-cards/core/lib/trades';
 import { UserDoesNotOwnCardError } from '@lil-indigestion-cards/core/lib/errors';
 
 const tradeEvent = z.object({
@@ -34,12 +38,12 @@ export async function handler(event: SQSEvent) {
         await setTradeStatusToFailed(
           tradeId,
           `${username} does not own ${card.cardName} ${card.rarityName} ${card.cardNumber} / ${card.totalOfType}`
-        )
+        );
+        return;
       } else if (error instanceof Error) {
         console.error(error.message);
         throw error;
-      }
-      throw error;
+      } else throw error;
     }
   }
 }

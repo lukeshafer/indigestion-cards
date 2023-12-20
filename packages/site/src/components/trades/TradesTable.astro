@@ -37,8 +37,8 @@ const isLoggedInUsername = (name: string) =>
 	<SortTableHead>
 		<SortTableColumn name="dateCreated" startDescending>Date</SortTableColumn>
 		<SortTableColumn name="with" hideOnBreakpoint="sm">With</SortTableColumn>
-		<SortTableColumn name="to" startDescending showOnBreakpoint="sm">To</SortTableColumn>
 		<SortTableColumn name="from" startDescending showOnBreakpoint="sm">From</SortTableColumn>
+		<SortTableColumn name="to" startDescending showOnBreakpoint="sm">To</SortTableColumn>
 		<SortTableColumn name="tradeType" startDescending showOnBreakpoint="sm" width="15%">
 			Type
 		</SortTableColumn>
@@ -70,7 +70,9 @@ const isLoggedInUsername = (name: string) =>
 						<a
 							href={`${routes.USERS}/${trade.receiverUsername}`}
 							class="hover:underline focus:underline">
-							{trade.receiverUsername}
+							{isLoggedInUsername(trade.senderUsername)
+								? trade.receiverUsername
+								: trade.senderUsername}
 						</a>
 					</SortTableCell>
 					<SortTableCell

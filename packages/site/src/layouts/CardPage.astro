@@ -6,8 +6,10 @@ import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { User } from '@lil-indigestion-cards/core/db/users';
 import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const session = Astro.locals.session;
+const siteConfig = await getSiteConfig();
 
 interface Props {
 	card: CardInstance;
@@ -52,14 +54,14 @@ const openDate = card.openedAt
 				client:load
 			/>
 		</div>
-	) : (
+	) : siteConfig.tradingIsEnabled ? (
 		<div class="mx-auto">
 			<Anchor
 				href={`${routes.TRADES}/new?receiverUsername=${card.username}&requestedCards=${card.instanceId}`}>
 				Request Trade
 			</Anchor>
 		</div>
-	)
+	) : null
 }
 <section class="mx-auto text-lg">
 	<Heading>Stats:</Heading>
@@ -108,4 +110,8 @@ const openDate = card.openedAt
 	</p>
 </section>
 
-{card.tradeHistory ? <CardTradeHistory history={card.tradeHistory} /> : null}
+{
+	card.tradeHistory && siteConfig.tradingIsEnabled ? (
+		<CardTradeHistory history={card.tradeHistory} />
+	) : null
+}
