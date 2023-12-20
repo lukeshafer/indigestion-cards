@@ -11,7 +11,7 @@ import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-c
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
-const sortTypes = [
+export const sortTypes = [
   { value: 'rarest', label: 'Most to Least Rare' },
   { value: 'common', label: 'Least to Most Rare' },
   { value: 'card-name-asc', label: 'Card Name (A-Z)' },
@@ -22,7 +22,7 @@ const sortTypes = [
   { value: 'owner-desc', label: 'Owner (Z-A)' },
 ] as const;
 
-type SortType = (typeof sortTypes)[number]['value'];
+export type SortType = (typeof sortTypes)[number]['value'];
 
 const cardListStyles = css`
 	grid-template-columns: repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr));
@@ -106,8 +106,8 @@ export default function CardList(props: {
   );
 }
 
-function sortCards(args: {
-  cards: CardType[];
+export function sortCards<T extends CardType>(args: {
+  cards: T[];
   // eslint-disable-next-line @typescript-eslint/ban-types
   sort: SortType | (string & {});
   rarityRanking?: RarityRankingRecord;

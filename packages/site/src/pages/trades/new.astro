@@ -9,6 +9,7 @@ import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances'
 import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
 import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
 import { Action } from '@/lib/action';
+import { getRarityRanking, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
@@ -65,6 +66,8 @@ const offeredCardIds = searchParams.getAll('offeredCards');
 const requestedCardIds = searchParams.getAll('requestedCards');
 let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
 
+const rarityRanking = getRarityRanking(await getSiteConfig());
+
 const { cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
 const { cardInstances: initialReceiverCards = [], users: initialReceiverUser = [] } =
 	initialReceiverUsername
@@ -110,6 +113,7 @@ function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInst
 		{initialRequestedCards}
 		{initialReceiverUsername}
 		{initialReceiverCards}
+		{rarityRanking}
 		client:load
 	/>
 </Page>

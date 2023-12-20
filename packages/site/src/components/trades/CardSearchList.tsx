@@ -2,21 +2,28 @@ import type { TradeCardUi } from './NewTrade';
 import { createMemo, createSignal, For } from 'solid-js';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { getCardSearcher } from '@/lib/client/search';
-import { TextInput } from '../form/Form';
+import { Select, TextInput } from '../form/Form';
 import { produce } from 'solid-js/store';
 import CardCheckbox from './CardCheckbox';
+import { sortTypes, type SortType, sortCards } from '../cards/CardList';
+import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 
 export default function CardSearchList(props: {
 	label: string;
 	cards: TradeCardUi[];
 	setCards: (setter: (cards: TradeCard[]) => TradeCard[]) => void;
 	type: 'offer' | 'request';
+	rarityRanking?: RarityRankingRecord;
 }) {
 	const [searchText, setSearchText] = createSignal('');
+	const [sort, setSort] = createSignal('rarest' satisfies SortType);
 
-	const searcher = createMemo(() => getCardSearcher(props.cards));
+	const sortedCards = () =>
+		sortCards({ cards: props.cards, sort: sort(), rarityRanking: props.rarityRanking });
+
+	const searcher = createMemo(() => getCardSearcher(sortedCards()));
 	const searchResults = () => {
-		if (!searchText()) return props.cards;
+		if (!searchText()) return sortedCards();
 		return searcher()(searchText());
 	};
 
@@ -26,6 +33,12 @@ export default function CardSearchList(props: {
 				{props.label}
 			</summary>
 			<div class="bg-brand-100 dark:bg-brand-950 border-b-brand-main sticky top-14 z-10 border-b p-4 pt-0">
+				<Select
+					name="sort"
+					label="Sort by"
+					setValue={(val) => setSort(val)}
+					options={Array.from(sortTypes)}
+				/>
 				<TextInput label="Search" name="search" setValue={setSearchText} />
 			</div>
 			<ul class="flex flex-wrap justify-center gap-4 py-4">

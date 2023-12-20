@@ -37,9 +37,14 @@ export default function CardCheckbox(props: {
 
 function MiniCard(props: { card: TradeCard }) {
 	return (
-		<div class="text-center">
+		<div class="text-center flex flex-col items-center">
 			<Card {...props.card} scale={0.5} />
-			<p class="font-bold">{props.card.cardName}</p>
+			<p class="font-bold">
+        {props.card.cardName}
+        {props.card.cardName}
+        {props.card.cardName}
+        {props.card.cardName}
+      </p>
 			<p>{props.card.rarityName}</p>
 			<p>
 				{props.card.cardNumber} / {props.card.totalOfType}

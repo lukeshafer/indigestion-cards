@@ -8,6 +8,7 @@ import { Heading } from '@/components/text';
 import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
+import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 
 type TradeState = {
   offeredCards: TradeCard[];
@@ -26,6 +27,7 @@ export default function NewTrade(props: {
   initialRequestedCards?: CardInstance[];
   initialReceiverUsername?: string;
   initialReceiverCards?: CardInstance[];
+  rarityRanking?: RarityRankingRecord;
 }) {
   const [state, setState] = createStore<TradeState>({
     offeredCards: props.initialOfferedCards ?? [],
@@ -108,6 +110,7 @@ export default function NewTrade(props: {
               label="Your Cards"
               cards={yourCards()}
               setCards={(setter) => setState('offeredCards', setter)}
+              rarityRanking={props.rarityRanking}
             />
           </Section>
           <Section heading="Request">
