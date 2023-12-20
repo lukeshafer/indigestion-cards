@@ -10,19 +10,6 @@ import { setAdminEnvSession } from '@lib/session';
 import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lib/twitch';
 import { sessions } from './sessions';
 
-declare module 'sst/node/future/auth' {
-	export interface SessionTypes {
-		user: {
-			userId: string;
-			username: string;
-		};
-		admin: {
-			userId: string;
-			username: string;
-		};
-	}
-}
-
 //const callbackPath = '/api/auth/callback';
 export const handler = AuthHandler({
 	sessions,
