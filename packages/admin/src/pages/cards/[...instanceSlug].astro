@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getCardInstanceById } from '@lib/card';
 import CardPage from '@/layouts/CardPage.astro';
+import { routes } from '@/constants';
 
 const slug = Astro.params.instanceSlug;
 if (!slug) {

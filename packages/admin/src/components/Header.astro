@@ -1,12 +1,19 @@
 ---
 import HeaderLink from '@/components/HeaderLink.astro';
+import UserConfig from './UserConfig';
+import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+
+const username = Astro.locals.session?.properties.username;
+
+const twitchData = username ? await getUserByLogin(username) : undefined;
 ---
 
 <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
-	<header class="relative gap-4 px-4 py-2 md:py-4 flex items-center justify-between">
+	<header class="relative flex items-center justify-between gap-4 px-4 py-2 md:py-4">
 		<nav class="flex flex-wrap items-center gap-2 text-black">
 			<HeaderLink href="/admin-users" title="Admin Users" />
 			<HeaderLink href="/cards" title="Cards" />
+			<HeaderLink href="/admin/give-pack" title="Give Pack" />
 			<HeaderLink href="/pack-types" title="Pack Types" />
 			<HeaderLink href="/packs" title="Packs" />
 			<HeaderLink href="/rarities" title="Rarities" />
@@ -14,8 +21,6 @@ import HeaderLink from '@/components/HeaderLink.astro';
 			<HeaderLink href="/site-config" title="Site Config" />
 			<HeaderLink href="/users" title="Users" />
 		</nav>
-		<form method="post" action="/api/auth/logout">
-			<button class="flex gap-4 font-medium hover:underline">Logout</button>
-		</form>
+		<UserConfig client:load user={twitchData} />
 	</header>
 </div>

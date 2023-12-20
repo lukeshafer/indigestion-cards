@@ -150,3 +150,5 @@ export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';
 export const NO_CARDS_OPENED_ID = 'no-cards-opened';
 export const SHIT_PACK_RARITY_ID = 'bronze';
+
+export const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];

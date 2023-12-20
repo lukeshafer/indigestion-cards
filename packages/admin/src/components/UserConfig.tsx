@@ -18,7 +18,6 @@ function clickOutside(el: Element, close: () => void) {
 export default function UserConfig(props: {
 	disableAnimations?: boolean;
 	user?: TwitchUser | undefined;
-	login: string;
 }) {
 	const [isOpen, setIsOpen] = createSignal(false);
 	const [disableAnimations, setDisableAnimations] = createSignal(
