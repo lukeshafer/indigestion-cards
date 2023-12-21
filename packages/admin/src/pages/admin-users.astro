@@ -7,6 +7,7 @@ import AddAdminUserForm from '@/components/admin-users/AddAdminUserForm.astro';
 import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
 import { Action } from '@/lib/action';
 import { createAlerts } from '@/lib/alert';
+import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
 
 const { output } = await Action(
 	Astro,
@@ -23,6 +24,11 @@ const { output } = await Action(
 			return {
 				error: `User ${username} is not a valid Twitch user.`,
 			};
+
+		setAdminEnvSession(
+			Astro.locals.session?.properties.username || 'admin',
+			Astro.locals.session?.properties.userId || 'admin'
+		);
 
 		const result = await createAdminUser({
 			userId: user.id,
@@ -47,9 +53,8 @@ const alerts = output?.error
 	  })
 	: undefined;
 
-const unsortedUsers = await getAllAdminUsers();
 const currentUser = Astro.locals.session?.properties?.userId;
-const users = unsortedUsers.sort((a, b) => {
+const users = (await getAllAdminUsers()).sort((a, b) => {
 	if (a.userId === currentUser) {
 		return -1;
 	}
