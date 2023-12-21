@@ -5,7 +5,8 @@ import { type UserLogin, userLogins } from '../db/userLogins';
 import { cardInstances, type CardInstance } from '../db/cardInstances';
 import { config } from '../db/_utils';
 import { getUserByLogin } from '../lib/twitch';
-import { packs } from '../db/packs';
+import { batchUpdateCardUsernames } from './card';
+import { batchUpdatePackUsername } from './pack';
 
 export async function getUser(userId: string) {
 	const user = await users.get({ userId }).go();
@@ -75,7 +76,7 @@ export async function getUserAndCard(args: { username: string; instanceId: strin
 			user: data.data.users[0],
 			userLogin: data.data.userLogins[0],
 			card,
-		}
+		};
 	} catch {
 		console.error('Error while retrieving user and card instance data for user', args.username);
 		return null;
@@ -139,43 +140,22 @@ export async function updateUsername(
 		);
 	}
 
-	const cards = await cardInstances.query.byOwnerId({ username: args.oldUsername }).go();
+	// TODO: get all minted cards and update those as well
 
-	const packData = await packs.query.byUsername({ username: args.oldUsername }).go();
+	console.log(`Updating username on user from ${args.oldUsername} to ${args.newUsername}`);
+	await users.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
 
-	const service = new Service(
-		{
-			users,
-			cardInstances,
-			packs,
-		},
-		config
-	);
+	console.log(`Updating username on packs from ${args.oldUsername} to ${args.newUsername}`);
+	await batchUpdatePackUsername({
+		newUsername: args.newUsername,
+		oldUsername: args.oldUsername,
+	});
 
-	// TODO: get all minted cards and update those
-
-	const transactionResult = await service.transaction
-		.write(({ users, cardInstances, packs }) => [
-			users.patch({ userId: args.userId }).set({ username: args.newUsername }).commit(),
-			...cards.data.map((card) =>
-				cardInstances
-					.patch({ designId: card.designId, instanceId: card.instanceId })
-					.set({
-						username: args.newUsername,
-						minterUsername:
-							card.minterUsername === args.oldUsername
-								? args.newUsername
-								: card.minterUsername,
-					})
-					.commit()
-			),
-			...packData.data.map((pack) =>
-				packs.patch({ packId: pack.packId }).set({ username: args.newUsername }).commit()
-			),
-		])
-		.go();
-
-	return transactionResult.data;
+	console.log(`Updating username on cards from ${args.oldUsername} to ${args.newUsername}`);
+	await batchUpdateCardUsernames({
+		newUsername: args.newUsername,
+		oldUsername: args.oldUsername,
+	});
 }
 
 export async function batchUpdateUsers(usersInput: CreateUser[]) {
@@ -204,15 +184,15 @@ export async function setUserProfile(args: {
 
 	const card = args.pinnedCard
 		? await cardInstances.query
-				.byId(args.pinnedCard)
-				.go()
-				.then((result) =>
-					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
-						? result.data[0]
-						: user.pinnedCard
-				)
+			.byId(args.pinnedCard)
+			.go()
+			.then((result) =>
+				result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+					? result.data[0]
+					: user.pinnedCard
+			)
 		: args.pinnedCard === null
-		? ({
+			? ({
 				instanceId: '',
 				designId: '',
 				imgUrl: '',
@@ -228,8 +208,8 @@ export async function setUserProfile(args: {
 				rarityColor: '',
 				totalOfType: 0,
 				cardDescription: '',
-		  } satisfies CardInstance)
-		: user.pinnedCard;
+			} satisfies CardInstance)
+			: user.pinnedCard;
 
 	return users
 		.patch({ userId: args.userId })

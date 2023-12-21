@@ -14,7 +14,7 @@ export async function handler() {
 			...twitchUsers
 				.filter((twitchUser) => {
 					const user = users.find((u) => u.userId === twitchUser.id);
-					return user && user.username !== twitchUser.login;
+					return user && user.username.toLowerCase() !== twitchUser.login.toLowerCase();
 				})
 				.map((twitchUser) => {
 					const user = users.find((u) => u.userId === twitchUser.id)!;
@@ -27,9 +27,7 @@ export async function handler() {
 		);
 	}
 
-	if (!usersToUpdate.length) {
-		return;
-	}
+	if (!usersToUpdate.length) return;
 
 	console.log(`Updating ${usersToUpdate.length} users`);
 	for (const user of usersToUpdate) {
