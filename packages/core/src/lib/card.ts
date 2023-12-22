@@ -45,3 +45,27 @@ export async function getCardInstanceByUsername(args: { username: string; instan
 	const result = await cardInstances.query.byOwnerId(args).go();
 	return result.data[0];
 }
+
+export async function batchUpdateCardUsernames(args: { oldUsername: string; newUsername: string }) {
+	const cards = await cardInstances.query
+		.byOwnerId({ username: args.oldUsername })
+		.go({ pages: 'all' });
+
+	const result = await cardInstances
+		.put(
+			cards.data.map((card) => ({
+				...card,
+				username:
+					card.username?.toLowerCase() === args.oldUsername.toLowerCase()
+						? args.newUsername
+						: card.username,
+				minterUsername:
+					card.minterUsername?.toLowerCase() === args.oldUsername.toLowerCase()
+						? args.newUsername
+						: card.minterUsername,
+			}))
+		)
+		.go();
+
+	return result;
+}
