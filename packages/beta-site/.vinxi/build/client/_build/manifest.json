@@ -1,0 +1,85 @@
+{
+  "\u0000virtual:#vinxi/handler/client.css": {
+    "file": "assets/client-48de8c6f.css",
+    "src": "\u0000virtual:#vinxi/handler/client.css"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-cyrillic-ext-wght-normal.woff2": {
+    "file": "assets/montserrat-cyrillic-ext-wght-normal-a0c152a7.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-cyrillic-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-cyrillic-wght-normal.woff2": {
+    "file": "assets/montserrat-cyrillic-wght-normal-637f5453.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-cyrillic-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-latin-ext-wght-normal.woff2": {
+    "file": "assets/montserrat-latin-ext-wght-normal-6e1f71b0.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2": {
+    "file": "assets/montserrat-latin-wght-normal-bb2f9008.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-vietnamese-wght-normal.woff2": {
+    "file": "assets/montserrat-vietnamese-wght-normal-26a448d7.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+montserrat@5.0.14/node_modules/@fontsource-variable/montserrat/files/montserrat-vietnamese-wght-normal.woff2"
+  },
+  "_index-f0dfe840.js": {
+    "file": "assets/index-f0dfe840.js",
+    "imports": [
+      "_web-072228e2.js"
+    ]
+  },
+  "_routing-a4c19d04.js": {
+    "file": "assets/routing-a4c19d04.js",
+    "imports": [
+      "_web-072228e2.js"
+    ]
+  },
+  "_web-072228e2.js": {
+    "file": "assets/web-072228e2.js"
+  },
+  "src/routes/[...404].tsx?pick=default&pick=$css": {
+    "file": "assets/_...404_-43054820.js",
+    "imports": [
+      "_web-072228e2.js",
+      "_routing-a4c19d04.js"
+    ],
+    "isDynamicEntry": true,
+    "isEntry": true,
+    "src": "src/routes/[...404].tsx?pick=default&pick=$css"
+  },
+  "src/routes/index.tsx?pick=default&pick=$css": {
+    "file": "assets/index-8949a5f7.js",
+    "imports": [
+      "_web-072228e2.js",
+      "_index-f0dfe840.js"
+    ],
+    "isDynamicEntry": true,
+    "isEntry": true,
+    "src": "src/routes/index.tsx?pick=default&pick=$css"
+  },
+  "virtual:#vinxi/handler/client": {
+    "assets": [
+      "assets/montserrat-cyrillic-ext-wght-normal-a0c152a7.woff2",
+      "assets/montserrat-cyrillic-wght-normal-637f5453.woff2",
+      "assets/montserrat-vietnamese-wght-normal-26a448d7.woff2",
+      "assets/montserrat-latin-ext-wght-normal-6e1f71b0.woff2",
+      "assets/montserrat-latin-wght-normal-bb2f9008.woff2"
+    ],
+    "css": [
+      "assets/client-48de8c6f.css"
+    ],
+    "dynamicImports": [
+      "src/routes/[...404].tsx?pick=default&pick=$css",
+      "src/routes/index.tsx?pick=default&pick=$css"
+    ],
+    "file": "assets/client-dc5455b4.js",
+    "imports": [
+      "_web-072228e2.js",
+      "_index-f0dfe840.js",
+      "_routing-a4c19d04.js"
+    ],
+    "isEntry": true,
+    "src": "virtual:#vinxi/handler/client"
+  }
+}

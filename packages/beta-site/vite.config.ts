@@ -1,3 +1,17 @@
-import { defineConfig } from "@solidjs/start/config";
+import { defineConfig } from '@solidjs/start/config';
 
-export default defineConfig({});
+console.log('loading config')
+export default defineConfig({
+	//start: {
+		//server: {
+			//preset: 'aws-lambda',
+		//},
+	//},
+	ssr: {
+		noExternal: [
+		],
+	},
+	optimizeDeps: {
+		exclude: ['sst'],
+	},
+});

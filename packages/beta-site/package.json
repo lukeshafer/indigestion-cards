@@ -2,16 +2,26 @@
   "name": "beta-site",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
+    "dev": "sst bind vinxi dev",
+    "build": "sst bind vinxi build",
     "start": "node ./.output/server/index.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/montserrat": "^5.0.14",
+    "@kobalte/core": "^0.11.2",
+    "@solid-primitives/context": "^0.2.1",
+    "@solidjs/meta": "^0.29.3",
     "@solidjs/router": "^0.10.5",
     "@solidjs/start": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.26",
+    "solid-icons": "^1.1.0",
     "solid-js": "^1.8.7",
+    "solid-markdown": "^2.0.0",
+    "solid-start-sst": "^2.38.7",
+    "sst": "2.38.7",
     "tailwindcss": "^3.3.3",
     "vinxi": "0.0.54"
   },

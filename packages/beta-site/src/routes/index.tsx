@@ -1,31 +1,52 @@
-import { A } from "@solidjs/router";
-import Counter from "~/components/Counter";
+import { type RouteDefinition } from '@solidjs/router';
+import { Title } from '@solidjs/meta';
+import { ASSETS } from '~/lib/constants';
+import { FAQ } from '~/content/FAQ';
+
+export const route = {
+	metadata: {
+		breadcrumbs: [{ label: 'Home', current: true }],
+	},
+} satisfies RouteDefinition;
 
 export default function Home() {
-  return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
-        Hello world!
-      </h1>
-      <Counter />
-      <p class="mt-8">
-        Visit{" "}
-        <a
-          href="https://solidjs.com"
-          target="_blank"
-          class="text-sky-600 hover:underline"
-        >
-          solidjs.com
-        </a>{" "}
-        to learn how to build Solid apps.
-      </p>
-      <p class="my-4">
-        <span>Home</span>
-        {" - "}
-        <A href="/about" class="text-sky-600 hover:underline">
-          About Page
-        </A>{" "}
-      </p>
-    </main>
-  );
+	return (
+		<>
+			<Title>Indigestion Cards</Title>
+			<div class="flex flex-col gap-28 overflow-x-hidden">
+				<section class="flex min-h-[30rem] flex-row-reverse flex-wrap items-center justify-center justify-items-center gap-4 gap-y-8">
+					<div class="-mx-12 -mr-20 flex origin-top justify-center pb-24">
+						<img
+							style={{ 'view-transition-name': 'ryan-of-the-wild-hero-card' }}
+							src={ASSETS.CARDS.HERO_CARD_1}
+							width="200"
+							class="w-52 origin-top-right translate-x-12 translate-y-6 -rotate-12 shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:translate-y-2"
+						/>
+						<img
+							style={{ 'view-transition-name': 'lilindcult-hero-card' }}
+							src={ASSETS.CARDS.HERO_CARD_2}
+							width="200"
+							class="w-52 origin-top-left rotate-6 shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:-translate-y-4"
+						/>
+						<img
+							style={{ 'view-transition-name': 'lilindheart-hero-card' }}
+							src={ASSETS.CARDS.HERO_CARD_3}
+							width="200"
+							class="w-52 origin-top-left -translate-x-12 translate-y-6 rotate-[18deg] shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:translate-y-2"
+						/>
+					</div>
+					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300">
+						Trading<sup class="">*</sup> cards
+						<br />
+						for the <s class="font-bold">cult</s>
+						<span class="text-brand-main text-shadow block font-bold">community</span>
+						<p class="py-8 text-xs">* Cards not yet tradeable.</p>
+					</h2>
+				</section>
+				<article class="prose prose-h2:uppercase prose-h2:text-center prose-h2:text-gray-600 dark:prose-h2:text-gray-300 prose-h2:font-bold prose-h2:text-3xl prose-h3:font-heading prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-gray-700 dark:prose-h3:text-gray-200 dark:prose-strong:text-white dark:prose-strong:font-bold prose-a:text-blue-900 dark:prose-a:text-blue-100 mx-auto max-w-3xl text-left text-lg text-gray-900 dark:text-gray-100">
+					<FAQ />
+				</article>
+			</div>
+		</>
+	);
 }
