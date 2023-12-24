@@ -2,7 +2,6 @@
 	"extends": "@tsconfig/node18/tsconfig.json",
 	"compilerOptions": {
 		"module": "esnext",
-		"baseUrl": ".",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true,

@@ -17,7 +17,9 @@
 		"types": ["vinxi/client"],
 		"isolatedModules": true,
 		"paths": {
-			"~/*": ["./src/*"]
+			"~/*": ["./src/*"],
+			"@lib/*": ["../core/src/lib/*"],
+			"@core-types/*": ["../core/src/types/*"]
 		}
 	}
 }

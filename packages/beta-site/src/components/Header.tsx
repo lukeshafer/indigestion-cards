@@ -1,6 +1,6 @@
 import { For } from 'solid-js';
 import { useLocation } from '@solidjs/router';
-import { ASSETS } from '~/lib/constants';
+import { ASSETS } from '~/config';
 
 export default function Header() {
 	const headerLinks = [

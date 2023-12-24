@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import CardList from '@/components/cards/CardList';
 import { getAllCardDesigns } from '@lib/design';
-import { routeNames, NO_CARDS_OPENED_ID } from '@/constants';
+import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 
 const designs = await getAllCardDesigns();

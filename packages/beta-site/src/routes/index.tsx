@@ -1,6 +1,6 @@
 import { type RouteDefinition } from '@solidjs/router';
 import { Title } from '@solidjs/meta';
-import { ASSETS } from '~/lib/constants';
+import { ASSETS } from '~/config';
 import { FAQ } from '~/content/FAQ';
 
 export const route = {

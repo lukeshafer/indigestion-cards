@@ -7,8 +7,8 @@
     "start": "node ./.output/server/index.mjs"
   },
   "dependencies": {
+    "@acab/ecsstatic": "^0.7.1",
     "@fontsource-variable/montserrat": "^5.0.14",
-    "@kobalte/core": "^0.11.2",
     "@solid-primitives/context": "^0.2.1",
     "@solidjs/meta": "^0.29.3",
     "@solidjs/router": "^0.10.5",
@@ -27,5 +27,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "vite": "^5.0.10"
   }
 }

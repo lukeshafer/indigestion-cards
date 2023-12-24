@@ -1,3 +1,18 @@
+export const routes = {
+	USERS: {
+		href: '/users',
+		name: 'Users',
+	},
+	CARDS: {
+		href: '/cards',
+		name: 'Cards',
+	},
+	TRADES: {
+		href: '/trades',
+		name: 'Trades',
+	},
+} as const;
+
 export const ASSETS = {
 	LOGO: '/assets/logo.png',
 	EMOTES: {

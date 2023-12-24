@@ -1,17 +1,25 @@
 import { defineConfig } from '@solidjs/start/config';
+import { searchForWorkspaceRoot } from 'vite';
+import path from 'path'
+import { ecsstatic } from '@acab/ecsstatic/vite';
 
-console.log('loading config')
+console.log('loading config');
 export default defineConfig({
-	//start: {
-		//server: {
-			//preset: 'aws-lambda',
-		//},
-	//},
+	resolve: {
+		alias: {
+			'@lib': path.resolve(__dirname, '../core/src/lib'),
+		},
+	},
+	server: {
+		fs: {
+			allow: [searchForWorkspaceRoot(process.cwd()), 'node_modules/'],
+		},
+	},
 	ssr: {
-		noExternal: [
-		],
+		noExternal: [],
 	},
 	optimizeDeps: {
 		exclude: ['sst'],
 	},
+	plugins: [ecsstatic()]
 });

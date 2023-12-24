@@ -1,6 +1,5 @@
 import { useLocation } from '@solidjs/router';
-import { As, Breadcrumbs as KBreadcrumbs } from '@kobalte/core';
-import { For, Show } from 'solid-js';
+import { For, Match, Show, Switch } from 'solid-js';
 
 export type BreadcrumbProps = {
 	label: string;
@@ -21,27 +20,52 @@ export default function Breadcrumbs() {
 			})) satisfies BreadcrumbProps[];
 
 	return (
-		<KBreadcrumbs.Root separator="/">
-			<ol class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4 dark:font-semibold dark:text-gray-50">
+		<section class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4 dark:font-semibold dark:text-gray-50">
+			<Show when={paths().length > 1}>
 				<For each={paths()}>
-					{(path) => (
-						<li class="flex gap-2">
-							<KBreadcrumbs.Link asChild current={path.current}>
-								<As
-									component="a"
-									href={path.href}
-									class="font-heading"
-									classList={{ underline: !path.current }}>
+					{(path, index) => (
+						<Switch
+							fallback={
+								<>
+									<p
+										class="font-heading block"
+										style={{
+											'view-transition-name': `breadcrumb-${index()}`,
+										}}>
+										{path.label}
+									</p>
+									<p class="font-heading block">/</p>
+								</>
+							}>
+							<Match when={path.label !== 'Home' || location.pathname === '/'}>
+								<p
+									class="font-heading text-brand-main block font-bold"
+									style={{
+										'view-transition-name': `breadcrumb-${index()}`,
+									}}>
 									{path.label}
-								</As>
-							</KBreadcrumbs.Link>
-							<Show when={!path.current}>
-								<KBreadcrumbs.Separator />
-							</Show>
-						</li>
+								</p>
+							</Match>
+							<Match when={path.href}>
+								{(href) => (
+									<>
+										<a
+											rel="prefetch"
+											class="font-heading underline"
+											href={href()}
+											style={{
+												'view-transition-name': `breadcrumb-${index()}`,
+											}}>
+											{path.label}
+										</a>
+										<p class="font-heading block">/</p>
+									</>
+								)}
+							</Match>
+						</Switch>
 					)}
 				</For>
-			</ol>
-		</KBreadcrumbs.Root>
+			</Show>
+		</section>
 	);
 }

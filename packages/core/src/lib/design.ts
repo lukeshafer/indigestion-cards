@@ -1,3 +1,4 @@
+'use server';
 import { ElectroError, Service } from 'electrodb';
 import {
 	type CardDesign,
@@ -9,6 +10,7 @@ import { getAllSeasons } from './season';
 import { cardInstances } from '../db/cardInstances';
 import { config } from '../db/_utils';
 import type { DBResult } from '../types';
+import { NO_CARDS_OPENED_ID } from './constants';
 
 export async function getAllCardDesigns() {
 	const seasons = await getAllSeasons();
@@ -16,6 +18,39 @@ export async function getAllCardDesigns() {
 		seasons.map((season) => cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go())
 	);
 	return results.flatMap((result) => result.data);
+}
+
+export async function getAllCardDesignsWithBestRarity() {
+	const designs = await getAllCardDesigns();
+
+	return designs.map((card, index) => {
+		const bestRarity = card.bestRarityFound;
+
+		if (bestRarity?.rarityId === NO_CARDS_OPENED_ID) {
+			return {
+				...bestRarity,
+				...card,
+				cardName: 'zzz' + index,
+				artist: '?????',
+				designId: 'zzz' + index,
+				seasonId: '',
+				seasonName: '',
+				imgUrl: '',
+				cardNumber: 1,
+				totalOfType: bestRarity.count,
+			};
+		}
+
+		return {
+			...card,
+			rarityName: bestRarity?.rarityName ?? '',
+			rarityId: bestRarity?.rarityId ?? '',
+			frameUrl: bestRarity?.frameUrl ?? '',
+			rarityColor: bestRarity?.rarityColor ?? '',
+			totalOfType: bestRarity?.count ?? 1,
+			cardNumber: 1,
+		};
+	});
 }
 
 export async function getCardDesignById(args: { designId: string; userId: string }) {

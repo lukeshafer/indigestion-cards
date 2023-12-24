@@ -1,10 +1,11 @@
 import AlertBox, { AlertsProvider } from './AlertBox';
-//import Breadcrumbs from './Breadcrumbs';
+import Breadcrumbs from './Breadcrumbs';
 import { type ParentProps, Show, Suspense } from 'solid-js';
 import { PageContextProvider } from '~/lib/page-context';
 import Header from './Header';
 import Footer from './Footer';
 import { MetaProvider } from '@solidjs/meta';
+import { useBeforeLeave } from '@solidjs/router';
 
 export default function PageLayout(
 	props: ParentProps<{
@@ -14,6 +15,15 @@ export default function PageLayout(
 		hideBreadcrumbs?: boolean;
 	}>
 ) {
+	useBeforeLeave((e) => {
+		if (document.startViewTransition) {
+			e.preventDefault();
+			document.startViewTransition(() => {
+				e.retry(true);
+			});
+		}
+	});
+
 	return (
 		<div
 			class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
@@ -31,9 +41,7 @@ export default function PageLayout(
 							<AlertBox />
 							<Show when={!props.hideBreadcrumbs}>
 								<div class="max-w-main mx-auto w-full">
-									{
-										//<Breadcrumbs />
-									}
+									<Breadcrumbs />
 								</div>
 							</Show>
 							<main
