@@ -1,7 +1,8 @@
-export type { CardDesign } from "../db/cardDesigns.js"
-export type { CardInstance } from "../db/cardInstances.js"
-export type { PackType } from "../db/packTypes"
-export type { Rarity } from "../db/rarities.js"
-export type { UserLogin } from "../db/userLogins.js"
-export type { User } from "../db/users.js"
-export type { Pack } from "../db/packs.ts"
+export type { CardDesign } from '../db/cardDesigns';
+export type { CardInstance } from '../db/cardInstances';
+export type { PackType } from '../db/packTypes';
+export type { Rarity } from '../db/rarities';
+export type { UserLogin } from '../db/userLogins';
+export type { User } from '../db/users';
+export type { Pack } from '../db/packs';
+export type { SiteConfig } from '../db/siteConfig';

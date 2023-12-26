@@ -76,10 +76,10 @@ export default function CardList(props: {
 											rel="prefetch"
 											href={
 												props.isUserPage && card.username
-													? `${routes.USERS}/${card.username}/${
+													? `${routes.USERS.href}/${card.username}/${
 															card.instanceId ?? ''
 													  } `
-													: `${routes.CARDS}/${card.designId}/${
+													: `${routes.CARDS.href}/${card.designId}/${
 															card.instanceId ?? ''
 													  }`
 											}>

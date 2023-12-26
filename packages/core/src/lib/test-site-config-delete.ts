@@ -147,10 +147,6 @@ export async function removeMessageFromSiteConfig(args: { message: string }) {
   await updateSiteConfig({ ...siteConfig, messages: newMessages });
 }
 
-//type RarityRankingType = NonNullable<SiteConfig['rarityRanking']>[number];
-//export type RarityRankingRecord = Record<string, RarityRankingType | undefined>;
-//export function getRarityRanking(): Promise<ReturnType<typeof transformRarityRanking>>;
-//export function getRarityRanking(siteConfig: SiteConfig): ReturnType<typeof transformRarityRanking>;
 export function getRarityRanking(siteConfig?: SiteConfig) {
   if (!siteConfig) return getSiteConfig().then(transformRarityRanking);
   return transformRarityRanking(siteConfig);

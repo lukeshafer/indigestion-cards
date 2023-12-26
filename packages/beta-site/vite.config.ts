@@ -16,6 +16,7 @@ export default defineConfig({
 		},
 	},
 	ssr: {
+		external: ['electrodb'],
 		noExternal: [],
 	},
 	optimizeDeps: {

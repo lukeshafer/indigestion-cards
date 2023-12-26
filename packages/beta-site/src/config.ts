@@ -1,10 +1,10 @@
 export const routes = {
 	USERS: {
-		href: '/users',
+		href: '/user',
 		name: 'Users',
 	},
 	CARDS: {
-		href: '/cards',
+		href: '/card',
 		name: 'Cards',
 	},
 	TRADES: {
