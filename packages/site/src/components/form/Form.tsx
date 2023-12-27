@@ -83,7 +83,6 @@ export function Form(props: {
 
 		const contentType = response.headers.get('content-type');
 		const isHTML = contentType?.startsWith('text/html');
-		console.log({ contentType });
 
 		if (response.ok) {
 			if (!props.noAlert)
