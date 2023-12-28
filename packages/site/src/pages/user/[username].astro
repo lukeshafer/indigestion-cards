@@ -8,6 +8,7 @@ import { routes, routeNames } from '@/constants';
 import { Anchor, Heading } from '@/components/text';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
+import { cachePage } from '@/lib/api';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -42,6 +43,8 @@ if (!userData) {
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
 
+cachePage(Astro);
+
 const siteConfig = await getSiteConfig();
 
 const { users, cardInstances } = userData;
@@ -52,7 +55,7 @@ const user = users[0] || {
 
 const pinnedCard = user.pinnedCard;
 const cardsNotInPack = cardInstances.filter(
-	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+	card => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
 );
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;

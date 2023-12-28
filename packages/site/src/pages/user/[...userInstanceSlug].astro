@@ -4,6 +4,7 @@ import { getCardInstanceByUsername } from '@lib/card';
 import { getUser } from '@lib/user';
 import { routeNames, routes } from '@/constants';
 import CardPage from '@/layouts/CardPage.astro';
+import { cachePage } from '@/lib/api';
 
 const session = Astro.locals.session;
 
@@ -29,6 +30,7 @@ if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
 	return Astro.redirect(`${routes.USERS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
+cachePage(Astro);
 const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
 ---
 
