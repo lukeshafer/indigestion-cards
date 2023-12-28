@@ -22,17 +22,17 @@ import Button from '@/components/form/Button.astro';
 			);
 			if (!form || !addAdminButton) return;
 
-			const formIsVisible = signal(false);
+			const isFormVisible = signal(false);
 			const originalButtonText = addAdminButton.textContent;
       const originalButtonTheme = addAdminButton.dataset.theme;
-			addAdminButton.addEventListener('click', () => (formIsVisible.value = !formIsVisible.value));
+			addAdminButton.addEventListener('click', () => (isFormVisible.value = !isFormVisible.value));
 
 			effect(() => {
-				form.hidden = !formIsVisible.value;
-				form.style.display = formIsVisible.value ? 'flex' : 'none';
+				form.hidden = !isFormVisible.value;
+				form.style.display = isFormVisible.value ? 'flex' : 'none';
 
-				addAdminButton.dataset.theme = formIsVisible.value ? 'red' : originalButtonTheme;
-				addAdminButton.textContent = formIsVisible.value ? 'Cancel' : originalButtonText;
+				addAdminButton.dataset.theme = isFormVisible.value ? 'red' : originalButtonTheme;
+				addAdminButton.textContent = isFormVisible.value ? 'Cancel' : originalButtonText;
 			});
 		}
 	}
