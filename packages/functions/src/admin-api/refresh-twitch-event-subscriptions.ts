@@ -5,10 +5,10 @@ import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
 	subscribeToTwitchEvent,
 	getActiveTwitchEventSubscriptions,
-	TwitchEvent,
 	SUBSCRIPTION_TYPE,
-	type SubscriptionType,
 	deleteTwitchEventSubscription,
+	type SubscriptionType,
+	type TwitchEvent,
 } from '@lib/twitch';
 import { setAdminEnvSession } from '@lib/session';
 import { useSession } from 'sst/node/future/auth';

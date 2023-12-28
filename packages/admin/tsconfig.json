@@ -1,0 +1,19 @@
+{
+	"extends": "astro/tsconfigs/strict",
+	"exclude": ["dist"],
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"target": "ES2020",
+		"allowJs": true,
+		"baseUrl": ".",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"paths": {
+			"@/*": ["src/*"],
+			"@lil-indigestion-cards/core/*": ["../core/src/*"],
+			"@lib/*": ["../core/src/lib/*"]
+		},
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js"
+	}
+}

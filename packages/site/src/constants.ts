@@ -13,8 +13,15 @@ export const PUBLIC_ROUTES = [
 	'/card/*',
 	'/login',
 	'/logout',
+	'/data/usernames',
+  '/trades/*',
+  '/data/*',
 ] as const;
 
+/** Routes that aren't admin only, but require a user login */
+export const USER_ROUTES = ['/trades'];
+
+/** Admin Api routes */
 const api_paths = {
 	PACK_TYPE: '/pack-type',
 	SEASON: '/season',
@@ -41,8 +48,11 @@ export const API = new Proxy(api_paths, {
 	},
 });
 
+/** User API Routes */
 const user_api_paths = {
 	USER: '/user',
+	TRADE: '/trade',
+	CARD: '/card',
 };
 
 export const USER_API = new Proxy(user_api_paths, {
@@ -53,6 +63,7 @@ export const USER_API = new Proxy(user_api_paths, {
 	},
 });
 
+/** Public API routes */
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',
 	SEARCH: '/api/search',
@@ -74,6 +85,7 @@ export const routes = {
 	PACKS: '/packs',
 	INSTANCES: '/card',
 	CARDS: '/card',
+	TRADES: '/trades',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',
@@ -110,6 +122,7 @@ export const routeNames = {
 	ADMIN: 'Admin',
 	ADMIN_CREATE: 'Create',
 	ADMIN_EDIT: 'Edit',
+	TRADES: 'Trades',
 } as const;
 
 export const ASSETS = {
@@ -137,3 +150,5 @@ export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';
 export const NO_CARDS_OPENED_ID = 'no-cards-opened';
 export const SHIT_PACK_RARITY_ID = 'bronze';
+
+export const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];

@@ -1,0 +1,141 @@
+---
+import CardList from '@/components/cards/CardList';
+import Page from '@/layouts/Page.astro';
+import { getUserAndCardInstances, createNewUser } from '@lib/user';
+import { getUserByLogin } from '@lib/twitch';
+import { getRarityRanking } from '@lib/site-config';
+import { routes } from '@/constants';
+import AdminOnly from '@/components/AdminOnly.astro';
+import { getAllPackTypes } from '@lib/pack-type';
+import { Heading } from '@/components/text';
+import UserPackForms from '@/components/pack/UserPackForms';
+import Card from '@/components/cards/Card';
+
+const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
+if (redirectCount > 3) {
+	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
+}
+
+const id = Astro.params.username;
+
+if (!id) {
+	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
+}
+
+let [userData, rarityRanking] = await Promise.all([
+	getUserAndCardInstances({ username: id }),
+	getRarityRanking(),
+]);
+
+const twitchData = await getUserByLogin(id).catch(() => null);
+if (!userData) {
+	if (twitchData) {
+		const newUser = await createNewUser({
+			username: twitchData.display_name,
+			userId: twitchData.id,
+		});
+		userData = {
+			users: [newUser],
+			cardInstances: [],
+			userLogins: [],
+		};
+		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`);
+	}
+	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
+}
+
+const { users, cardInstances } = userData;
+const user = users[0] || {
+	username: id,
+	userId: twitchData?.id,
+};
+
+const pinnedCard = user.pinnedCard;
+const cardsNotInPack = cardInstances.filter(
+	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+);
+
+const packTypes = await getAllPackTypes();
+---
+
+<Page title={user.username} class="flex flex-col gap-4" pageType="public">
+	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
+		<img
+			src={twitchData?.profile_image_url}
+			width="150"
+			height="150"
+			class="col-start-1 row-span-full h-fit rounded-full"
+		/>
+		<section class="mt-4 flex flex-col">
+			<h1
+				class="font-display my-2 text-4xl font-bold italic text-gray-600 dark:text-gray-200"
+				style={{ 'view-transition-name': `${user.username}-username` }}>
+				{user.username}
+			</h1>
+			<AdminOnly>
+				<details>
+					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
+					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
+						<p>User Id: {user.userId}</p>
+						<UserPackForms {user} {packTypes} client:load />
+					</div>
+				</details>
+			</AdminOnly>
+			<ul>
+				<li>
+					<div class="text-gray-800 dark:text-gray-100">
+						{
+							user.lookingFor?.trim() ? (
+								<div class="flex flex-col gap-2">
+									<p class="max-w-sm">
+										Looking for:{' '}
+										<span class="whitespace-pre-line font-medium">
+											{user.lookingFor || '???'}
+										</span>
+									</p>
+								</div>
+							) : null
+						}
+					</div>
+				</li>
+			</ul>
+		</section>
+		{
+			pinnedCard && pinnedCard.instanceId ? (
+				<div class="ml-auto">
+					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
+					<a
+						transition:name={
+							pinnedCard.designId === 'lilindheart'
+								? 'lilindheart-hero-card'
+								: pinnedCard.designId === 'lilindcult'
+								? 'lilindcult-hero-card'
+								: pinnedCard.designId === 'ryan-of-the-wild'
+								? 'ryan-of-the-wild-hero-card'
+								: undefined
+						}
+						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
+						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
+					</a>
+				</div>
+			) : null
+		}
+	</header>
+	<section class="my-4 grid gap-4 text-center">
+		<Heading>Cards</Heading>
+		<CardList
+			cards={cardsNotInPack}
+			rarityRanking={rarityRanking}
+			client:load
+			isUserPage
+			sortOnlyBy={[
+				'rarest',
+				'common',
+				'card-name-asc',
+				'card-name-desc',
+				'open-date-asc',
+				'open-date-desc',
+			]}
+		/>
+	</section>
+</Page>

@@ -204,7 +204,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 			);
 		},
 		setNextPack() {
-			setState('activePack', { ...this.packs[0] } ?? null);
+			setState('activePack', { ...this.packs[0] } || null);
 		},
 
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),

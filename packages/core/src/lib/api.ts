@@ -15,17 +15,14 @@ declare module 'sst/node/future/auth' {
 	}
 }
 
-type SchemaType = 'string' | 'number' | 'boolean';
+type SchemaType = keyof Types;
 
-interface Schema {
-	[key: string]: SchemaType | [SchemaType, 'optional'];
+export type Schema = {
+	[key: string]: SchemaType;
 }
 
-type ParsedOutput<SchemaToCheck extends Schema> = {
-	[key in keyof SchemaToCheck]: SchemaToCheck[key] extends [SchemaType, 'optional']
-	? Types[SchemaToCheck[key][0]] | undefined
-	: // @ts-expect-error - Key is a key of SchemaToCheck
-	Types[SchemaToCheck[key]];
+export type ParsedOutput<SchemaToCheck extends Schema> = {
+	[key in keyof SchemaToCheck]: Types[SchemaToCheck[key]];
 };
 
 type Result<SchemaToCheck extends Schema> =
@@ -38,7 +35,7 @@ type Result<SchemaToCheck extends Schema> =
 		errors: string[];
 	};
 
-export function useValidateFormData<SchemaToCheck extends Schema>(
+function useValidateFormData<SchemaToCheck extends Schema>(
 	schema: SchemaToCheck
 ): Result<SchemaToCheck> {
 	const params = useFormData();
@@ -48,23 +45,21 @@ export function useValidateFormData<SchemaToCheck extends Schema>(
 }
 
 export function validateSearchParams<SchemaToCheck extends Schema>(
-	params: URLSearchParams,
+	params: URLSearchParams | string,
 	schema: SchemaToCheck
 ): Result<SchemaToCheck> {
+  if (typeof params === "string") {
+    params = new URLSearchParams(params);
+  }
+
 	console.log('Validating search params', { params, schema });
 	const result: Record<string, Types[SchemaType] | undefined> = {};
 	const errors: string[] = [];
 	for (const key in schema) {
-		let type = schema[key] as SchemaType | [SchemaType, 'optional'];
-		const value = params.get(key);
+		let type = schema[key] as SchemaType;
+		const value = params.getAll(key) || undefined;
 
-		if (Array.isArray(type)) {
-			if (!value) {
-				result[key] = undefined;
-				continue;
-			}
-			type = type[0];
-		} else if (!value) {
+		if (!type.endsWith('[]') && !value.length && !type.endsWith('?')) {
 			errors.push(`Missing ${key}.`);
 			continue;
 		}
@@ -88,83 +83,83 @@ interface Types {
 	string: string;
 	number: number;
 	boolean: boolean;
+	'string?': string | undefined;
+	'number?': number | undefined;
+	'boolean?': boolean | undefined;
+	'string[]': string[];
+	'number[]': number[];
+	'boolean[]': boolean[];
 }
 
 function parseType<TypeToCheck extends SchemaType>(
-	value: string,
+	value: string[],
 	type: TypeToCheck
 ): Types[TypeToCheck] {
+	const isOptional = type.endsWith('?');
+	if (isOptional) type = type.slice(0, -1) as TypeToCheck;
+
+	const isArray = type.endsWith('[]');
+	if (isArray) type = type.slice(0, -2) as TypeToCheck;
+
+	if (!value.length) {
+		// @ts-expect-error - [] is a valid type if isArray is true
+		if (isArray) return [] as Types[TypeToCheck];
+		if (isOptional) return undefined as Types[TypeToCheck];
+		throw new Error('Missing value');
+	}
+
+	if (isArray) {
+		// @ts-expect-error - this is fine
+		return value.map((v) => parseType([v], type)) as Types[TypeToCheck];
+	}
+
 	switch (type) {
 		case 'string':
-			return value as Types[TypeToCheck];
+			return value[0] as Types[TypeToCheck];
 		case 'number':
-			if (isNaN(Number(value))) throw new Error('Not a number');
-			return Number(value) as Types[TypeToCheck];
+			if (isNaN(Number(value[0]))) throw new Error('Not a number');
+			return Number(value[0]) as Types[TypeToCheck];
 		case 'boolean':
-			return (value === 'true') as Types[TypeToCheck];
+			return (value[0] === 'true') as Types[TypeToCheck];
 	}
 
 	throw new Error('Invalid type');
 }
 
-export const ProtectedApiHandler: typeof ApiHandler = (callback) => {
-	return ApiHandler(async (...args) => {
-		console.log('Checking session');
-		const session = useSession();
-		if (session.type !== 'admin') {
-			console.log('Unauthorized', { session });
-			return {
-				statusCode: 401,
-				body: 'Unauthorized',
-			};
-		}
-		setAdminEnvSession(session.properties.username, session.properties.userId);
-
-		return callback(...args);
-	});
-};
-
-export const UserProtectedApiHandler: typeof ApiHandler = (callback) => {
-	return ApiHandler(async (...args) => {
-		console.log('Checking session');
-		const session = useSession();
-		if (session.type !== 'admin' && session.type !== 'user') {
-			console.log('Unauthorized', { session });
-			return {
-				statusCode: 401,
-				body: 'Unauthorized',
-			};
-		}
-		setAdminEnvSession(session.properties.username, session.properties.userId);
-
-		return callback(...args);
-	});
-};
-
 type Callback = Parameters<typeof ApiHandler>[0];
-type SiteHandlerContext<T extends Schema> = Parameters<Callback>[1] & {
+type SiteHandlerContext<T extends Schema, A extends AuthorizationType> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
+	session: A extends 'public'
+	? undefined
+	: {
+		userId: string;
+		username: string;
+	};
 };
+
+type AuthorizationType = 'public' | 'user' | 'admin';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type SiteHandlerCallback<S extends Schema = {}> = (
+type SiteHandlerCallback<S extends Schema = {}, A extends AuthorizationType = 'public'> = (
 	evt: Parameters<Callback>[0],
-	ctx: SiteHandlerContext<S>
+	ctx: SiteHandlerContext<S, A>
 ) => ReturnType<Callback>;
-type SiteHandlerOptions<S extends Schema> = {
-	authorizationType?: 'public' | 'user' | 'admin';
+type SiteHandlerOptions<S extends Schema, A extends AuthorizationType> = {
+	authorizationType?: A;
 	schema?: S;
 };
-export function SiteHandler<T extends Schema>(
-	options: SiteHandlerOptions<T>,
-	callback: SiteHandlerCallback<T>
+
+export function SiteHandler<T extends Schema, A extends AuthorizationType>(
+	options: SiteHandlerOptions<T, A>,
+	callback: SiteHandlerCallback<T, A>
 ): ReturnType<typeof ApiHandler>;
 export function SiteHandler(options: SiteHandlerCallback): ReturnType<typeof ApiHandler>;
-export function SiteHandler<T extends Schema>(
-	options: SiteHandlerOptions<T> | SiteHandlerCallback,
-	callback?: SiteHandlerCallback<T>
+export function SiteHandler<T extends Schema, A extends AuthorizationType>(
+	options: SiteHandlerOptions<T, A> | SiteHandlerCallback,
+	callback?: SiteHandlerCallback<T, A>
 ) {
 	if (typeof options === 'function') {
+		// @ts-expect-error - handled by function overload
 		callback = options;
 		options = {};
 	}
@@ -174,7 +169,7 @@ export function SiteHandler<T extends Schema>(
 	const { authorizationType = 'public', schema } = options;
 
 	return ApiHandler(async (evt, ctxOrig) => {
-		const ctx = ctxOrig as SiteHandlerContext<T>;
+		const ctx = ctxOrig as SiteHandlerContext<T, A>;
 		if (authorizationType !== 'public') {
 			const session = useSession();
 
@@ -189,12 +184,15 @@ export function SiteHandler<T extends Schema>(
 				};
 			}
 
+			// @ts-expect-error - the session properties are verified in the above statement
+			ctx.session = session.properties;
 			setAdminEnvSession(session.properties.username, session.properties.userId);
 		}
 
 		if (schema) {
 			const params = useValidateFormData(schema);
 			if (!params.success) {
+				console.error('Invalid params', { params });
 				return {
 					statusCode: 400,
 					body: params.errors.join(' '),

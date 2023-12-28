@@ -1,0 +1,51 @@
+---
+import ButtonCount from '../ButtonCount.astro';
+interface Props {
+	count: number;
+}
+
+const { count } = Astro.props;
+---
+
+<total-pack-count initial-count={count} hidden>
+	<ButtonCount />
+</total-pack-count>
+
+<script>
+	import { get } from '@/lib/client/data';
+	import { Signal, effect, signal } from '@preact/signals-core';
+
+	customElements.define(
+		'total-pack-count',
+		class TotalPackCount extends HTMLElement {
+			div: HTMLDivElement | null;
+			count: Signal<number>;
+			constructor() {
+				super();
+				this.div = this.querySelector('div');
+				const initialCount = Number(this.getAttribute('initial-count') || 0);
+				this.count = signal(initialCount);
+			}
+
+			connectedCallback() {
+				effect(() => {
+					if (!this.div) return;
+					this.div.textContent = String(this.count.value);
+					this.hidden = !this.count.value;
+				});
+
+				get('pack-count').then(({ packCount }) => {
+					this.count.value = packCount;
+				});
+			}
+
+			decrement() {
+				this.count.value -= 1;
+			}
+
+			increment() {
+				this.count.value += 1;
+			}
+		}
+	);
+</script>

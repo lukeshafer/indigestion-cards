@@ -1,0 +1,59 @@
+---
+import { twMerge } from 'tailwind-merge';
+
+export type ColumnProps = Props;
+interface Props {
+	name: string;
+	label?: string;
+	'no-sort'?: boolean;
+	width?: string;
+	type?: 'text' | 'number' | 'date';
+	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	hideOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	startDescending?: boolean;
+	align?: 'left' | 'center' | 'right';
+	class?: string;
+}
+
+const {
+	name,
+	label,
+	'no-sort': noSort = false,
+	width,
+	type,
+	showOnBreakpoint,
+	hideOnBreakpoint,
+	startDescending = false,
+	align,
+	class: className = '',
+} = Astro.props;
+---
+
+<th
+	data-name={name}
+	data-label={label}
+	data-type={type}
+	data-nosort={noSort}
+	data-start-descending={String(startDescending)}
+	style={{ width }}
+	class:list={[
+		twMerge('px-6 py-2', className),
+		{
+			'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700': !noSort,
+			hidden: showOnBreakpoint !== undefined,
+			'sm:table-cell': showOnBreakpoint === 'sm',
+			'md:table-cell': showOnBreakpoint === 'md',
+			'lg:table-cell': showOnBreakpoint === 'lg',
+			'xl:table-cell': showOnBreakpoint === 'xl',
+			'sm:hidden': hideOnBreakpoint === 'sm',
+			'md:hidden': hideOnBreakpoint === 'md',
+			'lg:hidden': hideOnBreakpoint === 'lg',
+			'xl:hidden': hideOnBreakpoint === 'xl',
+			'text-left': align === 'left',
+			'text-center': align === 'center',
+			'text-right': align === 'right',
+			'data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]': true,
+		},
+	]}>
+	<slot>{label}</slot>
+</th>

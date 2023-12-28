@@ -12,7 +12,7 @@ export async function GET(ctx: APIContext) {
 
 	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
 	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
-	console.log({ client_id, origin })
+	//console.log({ client_id, origin })
 
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
 		method: 'POST',
@@ -25,7 +25,7 @@ export async function GET(ctx: APIContext) {
 	})
 		.then((r) => r.text())
 		.then((r) => {
-			console.log(r);
+			//console.log(r);
 			return JSON.parse(r)
 		}).catch((err) => {
 			console.error('An error occurred parsing the JSON.', { err })
@@ -45,7 +45,7 @@ export async function GET(ctx: APIContext) {
 	const session = Session.verify(response.access_token);
 
 	if (session.type === 'admin' || session.type === 'user') {
-		return ctx.redirect(`/?alert=Logged in!&auth_token=${response.access_token}`, 302);
+		return ctx.redirect(`/?alert=Logged in!`, 302);
 	}
 	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }

@@ -1,4 +1,4 @@
-/** @type {import("@types/prettier").Config} */
+/** @type {import("prettier").Config} */
 module.exports = {
 	pluginSearchDirs: false,
 	useTabs: true,
@@ -16,5 +16,6 @@ module.exports = {
 	useTabs: true,
 	printWidth: 100,
 	bracketSameLine: true,
+	arrowParens: 'avoid',
 	plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
 };

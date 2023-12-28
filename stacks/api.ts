@@ -78,8 +78,8 @@ export function API({ app, stack }: StackContext) {
 			'GET /twitch/chatters': 'packages/functions/src/admin-api/twitch/chatters/get.handler',
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
-					'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				}
+						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
+				  }
 				: {}),
 			// PREORDER
 			'POST /preorder': 'packages/functions/src/admin-api/preorder/post.handler',
@@ -90,6 +90,8 @@ export function API({ app, stack }: StackContext) {
 			// USER ENDPOINTS
 			// USER
 			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
+			// CARD
+			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
 		},
 		defaults: {
 			function: {
@@ -115,16 +117,18 @@ export function API({ app, stack }: StackContext) {
 			allowHeaders: ['content-type', 'authorization'],
 			allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 			allowOrigins:
-				app.mode === 'dev' ? ['http://localhost:4321'] : [`https://${baseDomain}`],
+				app.mode === 'dev'
+					? ['http://localhost:4321', 'http://localhost:5173']
+					: [`https://${baseDomain}`],
 		},
 		customDomain:
 			app.mode === 'dev'
 				? undefined
 				: {
-					domainName: `api.${baseDomain}`,
-					path: API_VERSION,
-					hostedZone: hostedZone,
-				},
+						domainName: `api.${baseDomain}`,
+						path: API_VERSION,
+						hostedZone: hostedZone,
+				  },
 	});
 
 	stack.addOutputs({

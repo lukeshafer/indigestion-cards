@@ -10,19 +10,6 @@ import { setAdminEnvSession } from '@lib/session';
 import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lib/twitch';
 import { sessions } from './sessions';
 
-declare module 'sst/node/future/auth' {
-	export interface SessionTypes {
-		user: {
-			userId: string;
-			username: string;
-		};
-		admin: {
-			userId: string;
-			username: string;
-		};
-	}
-}
-
 //const callbackPath = '/api/auth/callback';
 export const handler = AuthHandler({
 	sessions,
@@ -40,37 +27,63 @@ export const handler = AuthHandler({
 			scope: 'openid',
 		}),
 	},
-	async onError(error) {
-		console.error('An error occurred', { error });
-		return {
-			statusCode: 400,
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-			body: 'Auth failed',
-		};
-	},
+	//async onError(error) {
+	//console.error('An error occurred', { error });
+	//return {
+	//statusCode: 400,
+	//headers: {
+	//'Content-Type': 'text/plain',
+	//},
+	//body: 'Auth failed',
+	//};
+	//},
 	callbacks: {
+		connect: {
+			async start(session, evt) {
+				console.log('start', { session, evt });
+			},
+			async error(session) {
+				console.log('start', { session });
+				return undefined;
+			},
+		},
 		async error(err) {
 			console.error('callbacks.error', { err });
-			return undefined
+			return undefined;
 		},
 		auth: {
 			async allowClient(clientID, redirect) {
+				const admin = 'https://admin.' + Config.DOMAIN_NAME;
+				const main = 'https://' + Config.DOMAIN_NAME;
+				console.log('Checking redirect', {
+					redirect,
+					clientID,
+					admin,
+					isAdmin: redirect.startsWith(admin),
+					main,
+					isMain: redirect.startsWith(main),
+				});
 				switch (clientID) {
 					case 'local':
 						return true;
 					case 'main':
-						return redirect.startsWith('https://' + Config.DOMAIN_NAME);
+						return redirect.startsWith(main);
+					case 'admin':
+						return redirect.startsWith(admin);
 					default:
 						return false;
 				}
 			},
+			async start(evt) {
+				console.log('Start', { evt });
+			},
 			async error(error) {
+				console.log('Error', { error });
 				console.error('An unknown error occurred', { error });
 				return undefined;
 			},
 			async success(input, response) {
+				console.log('Success', { input, response });
 				setAdminEnvSession('AuthHandler', 'createNewUserLogin');
 				if (input.provider === 'twitchUser') {
 					const claims = input.tokenset.claims();
@@ -78,6 +91,8 @@ export const handler = AuthHandler({
 					const adminUser = await getAdminUserById(claims.sub);
 					const userLogin = await getUserLoginById(claims.sub);
 					const userProfile = await getUser(claims.sub);
+
+					console.log({ adminUser, userLogin, userProfile });
 
 					if (adminUser) {
 						if (!userProfile) {
@@ -93,6 +108,8 @@ export const handler = AuthHandler({
 								hasProfile: true,
 							});
 						}
+
+						console.log('returning admin');
 						return response.session({
 							type: 'admin',
 							properties: {
@@ -102,6 +119,7 @@ export const handler = AuthHandler({
 						});
 					}
 
+					console.log('not admin');
 					if (userLogin) {
 						console.log('User login found');
 						if (!userProfile) {
@@ -128,6 +146,8 @@ export const handler = AuthHandler({
 						});
 					}
 
+					console.log('user is not in database');
+
 					// If user isn't in the database, add them
 					const usernames = await getListOfTwitchUsersByIds([claims.sub]);
 					if (usernames.length === 0) throw new Error('No username found');
@@ -135,7 +155,7 @@ export const handler = AuthHandler({
 					const userId = claims.sub;
 					const username = usernames[0].display_name;
 
-					console.log(userProfile);
+					console.log({ userProfile });
 					if (!userProfile)
 						await createNewUser({
 							userId,
@@ -150,6 +170,7 @@ export const handler = AuthHandler({
 
 					if (!newUser) throw new Error('Failed to create new user');
 
+					console.log('returning session');
 					return response.session({
 						type: 'user',
 						properties: {

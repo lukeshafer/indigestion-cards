@@ -1,50 +1,53 @@
 import { Bucket } from 'sst/node/bucket';
 
-import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
-import { createRarity, } from '@lib/rarity';
+import { SiteHandler } from '@lib/api';
+import { createRarity } from '@lib/rarity';
 import { deleteUnmatchedDesignImage } from '@lib/unmatched-image';
 import { moveImageBetweenBuckets, createS3Url } from '@lib/images';
 
-export const handler = ProtectedApiHandler(async () => {
-	const validationResult = useValidateFormData({
-		rarityId: 'string',
-		rarityName: 'string',
-		rarityColor: 'string',
-		defaultCount: 'number',
-		imageKey: 'string',
-		bucket: 'string',
-	});
+export const handler = SiteHandler(
+	{
+		authorizationType: 'admin',
+		schema: {
+			rarityId: 'string',
+			rarityName: 'string',
+			rarityColor: 'string',
+			defaultCount: 'number',
+			imageKey: 'string',
+			bucket: 'string',
+		},
+	},
+	async (_, { params }) => {
+		if (!params.rarityId.match(/^[a-z0-9-]+$/))
+			return {
+				statusCode: 400,
+				body: 'Invalid rarityId. (Must be lowercase, numbers, and dashes only)',
+			};
+		if (!params.rarityColor.match(/^#[a-f0-9]{6}$/i))
+			return { statusCode: 400, body: 'Invalid rarityColor. (Must be a hex color code)' };
+		if (params.defaultCount < 1)
+			return { statusCode: 400, body: 'Default count must be greater than 0' };
 
-	if (!validationResult.success)
-		return { statusCode: 400, body: validationResult.errors.join(' ') };
-	const params = validationResult.value;
+		const frameUrl = createS3Url({
+			bucket: Bucket.FrameDesigns.bucketName,
+			key: params.imageKey!,
+		});
 
-	if (!params.rarityId.match(/^[a-z0-9-]+$/))
-		return {
-			statusCode: 400,
-			body: 'Invalid rarityId. (Must be lowercase, numbers, and dashes only)',
-		};
-	if (!params.rarityColor.match(/^#[a-f0-9]{6}$/i))
-		return { statusCode: 400, body: 'Invalid rarityColor. (Must be a hex color code)' };
-	if (params.defaultCount < 1)
-		return { statusCode: 400, body: 'Default count must be greater than 0' };
+		const result = await createRarity({ ...params, frameUrl });
 
-	const frameUrl = createS3Url({ bucket: Bucket.FrameDesigns.bucketName, key: params.imageKey! });
+		if (!result.success)
+			return {
+				statusCode: result.error === 'Rarity already exists' ? 409 : 500,
+				body: result.error,
+			};
 
-	const result = await createRarity({ ...params, frameUrl });
+		await moveImageBetweenBuckets({
+			sourceBucket: Bucket.FrameDrafts.bucketName,
+			key: params.imageKey,
+			destinationBucket: Bucket.FrameDesigns.bucketName,
+		});
+		await deleteUnmatchedDesignImage({ imageId: params.imageKey, type: 'frame' });
 
-	if (!result.success)
-		return {
-			statusCode: result.error === 'Rarity already exists' ? 409 : 500,
-			body: result.error,
-		};
-
-	await moveImageBetweenBuckets({
-		sourceBucket: Bucket.FrameDrafts.bucketName,
-		key: params.imageKey,
-		destinationBucket: Bucket.FrameDesigns.bucketName,
-	});
-	await deleteUnmatchedDesignImage({ imageId: params.imageKey, type: 'frame' });
-
-	return { statusCode: 200, body: 'Rarity created!' };
-});
+		return { statusCode: 200, body: 'Rarity created!' };
+	}
+);

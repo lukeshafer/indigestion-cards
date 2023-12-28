@@ -1,0 +1,55 @@
+---
+export interface Path {
+	label: string;
+	href?: string | undefined;
+}
+
+interface Props {
+	path: Path[];
+}
+
+const { path: pathProp } = Astro.props;
+
+const path = [
+	{
+		label: 'Home',
+		href: '/',
+	},
+	...pathProp,
+] as Path[];
+---
+
+<section class="flex gap-2 p-4 text-sm font-medium text-gray-700 dark:text-gray-50 dark:font-semibold underline-offset-4">
+	{
+		path.length === 1
+			? null
+			: path.map(({ label, href }, index) =>
+					index === path.length - 1 &&
+					(label !== 'Home' || Astro.url.pathname === '/') ? (
+						<p
+							class="font-heading text-brand-main block font-bold"
+							transition:name={`breadcrumb-${index}`}>
+							{label}
+						</p>
+					) : href ? (
+						<>
+							<a
+								rel="prefetch"
+								class="font-heading underline"
+								href={href}
+								transition:name={`breadcrumb-${index}`}>
+								{label}
+							</a>
+							<p class="font-heading block">/</p>
+						</>
+					) : (
+						<>
+							<p class="font-heading block" transition:name={`breadcrumb-${index}`}>
+								{label}
+							</p>
+							<p class="font-heading block">/</p>
+						</>
+					)
+			  )
+	}
+</section>

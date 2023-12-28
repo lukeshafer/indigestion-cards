@@ -7,12 +7,12 @@ import { ASSETS } from '@/constants';
 
 interface Props {
 	title: string;
-	pageType?: 'public' | 'private';
+	pageType?: 'public' | 'user' | 'admin';
 }
 
 export type BaseProps = Props;
 
-const { title, pageType = 'private' } = Astro.props;
+const { title, pageType = 'admin' } = Astro.props;
 
 const session = Astro.locals.session;
 
@@ -22,7 +22,7 @@ const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
 
 <html
 	lang="en"
-	class:list={{ 'dark': colorTheme === 'dark' }}
+	class:list={{ dark: colorTheme === 'dark' }}
 	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 	<!--
 Oh, hello beautiful people of the internet!
@@ -47,7 +47,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 				localStorage.theme = 'dark';
 			} else {
 				document.documentElement.classList.remove('dark');
-				localStorage.theme = 'light'
+				localStorage.theme = 'light';
 			}
 		</script>
 		<title>
@@ -59,10 +59,11 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		</title>
 		{disableAnimations ? null : <ViewTransitions fallback="none" />}
 	</head>
-	<body
-	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
+	<body class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 		{
-			session?.type === 'admin' || pageType === 'public' ? (
+			session?.type === 'admin' ||
+			(session?.type === 'user' && pageType === 'user') ||
+			pageType === 'public' ? (
 				<slot />
 			) : (
 				<script> window.location.href = '/' </script>

@@ -1,4 +1,4 @@
-import { Preorder } from '@lil-indigestion-cards/core/db/preorders';
+import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
 import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
 import { givePackToUser } from '@lil-indigestion-cards/core/lib/pack';
 import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';

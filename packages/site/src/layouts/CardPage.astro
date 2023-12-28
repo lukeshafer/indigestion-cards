@@ -1,13 +1,16 @@
 ---
 import { routes } from '@/constants';
-import { Heading, PageTitle } from '@/components/text';
+import { Anchor, Heading, PageTitle } from '@/components/text';
 import PreviewableCard from '@/components/cards/PreviewableCard';
 import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
-import AdminOnly from '@/components/AdminOnly.astro';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { User } from '@lil-indigestion-cards/core/db/users';
+import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { checkIsCardTradeable } from '@lil-indigestion-cards/core/lib/trades';
 
 const session = Astro.locals.session;
+const siteConfig = await getSiteConfig();
 
 interface Props {
 	card: CardInstance;
@@ -52,6 +55,13 @@ const openDate = card.openedAt
 				client:load
 			/>
 		</div>
+	) : siteConfig.tradingIsEnabled && checkIsCardTradeable(card) ? (
+		<div class="mx-auto">
+			<Anchor
+				href={`${routes.TRADES}/new?receiverUsername=${card.username}&requestedCards=${card.instanceId}`}>
+				Request Trade
+			</Anchor>
+		</div>
 	) : null
 }
 <section class="mx-auto text-lg">
@@ -68,14 +78,9 @@ const openDate = card.openedAt
 		<b>Card Number:{' '}</b>
 		{card.cardNumber}
 	</p>
-	<AdminOnly>
-		<p>
-			<b>Season:{' '}</b>
-			<a class="underline" href={`${routes.SEASONS}/${card.seasonId}`}
-				>{card.seasonName}</a
-			>
-		</p>
-	</AdminOnly>
+	<p>
+		<b>Season: {card.seasonName}</b>
+	</p>
 	<p>
 		<b>Owner:{' '}</b>
 		{
@@ -105,3 +110,9 @@ const openDate = card.openedAt
 		{card.openedAt ? <time datetime={openDate}>{openDate}</time> : 'Not opened yet'}
 	</p>
 </section>
+
+{
+	card.tradeHistory && siteConfig.tradingIsEnabled ? (
+		<CardTradeHistory history={card.tradeHistory} />
+	) : null
+}

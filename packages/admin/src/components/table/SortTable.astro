@@ -1,0 +1,164 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { twMerge } from 'tailwind-merge';
+type Props = HTMLAttributes<'table'> & {
+	'search-column'?: string;
+};
+
+const { class: className = '', 'search-column': searchColumn, ...props } = Astro.props;
+---
+
+<sort-table class="grid gap-0" search-column={searchColumn}>
+	<table
+		class={twMerge(
+			`w-full table-fixed border-separate border-spacing-y-3 text-center`,
+			className
+		)}
+		{...props}>
+		<slot />
+	</table>
+</sort-table>
+
+<script>
+	import { signal, effect, computed } from '@preact/signals-core';
+
+	const sortModes = ['none', 'ascending', 'descending'] as const;
+
+	class SortTable extends HTMLElement {
+		sortedColumn = signal<Column | null>(null);
+		sortMode = signal<(typeof sortModes)[number]>('none');
+		filter = signal<string>('');
+
+		tbody: HTMLTableSectionElement | null = null;
+		columns: Array<Column> | null = null;
+		rows = signal<Array<Row>>([]);
+		connectedCallback() {
+			this.tbody = this.querySelector('tbody');
+			this.columns = queryAndFormatColumns(this);
+			this.rows.value = queryAndFormatRows(this);
+
+			this.columns?.forEach(
+				(column) =>
+					column.sort &&
+					column.element.addEventListener('click', () => {
+						this.#updateSortModeAndColumn(column);
+					})
+			);
+
+			effect(() => {
+				const els = this.sortedAndfilteredRows.value.map(({ element }) => element);
+				this.tbody?.replaceChildren(...els);
+			});
+		}
+
+		sortedRows = computed<Row[]>(() =>
+			this.rows.value.slice().sort((a, b) => {
+				const sortedColumn = this.sortedColumn.value;
+				if (this.sortMode.value === 'none' || sortedColumn === null) return 0;
+				const aVal = a.cells.get(sortedColumn.name)?.value ?? '';
+				const bVal = b.cells.get(sortedColumn.name)?.value ?? '';
+				if (!aVal && !bVal) return 0;
+				if (!aVal) return this.sortMode.value === 'ascending' ? -1 : 1;
+				if (!bVal) return this.sortMode.value === 'ascending' ? 1 : -1;
+				if (aVal === bVal) return 0;
+				if (sortedColumn.type === 'number')
+					return this.sortMode.value === 'ascending'
+						? Number(aVal) - Number(bVal)
+						: Number(bVal) - Number(aVal);
+
+				return this.sortMode.value === 'ascending'
+					? String(aVal).localeCompare(String(bVal))
+					: String(bVal).localeCompare(String(aVal));
+			})
+		);
+
+		sortedAndfilteredRows = computed<Row[]>(() => {
+			const filter = this.filter.value.toLowerCase();
+			const searchColumn = this.getAttribute('search-column');
+			if (!filter || !searchColumn) return this.sortedRows.value;
+
+			return this.sortedRows.value.filter((row) => {
+				const cell = row.cells.get(searchColumn);
+				if (!cell?.value) return false;
+				return cell.value.toLowerCase().includes(filter);
+			});
+		});
+
+		static observedAttributes = ['search'];
+		attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
+			switch (name) {
+				case 'search': {
+          this.filter.value = newValue;
+				}
+			}
+		}
+
+		#updateSortModeAndColumn(column: Column) {
+			if (column.name !== this.sortedColumn.value?.name) {
+				this.sortedColumn.value = column;
+				this.sortMode.value = column.startDescending ? 'descending' : 'ascending';
+			} else {
+				const currentModeIndex = sortModes.indexOf(this.sortMode.value);
+				this.sortMode.value = sortModes.at(
+					((column.startDescending ? sortModes.length - 1 : 1) + currentModeIndex) %
+						sortModes.length
+				) as (typeof sortModes)[number];
+			}
+
+			column.element.dataset.mode = this.sortMode.value;
+		}
+	}
+	customElements.define('sort-table', SortTable);
+
+	type Column = {
+		element: HTMLTableCellElement;
+		startDescending: boolean;
+		name: string;
+		label: string;
+		type: 'text' | 'number' | 'date';
+		sort: boolean;
+	};
+
+	type Row = {
+		element: HTMLTableRowElement;
+		cells: Map<
+			string,
+			{
+				element: HTMLTableCellElement;
+				value: string;
+			}
+		>;
+	};
+
+	function queryAndFormatColumns(el: HTMLElement): Array<Column> {
+		return [...el.querySelectorAll<HTMLTableCellElement>('thead th')].map((th) => ({
+			element: th,
+			name: th.dataset.name || '',
+			label: th.dataset.label || th.textContent || '',
+			sort: th.dataset.sort !== 'false',
+			startDescending: th.dataset.startDescending === 'true',
+			type:
+				th.dataset.type === 'number' || th.dataset.type === 'date'
+					? th.dataset.type
+					: 'text',
+		}));
+	}
+
+	function queryAndFormatRows(el: HTMLElement): Array<Row> {
+		return [...el.querySelectorAll<HTMLTableRowElement>('tbody tr')].map((row) => ({
+			element: row,
+			cells: new Map(
+				[...row.querySelectorAll('td')].map(
+					(cell) =>
+						[
+							cell.dataset.column!,
+							{
+								element: cell,
+								value: cell.dataset.value || '',
+							},
+						] as const
+				)
+			),
+		}));
+	}
+</script>

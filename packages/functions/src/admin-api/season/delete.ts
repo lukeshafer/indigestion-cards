@@ -1,22 +1,24 @@
-import { useValidateFormData, ProtectedApiHandler } from '@lib/api';
+import { SiteHandler } from '@lib/api';
 import { deleteSeasonById } from '@lib/season';
 
-export const handler = ProtectedApiHandler(async () => {
-	const validationResult = useValidateFormData({
-		seasonId: 'string',
-	});
+export const handler = SiteHandler(
+	{
+		authorizationType: 'admin',
+		schema: {
+			seasonId: 'string',
+		},
+	},
+	async (_, { params }) => {
+		const { seasonId } = params;
 
-	if (!validationResult.success)
-		return { statusCode: 400, body: validationResult.errors.join(' ') };
-	const { seasonId } = validationResult.value;
+		const result = await deleteSeasonById(seasonId);
 
-	const result = await deleteSeasonById(seasonId);
+		if (!result.success)
+			return {
+				statusCode: result.error === 'Season does not exist' ? 404 : 500,
+				body: result.error,
+			};
 
-	if (!result.success)
-		return {
-			statusCode: result.error === 'Season does not exist' ? 404 : 500,
-			body: result.error,
-		};
-
-	return { statusCode: 200, body: 'Season deleted!' };
-});
+		return { statusCode: 200, body: 'Season deleted!' };
+	}
+);

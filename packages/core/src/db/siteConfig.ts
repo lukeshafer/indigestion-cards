@@ -72,6 +72,9 @@ export const siteConfig = new Entity(
 					},
 				},
 			},
+      tradingIsEnabled: {
+        type: 'boolean',
+      },
 			...auditAttributes('siteConfig'),
 		},
 		indexes: {

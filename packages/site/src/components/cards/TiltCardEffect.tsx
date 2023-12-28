@@ -1,6 +1,6 @@
 import { createStore, type SetStoreFunction } from 'solid-js/store';
 import type { JSX } from 'solid-js';
-import { css } from '@acab/ecsstatic';
+import styles from './TiltCardEffect.module.css';
 
 interface TiltCardState {
 	transition: string;
@@ -109,71 +109,3 @@ function cardTilt(el: HTMLDivElement, setState: SetStoreFunction<TiltCardState>)
 		});
 	}
 }
-
-const styles = {
-	outer: css`
-		width: max-content;
-		position: relative;
-		transform-style: preserve-3d;
-		transition:
-			transform 0.3s,
-			scale 0.3s;
-		perspective: 900px;
-		z-index: 1;
-
-		--shine-opacity: 0.2;
-		--shine-position: 50%;
-		--shine-after-opacity: 0;
-		--shadow: 0;
-
-		&:hover {
-			transform: translateZ(300px);
-		}
-	`,
-	inner: css`
-		&::before,
-		&::after {
-			transform: translateZ(200px);
-			position: absolute;
-			inset: 0;
-			width: 100%;
-			height: 100%;
-			display: block;
-			z-index: 1;
-			content: '';
-
-			background-position: var(--shine-position) 0%;
-			opacity: var(--shine-after-opacity);
-			transition: opacity 0.5s;
-			background-repeat: no-repeat;
-		}
-
-		&::after {
-			--shine-level: clamp(0.05, calc(0.5 * var(--shadow)), 1);
-			background-size: 300% 200%;
-			background-image: radial-gradient(
-				ellipse at center,
-				rgba(49, 52, 56, var(--shine-level)) 0%,
-				rgba(49, 52, 56, calc(var(--shine-level) / 100)) 100%
-			);
-		}
-
-		&.shiny::before {
-			--adjusted: calc(var(--shine-opacity) - 0.5);
-			--sq: calc(1 - 3 * var(--adjusted) * var(--adjusted));
-			--shine-level: clamp(0.1, calc(0.6 * var(--sq)), 0.9);
-			background-size: 200% 110%;
-			background-image: linear-gradient(
-				110deg,
-				#fff0 0%,
-				hsl(calc(var(--shine-opacity) * 360) 100% 95% / 25%) 10%,
-				#fff3 20%,
-				hsl(calc(var(--shine-opacity) * 360) 100% 95% / var(--shine-level)) 35%,
-				rgb(255 255 255 / var(--shine-level)) 40%,
-				hsl(calc(var(--shine-opacity) * 360 + 180) 100% 95% / var(--shine-level)) 50%,
-				#fff3 80%,
-				#fff0 100%
-			);
-		}
-	`,
-};

@@ -4,6 +4,8 @@
 		"packages"
 	],
 	"compilerOptions": {
+		"module": "esnext",
+		"moduleResolution": "node",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"strict": true,

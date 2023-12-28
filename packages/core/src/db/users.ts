@@ -37,6 +37,32 @@ export const users = new Entity(
 			lookingFor: {
 				type: 'string',
 			},
+			isTrading: {
+				type: 'boolean',
+			},
+			tradeNotifications: {
+				type: 'list',
+				items: {
+					type: 'map',
+					properties: {
+						status: {
+							type: ['statusUpdated', 'newMessage'] as const,
+						},
+						tradeId: {
+							type: 'string',
+							required: true,
+						},
+						text: {
+							type: 'string',
+						},
+						createdAt: {
+							type: 'number',
+							default: () => Date.now(),
+							readOnly: true,
+						},
+					},
+				},
+			},
 			pinnedCard: {
 				type: 'map',
 				properties: {

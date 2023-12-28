@@ -1,6 +1,6 @@
 import type { User } from '@lil-indigestion-cards/core/db/users';
-import { Form, TextArea } from '../form/Form';
-import { createSignal, type JSX } from 'solid-js';
+import { Form, TextArea, SubmitButton, DeleteButton } from '../form/Form';
+import { createSignal } from 'solid-js';
 import { USER_API } from '@/constants';
 
 export default function UserLookingFor(props: { user: User; isLoggedInUser: boolean }) {
@@ -27,8 +27,8 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
-						<Button type="submit">Save</Button>
-						<Button onclick={() => setIsEditing(false)}>Cancel</Button>
+						<SubmitButton>Save</SubmitButton>
+						<DeleteButton onClick={() => setIsEditing(false)}>Cancel</DeleteButton>
 					</div>
 				</Form>
 			) : lookingFor().trim() ? (
@@ -39,7 +39,10 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 					</p>
 					{props.isLoggedInUser ? (
 						<div class="flex items-center gap-2">
-							<Button onClick={() => setIsEditing(true)}>Edit</Button>
+							<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
+							{
+								//<Button onClick={() => setIsEditing(true)}>Edit</Button>
+							}
 							<div class="w-min">
 								<Form
 									action={USER_API.USER}
@@ -50,7 +53,7 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 									}}>
 									<input type="hidden" name="userId" value={props.user.userId} />
 									<input type="hidden" name="lookingFor" value=" " />
-									<Button type="submit">Delete</Button>
+									<DeleteButton>Delete</DeleteButton>
 								</Form>
 							</div>
 						</div>
@@ -59,17 +62,9 @@ export default function UserLookingFor(props: { user: User; isLoggedInUser: bool
 			) : props.isLoggedInUser ? (
 				<>
 					<p class="font-medium">What cards are you looking for?</p>
-					<Button onClick={() => setIsEditing(true)}>Edit</Button>
+					<SubmitButton onClick={() => setIsEditing(true)}>Edit</SubmitButton>
 				</>
 			) : null}
 		</div>
-	);
-}
-
-function Button(props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) {
-	return (
-		<button {...props} class="bg-brand-main px-2 py-1 font-semibold text-white">
-			{props.children}
-		</button>
 	);
 }

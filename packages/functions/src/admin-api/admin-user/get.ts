@@ -1,7 +1,7 @@
-import { ProtectedApiHandler } from '@lib/api';
+import { SiteHandler } from '@lib/api';
 import { getAllAdminUsers } from '@lib/admin-user';
 
-export const handler = ProtectedApiHandler(async () => {
+export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
 	const users = await getAllAdminUsers();
 
 	return {
