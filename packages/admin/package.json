@@ -23,7 +23,7 @@
     "astro": "^3.4.4",
     "astro-icon": "^0.8.1",
     "astro-sst": "2.38.7",
-    "electrodb": "^2.10.3",
+    "electrodb": "^2.12.3",
     "fuse.js": "^7.0.0",
     "solid-js": "^1.8.5",
     "sst": "2.38.7",

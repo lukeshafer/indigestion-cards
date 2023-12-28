@@ -114,7 +114,6 @@ const packTypes = await getAllPackTypes();
 								? 'ryan-of-the-wild-hero-card'
 								: undefined
 						}
-						rel="prefetch"
 						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
 						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
 					</a>

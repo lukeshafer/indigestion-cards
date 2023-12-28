@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import aws from 'astro-sst';
-//import prefetch from '@astrojs/prefetch';
 import solid from '@astrojs/solid-js';
 import { ecsstatic } from '@acab/ecsstatic/vite';
 
