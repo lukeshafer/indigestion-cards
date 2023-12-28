@@ -6,16 +6,16 @@ import { useViewTransition } from '@/lib/client/utils';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-		| 'get'
-		| 'post'
-		| 'dialog'
-		| 'put'
-		| 'delete'
-		| 'options'
-		| 'head'
-		| 'trace'
-		| 'connect'
-		| 'patch';
+	| 'get'
+	| 'post'
+	| 'dialog'
+	| 'put'
+	| 'delete'
+	| 'options'
+	| 'head'
+	| 'trace'
+	| 'connect'
+	| 'patch';
 	action?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
@@ -69,7 +69,7 @@ export function Form(props: {
 			},
 			body,
 		})
-			.catch((err) => {
+			.catch(err => {
 				console.error(err);
 				throw err;
 			})
@@ -88,7 +88,7 @@ export function Form(props: {
 			if (!props.noAlert)
 				useViewTransition(() => {
 					const alertMessage = isHTML ? 'Success!' : responseBody || 'Success!';
-					setAlerts((alerts) => [{ message: alertMessage, type: 'success' }, ...alerts]);
+					setAlerts(alerts => [{ message: alertMessage, type: 'success' }, ...alerts]);
 				});
 			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
@@ -100,7 +100,7 @@ export function Form(props: {
 		} else {
 			if (!props.noAlert)
 				useViewTransition(() => {
-					setAlerts((alerts) => [
+					setAlerts(alerts => [
 						{
 							message: isHTML
 								? 'There was an error'
@@ -125,7 +125,7 @@ export function Form(props: {
 
 	return (
 		<form
-			ref={(el) => props.ref?.(el)}
+			ref={el => props.ref?.(el)}
 			class="relative flex w-full flex-col items-start gap-6"
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
@@ -199,7 +199,7 @@ export function TextInput(props: InputProps<string>) {
 						placeholder={props.placeholder ?? props.label}
 						readOnly={props.readOnly}
 						value={props.value ?? ''}
-						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
 					/>
 				</>
 			) : (
@@ -217,7 +217,7 @@ export function TextInput(props: InputProps<string>) {
 						placeholder={props.placeholder}
 						readOnly={props.readOnly}
 						value={props.value ?? ''}
-						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
 					/>
 				</InputGroup>
 			)}
@@ -225,11 +225,14 @@ export function TextInput(props: InputProps<string>) {
 	);
 }
 
-export function TextArea(props: InputProps<string> & { height?: string }) {
+export function TextArea(
+	props: InputProps<string> & { height?: string; maxLength?: string | number }
+) {
 	return (
 		<InputGroup>
 			<Label {...props} />
 			<textarea
+				maxLength={props.maxLength}
 				id={props.name}
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' h-32'}
@@ -239,7 +242,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -259,7 +262,7 @@ export function NumberInput(props: InputProps<number>) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -349,9 +352,9 @@ export function Select(props: {
 				class={BASE_INPUT_CLASS + ' bg-white'}
 				required={props.required}
 				value={props.value ?? props.options[0]?.value}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}>
+				onInput={e => props.setValue?.(e.target.value ?? '')}>
 				<For each={props.options}>
-					{(option) => (
+					{option => (
 						<option value={option.value} selected={option.value === props.value}>
 							{option.label}
 						</option>
@@ -379,7 +382,7 @@ export function Checkbox(props: {
 				rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 				required={props.required}
 				checked={props.value ?? false}
-				onInput={(e) => props.setValue?.(e.target.checked)}
+				onInput={e => props.setValue?.(e.target.checked)}
 			/>
 			<label
 				for={props.name}
@@ -407,7 +410,7 @@ export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={`${BUTTON_CLASS} outline-gray-200 dark:outline-gray-800 outline bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}>
+			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark outline outline-gray-200 dark:outline-gray-800`}>
 			{props.children}
 		</a>
 	);
@@ -419,17 +422,17 @@ export function SubmitButton(props: {
 	disabled?: boolean;
 	transitionId?: string;
 	confirm?: string;
-  name?: string;
+	name?: string;
 }) {
 	return (
 		<button
-      name={props.name}
+			name={props.name}
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}
-			onClick={(e) => {
+			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}
@@ -445,7 +448,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void; c
 		<button
 			type="submit"
 			class={`${BUTTON_CLASS} bg-red-400 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-800`}
-			onClick={(e) => {
+			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}

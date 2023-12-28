@@ -2,6 +2,7 @@ import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { For } from 'solid-js';
 import Card from '../cards/Card';
 import { produce } from 'solid-js/store';
+import { routes } from '@/constants';
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];
@@ -10,25 +11,27 @@ export default function OfferWindow(props: {
 	return (
 		<ul class="scrollbar-narrow m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-200 p-2 dark:bg-gray-700">
 			<For each={props.cards}>
-				{(card) => (
+				{card => (
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-card-' + card.instanceId }}>
-						<Card {...card} />
+						<a href={`${routes.INSTANCES}/${card.designId}/${card.instanceId}`}>
+							<Card {...card} />
+						</a>
 						{props.setCards ? (
 							<button
 								title="Remove Card"
 								class="absolute left-2 top-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-white p-1 font-black text-red-600 hover:brightness-75"
 								onClick={() => {
 									props.setCards?.(
-										produce((draft) => {
+										produce(draft => {
 											let index = draft.findIndex(
-												(c) => c.instanceId === card.instanceId
+												c => c.instanceId === card.instanceId
 											);
 											while (index !== -1) {
 												draft.splice(index, 1);
 												index = draft.findIndex(
-													(c) => c.instanceId === card.instanceId
+													c => c.instanceId === card.instanceId
 												);
 											}
 										})

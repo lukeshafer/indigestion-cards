@@ -7,6 +7,7 @@ import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances'
 import type { User } from '@lil-indigestion-cards/core/db/users';
 import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { checkIsCardTradeable } from '@lil-indigestion-cards/core/lib/trades';
 
 const session = Astro.locals.session;
 const siteConfig = await getSiteConfig();
@@ -54,7 +55,7 @@ const openDate = card.openedAt
 				client:load
 			/>
 		</div>
-	) : siteConfig.tradingIsEnabled ? (
+	) : siteConfig.tradingIsEnabled && checkIsCardTradeable(card) ? (
 		<div class="mx-auto">
 			<Anchor
 				href={`${routes.TRADES}/new?receiverUsername=${card.username}&requestedCards=${card.instanceId}`}>

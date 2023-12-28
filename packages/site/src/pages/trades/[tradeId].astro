@@ -83,8 +83,8 @@ if (!trade) {
 	return Astro.redirect('/trades?alert=Trade not found&type=error');
 }
 
-const isSender = trade.senderUsername === username;
-const isReceiver = trade.receiverUsername === username;
+const isSender = trade.senderUsername.toLowerCase() === username?.toLowerCase();
+const isReceiver = trade.receiverUsername.toLowerCase() === username?.toLowerCase();
 
 if (
 	userId &&
@@ -182,14 +182,14 @@ const tradeStatus = (() => {
 			<div class="col-span-full justify-self-center">
 				{
 					isSender ? (
-						<form method="post">
+						<form method="post" enctype="application/x-www-form-urlencoded">
 							<input type="hidden" name="tradeId" value={trade.tradeId} />
 							<input type="hidden" name="status" value="canceled" />
 							<DeleteButton>Cancel offer</DeleteButton>
 						</form>
 					) : isReceiver ? (
 						<div class="flex flex-wrap gap-2">
-							<form method="post">
+							<form method="post" enctype="application/x-www-form-urlencoded">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="accepted" />
 								<SubmitButton
@@ -198,7 +198,7 @@ const tradeStatus = (() => {
 									<div class="min-w-[8rem]">Accept offer</div>
 								</SubmitButton>
 							</form>
-							<form method="post">
+							<form method="post" enctype="application/x-www-form-urlencoded">
 								<input type="hidden" name="tradeId" value={trade.tradeId} />
 								<input type="hidden" name="status" value="rejected" />
 								<DeleteButton

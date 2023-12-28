@@ -38,6 +38,12 @@ export const twitchEvents = new Entity(
 			cost: {
 				type: 'number',
 			},
+			isEnabled: {
+				type: 'boolean'
+			},
+			isPaused: {
+				type: 'boolean'
+			},
 			...auditAttributes('twitchEvents'),
 		},
 		indexes: {

@@ -40,7 +40,7 @@ export async function Action<Output, A extends AuthorizationType = 'admin', S ex
       errors: validationResult.errors.map(error => new InputValidationError(error))
     }
   }
-  const output = await callback(validationResult.value)
+  const output = await callback(validationResult.value, ctx)
 
   return {
     output,
@@ -70,6 +70,6 @@ type ActionResult<Output> = {
 	errors: Array<InputValidationError | UnauthorizedError>;
 };
 
-type ActionCallback<Output, S extends Schema = {}> = (params: ParsedOutput<S>) => Output;
+type ActionCallback<Output, S extends Schema = {}> = (params: ParsedOutput<S>, ctx: AstroGlobal) => Output;
 
 type AuthorizationType = 'public' | 'user' | 'admin';

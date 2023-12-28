@@ -2,11 +2,12 @@ import type { Trade } from '@lil-indigestion-cards/core/db/trades';
 import { For, Match, Switch, createResource, type ResourceActions, Show, onMount } from 'solid-js';
 import { SubmitButton, TextInput } from '../form/Form';
 import { get } from '@/lib/client/data';
+import { routes } from '@/constants';
 
 export default function TradeMessageHistory(props: { trade: Trade; loggedInUserId?: string }) {
 	const [messages, messagesActions] = createResource(
 		() => props.trade.tradeId,
-		async (tradeId) => {
+		async tradeId => {
 			const trade = await get('trades', [tradeId]);
 			return trade.messages;
 		},
@@ -37,7 +38,7 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 	return (
 		<ul class="col-span-full grid min-h-[8rem] w-[32rem] max-w-full gap-3 justify-self-center rounded-lg bg-gray-200 px-6 py-4 dark:bg-gray-900">
 			<For each={messages()}>
-				{(message) => <Message message={message} trade={props.trade} />}
+				{message => <Message message={message} trade={props.trade} />}
 			</For>
 			<Show
 				when={
@@ -45,7 +46,7 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 						props.loggedInUserId === props.trade.receiverUserId) &&
 					props.loggedInUserId
 				}>
-				{(loggedInUserId) => (
+				{loggedInUserId => (
 					<MessageInput
 						actions={messagesActions}
 						loggedInUserId={loggedInUserId()}
@@ -62,7 +63,7 @@ function MessageInput(props: {
 	loggedInUserId: string;
 	messages: Trade['messages'];
 }) {
-	const messageCount = () => props.messages.filter((m) => m.type === 'message').length;
+	const messageCount = () => props.messages.filter(m => m.type === 'message').length;
 	const MESSAGE_LIMIT = 20;
 	const MESSAGE_LIMIT_WARNING_THRESHOLD = 12;
 	return (
@@ -76,13 +77,14 @@ function MessageInput(props: {
 			}>
 			<form
 				method="post"
-				onSubmit={async (e) => {
+				enctype="application/x-www-form-urlencoded"
+				onSubmit={async e => {
 					e.preventDefault();
 					const data = new FormData(e.currentTarget);
 					const message = data.get('message');
 
 					// eslint-disable-next-line
-					props.actions.mutate((msgs) =>
+					props.actions.mutate(msgs =>
 						msgs.concat([
 							{
 								message: message?.toString() ?? '',
@@ -102,13 +104,19 @@ function MessageInput(props: {
 					props.actions.refetch();
 				}}>
 				<div class="flex w-full gap-1">
-					<TextInput name="message" label="Send a message." inputOnly required />
+					<TextInput
+						name="message"
+						label="Send a message."
+						inputOnly
+						required
+						maxlength="140"
+					/>
 					<SubmitButton>Send</SubmitButton>
 				</div>
 				<Show when={messageCount() >= MESSAGE_LIMIT_WARNING_THRESHOLD}>
 					<p class="text-xs text-red-600">
-						Heads up, you're at {messageCount()} / {MESSAGE_LIMIT} messages! Consider moving this
-						conversation to Twitch or Discord messages!
+						Heads up, you're at {messageCount()} / {MESSAGE_LIMIT} messages! Consider
+						moving this conversation to Twitch or Discord messages!
 					</p>
 				</Show>
 				<p class="text-xs text-gray-600">
@@ -138,8 +146,8 @@ function Message(props: { message: Trade['messages'][number]; trade: Trade }) {
 						props.message.userId === props.trade.senderUserId
 							? props.trade.senderUsername
 							: props.message.userId === props.trade.receiverUserId
-							? props.trade.receiverUsername
-							: ''
+								? props.trade.receiverUsername
+								: ''
 					}
 				/>
 			</Match>
@@ -162,11 +170,12 @@ function UserMessage(props: { message: string; username: string; type: 'left' | 
 				'justify-self-end': props.type === 'right',
 				'justify-self-start': props.type === 'left',
 			}}>
-			<p
-				class="font-semibold text-gray-600 dark:text-gray-400"
+			<a
+				class="block font-semibold text-gray-600 hover:underline hover:text-black dark:text-gray-400 hover:dark:text-white"
+				href={routes.USERS + '/' + props.username}
 				classList={{ 'text-right': props.type === 'right' }}>
 				{props.username}
-			</p>
+			</a>
 			<p class="message">{props.message}</p>
 		</li>
 	);

@@ -10,6 +10,7 @@ import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
 import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
 import { Action } from '@/lib/action';
 import { getRarityRanking, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import type { Alert } from '@/lib/client/state';
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
@@ -19,7 +20,7 @@ if (!userId || !username) {
 
 const alerts: PageProps['alerts'] = [];
 
-const { output } = await Action(
+const { output, errors } = await Action(
 	Astro,
 	{
 		method: 'POST',
@@ -59,6 +60,8 @@ const { output } = await Action(
 	}
 );
 
+alerts.push(...errors.map(e => ({ type: 'error', message: e.message }) satisfies Alert));
+
 if (output instanceof Response) return output;
 
 const searchParams = Astro.url.searchParams;
@@ -89,7 +92,7 @@ const initialRequestedCards = requestedCardIds
 function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInstance[]) {
 	const cards = [];
 	for (const cardId of cardIdList) {
-		const card = cardInstances.find((cardInstance) => cardInstance.instanceId === cardId);
+		const card = cardInstances.find(cardInstance => cardInstance.instanceId === cardId);
 		if (card) cards.push(card);
 	}
 	return cards;

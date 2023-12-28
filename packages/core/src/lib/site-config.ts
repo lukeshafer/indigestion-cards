@@ -91,6 +91,8 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
             eventId: reward.id,
             eventName: reward.title,
             eventType: 'channel.channel_points_custom_reward_redemption.add',
+						isEnabled: reward.is_enabled,
+						isPaused: reward.is_paused,
           })
           .commit()
       ),
@@ -102,6 +104,8 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
           })
           .set({
             eventName: reward.title,
+						isEnabled: reward.is_enabled,
+						isPaused: reward.is_paused,
           })
           .commit()
       ),

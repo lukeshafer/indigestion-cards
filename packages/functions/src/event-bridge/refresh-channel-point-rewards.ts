@@ -16,7 +16,7 @@ export async function handler() {
 	const refreshTokenError =
 		'Twitch Authentication Error. If you are Ryan, please go to "Site Config" and click "Authorize Streamer Permissions" to refresh your token.';
 	const rewards = await getAllChannelPointRewards({ userId: Config.STREAMER_USER_ID }).catch(
-		async (e) => {
+		async e => {
 			console.error('Error getting channel point rewards: ', e);
 			await addMessageToSiteConfig({
 				type: 'error',
@@ -25,9 +25,7 @@ export async function handler() {
 			throw e;
 		}
 	);
-	await refreshChannelPointRewards(
-		rewards.filter((reward) => reward.is_enabled && !reward.is_paused)
-	);
+	await refreshChannelPointRewards(rewards);
 
 	await removeMessageFromSiteConfig({ message: refreshTokenError });
 	return { statusCode: 200 };
