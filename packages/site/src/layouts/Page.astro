@@ -7,6 +7,7 @@ import AlertBox from '@/components/AlertBox';
 import { getSiteConfig } from '@lib/site-config';
 import { Api } from 'sst/node/api';
 import type { Alert } from '@/lib/client/state';
+import LoadingBar from '@/components/LoadingBar';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -50,6 +51,7 @@ alerts.push(...(alertsProp ?? []));
 		<div
 			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
 			id="page-scroll-wrapper">
+			<LoadingBar client:load transition:persist transition:name="loadingbar" />
 			{noHeader ? null : <Header />}
 			<data-lists></data-lists>
 			<AlertBox client:load {alerts} />
