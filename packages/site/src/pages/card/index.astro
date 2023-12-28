@@ -2,16 +2,16 @@
 import Page from '@/layouts/Page.astro';
 import CardList from '@/components/cards/CardList';
 import { getAllCardDesigns } from '@lib/design';
-import { routeNames, NO_CARDS_OPENED_ID } from '@/constants';
+import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
+import { cachePage } from '@/lib/api';
 
 const designs = await getAllCardDesigns();
 
-const message = Astro.url.searchParams.get('message') || '';
+cachePage(Astro)
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
-	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
 	<PageHeader>
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>

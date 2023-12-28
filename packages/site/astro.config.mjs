@@ -3,7 +3,6 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import aws from 'astro-sst';
 import solid from '@astrojs/solid-js';
-import { ecsstatic } from '@acab/ecsstatic/vite';
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,6 +18,5 @@ export default defineConfig({
 		optimizeDeps: {
 			exclude: ['sst'],
 		},
-		plugins: [ecsstatic()],
 	},
 });

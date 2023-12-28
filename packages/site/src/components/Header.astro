@@ -26,11 +26,7 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 		class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
 		<nav
 			class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
-			<a
-				href="/"
-				title="Home"
-				class="mr-4 flex w-fit min-w-[2rem] items-center gap-4"
-				transition:name="page-header-home-link">
+			<a href="/" title="Home" class="mr-4 flex w-fit min-w-[2rem] items-center gap-4">
 				<img src={ASSETS.LOGO} alt="logo" class="block w-12 dark:invert" width="192" />
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
 					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>

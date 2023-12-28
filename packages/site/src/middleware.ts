@@ -1,4 +1,4 @@
-import type { MiddlewareResponseHandler } from 'astro';
+import type { MiddlewareHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { getAdminUserById } from '@lib/admin-user';
 import { AUTH_TOKEN, PUBLIC_ROUTES, USER_ROUTES } from './constants';
@@ -6,7 +6,7 @@ import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@lil-indigestion-cards/core/types';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
-const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
+const transformMethod: MiddlewareHandler = async (ctx, next) => {
 	const formMethod = ctx.url.searchParams.get('formmethod');
 	if (!formMethod) return next();
 	if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(formMethod.toUpperCase())) return next();
@@ -18,7 +18,7 @@ const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
 	return next();
 };
 
-const auth: MiddlewareResponseHandler = async (ctx, next) => {
+const auth: MiddlewareHandler = async (ctx, next) => {
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
 
 	// @ts-expect-error - cookie string is a fine input for this function
@@ -47,12 +47,12 @@ const auth: MiddlewareResponseHandler = async (ctx, next) => {
 	const isUserRoute = isPublicRoute || checkIncludesCurrentRoute(USER_ROUTES);
 
 	if (currentRoute.startsWith('/trade')) {
-    console.log("checking if trading is enabled")
+		console.log("checking if trading is enabled")
 		const siteConfig = await getSiteConfig();
-    if (!siteConfig.tradingIsEnabled) {
-      console.log("trading is not enabled, not a valid route")
-      return ctx.redirect('/404');
-    }
+		if (!siteConfig.tradingIsEnabled) {
+			console.log("trading is not enabled, not a valid route")
+			return ctx.redirect('/404');
+		}
 	}
 
 

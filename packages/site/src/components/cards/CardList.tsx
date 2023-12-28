@@ -70,7 +70,7 @@ export default function CardList(props: {
                       href={
                         props.isUserPage && card.username
                           ? `${routes.USERS}/${card.username}/${card.instanceId ?? ''
-                          } `
+                          }`
                           : `${routes.INSTANCES}/${card.designId}/${card.instanceId ?? ''
                           }`
                       }>

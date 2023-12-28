@@ -18,7 +18,7 @@ import {
   UserDoesNotOwnCardError,
 } from './errors';
 import { sendTradeAcceptedEvent } from '../events/trades';
-import { LEGACY_CARD_ID } from 'src/constants';
+import { LEGACY_CARD_ID } from '../constants';
 
 const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
 
