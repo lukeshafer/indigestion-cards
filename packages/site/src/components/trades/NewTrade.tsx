@@ -96,7 +96,7 @@ export default function NewTrade(props: {
   return (
     <>
       <form class="sr-only" id="reset-form"></form>
-      <form method="post" ref={(el) => setState('form', el)}>
+      <form method="post" ref={(el) => setState('form', el)} class="max-w-7xl mx-auto">
         <div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
           <Section heading="Offer">
             <input type="hidden" name="senderUsername" value={props.username} />
