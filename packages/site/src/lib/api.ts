@@ -37,7 +37,7 @@ export function cachePage(
 	ctx: AstroGlobal,
 	opts: CacheControlOptions = {
 		public: false,
-		maxAge: 0,
+		maxAge: 60,
 		staleWhileRevalidate: time({ minutes: 10 }),
 	}
 ) {
