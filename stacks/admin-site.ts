@@ -7,7 +7,7 @@ import { ConfigStack } from './config';
 import { Events } from './events';
 import { getHostedZone, getDomainName } from './constants';
 
-export function Sites({ app, stack }: StackContext) {
+export function AdminSite({ app, stack }: StackContext) {
   const table = use(Database);
   const { adminApi, twitchApi } = use(API);
   const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
@@ -18,8 +18,8 @@ export function Sites({ app, stack }: StackContext) {
 
   const baseDomain = getDomainName(stack.stage);
 
-  const site = new AstroSite(stack, 'site', {
-    path: 'packages/site',
+  const admin = new AstroSite(stack, 'adminSite', {
+    path: 'packages/admin',
     bind: [
       table,
       adminApi,
@@ -40,7 +40,7 @@ export function Sites({ app, stack }: StackContext) {
       app.mode === 'dev'
         ? undefined
         : {
-          domainName: baseDomain,
+          domainName: `admin.${baseDomain}`,
           hostedZone: hostedZone,
         },
     permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
@@ -48,6 +48,6 @@ export function Sites({ app, stack }: StackContext) {
   });
 
   stack.addOutputs({
-    SiteUrl: site.url,
+    AdminUrl: admin.url,
   });
 }
