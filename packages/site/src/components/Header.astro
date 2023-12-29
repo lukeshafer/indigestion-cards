@@ -9,6 +9,12 @@ import TradeNotificationCount from './TradeNotificationCount.astro';
 import TotalPackCount from './pack/TotalPackCount.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
+export interface Props {
+	logo?: keyof typeof logos;
+}
+
+const { logo = 'default' } = Astro.props;
+
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 
 const username = Astro.locals.session?.properties.username;
@@ -19,6 +25,11 @@ const canSeeTradesLink =
 	siteConfig.tradingIsEnabled;
 
 const twitchData = username ? await getUserByLogin(username) : undefined;
+
+const logos = {
+	default: ASSETS.LOGO,
+	tongle: ASSETS.TONGLE as string,
+} satisfies Record<string, string>;
 ---
 
 <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
@@ -27,10 +38,19 @@ const twitchData = username ? await getUserByLogin(username) : undefined;
 		<nav
 			class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
 			<a href="/" title="Home" class="mr-4 flex w-fit min-w-[2rem] items-center gap-4">
-				<img src={ASSETS.LOGO} alt="logo" class="block w-12 dark:invert" width="192" />
+				<img
+					src={logos[logo]}
+					alt="logo"
+					class={`block w-12 ${logo === 'default' ? 'dark:invert' : ''}`}
+					width="192"
+				/>
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
-					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
-					<span class="-mt-2 text-lg text-gray-700 dark:text-gray-200">cards</span>
+					<span class="text-brand-main mt-1 text-2xl lowercase italic"
+						>Indigestion</span
+					>
+					<span class="-mt-2 text-lg lowercase text-gray-700 dark:text-gray-200"
+						>Cards</span
+					>
 				</div>
 			</a>
 			{

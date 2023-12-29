@@ -11,7 +11,7 @@ export const GET = (async () => {
 		headers: {
 			'Cache-Control': cacheControl({
 				public: true,
-				maxAge: time({ minutes: 15 }),
+				maxAge: time({ minutes: 5 }),
 				staleWhileRevalidate: time({ days: 1 }),
 			}),
 		},

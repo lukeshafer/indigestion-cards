@@ -128,6 +128,7 @@ export const routeNames = {
 export const ASSETS = {
 	FAVICON: '/assets/favicon.png',
 	LOGO: '/assets/logo.png',
+  TONGLE: '/assets/lilindpartner.webp',
 	EMOTES: {
 		LILINDDISBLIF: '/assets/emotes/lilinddisblif.png',
 		LILINDBLIF: '/assets/emotes/lilindblif.png',
