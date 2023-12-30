@@ -1,13 +1,13 @@
 ---
 import { authApi } from '@/constants';
-import { Icon } from 'astro-icon';
+import { Icon } from 'astro-icon/components';
 const session = Astro.locals.session;
 ---
 
 <a
 	class="text-shadow-brand mt-5 flex w-fit items-center gap-2 bg-[#9146ff] px-4 py-2 font-bold uppercase text-white"
 	href={authApi.LOGIN}>
-	<Icon name="mdi:twitch" width="50" />
+	<Icon name="mdi:twitch" size={50} />
 	<span>
 		{session?.type === 'admin' ? 'Authorize Streamer Permissions' : 'Login with Twitch'}
 	</span>
