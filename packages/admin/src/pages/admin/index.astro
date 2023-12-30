@@ -1,5 +1,5 @@
 ---
-import { Icon } from 'astro-icon'
+import { Icon } from 'astro-icon/components'
 import '../../global.css'
 import { authApi, ASSETS } from '@/constants'
 ---
@@ -15,7 +15,7 @@ import { authApi, ASSETS } from '@/constants'
 	<body>
 		<main>
 			<a class="shine" href={authApi.LOGIN}>
-				<Icon name="mdi:twitch" width="50" />
+				<Icon name="mdi:twitch" size={50} />
 				<span>Log in with Twitch</span>
 			</a>
 		</main>
