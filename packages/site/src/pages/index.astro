@@ -35,7 +35,7 @@ const siteConfig = await getSiteConfig();
 			</div>
 			{
 				siteConfig.tradingIsEnabled ? (
-					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300">
+					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300" transition:name="hero-text-h2">
 						<u class="font-bold">Trading</u> cards
 						<br />
 						for the <s class="">cult</s>
@@ -45,7 +45,7 @@ const siteConfig = await getSiteConfig();
 						<RemainingPackCount />
 					</h2>
 				) : (
-					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300">
+					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300" transition:name="hero-text-h2">
 						Trading<sup class="">*</sup> cards
 						<br />
 						for the{' '}

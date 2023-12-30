@@ -1,18 +1,15 @@
----
-
----
-
-<remaining-pack-count>
+<remaining-pack-count transition:name="remaining-pack-count">
 	<template>
-		<p class="text-center text-xl h-0">
+		<p class="py-2 text-xl">
 			<span class="count text-brand-main"></span> packs left in{' '}
-			<span class="season"></span>!
+			<span class="season"></span>
 		</p>
 	</template>
 </remaining-pack-count>
 
 <script>
 	import { get } from '@/lib/client/data';
+	import { useViewTransition } from '@/lib/client/utils';
 	import type { DesignCountData } from '@/pages/data/packs-remaining';
 	import { signal, effect } from '@preact/signals-core';
 
@@ -36,7 +33,9 @@
 					const nodes = this.seasonsToShow.value.map(
 						this.createSeasonPackCounter.bind(this)
 					);
-					this.replaceChildren(...nodes);
+					useViewTransition(() => {
+						this.replaceChildren(...nodes);
+					});
 				});
 			}
 
@@ -56,7 +55,7 @@
 					if (data.possibleCards < 100) return false;
 					if (data.seasonId.toLowerCase() === 'moments') return false;
 					if (data.seasonName.toLowerCase() === 'moments') return false;
-					if (data.remainingCards > 250) return false;
+					if (data.remainingCards > 250 || data.remainingCards < 5) return false;
 
 					return true;
 				});

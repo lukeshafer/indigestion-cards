@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { TypedResponse } from '@/lib/api';
+import { TypedResponse, cacheControl, time } from '@/lib/api';
 import { getAllCardDesigns, getCardDesignAndInstancesById } from '@lib/design'
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 
@@ -9,7 +9,15 @@ export const GET = (async () => {
   const designCountData = await Promise.all(designs.map(getDesignCountData))
   const counts = [...designCountData.reduce(reducer, new Map()).values()]
 
-  return new TypedResponse(counts);
+  return new TypedResponse(counts, {
+    headers: {
+      'cache-control': cacheControl({
+        public: true,
+        maxAge: 0,
+        staleWhileRevalidate: time({minutes: 1})
+      })
+    }
+  });
 }) satisfies APIRoute;
 
 export interface DesignCountData {
