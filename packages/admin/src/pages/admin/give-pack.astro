@@ -2,12 +2,30 @@
 import { PageTitle } from '@/components/text';
 import Page from '@/layouts/Page.astro';
 import { getAllPackTypes } from '@lib/pack-type';
-import GivePackForm from '@/components/pack/GivePackForm';
+import { Form, Select, SubmitButton, TextInput } from '@/components/form/Form';
+import { API } from '@/constants';
 
 const packTypes = await getAllPackTypes();
 ---
 
 <Page title="Give Pack">
 	<PageTitle>Give Pack</PageTitle>
-	<GivePackForm {packTypes} client:load />
+	<Form action={API.PACK} method="post" client:load>
+		<TextInput name="username" label="Username">
+			<p>Leave blank for no user.</p>
+		</TextInput>
+		<Select
+			name="packType"
+			label="Pack Type"
+			required
+			options={[
+				{ value: '', label: '--' },
+				...packTypes.map(packType => ({
+					value: JSON.stringify(packType),
+					label: packType.packTypeName,
+				})),
+			]}
+		/>
+		<SubmitButton>Save</SubmitButton>
+	</Form>
 </Page>
