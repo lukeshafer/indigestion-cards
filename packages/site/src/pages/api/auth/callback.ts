@@ -10,7 +10,7 @@ export async function GET(ctx: APIContext) {
 		throw new Error('Code missing');
 	}
 
-	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
+	const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'main';
 	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
 	//console.log({ client_id, origin })
 
@@ -18,7 +18,7 @@ export async function GET(ctx: APIContext) {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
-			client_id: ctx.url.host === 'localhost:4321' ? 'local' : 'main',
+			client_id,
 			code,
 			redirect_uri: `${origin}${ctx.url.pathname}`,
 		}),
@@ -38,7 +38,7 @@ export async function GET(ctx: APIContext) {
 	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
 		maxAge: 60 * 60 * 24 * 30,
 		httpOnly: true,
-		secure: ctx.url.host !== 'localhost',
+		secure: ctx.url.host !== 'localhost:',
 		path: '/',
 	});
 

@@ -1,5 +1,6 @@
 import { ElectroError } from 'electrodb';
 import { packTypes, type CreatePackType } from '../db/packTypes';
+export type { PackType } from '../db/packTypes'
 
 export async function getAllPackTypes() {
 	const result = await packTypes.query.allPackTypes({}).go();

@@ -1,0 +1,66 @@
+---
+
+---
+
+<remaining-pack-count>
+	<template>
+		<p class="text-center text-xl h-0">
+			<span class="count text-brand-main"></span> packs left in{' '}
+			<span class="season"></span>!
+		</p>
+	</template>
+</remaining-pack-count>
+
+<script>
+	import { get } from '@/lib/client/data';
+	import type { DesignCountData } from '@/pages/data/packs-remaining';
+	import { signal, effect } from '@preact/signals-core';
+
+	customElements.define(
+		'remaining-pack-count',
+		class extends HTMLElement {
+			pre: HTMLPreElement;
+			seasonsToShow = signal<DesignCountData[]>([]);
+			template: HTMLTemplateElement;
+			constructor() {
+				super();
+				this.pre = document.createElement('pre');
+				this.appendChild(this.pre);
+				this.template = this.querySelector('template')!;
+			}
+
+			connectedCallback() {
+				this.refreshPacksRemaining();
+
+				effect(() => {
+					const nodes = this.seasonsToShow.value.map(
+						this.createSeasonPackCounter.bind(this)
+					);
+					this.replaceChildren(...nodes);
+				});
+			}
+
+			createSeasonPackCounter(data: DesignCountData) {
+				const node = this.template.content.cloneNode(true) as DocumentFragment;
+				node.querySelector('.count')!.textContent = String(
+					Math.floor(data.remainingCards / 5)
+				);
+				node.querySelector('.season')!.textContent = data.seasonName;
+				return node;
+			}
+
+			async refreshPacksRemaining() {
+				const packs = await get('packs-remaining');
+
+				this.seasonsToShow.value = packs.filter(data => {
+					if (data.possibleCards < 100) return false;
+					if (data.seasonId.toLowerCase() === 'moments') return false;
+					if (data.seasonName.toLowerCase() === 'moments') return false;
+					if (data.remainingCards > 250) return false;
+
+					return true;
+				});
+			}
+		}
+	);
+</script>

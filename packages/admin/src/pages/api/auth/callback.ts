@@ -10,7 +10,7 @@ export async function GET(ctx: APIContext) {
     throw new Error('Code missing');
   }
 
-  const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'admin';
+  const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'admin';
   const origin = client_id === 'local' ? ctx.url.origin : 'https://admin.' + Config.DOMAIN_NAME;
 
   console.log('fetching token', { client_id, origin });
@@ -53,7 +53,7 @@ export async function GET(ctx: APIContext) {
   ctx.cookies.set(AUTH_TOKEN, body.access_token, {
     maxAge: 60 * 60 * 24 * 30,
     httpOnly: true,
-    secure: ctx.url.host !== 'localhost',
+    secure: !ctx.url.host.startsWith('localhost:'),
     path: '/',
   });
 

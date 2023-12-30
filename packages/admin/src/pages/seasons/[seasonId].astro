@@ -3,7 +3,7 @@ import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getPackTypesBySeasonId } from '@lib/pack-type';
 import { getSeasonAndDesignsBySeasonId } from '@lib/season';
-import { NO_CARDS_OPENED_ID } from '@/constants';
+import { NO_CARDS_OPENED_ID, routes } from '@/constants';
 import { PageTitle, Heading, PageHeader } from '@/components/text';
 import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
 
@@ -37,8 +37,8 @@ const remainingCards = totalPossibleCards - ownedCards;
 const percentageDistributed = Math.round((ownedCards / totalPossibleCards) * 1000) / 10;
 
 const packTypes = await getPackTypesBySeasonId({ seasonId: id });
-const packTypesWithCardPools = await Promise.all(
-	packTypes.map(async (packType) => {
+const packTypesWithCardPools = (
+	packTypes.map((packType) => {
 		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
 		const openedPacks = ownedCards / packType.cardCount;
 		const remainingPacks = Math.floor(remainingCards / packType.cardCount);

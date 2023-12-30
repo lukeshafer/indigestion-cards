@@ -2,6 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import FAQ from '@/content/faq.md';
 import { ASSETS } from '@/constants';
+import RemainingPackCount from '@/components/RemainingPackCount.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const siteConfig = await getSiteConfig();
@@ -54,6 +55,7 @@ const siteConfig = await getSiteConfig();
 							</span>
 						</>
 						<p class="py-8 text-xs">* Cards not yet tradeable.</p>
+						<RemainingPackCount />
 					</h2>
 				)
 			}

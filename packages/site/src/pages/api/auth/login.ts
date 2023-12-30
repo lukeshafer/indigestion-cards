@@ -4,7 +4,7 @@ import { authApi } from '@/constants';
 import { Config } from 'sst/node/config';
 
 export const GET: APIRoute = async (ctx) => {
-	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
+	const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'main';
 	const isAdmin = ctx.locals.session?.type === 'admin';
 
 	console.log("redirect_uri: ", 'https://' + Config.DOMAIN_NAME + authApi.CALLBACK, { origin: ctx.url.origin, ConfigUrl: Config.DOMAIN_NAME })
