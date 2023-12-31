@@ -29,6 +29,7 @@ const api_paths = {
 	ADMIN_USER: '/admin-user',
 	PACK: '/pack',
 	CARD: '/card',
+  OPEN_CARD: '/open-card',
 	DESIGN: '/design',
 	SITE_CONFIG: '/site-config',
 	UNMATCHED_IMAGE: '/unmatched-image',

@@ -27,8 +27,8 @@ export function ShowcaseCard(props: {
 
 		state.isTesting
 			? console.log('Card flipped: ', body)
-			: await fetch(API.CARD, {
-					method: 'PATCH',
+			: await fetch(API.OPEN_CARD, {
+					method: 'POST',
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
 					},

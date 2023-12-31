@@ -11,7 +11,11 @@ export default function LoadingBar() {
 		});
 		document.addEventListener('astro:after-preparation', () => setWidth('50%'));
 		document.addEventListener('astro:before-swap', () => setWidth('80%'));
-		document.addEventListener('astro:after-swap', () => setWidth('90%'));
+		document.addEventListener('astro:after-swap', () => { 
+			setWidth('100%');
+			setTimeout(() => setIsVisible(false), 250);
+			setTimeout(() => setWidth('0%'), 500);
+    });
 		document.addEventListener('astro:page-load', () => {
 			setWidth('100%');
 			setTimeout(() => setIsVisible(false), 250);
