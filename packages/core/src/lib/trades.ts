@@ -336,8 +336,8 @@ export async function processTrade(trade: Trade) {
 
 	try {
 		await service.transaction.write(({ users }) => [
-			users.update({ userId: sender.user.userId }).set({ isTrading: true }).commit(),
-			users.update({ userId: receiver.user.userId }).set({ isTrading: true }).commit(),
+			users.patch({ userId: sender.user.userId }).set({ isTrading: true }).commit(),
+			users.patch({ userId: receiver.user.userId }).set({ isTrading: true }).commit(),
 		]);
 
 		const offeredCardsMoveToReceiver = trade.offeredCards.map(
@@ -359,7 +359,7 @@ export async function processTrade(trade: Trade) {
 		await service.transaction
 			.write(({ cardInstances, users, trades }) => [
 				users
-					.update({ userId: sender.user.userId })
+					.patch({ userId: sender.user.userId })
 					.add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
 					.append({
 						tradeNotifications: [
@@ -377,7 +377,7 @@ export async function processTrade(trade: Trade) {
 					.commit(),
 				...offeredCardsMoveToReceiver.map(card =>
 					cardInstances
-						.update({ instanceId: card.instanceId, designId: card.designId })
+						.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
 							tradeHistory: [
@@ -393,7 +393,7 @@ export async function processTrade(trade: Trade) {
 				),
 				...requestedCardsMoveToSender.map(card =>
 					cardInstances
-						.update({ instanceId: card.instanceId, designId: card.designId })
+						.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
 							tradeHistory: [
@@ -407,13 +407,13 @@ export async function processTrade(trade: Trade) {
 						})
 						.commit()
 				),
-				trades.update({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
+				trades.patch({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
 			])
 			.go();
 	} finally {
 		await service.transaction.write(({ users }) => [
-			users.update({ userId: sender.user.userId }).set({ isTrading: false }).commit(),
-			users.update({ userId: receiver.user.userId }).set({ isTrading: false }).commit(),
+			users.patch({ userId: sender.user.userId }).set({ isTrading: false }).commit(),
+			users.patch({ userId: receiver.user.userId }).set({ isTrading: false }).commit(),
 		]);
 	}
 }

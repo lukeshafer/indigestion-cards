@@ -229,7 +229,7 @@ export async function setUserProfile(args: {
 
 	return users
 		.patch({ userId: args.userId })
-		.set({ lookingFor: args.lookingFor ?? user.lookingFor, pinnedCard: card })
+		.set({ lookingFor: args.lookingFor?.slice(0,300) ?? user.lookingFor, pinnedCard: card })
 		.go()
 		.then((result) => result.data);
 }

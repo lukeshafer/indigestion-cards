@@ -53,6 +53,6 @@ export async function migration({ force = false } = {}) {
 				frameUrl: '',
 			};
 
-		await cardDesigns.update({ designId: card.designId }).set({ bestRarityFound }).go();
+		await cardDesigns.patch({ designId: card.designId }).set({ bestRarityFound }).go();
 	}
 }

@@ -75,7 +75,7 @@ export async function updateSeason({
 }: UpdateSeason & { seasonId: string }): Promise<DBResult<Partial<Season>>> {
 	try {
 		const result = await season
-			.update({ seasonId })
+			.patch({ seasonId })
 			.set({ seasonName, seasonDescription })
 			.go();
 		return {

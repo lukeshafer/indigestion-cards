@@ -99,22 +99,22 @@ export async function updatePackUser(options: {
   await service.transaction
     .write(({ packs, cardInstances, users }) => [
       packs
-        .update({ packId: pack.packId })
+        .patch({ packId: pack.packId })
         .set({ userId: user.userId, username: user.username })
         .commit(),
       ...pack.cardDetails.map((card) =>
         cardInstances
-          .update({ instanceId: card.instanceId, designId: card.designId })
+          .patch({ instanceId: card.instanceId, designId: card.designId })
           .set({ userId: user.userId, username: user.username })
           .commit()
       ),
       users
-        .update({ userId: user.userId })
+        .patch({ userId: user.userId })
         .set({ packCount: (user.packCount || 0) + 1 })
         .commit(),
       ...oldUserList.map((oldUser) =>
         users
-          .update({ userId: oldUser.userId })
+          .patch({ userId: oldUser.userId })
           .set({ packCount: (oldUser.packCount || 1) - 1 })
           .commit()
       ),

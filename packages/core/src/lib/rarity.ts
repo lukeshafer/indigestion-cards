@@ -37,7 +37,7 @@ export async function createRarity(rarity: CreateRarity): Promise<DBResult<Rarit
 
 export async function updateRarity(args: UpdateRarity & { rarityId: string }) {
 	const { rarityId, ...rest } = args;
-	const result = await rarities.update({ rarityId }).set(rest).go();
+	const result = await rarities.patch({ rarityId }).set(rest).go();
 	return result.data;
 }
 

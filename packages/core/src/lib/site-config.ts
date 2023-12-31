@@ -19,7 +19,7 @@ export async function updateBatchTwitchEvents(
   await Promise.all(
     events.map(async (event) => {
       const { eventId, eventType, ...rest } = event;
-      return twitchEvents.update({ eventId, eventType }).set(rest).go();
+      return twitchEvents.patch({ eventId, eventType }).set(rest).go();
     })
   );
 }
@@ -98,7 +98,7 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
       ),
       ...rewardsToUpdate.map((reward) =>
         twitchEvents
-          .update({
+          .patch({
             eventId: reward.id,
             eventType: 'channel.channel_points_custom_reward_redemption.add',
           })
