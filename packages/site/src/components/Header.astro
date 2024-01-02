@@ -1,66 +1,77 @@
 ---
-import AdminOnly from '@/components/AdminOnly.astro';
-import Hamburger from '@/components/Hamburger.astro';
+import HeaderLink from '@/components/HeaderLink.astro';
 import UserConfig from '@/components/UserConfig';
 import UserSearch from '@/components/UserSearch';
-import { ASSETS } from '@/constants';
-import { getLoginLink } from '@/lib/utils';
+import { ASSETS, routes } from '@/constants';
 import { getUserByLogin } from '@lib/twitch';
+import { Show } from 'solid-js';
+import TradeNotificationCount from './TradeNotificationCount.astro';
+import TotalPackCount from './pack/TotalPackCount.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+
+export interface Props {
+	logo?: keyof typeof logos;
+}
+
+const { logo = 'default' } = Astro.props;
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
-const currentPage = Astro.url.pathname;
 
 const username = Astro.locals.session?.properties.username;
 
-const headerLinks = [
-	{ href: '/card', title: 'Cards' },
-	{ href: '/user', title: 'Users' },
-];
+const siteConfig = await getSiteConfig();
+const canSeeTradesLink =
+	(Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin') &&
+	siteConfig.tradingIsEnabled;
 
 const twitchData = username ? await getUserByLogin(username) : undefined;
+
+const logos = {
+	default: ASSETS.LOGO,
+	tongle: ASSETS.TONGLE as string,
+} satisfies Record<string, string>;
 ---
 
 <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
 	<header
 		class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
-		<AdminOnly>
-			<div data-for-admin-panel class="toggle-btn z-100 px-2 py-2 text-lg">
-				<Hamburger />
-			</div>
-		</AdminOnly>
 		<nav
 			class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
-			<a
-				href="/"
-				title="Home"
-				class="mr-4 flex w-fit min-w-[2rem] items-center gap-4"
-				transition:name="page-header-home-link">
-				<img src={ASSETS.LOGO} alt="logo" class="block w-12 dark:invert" width="192" />
+			<a href="/" title="Home" class="mr-4 flex w-fit min-w-[2rem] items-center gap-4">
+				<img
+					src={logos[logo]}
+					alt="logo"
+					class={`block w-12 ${logo === 'default' ? 'dark:invert' : ''}`}
+					width="192"
+				/>
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
-					<span class="text-brand-main mt-1 text-2xl italic">indigestion</span>
-					<span class="-mt-2 text-lg text-gray-700 dark:text-gray-200">cards</span>
+					<span class="text-brand-main mt-1 text-2xl lowercase italic"
+						>Indigestion</span
+					>
+					<span class="-mt-2 text-lg lowercase text-gray-700 dark:text-gray-200"
+						>Cards</span
+					>
 				</div>
 			</a>
 			{
-				headerLinks.map(({ href, title }) => (
-					<a
-						href={href}
-						title={title}
-						transition:name={`page-header-nav-${href}`}
-						class="relative rounded px-2 py-1 transition-colors "
-						class:list={{
-							'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
-								currentPage.startsWith(href),
-							'text-gray-700 hover:bg-gray-200 hover:text-black dark:font-medium dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white':
-								!currentPage.startsWith(href),
-						}}>
-						{title}
-					</a>
-				))
+				Astro.locals.session?.type === 'admin' ? (
+					<HeaderLink href={routes.ADMIN.OPEN_PACKS} title="Open Packs">
+						Open Packs
+						<TotalPackCount count={0} />
+					</HeaderLink>
+				) : null
 			}
+			<HeaderLink href={routes.CARDS} title="Cards">Cards</HeaderLink>
+			<HeaderLink href={routes.USERS} title="Users">Users</HeaderLink>
+			<Show when={canSeeTradesLink}>
+				<HeaderLink href={routes.TRADES} title="Trades">
+					<TradeNotificationCount username={username!} transition:persist />
+					 My Trades
+				</HeaderLink>
+			</Show>
 		</nav>
-		<UserSearch client:load />
-		<UserConfig client:load {disableAnimations} user={twitchData} login={getLoginLink(Astro)} />
+		<UserSearch client:load transition:persist />
+		<UserConfig client:load {disableAnimations} user={twitchData} />
 	</header>
 </div>
 

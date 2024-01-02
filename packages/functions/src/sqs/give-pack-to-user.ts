@@ -1,4 +1,4 @@
-import { SQSEvent } from 'aws-lambda';
+import type { SQSEvent } from 'aws-lambda';
 import { z } from 'zod';
 import { givePackToUser } from '@lib/pack';
 import { packSchema } from '@lib/entity-schemas';

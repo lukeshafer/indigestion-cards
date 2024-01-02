@@ -6,9 +6,9 @@ export const handler = SiteHandler(
 		authorizationType: 'user',
 		schema: {
 			userId: 'string',
-			lookingFor: ['string', 'optional'],
-			pinnedCardId: ['string', 'optional'],
-			pinnedCardDesignId: ['string', 'optional'],
+			lookingFor: 'string?',
+			pinnedCardId: 'string?',
+			pinnedCardDesignId: 'string?',
 		},
 	},
 	async (_, ctx) => {

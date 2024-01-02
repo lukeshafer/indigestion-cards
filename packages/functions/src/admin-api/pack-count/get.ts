@@ -1,9 +1,9 @@
 import { useQueryParam } from 'sst/node/api';
-import { ProtectedApiHandler } from '@lib/api';
+import { SiteHandler } from '@lib/api';
 import { getUser } from '@lib/user';
 import { getAllPacks } from '@lib/pack';
 
-export const handler = ProtectedApiHandler(async () => {
+export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
 	const userId = useQueryParam('userId');
 
 	if (userId) {

@@ -74,6 +74,6 @@ export async function createCardDesign(card: CreateCardDesign): Promise<DBResult
 
 export async function updateCardDesign(args: UpdateCardDesign & { designId: string }) {
 	const { designId, ...rest } = args;
-	const result = await cardDesigns.update({ designId }).set(rest).go();
+	const result = await cardDesigns.patch({ designId }).set(rest).go();
 	return { success: true, data: result.data };
 }

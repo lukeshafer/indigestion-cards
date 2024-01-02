@@ -1,0 +1,32 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getAllSeasons } from '@lib/season';
+import { routes } from '@/constants';
+import { PageTitle, PageHeader, Anchor } from '@/components/text';
+
+const seasons = await getAllSeasons();
+---
+
+<Page title="All Seasons">
+	<PageHeader>
+		<PageTitle>All Seasons</PageTitle>
+		<Anchor href={routes.ADMIN.CREATE.SEASON}>Add New Season</Anchor>
+	</PageHeader>
+	<ul class="flex flex-wrap gap-8 pt-10 text-4xl">
+		{
+			seasons.map((season, index) => (
+				<li>
+					<a
+						class="font-display shine text-shadow-brand p-8 pt-9 italic text-white transition-transform"
+						class:list={{
+							'bg-brand-secondary': index % 2 === 1,
+							'bg-accent-secondary': index % 2 === 0,
+						}}
+						href={`${routes.SEASONS}/${season.seasonId}`}>
+						{season.seasonName}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</Page>

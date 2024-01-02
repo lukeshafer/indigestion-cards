@@ -1,0 +1,63 @@
+---
+import Base, { type BaseProps } from './Base.astro';
+import AdminOnly from '@/components/AdminOnly.astro';
+import Header from '@/components/Header.astro';
+import AlertBox from '@/components/AlertBox';
+import { getSiteConfig } from '@lib/site-config';
+import { Api } from 'sst/node/api';
+import type { Alert } from '@/lib/client/state';
+
+export interface Props extends BaseProps {
+	class?: string;
+	wide?: boolean;
+	alerts?: Alert[];
+	'no-header'?: boolean;
+}
+
+const isAdmin = Astro.locals.session?.type === 'admin';
+const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
+
+{
+	const alert = Astro.url.searchParams.get('alert');
+	const alertType =
+		Astro.url.searchParams.get('alertType') ||
+		Astro.url.searchParams.get('alerttype') ||
+		Astro.url.searchParams.get('type');
+	if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
+}
+
+let {
+	class: className,
+	wide = false,
+	'no-header': noHeader = false,
+	alerts: alertsProp,
+	...baseProps
+} = Astro.props;
+
+alerts.push(...(alertsProp ?? []));
+---
+
+<Base {...baseProps}>
+	<div
+		class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
+		id="page-layout-wrapper"
+		data-api-url={Api.AdminApi.url}>
+		<div
+			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
+			id="page-scroll-wrapper">
+      <AdminOnly>
+        <Header />
+      </AdminOnly>
+			<AlertBox client:load {alerts} />
+			<main
+				transition:name={wide ? undefined : 'main'}
+				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
+				class="@container/main z-0 col-start-2 mx-auto mb-8 w-full flex-1">
+				<slot />
+			</main>
+		</div>
+	</div>
+</Base>
+
+<style>
+</style>

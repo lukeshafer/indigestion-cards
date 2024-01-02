@@ -1,0 +1,28 @@
+---
+interface Props {
+	href: string;
+	title: string;
+}
+
+const { href, title } = Astro.props;
+
+const currentPage = Astro.url.pathname;
+
+const sessionType = Astro.locals.session?.type
+const url = new URL(href, 'https://example.com/');
+if (!sessionType || sessionType === 'public') url.searchParams.set('public', '');
+---
+
+<a
+	href={url.pathname + url.search}
+	title={title}
+	transition:name={`page-header-nav-${href}`}
+	class="relative rounded px-2 py-1 transition-colors"
+	class:list={{
+		'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
+			currentPage.startsWith(href),
+		'text-gray-700 hover:bg-gray-200 hover:text-black dark:font-medium dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white':
+			!currentPage.startsWith(href),
+	}}>
+  <slot>{title}</slot>
+</a>

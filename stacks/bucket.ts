@@ -11,7 +11,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4321'] : [origin],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4322'] : [origin],
 			},
 		],
 		notifications: {
@@ -31,7 +31,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4321'] : [origin],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4322'] : [origin],
 			},
 		],
 		notifications: {
@@ -51,7 +51,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4321'] : [origin],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4322'] : [origin],
 			},
 		],
 		defaults: {
@@ -65,7 +65,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		cors: [
 			{
 				allowedMethods: ['POST', 'GET'],
-				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4321'] : [origin],
+				allowedOrigins: app.mode === 'dev' ? ['http://localhost:4322'] : [origin],
 			},
 		],
 		defaults: {

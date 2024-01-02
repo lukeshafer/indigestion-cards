@@ -1,0 +1,40 @@
+---
+interface Props {
+  column: string;
+	value: string | number;
+	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	hideOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
+	font?: 'default' | 'title';
+	align?: 'left' | 'center' | 'right';
+}
+
+const { column, value, showOnBreakpoint, hideOnBreakpoint, font, align } = Astro.props;
+---
+
+<td
+  data-column={column}
+  data-value={value}
+	class="relative px-5 py-3 group-[compact]:p-2"
+	class:list={{
+		hidden: !!showOnBreakpoint,
+		'sm:table-cell': showOnBreakpoint === 'sm',
+		'md:table-cell': showOnBreakpoint === 'md',
+		'lg:table-cell': showOnBreakpoint === 'lg',
+		'xl:table-cell': showOnBreakpoint === 'xl',
+		'sm:hidden': hideOnBreakpoint === 'sm',
+		'md:hidden': hideOnBreakpoint === 'md',
+		'lg:hidden': hideOnBreakpoint === 'lg',
+		'xl:hidden': hideOnBreakpoint === 'xl',
+		'font-display': font === 'title',
+		'text-lg': font === 'title',
+		'pb-2': font === 'title',
+		italic: font === 'title',
+		'text-gray-700 dark:text-gray-50': font === 'title',
+		'font-body': font === 'default',
+		'text-base': font === 'default',
+		'text-left': align === 'left',
+		'text-center': align === 'center',
+		'text-right': align === 'right',
+	}}>
+	<slot>{value}</slot>
+</td>

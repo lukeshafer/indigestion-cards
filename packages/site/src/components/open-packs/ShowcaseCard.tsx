@@ -25,14 +25,12 @@ export function ShowcaseCard(props: {
 			packId: props.packId,
 		}).toString();
 
-		const auth_token = localStorage.getItem('auth_token');
 		state.isTesting
 			? console.log('Card flipped: ', body)
-			: await fetch(API.CARD, {
-					method: 'PATCH',
+			: await fetch(API.OPEN_CARD, {
+					method: 'POST',
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
-						Authorization: auth_token ? `Bearer ${auth_token}` : '',
 					},
 					body,
 			  });

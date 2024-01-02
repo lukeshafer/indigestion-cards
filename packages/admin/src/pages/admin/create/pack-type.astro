@@ -1,0 +1,17 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getAllSeasons } from '@lib/season';
+import { getAllCardDesigns } from '@lib/design';
+import { PageTitle } from '@/components/text';
+import PackTypeForm from '@/components/pack-type/PackTypeForm';
+
+const seasons = await getAllSeasons();
+const cardDesigns = await getAllCardDesigns();
+---
+
+<Page
+	title="Create Pack Type"
+  >
+	<PageTitle>Create Pack Type</PageTitle>
+	<PackTypeForm client:load {seasons} {cardDesigns} />
+</Page>

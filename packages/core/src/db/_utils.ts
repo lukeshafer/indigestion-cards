@@ -24,7 +24,7 @@ export const auditAttributes = (entityName: string) =>
 				// add to audit log
 				if (
 					!process.env.SESSION_USER_ID ||
-					process.env.SESSION_TYPE !== 'admin' ||
+					(process.env.SESSION_TYPE !== 'admin' && process.env.SESSION_TYPE !== 'user') ||
 					!process.env.SESSION_USERNAME
 				) {
 					throw new Error('Username and ID are required in process.env');

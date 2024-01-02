@@ -1,4 +1,4 @@
-import { SQSEvent } from 'aws-lambda';
+import type { SQSEvent } from 'aws-lambda';
 import { addMessageToSiteConfig } from '@lib/site-config';
 
 export async function handler(event: SQSEvent) {

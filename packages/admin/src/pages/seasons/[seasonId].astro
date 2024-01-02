@@ -1,0 +1,130 @@
+---
+import CardList from '@/components/cards/CardList';
+import Page from '@/layouts/Page.astro';
+import { getPackTypesBySeasonId } from '@lib/pack-type';
+import { getSeasonAndDesignsBySeasonId } from '@lib/season';
+import { NO_CARDS_OPENED_ID, routes } from '@/constants';
+import { PageTitle, Heading, PageHeader } from '@/components/text';
+import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
+
+const id = Astro.params.seasonId;
+
+if (!id) {
+	return Astro.redirect(`${routes.SEASONS}?alert=Season ID is required`);
+}
+
+const {
+	season: [season],
+	cardDesigns,
+	cardInstances,
+} = await getSeasonAndDesignsBySeasonId(id);
+
+if (!season) {
+	return Astro.redirect(`${routes.SEASONS}?alert='${id}' does not exist&type=error`);
+}
+
+const totalPossibleCards = cardDesigns.reduce((acc, card) => {
+	return (
+		acc +
+		(card.rarityDetails?.reduce((acc, rarity) => {
+			return acc + rarity.count;
+		}, 0) ?? 0)
+	);
+}, 0);
+
+const ownedCards = cardInstances.length;
+const remainingCards = totalPossibleCards - ownedCards;
+const percentageDistributed = Math.round((ownedCards / totalPossibleCards) * 1000) / 10;
+
+const packTypes = await getPackTypesBySeasonId({ seasonId: id });
+const packTypesWithCardPools = (
+	packTypes.map((packType) => {
+		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
+		const openedPacks = ownedCards / packType.cardCount;
+		const remainingPacks = Math.floor(remainingCards / packType.cardCount);
+		const percentagePacksOpened = Math.round((openedPacks / totalPossiblePacks) * 1000) / 10;
+		return {
+			...packType,
+			totalPossiblePacks,
+			openedPacks,
+			remainingPacks,
+			percentagePacksOpened,
+		};
+	})
+);
+---
+
+<Page title={season.seasonName} class="flex flex-col gap-4">
+	<header>
+		<PageHeader>
+			<PageTitle id="season-name">{season.seasonName}</PageTitle>
+		</PageHeader>
+
+		<p class="text-lg" id="season-description">{season.seasonDescription || ''}</p>
+	</header>
+
+	<section class="text-lg">
+		<Heading>Stats:</Heading>
+		<p class="ml-4"><b>Total cards in season:</b> {totalPossibleCards}</p>
+		<p class="ml-4"><b>Cards distributed:</b> {ownedCards}</p>
+		<p class="ml-4"><b>Card remaining to distribute:</b> {remainingCards}</p>
+		<p class="ml-4">
+			<b>Percentage distributed:</b>
+			{percentageDistributed}%
+		</p>
+
+		<div class="ml-4 mt-4">
+			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
+			<ul>
+				{
+					packTypesWithCardPools.map(async (packType) => (
+						<li>
+							<b>{packType.packTypeName}</b>: {packType.totalPossiblePacks} total
+							{packType.totalPossiblePacks === 1 ? 'pack' : 'packs'},{' '}
+							{packType.remainingPacks}
+							{packType.remainingPacks === 1 ? 'pack' : 'packs'} remaining to be
+							opened
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<Heading>Designs:</Heading>
+	<CardList
+		sessionType={Astro.locals.session?.type}
+		cards={cardDesigns.map((card, index) => {
+			const rarity = card.bestRarityFound;
+
+			if (rarity?.rarityId === NO_CARDS_OPENED_ID && Astro.locals.session?.type !== 'admin') {
+				return {
+					...rarity,
+					...card,
+					cardName: 'zzz' + index,
+					artist: '?????',
+					designId: 'zzz' + index,
+					seasonId: '',
+					seasonName: '',
+					imgUrl: '',
+					cardNumber: 1,
+					totalOfType: rarity.count,
+				};
+			}
+
+			return {
+				...card,
+				rarityName: rarity?.rarityName ?? '',
+				rarityId: rarity?.rarityId ?? '',
+				frameUrl: rarity?.frameUrl ?? '',
+				rarityColor: rarity?.rarityColor ?? '',
+				totalOfType: rarity?.count ?? 1,
+				cardNumber: 1,
+			};
+		})}
+		sortOnlyBy={['card-name-asc', 'card-name-desc']}
+		client:load
+	/>
+
+	<DeleteSeasonButton seasonId={season.seasonId} client:load />
+</Page>

@@ -1,0 +1,34 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getCardInstanceById } from '@lib/card';
+import CardPage from '@/layouts/CardPage.astro';
+import { routes } from '@/constants';
+
+const slug = Astro.params.instanceSlug;
+if (!slug) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No instance route provided');
+}
+const [designId, instanceId] = slug.split('/');
+
+if (!designId) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
+}
+if (!instanceId) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No instance id provided');
+}
+
+const instance = await getCardInstanceById({ designId, instanceId });
+if (!instance) {
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+}
+
+if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+}
+---
+
+<Page
+	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
+	class="flex flex-col gap-6">
+	<CardPage card={instance} />
+</Page>

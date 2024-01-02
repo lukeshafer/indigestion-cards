@@ -1,0 +1,41 @@
+---
+import Page from '@/layouts/Page.astro';
+import { getAllPacks } from '@lib/pack';
+import { Heading, PageHeader, PageTitle } from '@/components/text';
+import PackTable from '@/components/pack/PackTable';
+import { getAllPreorders } from '@lil-indigestion-cards/core/lib/preorder';
+import CreatePreorderForm from '@/components/preorder/CreatePreorderForm';
+import ConvertPreordersToPacksForm from '@/components/preorder/ConvertPreordersToPacksForm';
+import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
+
+const packs = await getAllPacks();
+const preorders = await getAllPreorders();
+const packTypes = await getAllPackTypes();
+---
+
+<Page title="All Packs">
+	<PageHeader>
+		<PageTitle>All Packs</PageTitle>
+	</PageHeader>
+
+	<div class="mx-auto max-w-2xl">
+		<PackTable {packs} client:load />
+		<section class="mt-8 flex flex-col gap-4">
+			<Heading>Preorders</Heading>
+			<ul class="flex flex-col gap-3 bg-gray-200 p-4 dark:bg-gray-800">
+				{
+					preorders.map((preorder) => (
+						<li>
+							{preorder.username},{' '}
+							{preorder.createdAt
+								? new Date(preorder.createdAt).toLocaleString()
+								: ''}
+						</li>
+					))
+				}
+			</ul>
+			<CreatePreorderForm client:load />
+			<ConvertPreordersToPacksForm {packTypes} client:load />
+		</section>
+	</div>
+</Page>

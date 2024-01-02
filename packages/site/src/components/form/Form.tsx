@@ -6,25 +6,27 @@ import { useViewTransition } from '@/lib/client/utils';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-		| 'get'
-		| 'post'
-		| 'dialog'
-		| 'put'
-		| 'delete'
-		| 'options'
-		| 'head'
-		| 'trace'
-		| 'connect'
-		| 'patch';
-	action: string;
+	| 'get'
+	| 'post'
+	| 'dialog'
+	| 'put'
+	| 'delete'
+	| 'options'
+	| 'head'
+	| 'trace'
+	| 'connect'
+	| 'patch';
+	action?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
-	onsubmit?: () => void;
+	onsubmit?: (e: SubmitEvent) => void;
 	loadingText?: string;
 	successRedirect?: string;
 	errorRedirect?: string;
 	successRefresh?: boolean;
+	ref?: (el: HTMLFormElement) => void;
+	noAlert?: boolean;
 }) {
 	const [isLoading, setIsLoading] = createSignal(false);
 
@@ -35,10 +37,10 @@ export function Form(props: {
 		let formURL: URL;
 		let isLocal = false;
 		try {
-			formURL = new URL(props.action);
+			formURL = new URL(props.action || window.location.pathname);
 		} catch {
 			isLocal = true;
-			formURL = new URL(props.action, 'http://localhost');
+			formURL = new URL(props.action || window.location.pathname, 'http://localhost');
 		}
 
 		formURL.searchParams.set('formmethod', props.method);
@@ -47,7 +49,7 @@ export function Form(props: {
 
 	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
-		if (props.onsubmit) props.onsubmit();
+		if (props.onsubmit) props.onsubmit(e);
 		if (props.confirm && !confirm(props.confirm)) return;
 		const form = e.target as HTMLFormElement;
 		const formData = new FormData(form);
@@ -55,19 +57,19 @@ export function Form(props: {
 
 		setIsLoading(true);
 		const action =
-			props.method.toUpperCase() === 'GET' ? `${props.action}?${data}` : props.action;
+			props.method.toUpperCase() === 'GET'
+				? `${props.action || window.location.href}?${data}`
+				: props.action || window.location.href;
 		const body = props.method.toUpperCase() === 'GET' ? undefined : data;
 
-		const auth_token = localStorage.getItem('auth_token');
 		const response = await fetch(action, {
 			method: props.method.toUpperCase(),
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
-				Authorization: auth_token ? `Bearer ${auth_token}` : '',
 			},
 			body,
 		})
-			.catch((err) => {
+			.catch(err => {
 				console.error(err);
 				throw err;
 			})
@@ -79,13 +81,15 @@ export function Form(props: {
 
 		const responseBody = await response.text();
 
+		const contentType = response.headers.get('content-type');
+		const isHTML = contentType?.startsWith('text/html');
+
 		if (response.ok) {
-			useViewTransition(() => {
-				setAlerts((alerts) => [
-					...alerts,
-					{ message: responseBody || 'Success!', type: 'success' },
-				]);
-			});
+			if (!props.noAlert)
+				useViewTransition(() => {
+					const alertMessage = isHTML ? 'Success!' : responseBody || 'Success!';
+					setAlerts(alerts => [{ message: alertMessage, type: 'success' }, ...alerts]);
+				});
 			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
 				const redirectURL = new URL(props.successRedirect, window.location.origin);
@@ -94,20 +98,18 @@ export function Form(props: {
 			}
 			if (props.successRefresh) location.reload();
 		} else {
-			const contentType = response.headers.get('content-type');
-			const isHTML = contentType?.startsWith('text/html');
-
-			useViewTransition(() => {
-				setAlerts((alerts) => [
-					...alerts,
-					{
-						message: isHTML
-							? 'There was an error'
-							: responseBody || 'There was an error.',
-						type: 'error',
-					},
-				]);
-			});
+			if (!props.noAlert)
+				useViewTransition(() => {
+					setAlerts(alerts => [
+						{
+							message: isHTML
+								? 'There was an error'
+								: responseBody || 'There was an error.',
+							type: 'error',
+						},
+						...alerts,
+					]);
+				});
 			if (props.errorRedirect) {
 				const redirectURL = new URL(props.errorRedirect, window.location.origin);
 				if (redirectURL.pathname !== location.pathname) {
@@ -123,21 +125,28 @@ export function Form(props: {
 
 	return (
 		<form
+			ref={el => props.ref?.(el)}
 			class="relative flex w-full flex-col items-start gap-6"
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
 			enctype={props.enctype}
 			onSubmit={handleSubmit}>
 			<Show when={isLoading()}>
-				<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-50/50 bg-opacity-50 dark:bg-gray-950/50">
-					<img src={ASSETS.EMOTES.LILINDPB} alt="" />
-					{props.loadingText ? (
-						<p class="font-heading font-bold uppercase">{props.loadingText}</p>
-					) : null}
-				</div>
+				<Loading loadingText={props.loadingText} />
 			</Show>
 			{props.children}
 		</form>
+	);
+}
+
+export function Loading(props: { loadingText?: string }) {
+	return (
+		<div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gray-50/50 bg-opacity-50 dark:bg-gray-950/50">
+			<img src={ASSETS.EMOTES.LILINDPB} alt="" />
+			{props.loadingText ? (
+				<p class="font-heading font-bold uppercase">{props.loadingText}</p>
+			) : null}
+		</div>
 	);
 }
 
@@ -175,24 +184,30 @@ export function TextInput(props: InputProps<string>) {
 	return (
 		<>
 			{props.inputOnly ? (
-				<input
-					{...props}
-					id={props.name}
-					name={props.name}
-					type="text"
-					class={BASE_INPUT_CLASS}
-					classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
-					required={props.required}
-					placeholder={props.placeholder ?? props.label}
-					readOnly={props.readOnly}
-					value={props.value ?? ''}
-					onInput={(e) => props.setValue?.(e.target.value ?? '')}
-				/>
+				<>
+					<label class="sr-only" for={props.name}>
+						{props.label}
+					</label>
+					<input
+						{...props}
+						id={props.name}
+						name={props.name}
+						type="text"
+						class={BASE_INPUT_CLASS}
+						classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
+						required={props.required}
+						placeholder={props.placeholder ?? props.label}
+						readOnly={props.readOnly}
+						value={props.value ?? ''}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
+					/>
+				</>
 			) : (
 				<InputGroup>
 					<Label {...props} />
 					{props.children}
 					<input
+						{...props}
 						id={props.name}
 						name={props.name}
 						type="text"
@@ -202,7 +217,7 @@ export function TextInput(props: InputProps<string>) {
 						placeholder={props.placeholder}
 						readOnly={props.readOnly}
 						value={props.value ?? ''}
-						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
 					/>
 				</InputGroup>
 			)}
@@ -210,11 +225,14 @@ export function TextInput(props: InputProps<string>) {
 	);
 }
 
-export function TextArea(props: InputProps<string> & { height?: string }) {
+export function TextArea(
+	props: InputProps<string> & { height?: string; maxLength?: string | number }
+) {
 	return (
 		<InputGroup>
 			<Label {...props} />
 			<textarea
+				maxLength={props.maxLength}
 				id={props.name}
 				name={props.name}
 				class={BASE_INPUT_CLASS + ' h-32'}
@@ -224,7 +242,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -244,7 +262,7 @@ export function NumberInput(props: InputProps<number>) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -282,7 +300,6 @@ export function FileInput(props: {
 }) {
 	const [preview, setPreview] = createSignal<string | null>(null);
 
-	// @ts-expect-error Solid directive
 	const showPreview = (el: HTMLInputElement) => {
 		el.addEventListener('change', () => {
 			const file = el.files?.[0];
@@ -299,13 +316,14 @@ export function FileInput(props: {
 		<InputGroup>
 			<Label {...props} />
 			<input
-				use:showPreview
+				ref={showPreview}
 				id={props.name}
 				name={props.name}
 				type="file"
-				class="focus:border-accent-light focus:ring-accent-light file:text-shadow file:bg-brand-main 
-				file:hover:bg-brand-dark file:brand-shadow block w-full rounded-none p-1 text-black 
-				file:cursor-pointer file:rounded file:border-none file:px-4 file:py-2 file:font-bold 
+				class="focus:border-accent-light focus:ring-accent-light file:text-shadow file:bg-brand-light 
+				file:hover:bg-brand-main file:dark:bg-brand-main file:dark:hover:bg-brand-dark 
+        file:brand-shadow file:text-outline block w-full rounded-none p-1 text-black
+				file:cursor-pointer file:rounded-full file:border-none file:px-4 file:py-2 file:font-bold 
 				file:uppercase file:text-white file:transition-colors focus:outline-none focus:ring-4"
 				required={props.required}
 				accept={props.accept}
@@ -334,9 +352,9 @@ export function Select(props: {
 				class={BASE_INPUT_CLASS + ' bg-white'}
 				required={props.required}
 				value={props.value ?? props.options[0]?.value}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}>
+				onInput={e => props.setValue?.(e.target.value ?? '')}>
 				<For each={props.options}>
-					{(option) => (
+					{option => (
 						<option value={option.value} selected={option.value === props.value}>
 							{option.label}
 						</option>
@@ -364,7 +382,7 @@ export function Checkbox(props: {
 				rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 				required={props.required}
 				checked={props.value ?? false}
-				onInput={(e) => props.setValue?.(e.target.checked)}
+				onInput={e => props.setValue?.(e.target.checked)}
 			/>
 			<label
 				for={props.name}
@@ -386,18 +404,13 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-shadow font-heading rounded border border-gray-300 dark:border-gray-800 px-4 py-2 font-bold uppercase text-white transition-colors';
+	'text-outline dark:text-outline-dark font-heading rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
 
-export function Anchor(props: { children: string; href: string; type?: 'submit' | 'delete' }) {
+export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={BUTTON_CLASS}
-			classList={{
-				'bg-brand-main hover:bg-brand-dark dark:bg-brand-dark':
-					!props.type || props.type === 'submit',
-				'bg-red-500 hover:bg-red-800': props.type === 'delete',
-			}}>
+			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark outline outline-gray-200 dark:outline-gray-800`}>
 			{props.children}
 		</a>
 	);
@@ -408,26 +421,39 @@ export function SubmitButton(props: {
 	onClick?: () => void;
 	disabled?: boolean;
 	transitionId?: string;
+	confirm?: string;
+	name?: string;
 }) {
 	return (
 		<button
+			name={props.name}
 			type="submit"
 			disabled={props.disabled}
-			style={{ 'view-transition-name': props.transitionId }}
+			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
-			class={`${BUTTON_CLASS} bg-brand-main hover:bg-brand-dark dark:bg-brand-dark dark:hover:brightness-90`}
-			onClick={() => props.onClick?.()}>
+			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}
+			onClick={e => {
+				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
+					e.preventDefault();
+				}
+				props.onClick?.();
+			}}>
 			{props.children ?? 'Submit'}
 		</button>
 	);
 }
 
-export function DeleteButton(props: { children?: string; onClick?: () => void }) {
+export function DeleteButton(props: { children?: string; onClick?: () => void; confirm?: string }) {
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-red-500 hover:bg-red-800 dark:bg-red-700 `}
-			onClick={() => props.onClick?.()}>
+			class={`${BUTTON_CLASS} bg-red-400 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-800`}
+			onClick={e => {
+				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
+					e.preventDefault();
+				}
+				props.onClick?.();
+			}}>
 			{props.children ?? 'Delete'}
 		</button>
 	);

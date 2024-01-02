@@ -10,22 +10,22 @@ export async function GET(ctx: APIContext) {
 		throw new Error('Code missing');
 	}
 
-	const client_id = ctx.url.host === 'localhost:4321' ? 'local' : 'main';
+	const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'main';
 	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
-	console.log({ client_id, origin })
+	//console.log({ client_id, origin })
 
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
-			client_id: ctx.url.host === 'localhost:4321' ? 'local' : 'main',
+			client_id,
 			code,
 			redirect_uri: `${origin}${ctx.url.pathname}`,
 		}),
 	})
 		.then((r) => r.text())
 		.then((r) => {
-			console.log(r);
+			//console.log(r);
 			return JSON.parse(r)
 		}).catch((err) => {
 			console.error('An error occurred parsing the JSON.', { err })
@@ -38,14 +38,14 @@ export async function GET(ctx: APIContext) {
 	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
 		maxAge: 60 * 60 * 24 * 30,
 		httpOnly: true,
-		secure: ctx.url.host !== 'localhost',
+		secure: ctx.url.host !== 'localhost:',
 		path: '/',
 	});
 
 	const session = Session.verify(response.access_token);
 
 	if (session.type === 'admin' || session.type === 'user') {
-		return ctx.redirect(`/?alert=Logged in!&auth_token=${response.access_token}`, 302);
+		return ctx.redirect(`/?alert=Logged in!`, 302);
 	}
 	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
 }

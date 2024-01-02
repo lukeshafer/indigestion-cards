@@ -1,12 +1,16 @@
 ---
 import Page from '@/layouts/Page.astro';
-import { getAllUsers } from '@lib/user';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
 
-const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.username));
+import { GET as getUsers } from '@/pages/data/users';
+import { cachePage } from '@/lib/api';
+
+cachePage(Astro)
+
+const { data: users } = await getUsers();
 const preorders = await getAllPreorders();
 ---
 

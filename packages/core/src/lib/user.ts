@@ -54,6 +54,22 @@ export async function getUserAndCardInstances(args: { username: string }): Promi
 	}
 }
 
+export async function getUserAndOpenedCardInstances(args: { username: string }): Promise<{
+	users: User[];
+	userLogins: UserLogin[];
+	cardInstances: CardInstance[];
+} | null> {
+	const data = await getUserAndCardInstances(args);
+
+	if (!data) return null;
+
+	return {
+		users: data.users,
+		userLogins: data.userLogins,
+		cardInstances: data.cardInstances.filter((card) => card.openedAt),
+	};
+}
+
 export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
 	user: User;
 	userLogin: UserLogin;
@@ -213,7 +229,24 @@ export async function setUserProfile(args: {
 
 	return users
 		.patch({ userId: args.userId })
-		.set({ lookingFor: args.lookingFor ?? user.lookingFor, pinnedCard: card })
+		.set({ lookingFor: args.lookingFor?.slice(0,500) ?? user.lookingFor, pinnedCard: card })
 		.go()
 		.then((result) => result.data);
+}
+
+export async function removeTradeNotification(args: { userId: string; tradeId: string }) {
+	const queryResult = await users.query.byId({ userId: args.userId }).go();
+
+	const user = queryResult.data[0];
+	console.log({ user });
+	if (!user) return;
+
+	return users
+		.patch({ userId: args.userId })
+		.set({
+			tradeNotifications: user.tradeNotifications?.filter(
+				(notification) => notification.tradeId !== args.tradeId
+			),
+		})
+		.go();
 }

@@ -1,0 +1,51 @@
+---
+import ButtonCount from './ButtonCount.astro';
+interface Props {
+	username: string;
+}
+
+const { username } = Astro.props;
+---
+
+<trade-notification-count {username} hidden>
+	<ButtonCount />
+</trade-notification-count>
+
+<script>
+	import { get } from '../lib/client/data';
+
+	customElements.define(
+		'trade-notification-count',
+		class TradeNotificationCount extends HTMLElement {
+			div: HTMLDivElement | null;
+			constructor() {
+				super();
+				this.div = this.querySelector('div');
+			}
+
+			connectedCallback() {
+				this.fetchNotifications();
+			}
+
+			async fetchNotifications() {
+				const username = this.getAttribute('username');
+				if (!username) return this.setCount(0);
+
+				const user = await get('user', [username]);
+
+				const count = user?.tradeNotifications?.reduce(
+					(acc, notif) => acc.add(notif.tradeId),
+					new Set<string>()
+				).size;
+
+				return this.setCount(count || 0);
+			}
+
+			setCount(count: number) {
+				if (this.div) this.div.textContent = count < 100 ? String(count) : '99+';
+				if (!count) this.hidden = true;
+				else this.hidden = false;
+			}
+		}
+	);
+</script>

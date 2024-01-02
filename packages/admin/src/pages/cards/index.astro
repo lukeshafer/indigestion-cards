@@ -1,0 +1,60 @@
+---
+import Page from '@/layouts/Page.astro';
+import CardList from '@/components/cards/CardList';
+import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
+import { getAllCardDesigns } from '@lib/design';
+import { routes, NO_CARDS_OPENED_ID } from '@/constants';
+import { PageTitle, PageHeader, Anchor } from '@/components/text';
+import AdminOnly from '@/components/AdminOnly.astro';
+
+const designs = await getAllCardDesigns();
+
+const message = Astro.url.searchParams.get('message') || '';
+---
+
+<Page title="All Cards">
+	{message ? <p class="bg-green-200 p-4 text-center text-xl">{message}</p> : null}
+	<UnmatchedImageList type="cardDesign" />
+	<PageHeader>
+		<PageTitle>All Cards</PageTitle>
+		<AdminOnly>
+			<Anchor href={routes.ADMIN.CREATE.CARD_DESIGN}>Add New Card</Anchor>
+		</AdminOnly>
+	</PageHeader>
+	<CardList
+		cards={designs.map((card, index) => {
+			const bestRarity = card.bestRarityFound;
+
+			if (
+				bestRarity?.rarityId === NO_CARDS_OPENED_ID &&
+				Astro.locals.session?.type !== 'admin'
+			) {
+				return {
+					...bestRarity,
+					...card,
+					cardName: 'zzz' + index,
+					artist: '?????',
+					designId: 'zzz' + index,
+					seasonId: '',
+					seasonName: '',
+					imgUrl: '',
+					cardNumber: 1,
+					totalOfType: bestRarity.count,
+				};
+			}
+
+			return {
+				...card,
+				rarityName: bestRarity?.rarityName ?? '',
+				rarityId: bestRarity?.rarityId ?? '',
+				frameUrl: bestRarity?.frameUrl ?? '',
+				rarityColor: bestRarity?.rarityColor ?? '',
+				totalOfType: bestRarity?.count ?? 1,
+				cardNumber: 1,
+			};
+		})}
+		sortOnlyBy={['card-name-asc', 'card-name-desc']}
+		sessionType={Astro.locals.session?.type}
+		client:load
+	/>
+</Page>

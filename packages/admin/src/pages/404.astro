@@ -1,0 +1,16 @@
+---
+import Page from '@/layouts/Page.astro';
+import { ASSETS } from '@/constants';
+---
+
+<Page title="Page not found" class="flex flex-col items-center">
+	<h1 class="font-display my-5 text-7xl italic text-red-500">404</h1>
+	<img
+		src={ASSETS.EMOTES.LILINDOHNO}
+		width="100"
+		alt="Ryan shaking his head in panic"
+		class="OHNO h-40 w-40 text-center font-mono text-4xl"
+	/>
+	<p class="font-display text-brand-secondary my-2 text-3xl italic">OH NO</p>
+	<p class="mt-12 text-center font-mono text-3xl">The page you're looking for doesn't exist!!</p>
+</Page>

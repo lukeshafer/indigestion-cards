@@ -37,11 +37,11 @@ export async function createRarity(rarity: CreateRarity): Promise<DBResult<Rarit
 
 export async function updateRarity(args: UpdateRarity & { rarityId: string }) {
 	const { rarityId, ...rest } = args;
-	const result = await rarities.update({ rarityId }).set(rest).go();
+	const result = await rarities.patch({ rarityId }).set(rest).go();
 	return result.data;
 }
 
-export async function deleteRarityById(id: string): Promise<DBResult<Rarity>> {
+export async function deleteRarityById(id: string): Promise<DBResult<Partial<Rarity>>> {
 	const allDesigns = await getAllCardDesigns();
 	const designsWithRarity = allDesigns.some(
 		(design) => design.rarityDetails?.some((r) => r.rarityId === id)

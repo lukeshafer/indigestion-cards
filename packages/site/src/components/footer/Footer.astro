@@ -1,5 +1,5 @@
 ---
-import { Icon } from 'astro-icon';
+import { Icon } from 'astro-icon/components';
 ---
 
 <footer
@@ -10,7 +10,7 @@ import { Icon } from 'astro-icon';
 			target="_blank"
 			class="hover:brightness-90"
 			title="Twitch">
-			<Icon name="mdi:twitch" class="text-brand-main w-11" />
+			<Icon name="mdi:twitch" class="text-brand-main w-11" size={44} />
 			<span class="sr-only">Twitch</span>
 		</a>
 		<a
@@ -18,7 +18,7 @@ import { Icon } from 'astro-icon';
 			target="_blank"
 			class="hover:brightness-90"
 			title="YouTube">
-			<Icon name="mdi:youtube" class="text-brand-main w-12" />
+			<Icon name="mdi:youtube" class="text-brand-main w-12" size={48} />
 			<span class="sr-only">YouTube</span>
 		</a>
 		<a
@@ -26,7 +26,7 @@ import { Icon } from 'astro-icon';
 			target="_blank"
 			class="hover:brightness-90"
 			title="Patreon">
-			<Icon name="mdi:patreon" class="text-brand-main w-10" />
+			<Icon name="mdi:patreon" class="text-brand-main w-10" size={40} />
 			<span class="sr-only">Patreon</span>
 		</a>
 	</nav>

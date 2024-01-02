@@ -9,15 +9,18 @@
     "deploy": "sst deploy",
     "remove": "sst remove",
     "console": "sst console",
-    "typecheck": "tsc --noEmit",
+    "check": "pnpm run root:check & pnpm run core:check & pnpm run functions:check & pnpm run site:check",
+    "root:check": "tsc --noEmit",
     "core:check": "pnpm --filter core run typecheck",
     "functions:check": "pnpm --filter functions run typecheck",
     "site:check": "pnpm --filter site run typecheck",
+    "admin:check": "pnpm --filter admin run typecheck",
     "site:add": "pnpm --filter site run astro add",
     "site:dev": "pnpm --filter site run dev",
     "site:dev:host": "pnpm --filter site run dev:host",
     "site:build": "pnpm --filter site run build",
-    "site:astro": "pnpm --filter site run astro"
+    "site:astro": "pnpm --filter site run astro",
+    "admin:dev": "pnpm --filter admin run dev"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
@@ -31,7 +34,7 @@
     "graphql": "16.8.1",
     "prettier-plugin-astro": "^0.12.0",
     "prettier-plugin-tailwindcss": "^0.5.6",
-    "sst": "2.37.0",
+    "sst": "2.38.7",
     "typescript": "^5.2.2"
   },
   "workspaces": [
