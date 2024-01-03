@@ -16,13 +16,10 @@
 	customElements.define(
 		'remaining-pack-count',
 		class extends HTMLElement {
-			pre: HTMLPreElement;
 			seasonsToShow = signal<DesignCountData[]>([]);
 			template: HTMLTemplateElement;
 			constructor() {
 				super();
-				this.pre = document.createElement('pre');
-				this.appendChild(this.pre);
 				this.template = this.querySelector('template')!;
 			}
 

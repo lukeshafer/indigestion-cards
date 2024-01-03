@@ -1,19 +1,9 @@
 import { router, publicProcedure } from './trpc';
-import { z } from 'astro/zod'
+
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 export const appRouter = router({
-  userList: publicProcedure
-    .input(z.string())
-    .query(async ({ input }) => {
-      // Retrieve users from a datasource, this is an imaginary database
-      const users = [input, 'user 1', 'user 2']
-      return users;
-    }),
-  userCreate: publicProcedure
-    .input(z.object({ name: z.string() }))
-    .mutation(async ({ input }) => {
-      console.log({ input })
-    })
+	siteConfig: publicProcedure.query(async () => getSiteConfig()),
 });
 
 // Export type router type signature,

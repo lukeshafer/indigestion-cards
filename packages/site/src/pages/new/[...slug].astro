@@ -1,0 +1,8 @@
+---
+import Page from '@/layouts/Page.astro';
+import Router from '@/components/router/client-router'
+---
+
+<Page title="testing">
+  <Router url={Astro.url.pathname} client:load />
+</Page>

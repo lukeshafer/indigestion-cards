@@ -242,6 +242,9 @@ importers:
       solid-js:
         specifier: ^1.8.7
         version: 1.8.7
+      solid-markdown:
+        specifier: ^2.0.0
+        version: 2.0.0(solid-js@1.8.7)
       sst:
         specifier: 2.38.7
         version: 2.38.7
@@ -6959,12 +6962,6 @@ packages:
       '@types/node': 20.10.6
     dev: false
 
-  /@types/debug@4.1.11:
-    resolution: {integrity: sha512-R2qflTjHDs4CL6D/6TkqBeIHr54WzZfIxN729xvCNlYIVp2LknlnCro5Yo3frNaX2E5gO9pZ3/QAPVdGmu+q9w==}
-    dependencies:
-      '@types/ms': 0.7.34
-    dev: false
-
   /@types/debug@4.1.12:
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
     dependencies:
@@ -10054,7 +10051,6 @@ packages:
 
   /inline-style-parser@0.1.1:
     resolution: {integrity: sha512-7NXolsK4CAS5+xvdj5OMMbI962hU/wvwoxk+LWR9Ek9bVtyuuYScDN6eS0rUm6TxApFpw7CX1o4uJzcd4AyD3Q==}
-    dev: true
 
   /internal-slot@1.0.5:
     resolution: {integrity: sha512-Y+R5hJrzs52QCG2laLn4udYVnxsfny9CpOhNhUvk/SSSVyF6T27FzRbF0sroPidSu3X8oEAkOn2K804mjpt6UQ==}
@@ -11373,7 +11369,7 @@ packages:
   /micromark@3.2.0:
     resolution: {integrity: sha512-uD66tJj54JLYq0De10AhWycZWGQNUvDI55xPgk2sQM5kn1JYlhbCMTtEeT27+vAhW2FBQxLlOmS3pmA7/2z4aA==}
     dependencies:
-      '@types/debug': 4.1.11
+      '@types/debug': 4.1.12
       debug: 4.3.4
       decode-named-character-reference: 1.0.2
       micromark-core-commonmark: 1.1.0
@@ -13024,6 +13020,27 @@ packages:
       seroval: 0.15.1
     dev: false
 
+  /solid-markdown@2.0.0(solid-js@1.8.7):
+    resolution: {integrity: sha512-TttuvRaAuvHNIOZ2Weqfi4C16SAE5QaWA4qLwZY8Ad/g7gQyE3aUenXK4sgy9spM/uumz150JIc2oxDGiNLfEw==}
+    engines: {node: '>=18', pnpm: '>=8.6.0'}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      comma-separated-tokens: 2.0.3
+      property-information: 6.4.0
+      remark-gfm: 3.0.1
+      remark-parse: 10.0.2
+      remark-rehype: 10.1.0
+      solid-js: 1.8.7
+      space-separated-tokens: 2.0.2
+      style-to-object: 0.3.0
+      unified: 10.1.2
+      unist-util-visit: 4.1.2
+      vfile: 5.3.7
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /solid-refresh@0.5.3(solid-js@1.8.7):
     resolution: {integrity: sha512-Otg5it5sjOdZbQZJnvo99TEBAr6J7PQ5AubZLNU6szZzg3RQQ5MX04oteBIIGDs0y2Qv8aXKm9e44V8z+UnFdw==}
     peerDependencies:
@@ -13322,7 +13339,6 @@ packages:
     resolution: {integrity: sha512-CzFnRRXhzWIdItT3OmF8SQfWyahHhjq3HwcMNCNLn+N7klOOqPjMeG/4JSu77D7ypZdGvSzvkrbyeTMizz2VrA==}
     dependencies:
       inline-style-parser: 0.1.1
-    dev: true
 
   /sucrase@3.34.0:
     resolution: {integrity: sha512-70/LQEZ07TEcxiU2dz51FKaE6hCTWC6vr7FOk3Gr0U60C3shtAN+H+BFr9XlYe5xqf3RA8nrc+VIwzCfnxuXJw==}
