@@ -1,13 +1,13 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import type { APIRoute } from 'astro';
-import { createContext } from '../../server/context';
+import { createAstroContext } from '../../server/context';
 import { appRouter } from '../../server/router';
 
-export const ALL: APIRoute = (opts) => {
+export const ALL: APIRoute = (ctx) => {
   return fetchRequestHandler({
     endpoint: '/trpc',
-    req: opts.request,
+    req: ctx.request,
     router: appRouter,
-    createContext,
+    createContext: createAstroContext(ctx),
   });
 };

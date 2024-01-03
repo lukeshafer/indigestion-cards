@@ -1,28 +1,27 @@
 import { Router as SolidRouter, Route } from '@solidjs/router';
-import { onMount, type ParentProps } from 'solid-js';
 import { isServer } from 'solid-js/web';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/solid-query'
-import Home from './Home'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import Home from './Home';
+import type { Session } from '@lil-indigestion-cards/core/types';
+import { createContext, useContext } from 'solid-js';
 
-const queryClient = new QueryClient();
-
-function Root(props: ParentProps) {
-  return (
-    <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>
-  )
+type ClientContextProps = {
+	session: Session | null;
+	disableAnimations: boolean;
 }
 
-export default function Router(props: { url: string }) {
-  onMount(() => {
-    console.log('client log test');
-  });
+export const queryClient = new QueryClient();
+const ClientContext = createContext<ClientContextProps | null>(null);
+export const useClientContext = () => useContext(ClientContext);
 
-  return (
-    <SolidRouter url={isServer ? props.url : ''} base="/new" root={Root}>
-      <Route path="/" component={Home} />
-    </SolidRouter>
-  );
+export default function Router(props: { ssrUrl: string; ssrCtx: ClientContextProps }) {
+	return (
+		<ClientContext.Provider value={props.ssrCtx}>
+			<QueryClientProvider client={queryClient}>
+				<SolidRouter url={isServer ? props.ssrUrl : ''} base="/new">
+					<Route path="/" component={Home} />
+				</SolidRouter>
+			</QueryClientProvider>
+		</ClientContext.Provider>
+	);
 }

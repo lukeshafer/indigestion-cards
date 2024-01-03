@@ -1,15 +1,10 @@
 import { ASSETS } from '@/constants';
-import { trpc } from '@/client/trpc';
-import { createQuery } from '@tanstack/solid-query';
+import { getSiteConfig } from '@/client/data';
 import RemainingPackCount from '../RemainingPackCount';
 import FAQ from '../FAQ';
 
 export default function Home() {
-  const siteConfig = createQuery(() => ({
-    queryFn: () => trpc.siteConfig.query(),
-    queryKey: ['site-config'],
-  }));
-
+	const siteConfig = getSiteConfig();
   return (
     <>
       <h1 class="sr-only">Indigestion Cards</h1>

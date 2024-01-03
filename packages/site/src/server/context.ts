@@ -1,10 +1,14 @@
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch';
+import type { APIContext } from 'astro';
 
-export function createContext({
-  req,
-  resHeaders,
-}: FetchCreateContextFnOptions) {
-  const user = { name: req.headers.get('username') ?? 'anonymous' };
-  return { req, resHeaders, user };
+export function createAstroContext(ctx: APIContext) {
+	return function createContext(opts: FetchCreateContextFnOptions) {
+		return {
+			...opts,
+			session: ctx.locals.session,
+		};
+	};
 }
-export type Context = Awaited<ReturnType<typeof createContext>>;
+
+type CreateContext = Awaited<ReturnType<typeof createAstroContext>>;
+export type Context = Awaited<ReturnType<CreateContext>>;

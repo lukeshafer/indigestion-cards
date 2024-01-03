@@ -1,8 +1,15 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Router from '@/components/router/client-router'
+import Router from '@/components/router/client-router';
 ---
 
 <Page title="testing">
-  <Router url={Astro.url.pathname} client:load />
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrCtx={{
+			session: Astro.locals.session,
+			disableAnimations: Astro.cookies.get('disable-animations')?.boolean() ?? false,
+		}}
+		client:load
+	/>
 </Page>
