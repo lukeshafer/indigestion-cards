@@ -28,6 +28,7 @@
     "astro-sst": "2.38.7",
     "electrodb": "^2.12.3",
     "fuse.js": "^7.0.0",
+    "solid-icons": "^1.1.0",
     "solid-js": "^1.8.7",
     "solid-markdown": "^2.0.0",
     "sst": "2.38.7",

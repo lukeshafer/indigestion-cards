@@ -3,10 +3,14 @@ import { getSiteConfig } from '@/client/data';
 import RemainingPackCount from '../RemainingPackCount';
 import FAQ from '../FAQ';
 
+import Header from '../Header';
+import Footer from '../Footer';
+
 export default function Home() {
 	const siteConfig = getSiteConfig();
   return (
     <>
+			<Header></Header>
       <h1 class="sr-only">Indigestion Cards</h1>
       <div class="flex flex-col gap-8 overflow-x-hidden">
         <section class="flex min-h-[30rem] flex-row-reverse flex-wrap items-center justify-center justify-items-center gap-4 gap-y-8">
@@ -62,6 +66,7 @@ export default function Home() {
           <FAQ />
         </article>
       </div>
+			<Footer></Footer>
     </>
   );
 }

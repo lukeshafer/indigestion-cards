@@ -239,6 +239,9 @@ importers:
       fuse.js:
         specifier: ^7.0.0
         version: 7.0.0
+      solid-icons:
+        specifier: ^1.1.0
+        version: 1.1.0(solid-js@1.8.7)
       solid-js:
         specifier: ^1.8.7
         version: 1.8.7
@@ -13012,6 +13015,14 @@ packages:
     dependencies:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 4.0.0
+
+  /solid-icons@1.1.0(solid-js@1.8.7):
+    resolution: {integrity: sha512-IesTfr/F1ElVwH2E1110s2RPXH4pujKfSs+koT8rwuTAdleO5s26lNSpqJV7D1+QHooJj18mcOiz2PIKs0ic+A==}
+    peerDependencies:
+      solid-js: '*'
+    dependencies:
+      solid-js: 1.8.7
+    dev: false
 
   /solid-js@1.8.7:
     resolution: {integrity: sha512-9dzrSVieh2zj3SnJ02II6xZkonR6c+j/91b7XZUNcC6xSaldlqjjGh98F1fk5cRJ8ZTkzqF5fPIWDxEOs6QZXA==}
