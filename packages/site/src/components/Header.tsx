@@ -2,10 +2,10 @@ import HeaderLink from './HeaderLink';
 import UserConfig from './UserConfig';
 import UserSearch from './UserSearch';
 import { ASSETS, routes } from '@/constants';
-import { Show } from 'solid-js';
+import { Show, useContext } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
 import TotalPackCount from './TotalPackCount';
-import { useClientContext } from './router/client-router';
+import { ClientContext } from '@/client/context';
 import { getSiteConfig, getTwitchUser } from '@/client/data';
 
 const logos = {
@@ -15,7 +15,7 @@ const logos = {
 
 export default function Header(props: { logo?: keyof typeof logos }) {
 	const siteConfig = getSiteConfig();
-	const ctx = useClientContext();
+	const ctx = useContext(ClientContext);
 	const username = ctx?.session?.properties.username;
 	const twitchData = username ? getTwitchUser(username) : null;
 	const canSeeTradesLink = () =>

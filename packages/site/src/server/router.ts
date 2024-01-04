@@ -5,6 +5,10 @@ import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 import { getUserByUserName } from '@lil-indigestion-cards/core/lib/user';
 import { z } from 'astro/zod';
 import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import {
+	getAllCardDesigns,
+	getCardDesignAndInstancesById,
+} from '@lil-indigestion-cards/core/lib/design';
 
 export const appRouter = router({
 	siteConfig: publicProcedure.query(async () => getSiteConfig()),
@@ -12,6 +16,12 @@ export const appRouter = router({
 		byUsername: publicProcedure
 			.input(z.object({ username: z.string() }))
 			.query(async ({ input }) => getUserByUserName(input.username)),
+	}),
+	cardDesigns: router({
+		getAll: publicProcedure.query(getAllCardDesigns),
+		byId: publicProcedure
+			.input(z.object({ designId: z.string() }))
+			.query(({ input }) => getCardDesignAndInstancesById(input)),
 	}),
 	packs: router({
 		count: adminProcedure.query(async () => getAllPacks().then(p => p.length)),

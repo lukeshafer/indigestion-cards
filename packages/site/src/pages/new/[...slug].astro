@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
 import Router from '@/components/router/client-router';
+import Base from '@/layouts/Base.astro';
 ---
 
-<Page title="testing">
+<Base title="New Homepage Test">
 	<Router
 		ssrUrl={Astro.url.pathname}
 		ssrCtx={{
@@ -12,4 +12,4 @@ import Router from '@/components/router/client-router';
 		}}
 		client:load
 	/>
-</Page>
+</Base>
