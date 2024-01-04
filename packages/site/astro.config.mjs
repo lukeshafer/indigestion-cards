@@ -10,6 +10,7 @@ export default defineConfig({
 	output: 'server',
 	adapter: aws({
 		serverRoutes: ['api/*', 'trades/*'],
+		responseMode: 'stream',
 	}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {

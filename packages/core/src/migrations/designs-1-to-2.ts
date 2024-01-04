@@ -1,14 +1,35 @@
-import { type CreateEntityItem, type UpdateEntityItem, Entity, type EntityItem } from 'electrodb';
-import { config, auditAttributes } from './_utils';
+import { Entity } from 'electrodb';
+import { config, auditAttributes } from '../db/_utils';
+import { cardDesigns } from 'src/db/cardDesigns';
 
-export type CardDesign = EntityItem<typeof cardDesigns>;
-export type CreateCardDesign = CreateEntityItem<typeof cardDesigns>;
-export type UpdateCardDesign = UpdateEntityItem<typeof cardDesigns>;
-export const cardDesigns = new Entity(
+export async function migration() {
+	const old = await oldDesigns.scan.go();
+	let successCount = 0;
+	let errorCount = 0;
+	for (const design of old.data) {
+		try {
+			console.log('Migrating design', design.designId, { design });
+			await cardDesigns.create(design).go();
+			await oldDesigns.delete(design).go();
+			successCount++;
+		} catch (error) {
+			console.error('An error occurred with the design', design.designId, {
+				design,
+				error,
+			});
+			errorCount++;
+			continue;
+		}
+	}
+
+	console.log({ successCount, errorCount });
+}
+
+const oldDesigns = new Entity(
 	{
 		model: {
 			entity: 'cardDesign',
-			version: '2',
+			version: '1',
 			service: 'card-app',
 		},
 		attributes: {
@@ -122,17 +143,6 @@ export const cardDesigns = new Entity(
 				},
 				sk: {
 					field: 'gsi1sk',
-					composite: ['designId'],
-				},
-			},
-			allDesigns: {
-				index: 'gsi2',
-				pk: {
-					field: 'gsi2pk',
-					composite: [],
-				},
-				sk: {
-					field: 'gsi2sk',
 					composite: ['designId'],
 				},
 			},
