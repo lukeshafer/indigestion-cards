@@ -19,7 +19,7 @@
     "@iconify-json/mdi": "^1.1.63",
     "@preact/signals-core": "^1.5.1",
     "@tailwindcss/container-queries": "^0.1.1",
-    "astro": "^4.0.8",
+    "astro": "^4.1.1",
     "astro-icon": "^1.0.1",
     "astro-sst": "2.39.2",
     "electrodb": "^2.12.3",
