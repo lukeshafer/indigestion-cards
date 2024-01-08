@@ -12,7 +12,7 @@ import Card from './Card';
 const { card, pathType, showUsernames = false } = Astro.props;
 ---
 
-<div class="w-fit">
+<li class="w-fit" data-card={JSON.stringify(card)}>
 	<Show when={card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID}>
 		<Card slot="fallback" {...card} scale="var(--card-scale)" />
 		<a
@@ -32,4 +32,4 @@ const { card, pathType, showUsernames = false } = Astro.props;
 			</p>
 		</Show>
 	</Show>
-</div>
+</li>

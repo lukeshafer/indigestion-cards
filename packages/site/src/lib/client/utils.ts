@@ -3,12 +3,30 @@ import { FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import { z } from 'astro/zod';
 
 export const useViewTransition = (cb: () => unknown) =>
 	// @ts-expect-error - startViewTransition is not on Document yet
 	document.startViewTransition ? document.startViewTransition(cb) : cb();
 
 export type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
+
+export const cardListItemSchema = z.object({
+	rarityName: z.string(),
+	cardName: z.string(),
+	cardDescription: z.string(),
+	designId: z.string(),
+	cardNumber: z.number(),
+	totalOfType: z.number(),
+	rarityId: z.string(),
+	instanceId: z.string().optional(),
+	username: z.string().optional(),
+	openedAt: z.string().optional(),
+  frameUrl: z.string(),
+  imgUrl: z.string(),
+  rarityColor: z.string(),
+}) satisfies z.Schema<CardType>;
+export type CardListItem = z.infer<typeof cardListItemSchema>;
 
 export const sortTypes = [
 	{ value: 'rarest', label: 'Most to Least Rare' },
@@ -23,13 +41,14 @@ export const sortTypes = [
 
 export type SortType = (typeof sortTypes)[number]['value'];
 
-export function sortCards<T extends CardType>(args: {
+export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
 }) {
-	const { cards, sort } = args;
+	const { cards: originalCards, sort } = args;
+	const cards = originalCards.slice();
 
 	switch (sort) {
 		case 'card-name-asc':
@@ -87,7 +106,7 @@ export function sortCards<T extends CardType>(args: {
 	}
 }
 
-function rarestCardSort(a: CardType, b: CardType, rarityRanking?: RarityRankingRecord) {
+function rarestCardSort(a: CardListItem, b: CardListItem, rarityRanking?: RarityRankingRecord) {
 	if (rarityRanking) {
 		const aRank = rarityRanking[a.rarityId]?.ranking ?? Infinity;
 		const bRank = rarityRanking[b.rarityId]?.ranking ?? Infinity;

@@ -1,14 +1,12 @@
 ---
 import Page from '@/layouts/Page.astro';
-import CardListSolid from '@/components/cards/CardList';
-import CardListAstro from '@/components/cards/CardList.astro';
+import CardList from '@/components/cards/CardList.astro';
 import { getAllCardDesigns } from '@lib/design';
 import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 import { cachePage } from '@/lib/api';
-import { mapStream, streamAllCardDesigns } from '@/lib/stream';
 
-const designStream = streamAllCardDesigns();
+const designs = await getAllCardDesigns();
 
 cachePage(Astro);
 ---
@@ -17,24 +15,21 @@ cachePage(Astro);
 	<PageHeader>
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
-	{designStream}
-	<CardListAstro
+	<CardList
 		pathType="card"
-		cards={mapStream(designStream, cards =>
-			cards?.map(card => {
-				const bestRarity = card.bestRarityFound;
+		cards={designs.map(card => {
+			const bestRarity = card.bestRarityFound;
 
-				return {
-					...card,
-					rarityName: bestRarity?.rarityName ?? '',
-					rarityId: bestRarity?.rarityId ?? '',
-					frameUrl: bestRarity?.frameUrl ?? '',
-					rarityColor: bestRarity?.rarityColor ?? '',
-					totalOfType: bestRarity?.count ?? 1,
-					cardNumber: 1,
-				};
-			})
-		)}
+			return {
+				...card,
+				rarityName: bestRarity?.rarityName ?? '',
+				rarityId: bestRarity?.rarityId ?? '',
+				frameUrl: bestRarity?.frameUrl ?? '',
+				rarityColor: bestRarity?.rarityColor ?? '',
+				totalOfType: bestRarity?.count ?? 1,
+				cardNumber: 1,
+			};
+		})}
 		sortOnlyBy={['card-name-asc', 'card-name-desc']}
 	/>
 </Page>
