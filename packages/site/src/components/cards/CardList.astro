@@ -53,7 +53,7 @@ const allowedSortTypes = sortOnlyBy?.length
 </card-list>
 
 <script>
-	import { createSignal, createEffect, createRoot } from 'solid-js';
+	import { createSignal, createEffect } from 'solid-js';
 	import {
 		sortCards,
 		cardListItemSchema,
@@ -61,6 +61,33 @@ const allowedSortTypes = sortOnlyBy?.length
 		useViewTransition,
 	} from '@/lib/client/utils';
 	import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+	import { defineElement } from 'solid-enhancement';
+
+	defineElement(
+		{ name: 'card-list', attributes: ['no-sort'] as const },
+		({ attributes, $, $$ }) => {
+			const rarityRanking = JSON.parse(attributes['rarity-ranking']!) as RarityRankingRecord;
+			const cardList = $('ul');
+
+			const [sortMode, setSortMode] = createSignal($('select').value);
+			$('select').onchange = () => setSortMode($('select').value);
+
+			const cardsElementMap = parseCards($$('ul > li', HTMLLIElement));
+			const cardsDataList = Array.from(cardsElementMap.values()).map(value => value.card);
+
+			const sortedCards = () =>
+				sortCards({ cards: cardsDataList, sort: sortMode(), rarityRanking });
+
+			createEffect(() => {
+				if (attributes['no-sort']) return;
+				sortedCards().forEach(card => {
+					const data = cardsElementMap.get(card.instanceId || card.designId);
+					if (!data) return;
+					useViewTransition(() => cardList.appendChild(data.el));
+				});
+			});
+		}
+	);
 
 	function parseCards<El extends HTMLElement>(elements: NodeListOf<El>) {
 		return [...elements.values()].reduce<Map<string, { el: El; card: CardListItem }>>(
@@ -76,51 +103,4 @@ const allowedSortTypes = sortOnlyBy?.length
 			new Map()
 		);
 	}
-
-	customElements.define(
-		'card-list',
-		class CardList extends HTMLElement {
-			connectedCallback() {
-				createRoot(() => {
-					if (this.getAttribute('no-sort') !== null) return;
-
-					const rarityRanking = JSON.parse(
-						this.getAttribute('rarity-ranking')!
-					) as RarityRankingRecord;
-
-					const select = this.querySelector('select');
-					if (!select) return;
-
-					const cardList = this.querySelector('ul');
-					if (!cardList) return;
-
-					const [sortMode, setSortMode] = createSignal(select.value);
-					select.onchange = () => {
-						console.log('change');
-						setSortMode(select.value);
-					};
-
-					const cardsElementMap = parseCards(cardList.querySelectorAll('li'));
-					const cardsDataList = Array.from(cardsElementMap.values()).map(
-						value => value.card
-					);
-
-					const sortedCards = () =>
-						sortCards({ cards: cardsDataList, sort: sortMode(), rarityRanking });
-
-					createEffect(() => {
-						console.log('effect');
-						sortedCards().forEach(card => {
-							const data = cardsElementMap.get(card.instanceId || card.designId);
-							if (!data) return;
-							console.log('appending');
-							useViewTransition(() => {
-								cardList.appendChild(data.el);
-							});
-						});
-					});
-				});
-			}
-		}
-	);
 </script>
