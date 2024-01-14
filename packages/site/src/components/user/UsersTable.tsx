@@ -82,7 +82,7 @@ export default function UsersTable(props: { users: User[]; preorders?: Preorder[
 							</span>
 						</>
 					),
-					value: user.packCount,
+					value: user.packCount + user.preorders.length,
 				},
 			}))}
 		/>
