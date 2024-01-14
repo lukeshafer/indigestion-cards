@@ -1,5 +1,5 @@
 ---
-import CardList from '@/components/cards/CardList';
+import CardList from '@/components/cards/CardList.astro';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
@@ -7,7 +7,7 @@ import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
 import { Anchor, Heading } from '@/components/text';
 import UserLookingFor from '@/components/user/UserLookingFor';
-import Card from '@/components/cards/Card';
+import Card from '@/components/cards/Card.astro';
 import { cachePage } from '@/lib/api';
 import type { Props as HeaderProps } from '@/components/Header.astro';
 
@@ -119,7 +119,7 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 								: undefined
 						}
 						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
-						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
+						<Card {...pinnedCard} scale="var(--card-scale)" />
 					</a>
 				</div>
 			) : null
@@ -130,8 +130,7 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 		<CardList
 			cards={cardsNotInPack}
 			rarityRanking={rarityRanking}
-			client:load
-			isUserPage
+      pathType="user"
 			sortOnlyBy={[
 				'rarest',
 				'common',

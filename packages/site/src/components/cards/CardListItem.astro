@@ -1,13 +1,13 @@
 ---
 import Show from '@/components/Show.astro';
 import { NO_CARDS_OPENED_ID, routes } from '@/constants';
-import type { CardType } from '@/lib/client/utils';
+import type { CardProps } from '@/lib/client/utils';
 interface Props {
-	card: CardType;
+	card: CardProps;
 	pathType: 'user' | 'card';
 	showUsernames?: boolean;
 }
-import Card from './Card';
+import Card from './Card.astro';
 
 const { card, pathType, showUsernames = false } = Astro.props;
 ---

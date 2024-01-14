@@ -1,0 +1,158 @@
+---
+interface Props {
+	shiny?: boolean;
+}
+---
+
+<tilt-card>
+	<div class:list={{ shiny: Astro.props.shiny, inner: true }}>
+		<slot />
+	</div>
+</tilt-card>
+
+<script>
+	import { defineElement } from 'solid-enhancement';
+	import { createEffect } from 'solid-js';
+	import { createStore } from 'solid-js/store';
+	defineElement('tilt-card', ({ root, $ }) => {
+		const defaultState = {
+			transitionDuration: '0.1s',
+			isShineVisible: false,
+			x: 0,
+			y: 0,
+		};
+		const [state, setState] = createStore({ ...defaultState });
+		const resetCard = () => setState(defaultState);
+
+		// @ts-expect-error until I fix the types
+		const inner = $('tilt-card > .inner', HTMLDivElement);
+		createEffect(() => {
+			inner.style.setProperty('--shine-after-opacity', state.isShineVisible ? '1' : '0');
+			inner.style.setProperty('--x', String(state.x));
+			inner.style.setProperty('--y', String(state.y));
+			inner.style.transitionDuration = state.transitionDuration;
+		});
+
+		root.addEventListener('mouseenter', handleEnterEvent);
+		root.addEventListener('touchstart', handleEnterEvent);
+
+		function handleEnterEvent() {
+			if (checkAreAnimationsDisabled()) {
+				root.style.transition = 'transform 0.0s';
+				return;
+			} else root.style.removeProperty('transition');
+
+			root.addEventListener('mousemove', handleMoveEvent);
+			//root.addEventListener('touchmove', handleMoveEvent);
+			root.addEventListener('mouseleave', handleLeaveEvent);
+			//root.addEventListener('touchend', handleLeaveEvent);
+
+			setState('isShineVisible', true);
+			setTimeout(() => setState('transitionDuration', '0.0s'), 150);
+		}
+
+		function handleMoveEvent(e: MouseEvent | TouchEvent) {
+			if (checkAreAnimationsDisabled()) return;
+
+			if (e.type === 'touchmove') e.preventDefault();
+
+			const { clientX, clientY } = 'touches' in e ? e.touches[0] : e;
+			const { left, top, width, height } = root.getBoundingClientRect();
+
+			const x = Math.min(Math.max((clientX - left) / width - 0.5, -0.5), 0.5);
+			const y = Math.min(Math.max((clientY - top) / height - 0.5, -0.5), 0.5);
+
+			setState({ x, y });
+		}
+
+		function handleLeaveEvent() {
+			root.removeEventListener('mousemove', handleMoveEvent);
+			root.removeEventListener('touchmove', handleMoveEvent);
+			root.removeEventListener('mouseleave', handleLeaveEvent);
+			root.removeEventListener('touchend', handleLeaveEvent);
+
+			if (checkAreAnimationsDisabled()) return;
+			resetCard();
+		}
+	});
+
+	function checkAreAnimationsDisabled() {
+		return (
+			localStorage.getItem('disableAnimations') === 'true' ||
+			document.body.classList.contains('disable-animations')
+		);
+	}
+</script>
+
+<style>
+	tilt-card {
+		width: max-content;
+		position: relative;
+		transform-style: preserve-3d;
+		transition: transform 0.3s;
+		perspective: 900px;
+		display: block;
+		z-index: 1;
+
+		--shine-opacity: 0.2;
+		--shine-position: 50%;
+		--shine-after-opacity: 0;
+	}
+
+	tilt-card:hover {
+		transform: translateZ(300px);
+	}
+
+	.inner {
+		--angle: calc(sqrt(pow(var(--x), 2) + pow(var(--y), 2)) * 70deg);
+		--shine-position: calc(60% * var(--x) + 40% * var(--y) + 50%);
+		--shine-opacity: calc(var(--y) + var(--x) / 2 - 0.05);
+
+		transform: rotate3d(var(--y), calc(-1 * var(--x)), 0, var(--angle));
+		transition-property: transform;
+		transition-timing-function: linear;
+	}
+
+	.inner::before,
+	.inner::after {
+		transform: translateZ(200px);
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		display: block;
+		z-index: 1;
+		content: '';
+
+		background-position: var(--shine-position) 0%;
+		opacity: var(--shine-after-opacity);
+		transition: opacity 0.5s;
+		background-repeat: no-repeat;
+	}
+
+	.inner::after {
+		--shine-level: clamp(0.05, calc(-0.5 * var(--y)), 1);
+		background-size: 300% 200%;
+		background-image: radial-gradient(
+			ellipse at center,
+			rgba(49, 52, 56, var(--shine-level)) 0%,
+			rgba(49, 52, 56, calc(var(--shine-level) / 100)) 100%
+		);
+	}
+
+	.inner.shiny::before {
+		--shine-level: clamp(0.1, calc(0.6 * (1 - 3 * pow((var(--shine-opacity) - 0.5), 2))), 0.9);
+		background-size: 200% 110%;
+		background-image: linear-gradient(
+			110deg,
+			#fff0 0%,
+			hsl(calc(var(--shine-opacity) * 360) 100% 95% / 25%) 10%,
+			#fff3 20%,
+			hsl(calc(var(--shine-opacity) * 360) 100% 95% / var(--shine-level)) 35%,
+			rgb(255 255 255 / var(--shine-level)) 40%,
+			hsl(calc(var(--shine-opacity) * 360 + 180) 100% 95% / var(--shine-level)) 50%,
+			#fff3 80%,
+			#fff0 100%
+		);
+	}
+</style>

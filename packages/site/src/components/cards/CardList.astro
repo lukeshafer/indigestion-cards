@@ -1,6 +1,6 @@
 ---
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
-import type { CardType, SortType } from '@/lib/client/utils';
+import type { CardProps, SortType } from '@/lib/client/utils';
 import { sortTypes } from '@/lib/client/utils';
 import { Select } from '../form/Form';
 import { Show } from 'solid-js';
@@ -8,7 +8,7 @@ import CardListItem from './CardListItem.astro';
 import { mapStream } from '@/lib/stream';
 
 interface Props {
-	cards: CardType[] | ReadableStream<CardType[]>;
+	cards: CardProps[] | ReadableStream<CardProps[]>;
 	showUsernames?: boolean;
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
@@ -78,14 +78,17 @@ const allowedSortTypes = sortOnlyBy?.length
 			const sortedCards = () =>
 				sortCards({ cards: cardsDataList, sort: sortMode(), rarityRanking });
 
-			createEffect(() => {
-				if (attributes['no-sort']) return;
-				sortedCards().forEach(card => {
+			createEffect((prevSortedCards: Array<CardListItem>) => {
+				const cards = sortedCards();
+				if (attributes['no-sort']) return prevSortedCards;
+				if (JSON.stringify(cards) === JSON.stringify(prevSortedCards)) return cards;
+				cards.forEach(card => {
 					const data = cardsElementMap.get(card.instanceId || card.designId);
 					if (!data) return;
 					useViewTransition(() => cardList.appendChild(data.el));
 				});
-			});
+				return cards;
+			}, sortedCards());
 		}
 	);
 

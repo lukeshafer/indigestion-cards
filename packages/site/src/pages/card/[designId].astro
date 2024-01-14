@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Card from '@/components/cards/Card';
-import CardList from '@/components/cards/CardList';
+import Card from '@/components/cards/Card.astro';
+import CardList from '@/components/cards/CardList.astro';
 import { getCardDesignAndInstancesById } from '@lib/design';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
@@ -26,12 +26,12 @@ if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
-cachePage(Astro)
+cachePage(Astro);
 const siteConfig = await getSiteConfig();
 const rarityRanking = getRarityRanking(siteConfig);
 
 const baseRarity = design.bestRarityFound ||
-	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
+	design.rarityDetails?.find(r => r.rarityId === LEGACY_CARD_ID) ||
 	siteConfig?.baseRarity || {
 		rarityId: 'default',
 		rarityName: 'Default',
@@ -47,7 +47,7 @@ instances.sort((a, b) =>
 		: +a.totalOfType - +b.totalOfType
 );
 
-const openedInstances = instances.filter((instance) => instance.openedAt);
+const openedInstances = instances.filter(instance => instance.openedAt);
 ---
 
 <Page
@@ -57,7 +57,7 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
-		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
+		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} />
 		<section class="mx-auto text-lg">
 			<p>
 				<b>Season:{' '}</b>
@@ -74,7 +74,7 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 		<CardList
 			cards={openedInstances}
 			showUsernames
-			client:load
+			pathType="card"
 			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
 			rarityRanking={rarityRanking}
 		/>

@@ -24,7 +24,7 @@
     "astro-sst": "2.39.2",
     "electrodb": "^2.12.3",
     "fuse.js": "^7.0.0",
-    "solid-enhancement": "latest",
+    "solid-enhancement": "^0.0.5",
     "solid-js": "^1.8.10",
     "sst": "2.39.2",
     "tailwind-merge": "^2.1.0",
