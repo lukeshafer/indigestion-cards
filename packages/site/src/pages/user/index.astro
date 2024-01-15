@@ -3,12 +3,12 @@ import Page from '@/layouts/Page.astro';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
 import { PageHeader, PageTitle } from '@/components/text';
-import UsersTable from '@/components/user/UsersTable';
+import UsersTable from '@/components/user/UsersTable.astro';
 
 import { GET as getUsers } from '@/pages/data/users';
 import { cachePage } from '@/lib/api';
 
-cachePage(Astro)
+cachePage(Astro);
 
 const { data: users } = await getUsers();
 const preorders = await getAllPreorders();
@@ -19,6 +19,6 @@ const preorders = await getAllPreorders();
 		<PageTitle>Users</PageTitle>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
-		<UsersTable {users} {preorders} client:load />
+		<UsersTable {users} {preorders} />
 	</div>
 </Page>
