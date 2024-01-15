@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import Card from '@/components/cards/Card.astro';
+import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList.astro';
 import { getCardDesignAndInstancesById } from '@lib/design';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
@@ -57,7 +57,7 @@ const openedInstances = instances.filter(instance => instance.openedAt);
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
-		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} />
+		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
 		<section class="mx-auto text-lg">
 			<p>
 				<b>Season:{' '}</b>
