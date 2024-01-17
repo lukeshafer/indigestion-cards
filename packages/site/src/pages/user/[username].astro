@@ -1,5 +1,5 @@
 ---
-import CardList from '@/components/cards/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
 import { getUserAndCardInstances, createNewUser } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
@@ -130,7 +130,8 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 		<CardList
 			cards={cardsNotInPack}
 			rarityRanking={rarityRanking}
-      pathType="user"
+      client:load
+      isUserPage
 			sortOnlyBy={[
 				'rarest',
 				'common',

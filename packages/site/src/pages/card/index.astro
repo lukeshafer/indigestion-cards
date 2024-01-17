@@ -1,6 +1,6 @@
 ---
 import Page from '@/layouts/Page.astro';
-import CardList from '@/components/cards/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import { getAllCardDesigns } from '@lib/design';
 import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
@@ -16,7 +16,6 @@ cachePage(Astro);
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
-		pathType="card"
 		cards={designs.map(card => {
 			const bestRarity = card.bestRarityFound;
 

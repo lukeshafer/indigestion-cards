@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import Card from '@/components/cards/Card';
-import CardList from '@/components/cards/CardList.astro';
+import CardList from '@/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@lib/design';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
@@ -72,9 +72,9 @@ const openedInstances = instances.filter(instance => instance.openedAt);
 	<section class="flex flex-col text-center">
 		<Heading>Cards Opened</Heading>
 		<CardList
+			client:load
 			cards={openedInstances}
 			showUsernames
-			pathType="card"
 			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
 			rarityRanking={rarityRanking}
 		/>
