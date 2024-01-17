@@ -24,7 +24,6 @@ interface Props {
 		const [state, setState] = createStore({ ...defaultState });
 		const resetCard = () => setState(defaultState);
 
-		// @ts-expect-error until I fix the types
 		const inner = $('tilt-card > .inner', HTMLDivElement);
 		createEffect(() => {
 			inner.style.setProperty('--shine-after-opacity', state.isShineVisible ? '1' : '0');
