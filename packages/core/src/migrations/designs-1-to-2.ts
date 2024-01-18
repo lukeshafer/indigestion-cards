@@ -1,6 +1,6 @@
 import { Entity } from 'electrodb';
 import { config, auditAttributes } from '../db/_utils';
-import { cardDesigns } from 'src/db/cardDesigns';
+import { cardDesigns } from '../db/cardDesigns';
 
 export async function migration() {
 	const old = await oldDesigns.scan.go();

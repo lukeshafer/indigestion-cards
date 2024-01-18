@@ -12,7 +12,7 @@
     "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
-    "@astrojs/solid-js": "^3.0.3",
+    "@astrojs/solid-js": "^4.0.1",
     "@astrojs/tailwind": "^5.1.0",
     "@fontsource-variable/montserrat": "^5.0.14",
     "@formkit/auto-animate": "^0.7.0",
@@ -20,18 +20,18 @@
     "@preact/signals-core": "^1.5.1",
     "@tailwindcss/container-queries": "^0.1.1",
     "astro": "^4.1.1",
-    "astro-icon": "^1.0.1",
-    "astro-sst": "2.39.2",
+    "astro-icon": "^1.0.2",
+    "astro-sst": "2.39.6",
     "electrodb": "^2.12.3",
     "fuse.js": "^7.0.0",
     "solid-enhancement": "^0.0.5",
-    "solid-js": "^1.8.10",
-    "sst": "2.39.2",
+    "solid-js": "^1.8.11",
+    "sst": "2.39.6",
     "tailwind-merge": "^2.1.0",
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.3.4",
+    "@astrojs/check": "^0.4.1",
     "@aws-sdk/client-s3": "^3.398.0",
     "@aws-sdk/s3-presigned-post": "^3.398.0",
     "@tailwindcss/typography": "^0.5.10",
