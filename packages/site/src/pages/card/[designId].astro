@@ -26,12 +26,12 @@ if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
-cachePage(Astro)
+cachePage(Astro);
 const siteConfig = await getSiteConfig();
 const rarityRanking = getRarityRanking(siteConfig);
 
 const baseRarity = design.bestRarityFound ||
-	design.rarityDetails?.find((r) => r.rarityId === LEGACY_CARD_ID) ||
+	design.rarityDetails?.find(r => r.rarityId === LEGACY_CARD_ID) ||
 	siteConfig?.baseRarity || {
 		rarityId: 'default',
 		rarityName: 'Default',
@@ -47,7 +47,7 @@ instances.sort((a, b) =>
 		: +a.totalOfType - +b.totalOfType
 );
 
-const openedInstances = instances.filter((instance) => instance.openedAt);
+const openedInstances = instances.filter(instance => instance.openedAt);
 ---
 
 <Page
@@ -72,9 +72,9 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 	<section class="flex flex-col text-center">
 		<Heading>Cards Opened</Heading>
 		<CardList
+			client:load
 			cards={openedInstances}
 			showUsernames
-			client:load
 			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc']}
 			rarityRanking={rarityRanking}
 		/>

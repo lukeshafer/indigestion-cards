@@ -75,14 +75,12 @@ export default function Card(props: Props) {
               <img
                 src={ASSETS.CARDS.SHIT_PACK}
                 style={{
-                  animation:
-                    props.stamps?.includes('new-stamp')
-                      ? 'stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards'
-                      : undefined,
-                  'transform-origin':
-                    props.stamps?.includes('new-stamp')
-                      ? 'center'
-                      : undefined,
+                  animation: props.stamps?.includes('new-stamp')
+                    ? 'stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards'
+                    : undefined,
+                  'transform-origin': props.stamps?.includes('new-stamp')
+                    ? 'center'
+                    : undefined,
                 }}
                 classList={{
                   'opacity-80': !props.stamps?.includes('new-stamp'),

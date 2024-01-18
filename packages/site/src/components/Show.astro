@@ -1,0 +1,12 @@
+---
+interface Props {
+	/** Expression returning a truthy or falsy value */
+	when: any;
+	/** Fallback on a falsy `when` value. Can also use slot named fallback
+	 * e.g. <p slot="fallback">I only render on false</p>
+	 */
+	fallback?: any;
+}
+---
+
+{Astro.props.when ? <slot /> : Astro.props.fallback || <slot name="fallback" />}

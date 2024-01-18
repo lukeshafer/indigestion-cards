@@ -5,17 +5,13 @@ import {
 	type UpdateCardDesign,
 	cardDesigns,
 } from '../db/cardDesigns';
-import { getAllSeasons } from './season';
 import { cardInstances } from '../db/cardInstances';
 import { config } from '../db/_utils';
 import type { DBResult } from '../types';
 
 export async function getAllCardDesigns() {
-	const seasons = await getAllSeasons();
-	const results = await Promise.all(
-		seasons.map((season) => cardDesigns.query.bySeasonId({ seasonId: season.seasonId }).go())
-	);
-	return results.flatMap((result) => result.data);
+	const results = await cardDesigns.query.allDesigns({}).go({ pages: 'all' });
+	return results.data;
 }
 
 export async function getCardDesignById(args: { designId: string; userId: string }) {
