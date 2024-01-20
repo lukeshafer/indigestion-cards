@@ -16,6 +16,7 @@ cachePage(Astro);
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
+    client:load
 		cards={designs.map(card => {
 			const bestRarity = card.bestRarityFound;
 

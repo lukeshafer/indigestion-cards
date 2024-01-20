@@ -11,7 +11,7 @@ export default defineConfig({
     // @ts-expect-error until the SST adapter is updated for Astro 4
 	adapter: aws({
 		serverRoutes: ['api/*', 'trades/*'],
-		responseMode: 'stream',
+		//responseMode: 'stream',
 	}),
 	integrations: [tailwind(), 
     // @ts-expect-error until the solid integration is updated for Astro 4
