@@ -37,7 +37,7 @@ export default function Card(props: Props) {
         <article
           class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left"
           style={{
-            'background-color': props.rarityColor,
+            'background': props.rarityColor,
             'view-transition-name': `card-${props.instanceId ?? props.designId}`,
           }}>
           <img
