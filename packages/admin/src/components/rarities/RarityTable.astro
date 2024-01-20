@@ -26,14 +26,14 @@ const { rarities } = Astro.props;
 	</SortTableHead>
 	<SortTableBody>
 		{
-			rarities.map(({ rarityName, defaultCount, rarityId, frameUrl }) => (
+			rarities.map(({ rarityName, defaultCount, rarityId, frameUrl, rarityColor }) => (
 				<SortTableRow>
 					<SortTableCell column="name" value={rarityName} />
 					<SortTableCell column="count" value={defaultCount} showOnBreakpoint="sm" />
 					<SortTableCell column="actions" value="" showOnBreakpoint="sm">
 						<div class="grid gap-2">
 							<DeleteRarityButton {rarityId} {frameUrl} client:idle />
-							<RarityPreviewButton {frameUrl} />
+							<RarityPreviewButton {frameUrl} {rarityColor} />
 						</div>
 					</SortTableCell>
 				</SortTableRow>
