@@ -9,6 +9,7 @@
     "build": "sst bind astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "knip": "knip",
     "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
@@ -22,7 +23,6 @@
     "astro": "^4.2.1",
     "astro-icon": "^1.0.2",
     "astro-sst": "2.39.7",
-    "electrodb": "^2.13.0",
     "fuse.js": "^7.0.0",
     "solid-js": "^1.8.11",
     "sst": "2.39.7",
@@ -30,6 +30,7 @@
     "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
+    "electrodb": "^2.13.0",
     "@astrojs/check": "^0.4.1",
     "@aws-sdk/client-s3": "^3.496.0",
     "@aws-sdk/s3-presigned-post": "^3.496.0",
