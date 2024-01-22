@@ -3,18 +3,6 @@ import type { TwitchUser } from '@lib/twitch';
 import UserIcon from './icons/UserIcon';
 import { authApi } from '@/constants';
 
-function clickOutside(el: Element, close: () => void) {
-	const onClick = (e: MouseEvent) => {
-		if (!el.contains(e.target as Element)) {
-			e.stopPropagation();
-			close();
-		}
-	};
-	document.body.addEventListener('click', onClick);
-
-	onCleanup(() => document.body.removeEventListener('click', onClick));
-}
-
 export default function UserConfig(props: {
 	disableAnimations?: boolean;
 	user?: TwitchUser | undefined;
@@ -68,13 +56,23 @@ export default function UserConfig(props: {
 		<div class="relative z-10">
 			<UserConfigButton
 				user={props.user}
-				onClick={() => setIsOpen((v) => !v)}
+				onClick={() => setIsOpen(v => !v)}
 				open={isOpen()}
 			/>
 			<Show when={isOpen()}>
 				<menu
 					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20 dark:text-gray-100"
-					ref={(el) => clickOutside(el, () => setIsOpen(false))}>
+					ref={el => {
+						const onClick = (e: MouseEvent) => {
+							if (!(e.target instanceof Node) || !el.contains(e.target)) {
+								e.stopPropagation();
+								setIsOpen(false);
+							}
+						};
+						document.body.addEventListener('click', onClick);
+
+						onCleanup(() => document.body.removeEventListener('click', onClick));
+					}}>
 					{props.user ? (
 						<a
 							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
@@ -98,7 +96,7 @@ export default function UserConfig(props: {
 							}}
 							aria-pressed={disableAnimations()}
 							onClick={() => {
-								setDisableAnimations((v) => !v);
+								setDisableAnimations(v => !v);
 							}}>
 							Disable Animations
 						</button>
@@ -110,7 +108,7 @@ export default function UserConfig(props: {
 							}}
 							aria-pressed={colorTheme() === 'dark'}
 							onClick={() => {
-								setColorTheme((v) => (v === 'dark' ? 'light' : 'dark'));
+								setColorTheme(v => (v === 'dark' ? 'light' : 'dark'));
 							}}>
 							Dark Mode
 						</button>

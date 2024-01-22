@@ -6,16 +6,16 @@ import { useViewTransition } from '@/lib/client/utils';
 export function Form(props: {
 	children: JSX.Element;
 	method:
-	| 'get'
-	| 'post'
-	| 'dialog'
-	| 'put'
-	| 'delete'
-	| 'options'
-	| 'head'
-	| 'trace'
-	| 'connect'
-	| 'patch';
+		| 'get'
+		| 'post'
+		| 'dialog'
+		| 'put'
+		| 'delete'
+		| 'options'
+		| 'head'
+		| 'trace'
+		| 'connect'
+		| 'patch';
 	action?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
@@ -47,11 +47,18 @@ export function Form(props: {
 		return isLocal ? formURL.pathname + formURL.search : formURL.toString();
 	};
 
-	const handleSubmit = async (e: SubmitEvent) => {
+	const handleSubmit = async (
+		e: Event & {
+			submitter: HTMLElement;
+		} & {
+			currentTarget: HTMLFormElement;
+			target: Element;
+		}
+	) => {
 		e.preventDefault();
 		if (props.onsubmit) props.onsubmit(e);
 		if (props.confirm && !confirm(props.confirm)) return;
-		const form = e.target as HTMLFormElement;
+		const form = e.currentTarget;
 		const formData = new FormData(form);
 		const data = new URLSearchParams(formData as unknown as string);
 

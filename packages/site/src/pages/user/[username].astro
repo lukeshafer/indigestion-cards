@@ -11,6 +11,7 @@ import Card from '@/components/cards/Card';
 import { cachePage } from '@/lib/api';
 import type { Props as HeaderProps } from '@/components/Header.astro';
 
+console.log('username page')
 type Logo = HeaderProps['logo'];
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -129,8 +130,8 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 		<CardList
 			cards={cardsNotInPack}
 			rarityRanking={rarityRanking}
-			client:load
-			isUserPage
+      client:load
+      isUserPage
 			sortOnlyBy={[
 				'rarest',
 				'common',

@@ -8,7 +8,7 @@ import { cachePage } from '@/lib/api';
 
 const designs = await getAllCardDesigns();
 
-cachePage(Astro)
+cachePage(Astro);
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
@@ -16,7 +16,8 @@ cachePage(Astro)
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
-		cards={designs.map((card) => {
+    client:load
+		cards={designs.map(card => {
 			const bestRarity = card.bestRarityFound;
 
 			return {
@@ -30,7 +31,5 @@ cachePage(Astro)
 			};
 		})}
 		sortOnlyBy={['card-name-asc', 'card-name-desc']}
-		sessionType={Astro.locals.session?.type}
-		client:load
 	/>
 </Page>
