@@ -1,6 +1,6 @@
 ---
 import Base, { type BaseProps } from './Base.astro';
-import Breadcrumbs, { type Path } from '@/components/Breadcrumbs.astro';
+import Breadcrumbs, { type Path } from '@/components/Breadcrumbs';
 import Header, { type Props as HeaderProps } from '@/components/Header.astro';
 import Footer from '@/components/footer/Footer.astro';
 import AlertBox from '@/components/AlertBox';
@@ -16,7 +16,7 @@ export interface Props extends BaseProps {
 	alerts?: Alert[];
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
-  logo?: HeaderProps['logo']
+	logo?: HeaderProps['logo'];
 }
 
 const isAdmin = Astro.locals.session?.type === 'admin';
@@ -38,7 +38,7 @@ let {
 	'hide-breadcrumbs': hideBreadcrumbs,
 	'no-header': noHeader = false,
 	alerts: alertsProp,
-  logo,
+	logo,
 	...baseProps
 } = Astro.props;
 
@@ -51,7 +51,7 @@ alerts.push(...(alertsProp ?? []));
 		id="page-layout-wrapper"
 		data-api-url={Api.AdminApi.url}>
 		<div
-			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
+			class="relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950"
 			id="page-scroll-wrapper">
 			<LoadingBar client:load transition:persist transition:name="loadingbar" />
 			{noHeader ? null : <Header {logo} />}
@@ -60,7 +60,7 @@ alerts.push(...(alertsProp ?? []));
 			{
 				hideBreadcrumbs ? null : (
 					<div class="max-w-main mx-auto w-full">
-						<Breadcrumbs path={breadcrumbs ?? []} />
+						<Breadcrumbs path={breadcrumbs ?? []} currentPath={Astro.url.pathname} />
 					</div>
 				)
 			}

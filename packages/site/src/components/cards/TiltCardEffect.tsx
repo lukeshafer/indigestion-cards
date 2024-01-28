@@ -14,7 +14,6 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 
 	function cardTilt(el: HTMLDivElement) {
 		el.addEventListener('mouseenter', handleEnterEvent);
-		el.addEventListener('touchstart', handleEnterEvent);
 
 		function handleEnterEvent() {
 			if (
@@ -73,7 +72,7 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 		<div class={styles.outer} ref={cardTilt}>
 			<div
 				class={styles.inner}
-				classList={{ shiny: props.shiny ?? false }}
+				classList={{ [styles.shiny]: props.shiny ?? false }}
 				style={{
 					'--x': String(state.x),
 					'--y': String(state.y),
