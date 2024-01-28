@@ -33,7 +33,7 @@ export default function Card(props: Props) {
 
   return (
     <div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
-      <TiltCardEffect shiny={!isSecret()}>
+      <TiltCardEffect shiny={true}>
         <article
           class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left"
           style={{

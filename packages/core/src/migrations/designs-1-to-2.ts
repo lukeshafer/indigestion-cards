@@ -3,7 +3,7 @@ import { config, auditAttributes } from '../db/_utils';
 import { cardDesigns } from '../db/cardDesigns';
 
 export async function migration() {
-	const old = await oldDesigns.scan.go();
+	const old = await oldDesigns.scan.go({ pages: 'all' });
 	let successCount = 0;
 	let errorCount = 0;
 	for (const design of old.data) {

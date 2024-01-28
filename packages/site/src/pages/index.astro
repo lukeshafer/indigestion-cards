@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import FAQ from '@/content/faq.md';
 import { ASSETS } from '@/constants';
-import RemainingPackCount from '@/components/RemainingPackCount.astro';
+import RemainingPackCount from '@/components/RemainingPackCount';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const siteConfig = await getSiteConfig();
@@ -42,7 +42,7 @@ const siteConfig = await getSiteConfig();
 						<span class="text-brand-main text-shadow-brand block font-bold">
 							community
 						</span>
-						<RemainingPackCount />
+						<RemainingPackCount client:idle />
 					</h2>
 				) : (
 					<h2 class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300" transition:name="hero-text-h2">
@@ -56,7 +56,7 @@ const siteConfig = await getSiteConfig();
 							</span>
 						</>
 						<p class="py-8 text-xs">* Cards not yet tradeable.</p>
-						<RemainingPackCount />
+						<RemainingPackCount client:idle />
 					</h2>
 				)
 			}
