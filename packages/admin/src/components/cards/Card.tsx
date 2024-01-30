@@ -32,7 +32,7 @@ export default function Card(props: Props) {
 	const cardDescription = () =>
 		isFullArt() || isLegacy() || isSecret() ? '' : props.cardDescription;
 	const frameUrl = () => (isSecret() ? '' : props.frameUrl);
-	const imgUrl = () => (isSecret() ? ASSETS.CARDS.CARD_BACK : props.imgUrl);
+	const imgUrl = () => props.imgUrl;
 
 	const isShitPack = () => props.stamps?.includes('shit-pack');
 
@@ -41,7 +41,7 @@ export default function Card(props: Props) {
 			<article
 				class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left"
 				style={{
-					'background': props.rarityColor,
+					background: props.rarityColor,
 					'view-transition-name': `card-${props.instanceId ?? props.designId}`,
 				}}>
 				<img src={imgUrl()} alt={props.cardName} loading="lazy" class="absolute inset-0" />
