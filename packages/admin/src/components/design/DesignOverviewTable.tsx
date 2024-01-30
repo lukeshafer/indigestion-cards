@@ -3,6 +3,7 @@ import Table from '@/components/table/Table';
 export default function DesignOverviewTable(props: {
 	rarityStatsArray: {
 		rarityName: string;
+		rarityId: string;
 		received: number;
 		opened: number;
 		unopened: number;
@@ -14,6 +15,10 @@ export default function DesignOverviewTable(props: {
 		<Table
 			compact
 			columns={[
+				{
+					name: 'rarityId',
+					label: 'Rarity Id',
+				},
 				{
 					name: 'rarityName',
 					label: 'Rarity',
@@ -48,7 +53,8 @@ export default function DesignOverviewTable(props: {
 					type: 'number',
 				},
 			]}
-			rows={props.rarityStatsArray.map((rarityStats) => ({
+			rows={props.rarityStatsArray.map(rarityStats => ({
+				rarityId: rarityStats.rarityId,
 				rarityName: rarityStats.rarityName,
 				received: rarityStats.received,
 				opened: rarityStats.opened,
