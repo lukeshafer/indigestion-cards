@@ -20,6 +20,10 @@ export function Sites({ app, stack }: StackContext) {
 
   const site = new AstroSite(stack, 'site', {
     path: 'packages/site',
+    dev: {
+      deploy: true,
+      url: ""
+    },
     bind: [
       table,
       adminApi,
@@ -37,9 +41,10 @@ export function Sites({ app, stack }: StackContext) {
       bus,
     ],
     customDomain:
-      app.mode === 'dev'
-        ? undefined
-        : {
+      //app.mode === 'dev'
+        //? undefined
+        //: 
+      {
           domainName: baseDomain,
           hostedZone: hostedZone,
         },

@@ -382,6 +382,7 @@ export async function processTrade(trade: Trade) {
 						.append({
 							tradeHistory: [
 								{
+									version: 2,
 									tradeId: trade.tradeId,
 									status: 'completed',
 									completedAt: Date.now(),
@@ -398,6 +399,7 @@ export async function processTrade(trade: Trade) {
 						.append({
 							tradeHistory: [
 								{
+									version: 2,
 									tradeId: trade.tradeId,
 									status: 'completed',
 									completedAt: Date.now(),
@@ -424,21 +426,21 @@ function formatToAndFromUsers(args: { card: CardInstance; trade: Trade }): {
 	toUserId: string;
 	toUsername: string;
 } {
-	if (args.card.userId === args.trade.receiverUserId)
-		return {
-			toUserId: args.trade.senderUserId,
-			toUsername: args.trade.senderUsername,
-			fromUserId: args.trade.receiverUserId,
-			fromUsername: args.trade.receiverUsername,
-		};
-	else if (args.card.userId === args.trade.senderUserId)
+	if (args.card.userId === args.trade.receiverUserId) {
 		return {
 			toUserId: args.trade.receiverUserId,
 			toUsername: args.trade.receiverUsername,
 			fromUserId: args.trade.senderUserId,
 			fromUsername: args.trade.senderUsername,
 		};
-	else throw new Error('Card cannot be traded between these two users.');
+	} else if (args.card.userId === args.trade.senderUserId) {
+		return {
+			toUserId: args.trade.senderUserId,
+			toUsername: args.trade.senderUsername,
+			fromUserId: args.trade.receiverUserId,
+			fromUsername: args.trade.receiverUsername,
+		};
+	} else throw new Error('Card cannot be traded between these two users.');
 }
 
 async function getAndValidateUserAndCardInstances(username: string) {
