@@ -1,0 +1,13 @@
+guildencrantz trade problem
+firefox testing, creating trades not working for RJ
+shit stamps don't show
+shit pack calculation
+marsh having trouble on mobile (2:13ish on the vod)
+dokuritsu bug in bug thread
+pinned cards aren't handled
+sorting the status doesn't make a ton of sense
+oliver's bug (in DMs)
+add card searching
+tony mentioned sorting issues in bugs thread
+randommisao mentioned a bug when trying to trade
+fix the FAQ

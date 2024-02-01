@@ -51,6 +51,12 @@ const tradeCardsProperties = {
     type: 'number',
     required: true,
   },
+  stamps: {
+    type: 'list',
+    items: {
+      type: 'string',
+    },
+  },
 } as const;
 
 export const trades = new Entity(

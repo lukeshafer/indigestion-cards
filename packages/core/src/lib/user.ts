@@ -66,7 +66,7 @@ export async function getUserAndOpenedCardInstances(args: { username: string }):
 	return {
 		users: data.users,
 		userLogins: data.userLogins,
-		cardInstances: data.cardInstances.filter((card) => card.openedAt),
+		cardInstances: data.cardInstances.filter(card => card.openedAt),
 	};
 }
 
@@ -86,7 +86,7 @@ export async function getUserAndCard(args: { username: string; instanceId: strin
 
 	try {
 		const data = await service.collections.cardsByOwnerName({ username: args.username }).go();
-		const card = data.data.cardInstances.find((card) => card.instanceId === args.instanceId);
+		const card = data.data.cardInstances.find(card => card.instanceId === args.instanceId);
 		if (!card) throw new Error('Card not found');
 		return {
 			user: data.data.users[0],
@@ -160,6 +160,7 @@ export async function updateUsername(
 
 	console.log(`Updating username on user from ${args.oldUsername} to ${args.newUsername}`);
 	await users.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
+	await userLogins.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
 
 	console.log(`Updating username on packs from ${args.oldUsername} to ${args.newUsername}`);
 	await batchUpdatePackUsername({
@@ -179,7 +180,7 @@ export async function batchUpdateUsers(usersInput: CreateUser[]) {
 }
 
 export async function checkIfUserExists(userId: string): Promise<boolean> {
-	return getUser(userId).then((user) => !!user);
+	return getUser(userId).then(user => !!user);
 }
 
 export async function checkIfUsernameExists(userName: string) {
@@ -200,38 +201,38 @@ export async function setUserProfile(args: {
 
 	const card = args.pinnedCard
 		? await cardInstances.query
-			.byId(args.pinnedCard)
-			.go()
-			.then((result) =>
-				result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
-					? result.data[0]
-					: user.pinnedCard
-			)
+				.byId(args.pinnedCard)
+				.go()
+				.then(result =>
+					result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
+						? result.data[0]
+						: user.pinnedCard
+				)
 		: args.pinnedCard === null
 			? ({
-				instanceId: '',
-				designId: '',
-				imgUrl: '',
-				userId: '',
-				username: '',
-				cardName: '',
-				frameUrl: '',
-				rarityId: '',
-				rarityName: '',
-				seasonId: '',
-				cardNumber: 0,
-				seasonName: '',
-				rarityColor: '',
-				totalOfType: 0,
-				cardDescription: '',
-			} satisfies CardInstance)
+					instanceId: '',
+					designId: '',
+					imgUrl: '',
+					userId: '',
+					username: '',
+					cardName: '',
+					frameUrl: '',
+					rarityId: '',
+					rarityName: '',
+					seasonId: '',
+					cardNumber: 0,
+					seasonName: '',
+					rarityColor: '',
+					totalOfType: 0,
+					cardDescription: '',
+				} satisfies CardInstance)
 			: user.pinnedCard;
 
 	return users
 		.patch({ userId: args.userId })
-		.set({ lookingFor: args.lookingFor?.slice(0,500) ?? user.lookingFor, pinnedCard: card })
+		.set({ lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor, pinnedCard: card })
 		.go()
-		.then((result) => result.data);
+		.then(result => result.data);
 }
 
 export async function removeTradeNotification(args: { userId: string; tradeId: string }) {
@@ -245,7 +246,7 @@ export async function removeTradeNotification(args: { userId: string; tradeId: s
 		.patch({ userId: args.userId })
 		.set({
 			tradeNotifications: user.tradeNotifications?.filter(
-				(notification) => notification.tradeId !== args.tradeId
+				notification => notification.tradeId !== args.tradeId
 			),
 		})
 		.go();
