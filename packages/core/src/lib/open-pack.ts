@@ -153,7 +153,7 @@ export async function openCardFromPack(args: {
 	);
 	const deletePack = newCardDetails.every((c) => c.opened);
 	const isShitPack = deletePack
-		? newCardDetails.every((c) => c.rarityId === SHIT_PACK_RARITY_ID)
+		? newCardDetails.every((c) => c.rarityId.startsWith(SHIT_PACK_RARITY_ID))
 		: false;
 
 	const updateRarity = checkIsRarityBetter(

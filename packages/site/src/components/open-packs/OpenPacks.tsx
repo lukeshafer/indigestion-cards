@@ -226,7 +226,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 
 			if (
 				this.activePack?.cardDetails.every(
-					(card) => card.opened && card.rarityId === SHIT_PACK_RARITY_ID
+					(card) => card.opened && card.rarityId.startsWith(SHIT_PACK_RARITY_ID)
 				)
 			)
 				setTimeout(
