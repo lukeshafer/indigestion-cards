@@ -11,3 +11,4 @@ add card searching
 tony mentioned sorting issues in bugs thread
 randommisao mentioned a bug when trying to trade
 fix the FAQ
+rj's cards arent loading on new trades
