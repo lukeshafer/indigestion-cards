@@ -35,7 +35,7 @@ export async function createTradeFromApi(params: {
 	requestedCards: string[];
 	message?: string;
 }) {
-  console.log("Creating trade", { params })
+	console.log('Creating trade', { params });
 
 	if (params.senderUsername === params.receiverUsername) {
 		throw new InputValidationError('Cannot trade with yourself');
@@ -362,6 +362,25 @@ export async function processTrade(trade: Trade) {
 			.write(({ cardInstances, users, trades }) => [
 				users
 					.patch({ userId: sender.user.userId })
+					.set({
+						pinnedCard: trade.offeredCards.some(
+							card => card.instanceId === sender.user.pinnedCard?.instanceId
+						)
+							? {
+									instanceId: '',
+									designId: '',
+									imgUrl: '',
+									cardName: '',
+									frameUrl: '',
+									rarityId: '',
+									rarityName: '',
+									cardNumber: 0,
+									rarityColor: '',
+									totalOfType: 0,
+									cardDescription: '',
+								}
+							: sender.user.pinnedCard,
+					})
 					.add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
 					.append({
 						tradeNotifications: [
@@ -375,6 +394,25 @@ export async function processTrade(trade: Trade) {
 					.commit(),
 				users
 					.patch({ userId: receiver.user.userId })
+					.set({
+						pinnedCard: trade.requestedCards.some(
+							card => card.instanceId === receiver.user.pinnedCard?.instanceId
+						)
+							? {
+									instanceId: '',
+									designId: '',
+									imgUrl: '',
+									cardName: '',
+									frameUrl: '',
+									rarityId: '',
+									rarityName: '',
+									cardNumber: 0,
+									rarityColor: '',
+									totalOfType: 0,
+									cardDescription: '',
+								}
+							: receiver.user.pinnedCard,
+					})
 					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
 					.commit(),
 				...offeredCardsMoveToReceiver.map(card =>
