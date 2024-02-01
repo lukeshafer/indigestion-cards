@@ -35,6 +35,8 @@ export async function createTradeFromApi(params: {
 	requestedCards: string[];
 	message?: string;
 }) {
+  console.log("Creating trade", { params })
+
 	if (params.senderUsername === params.receiverUsername) {
 		throw new InputValidationError('Cannot trade with yourself');
 	}
@@ -95,7 +97,7 @@ export async function createTradeFromApi(params: {
 	};
 
 	try {
-		console.log({ tradeOptions });
+		console.log({ tradeOptions: JSON.stringify(tradeOptions) });
 		const trade = await trades.create(tradeOptions).go();
 		const user = await users
 			.patch({ userId: tradeOptions.receiverUserId })

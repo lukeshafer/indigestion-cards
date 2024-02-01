@@ -98,6 +98,7 @@ export default function NewTrade(props: {
 			<form class="sr-only" id="reset-form"></form>
 			<form
 				method="post"
+        action="/api/trades/create-trade"
 				ref={el => setState('form', el)}
 				class="mx-auto max-w-7xl"
 				enctype="application/x-www-form-urlencoded">

@@ -1,5 +1,3 @@
-trade history is wrong?
-icelos' trading (account) doesn't work
 guildencrantz trade problem
 firefox testing, creating trades not working for RJ
 shit stamps don't show
@@ -10,3 +8,6 @@ pinned cards aren't handled
 sorting the status doesn't make a ton of sense
 oliver's bug (in DMs)
 add card searching
+tony mentioned sorting issues in bugs thread
+randommisao mentioned a bug when trying to trade
+fix the FAQ

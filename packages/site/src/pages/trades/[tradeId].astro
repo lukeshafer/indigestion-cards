@@ -4,78 +4,16 @@ import { Heading } from '@/components/text';
 import OfferWindow from '@/components/trades/OfferWindow';
 import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
 import { routeNames, routes } from '@/constants';
-import Page, { type Props as PageProps } from '@/layouts/Page.astro';
-import { InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
-import { validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
+import Page from '@/layouts/Page.astro';
 import { removeTradeNotification } from '@lil-indigestion-cards/core/lib/user';
-import {
-	getTrade,
-	updateTradeStatus,
-	addMessageToTrade,
-} from '@lil-indigestion-cards/core/lib/trades';
+import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
 import { Show } from 'solid-js';
 
-const alerts: PageProps['alerts'] = [];
-
-const username = Astro.locals.user?.properties.username;
-const userId = Astro.locals.user?.properties.userId;
+const userId = Astro.locals.session?.properties.userId || undefined;
 
 const tradeId = Astro.params.tradeId;
 if (!tradeId) {
 	return Astro.redirect('/trades?alert=Invalid trade ID&type=error');
-}
-
-if (Astro.request.method === 'POST') {
-	if (!username || !userId) {
-		return new Response('You must be logged in to update a trade.', {
-			status: 401,
-		});
-	}
-	const body = new URLSearchParams(await Astro.request.text());
-	const result = validateSearchParams(body, {
-		status: 'string?',
-		message: 'string?',
-	});
-
-	if (!result.success) {
-		alerts.push({ type: 'error', message: 'No data provided in request.' });
-	} else if (Object.values(result.value).every((v) => v === undefined)) {
-		alerts.push({ type: 'error', message: 'No update status provided.' });
-	} else {
-		const { status, message } = result.value;
-
-		if (status)
-			try {
-				await updateTradeStatus({
-					tradeId,
-					status,
-					loggedInUserId: userId,
-				});
-			} catch (err) {
-				if (err instanceof InputValidationError) {
-					alerts.push({ type: 'error', message: err.message });
-				} else {
-					console.error(err);
-					alerts.push({
-						type: 'error',
-						message: 'An error occurred while updating the trade.',
-					});
-				}
-			}
-
-		if (message) {
-			await addMessageToTrade({
-				loggedInUserId: userId,
-				tradeId,
-				message: {
-					message,
-					userId,
-					type: 'message',
-				},
-			});
-			// add message to the trade data
-		}
-	}
 }
 
 const trade = await getTrade(tradeId);
@@ -83,8 +21,8 @@ if (!trade) {
 	return Astro.redirect('/trades?alert=Trade not found&type=error');
 }
 
-const isSender = trade.senderUsername.toLowerCase() === username?.toLowerCase();
-const isReceiver = trade.receiverUsername.toLowerCase() === username?.toLowerCase();
+const isSender = trade.senderUserId.toLowerCase() === userId?.toLowerCase();
+const isReceiver = trade.receiverUserId.toLowerCase() === userId?.toLowerCase();
 
 if (
 	userId &&
@@ -182,15 +120,19 @@ const tradeStatus = (() => {
 			<div class="col-span-full justify-self-center">
 				{
 					isSender ? (
-						<form method="post" enctype="application/x-www-form-urlencoded">
-							<input type="hidden" name="tradeId" value={trade.tradeId} />
+						<form
+							method="post"
+							enctype="application/x-www-form-urlencoded"
+							action={`/api/trades/update-trade/${trade.tradeId}`}>
 							<input type="hidden" name="status" value="canceled" />
 							<DeleteButton>Cancel offer</DeleteButton>
 						</form>
 					) : isReceiver ? (
 						<div class="flex flex-wrap gap-2">
-							<form method="post" enctype="application/x-www-form-urlencoded">
-								<input type="hidden" name="tradeId" value={trade.tradeId} />
+							<form
+								method="post"
+								enctype="application/x-www-form-urlencoded"
+								action={`/api/trades/update-trade/${trade.tradeId}`}>
 								<input type="hidden" name="status" value="accepted" />
 								<SubmitButton
 									confirm="Are you sure you want to accept this trade? Once accepted, the trade is final and cannot be reversed."
@@ -198,8 +140,10 @@ const tradeStatus = (() => {
 									<div class="min-w-[8rem]">Accept offer</div>
 								</SubmitButton>
 							</form>
-							<form method="post" enctype="application/x-www-form-urlencoded">
-								<input type="hidden" name="tradeId" value={trade.tradeId} />
+							<form
+								method="post"
+								enctype="application/x-www-form-urlencoded"
+								action={`/api/trades/update-trade/${trade.tradeId}`}>
 								<input type="hidden" name="status" value="rejected" />
 								<DeleteButton
 									confirm="Are you sure you want to reject this trade?"
