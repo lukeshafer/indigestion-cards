@@ -85,7 +85,7 @@ export function Form(props: {
 
 		if (response.redirected) {
 			try {
-				navigate(response.url);
+				await navigate(response.url);
 			} catch {
 				location.assign(response.url);
 			}
