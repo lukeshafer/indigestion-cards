@@ -84,8 +84,11 @@ export function Form(props: {
 			.finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-      return navigate(response.url);
-			//return location.assign(response.url);
+			try {
+				await navigate(response.url);
+			} catch {
+				location.assign(response.url);
+			}
 		}
 
 		const responseBody = await response.text();
