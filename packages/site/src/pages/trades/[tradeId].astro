@@ -1,5 +1,5 @@
 ---
-import { DeleteButton, SubmitButton } from '@/components/form/Form';
+import { DeleteButton, Form, SubmitButton } from '@/components/form/Form';
 import { Heading } from '@/components/text';
 import OfferWindow from '@/components/trades/OfferWindow';
 import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
@@ -120,16 +120,18 @@ const tradeStatus = (() => {
 			<div class="col-span-full justify-self-center">
 				{
 					isSender ? (
-						<form
+						<Form
+							client:load
 							method="post"
 							enctype="application/x-www-form-urlencoded"
 							action={`/api/trades/update-trade/${trade.tradeId}`}>
 							<input type="hidden" name="status" value="canceled" />
 							<DeleteButton>Cancel offer</DeleteButton>
-						</form>
+						</Form>
 					) : isReceiver ? (
 						<div class="flex flex-wrap gap-2">
-							<form
+							<Form
+								client:load
 								method="post"
 								enctype="application/x-www-form-urlencoded"
 								action={`/api/trades/update-trade/${trade.tradeId}`}>
@@ -139,8 +141,9 @@ const tradeStatus = (() => {
 									client:idle>
 									<div class="min-w-[8rem]">Accept offer</div>
 								</SubmitButton>
-							</form>
-							<form
+							</Form>
+							<Form
+								client:load
 								method="post"
 								enctype="application/x-www-form-urlencoded"
 								action={`/api/trades/update-trade/${trade.tradeId}`}>
@@ -150,7 +153,7 @@ const tradeStatus = (() => {
 									client:idle>
 									<div class="min-w-[8rem]">Reject offer</div>
 								</DeleteButton>
-							</form>
+							</Form>
 						</div>
 					) : null
 				}

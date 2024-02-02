@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
-import { Suspense, createResource, type JSX, Show, createEffect, on } from 'solid-js';
+import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { USER_API, UNTRADEABLE_RARITY_IDS } from '@/constants';
@@ -9,12 +9,14 @@ import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import { navigate } from 'astro:transitions/client'
 
 type TradeState = {
 	offeredCards: TradeCard[];
 	requestedCards: TradeCard[];
 	receiverUsername: string | null;
 	form: HTMLFormElement | null;
+	formDataParams: URLSearchParams | undefined;
 };
 
 export type TradeCardUi = CardInstance & { checked: boolean };
@@ -34,7 +36,23 @@ export default function NewTrade(props: {
 		requestedCards: props.initialRequestedCards ?? [],
 		receiverUsername: props.initialReceiverUsername ?? null,
 		form: null,
+		get formDataParams() {
+			const form = this.form;
+			if (!form) return undefined;
+			const formData = new FormData(form);
+			formData.delete('offeredCards');
+			formData.delete('requestedCards');
+			state.offeredCards.forEach(card => formData.append('offeredCards', card.instanceId));
+			state.requestedCards.forEach(card =>
+				formData.append('requestedCards', card.instanceId)
+			);
+
+			// @ts-expect-error - there are no files in this form
+			return new URLSearchParams([...formData.entries()]);
+		},
 	});
+
+	const [isLoading, setIsLoading] = createSignal(false);
 
 	const [users] = createResource(async () => get('usernames'));
 
@@ -98,10 +116,29 @@ export default function NewTrade(props: {
 			<form class="sr-only" id="reset-form"></form>
 			<form
 				method="post"
-        action="/api/trades/create-trade"
+				action="/api/trades/create-trade"
 				ref={el => setState('form', el)}
-				class="mx-auto max-w-7xl"
+				onSubmit={async e => {
+					e.preventDefault();
+					setIsLoading(true);
+					try {
+						const response = await fetch(state.form!.action, {
+							method: 'post',
+							body: state.formDataParams?.toString(),
+						});
+
+            if (response.redirected) {
+              navigate(response.url);
+            }
+					} finally {
+						setIsLoading(false);
+					}
+				}}
+				class="relative mx-auto max-w-7xl"
 				enctype="application/x-www-form-urlencoded">
+				<Show when={isLoading()}>
+					<Loading loadingText="Sending your trade" />
+				</Show>
 				<div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
 					<Section heading="Offer">
 						<input type="hidden" name="senderUsername" value={props.username} />
@@ -222,12 +259,9 @@ const updateUrlFromState = (state: TradeState) => {
 				() => state.receiverUsername,
 			],
 			() => {
-				//console.log('updating url');
-				const form = state.form;
-				if (!form) return;
-				const formData = new FormData(form);
-				// @ts-expect-error - there are no files in this form
-				const params = new URLSearchParams([...formData.entries()]);
+				const params = state.formDataParams;
+				if (!params) return;
+
 				params.delete('search');
 				if (!params.get('receiverUsername')) params.delete('receiverUsername');
 

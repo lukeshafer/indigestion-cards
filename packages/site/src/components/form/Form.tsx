@@ -2,6 +2,7 @@ import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
 import { useViewTransition } from '@/lib/client/utils';
+import { navigate } from 'astro:transitions/client';
 
 export function Form(props: {
 	children: JSX.Element;
@@ -83,7 +84,8 @@ export function Form(props: {
 			.finally(() => setIsLoading(false));
 
 		if (response.redirected) {
-			return location.assign(response.url);
+      return navigate(response.url);
+			//return location.assign(response.url);
 		}
 
 		const responseBody = await response.text();
