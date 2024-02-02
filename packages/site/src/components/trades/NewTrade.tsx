@@ -9,7 +9,7 @@ import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
-import { navigate } from 'astro:transitions/client'
+import { navigate } from 'astro:transitions/client';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -127,9 +127,13 @@ export default function NewTrade(props: {
 							body: state.formDataParams?.toString(),
 						});
 
-            if (response.redirected) {
-              navigate(response.url);
-            }
+						if (response.redirected) {
+							try {
+								navigate(response.url);
+							} catch {
+								location.assign(response.url);
+							}
+						}
 					} finally {
 						setIsLoading(false);
 					}
