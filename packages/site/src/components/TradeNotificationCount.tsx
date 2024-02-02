@@ -6,7 +6,6 @@ export default function TradeNotificationCount(props: { username: string }) {
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {
-      console.log('fetching notification count')
 			const user = await get('user', [username]);
 			return (
 				user?.tradeNotifications?.reduce(
@@ -17,8 +16,15 @@ export default function TradeNotificationCount(props: { username: string }) {
 		}
 	);
 
-	onMount(() => globalThis.addEventListener?.('astro:page-load', refetch));
-	onCleanup(() => globalThis.removeEventListener?.('astro:page-load', refetch));
+  let interval: NodeJS.Timeout;
+	onMount(() => {
+		globalThis.addEventListener?.('astro:page-load', refetch);
+    interval = setInterval(refetch, 5000);
+	});
+	onCleanup(() => {
+		globalThis.removeEventListener?.('astro:page-load', refetch);
+    clearInterval(interval);
+	});
 
 	return (
 		<Show when={count()}>

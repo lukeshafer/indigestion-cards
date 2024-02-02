@@ -1,0 +1,11 @@
+---
+import FAQEditor from '@/components/FAQEditor';
+import Page from '@/layouts/Page.astro';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+
+const siteConfig = await getSiteConfig();
+---
+
+<Page title="FAQ">
+	<FAQEditor faq={siteConfig.faq || ''} client:load />
+</Page>

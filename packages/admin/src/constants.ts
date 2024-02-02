@@ -15,6 +15,7 @@ const api_paths = {
 	TWITCH_CHATTERS: '/twitch/chatters',
 	PREORDER: '/preorder',
 	CONVERT_PREORDERS: '/convert-all-preorders-to-pack',
+  FAQ: '/faq',
 };
 
 export const API = new Proxy(api_paths, {

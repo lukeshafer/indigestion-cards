@@ -1,7 +1,7 @@
 ---
 import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
-import { getUserAndCardInstances, createNewUser } from '@lib/user';
+import { createNewUser, getUserAndOpenedCardInstances } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
@@ -26,7 +26,7 @@ if (!id) {
 }
 
 let [userData, rarityRanking] = await Promise.all([
-	getUserAndCardInstances({ username: id }),
+	getUserAndOpenedCardInstances({ username: id }),
 	getRarityRanking(),
 ]);
 
@@ -58,8 +58,8 @@ const user = users[0] || {
 };
 
 const pinnedCard = user.pinnedCard;
-const cardsNotInPack = cardInstances.filter(
-	card => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+const unpinnedCards = cardInstances.filter(
+	card => card.instanceId !== pinnedCard?.instanceId
 );
 
 const userLogoMap: Record<string, Logo | undefined> = {
@@ -128,7 +128,7 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
 		<CardList
-			cards={cardsNotInPack}
+			cards={unpinnedCards}
 			rarityRanking={rarityRanking}
       client:load
       isUserPage
