@@ -86,6 +86,8 @@ export function API({ app, stack }: StackContext) {
 			// CONVERT-PREORDERS-TO-PACKS
 			'POST /convert-all-preorders-to-pack':
 				'packages/functions/src/admin-api/convert-all-preorders-to-pack/post.handler',
+      // FAQ
+      'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
 
 			// USER ENDPOINTS
 			// USER

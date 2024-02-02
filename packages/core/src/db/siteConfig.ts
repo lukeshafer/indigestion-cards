@@ -74,6 +74,9 @@ export const siteConfig = new Entity(
       tradingIsEnabled: {
         type: 'boolean',
       },
+      faq: {
+        type: 'string',
+      },
       ...auditAttributes('siteConfig'),
     },
     indexes: {

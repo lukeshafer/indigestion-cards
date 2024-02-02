@@ -240,6 +240,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
+        children={props.children}
 				onInput={(e) => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>

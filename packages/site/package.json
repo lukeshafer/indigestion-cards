@@ -25,16 +25,17 @@
     "astro-sst": "2.39.7",
     "fuse.js": "^7.0.0",
     "solid-js": "^1.8.11",
+    "solid-markdown": "^2.0.0",
     "sst": "2.39.7",
     "tailwind-merge": "^2.2.0",
     "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
-    "electrodb": "^2.13.0",
     "@astrojs/check": "^0.4.1",
     "@aws-sdk/client-s3": "^3.496.0",
     "@aws-sdk/s3-presigned-post": "^3.496.0",
     "@tailwindcss/typography": "^0.5.10",
+    "electrodb": "^2.13.0",
     "postcss": "^8.4.33",
     "typescript": "^5.3.3",
     "zod": "^3.22.4"
