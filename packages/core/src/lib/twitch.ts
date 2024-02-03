@@ -3,9 +3,11 @@ import crypto from 'crypto';
 import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-schemas';
 import fetch from 'node-fetch';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { SSM } from '@aws-sdk/client-ssm';
 import { z } from 'zod';
 
 const secretsManager = new SecretsManager();
+const ssm = new SSM();
 
 export const TWITCH_HEADERS = {
 	MESSAGE_TYPE: 'twitch-eventsub-message-type',
@@ -468,29 +470,55 @@ export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>
 		...args,
 	};
 
-	return secretsManager.putSecretValue({
-		SecretId: Config.TWITCH_TOKENS_ARN,
-		SecretString: JSON.stringify(newTokens),
+	await ssm.putParameter({
+		Name: Config.TWITCH_TOKENS_PARAM,
+		Value: JSON.stringify(newTokens),
+		Type: 'SecureString',
+		Overwrite: true,
 	});
+
+	//return secretsManager.putSecretValue({
+	//SecretId: Config.TWITCH_TOKENS_ARN,
+	//SecretString: JSON.stringify(newTokens),
+	//});
 }
 
 export async function getTwitchTokens() {
-	const secret = await secretsManager.getSecretValue({
-		SecretId: Config.TWITCH_TOKENS_ARN,
-	});
+	const secret =
+		(await ssm
+			.getParameter({
+				Name: Config.TWITCH_TOKENS_PARAM,
+				WithDecryption: true,
+			})
+			.then(p => p.Parameter?.Value)
+			.catch(() => undefined)) ||
+		(await secretsManager
+			.getSecretValue({
+				SecretId: Config.TWITCH_TOKENS_ARN,
+			})
+			.then(s => s.SecretString));
 
 	try {
-		const result = twitchTokens.parse(JSON.parse(secret.SecretString || '{}'));
+		const result = twitchTokens.parse(JSON.parse(secret || '{}'));
 		return result;
 	} catch (error) {
-		await secretsManager.putSecretValue({
-			SecretId: Config.TWITCH_TOKENS_ARN,
-			SecretString: JSON.stringify({
+		await ssm.putParameter({
+			Name: Config.TWITCH_TOKENS_PARAM,
+			Type: 'SecureString',
+			Value: JSON.stringify({
 				app_access_token: '',
 				streamer_access_token: '',
 				streamer_refresh_token: '',
 			} satisfies z.infer<typeof twitchTokens>),
 		});
+		//await secretsManager.putSecretValue({
+		//SecretId: Config.TWITCH_TOKENS_ARN,
+		//SecretString: JSON.stringify({
+		//app_access_token: '',
+		//streamer_access_token: '',
+		//streamer_refresh_token: '',
+		//} satisfies z.infer<typeof twitchTokens>),
+		//});
 		console.error(error);
 		throw new Error('Failed to parse Twitch tokens');
 	}
@@ -608,7 +636,7 @@ export async function deleteTwitchEventSubscription(id: string) {
 			'Client-ID': Config.TWITCH_CLIENT_ID,
 			Authorization: `Bearer ${appAccessToken}`,
 		},
-	}).then(async (res) => {
+	}).then(async res => {
 		if (res.ok) return res;
 		if (res.status !== 401) {
 			console.error(res, await res.text());

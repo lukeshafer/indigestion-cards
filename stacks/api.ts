@@ -25,11 +25,17 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_TOKENS_ARN,
+					config.TWITCH_TOKENS_ARN, // can remove after updates
+					config.TWITCH_TOKENS_PARAM,
 					table,
 					eventBus,
 				],
-				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				permissions: [
+					'secretsmanager:GetSecretValue',
+					'secretsmanager:PutSecretValue',
+					'ssm:GetParameter',
+					'ssm:PutParameter',
+				],
 				runtime: 'nodejs18.x',
 			},
 		},
@@ -79,15 +85,15 @@ export function API({ app, stack }: StackContext) {
 			...(app.mode === 'dev' && app.stage !== 'prod'
 				? {
 						'POST /purge-db': 'packages/functions/src/admin-api/purge-db.handler',
-				  }
+					}
 				: {}),
 			// PREORDER
 			'POST /preorder': 'packages/functions/src/admin-api/preorder/post.handler',
 			// CONVERT-PREORDERS-TO-PACKS
 			'POST /convert-all-preorders-to-pack':
 				'packages/functions/src/admin-api/convert-all-preorders-to-pack/post.handler',
-      // FAQ
-      'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
+			// FAQ
+			'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
 
 			// USER ENDPOINTS
 			// USER
@@ -100,7 +106,8 @@ export function API({ app, stack }: StackContext) {
 				bind: [
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
-					config.TWITCH_TOKENS_ARN,
+					config.TWITCH_TOKENS_ARN, // can remove after updates
+					config.TWITCH_TOKENS_PARAM,
 					config.STREAMER_USER_ID,
 					table,
 					eventBus,
@@ -111,7 +118,12 @@ export function API({ app, stack }: StackContext) {
 					siteAuth,
 					twitchApi,
 				],
-				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				permissions: [
+					'secretsmanager:GetSecretValue',
+					'secretsmanager:PutSecretValue',
+					'ssm:GetParameter',
+					'ssm:PutParameter',
+				],
 				runtime: 'nodejs18.x',
 			},
 		},
@@ -130,7 +142,7 @@ export function API({ app, stack }: StackContext) {
 						domainName: `api.${baseDomain}`,
 						path: API_VERSION,
 						hostedZone: hostedZone,
-				  },
+					},
 	});
 
 	stack.addOutputs({

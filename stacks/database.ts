@@ -49,9 +49,15 @@ export function Database({ stack }: StackContext) {
 					table,
 					config.TWITCH_CLIENT_SECRET,
 					config.TWITCH_CLIENT_ID,
-					config.TWITCH_TOKENS_ARN,
+					config.TWITCH_TOKENS_ARN, // can remove after updates
+					config.TWITCH_TOKENS_PARAM,
 				],
-				permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+				permissions: [
+					'secretsmanager:GetSecretValue',
+					'secretsmanager:PutSecretValue',
+					'ssm:GetParameter',
+					'ssm:PutParameter',
+				],
 				runtime: 'nodejs18.x',
 			},
 		},
