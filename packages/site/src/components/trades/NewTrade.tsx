@@ -235,6 +235,7 @@ export default function NewTrade(props: {
 									label={`${state.receiverUsername}'s cards`}
 									cards={receiverCardsUi() ?? []}
 									setCards={setter => setState('requestedCards', setter)}
+									rarityRanking={props.rarityRanking}
 								/>
 							</Suspense>
 						</Show>
