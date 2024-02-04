@@ -8,6 +8,7 @@ import { getSiteConfig } from '@lib/site-config';
 import { Api } from 'sst/node/api';
 import type { Alert } from '@/lib/client/state';
 import LoadingBar from '@/components/LoadingBar';
+import MobileNav from '@/components/MobileNav';
 
 export interface Props extends BaseProps {
 	class?: string;
@@ -55,6 +56,7 @@ alerts.push(...(alertsProp ?? []));
 			id="page-scroll-wrapper">
 			<LoadingBar client:load transition:persist transition:name="loadingbar" />
 			{noHeader ? null : <Header {logo} />}
+			<MobileNav transition:persist />
 			<data-lists></data-lists>
 			<AlertBox client:load {alerts} />
 			{
