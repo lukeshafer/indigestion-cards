@@ -5,7 +5,7 @@ export function CardScaleAdjuster() {
 	const state = useContext(OpenPacksContext);
 
 	createEffect(() => {
-		document.cookie = `openPacksScale=${state.cardScale}; path=/`;
+		document.cookie = `openPacksScale=${state.cardScale}; path=/; max-age=31536000`;
 	});
 
 	return (

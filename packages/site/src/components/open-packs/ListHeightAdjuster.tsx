@@ -15,7 +15,7 @@ export function ListHeightAdjuster() {
 			window.removeEventListener('mousemove', handleMouseMove);
 			window.removeEventListener('mouseup', handleMouseUp);
 			// set the margin in a cookie
-			document.cookie = `openPacksMargin=${state.listHeight ?? ''}; path=/`;
+			document.cookie = `openPacksMargin=${state.listHeight ?? ''}; path=/; max-age=31536000`;
 		};
 		window.addEventListener('mousemove', handleMouseMove);
 		window.addEventListener('mouseup', handleMouseUp);
