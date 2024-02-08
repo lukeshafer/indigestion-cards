@@ -36,8 +36,9 @@ export async function GET(ctx: APIContext) {
 	}
 
 	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
-		maxAge: 60 * 60 * 24 * 30,
+		maxAge: 31536000,
 		httpOnly: true,
+    sameSite: "lax",
 		secure: ctx.url.host !== 'localhost:',
 		path: '/',
 	});
