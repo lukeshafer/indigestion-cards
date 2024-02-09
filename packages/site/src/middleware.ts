@@ -26,6 +26,11 @@ const auth: MiddlewareHandler = async (ctx, next) => {
   ctx.locals.session = session;
   //console.log({ session });
 
+	if ((session.properties.version || 0) < 2) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(AUTH_TOKEN);
+	}
+
   if (session.type === 'admin') {
     const adminUser = await getAdminUserById(session?.properties.userId ?? '');
     if (!adminUser) {
