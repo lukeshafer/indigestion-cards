@@ -26,6 +26,11 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	ctx.locals.session = session;
 	//console.log({ session });
 
+	if ((session.properties.version || 0) < 2) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(AUTH_TOKEN);
+	}
+
 	if (session.type === 'admin') {
 		const adminUser = await getAdminUserById(session?.properties.userId ?? '');
 		if (!adminUser) {
@@ -36,7 +41,7 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	}
 
 	const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
-		routeList.some((route) =>
+		routeList.some(route =>
 			route.endsWith('*')
 				? currentRoute.startsWith(route.slice(0, -1))
 				: currentRoute === route
@@ -47,14 +52,13 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	const isUserRoute = isPublicRoute || checkIncludesCurrentRoute(USER_ROUTES);
 
 	if (currentRoute.startsWith('/trade')) {
-		console.log("checking if trading is enabled")
+		console.log('checking if trading is enabled');
 		const siteConfig = await getSiteConfig();
 		if (!siteConfig.tradingIsEnabled) {
-			console.log("trading is not enabled, not a valid route")
+			console.log('trading is not enabled, not a valid route');
 			return ctx.redirect('/404');
 		}
 	}
-
 
 	process.env.SESSION_USER_ID = session?.properties.userId ?? undefined;
 	process.env.SESSION_USERNAME = session?.properties.username ?? undefined;

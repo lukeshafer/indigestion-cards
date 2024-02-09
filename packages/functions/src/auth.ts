@@ -115,6 +115,7 @@ export const handler = AuthHandler({
 							properties: {
 								userId: adminUser.userId,
 								username: adminUser.username,
+                version: 2,
 							},
 						});
 					}
@@ -142,6 +143,7 @@ export const handler = AuthHandler({
 							properties: {
 								userId: userLogin.userId,
 								username: userLogin.username,
+                version: 2,
 							},
 						});
 					}
@@ -176,6 +178,7 @@ export const handler = AuthHandler({
 						properties: {
 							userId: newUser.userId,
 							username: newUser.username,
+              version: 2,
 						},
 					});
 				}
@@ -214,6 +217,7 @@ export const handler = AuthHandler({
 						properties: {
 							userId: adminUser.userId,
 							username: adminUser.username,
+              version: 2,
 						},
 					});
 				}
