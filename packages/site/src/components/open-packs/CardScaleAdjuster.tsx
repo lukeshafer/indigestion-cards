@@ -5,7 +5,8 @@ export function CardScaleAdjuster() {
 	const state = useContext(OpenPacksContext);
 
 	createEffect(() => {
-		document.cookie = `openPacksScale=${state.cardScale}; path=/; max-age=31536000`;
+		const expires = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+		document.cookie = `openPacksScale=${state.cardScale}; path=/; expires=${expires.toUTCString()}`;
 	});
 
 	return (
