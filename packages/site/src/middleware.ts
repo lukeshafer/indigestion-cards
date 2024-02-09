@@ -35,8 +35,8 @@ const auth: MiddlewareHandler = async (ctx, next) => {
     }
   }
 
-  if (ctx.locals.session) {
-    ctx.cookies.set(AUTH_TOKEN, cookie!.value, {
+  if (ctx.locals.session && cookie) {
+    ctx.cookies.set(AUTH_TOKEN, cookie.value, {
       maxAge: 31536000,
       httpOnly: true,
       sameSite: 'lax',
