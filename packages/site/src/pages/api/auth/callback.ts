@@ -23,30 +23,31 @@ export async function GET(ctx: APIContext) {
 			redirect_uri: `${origin}${ctx.url.pathname}`,
 		}),
 	})
-		.then((r) => r.text())
-		.then((r) => {
+		.then(r => r.text())
+		.then(r => {
 			//console.log(r);
-			return JSON.parse(r)
-		}).catch((err) => {
-			console.error('An error occurred parsing the JSON.', { err })
+			return JSON.parse(r);
+		})
+		.catch(err => {
+			console.error('An error occurred parsing the JSON.', { err });
 		});
 
 	if (!response.access_token) {
 		throw new Error('No access token');
 	}
 
-	ctx.cookies.set(AUTH_TOKEN, response.access_token, {
-		maxAge: 31536000,
-		httpOnly: true,
-    sameSite: "lax",
-		secure: ctx.url.host !== 'localhost:',
-		path: '/',
-	});
-
 	const session = Session.verify(response.access_token);
 
 	if (session.type === 'admin' || session.type === 'user') {
+		ctx.cookies.set(AUTH_TOKEN, response.access_token, {
+			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: ctx.url.host !== 'localhost:',
+			path: '/',
+		});
+
 		return ctx.redirect(`/?alert=Logged in!`, 302);
 	}
-	return ctx.redirect(`/?alert=Not an authorized admin.&type=error`, 302);
+	return ctx.redirect(`/?alert=Not an authorized user.&type=error`, 302);
 }
