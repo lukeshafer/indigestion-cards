@@ -26,6 +26,11 @@ const auth: MiddlewareHandler = async (ctx, next) => {
   ctx.locals.session = session;
   //console.log({ session });
 
+	if ((session.properties.version || 0) < 2) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(AUTH_TOKEN);
+	}
+
   if (session.type === 'admin') {
     const adminUser = await getAdminUserById(session?.properties.userId ?? '');
     if (!adminUser) {
@@ -35,15 +40,15 @@ const auth: MiddlewareHandler = async (ctx, next) => {
     }
   }
 
-  if (ctx.locals.session) {
-    ctx.cookies.set(AUTH_TOKEN, cookie!.value, {
-      maxAge: 31536000,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: ctx.url.host !== 'localhost:',
-      path: '/',
-    });
-  }
+  //if (ctx.locals.session && cookie) {
+    //ctx.cookies.set(AUTH_TOKEN, cookie.value, {
+      //expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      //httpOnly: true,
+      //sameSite: 'lax',
+      //secure: ctx.url.host !== 'localhost:',
+      //path: '/',
+    //});
+  //}
 
   const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
     routeList.some(route =>

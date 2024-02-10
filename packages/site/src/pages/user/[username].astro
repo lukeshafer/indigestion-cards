@@ -8,7 +8,6 @@ import { routes, routeNames } from '@/constants';
 import { Anchor, Heading } from '@/components/text';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
-import { cachePage } from '@/lib/api';
 import type { Props as HeaderProps } from '@/components/Header.astro';
 
 console.log('username page')
@@ -46,8 +45,6 @@ if (!userData) {
 	}
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
-
-cachePage(Astro);
 
 const siteConfig = await getSiteConfig();
 

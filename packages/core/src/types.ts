@@ -5,6 +5,7 @@ export interface PublicSession {
 	properties: {
 		userId?: null | undefined;
 		username?: null | undefined;
+    version?: null | undefined;
 	};
 }
 
@@ -13,6 +14,7 @@ export interface UserSession {
 	properties: {
 		userId: string;
 		username: string;
+    version?: number;
 	};
 }
 
@@ -21,6 +23,7 @@ export interface AdminSession {
 	properties: {
 		userId: string;
 		username: string;
+    version?: number;
 	};
 }
 

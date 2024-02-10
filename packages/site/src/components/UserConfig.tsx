@@ -30,7 +30,9 @@ export default function UserConfig(props: {
 	createEffect(() => {
 		document?.body.classList.toggle('disable-animations', disableAnimations());
 		localStorage.setItem('disableAnimations', disableAnimations().toString());
-		document.cookie = `disable-animations=${disableAnimations()}; path=/; max-age=31536000; SameSite=Lax`;
+
+		const expires = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+		document.cookie = `disable-animations=${disableAnimations()}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
 
 		if (disableAnimations()) {
 			document.body.dataset['astro-reload'] = 'true';
@@ -40,7 +42,9 @@ export default function UserConfig(props: {
 	createEffect(() => {
 		document.documentElement.classList.toggle('dark', colorTheme() === 'dark');
 		localStorage.setItem('theme', colorTheme());
-		document.cookie = `theme=${colorTheme()}; path=/; max-age=31536000; SameSite=Lax`;
+
+		const expires = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+		document.cookie = `theme=${colorTheme()}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
 
 		const colors = {
 			light: '#ffffff',
