@@ -40,16 +40,15 @@ const auth: MiddlewareHandler = async (ctx, next) => {
     }
   }
 
-  if (ctx.locals.session && cookie) {
-    ctx.cookies.set(AUTH_TOKEN, cookie.value, {
-      //maxAge: 31536000,
-      expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: ctx.url.host !== 'localhost:',
-      path: '/',
-    });
-  }
+  //if (ctx.locals.session && cookie) {
+    //ctx.cookies.set(AUTH_TOKEN, cookie.value, {
+      //expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      //httpOnly: true,
+      //sameSite: 'lax',
+      //secure: ctx.url.host !== 'localhost:',
+      //path: '/',
+    //});
+  //}
 
   const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
     routeList.some(route =>
