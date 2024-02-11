@@ -26,10 +26,13 @@ export default function Card(props: Props) {
 	const cardName = () => (isFullArt() || isLegacy() || isSecret() ? '' : props.cardName);
 	const cardDescription = () =>
 		isFullArt() || isLegacy() || isSecret() ? '' : props.cardDescription;
-	const frameUrl = () => (isSecret() ? '' : props.frameUrl);
-	const imgUrl = () => (isSecret() ? ASSETS.CARDS.CARD_BACK : props.imgUrl);
+	//const frameUrl = () => (isSecret() ? '' : props.frameUrl);
+	//const imgUrl = () => (isSecret() ? ASSETS.CARDS.CARD_BACK : props.imgUrl);
 
 	const isShitPack = () => props.stamps?.includes('shit-pack');
+
+	const combinedImgUrl = () =>
+		isSecret() ? ASSETS.CARDS.CARD_BACK : `/images/cards/${props.designId}/${props.rarityId}.png`;
 
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
@@ -43,12 +46,13 @@ export default function Card(props: Props) {
 						'view-transition-name': `card-${props.instanceId ?? props.designId}`,
 					}}>
 					<img
-						src={imgUrl()}
+						src={combinedImgUrl()}
 						alt={props.cardName}
-						loading="lazy"
 						class="absolute inset-0"
 					/>
-					<img src={frameUrl()} alt="" class="absolute inset-0" />
+          {
+            //<img src={frameUrl()} alt="" class="absolute inset-0" />
+          }
 					<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
 						{cardName()}
 					</h3>

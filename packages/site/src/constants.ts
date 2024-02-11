@@ -16,6 +16,7 @@ export const PUBLIC_ROUTES = [
 	'/data/usernames',
   '/trades/*',
   '/data/*',
+  '/images/*'
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
