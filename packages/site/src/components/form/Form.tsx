@@ -3,6 +3,7 @@ import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
 import { useViewTransition } from '@/lib/client/utils';
 import { navigate } from 'astro:transitions/client';
+import { twMerge } from 'tailwind-merge'
 
 export function Form(props: {
 	children: JSX.Element;
@@ -18,6 +19,7 @@ export function Form(props: {
 		| 'connect'
 		| 'patch';
 	action?: string;
+  class?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
@@ -138,7 +140,7 @@ export function Form(props: {
 	return (
 		<form
 			ref={el => props.ref?.(el)}
-			class="relative flex w-full flex-col items-start gap-6"
+			class={ twMerge("relative flex w-full flex-col items-start gap-6", props.class) }
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
 			enctype={props.enctype}
@@ -205,7 +207,7 @@ export function TextInput(props: InputProps<string>) {
 						id={props.name}
 						name={props.name}
 						type="text"
-						class={BASE_INPUT_CLASS}
+						class={twMerge(BASE_INPUT_CLASS, props.class ?? "")}
 						classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
 						required={props.required}
 						placeholder={props.placeholder ?? props.label}

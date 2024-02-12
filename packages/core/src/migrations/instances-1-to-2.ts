@@ -1,12 +1,34 @@
-import { Entity, type EntityItem } from 'electrodb';
-import { config, auditAttributes } from './_utils';
+import { Entity } from 'electrodb';
+import { config, auditAttributes } from '../db/_utils';
+import { cardInstances } from '../db/cardInstances';
 
-export type CardInstance = EntityItem<typeof cardInstances>;
-export const cardInstances = new Entity(
+export async function migration() {
+	const old = await oldInstances.scan.go({ pages: 'all' });
+	let successCount = 0;
+	let errorCount = 0;
+	for (const instance of old.data) {
+		try {
+			console.log('Migrating instance', instance.instanceId, { instance });
+			await cardInstances.create(instance).go();
+			await oldInstances.delete(instance).go();
+			successCount++;
+		} catch (error) {
+			console.error('An error occurred with the card', instance.instanceId, {
+				instance,
+				error,
+			});
+			errorCount++;
+			continue;
+		}
+	}
+
+	console.log({ successCount, errorCount });
+}
+export const oldInstances = new Entity(
   {
     model: {
       entity: 'cardInstance',
-      version: '2',
+      version: '1',
       service: 'card-app',
     },
     attributes: {
@@ -175,18 +197,8 @@ export const cardInstances = new Entity(
           composite: ['designId', 'instanceId'],
         },
       },
-      byDesignAndRarity: {
-        index: 'gsi4',
-        pk: {
-          field: 'gsi4pk',
-          composite: ['designId'],
-        },
-        sk: {
-          field: 'gsi4sk',
-          composite: ['rarityId', 'instanceId'],
-        },
-      },
     },
   },
   config
 );
+

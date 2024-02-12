@@ -18,20 +18,20 @@ export function time(opts: { days?: number; hours?: number; minutes?: number; se
 	);
 }
 
-//type CacheControlOptions = {
-	//public?: boolean;
-	//maxAge?: number;
-	//staleWhileRevalidate?: number;
-//};
-//export function cacheControl(opts: CacheControlOptions) {
-	//const result = [opts.public ? 'public' : 'private'];
+type CacheControlOptions = {
+  public?: boolean;
+  maxAge?: number;
+  staleWhileRevalidate?: number;
+};
+export function cacheControl(opts: CacheControlOptions) {
+  const result = [opts.public ? 'public' : 'private'];
 
-	//if (opts.maxAge !== undefined) result.push(`max-age=${opts.maxAge}`);
-	//if (opts.staleWhileRevalidate !== undefined)
-		//result.push(`stale-while-revalidate=${opts.staleWhileRevalidate}`);
+  if (opts.maxAge !== undefined) result.push(`max-age=${opts.maxAge}`);
+  if (opts.staleWhileRevalidate !== undefined)
+    result.push(`stale-while-revalidate=${opts.staleWhileRevalidate}`);
 
-	//return result.join(', ');
-//}
+  return result.join(', ');
+}
 
 //export function cachePage(
 	//ctx: AstroGlobal,

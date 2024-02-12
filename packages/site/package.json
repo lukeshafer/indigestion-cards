@@ -24,6 +24,7 @@
     "astro-icon": "^1.0.2",
     "astro-sst": "2.39.7",
     "fuse.js": "^7.0.0",
+    "sharp": "^0.33.2",
     "solid-js": "^1.8.11",
     "solid-markdown": "^2.0.0",
     "sst": "2.39.7",

@@ -36,19 +36,8 @@ const auth: MiddlewareHandler = async (ctx, next) => {
     if (!adminUser) {
       ctx.locals.session = null;
       ctx.cookies.delete(AUTH_TOKEN);
-      //console.error('No admin user found for session:', session);
     }
   }
-
-  //if (ctx.locals.session && cookie) {
-    //ctx.cookies.set(AUTH_TOKEN, cookie.value, {
-      //expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      //httpOnly: true,
-      //sameSite: 'lax',
-      //secure: ctx.url.host !== 'localhost:',
-      //path: '/',
-    //});
-  //}
 
   const checkIncludesCurrentRoute = (routeList: readonly string[]) =>
     routeList.some(route =>

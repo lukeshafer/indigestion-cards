@@ -14,6 +14,8 @@ export function Database({ stack }: StackContext) {
       gsi2sk: 'string',
       gsi3pk: 'string',
       gsi3sk: 'string',
+      gsi4pk: 'string',
+      gsi4sk: 'string',
     },
     primaryIndex: {
       partitionKey: 'pk',
@@ -31,6 +33,10 @@ export function Database({ stack }: StackContext) {
       gsi3: {
         partitionKey: 'gsi3pk',
         sortKey: 'gsi3sk',
+      },
+      gsi4: {
+        partitionKey: 'gsi4pk',
+        sortKey: 'gsi4sk',
       },
     },
   });
