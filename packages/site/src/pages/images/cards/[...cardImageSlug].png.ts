@@ -46,11 +46,9 @@ export const GET: APIRoute = async ctx => {
 			'Content-Type': 'image/png',
 			'Content-Length': String(outputBuffer.length),
 			'Cache-Control': cacheControl({
-				//maxAge: 60 * 60 * 24 * 30,
-        maxAge: 60, // FIXME: too short for prod, but good for testing
+        maxAge: 60 * 60 * 24 * 30,
 				public: ctx.locals.session?.type === 'admin' ? false : true,
-        //staleWhileRevalidate: 60 * 60 * 24 * 365,
-        staleWhileRevalidate: 60 * 60 * 24, // FIXME: in prod
+        staleWhileRevalidate: 60 * 60 * 24 * 365,
 			}),
 		},
 	});
