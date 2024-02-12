@@ -19,6 +19,7 @@ export function Form(props: {
 		| 'connect'
 		| 'patch';
 	action?: string;
+  class?: string;
 	enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
 	confirm?: string;
 	onsuccess?: () => void;
@@ -139,7 +140,7 @@ export function Form(props: {
 	return (
 		<form
 			ref={el => props.ref?.(el)}
-			class="relative flex w-full flex-col items-start gap-6"
+			class={ twMerge("relative flex w-full flex-col items-start gap-6", props.class) }
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
 			enctype={props.enctype}

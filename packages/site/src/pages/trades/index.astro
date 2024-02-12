@@ -3,13 +3,14 @@
 import { getAllTradesForUser } from '@lil-indigestion-cards/core/lib/trades';
 
 // UI
-import { PageHeader, PageTitle, Heading } from '@/components/text';
+import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { Anchor } from '@/components/text';
 import TradesTable from '@/components/trades/TradesTable.astro';
 import { getUser } from '@lil-indigestion-cards/core/lib/user';
 import type { Trade } from '@lil-indigestion-cards/core/db/trades';
+import type { User } from '@lil-indigestion-cards/core/db/users';
 
 const userId = Astro.locals.user?.properties.userId;
 const username = Astro.locals.user?.properties.username;
@@ -20,19 +21,26 @@ if (!userId || !username) {
 
 const trades = await getAllTradesForUser(userId);
 
+const notifications = await getUser(userId).then(u =>
+	(u?.tradeNotifications ?? []).reduce((acc, notif) => {
+		const tradenotif = acc.get(notif.tradeId);
+		if (!tradenotif) return acc.set(notif.tradeId, notif);
+		if (notif.status === 'statusUpdated') return acc.set(notif.tradeId, notif);
+		return acc;
+	}, new Map<string, NonNullable<User['tradeNotifications']>[number]>())
+);
+
 const pending: Trade[] = [];
 const complete: Trade[] = [];
 
-for (const trade of trades.incoming) {
+let completeNotificationCount = 0;
+for (const trade of [...trades.outgoing, ...trades.incoming]) {
 	if (trade.status === 'pending') pending.push(trade);
-	else complete.push(trade);
+	else {
+		if (notifications.has(trade.tradeId)) completeNotificationCount++;
+		complete.push(trade);
+	}
 }
-for (const trade of trades.outgoing) {
-	if (trade.status === 'pending') pending.push(trade);
-	else complete.push(trade);
-}
-
-const user = await getUser(userId);
 ---
 
 <Page title="Trades" pageType="user" breadcrumbs={[{ label: routeNames.TRADES }]}>
@@ -45,13 +53,13 @@ const user = await getUser(userId);
 
 	<section aria-labelledby="open-trades">
 		<h2 id="open-trades" class="sr-only">Open Trades</h2>
-		<TradesTable trades={pending} userTradeNotifications={user?.tradeNotifications} />
+		<TradesTable trades={pending} {notifications} />
 	</section>
 
 	<br />
-  
-  <details>
-    <summary>Closed Trades</summary>
-		<TradesTable trades={complete} userTradeNotifications={user?.tradeNotifications} />
-  </details>
+
+	<details open={completeNotificationCount > 0}>
+		<summary>Closed Trades</summary>
+		<TradesTable trades={complete} {notifications} />
+	</details>
 </Page>
