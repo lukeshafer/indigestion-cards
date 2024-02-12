@@ -3,12 +3,13 @@
 import { getAllTradesForUser } from '@lil-indigestion-cards/core/lib/trades';
 
 // UI
-import { PageHeader, PageTitle } from '@/components/text';
+import { PageHeader, PageTitle, Heading } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import { Anchor } from '@/components/text';
 import TradesTable from '@/components/trades/TradesTable.astro';
 import { getUser } from '@lil-indigestion-cards/core/lib/user';
+import type { Trade } from '@lil-indigestion-cards/core/db/trades';
 
 const userId = Astro.locals.user?.properties.userId;
 const username = Astro.locals.user?.properties.username;
@@ -18,6 +19,19 @@ if (!userId || !username) {
 }
 
 const trades = await getAllTradesForUser(userId);
+
+const pending: Trade[] = [];
+const complete: Trade[] = [];
+
+for (const trade of trades.incoming) {
+	if (trade.status === 'pending') pending.push(trade);
+	else complete.push(trade);
+}
+for (const trade of trades.outgoing) {
+	if (trade.status === 'pending') pending.push(trade);
+	else complete.push(trade);
+}
+
 const user = await getUser(userId);
 ---
 
@@ -29,9 +43,15 @@ const user = await getUser(userId);
 		</div>
 	</PageHeader>
 
-	<TradesTable
-		incomingTrades={trades.incoming}
-		outgoingTrades={trades.outgoing}
-		userTradeNotifications={user?.tradeNotifications}
-	/>
+	<section aria-labelledby="open-trades">
+		<h2 id="open-trades" class="sr-only">Open Trades</h2>
+		<TradesTable trades={pending} userTradeNotifications={user?.tradeNotifications} />
+	</section>
+
+	<br />
+  
+  <details>
+    <summary>Closed Trades</summary>
+		<TradesTable trades={complete} userTradeNotifications={user?.tradeNotifications} />
+  </details>
 </Page>

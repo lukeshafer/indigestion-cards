@@ -9,18 +9,16 @@ import SortTableHead from '../table/SortTableHead.astro';
 import SortTableColumn from '../table/SortTableColumn.astro';
 import { routes } from '@/constants';
 import { Anchor } from '../text';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
-	incomingTrades: Array<Trade>;
-	outgoingTrades: Array<Trade>;
+	trades: Array<Trade>;
 	userTradeNotifications: User['tradeNotifications'];
 }
 
-const { incomingTrades, outgoingTrades, userTradeNotifications } = Astro.props;
+const { trades, userTradeNotifications } = Astro.props;
 
-const trades = [...incomingTrades, ...outgoingTrades].sort(
-	(a, b) => (b.createdAt || 0) - (a.createdAt || 0)
-);
+const sortedTrades = trades.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
 const notifications = userTradeNotifications?.reduce((acc, notif) => {
 	const tradenotif = acc.get(notif.tradeId);
@@ -35,13 +33,12 @@ const isLoggedInUsername = (name: string) =>
 
 <SortTable>
 	<SortTableHead>
-		<SortTableColumn name="dateCreated" startDescending>Date</SortTableColumn>
-		<SortTableColumn name="with" hideOnBreakpoint="sm">With</SortTableColumn>
-		<SortTableColumn name="from" startDescending showOnBreakpoint="sm">From</SortTableColumn>
-		<SortTableColumn name="to" startDescending showOnBreakpoint="sm">To</SortTableColumn>
-		<SortTableColumn name="tradeType" startDescending showOnBreakpoint="sm" width="15%">
-			Type
+		<SortTableColumn name="dateCreated" startDescending width="15%" showOnBreakpoint="sm">
+			Date
 		</SortTableColumn>
+		<SortTableColumn name="tradeType" startDescending width="14%">Type</SortTableColumn>
+		<SortTableColumn name="from" startDescending>From</SortTableColumn>
+		<SortTableColumn name="to" startDescending>To</SortTableColumn>
 		<SortTableColumn name="status" startDescending showOnBreakpoint="sm">
 			Status
 		</SortTableColumn>
@@ -49,9 +46,12 @@ const isLoggedInUsername = (name: string) =>
 	</SortTableHead>
 	<SortTableBody>
 		{
-			trades.map((trade) => (
+			sortedTrades.map(trade => (
 				<SortTableRow highlighted={notifications?.has(trade.tradeId)}>
-					<SortTableCell column="dateCreated" value={trade.createdAt || 0}>
+					<SortTableCell
+						column="dateCreated"
+						value={trade.createdAt || 0}
+						showOnBreakpoint="sm">
 						{trade.createdAt ? (
 							<time datetime={new Date(trade.createdAt).toISOString()}>
 								{new Date(trade.createdAt).toLocaleDateString()}
@@ -59,49 +59,38 @@ const isLoggedInUsername = (name: string) =>
 						) : null}
 					</SortTableCell>
 					<SortTableCell
-						column="with"
-						font="title"
-						hideOnBreakpoint="sm"
-						value={
-							isLoggedInUsername(trade.senderUsername)
-								? trade.receiverUsername
-								: trade.senderUsername
-						}>
-						<a
-							href={`${routes.USERS}/${trade.receiverUsername}`}
-							class="hover:underline focus:underline">
-							{isLoggedInUsername(trade.senderUsername)
-								? trade.receiverUsername
-								: trade.senderUsername}
-						</a>
+						column="tradeType"
+						value={isLoggedInUsername(trade.senderUsername) ? 'Outgoing' : 'Incoming'}>
+						{isLoggedInUsername(trade.senderUsername) ? (
+							<Icon
+								name="mdi:export"
+								title="Out"
+								class="mx-auto max-w-8 text-gray-700 dark:text-gray-100"
+								size={30}
+							/>
+						) : (
+							<Icon
+								name="mdi:import"
+								title="In"
+								class="mx-auto max-w-8 text-gray-700 dark:text-gray-100"
+								size={30}
+							/>
+						)}
 					</SortTableCell>
-					<SortTableCell
-						showOnBreakpoint="sm"
-						column="from"
-						font="title"
-						value={trade.senderUsername}>
+					<SortTableCell column="from" font="title" value={trade.senderUsername}>
 						<a
 							href={`${routes.USERS}/${trade.senderUsername}`}
 							class="hover:underline focus:underline">
 							{trade.senderUsername}
 						</a>
 					</SortTableCell>
-					<SortTableCell
-						showOnBreakpoint="sm"
-						column="to"
-						font="title"
-						value={trade.receiverUsername}>
+					<SortTableCell column="to" font="title" value={trade.receiverUsername}>
 						<a
 							href={`${routes.USERS}/${trade.receiverUsername}`}
 							class="hover:underline focus:underline">
 							{trade.receiverUsername}
 						</a>
 					</SortTableCell>
-					<SortTableCell
-						showOnBreakpoint="sm"
-						column="tradeType"
-						value={isLoggedInUsername(trade.senderUsername) ? 'Outgoing' : 'Incoming'}
-					/>
 					<SortTableCell
 						showOnBreakpoint="sm"
 						column="status"
@@ -111,8 +100,8 @@ const isLoggedInUsername = (name: string) =>
 								: (notifications?.get(trade.tradeId)?.status === 'statusUpdated'
 										? 'New Status: '
 										: '') +
-								  trade.status.charAt(0).toUpperCase() +
-								  trade.status.slice(1)
+									trade.status.charAt(0).toUpperCase() +
+									trade.status.slice(1)
 						}
 					/>
 					<SortTableCell column="actions" value="">

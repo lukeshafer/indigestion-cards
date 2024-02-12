@@ -48,9 +48,9 @@ export const GET: APIRoute = async ctx => {
 			'Cache-Control': cacheControl({
 				//maxAge: 60 * 60 * 24 * 30,
         maxAge: 60, // FIXME: too short for prod, but good for testing
-				public: true,
-				//staleWhileRevalidate: 60 * 60 * 24 * 365,
-				//staleWhileRevalidate: 60 * 60 * 24 * 365,
+				public: ctx.locals.session?.type === 'admin' ? false : true,
+        //staleWhileRevalidate: 60 * 60 * 24 * 365,
+        staleWhileRevalidate: 60 * 60 * 24, // FIXME: in prod
 			}),
 		},
 	});
@@ -68,7 +68,8 @@ async function getImages({
 	cardImgUrl: string;
 	frameImgUrl: string;
 } | null> {
-	const [card] = await getCardInstanceByDesignAndRarity({ designId, rarityId });
+	const cards = await getCardInstanceByDesignAndRarity({ designId, rarityId });
+  const card = cards.find(c => c.openedAt)
 	if (card)
 		return {
 			cardImgUrl: card.imgUrl,
