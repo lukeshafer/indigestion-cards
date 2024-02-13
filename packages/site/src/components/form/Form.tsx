@@ -418,13 +418,13 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 }
 
 const BUTTON_CLASS =
-	'text-outline dark:text-outline-dark font-heading rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
+	/* tw */ 'text-outline dark:text-outline-dark font-heading block w-fit rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
 
 export function Anchor(props: { children: string; href: string }) {
 	return (
 		<a
 			href={props.href}
-			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark outline outline-gray-200 dark:outline-gray-800`}>
+			class={`${BUTTON_CLASS} bg-brand-light text-center hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark outline outline-gray-200 dark:outline-gray-800`}>
 			{props.children}
 		</a>
 	);
