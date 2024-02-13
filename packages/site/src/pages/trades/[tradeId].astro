@@ -162,13 +162,9 @@ const tradeStatus = (() => {
 				}
 			</div>
 		</Show>
-    {isSender ? (
-      <div class="col-span-2 mx-auto w-fit my-2">
-        <Anchor href={formatTradeLink(trade)}>Copy Trade</Anchor>
-      </div>
-    ) : isReceiver ? (
-      <div class="col-span-2 mx-auto w-fit my-2">
-        <Anchor href={formatTradeLink(trade, true)}>Copy Trade</Anchor>
+    {isSender || isReceiver ? (
+      <div class="col-span-2 mx-auto w-fit">
+        <Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
       </div>
     ) : null}
 	</div>
