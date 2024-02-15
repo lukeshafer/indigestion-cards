@@ -225,7 +225,7 @@ export function TextInput(props: InputProps<string>) {
             id={props.name}
             name={props.name}
             type="text"
-            class={BASE_INPUT_CLASS}
+            class={twMerge(BASE_INPUT_CLASS, props.class ?? "")}
             classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
             required={props.required}
             placeholder={props.placeholder}
