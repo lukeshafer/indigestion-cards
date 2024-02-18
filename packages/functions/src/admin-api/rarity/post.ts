@@ -23,8 +23,6 @@ export const handler = SiteHandler(
 				statusCode: 400,
 				body: 'Invalid rarityId. (Must be lowercase, numbers, and dashes only)',
 			};
-		if (!params.rarityColor.match(/^#[a-f0-9]{6}$/i))
-			return { statusCode: 400, body: 'Invalid rarityColor. (Must be a hex color code)' };
 		if (params.defaultCount < 1)
 			return { statusCode: 400, body: 'Default count must be greater than 0' };
 

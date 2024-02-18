@@ -20,6 +20,9 @@ export function Sites({ app, stack }: StackContext) {
 
   const site = new AstroSite(stack, 'site', {
     path: 'packages/site',
+    //dev: {
+    //deploy: true,
+    //},
     bind: [
       table,
       adminApi,
@@ -32,7 +35,7 @@ export function Sites({ app, stack }: StackContext) {
       config.TWITCH_CLIENT_ID,
       config.TWITCH_CLIENT_SECRET,
       config.STREAMER_USER_ID,
-      config.TWITCH_TOKENS_ARN,
+      config.TWITCH_TOKENS_PARAM,
       config.DOMAIN_NAME,
       bus,
     ],
@@ -43,7 +46,7 @@ export function Sites({ app, stack }: StackContext) {
           domainName: baseDomain,
           hostedZone: hostedZone,
         },
-    permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+    permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
     runtime: 'nodejs18.x',
   });
 

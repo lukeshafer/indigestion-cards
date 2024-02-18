@@ -1,16 +1,16 @@
 ---
 import CardList from '@/components/cards/CardList';
 import Page from '@/layouts/Page.astro';
-import { getUserAndCardInstances, createNewUser } from '@lib/user';
+import { createNewUser, getUserAndOpenedCardInstances } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
 import { Anchor, Heading } from '@/components/text';
 import UserLookingFor from '@/components/user/UserLookingFor';
 import Card from '@/components/cards/Card';
-import { cachePage } from '@/lib/api';
 import type { Props as HeaderProps } from '@/components/Header.astro';
 
+console.log('username page')
 type Logo = HeaderProps['logo'];
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -25,7 +25,7 @@ if (!id) {
 }
 
 let [userData, rarityRanking] = await Promise.all([
-	getUserAndCardInstances({ username: id }),
+	getUserAndOpenedCardInstances({ username: id }),
 	getRarityRanking(),
 ]);
 
@@ -46,8 +46,6 @@ if (!userData) {
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
 
-cachePage(Astro);
-
 const siteConfig = await getSiteConfig();
 
 const { users, cardInstances } = userData;
@@ -57,8 +55,8 @@ const user = users[0] || {
 };
 
 const pinnedCard = user.pinnedCard;
-const cardsNotInPack = cardInstances.filter(
-	card => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+const unpinnedCards = cardInstances.filter(
+	card => card.instanceId !== pinnedCard?.instanceId
 );
 
 const userLogoMap: Record<string, Logo | undefined> = {
@@ -127,10 +125,10 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
 		<CardList
-			cards={cardsNotInPack}
+			cards={unpinnedCards}
 			rarityRanking={rarityRanking}
-			client:load
-			isUserPage
+      client:load
+      isUserPage
 			sortOnlyBy={[
 				'rarest',
 				'common',

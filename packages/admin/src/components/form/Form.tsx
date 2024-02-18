@@ -240,6 +240,7 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
+        children={props.children}
 				onInput={(e) => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
@@ -282,7 +283,7 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 			/>
 			<button
 				hidden={!isReadOnly()}
-				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black opacity-50 hover:opacity-100"
+				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black dark:text-white opacity-50 hover:opacity-100"
 				onClick={handleEditClick}>
 				Edit
 			</button>

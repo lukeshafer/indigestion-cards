@@ -54,7 +54,7 @@ export default function CardDesignForm(props: {
 					label="Season"
 					name="season"
 					required
-					options={props.seasons.map((season) => ({
+					options={props.seasons.map(season => ({
 						label: season.seasonName,
 						value: JSON.stringify({
 							seasonId: season.seasonId,
@@ -73,9 +73,9 @@ export default function CardDesignForm(props: {
 				<TextInput label="Artist" name="artist" required />
 				<Fieldset legend="Rarity Details">
 					<For each={props.rarities}>
-						{(rarity) => (
+						{rarity => (
 							<NumberInput
-								label={rarity.rarityName}
+								label={`${rarity.rarityName}, ${rarity.rarityId}`}
 								name={`rarity-${rarity.rarityId}-count`}
 								value={isLegacy() ? 0 : rarity.defaultCount}
 								required

@@ -156,7 +156,7 @@ function RankingItem(props: {
 				</button>
 			</span>
 			<span class="inline-block w-8 p-2 text-center">{props.index + 1}</span>
-			<span>{props.rarity.rarityName}</span>
+			<span>{props.rarity.rarityName} ({props.rarity.rarityId})</span>
 		</li>
 	);
 }

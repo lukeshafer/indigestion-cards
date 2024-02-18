@@ -17,10 +17,10 @@ const seasons = await getAllSeasons();
 			seasons.map((season, index) => (
 				<li>
 					<a
-						class="font-display shine text-shadow-brand p-8 pt-9 italic text-white transition-transform"
+						class="block font-display shine text-shadow-brand p-8 pt-9 italic text-white transition-transform"
 						class:list={{
-							'bg-brand-secondary': index % 2 === 1,
-							'bg-accent-secondary': index % 2 === 0,
+							'bg-brand-secondary dark:bg-brand-dark': index % 2 === 1,
+							'bg-accent-secondary dark:bg-accent-dark': index % 2 === 0,
 						}}
 						href={`${routes.SEASONS}/${season.seasonId}`}>
 						{season.seasonName}

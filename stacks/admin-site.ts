@@ -32,7 +32,7 @@ export function AdminSite({ app, stack }: StackContext) {
       config.TWITCH_CLIENT_ID,
       config.TWITCH_CLIENT_SECRET,
       config.STREAMER_USER_ID,
-      config.TWITCH_TOKENS_ARN,
+      config.TWITCH_TOKENS_PARAM,
       config.DOMAIN_NAME,
       bus,
     ],
@@ -43,7 +43,7 @@ export function AdminSite({ app, stack }: StackContext) {
           domainName: `admin.${baseDomain}`,
           hostedZone: hostedZone,
         },
-    permissions: ['secretsmanager:GetSecretValue', 'secretsmanager:PutSecretValue'],
+    permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
     runtime: 'nodejs18.x',
   });
 

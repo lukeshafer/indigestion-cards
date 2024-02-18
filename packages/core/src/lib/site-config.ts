@@ -158,6 +158,16 @@ export function getRarityRanking(siteConfig?: SiteConfig) {
   return transformRarityRanking(siteConfig);
 }
 
+export async function getFaq() {
+  const result = await getSiteConfig();
+  return result.faq
+}
+
+export async function updateFaq(content: string) {
+  const siteConfig = await getSiteConfig();
+  await updateSiteConfig({ ...siteConfig, faq: content });
+}
+
 function transformRarityRanking(siteConfig: SiteConfig) {
   const rarityRanking = siteConfig.rarityRanking ?? [];
   return Object.fromEntries(rarityRanking.map((r) => [r.rarityId, r] as const)) || {};

@@ -14,7 +14,7 @@ export default function TradeNotificationCount(props: { username: string }) {
 			user.data?.tradeNotifications?.reduce(
 				(acc, notif) => acc.add(notif.tradeId),
 				new Set<string>()
-			).size
+			).size || 0
 	);
 
 	return (

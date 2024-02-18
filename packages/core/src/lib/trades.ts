@@ -35,6 +35,8 @@ export async function createTradeFromApi(params: {
 	requestedCards: string[];
 	message?: string;
 }) {
+	console.log('Creating trade', { params });
+
 	if (params.senderUsername === params.receiverUsername) {
 		throw new InputValidationError('Cannot trade with yourself');
 	}
@@ -95,7 +97,7 @@ export async function createTradeFromApi(params: {
 	};
 
 	try {
-		console.log({ tradeOptions });
+		console.log({ tradeOptions: JSON.stringify(tradeOptions) });
 		const trade = await trades.create(tradeOptions).go();
 		const user = await users
 			.patch({ userId: tradeOptions.receiverUserId })
@@ -360,6 +362,25 @@ export async function processTrade(trade: Trade) {
 			.write(({ cardInstances, users, trades }) => [
 				users
 					.patch({ userId: sender.user.userId })
+					.set({
+						pinnedCard: trade.offeredCards.some(
+							card => card.instanceId === sender.user.pinnedCard?.instanceId
+						)
+							? {
+									instanceId: '',
+									designId: '',
+									imgUrl: '',
+									cardName: '',
+									frameUrl: '',
+									rarityId: '',
+									rarityName: '',
+									cardNumber: 0,
+									rarityColor: '',
+									totalOfType: 0,
+									cardDescription: '',
+								}
+							: sender.user.pinnedCard,
+					})
 					.add({ cardCount: trade.requestedCards.length - trade.offeredCards.length })
 					.append({
 						tradeNotifications: [
@@ -373,6 +394,25 @@ export async function processTrade(trade: Trade) {
 					.commit(),
 				users
 					.patch({ userId: receiver.user.userId })
+					.set({
+						pinnedCard: trade.requestedCards.some(
+							card => card.instanceId === receiver.user.pinnedCard?.instanceId
+						)
+							? {
+									instanceId: '',
+									designId: '',
+									imgUrl: '',
+									cardName: '',
+									frameUrl: '',
+									rarityId: '',
+									rarityName: '',
+									cardNumber: 0,
+									rarityColor: '',
+									totalOfType: 0,
+									cardDescription: '',
+								}
+							: receiver.user.pinnedCard,
+					})
 					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
 					.commit(),
 				...offeredCardsMoveToReceiver.map(card =>
@@ -382,6 +422,7 @@ export async function processTrade(trade: Trade) {
 						.append({
 							tradeHistory: [
 								{
+									version: 2,
 									tradeId: trade.tradeId,
 									status: 'completed',
 									completedAt: Date.now(),
@@ -398,6 +439,7 @@ export async function processTrade(trade: Trade) {
 						.append({
 							tradeHistory: [
 								{
+									version: 2,
 									tradeId: trade.tradeId,
 									status: 'completed',
 									completedAt: Date.now(),
@@ -424,21 +466,21 @@ function formatToAndFromUsers(args: { card: CardInstance; trade: Trade }): {
 	toUserId: string;
 	toUsername: string;
 } {
-	if (args.card.userId === args.trade.receiverUserId)
-		return {
-			toUserId: args.trade.senderUserId,
-			toUsername: args.trade.senderUsername,
-			fromUserId: args.trade.receiverUserId,
-			fromUsername: args.trade.receiverUsername,
-		};
-	else if (args.card.userId === args.trade.senderUserId)
+	if (args.card.userId === args.trade.receiverUserId) {
 		return {
 			toUserId: args.trade.receiverUserId,
 			toUsername: args.trade.receiverUsername,
 			fromUserId: args.trade.senderUserId,
 			fromUsername: args.trade.senderUsername,
 		};
-	else throw new Error('Card cannot be traded between these two users.');
+	} else if (args.card.userId === args.trade.senderUserId) {
+		return {
+			toUserId: args.trade.senderUserId,
+			toUsername: args.trade.senderUsername,
+			fromUserId: args.trade.receiverUserId,
+			fromUsername: args.trade.receiverUsername,
+		};
+	} else throw new Error('Card cannot be traded between these two users.');
 }
 
 async function getAndValidateUserAndCardInstances(username: string) {

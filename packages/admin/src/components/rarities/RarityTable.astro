@@ -18,7 +18,8 @@ const { rarities } = Astro.props;
 
 <SortTable>
 	<SortTableHead>
-		<SortTableColumn name="name" width="40%">Name</SortTableColumn>
+		<SortTableColumn name="id">Id</SortTableColumn>
+		<SortTableColumn name="name" width="30%">Name</SortTableColumn>
 		<SortTableColumn name="count" showOnBreakpoint="sm" type="number" startDescending>
 			Default Count
 		</SortTableColumn>
@@ -26,14 +27,15 @@ const { rarities } = Astro.props;
 	</SortTableHead>
 	<SortTableBody>
 		{
-			rarities.map(({ rarityName, defaultCount, rarityId, frameUrl }) => (
+			rarities.map(({ rarityName, defaultCount, rarityId, frameUrl, rarityColor }) => (
 				<SortTableRow>
+					<SortTableCell column="id" value={rarityId} />
 					<SortTableCell column="name" value={rarityName} />
 					<SortTableCell column="count" value={defaultCount} showOnBreakpoint="sm" />
-					<SortTableCell column="actions" value="" showOnBreakpoint="sm">
+					<SortTableCell column="actions" value="">
 						<div class="grid gap-2">
 							<DeleteRarityButton {rarityId} {frameUrl} client:idle />
-							<RarityPreviewButton {frameUrl} />
+							<RarityPreviewButton {frameUrl} {rarityColor} />
 						</div>
 					</SortTableCell>
 				</SortTableRow>

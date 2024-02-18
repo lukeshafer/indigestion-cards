@@ -8,7 +8,7 @@ export const cardDesigns = new Entity(
 	{
 		model: {
 			entity: 'cardDesign',
-			version: '1',
+			version: '2',
 			service: 'card-app',
 		},
 		attributes: {
@@ -122,6 +122,17 @@ export const cardDesigns = new Entity(
 				},
 				sk: {
 					field: 'gsi1sk',
+					composite: ['designId'],
+				},
+			},
+			allDesigns: {
+				index: 'gsi2',
+				pk: {
+					field: 'gsi2pk',
+					composite: [],
+				},
+				sk: {
+					field: 'gsi2sk',
 					composite: ['designId'],
 				},
 			},

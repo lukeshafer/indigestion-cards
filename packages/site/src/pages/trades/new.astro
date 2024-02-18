@@ -6,11 +6,7 @@ import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import NewTrade from '@/components/trades/NewTrade';
 import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
-import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
-import { Action } from '@/lib/action';
 import { getRarityRanking, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
-import type { Alert } from '@/lib/client/state';
 
 const { userId, username } = Astro.locals.user?.properties || {};
 
@@ -19,50 +15,6 @@ if (!userId || !username) {
 }
 
 const alerts: PageProps['alerts'] = [];
-
-const { output, errors } = await Action(
-	Astro,
-	{
-		method: 'POST',
-		authorizationType: 'user',
-		schema: {
-			receiverUsername: 'string',
-			offeredCards: 'string[]',
-			requestedCards: 'string[]',
-			message: 'string?',
-		},
-	},
-	async ({ receiverUsername, offeredCards, requestedCards, message }) => {
-		try {
-			const trade = await createTradeFromApi({
-				senderUsername: username,
-				receiverUsername,
-				offeredCards,
-				requestedCards,
-				message,
-			});
-			const tradeId = trade.data.tradeId;
-			return Astro.redirect(`/trades/${tradeId}?alert=Trade Created`);
-		} catch (error) {
-			if (error instanceof InputValidationError) {
-				alerts.push({ type: 'error', message: error.message });
-			} else if (error instanceof ServerError) {
-				console.error(error);
-				alerts.push({
-					type: 'error',
-					message: 'An internal server error occurred while creating the trade.',
-				});
-			} else {
-				console.error(error);
-				throw error;
-			}
-		}
-	}
-);
-
-alerts.push(...errors.map(e => ({ type: 'error', message: e.message }) satisfies Alert));
-
-if (output instanceof Response) return output;
 
 const searchParams = Astro.url.searchParams;
 const offeredCardIds = searchParams.getAll('offeredCards');

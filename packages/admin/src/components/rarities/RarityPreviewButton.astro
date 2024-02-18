@@ -3,14 +3,15 @@ import { SubmitButton } from '../form/Form';
 
 interface Props {
 	frameUrl: string;
+	rarityColor: string;
 }
 
-const { frameUrl } = Astro.props;
+const { frameUrl, rarityColor } = Astro.props;
 ---
 
 <rarity-preview-button>
 	<SubmitButton>Preview</SubmitButton>
-	<img hidden src={frameUrl} />
+	<img hidden src={frameUrl} style={{ background: rarityColor }} />
 </rarity-preview-button>
 
 <script>
@@ -21,7 +22,7 @@ const { frameUrl } = Astro.props;
 				const img = this.querySelector('img');
 				const button = this.querySelector('button');
 				if (!img || !button) return;
-        const origText = button.textContent;
+				const origText = button.textContent;
 
 				let isPreviewing = false;
 				button?.addEventListener('click', () => {

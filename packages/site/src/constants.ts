@@ -16,10 +16,11 @@ export const PUBLIC_ROUTES = [
 	'/data/usernames',
   '/trades/*',
   '/data/*',
+  '/images/*'
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
-export const USER_ROUTES = ['/trades'];
+export const USER_ROUTES = ['/trades', '/api/trades', '/api/trades/*'];
 
 /** Admin Api routes */
 const api_paths = {

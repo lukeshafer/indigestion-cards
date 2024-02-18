@@ -1,63 +1,48 @@
-import { useLocation } from '@solidjs/router';
 import { For, Match, Show, Switch } from 'solid-js';
+// TODO: use router stuff for the path
 
-export interface Crumb {
+export interface Path {
 	label: string;
 	href?: string | undefined;
 }
 
-export default function Breadcrumbs(props: { crumbs: Crumb[] }) {
-	const crumbs = () =>
-		[
-			{
-				label: 'Home',
-				href: '/',
-			},
-			...props.crumbs,
-		] as Array<Crumb>;
-
-	const location = useLocation();
+export default function (props: { path: Path[], currentPath: string }) {
+	const fullPath = () => [{ label: 'Home', href: '/' }, ...props.path];
 
 	return (
 		<section class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4 dark:font-semibold dark:text-gray-50">
-			<Show when={crumbs().length > 1}>
-				<For each={crumbs()}>
-					{(crumb, index) => (
-						<Switch
-							fallback={
-								<>
-									<p
-										class="font-heading block"
-										style={{ 'view-transition-name': `breadcrumb-${index()}` }}>
-										{crumb.label}
-									</p>
-									<p class="font-heading block" aria-hidden="true">
-										/
-									</p>
-								</>
-							}>
+			<Show when={fullPath().length > 1}>
+				<For each={fullPath()}>
+					{({ label, href }, index) => (
+						<Switch>
 							<Match
 								when={
-									index() === crumbs().length &&
-									(crumb.label !== 'Home' || location.pathname === '/')
+									index() === fullPath().length - 1 &&
+									(label !== 'Home' || props.currentPath === '/')
 								}>
 								<p
 									class="font-heading text-brand-main block font-bold"
 									style={{ 'view-transition-name': `breadcrumb-${index()}` }}>
-									{crumb.label}
+									{label}
 								</p>
 							</Match>
-							<Match when={crumb.href}>
+							<Match when={href}>
 								<a
 									rel="prefetch"
 									class="font-heading underline"
-									href={crumb.href}
+									href={href}
 									style={{ 'view-transition-name': `breadcrumb-${index()}` }}>
-									{crumb.label}
+									{label}
 								</a>
-								<p class="font-heading block" aria-hidden="true">
-									/
+								<Divider />
+							</Match>
+							<Match when={true}>
+								<p
+									class="font-heading block"
+									style={{ 'view-transition-name': `breadcrumb-${index()}` }}>
+									{label}
 								</p>
+								<Divider />
 							</Match>
 						</Switch>
 					)}
@@ -66,3 +51,9 @@ export default function Breadcrumbs(props: { crumbs: Crumb[] }) {
 		</section>
 	);
 }
+
+const Divider = () => (
+	<div class="font-heading block" aria-hidden="true">
+		/
+	</div>
+);

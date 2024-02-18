@@ -16,16 +16,16 @@ export function time(opts: { days?: number; hours?: number; minutes?: number; se
 	);
 }
 
-export function cacheControl(opts: {
-	public?: boolean;
-	maxAge?: number;
-	staleWhileRevalidate?: number;
-}) {
-	const result = [opts.public ? 'public' : 'private'];
+//export function cacheControl(opts: {
+	//public?: boolean;
+	//maxAge?: number;
+	//staleWhileRevalidate?: number;
+//}) {
+	//const result = [opts.public ? 'public' : 'private'];
 
-	if (opts.maxAge) result.push(`max-age=${opts.maxAge}`);
-	if (opts.staleWhileRevalidate)
-		result.push(`stale-while-revalidate=${opts.staleWhileRevalidate}`);
+	//if (opts.maxAge) result.push(`max-age=${opts.maxAge}`);
+	//if (opts.staleWhileRevalidate)
+		//result.push(`stale-while-revalidate=${opts.staleWhileRevalidate}`);
 
-	return result.join(', ');
-}
+	//return result.join(', ');
+//}

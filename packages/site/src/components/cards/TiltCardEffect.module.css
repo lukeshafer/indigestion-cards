@@ -1,64 +1,70 @@
 .outer {
-  width: max-content;
-  position: relative;
-  transform-style: preserve-3d;
-  transition:
-    transform 0.3s,
-    scale 0.3s;
-  perspective: 900px;
-  z-index: 1;
+	width: max-content;
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform 0.3s;
+	perspective: 900px;
+	display: block;
+	z-index: 1;
 
-  --shine-opacity: 0.2;
-  --shine-position: 50%;
-  --shine-after-opacity: 0;
-  --shadow: 0;
+	--shine-opacity: 0.2;
+	--shine-position: 50%;
+	--shine-after-opacity: 0;
 }
 
 .outer:hover {
-  transform: translateZ(300px);
+	transform: translateZ(300px);
+}
+
+.inner {
+	--angle: calc(sqrt(pow(var(--x), 2) + pow(var(--y), 2)) * 70deg);
+	--shine-position: calc(60% * var(--x) + 40% * var(--y) + 50%);
+	--shine-opacity: calc(var(--y) + var(--x) / 2 - 0.05);
+
+	transform: rotate3d(var(--y), calc(-1 * var(--x)), 0, var(--angle));
+	transition-property: transform;
+	transition-timing-function: linear;
 }
 
 .inner::before,
 .inner::after {
-  transform: translateZ(200px);
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: 1;
-  content: '';
+	transform: translateZ(200px);
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	z-index: 1;
+	content: '';
 
-  background-position: var(--shine-position) 0%;
-  opacity: var(--shine-after-opacity);
-  transition: opacity 0.5s;
-  background-repeat: no-repeat;
+	background-position: var(--shine-position) 0%;
+	opacity: var(--shine-after-opacity);
+	transition: opacity 0.5s;
+	background-repeat: no-repeat;
 }
 
 .inner::after {
-			--shine-level: clamp(0.05, calc(0.5 * var(--shadow)), 1);
-			background-size: 300% 200%;
-			background-image: radial-gradient(
-				ellipse at center,
-				rgba(49, 52, 56, var(--shine-level)) 0%,
-				rgba(49, 52, 56, calc(var(--shine-level) / 100)) 100%
-			);
+	--shine-level: clamp(0.05, calc(-0.5 * var(--y)), 1);
+	background-size: 300% 200%;
+	background-image: radial-gradient(
+		ellipse at center,
+		rgba(49, 52, 56, var(--shine-level)) 0%,
+		rgba(49, 52, 56, calc(var(--shine-level) / 100)) 100%
+	);
 }
 
-.inner .shiny::before {
-  --adjusted: calc(var(--shine-opacity) - 0.5);
-  --sq: calc(1 - 3 * var(--adjusted) * var(--adjusted));
-  --shine-level: clamp(0.1, calc(0.6 * var(--sq)), 0.9);
-  background-size: 200% 110%;
-  background-image: linear-gradient(
-    110deg,
-    #fff0 0%,
-    hsl(calc(var(--shine-opacity) * 360) 100% 95% / 25%) 10%,
-    #fff3 20%,
-    hsl(calc(var(--shine-opacity) * 360) 100% 95% / var(--shine-level)) 35%,
-    rgb(255 255 255 / var(--shine-level)) 40%,
-    hsl(calc(var(--shine-opacity) * 360 + 180) 100% 95% / var(--shine-level)) 50%,
-    #fff3 80%,
-    #fff0 100%
-  );
+.inner.shiny::before {
+	--shine-level: clamp(0.1, calc(0.6 * (1 - 3 * pow((var(--shine-opacity) - 0.5), 2))), 0.9);
+	background-size: 200% 110%;
+	background-image: linear-gradient(
+		110deg,
+		#fff0 0%,
+		hsl(calc(var(--shine-opacity) * 360) 100% 95% / 25%) 10%,
+		#fff3 20%,
+		hsl(calc(var(--shine-opacity) * 360) 100% 95% / var(--shine-level)) 35%,
+		rgb(255 255 255 / var(--shine-level)) 40%,
+		hsl(calc(var(--shine-opacity) * 360 + 180) 100% 95% / var(--shine-level)) 50%,
+		#fff3 80%,
+		#fff0 100%
+	);
 }

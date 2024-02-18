@@ -29,7 +29,7 @@ export function Statistics() {
 			return { shitPackOdds: 0 };
 		}
 
-		if (state.cardsOpened?.some((card) => card.rarityId.toLowerCase() !== SHIT_PACK_RARITY_ID))
+		if (state.cardsOpened?.some((card) => !card.rarityId.toLowerCase().startsWith(SHIT_PACK_RARITY_ID)))
 			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 

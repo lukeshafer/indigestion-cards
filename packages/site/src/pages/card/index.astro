@@ -4,11 +4,10 @@ import CardList from '@/components/cards/CardList';
 import { getAllCardDesigns } from '@lib/design';
 import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
-import { cachePage } from '@/lib/api';
 
 const designs = await getAllCardDesigns();
 
-cachePage(Astro)
+const filters = [...Astro.url.searchParams.entries()];
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
@@ -16,7 +15,9 @@ cachePage(Astro)
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
-		cards={designs.map((card) => {
+		client:load
+		{filters}
+		cards={designs.map(card => {
 			const bestRarity = card.bestRarityFound;
 
 			return {
@@ -30,7 +31,5 @@ cachePage(Astro)
 			};
 		})}
 		sortOnlyBy={['card-name-asc', 'card-name-desc']}
-		sessionType={Astro.locals.session?.type}
-		client:load
 	/>
 </Page>
