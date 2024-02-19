@@ -1,0 +1,35 @@
+{
+  "name": "app",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
+  "dependencies": {
+    "@fontsource-variable/montserrat": "^5.0.17",
+    "@formkit/auto-animate": "^0.8.1",
+    "@solidjs/router": "^0.12.3",
+    "@solidjs/start": "^0.5.9",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.26",
+    "solid-icons": "^1.1.0",
+    "solid-js": "^1.8.15",
+    "solid-markdown": "^2.0.0",
+    "sst": "2.39.7",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss": "^3.3.3",
+    "vinxi": "^0.2.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.515.0",
+    "@aws-sdk/s3-presigned-post": "^3.515.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "electrodb": "^2.13.1",
+    "valibot": "^0.28.1"
+  }
+}
