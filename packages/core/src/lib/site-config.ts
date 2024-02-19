@@ -17,7 +17,7 @@ export async function updateBatchTwitchEvents(
   })[]
 ) {
   await Promise.all(
-    events.map(async (event) => {
+    events.map(async event => {
       const { eventId, eventType, ...rest } = event;
       return twitchEvents.patch({ eventId, eventType }).set(rest).go();
     })
@@ -36,48 +36,48 @@ export async function getTwitchEventById(args: { eventId: string }) {
 export function checkIsValidTwitchEventType(
   eventType: string
 ): eventType is (typeof twitchEventTypes)[number] {
-  return twitchEventTypes.some((type) => type === eventType);
+  return twitchEventTypes.some(type => type === eventType);
 }
 
 export async function refreshChannelPointRewards(newRewards: ChannelPointReward[]) {
   const existingRewards = await twitchEvents.query
     .byEventId({ eventType: 'channel.channel_points_custom_reward_redemption.add' })
     .go()
-    .then((result) => result.data);
+    .then(result => result.data);
 
   const rewardsToDelete = existingRewards.filter(
-    (reward) => !newRewards.some((newReward) => newReward.id === reward.eventId)
+    reward => !newRewards.some(newReward => newReward.id === reward.eventId)
   );
   if (rewardsToDelete.length > 0)
     console.log(
       `Deleting rewards: ${JSON.stringify(
-        rewardsToDelete.map((r) => r.eventName),
+        rewardsToDelete.map(r => r.eventName),
         null,
         2
       )}`
     );
 
   const rewardsToAdd = newRewards.filter(
-    (newReward) => !existingRewards.some((reward) => reward.eventId === newReward.id)
+    newReward => !existingRewards.some(reward => reward.eventId === newReward.id)
   );
   if (rewardsToAdd.length > 0)
     console.log(
       `Adding rewards: ${JSON.stringify(
-        rewardsToAdd.map((r) => r.title),
+        rewardsToAdd.map(r => r.title),
         null,
         2
       )}`
     );
 
-  const rewardsToUpdate = newRewards.filter((newReward) =>
-    existingRewards.some((reward) => reward.eventId === newReward.id)
+  const rewardsToUpdate = newRewards.filter(newReward =>
+    existingRewards.some(reward => reward.eventId === newReward.id)
   );
 
   const db = new Service({ twitchEvents }, config);
 
   const result = await db.transaction
     .write(({ twitchEvents }) => [
-      ...rewardsToDelete.map((reward) =>
+      ...rewardsToDelete.map(reward =>
         twitchEvents
           .delete({
             eventId: reward.eventId,
@@ -85,18 +85,18 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
           })
           .commit()
       ),
-      ...rewardsToAdd.map((reward) =>
+      ...rewardsToAdd.map(reward =>
         twitchEvents
           .create({
             eventId: reward.id,
             eventName: reward.title,
             eventType: 'channel.channel_points_custom_reward_redemption.add',
-						isEnabled: reward.is_enabled,
-						isPaused: reward.is_paused,
+            isEnabled: reward.is_enabled,
+            isPaused: reward.is_paused,
           })
           .commit()
       ),
-      ...rewardsToUpdate.map((reward) =>
+      ...rewardsToUpdate.map(reward =>
         twitchEvents
           .patch({
             eventId: reward.id,
@@ -104,8 +104,8 @@ export async function refreshChannelPointRewards(newRewards: ChannelPointReward[
           })
           .set({
             eventName: reward.title,
-						isEnabled: reward.is_enabled,
-						isPaused: reward.is_paused,
+            isEnabled: reward.is_enabled,
+            isPaused: reward.is_paused,
           })
           .commit()
       ),
@@ -119,7 +119,7 @@ export async function checkIsDuplicateTwitchEventMessage(args: { message_id: str
   const result = await twitchEventMessageHistory.query
     .byMessageId({ message_id: args.message_id })
     .go()
-    .then((result) => result.data)
+    .then(result => result.data)
     .catch(() => []);
 
   return result.length > 0;
@@ -137,7 +137,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 export async function addMessageToSiteConfig(args: SiteConfig['messages'][number]) {
   const siteConfig = await getSiteConfig();
   const existingMessages = siteConfig.messages ?? [];
-  if (existingMessages.some((message) => message.message === args.message)) return;
+  if (existingMessages.some(message => message.message === args.message)) return;
   const newMessages = [...existingMessages, args];
   await updateSiteConfig({ ...siteConfig, messages: newMessages });
 }
@@ -160,7 +160,7 @@ export function getRarityRanking(siteConfig?: SiteConfig) {
 
 export async function getFaq() {
   const result = await getSiteConfig();
-  return result.faq
+  return result.faq;
 }
 
 export async function updateFaq(content: string) {
@@ -168,7 +168,7 @@ export async function updateFaq(content: string) {
   await updateSiteConfig({ ...siteConfig, faq: content });
 }
 
-function transformRarityRanking(siteConfig: SiteConfig) {
+function transformRarityRanking(siteConfig: SiteConfig): RarityRankingRecord {
   const rarityRanking = siteConfig.rarityRanking ?? [];
-  return Object.fromEntries(rarityRanking.map((r) => [r.rarityId, r] as const)) || {};
+  return Object.fromEntries(rarityRanking.map(r => [r.rarityId, r] as const)) || {};
 }

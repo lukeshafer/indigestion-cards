@@ -1,13 +1,9 @@
-import { trpc } from '@/client/trpc';
 import ButtonCount from './ButtonCount';
-import { createQuery } from '@tanstack/solid-query';
 import { createMemo } from 'solid-js';
+import { fetchUserByUsername } from '@/client/data';
 
 export default function TradeNotificationCount(props: { username: string }) {
-	const user = createQuery(() => ({
-		queryKey: ['users', 'byUsername', props.username],
-		queryFn: () => trpc.users.byUsername.query({ username: props.username }),
-	}));
+  const user = fetchUserByUsername(props.username)
 
 	const notificationCount = createMemo(
 		() =>

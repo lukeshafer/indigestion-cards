@@ -1,13 +1,14 @@
 import { For, Match, Show, Switch } from 'solid-js';
-// TODO: use router stuff for the path
+import { useLocation } from '@solidjs/router';
 
 export interface Path {
 	label: string;
 	href?: string | undefined;
 }
 
-export default function (props: { path: Path[], currentPath: string }) {
+export default function Breadcrumbs(props: { path: Path[] }) {
 	const fullPath = () => [{ label: 'Home', href: '/' }, ...props.path];
+	const location = useLocation();
 
 	return (
 		<section class="flex gap-2 p-4 text-sm font-medium text-gray-700 underline-offset-4 dark:font-semibold dark:text-gray-50">
@@ -18,7 +19,7 @@ export default function (props: { path: Path[], currentPath: string }) {
 							<Match
 								when={
 									index() === fullPath().length - 1 &&
-									(label !== 'Home' || props.currentPath === '/')
+									(label !== 'Home' || location.pathname === '/')
 								}>
 								<p
 									class="font-heading text-brand-main block font-bold"

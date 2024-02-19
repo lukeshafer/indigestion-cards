@@ -189,25 +189,25 @@ export function sortCards<T extends CardType>(args: {
 
   switch (sort) {
     case 'card-name-asc':
-      return cards.sort(
+      return cards.slice().sort(
         (a, b) =>
           a.cardName.localeCompare(b.cardName) ||
           a.totalOfType - b.totalOfType ||
           +a.cardNumber - +b.cardNumber
       );
     case 'card-name-desc':
-      return cards.sort(
+      return cards.slice().sort(
         (a, b) =>
           b.cardName.localeCompare(a.cardName) ||
           a.totalOfType - b.totalOfType ||
           +a.cardNumber - +b.cardNumber
       );
     case 'rarest':
-      return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking));
+      return cards.slice().sort((a, b) => rarestCardSort(a, b, args.rarityRanking));
     case 'common':
-      return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking)).reverse();
+      return cards.slice().sort((a, b) => rarestCardSort(a, b, args.rarityRanking)).reverse();
     case 'open-date-desc':
-      return cards.sort((a, b) =>
+      return cards.slice().sort((a, b) =>
         !(a.openedAt && b.openedAt)
           ? 0
           : new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
@@ -215,7 +215,7 @@ export function sortCards<T extends CardType>(args: {
           +a.cardNumber - +b.cardNumber
       );
     case 'open-date-asc':
-      return cards.sort((a, b) =>
+      return cards.slice().sort((a, b) =>
         !(a.openedAt && b.openedAt)
           ? 0
           : new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
@@ -223,7 +223,7 @@ export function sortCards<T extends CardType>(args: {
           +a.cardNumber - +b.cardNumber
       );
     case 'owner-asc':
-      return cards.sort((a, b) =>
+      return cards.slice().sort((a, b) =>
         !(a.username && b.username)
           ? 0
           : a.username.localeCompare(b.username) ||
@@ -231,7 +231,7 @@ export function sortCards<T extends CardType>(args: {
           +a.cardNumber - +b.cardNumber
       );
     case 'owner-desc':
-      return cards.sort((a, b) =>
+      return cards.slice().sort((a, b) =>
         !(a.username && b.username)
           ? 0
           : b.username.localeCompare(a.username) ||

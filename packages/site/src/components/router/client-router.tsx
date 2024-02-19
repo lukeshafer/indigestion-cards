@@ -1,13 +1,16 @@
+import { onMount, lazy } from 'solid-js';
 import { Router as SolidRouter, Route } from '@solidjs/router';
 import { isServer } from 'solid-js/web';
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
-import HomePage from './HomePage';
 import AllCardsPage from './AllCardsPage';
 import Page from '@/components/Page';
 import { ClientContext, type ClientContextProps } from '@/client/context';
-import { onMount } from 'solid-js';
+import DesignPage from './DesignPage';
+import HomePage from './HomePage';
+import { fetchAllDesigns, fetchDesign, fetchRarityRanking, fetchSiteConfig } from '@/client/data';
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 
-export const queryClient = new QueryClient();
+// TODO: re-add query client and provider!!!
+const queryClient = new QueryClient();
 
 export default function Router(props: { ssrUrl: string; ssrCtx: ClientContextProps }) {
 	onMount(() => {
@@ -31,9 +34,27 @@ export default function Router(props: { ssrUrl: string; ssrCtx: ClientContextPro
 			<ClientContext.Provider value={props.ssrCtx}>
 				<QueryClientProvider client={queryClient}>
 					<SolidRouter url={isServer ? props.ssrUrl : ''} root={Page} base="/new">
-						<Route path="/" component={HomePage} />
-						<Route path="/card" component={AllCardsPage} />
-						<Route path="/card/:designId" component={AllCardsPage} />
+						<Route
+							path="/"
+							component={HomePage}
+						/>
+						{
+							//<Route
+							//path="/card"
+							//component={AllCardsPage}
+							//load={() => {
+							//void fetchAllDesigns(queryClient).data;
+							//}}
+							///>
+							//<Route
+							//path="/card/:designId"
+							//component={DesignPage}
+							//load={({ params }) => {
+							//void fetchDesign(params.designId, queryClient).data;
+							//void fetchRarityRanking(queryClient).data;
+							//}}
+							///>
+						}
 						<Route path="*404" component={() => <div>404</div>} />
 					</SolidRouter>
 				</QueryClientProvider>

@@ -1,6 +1,7 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, routes } from '@/constants';
+import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, routes } from '@/constants';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import type { Trade } from '@lil-indigestion-cards/core/db/trades';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 import { z } from 'astro/zod';
@@ -91,32 +92,32 @@ export function sortCards<T extends CardListItem>(args: {
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'open-date-asc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'owner-asc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: a.username.localeCompare(b.username) ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		case 'owner-desc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: b.username.localeCompare(a.username) ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+					  a.cardName.localeCompare(b.cardName) ||
+					  +a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;
@@ -157,4 +158,17 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 	trade.offeredCards.forEach(c => params.append('offeredCards', c.instanceId));
 
 	return routes.TRADES + '/new?' + params.toString();
+}
+
+export function getBestRarityFound(design: CardDesign, siteConfig?: SiteConfig) {
+	return (
+		design.bestRarityFound ||
+		design.rarityDetails?.find(r => r.rarityId === LEGACY_CARD_ID) ||
+		siteConfig?.baseRarity || {
+			rarityId: 'default',
+			rarityName: 'Default',
+			frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
+			rarityColor: '#fff',
+		}
+	);
 }

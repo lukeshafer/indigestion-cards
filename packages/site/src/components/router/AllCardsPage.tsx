@@ -1,14 +1,10 @@
-import { createQuery } from '@tanstack/solid-query';
 import CardList from '../cards/CardList';
-import { trpc } from '@/client/trpc';
 import { PageTitle, PageHeader } from '@/components/text';
 import { Show } from 'solid-js';
+import { fetchAllDesigns } from '@/client/data';
 
 export default function AllCardsPage() {
-	const designs = createQuery(() => ({
-		queryKey: ['card-designs'],
-		queryFn: async () => trpc.cardDesigns.getAll.query(),
-	}));
+	const designs = fetchAllDesigns();
 
 	return (
 		<>
