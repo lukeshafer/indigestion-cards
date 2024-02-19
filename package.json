@@ -21,6 +21,7 @@
 		"site:build": "pnpm --filter site run build",
 		"site:astro": "pnpm --filter site run astro",
 		"admin:dev": "pnpm --filter admin run dev",
+		"app:dev": "pnpm --filter app run dev",
 		"knip": "knip"
 	},
 	"devDependencies": {

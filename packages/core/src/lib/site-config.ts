@@ -1,3 +1,4 @@
+"use server";
 import type { ChannelPointReward } from './twitch';
 import {
   twitchEvents,

@@ -2,8 +2,8 @@ import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
 import { setAlerts } from '@/lib/client/state';
 import { ASSETS } from '@/constants';
 import { useViewTransition } from '@/lib/client/utils';
-import { navigate } from 'astro:transitions/client';
 import { twMerge } from 'tailwind-merge'
+import { useNavigate } from '@solidjs/router';
 
 export function Form(props: {
   children: JSX.Element;
@@ -32,6 +32,7 @@ export function Form(props: {
   noAlert?: boolean;
 }) {
   const [isLoading, setIsLoading] = createSignal(false);
+  const navigate = useNavigate();
 
   const formAction = () => {
     // Forms support GET and POST methods, so no need to modify the method on the server
@@ -87,7 +88,7 @@ export function Form(props: {
 
     if (response.redirected) {
       try {
-        await navigate(response.url);
+        await navigate(response.url, {replace: true, scroll: true});
       } catch {
         location.assign(response.url);
       }

@@ -1,9 +1,10 @@
 import { Show } from 'solid-js';
 import ButtonCount from './ButtonCount';
-import { fetchPackCount } from '@/client/data';
+import { createAsync } from '@solidjs/router';
+import { get } from '@/lib/client/data';
 
 export default function TotalPackCount(props: { count: number }) {
-  const packCount = fetchPackCount({ initialCount: props.count })
+  const packCount = createAsync(() => get('pack-count'), { initialValue: { packCount: props.count } })
 
-  return <Show when={packCount.data}>{count => <ButtonCount>{count()}</ButtonCount>}</Show>;
+  return <Show when={packCount().packCount}>{count => <ButtonCount>{count()}</ButtonCount>}</Show>;
 }

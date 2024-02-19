@@ -2,9 +2,9 @@
   "name": "app",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "sst bind vinxi dev",
+    "build": "sst bind vinxi build",
+    "start": "sst bind vinxi start"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.0.17",

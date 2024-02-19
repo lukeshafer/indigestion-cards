@@ -2,7 +2,7 @@ import { FaBrandsPatreon, FaBrandsTwitch, FaBrandsYoutube } from 'solid-icons/fa
 
 export default function Footer() {
 	return (
-		<footer class="grid justify-center gap-1 border-t border-t-gray-300 bg-white py-6 text-center text-sm dark:border-t-gray-800 dark:bg-gray-950">
+		<footer class="grid justify-center gap-1 border-t border-t-gray-300 bg-white py-6 text-gray-800 dark:text-gray-200 text-center text-sm dark:border-t-gray-800 dark:bg-gray-950">
 			<nav class="flex items-center gap-8">
 				<a
 					href="https://twitch.tv/lil_indigestion"

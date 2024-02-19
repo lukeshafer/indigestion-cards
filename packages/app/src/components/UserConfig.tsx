@@ -33,10 +33,10 @@ export default function UserConfig(props: {
 
 		const expires = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 		document.cookie = `disable-animations=${disableAnimations()}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
-
-		if (disableAnimations()) {
-			document.body.dataset['astro-reload'] = 'true';
-		}
+    //
+		//if (disableAnimations()) {
+			//document.body.dataset['astro-reload'] = 'true';
+		//}
 	});
 
 	createEffect(() => {

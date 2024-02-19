@@ -9,7 +9,7 @@ import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
-import { navigate } from 'astro:transitions/client';
+import { useNavigate } from '@solidjs/router';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -111,6 +111,8 @@ export default function NewTrade(props: {
 
 	updateUrlFromState(state);
 
+  const navigate = useNavigate()
+
 	return (
 		<>
 			<form class="sr-only" id="reset-form"></form>
@@ -129,7 +131,7 @@ export default function NewTrade(props: {
 
 						if (response.redirected) {
 							try {
-								await navigate(response.url);
+								await navigate(response.url, { replace: true, scroll: true });
 							} catch {
 								location.assign(response.url);
 							}

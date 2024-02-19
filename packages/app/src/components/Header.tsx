@@ -5,22 +5,28 @@ import { ASSETS, routes } from '@/constants';
 import { Show, useContext } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
 import TotalPackCount from './TotalPackCount';
-import { ClientContext } from '@/client/context';
-import { fetchSiteConfig, fetchTwitchUser } from '@/client/data';
+import { ClientContext } from '@/context';
+import { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 
 const logos = {
   default: ASSETS.LOGO,
   tongle: ASSETS.TONGLE,
 } satisfies Record<string, string>;
 
-export default function Header(props: { logo?: keyof typeof logos }) {
-  const siteConfig = fetchSiteConfig();
+export default function Header(props: {
+  logo?: keyof typeof logos;
+  siteConfig?: SiteConfig;
+  twitchUser?: {
+    login: string;
+    id: string;
+    display_name: string;
+    profile_image_url: string;
+  };
+}) {
   const ctx = useContext(ClientContext);
-  const username = ctx?.session?.properties.username;
-  const twitchData = username ? fetchTwitchUser(username) : null;
   const canSeeTradesLink = () =>
     (ctx?.session?.type === 'user' || ctx?.session?.type === 'admin') &&
-    siteConfig.data?.tradingIsEnabled;
+    props.siteConfig?.tradingIsEnabled;
 
   return (
     <div class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
@@ -34,8 +40,8 @@ export default function Header(props: { logo?: keyof typeof logos }) {
               src={logos[props.logo || 'default']}
               alt="logo"
               class={`block w-12 ${props.logo === 'default' || props.logo === undefined
-                  ? 'dark:invert'
-                  : ''
+                ? 'dark:invert'
+                : ''
                 }`}
               width="192"
             />
@@ -68,7 +74,7 @@ export default function Header(props: { logo?: keyof typeof logos }) {
           </Show>
         </nav>
         <UserSearch />
-        <UserConfig disableAnimations={ctx?.disableAnimations} user={twitchData?.data} />
+        <UserConfig disableAnimations={ctx?.disableAnimations} user={props.twitchUser} />
       </header>
     </div>
   );

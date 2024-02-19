@@ -13,7 +13,9 @@
 		"types": ["vinxi/client"],
 		"isolatedModules": true,
 		"paths": {
-      "~/*": ["./src/*"]
+      "@/*": ["./src/*"],
+			"@lil-indigestion-cards/core/*": ["../core/src/*"],
+			"@lib/*": ["../core/src/lib/*"]
     }
 	}
 }
