@@ -77,14 +77,3 @@ export function cacheControl(opts: CacheControlOptions) {
 
   return result.join(', ');
 }
-
-//export function cachePage(
-//ctx: AstroGlobal,
-//opts: CacheControlOptions = {
-//public: false,
-//maxAge: 60,
-//staleWhileRevalidate: time({ minutes: 10 }),
-//}
-//) {
-//ctx.response.headers.set('cache-control', cacheControl(opts));
-//}

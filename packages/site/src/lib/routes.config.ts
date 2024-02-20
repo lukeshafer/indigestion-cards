@@ -10,22 +10,70 @@ if (!import.meta.env.SSR) {
 	throw new Error('This file should only be imported on the server');
 }
 
+export const data = {
+	users: createLoader(async () => {
+		const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.username));
+		return users;
+	}),
+	usernames: createLoader(async () => {
+		return (await getAllUsers()).map(user => user.username).sort((a, b) => a.localeCompare(b));
+	}),
+	'packs-remaining': createLoader(() => getPacksRemaining()),
+	'pack-count': createLoader(async () => {
+		const packs = await getAllPacks();
+		const packCount = packs.length;
+
+		return { packCount };
+	}),
+	user: createLoader(
+		z.object({
+			username: z.string(),
+		}),
+		async ({ username }) => {
+			console.log('fetching user by username', { username });
+			return getUserByUserName(username);
+		}
+	),
+	trades: createLoader(
+		z.object({
+			tradeId: z.string(),
+		}),
+		async ({ tradeId }) => getTrade(tradeId)
+	),
+} satisfies Record<string, InputLoader<any, any> | NoInputLoader<any>>;
+
 export const routes = {
 	'/': {
 		data: ['user'],
-		conversion: ctx => ({
-			username: ctx.url.searchParams.get('username') || 'snailyluke',
+		params: url => ({
+			username: url.searchParams.get('username') || 'snailyluke',
 		}),
 	},
 	'/users': { data: ['users'] },
-} satisfies Record<
-	string,
-	{
-		data: Readonly<Array<InputKey | NoInputKey>>;
-		conversion?: (ctx: AstroGlobal | APIContext) => any;
-	}
->;
+} satisfies RoutesDefinition<any>;
 export type RouteName = keyof typeof routes;
+export type RoutesDefinition<D extends Record<string, RouteDefinition<any>>> = D;
+
+type RouteDefinition<Keys extends KeyArray> = {
+	data: Keys;
+	params?: (url: URL) => DataParams<Keys>;
+};
+
+type DataParams<K extends KeyArray> = K extends [InputKey | NoInputKey]
+	? ParamsObj<K[0]>
+	: K extends [infer First, ...infer Rest]
+	? First extends InputKey | NoInputKey
+		? Rest extends KeyArray
+			? Merge<ParamsObj<First>, DataParams<Rest>>
+			: never
+		: never
+	: never;
+
+export type KeyArray = Readonly<Array<InputKey | NoInputKey>>;
+type ParamsObj<K extends InputKey | NoInputKey> = K extends InputKey ? Params<K> : {};
+type Merge<F, S> = {
+	[P in keyof F | keyof S]: P extends keyof S ? S[P] : P extends keyof F ? F[P] : never;
+};
 
 type RouteDataKey<R extends RouteName> = (typeof routes)[R]['data'][number];
 type RouteDataOutput<R extends RouteName> = LoaderOutput<(typeof data)[RouteDataKey<R>]>;
@@ -48,21 +96,21 @@ export async function getRouteData<Route extends RouteName>(
 	}
 
 	const params =
-		'conversion' in routeData
-			? routeData.conversion(ctx)
+		'params' in routeData
+			? routeData.params(ctx)
 			: Object.fromEntries(ctx.url.searchParams.entries());
 
 	const entries = await Promise.all(
 		routeData.data.map(async key => {
 			const loader = data[key];
-			console.log('loading: ', { key,  });
+			console.log('loading: ', { key });
 			if ('schema' in loader) {
 				console.log('schema in loader', { params });
 				const parsed = loader.schema.safeParse(params);
-        if (!parsed.success) {
-          console.log("FAILED TO PARSED")
-          return [key, {}]
-        }
+				if (!parsed.success) {
+					console.log('FAILED TO PARSED');
+					return [key, {}];
+				}
 				// @ts-ignore -- The parsed result will always be correct
 				return [key, await loader.load(parsed)] as const;
 			} else {
@@ -77,38 +125,6 @@ export async function getRouteData<Route extends RouteName>(
 //type InputLoaderKey<K extends InputKey> = [K, z.infer<typeof data[K]['schema']>]
 
 //type T = InputLoaderKey<'user'>
-
-export const data = {
-	users: createLoader(async () => {
-		const users = (await getAllUsers()).sort((a, b) => a.username.localeCompare(b.username));
-		return users;
-	}),
-	usernames: createLoader(async () => {
-		return (await getAllUsers()).map(user => user.username).sort((a, b) => a.localeCompare(b));
-	}),
-	'packs-remaining': createLoader(() => getPacksRemaining()),
-	'pack-count': createLoader(async () => {
-		const packs = await getAllPacks();
-		const packCount = packs.length;
-
-		return { packCount };
-	}),
-	user: createLoader(
-		z.object({
-			username: z.string(),
-		}),
-		async ({ username }) => {
-			console.log('fetching user by username', {username});
-			return getUserByUserName(username);
-		}
-	),
-	trades: createLoader(
-		z.object({
-			tradeId: z.string(),
-		}),
-		async ({ tradeId }) => getTrade(tradeId)
-	),
-} satisfies Record<string, InputLoader<any, any> | NoInputLoader<any>>;
 
 type KeysMatching<T extends object, V> = {
 	[K in keyof T]-?: T[K] extends V ? K : never;
