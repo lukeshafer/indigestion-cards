@@ -1,12 +1,13 @@
 import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import Card from '@/components/cards/Card';
-import { For, Show, createSignal } from 'solid-js';
-import { Select } from '../form/Form';
+import { For, Show, createEffect, createSignal } from 'solid-js';
+import { Fieldset, Select, SubmitButton, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { useViewTransition } from '@/lib/client/utils';
 import type { Session } from '@/env';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import Fuse from 'fuse.js';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
@@ -31,6 +32,7 @@ export default function CardList(props: {
 	sessionType?: Session['type'];
 	isUserPage?: boolean;
 	rarityRanking?: RarityRankingRecord;
+	filters?: Array<[string, string]>;
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
@@ -38,30 +40,106 @@ export default function CardList(props: {
 			: sortTypes.slice();
 	// eslint-disable-next-line solid/reactivity
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
+	const [searchText, setSearchText] = createSignal('');
+	const [filters, setFilters] = createSignal<[string, FormDataEntryValue][]>(
+		props.filters?.filter(([f]) => f === 'seasonId') ?? []
+	);
 
-	const sortedCards = () =>
-		sortCards({ cards: props.cards, sort: sort(), rarityRanking: props.rarityRanking });
+	const seasons = () => [
+		...props.cards.reduce<Map<string, string>>(
+			(map, card) =>
+				card.seasonId && card.seasonName ? map.set(card.seasonId, card.seasonName) : map,
+			new Map()
+		),
+	];
+
+	const cards = () => {
+		const filtered =
+			filters().length === 0
+				? props.cards
+				: props.cards.filter(c =>
+						filters().some(([key, value]) => c[key as keyof typeof c] === value)
+					);
+
+		const sorted = sortCards({
+			cards: filtered,
+			sort: sort(),
+			rarityRanking: props.rarityRanking,
+		});
+
+		const searcher = getCardSearcher(sorted);
+
+		const searched = searchText() ? searcher(searchText()) : sorted;
+		return searched;
+	};
+
+	createEffect(() => {});
 
 	return (
 		<div class="flex flex-col gap-3 ">
-			{props.noSort ? null : (
-				<div class="ml-auto flex w-fit">
-					<Select
-						name="sort"
-						label="Sort by"
-						setValue={val => useViewTransition(() => setSort(val))}
-						options={allowedSortTypes()}
+			<div class="flex px-4">
+				{seasons().length > 1 ? (
+					<details class="w-fit min-w-32 max-w-72 self-end">
+						<summary>Filter</summary>
+						<form
+							class="grid"
+							onSubmit={e => e.preventDefault()}
+							onInput={async e => {
+								const formData = new FormData(e.currentTarget);
+								syncFormDataWithUrlSearchParams(formData);
+								setFilters(Array.from(formData.entries()));
+							}}>
+							<Fieldset legend="Season">
+								{seasons().map(([seasonId, seasonName]) => (
+									<label class="flex gap-2">
+										<input
+											type="checkbox"
+											name="seasonId"
+											checked={props.filters?.some(
+												([key, value]) =>
+													key === 'seasonId' && value === seasonId
+											)}
+											value={seasonId}
+											class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
+                      rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+										/>
+										{seasonName}
+									</label>
+								))}
+							</Fieldset>
+							<div ref={e => e.remove()}>
+								<SubmitButton>Save</SubmitButton>
+							</div>
+						</form>
+					</details>
+				) : null}
+				<div class="ml-auto flex gap-4">
+					<TextInput
+						class="h-8 self-end"
+						name="search"
+						label="Search cards"
+						type="text"
+						setValue={setSearchText}
 					/>
+					{props.noSort ? null : (
+						<Select
+							name="sort"
+							class="h-8 self-end p-1"
+							label="Sort by"
+							setValue={val => useViewTransition(() => setSort(val))}
+							options={allowedSortTypes()}
+						/>
+					)}
 				</div>
-			)}
+			</div>
 			<ul
 				class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
 				style={{
 					'grid-template-columns':
 						'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 				}}>
-				<Show when={sortedCards().length > 0} fallback={<p>No cards found</p>}>
-					<For each={sortedCards()}>
+				<Show when={cards().length > 0} fallback={<p>No cards found</p>}>
+					<For each={cards()}>
 						{(card, index) => (
 							<li class="w-fit">
 								{card.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID ? (
@@ -192,4 +270,43 @@ function rarestCardSort(a: CardType, b: CardType, rarityRanking?: RarityRankingR
 	}
 
 	return a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber;
+}
+
+export function getCardSearcher(cards: CardType[]) {
+	const fuse = new Fuse(cards, {
+		keys: [
+			{
+				name: 'cardName',
+				weight: 5,
+			},
+			{
+				name: 'rarityName',
+				weight: 5,
+			},
+			{
+				name: 'seasonName',
+				weight: 2,
+			},
+			{
+				name: 'cardNumber',
+				weight: 2,
+			},
+			{
+				name: 'username',
+				weight: 1,
+			},
+			{
+				name: 'stamps',
+				weight: 1,
+			},
+		],
+	});
+
+	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
+}
+
+function syncFormDataWithUrlSearchParams(formData: FormData) {
+	const url = new URL(window.location.href);
+	url.search = new URLSearchParams(formData as unknown as string).toString();
+	window.history.replaceState({}, '', url.toString());
 }

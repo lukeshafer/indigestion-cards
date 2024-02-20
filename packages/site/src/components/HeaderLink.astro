@@ -8,9 +8,7 @@ const { href, title } = Astro.props;
 
 const currentPage = Astro.url.pathname;
 
-const sessionType = Astro.locals.session?.type
 const url = new URL(href, 'https://example.com/');
-if (!sessionType || sessionType === 'public') url.searchParams.set('public', '');
 ---
 
 <a

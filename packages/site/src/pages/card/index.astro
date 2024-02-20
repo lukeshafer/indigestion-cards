@@ -6,6 +6,8 @@ import { routeNames } from '@/constants';
 import { PageTitle, PageHeader } from '@/components/text';
 
 const designs = await getAllCardDesigns();
+
+const filters = [...Astro.url.searchParams.entries()];
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
@@ -13,7 +15,8 @@ const designs = await getAllCardDesigns();
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
 	<CardList
-    client:load
+		client:load
+		{filters}
 		cards={designs.map(card => {
 			const bestRarity = card.bestRarityFound;
 
