@@ -1,21 +1,39 @@
 import { ASSETS } from '@/constants';
 import RemainingPackCount from '../RemainingPackCount';
 import FAQ from '../FAQ';
-import { Show } from 'solid-js';
+import { JSX, Show, createEffect, createResource, onMount } from 'solid-js';
 import { createQuery } from '@tanstack/solid-query';
 import { trpc } from '@/client/trpc';
+import { get } from '@/lib/client/data';
+import { Route, type RouteSectionProps } from '@solidjs/router';
 
-export default function Home() {
-  const siteConfig = createQuery(
-    () => ({
-      queryKey: ['site-config'],
-      queryFn: () => trpc.siteConfig.query(),
-    }),
+export default function Home(props: RouteSectionProps) {
+  const [data, { refetch }] = createResource(
+    async () => {
+      const users = await get('user', { username: 'snailyLuke' });
+      return users;
+    },
+    { initialValue: props.data.user, ssrLoadFrom: 'initial' }
   );
+
+  onMount(() => {
+    refetch();
+  })
+
+  createEffect(() => {
+    //refetch();
+    console.log(data());
+  });
+
+  const siteConfig = createQuery(() => ({
+    queryKey: ['site-config'],
+    queryFn: () => trpc.siteConfig.query(),
+  }));
 
   return (
     <>
       <h1 class="sr-only">Indigestion Cards</h1>
+      {data()?.map?.(d => <div>{d.username}</div>)}
       <div class="flex flex-col gap-8 overflow-x-hidden">
         <section class="flex min-h-[30rem] flex-row-reverse flex-wrap items-center justify-center justify-items-center gap-4 gap-y-8">
           <div class="-mx-12 -mr-20 flex origin-top justify-center pb-24">

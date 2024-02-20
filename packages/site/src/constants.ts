@@ -1,6 +1,7 @@
 /** Only routes that are accessible without logging in */
 export const PUBLIC_ROUTES = [
 	'/',
+  '/new',
 	'/user',
 	'/user/*',
 	'/404',

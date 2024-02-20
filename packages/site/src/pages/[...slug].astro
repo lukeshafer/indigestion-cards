@@ -1,0 +1,20 @@
+---
+import Router from '@/components/router/client-router';
+import Base from '@/layouts/Base.astro';
+import {getRouteData} from '../lib/routes.config'
+
+const routeData = await getRouteData(Astro.url.pathname, Astro);
+console.log(routeData)
+---
+
+<Base title="New Homepage Test" pageType="public">
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrCtx={{
+			session: Astro.locals.session,
+			disableAnimations: Astro.cookies.get('disable-animations')?.boolean() ?? false,
+		}}
+    ssrData={routeData}
+		client:load
+	/>
+</Base>

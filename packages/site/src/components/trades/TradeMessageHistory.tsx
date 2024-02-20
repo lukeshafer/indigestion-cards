@@ -8,7 +8,7 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
   const [messages, messagesActions] = createResource(
     () => props.trade.tradeId,
     async tradeId => {
-      const trade = await get('trades', [tradeId]);
+      const trade = await get('trades', { tradeId });
       return trade.messages;
     },
     {
