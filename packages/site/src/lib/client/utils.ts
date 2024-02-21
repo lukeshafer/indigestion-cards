@@ -153,8 +153,8 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 		receiverUsername: reverse ? trade.senderUsername : trade.receiverUsername,
 	});
 
-	trade.requestedCards.forEach(c => params.append('requestedCards', c.instanceId));
-	trade.offeredCards.forEach(c => params.append('offeredCards', c.instanceId));
+	trade.requestedCards.forEach(c => params.append(reverse ? 'offeredCards' : 'requestedCards', c.instanceId));
+	trade.offeredCards.forEach(c => params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId));
 
 	return routes.TRADES + '/new?' + params.toString();
 }
