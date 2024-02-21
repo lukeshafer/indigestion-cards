@@ -1,49 +1,15 @@
 import type { JSX } from 'solid-js';
-import type { RouteName, KeyArray, RoutesDefinition } from '../routes.config.ts';
+import type { DataKey, DataOutput } from '../routes.config.ts';
+import type { RouteSectionProps } from '@solidjs/router';
 
-function defineRoute<R extends RouteName>(
-  name: R,
-  component: () => JSX.Element
+export function defineRoute<R extends string, K extends Array<DataKey>>(
+	route: R,
+	data: K,
+	component: (
+		props: RouteSectionProps<{
+			[Key in K[number]]: DataOutput<Key>;
+		}>
+	) => JSX.Element
 ) {
-const
-
-  return <Route />
+	return { route, data, component };
 }
-
-const routes = defineRoutes({
-  '/': {
-    data: ['user'] as const,
-    params: url => ({
-      username: url.searchParams.get('username') || 'snailyluke',
-    }),
-  },
-  '/users': { data: ['users'] },
-})
-
-function defineRoutes<K extends KeyArray>(def: RoutesDefinition<K>) {
-
-}
-
-//export default function Home(props: RouteSectionProps) {
-  //const [data, { refetch }] = createResource(
-    //async () => {
-      //const users = await get('users');
-      //return [...users, ...users];
-    //},
-    //{ initialValue: props.data.users, ssrLoadFrom: 'initial' }
-  //);
-
-  //onMount(() => {
-    //refetch();
-  //})
-
-  //createEffect(() => {
-    ////refetch();
-    //console.log(data());
-  //});
-
-  //const siteConfig = createQuery(() => ({
-    //queryKey: ['site-config'],
-    //queryFn: () => trpc.siteConfig.query(),
-  //}));
-

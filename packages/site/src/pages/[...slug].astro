@@ -1,10 +1,15 @@
 ---
 import Router from '@/components/router/client-router';
 import Base from '@/layouts/Base.astro';
-import {getRouteData} from '../lib/routes.config'
+import { routes } from '@/routes';
+import { loadServerRoute } from '@/lib/routes.config';
 
-const routeData = await getRouteData(Astro.url.pathname, Astro);
-console.log(routeData)
+const route = await loadServerRoute({
+  routes,
+	url: Astro.url,
+});
+
+console.log("Loaded Route", { route })
 ---
 
 <Base title="New Homepage Test" pageType="public">
@@ -14,7 +19,7 @@ console.log(routeData)
 			session: Astro.locals.session,
 			disableAnimations: Astro.cookies.get('disable-animations')?.boolean() ?? false,
 		}}
-    ssrData={routeData}
+    ssrRoute={route}
 		client:load
 	/>
 </Base>

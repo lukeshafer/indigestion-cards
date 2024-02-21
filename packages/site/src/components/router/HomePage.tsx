@@ -1,39 +1,23 @@
 import { ASSETS } from '@/constants';
 import RemainingPackCount from '../RemainingPackCount';
 import FAQ from '../FAQ';
-import { JSX, Show, createEffect, createResource, onMount } from 'solid-js';
-import { createQuery } from '@tanstack/solid-query';
-import { trpc } from '@/client/trpc';
+import { Show, createResource, onMount } from 'solid-js';
 import { get } from '@/lib/client/data';
-import { Route, type RouteSectionProps } from '@solidjs/router';
+import { defineRoute } from '@/lib/client/routes.client';
 
-export default function Home(props: RouteSectionProps) {
-  const [data, { refetch }] = createResource(
-    async () => {
-      const users = await get('user', { username: 'snailyLuke' });
-      return users;
-    },
-    { initialValue: props.data.user, ssrLoadFrom: 'initial' }
+export const HomePageRoute = defineRoute('/', ['site-config'], props => {
+  const [siteConfig, { refetch }] = createResource(
+    async () => get('site-config'),
+    { initialValue: props.data?.['site-config'], ssrLoadFrom: 'initial' }
   );
 
   onMount(() => {
     refetch();
-  })
-
-  createEffect(() => {
-    //refetch();
-    console.log(data());
   });
-
-  const siteConfig = createQuery(() => ({
-    queryKey: ['site-config'],
-    queryFn: () => trpc.siteConfig.query(),
-  }));
 
   return (
     <>
       <h1 class="sr-only">Indigestion Cards</h1>
-      {data()?.map?.(d => <div>{d.username}</div>)}
       <div class="flex flex-col gap-8 overflow-x-hidden">
         <section class="flex min-h-[30rem] flex-row-reverse flex-wrap items-center justify-center justify-items-center gap-4 gap-y-8">
           <div class="-mx-12 -mr-20 flex origin-top justify-center pb-24">
@@ -56,7 +40,7 @@ export default function Home(props: RouteSectionProps) {
               class="w-52 origin-top-left -translate-x-12 translate-y-6 rotate-[18deg] shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:translate-y-2"
             />
           </div>
-          {siteConfig.data?.tradingIsEnabled ? (
+          {siteConfig()?.tradingIsEnabled ? (
             <h2
               class="font-heading w-max text-[2.5rem] font-semibold leading-none text-gray-600 dark:text-gray-300"
               style={{ 'view-transition-name': 'hero-text-h2' }}>
@@ -84,9 +68,9 @@ export default function Home(props: RouteSectionProps) {
           )}
         </section>
         <article class="prose prose-h2:uppercase prose-h2:text-center prose-h2:text-gray-600 dark:prose-h2:text-gray-300 prose-h2:font-bold prose-h2:text-3xl prose-h3:font-heading prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-gray-700 dark:prose-h3:text-gray-200 dark:prose-strong:text-white dark:prose-strong:font-bold prose-a:text-blue-900 dark:prose-a:text-blue-100 mx-auto max-w-3xl text-lg text-gray-900 dark:text-gray-100">
-          <Show when={siteConfig.data?.faq}>{faq => <FAQ content={faq()} />}</Show>
+          <Show when={siteConfig()?.faq}>{faq => <FAQ content={faq()} />}</Show>
         </article>
       </div>
     </>
   );
-}
+});

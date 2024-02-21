@@ -1,14 +1,13 @@
-import { createLoader, type LoaderOutput, type InputLoader, type NoInputLoader } from './api';
-import { getAllUsers, getUserByUserName } from '@lib/user';
-import { getPacksRemaining } from './server/packs';
-import { getAllPacks } from '@lib/pack';
 import { z } from 'astro/zod';
-import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
-import type { APIContext, AstroGlobal } from 'astro';
-
-if (!import.meta.env.SSR) {
-	throw new Error('This file should only be imported on the server');
-}
+import { URLPattern } from 'urlpattern-polyfill';
+import { getAllCardDesigns } from '@lib/design';
+import { getAllUsers, getUserByUserName } from '@lib/user';
+import { getTrade } from '@lib/trades';
+import { getSiteConfig } from '@lib/site-config';
+import { getAllPacks } from '@lib/pack';
+import { createLoader, type LoaderOutput, type InputLoader, type NoInputLoader } from './api';
+import { getPacksRemaining } from './server/packs';
+import type { defineRoute } from './client/routes.client';
 
 export const data = {
 	users: createLoader(async () => {
@@ -17,13 +16,6 @@ export const data = {
 	}),
 	usernames: createLoader(async () => {
 		return (await getAllUsers()).map(user => user.username).sort((a, b) => a.localeCompare(b));
-	}),
-	'packs-remaining': createLoader(() => getPacksRemaining()),
-	'pack-count': createLoader(async () => {
-		const packs = await getAllPacks();
-		const packCount = packs.length;
-
-		return { packCount };
 	}),
 	user: createLoader(
 		z.object({
@@ -34,79 +26,80 @@ export const data = {
 			return getUserByUserName(username);
 		}
 	),
+
+  designs: createLoader(async () => {
+    return getAllCardDesigns()
+  }),
+
+	'packs-remaining': createLoader(() => getPacksRemaining()),
+	'pack-count': createLoader(async () => {
+		const packs = await getAllPacks();
+		const packCount = packs.length;
+
+		return { packCount };
+	}),
+
 	trades: createLoader(
 		z.object({
 			tradeId: z.string(),
 		}),
 		async ({ tradeId }) => getTrade(tradeId)
 	),
+	'site-config': createLoader(() => {
+		return getSiteConfig();
+	}),
 } satisfies Record<string, InputLoader<any, any> | NoInputLoader<any>>;
 
-export const routes = {
-	'/': {
-		data: ['user'],
-		params: url => ({
-			username: url.searchParams.get('username') || 'snailyluke',
-		}),
-	},
-	'/users': { data: ['users'] },
-} satisfies RoutesDefinition<any>;
-export type RouteName = keyof typeof routes;
-export type RoutesDefinition<D extends Record<string, RouteDefinition<any>>> = D;
+// BEGIN LIBRARY
 
-type RouteDefinition<Keys extends KeyArray> = {
-	data: Keys;
-	params?: (url: URL) => DataParams<Keys>;
-};
+if (!import.meta.env.SSR) {
+	throw new Error('This file should only be imported on the server');
+}
 
-type DataParams<K extends KeyArray> = K extends [InputKey | NoInputKey]
-	? ParamsObj<K[0]>
-	: K extends [infer First, ...infer Rest]
-	? First extends InputKey | NoInputKey
-		? Rest extends KeyArray
-			? Merge<ParamsObj<First>, DataParams<Rest>>
-			: never
-		: never
-	: never;
+// FUNCTION EXPORTS USING ABOVE DATA
+type RouteDefinition = ReturnType<typeof defineRoute>;
+export async function loadServerRoute(opts: { routes: Array<RouteDefinition>; url: URL }) {
+	const route = await getBestRouteMatch(opts);
 
-export type KeyArray = Readonly<Array<InputKey | NoInputKey>>;
-type ParamsObj<K extends InputKey | NoInputKey> = K extends InputKey ? Params<K> : {};
-type Merge<F, S> = {
-	[P in keyof F | keyof S]: P extends keyof S ? S[P] : P extends keyof F ? F[P] : never;
-};
+	if (!route) return null;
+	else
+		return {
+			pattern: route.route,
+			data: await loadServerDataFromRouteDataKeys(route),
+		};
+}
 
-type RouteDataKey<R extends RouteName> = (typeof routes)[R]['data'][number];
-type RouteDataOutput<R extends RouteName> = LoaderOutput<(typeof data)[RouteDataKey<R>]>;
-type LoaderOutputForKey<K extends keyof typeof data> = LoaderOutput<(typeof data)[K]>;
-type RouteData<R extends RouteName> = {
-	[K in RouteDataKey<R>]: RouteDataOutput<R>;
-};
-
-export async function getRouteData<Route extends RouteName>(
-	route: Route,
-	ctx: AstroGlobal | APIContext
-): Promise<RouteData<Route>> {
-	console.log('Getting route data', { route });
-
-	const routeData = routes[route];
-	console.log({ routeData });
-	if (!routeData) {
-		console.log('no routedata found');
-		return {};
+async function getBestRouteMatch(opts: { routes: Array<RouteDefinition>; url: URL }) {
+	for (const { route, data: dataKeys } of opts.routes) {
+		const urlPattern = new URLPattern({ pathname: route });
+		if (urlPattern.test(opts.url)) {
+			return {
+				route,
+				dataKeys,
+				params: urlPattern.exec(opts.url)?.pathname.groups ?? {},
+			};
+		}
 	}
+}
 
-	const params =
-		'params' in routeData
-			? routeData.params(ctx)
-			: Object.fromEntries(ctx.url.searchParams.entries());
+type DataOutputRecord<Key extends DataKey> = {
+	[K in Key]: DataOutput<K>;
+};
+
+async function loadServerDataFromRouteDataKeys<Key extends DataKey>(opts: {
+	route: string;
+	dataKeys: Array<Key>;
+	params: Record<string, string | undefined>;
+}): Promise<DataOutputRecord<Key>> {
+	console.debug('loading route', opts.route);
 
 	const entries = await Promise.all(
-		routeData.data.map(async key => {
+		opts.dataKeys.map(async key => {
 			const loader = data[key];
 			console.log('loading: ', { key });
-			if ('schema' in loader) {
-				console.log('schema in loader', { params });
-				const parsed = loader.schema.safeParse(params);
+			if ('schema' in loader && loader.schema) {
+				console.debug('schema in loader', { loader, params: opts.params });
+				const parsed = loader.schema.safeParse(opts.params);
 				if (!parsed.success) {
 					console.log('FAILED TO PARSED');
 					return [key, {}];
@@ -115,16 +108,15 @@ export async function getRouteData<Route extends RouteName>(
 				return [key, await loader.load(parsed)] as const;
 			} else {
 				console.log('no schema in loader');
-				return [key, await loader.load()] as const;
+				return [key, await loader.load({})] as const;
 			}
 		})
 	);
 	return Object.fromEntries(entries);
 }
 
-//type InputLoaderKey<K extends InputKey> = [K, z.infer<typeof data[K]['schema']>]
-
-//type T = InputLoaderKey<'user'>
+export type KeyArray = Readonly<Array<InputKey | NoInputKey>>;
+export type DataOutput<K extends DataKey> = LoaderOutput<(typeof data)[K]>;
 
 type KeysMatching<T extends object, V> = {
 	[K in keyof T]-?: T[K] extends V ? K : never;
@@ -137,17 +129,18 @@ export type Params<K extends InputKey | NoInputKey> = K extends InputKey
 	? z.infer<(typeof data)[K]['schema']>
 	: undefined;
 
-function CLIENT_GETTER_FN<Path extends NoInputKey>(path: Path): Promise<LoaderOutputForKey<Path>>;
+// @ts-expect-error -- the implementation will not match
+function CLIENT_GETTER_FN<Path extends NoInputKey>(path: Path): Promise<DataOutput<Path>>;
 function CLIENT_GETTER_FN<Path extends InputKey>(
 	path: Path,
 	input: Params<Path>
-): Promise<LoaderOutputForKey<Path>>;
+): Promise<DataOutput<Path>>;
 function CLIENT_GETTER_FN<Path extends InputKey | NoInputKey>(
 	// @ts-expect-error This function should never run
 	path,
 	// @ts-expect-error This function should never run
 	input
-): Promise<LoaderOutputForKey<Path>> {
+): Promise<DataOutput<Path>> {
 	throw new Error('IMPLEMENTATION MISSING');
 	// @ts-expect-error This function should never run
 	return;
