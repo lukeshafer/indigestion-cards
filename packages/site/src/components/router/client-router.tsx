@@ -26,9 +26,10 @@ export default function Router(props: {
                   path={route.route}
                   component={route.component}
                   load={
-                    route.route === props.ssrRoute.pattern
+                    isServer && route.route === props.ssrRoute?.pattern
                       ? () => props.ssrRoute.data
                       : () => undefined
+                      // TODO: add resource proxy/getter to fetch all the data
                   }
                 />
               );

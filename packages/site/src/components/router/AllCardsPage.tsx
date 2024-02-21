@@ -3,15 +3,16 @@ import { PageTitle, PageHeader } from '@/components/text';
 import { Show } from 'solid-js';
 import { fetchAllDesigns } from '@/client/data';
 
-export default function AllCardsPage() {
-	const designs = fetchAllDesigns();
+import { defineRoute } from '@/lib/client/routes.client';
 
+export const AllCardsRoute = defineRoute('/card', ['designs'], props => {
+  //const designs = props.data?.designs
 	return (
 		<>
 			<PageHeader>
 				<PageTitle>All Cards</PageTitle>
 			</PageHeader>
-			<Show when={designs.data}>
+			<Show when={props.data?.designs}>
 				{designs => (
 					<CardList
 						cards={designs().map(card => {
@@ -33,4 +34,5 @@ export default function AllCardsPage() {
 			</Show>
 		</>
 	);
-}
+})
+
