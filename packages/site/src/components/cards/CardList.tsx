@@ -1,6 +1,6 @@
 import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
 import Card from '@/components/cards/Card';
-import { For, Show, createEffect, createSignal } from 'solid-js';
+import { For, Show, createMemo, createSignal } from 'solid-js';
 import { Fieldset, Select, SubmitButton, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
@@ -42,7 +42,7 @@ export default function CardList(props: {
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
 	const [searchText, setSearchText] = createSignal('');
 	const [filters, setFilters] = createSignal<[string, FormDataEntryValue][]>(
-		props.filters?.filter(([f]) => f === 'seasonId') ?? []
+		props.filters?.filter(([f]) => ['seasonId'].includes(f)) ?? []
 	);
 
 	const seasons = () => [
@@ -53,27 +53,32 @@ export default function CardList(props: {
 		),
 	];
 
-	const cards = () => {
-		const filtered =
-			filters().length === 0
-				? props.cards
-				: props.cards.filter(c =>
-						filters().some(([key, value]) => c[key as keyof typeof c] === value)
-					);
+	const filteredCards = createMemo(() => {
+		//console.log('filtering', filters());
+		return filters().length === 0
+			? props.cards
+			: props.cards.filter(c =>
+					filters().some(([key, value]) => c[key as keyof typeof c] === value)
+				);
+	});
 
-		const sorted = sortCards({
-			cards: filtered,
+	const sortedCards = createMemo(() => {
+		//console.log('sorting', sort());
+		const s = sortCards({
+			cards: filteredCards(),
 			sort: sort(),
 			rarityRanking: props.rarityRanking,
 		});
 
-		const searcher = getCardSearcher(sorted);
+		return s;
+	});
 
-		const searched = searchText() ? searcher(searchText()) : sorted;
-		return searched;
-	};
+	const searcher = createMemo(() => {
+		//console.log('creating searcher');
+		return getCardSearcher(sortedCards());
+	});
 
-	createEffect(() => {});
+	const cards = () => (searchText() ? searcher()(searchText()) : sortedCards());
 
 	return (
 		<div class="flex flex-col gap-3 ">
@@ -189,10 +194,12 @@ export function sortCards<T extends CardType>(args: {
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
 }) {
-	const { cards, sort } = args;
+	const { cards: inputCards, sort } = args;
+	const cards = inputCards.slice();
 
 	switch (sort) {
 		case 'card-name-asc':
+			//console.debug('card-name-asc', cards);
 			return cards.sort(
 				(a, b) =>
 					a.cardName.localeCompare(b.cardName) ||
@@ -200,6 +207,7 @@ export function sortCards<T extends CardType>(args: {
 					+a.cardNumber - +b.cardNumber
 			);
 		case 'card-name-desc':
+			//console.debug('card-name-desc', cards);
 			return cards.sort(
 				(a, b) =>
 					b.cardName.localeCompare(a.cardName) ||
