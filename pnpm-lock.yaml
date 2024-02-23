@@ -227,6 +227,9 @@ importers:
       '@preact/signals-core':
         specifier: ^1.5.1
         version: 1.5.1
+      '@solid-primitives/map':
+        specifier: ^0.4.9
+        version: 0.4.9(solid-js@1.8.11)
       '@solidjs/router':
         specifier: ^0.12.4
         version: 0.12.4(solid-js@1.8.11)
@@ -6038,6 +6041,32 @@ packages:
       ignore: 5.3.0
       p-map: 4.0.0
     dev: true
+
+  /@solid-primitives/map@0.4.9(solid-js@1.8.11):
+    resolution: {integrity: sha512-wMbIhfn24QDnNqJHRskFjKJ2bwvcx28/S0xBKoZdRdUaqIPZYWOVT8SM++dfWS44YdC2kJPF4RSTY1022aujLA==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/trigger': 1.0.9(solid-js@1.8.11)
+      solid-js: 1.8.11
+    dev: false
+
+  /@solid-primitives/trigger@1.0.9(solid-js@1.8.11):
+    resolution: {integrity: sha512-hW9r8LkFQ0KSAtesSVUfZ9uIAuttslndgfJs+hD+SD1C5JwHyDm4sFoJKzahexh04iKX29JXmuDEjdjudIWqFQ==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': 6.2.2(solid-js@1.8.11)
+      solid-js: 1.8.11
+    dev: false
+
+  /@solid-primitives/utils@6.2.2(solid-js@1.8.11):
+    resolution: {integrity: sha512-11ypVbp987XxETeRqY5Y3OmmTpm8/jZqJXRvo6AyqBthzkvvjEdReuUMU2yVb+pwWGxfZpWHZ6EUCcGXUMhfwg==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.8.11
+    dev: false
 
   /@solidjs/router@0.12.4(solid-js@1.8.11):
     resolution: {integrity: sha512-2S5QWYmpWSIWn5ei85eoStEMmECERX2BiBkEvmqYDrgX79I8D95YaWVdHbcFGOxISPTY4TP7RxjRiofs/AIFJQ==}

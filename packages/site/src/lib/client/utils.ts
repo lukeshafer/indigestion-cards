@@ -9,6 +9,10 @@ export const useViewTransition = (cb: () => unknown) =>
 	// @ts-expect-error - startViewTransition is not on Document yet
 	document.startViewTransition ? document.startViewTransition(cb) : cb();
 
+export function transitionname(el: HTMLElement, value: string) {
+  el?.style?.setProperty?.('view-transition-name', value)
+}
+
 export type CardProps = Partial<CardInstance> &
 	Partial<CardDesign> & {
 		rarityName: string;

@@ -19,6 +19,7 @@
     "@formkit/auto-animate": "^0.8.1",
     "@iconify-json/mdi": "^1.1.64",
     "@preact/signals-core": "^1.5.1",
+    "@solid-primitives/map": "^0.4.9",
     "@solidjs/router": "^0.12.4",
     "@tailwindcss/container-queries": "^0.1.1",
     "astro": "^4.2.1",
