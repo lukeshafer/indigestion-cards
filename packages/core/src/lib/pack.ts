@@ -8,6 +8,7 @@ import { type CardInstance, cardInstances } from '../db/cardInstances';
 import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
 import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
 import { PackTypeIsOutOfCardsError } from './errors';
+import { getAllCardDesigns, getCardDesignAndInstancesById } from './design';
 
 export async function getAllPacks(): Promise<Pack[]> {
   const result = await packs.query.allPacks({}).go();
@@ -330,4 +331,45 @@ export async function batchUpdatePackUsername(args: { oldUsername: string; newUs
       }))
     )
     .go();
+}
+
+export async function getPacksRemaining() {
+  const designs = await getAllCardDesigns();
+
+  const designCountData = await Promise.all(
+    designs.map(async design => {
+      const { cardInstances } = await getCardDesignAndInstancesById(design);
+
+      const ownedCards = cardInstances.length;
+      const possibleCards =
+        design.rarityDetails?.reduce((acc, rarity) => {
+          return acc + rarity.count;
+        }, 0) ?? 0;
+      const remainingCards = possibleCards - ownedCards;
+
+      return {
+        seasonId: design.seasonId,
+        seasonName: design.seasonName,
+        ownedCards,
+        possibleCards,
+        remainingCards,
+      };
+    })
+  );
+  const counts = [
+    ...designCountData
+      .reduce((map, { seasonId, seasonName, ownedCards, remainingCards, possibleCards }) => {
+        const prev = map.get(seasonId);
+        return map.set(seasonId, {
+          seasonId,
+          seasonName,
+          ownedCards: ownedCards + (prev?.ownedCards ?? 0),
+          possibleCards: possibleCards + (prev?.possibleCards ?? 0),
+          remainingCards: remainingCards + (prev?.remainingCards ?? 0),
+        });
+      }, new Map<string, (typeof designCountData)[number]>())
+      .values(),
+  ];
+
+  return counts;
 }

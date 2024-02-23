@@ -46,7 +46,7 @@ importers:
         version: 0.5.11(prettier-plugin-astro@0.12.3)(prettier@3.2.4)
       sst:
         specifier: 2.39.7
-        version: 2.39.7
+        version: 2.39.7(@types/react@18.2.51)
       typescript:
         specifier: ^5.2.2
         version: 5.3.3
@@ -180,7 +180,7 @@ importers:
         version: 1.8.11
       sst:
         specifier: 2.39.7
-        version: 2.39.7
+        version: 2.39.7(@types/react@18.2.51)
 
   packages/functions:
     dependencies:
@@ -205,7 +205,7 @@ importers:
         version: 18.19.8
       sst:
         specifier: 2.39.7
-        version: 2.39.7
+        version: 2.39.7(@types/react@18.2.51)
 
   packages/site:
     dependencies:
@@ -227,6 +227,9 @@ importers:
       '@preact/signals-core':
         specifier: ^1.5.1
         version: 1.5.1
+      '@solidjs/router':
+        specifier: ^0.12.4
+        version: 0.12.4(solid-js@1.8.11)
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.1)
@@ -253,13 +256,16 @@ importers:
         version: 2.0.0(solid-js@1.8.11)
       sst:
         specifier: 2.39.7
-        version: 2.39.7
+        version: 2.39.7(@types/react@18.2.51)
       tailwind-merge:
         specifier: ^2.2.0
         version: 2.2.0
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1
+      urlpattern-polyfill:
+        specifier: ^10.0.0
+        version: 10.0.0
     devDependencies:
       '@astrojs/check':
         specifier: ^0.4.1
@@ -1292,56 +1298,6 @@ packages:
     transitivePeerDependencies:
       - aws-crt
     dev: true
-
-  /@aws-sdk/client-ssm@3.496.0:
-    resolution: {integrity: sha512-qlsUlevthRnwMDAfJMcWaG3wmnIYyt3MltEPETT+E03GnXkbjgfPCjefy+IU6gqM2FwcWrMTGEE9iQoEOs73ow==}
-    engines: {node: '>=14.0.0'}
-    dependencies:
-      '@aws-crypto/sha256-browser': 3.0.0
-      '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.496.0
-      '@aws-sdk/core': 3.496.0
-      '@aws-sdk/credential-provider-node': 3.496.0
-      '@aws-sdk/middleware-host-header': 3.496.0
-      '@aws-sdk/middleware-logger': 3.496.0
-      '@aws-sdk/middleware-recursion-detection': 3.496.0
-      '@aws-sdk/middleware-signing': 3.496.0
-      '@aws-sdk/middleware-user-agent': 3.496.0
-      '@aws-sdk/region-config-resolver': 3.496.0
-      '@aws-sdk/types': 3.496.0
-      '@aws-sdk/util-endpoints': 3.496.0
-      '@aws-sdk/util-user-agent-browser': 3.496.0
-      '@aws-sdk/util-user-agent-node': 3.496.0(aws-crt@1.21.0)
-      '@smithy/config-resolver': 2.1.1
-      '@smithy/core': 1.3.1
-      '@smithy/fetch-http-handler': 2.4.1
-      '@smithy/hash-node': 2.1.1
-      '@smithy/invalid-dependency': 2.1.1
-      '@smithy/middleware-content-length': 2.1.1
-      '@smithy/middleware-endpoint': 2.4.1
-      '@smithy/middleware-retry': 2.1.1
-      '@smithy/middleware-serde': 2.1.1
-      '@smithy/middleware-stack': 2.1.1
-      '@smithy/node-config-provider': 2.2.1
-      '@smithy/node-http-handler': 2.3.1
-      '@smithy/protocol-http': 3.1.1
-      '@smithy/smithy-client': 2.3.1
-      '@smithy/types': 2.9.1
-      '@smithy/url-parser': 2.1.1
-      '@smithy/util-base64': 2.1.1
-      '@smithy/util-body-length-browser': 2.1.1
-      '@smithy/util-body-length-node': 2.2.1
-      '@smithy/util-defaults-mode-browser': 2.1.1
-      '@smithy/util-defaults-mode-node': 2.1.1
-      '@smithy/util-endpoints': 1.1.1
-      '@smithy/util-retry': 2.1.1
-      '@smithy/util-utf8': 2.1.1
-      '@smithy/util-waiter': 2.1.1
-      tslib: 2.6.2
-      uuid: 8.3.2
-    transitivePeerDependencies:
-      - aws-crt
-    dev: false
 
   /@aws-sdk/client-ssm@3.504.0:
     resolution: {integrity: sha512-HaqPsRds/1F8MSy0xM8iwsjSUlSoKsYsyi4DVwZ/C29t6iunAnxx+tcQ9U7pK3usMGWCcsAcJdJp2VksmWCmFQ==}
@@ -6082,6 +6038,14 @@ packages:
       ignore: 5.3.0
       p-map: 4.0.0
     dev: true
+
+  /@solidjs/router@0.12.4(solid-js@1.8.11):
+    resolution: {integrity: sha512-2S5QWYmpWSIWn5ei85eoStEMmECERX2BiBkEvmqYDrgX79I8D95YaWVdHbcFGOxISPTY4TP7RxjRiofs/AIFJQ==}
+    peerDependencies:
+      solid-js: ^1.8.6
+    dependencies:
+      solid-js: 1.8.11
+    dev: false
 
   /@stitches/core@1.2.8:
     resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
@@ -12703,7 +12667,7 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
 
-  /sst@2.39.7:
+  /sst@2.39.7(@types/react@18.2.51):
     resolution: {integrity: sha512-cJ/AbVXuWBC9Lawbk9WUobejjsrZknfKIKEvbnwQaiJ0vLJ4VjR/NMj1X5Oh1JJeeLnRLrRIL3Al2BKuzuIQbw==}
     hasBin: true
     peerDependencies:
@@ -12792,97 +12756,6 @@ packages:
       - react-devtools-core
       - supports-color
       - utf-8-validate
-
-  /sst@2.39.7(@types/react@18.2.51):
-    resolution: {integrity: sha512-cJ/AbVXuWBC9Lawbk9WUobejjsrZknfKIKEvbnwQaiJ0vLJ4VjR/NMj1X5Oh1JJeeLnRLrRIL3Al2BKuzuIQbw==}
-    hasBin: true
-    peerDependencies:
-      '@sls-next/lambda-at-edge': ^3.7.0
-    peerDependenciesMeta:
-      '@sls-next/lambda-at-edge':
-        optional: true
-    dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.110.1-alpha.0(aws-cdk-lib@2.110.1)(constructs@10.3.0)
-      '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.110.1-alpha.0(@aws-cdk/aws-apigatewayv2-alpha@2.110.1-alpha.0)(aws-cdk-lib@2.110.1)(constructs@10.3.0)
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.110.1-alpha.0(@aws-cdk/aws-apigatewayv2-alpha@2.110.1-alpha.0)(aws-cdk-lib@2.110.1)(constructs@10.3.0)
-      '@aws-cdk/cloud-assembly-schema': 2.110.1
-      '@aws-cdk/cloudformation-diff': 2.110.1
-      '@aws-cdk/cx-api': 2.110.1(@aws-cdk/cloud-assembly-schema@2.110.1)
-      '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/client-cloudformation': 3.496.0
-      '@aws-sdk/client-ecs': 3.496.0
-      '@aws-sdk/client-eventbridge': 3.496.0
-      '@aws-sdk/client-iam': 3.496.0
-      '@aws-sdk/client-iot': 3.496.0
-      '@aws-sdk/client-iot-data-plane': 3.496.0
-      '@aws-sdk/client-lambda': 3.496.0
-      '@aws-sdk/client-rds-data': 3.496.0
-      '@aws-sdk/client-s3': 3.496.0
-      '@aws-sdk/client-ssm': 3.496.0
-      '@aws-sdk/client-sts': 3.496.0
-      '@aws-sdk/config-resolver': 3.374.0
-      '@aws-sdk/credential-providers': 3.496.0
-      '@aws-sdk/middleware-retry': 3.374.0
-      '@aws-sdk/middleware-signing': 3.496.0
-      '@aws-sdk/signature-v4-crt': 3.496.0
-      '@aws-sdk/smithy-client': 3.374.0
-      '@babel/core': 7.23.7
-      '@babel/generator': 7.23.6
-      '@babel/plugin-syntax-typescript': 7.23.3(@babel/core@7.23.7)
-      '@smithy/signature-v4': 2.1.1
-      '@trpc/server': 9.16.0
-      adm-zip: 0.5.10
-      aws-cdk-lib: 2.110.1(constructs@10.3.0)
-      aws-iot-device-sdk: 2.2.13
-      aws-sdk: 2.1540.0
-      builtin-modules: 3.2.0
-      cdk-assets: 2.110.1
-      chalk: 5.3.0
-      chokidar: 3.5.3
-      ci-info: 3.9.0
-      colorette: 2.0.20
-      conf: 10.2.0
-      constructs: 10.3.0
-      cross-spawn: 7.0.3
-      dendriform-immer-patch-optimiser: 2.1.3(immer@9.0.21)
-      dotenv: 16.3.2
-      esbuild: 0.18.13
-      express: 4.18.2
-      fast-jwt: 3.3.2
-      get-port: 6.1.2
-      glob: 10.3.10
-      graphql: 16.8.1
-      graphql-yoga: 3.9.1(graphql@16.8.1)
-      immer: 9.0.21
-      ink: 4.4.1(@types/react@18.2.51)(react@18.2.0)
-      ink-spinner: 5.0.0(ink@4.4.1)(react@18.2.0)
-      kysely: 0.25.0
-      kysely-codegen: 0.10.1(kysely@0.25.0)
-      kysely-data-api: 0.2.1(@aws-sdk/client-rds-data@3.496.0)(kysely@0.25.0)
-      minimatch: 6.2.0
-      openid-client: 5.6.4
-      ora: 6.3.1
-      react: 18.2.0
-      remeda: 1.37.0
-      sst-aws-cdk: 2.110.1-1
-      tree-kill: 1.2.2
-      undici: 5.28.2
-      uuid: 9.0.1
-      ws: 8.16.0
-      yargs: 17.7.2
-      zod: 3.22.4
-    transitivePeerDependencies:
-      - '@types/react'
-      - aws-crt
-      - better-sqlite3
-      - bufferutil
-      - debug
-      - mysql2
-      - pg
-      - react-devtools-core
-      - supports-color
-      - utf-8-validate
-    dev: false
 
   /stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
@@ -13526,6 +13399,10 @@ packages:
     dependencies:
       punycode: 1.3.2
       querystring: 0.2.0
+
+  /urlpattern-polyfill@10.0.0:
+    resolution: {integrity: sha512-H/A06tKD7sS1O1X2SshBVeA5FLycRpjqiBeqGKmBwBDBy28EnRjORxTNe269KSSr5un5qyWi1iL61wLxpd+ZOg==}
+    dev: false
 
   /urlpattern-polyfill@8.0.2:
     resolution: {integrity: sha512-Qp95D4TPJl1kC9SKigDcqgyM2VDVO4RiJc2d4qe5GrYm+zbIQCWWKAFaJNQ4BhdFeDGwBmAxqJBwWSJDb9T3BQ==}
