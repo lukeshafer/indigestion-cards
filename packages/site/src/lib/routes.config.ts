@@ -8,6 +8,8 @@ import { getAllPacks } from '@lib/pack';
 import { createLoader, type LoaderOutput, type InputLoader, type NoInputLoader } from './api';
 import { getPacksRemaining } from './server/packs';
 import type { defineRoute } from './client/routes.client';
+import type { JSX } from 'solid-js';
+import type { RouteSectionProps } from '@solidjs/router';
 
 export const data = {
   users: createLoader(async () => {

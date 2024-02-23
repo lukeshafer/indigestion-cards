@@ -1,0 +1,14 @@
+{
+	"extends": "@tsconfig/node16/tsconfig.json",
+	"compilerOptions": {
+		"module": "esnext",
+		"lib": ["es2023", "DOM"],
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strict": true,
+		"verbatimModuleSyntax": true,
+		"baseUrl": ".",
+		"paths": {
+		}
+	}
+}

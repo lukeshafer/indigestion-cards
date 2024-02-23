@@ -1,6 +1,7 @@
 import { packs, type Pack } from '../db/packs';
 import type { DBResult } from '../types';
 import { checkIfUserExists, createNewUser, getUser } from './user';
+import { getAllCardDesigns, getCardDesignAndInstancesById } from './design';
 import { Service } from 'electrodb';
 import { config } from '../db/_utils';
 import { users } from '../db/users';
@@ -61,7 +62,7 @@ export async function givePackToUser(packDetails: PackDetails) {
         packTypeId: packDetails.packType.packTypeId,
         packTypeName: packDetails.packType.packTypeName,
       },
-    }).catch((err) => {
+    }).catch(err => {
       if (err instanceof PackTypeIsOutOfCardsError) errors.push(err);
       else throw err;
     });
@@ -102,7 +103,7 @@ export async function updatePackUser(options: {
         .patch({ packId: pack.packId })
         .set({ userId: user.userId, username: user.username })
         .commit(),
-      ...pack.cardDetails.map((card) =>
+      ...pack.cardDetails.map(card =>
         cardInstances
           .patch({ instanceId: card.instanceId, designId: card.designId })
           .set({ userId: user.userId, username: user.username })
@@ -112,7 +113,7 @@ export async function updatePackUser(options: {
         .patch({ userId: user.userId })
         .set({ packCount: (user.packCount || 0) + 1 })
         .commit(),
-      ...oldUserList.map((oldUser) =>
+      ...oldUserList.map(oldUser =>
         users
           .patch({ userId: oldUser.userId })
           .set({ packCount: (oldUser.packCount || 1) - 1 })
@@ -139,7 +140,7 @@ export async function deleteFirstPackForUser(args: {
     const pack = await findPackForUser(args);
     if (!pack) return { success: false, error: 'User has no pack to delete!' };
 
-    const openedCount = pack.cardDetails.filter((card) => card.opened).length;
+    const openedCount = pack.cardDetails.filter(card => card.opened).length;
     const user = await getUser(args.userId);
     const result = await service.transaction
       .write(({ users, cardInstances, packs }) => [
@@ -156,7 +157,7 @@ export async function deleteFirstPackForUser(args: {
               .commit(),
           ]
           : []),
-        ...(pack.cardDetails?.map((card) =>
+        ...(pack.cardDetails?.map(card =>
           cardInstances
             .delete({ designId: card.designId, instanceId: card.instanceId })
             .commit()
@@ -198,7 +199,7 @@ export async function deletePack(args: { packId: string }) {
   const pack = await getPackById({ packId: args.packId });
 
   const user = pack.userId ? await getUser(pack.userId) : null;
-  const openCount = pack.cardDetails.filter((card) => card.opened).length;
+  const openCount = pack.cardDetails.filter(card => card.opened).length;
 
   const result = await service.transaction
     .write(({ users, cardInstances, packs }) => [
@@ -215,7 +216,7 @@ export async function deletePack(args: { packId: string }) {
             .commit(),
         ]
         : []),
-      ...(pack.cardDetails?.map((card) =>
+      ...(pack.cardDetails?.map(card =>
         cardInstances
           .delete({ designId: card.designId, instanceId: card.instanceId })
           .commit()
@@ -294,7 +295,7 @@ export async function createPack(args: {
           userId: user?.userId,
           username: user?.username,
           seasonId: args.seasonId,
-          cardDetails: cards.map((card) => ({
+          cardDetails: cards.map(card => ({
             instanceId: card.instanceId,
             designId: card.designId,
             cardName: card.cardName,
@@ -309,7 +310,7 @@ export async function createPack(args: {
           })),
         })
         .commit(),
-      ...cards.map((card) => cardInstances.create(card).commit()),
+      ...cards.map(card => cardInstances.create(card).commit()),
     ])
     .go();
 
@@ -321,7 +322,7 @@ export async function batchUpdatePackUsername(args: { oldUsername: string; newUs
 
   return await packs
     .put(
-      existingPacks.data.map((pack) => ({
+      existingPacks.data.map(pack => ({
         ...pack,
         username:
           pack.username?.toLowerCase() === args.oldUsername.toLowerCase()
@@ -330,4 +331,45 @@ export async function batchUpdatePackUsername(args: { oldUsername: string; newUs
       }))
     )
     .go();
+}
+
+export async function getPacksRemaining() {
+  const designs = await getAllCardDesigns();
+
+  const designCountData = await Promise.all(
+    designs.map(async design => {
+      const { cardInstances } = await getCardDesignAndInstancesById(design);
+
+      const ownedCards = cardInstances.length;
+      const possibleCards =
+        design.rarityDetails?.reduce((acc, rarity) => {
+          return acc + rarity.count;
+        }, 0) ?? 0;
+      const remainingCards = possibleCards - ownedCards;
+
+      return {
+        seasonId: design.seasonId,
+        seasonName: design.seasonName,
+        ownedCards,
+        possibleCards,
+        remainingCards,
+      };
+    })
+  );
+  const counts = [
+    ...designCountData
+      .reduce((map, { seasonId, seasonName, ownedCards, remainingCards, possibleCards }) => {
+        const prev = map.get(seasonId);
+        return map.set(seasonId, {
+          seasonId,
+          seasonName,
+          ownedCards: ownedCards + (prev?.ownedCards ?? 0),
+          possibleCards: possibleCards + (prev?.possibleCards ?? 0),
+          remainingCards: remainingCards + (prev?.remainingCards ?? 0),
+        });
+      }, new Map<string, (typeof designCountData)[number]>())
+      .values(),
+  ];
+
+  return counts;
 }

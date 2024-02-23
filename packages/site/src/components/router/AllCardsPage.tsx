@@ -1,11 +1,10 @@
 import CardList from '../cards/CardList';
 import { PageTitle, PageHeader } from '@/components/text';
 import { Show } from 'solid-js';
-import { fetchAllDesigns } from '@/client/data';
+//import { fetchAllDesigns } from '@/client/data';
+import { client } from '@/data.client';
 
-import { defineRoute } from '@/lib/client/routes.client';
-
-export const AllCardsRoute = defineRoute('/card', ['designs'], props => {
+export default client.defineRoute('/card', ['designs'], props => {
   //const designs = props.data?.designs
 	return (
 		<>

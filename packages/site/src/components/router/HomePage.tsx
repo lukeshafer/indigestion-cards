@@ -3,9 +3,9 @@ import RemainingPackCount from '../RemainingPackCount';
 import FAQ from '../FAQ';
 import { Show, createResource, onMount } from 'solid-js';
 import { get } from '@/lib/client/data';
-import { defineRoute } from '@/lib/client/routes.client';
+import { client } from '@/data.client'
 
-export const HomePageRoute = defineRoute('/', ['site-config'], props => {
+export default client.defineRoute('/', ['site-config'], props => {
 	const [siteConfig, { refetch }] = createResource(async () => get('site-config'), {
 		initialValue: props.data?.['site-config'],
 		ssrLoadFrom: 'initial',

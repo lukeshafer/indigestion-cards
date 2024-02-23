@@ -2,9 +2,9 @@
 import Router from '@/components/router/client-router';
 import Base from '@/layouts/Base.astro';
 import { routes } from '@/routes';
-import { loadServerRoute } from '@/lib/routes.config';
+import { server } from '@/data.server';
 
-const route = await loadServerRoute({
+const route = await server.loadServerRoute({
   routes,
 	url: Astro.url,
 });

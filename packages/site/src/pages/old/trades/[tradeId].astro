@@ -171,7 +171,8 @@ const tradeStatus = (() => {
 
 	<trade-fetcher trade-id={trade.tradeId} status={trade.status}></trade-fetcher>
 	<script>
-		import { get } from '@/lib/client/data';
+		import { client } from '@/data.client';
+    const { get } = client;
 
 		customElements.define(
 			'trade-fetcher',
