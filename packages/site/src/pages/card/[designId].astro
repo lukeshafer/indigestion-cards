@@ -7,6 +7,7 @@ import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
 import { PageTitle } from '@/components/text';
 import { Heading } from '@/components/text';
+import CardDesignPage from '@/routes/card/[designId]';
 
 const designId = Astro.params.designId;
 
@@ -53,28 +54,13 @@ const openedInstances = instances.filter(instance => instance.openedAt);
 	class="flex flex-col gap-9"
 	pageType="public"
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
-	<header class="flex flex-col items-center gap-4">
-		<PageTitle>{design.cardName}</PageTitle>
-		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
-		<section class="mx-auto text-lg">
-			<p>
-				<b>Season:{' '}</b>
-				{design.seasonName}
-			</p>
-			<p>
-				<b>Artist:{' '}</b>
-				{design.artist}
-			</p>
-		</section>
-	</header>
-	<section class="flex flex-col text-center">
-		<Heading>Cards Opened</Heading>
-		<CardList
-			client:load
-			cards={openedInstances}
-			showUsernames
-			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc', 'open-date-desc', 'open-date-asc']}
-			rarityRanking={rarityRanking}
-		/>
-	</section>
+  <CardDesignPage
+    client:load
+    data={{
+      design,
+      siteConfig,
+      openedInstances,
+      rarityRanking,
+    }}
+  />
 </Page>
