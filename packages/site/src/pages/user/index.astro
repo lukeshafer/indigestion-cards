@@ -2,7 +2,7 @@
 import Page from '@/layouts/Page.astro';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
-import Users from '@/routes/user/index';
+import UsersPage from '@/routes/user/index';
 import Router from '@/data/router';
 
 import { server } from '@/data/data.server';
@@ -14,8 +14,9 @@ const preorders = await getAllPreorders();
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
   <Router
     ssrUrl={Astro.url.pathname}
-    ssrRoute={Users}
+    ssrComponent={UsersPage}
     ssrData={{ users, preorders }}
+    session={Astro.locals.session}
     client:load
   />
 </Page>

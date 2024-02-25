@@ -4,10 +4,11 @@ import { createNewUser, getUserAndOpenedCardInstances } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
-import UserPage from '@/routes/user/[username]'
+import UserPage from '@/routes/user/[username]';
 import type { Props as HeaderProps } from '@/components/Header.astro';
+import Router from '@/data/router';
 
-console.log('username page')
+console.log('username page');
 type Logo = HeaderProps['logo'];
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -23,7 +24,7 @@ if (!id) {
 
 let [userData, siteConfig] = await Promise.all([
 	getUserAndOpenedCardInstances({ username: id }),
-  getSiteConfig(),
+	getSiteConfig(),
 ]);
 
 const rarityRanking = getRarityRanking(siteConfig);
@@ -56,25 +57,28 @@ const user = users[0] || {
 const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
 };
-const logo = userLogoMap[id]
+const logo = userLogoMap[id];
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 ---
 
 <Page
 	title={user.username}
-  {logo}
+	{logo}
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
-  <UserPage 
-    client:load
-    data={{
-    user,
-    isLoggedInUser,
-    cards: cardInstances,
-    siteConfig,
-    rarityRanking,
-    twitchData: twitchData || undefined
-  }}/>
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrComponent={UserPage}
+		ssrData={{
+			user,
+			cards: cardInstances,
+			siteConfig,
+			rarityRanking,
+			twitchData: twitchData || undefined,
+		}}
+    session={Astro.locals.session}
+		client:load
+	/>
 </Page>

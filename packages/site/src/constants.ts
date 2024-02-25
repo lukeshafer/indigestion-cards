@@ -9,6 +9,8 @@ export const PUBLIC_ROUTES = [
 	'/api/search',
 	'/api/auth/*',
 	'/api/user/*',
+  '/trpc/*',
+  '/trpc',
 	'/card',
 	'/card/*',
 	'/login',

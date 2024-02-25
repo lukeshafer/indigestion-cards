@@ -1,112 +1,94 @@
-import { Router as SolidRouter, Route, useBeforeLeave } from '@solidjs/router';
+import {
+	Router as SolidRouter,
+	Route,
+	useBeforeLeave,
+	type RouteSectionProps,
+	type RouteLoadFuncArgs,
+} from '@solidjs/router';
 import { isServer } from 'solid-js/web';
-import type {
-	RouteOptions,
-	RouteComponent,
-	RouteOptionsData,
-} from './data.client';
-import type { Data } from './data.server';
 import { useViewTransition } from '@/lib/client/utils';
-import { lazy } from 'solid-js';
+import { For, JSX, lazy } from 'solid-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import { SessionContext } from '@/lib/client/context';
+import type { Session } from '@lil-indigestion-cards/core/types';
 
 // ROUTES
-import { route as indexRoute } from '@/routes';
-import { route as allCardsRoute } from '@/routes/card';
-import { route as designIdRoute } from '@/routes/card/[designId]';
-// import UsersPage from '@/routes/user';
+import Index, { route as indexRoute } from '@/routes';
+import CardsPage, { route as allCardsRoute } from '@/routes/card';
+import CardDesignPage, { route as designIdRoute } from '@/routes/card/[designId]';
+import UsersPage, { route as usersRoute } from '@/routes/user';
+import UserPage, { route as usernameRoute } from '@/routes/user/[username]';
 
-//const routes = [Index, CardsPage, CardDesignPage];
+export type RouteOptions<T> = {
+	path: string;
+	load: (
+		args: RouteLoadFuncArgs,
+		ssrData?: T
+	) => {
+		[K in keyof T]: T[K] | undefined;
+	};
+};
 
-const Index = lazy(() => import('@/routes'));
+export type RouteComponent<T> = (props: RouteSectionProps<T>) => JSX.Element;
+
+const routes = [
+	[Index, indexRoute],
+	[CardsPage, allCardsRoute],
+	[CardDesignPage, designIdRoute],
+	[UsersPage, usersRoute],
+  [UserPage, usernameRoute],
+] as const;
 
 const queryClient = new QueryClient();
 
-export default function Router<Key extends keyof Data, Route extends RouteOptions<Key>>(props: {
+export default function Router<Data>(props: {
 	ssrUrl: string;
-	ssrRoute: Route;
-	ssrComponent: RouteComponent<Key, Route>;
-	ssrData: RouteOptionsData<Key, Route>;
+	ssrComponent: RouteComponent<Data>;
+	ssrData: Data;
+	session: Session | null;
 }) {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<SolidRouter
-				url={isServer ? props.ssrUrl : ''}
-				root={props => {
-					useBeforeLeave(e => {
-						e.preventDefault();
-						useViewTransition(() => {
-							e.retry(true);
+		<SessionContext.Provider value={props.session}>
+			<QueryClientProvider client={queryClient}>
+				<SolidRouter
+					url={isServer ? props.ssrUrl : ''}
+					root={props => {
+						useBeforeLeave(e => {
+							e.preventDefault();
+							useViewTransition(() => {
+								e.retry(true);
+							});
 						});
-					});
-					return (
-						<>
-							<nav class="flex gap-2 bg-black p-3 text-lime-200 underline">
-								<a href="/">Home</a>
-								<a href="/user">Users</a>
-								<a href="/card">Cards</a>
-							</nav>
-							{props.children}
-						</>
-					);
-				}}>
-				<Route
-					path={indexRoute.path}
-					component={isServer ? props.ssrComponent : Index}
-					load={args =>
-						indexRoute.load(
-							args,
-							args.location.pathname === props.ssrUrl ? props.ssrData : undefined
-						)
-					}
-				/>
-				<Route
-					path={allCardsRoute.path}
-					component={isServer ? props.ssrComponent : lazy(() => import('@/routes/card'))}
-					load={args =>
-						allCardsRoute.load(
-							args,
-							args.location.pathname === props.ssrUrl ? props.ssrData : undefined
-						)
-					}
-				/>
-				<Route
-					path={designIdRoute.path}
-					component={
-						isServer
-							? props.ssrComponent
-							: lazy(() => import('@/routes/card/[designId]'))
-					}
-					load={args =>
-						designIdRoute.load(
-							args,
-							args.location.pathname === props.ssrUrl ? props.ssrData : undefined
-						)
-					}
-				/>
-				{
-					//routes.map(route => (
-					//<Route
-					//path={route.route}
-					//component={route.component}
-					//load={args => {
-					//if (args.location.pathname === props.ssrUrl) {
-					//return props.ssrData as RouteData<typeof route>;
-					//}
-					////console.log('loading route', route);
-					//const resources: Record<string, (() => any) | undefined> = {};
-					//for (const key of route.data) {
-					//resources[key] = createData(key as keyof RouteData<typeof route>, args);
-					//}
-					//return new Proxy({} as RouteData<typeof route>, {
-					//get: (_, key) => resources[String(key)]?.(),
-					//});
-					//}}
-					///>
-					//))
-				}
-				<Route path="*404" component={lazy(() => import('@/routes/404'))} />
-			</SolidRouter>
-		</QueryClientProvider>
+						return (
+							<>
+								<nav class="flex gap-2 bg-black p-3 text-lime-200 underline">
+									<a href="/">Home</a>
+									<a href="/user">Users</a>
+									<a href="/card">Cards</a>
+								</nav>
+								{props.children}
+							</>
+						);
+					}}>
+					<For each={routes}>
+						{([Component, route]) => (
+							<Route
+								path={route.path}
+								component={Component}
+								load={args =>
+									route.load(
+										args,
+										isServer && args.location.pathname === props.ssrUrl
+											? props.ssrData
+											: undefined
+									)
+								}
+							/>
+						)}
+					</For>
+					<Route path="*404" component={lazy(() => import('@/routes/404'))} />
+				</SolidRouter>
+			</QueryClientProvider>
+		</SessionContext.Provider>
 	);
 }

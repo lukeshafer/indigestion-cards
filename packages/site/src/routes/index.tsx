@@ -1,20 +1,23 @@
 import FAQ from '@/components/FAQ';
 import { ASSETS } from '@/constants';
-import { client, createRouteOptions } from '@/data/data.client';
-
 import { transitionname } from '@/lib/client/utils';
+import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
+import { trpc } from '@/trpc/client';
 import { createQuery } from '@tanstack/solid-query';
-// @ts-expect-error -- just calling for typescript
-() => void transitionname({}, '');
+import type { RouteComponent, RouteOptions } from '@/data/router';
 
-export const route = createRouteOptions({
+() => void transitionname;
+
+type RouteData = {
+	siteConfig: SiteConfig;
+};
+
+export const route = {
 	path: '/',
-	data: ['siteConfig'],
 	load: (_, ssrData) => {
-    console.log('loading index', ssrData);
 		const siteConfig = createQuery(() => ({
 			queryKey: ['siteConfig'],
-			queryFn: () => client.get('siteConfig'),
+			queryFn: () => trpc.siteConfig.query(),
 			initialData: ssrData?.siteConfig,
 		}));
 
@@ -24,9 +27,9 @@ export const route = createRouteOptions({
 			},
 		};
 	},
-});
+} satisfies RouteOptions<RouteData>;
 
-export default route.createRoute(props => {
+export default (function Index(props) {
 	return (
 		<>
 			<h1 class="sr-only">Indigestion Cards</h1>
@@ -74,4 +77,4 @@ export default route.createRoute(props => {
 			</div>
 		</>
 	);
-});
+} satisfies RouteComponent<RouteData>);

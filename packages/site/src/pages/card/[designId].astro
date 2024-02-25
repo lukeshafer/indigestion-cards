@@ -30,8 +30,9 @@ const rarityRanking = getRarityRanking(siteConfig);
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: card.design.cardName }]}>
   <Router
     ssrUrl={Astro.url.pathname}
-    ssrRoute={CardDesignPage}
+    ssrComponent={CardDesignPage}
     ssrData={{ card, siteConfig, rarityRanking }}
+    session={Astro.locals.session}
     client:load
     />
 </Page>

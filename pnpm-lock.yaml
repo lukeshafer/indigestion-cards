@@ -239,6 +239,12 @@ importers:
       '@tanstack/solid-query':
         specifier: ^5.24.1
         version: 5.24.1(solid-js@1.8.11)
+      '@trpc/client':
+        specifier: ^10.45.1
+        version: 10.45.1(@trpc/server@10.45.1)
+      '@trpc/server':
+        specifier: ^10.45.1
+        version: 10.45.1
       astro:
         specifier: ^4.2.1
         version: 4.2.1(@types/node@18.19.8)(typescript@5.3.3)
@@ -6117,6 +6123,18 @@ packages:
     dependencies:
       '@tanstack/query-core': 5.24.1
       solid-js: 1.8.11
+    dev: false
+
+  /@trpc/client@10.45.1(@trpc/server@10.45.1):
+    resolution: {integrity: sha512-nVbAk1xpIiI64WgzXGgfxPOGgHoYvffn1IsjV1D/Ri7DL4BKuo2qtZ7UQ+OuHkzH2M8j4ikSVBDpk545fOdvpw==}
+    peerDependencies:
+      '@trpc/server': 10.45.1
+    dependencies:
+      '@trpc/server': 10.45.1
+    dev: false
+
+  /@trpc/server@10.45.1:
+    resolution: {integrity: sha512-KOzBEVaHW9IxEedUP9E50y0tYxAuvlzyjn80Bpemw4rcNbT4WtJnhkFPUY+qDJl7Crt3B/oY2qMgSxVWi9toLg==}
     dev: false
 
   /@trpc/server@9.16.0:

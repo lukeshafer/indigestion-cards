@@ -1,16 +1,21 @@
 import CardList from '@/components/cards/CardList';
 import { PageHeader, PageTitle } from '@/components/text';
-import { client, createRouteOptions } from '@/data/data.client';
+import type { RouteOptions, RouteComponent } from '@/data/router';
+import { trpc } from '@/trpc/client';
+import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { createQuery } from '@tanstack/solid-query';
 import { Show } from 'solid-js';
 
-export const route = createRouteOptions({
+type RouteData = {
+	designs: Array<CardDesign>;
+};
+
+export const route = {
 	path: '/card',
-	data: ['designs'],
 	load: (_, ssrData) => {
 		const designs = createQuery(() => ({
 			queryKey: ['designs'],
-			queryFn: () => client.get('designs'),
+			queryFn: () => trpc.designs.all.query(),
 			initialData: ssrData?.designs,
 		}));
 
@@ -20,9 +25,9 @@ export const route = createRouteOptions({
 			},
 		};
 	},
-});
+} satisfies RouteOptions<RouteData>;
 
-export default route.createRoute(props => {
+export default (function CardsPage(props) {
 	return (
 		<>
 			<PageHeader>
@@ -51,4 +56,4 @@ export default route.createRoute(props => {
 			</Show>
 		</>
 	);
-});
+} satisfies RouteComponent<RouteData>);
