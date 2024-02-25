@@ -22,6 +22,7 @@
     "@solid-primitives/map": "^0.4.9",
     "@solidjs/router": "^0.12.4",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@tanstack/solid-query": "^5.24.1",
     "astro": "^4.2.1",
     "astro-icon": "^1.0.2",
     "astro-sst": "2.39.7",

@@ -1,7 +1,7 @@
 ---
 import Page from '@/layouts/Page.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
-import IndexPage from '@/routes/index';
+import IndexPage, { route } from '@/routes/index';
 import Router from '@/data/router';
 
 const siteConfig = await getSiteConfig();
@@ -10,7 +10,8 @@ const siteConfig = await getSiteConfig();
 <Page title="Indigestion Cards" pageType="public">
 	<Router
 		ssrUrl={Astro.url.pathname}
-		ssrRoute={IndexPage}
+		ssrRoute={route}
+    ssrComponent={IndexPage}
     ssrData={{ siteConfig }}
 		client:load
 	/>

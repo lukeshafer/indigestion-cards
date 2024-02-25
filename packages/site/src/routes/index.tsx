@@ -1,14 +1,32 @@
 import FAQ from '@/components/FAQ';
 import { ASSETS } from '@/constants';
-import { client, createData } from '@/data/data.client';
+import { client, createRouteOptions } from '@/data/data.client';
 
 import { transitionname } from '@/lib/client/utils';
+import { createQuery } from '@tanstack/solid-query';
 // @ts-expect-error -- just calling for typescript
 () => void transitionname({}, '');
 
-export default client.defineRoute('/', ['siteConfig'], props => {
-  const siteConfig = createData('siteConfig', props);
+export const route = createRouteOptions({
+	path: '/',
+	data: ['siteConfig'],
+	load: (_, ssrData) => {
+    console.log('loading index', ssrData);
+		const siteConfig = createQuery(() => ({
+			queryKey: ['siteConfig'],
+			queryFn: () => client.get('siteConfig'),
+			initialData: ssrData?.siteConfig,
+		}));
 
+		return {
+			get siteConfig() {
+				return siteConfig.data;
+			},
+		};
+	},
+});
+
+export default route.createRoute(props => {
 	return (
 		<>
 			<h1 class="sr-only">Indigestion Cards</h1>
@@ -52,7 +70,7 @@ export default client.defineRoute('/', ['siteConfig'], props => {
 						}
 					</h2>
 				</section>
-				<FAQ content={siteConfig()?.faq ?? ''} />
+				<FAQ content={props.data?.siteConfig?.faq ?? ''} />
 			</div>
 		</>
 	);
