@@ -1,63 +1,69 @@
-import { Router as SolidRouter, Route, cache, createAsync } from '@solidjs/router';
+import { Router as SolidRouter, Route, useBeforeLeave } from '@solidjs/router';
 import { isServer } from 'solid-js/web';
-import { client, type Route as RouteType } from './data.client';
+import { type Route as RouteType, type RouteData, createData } from './data.client';
+import { useViewTransition } from '@/lib/client/utils';
+import { lazy } from 'solid-js';
 
-const routes: Array<RouteType> = [];
+// ROUTES
+import Index from '@/routes';
+import CardsPage from '@/routes/card';
+import CardDesignPage from '@/routes/card/[designId]';
+import UsersPage from '@/routes/user';
 
-export default function Router(props: {
+const routes: Array<RouteType> = [Index, CardsPage, CardDesignPage, UsersPage];
+
+export default function Router<R extends RouteType>(props: {
 	ssrUrl: string;
-	//ssrCtx: ClientContextProps;
-	ssrRoute: {
-		pattern: string;
-		data: any;
-	};
+	ssrRoute: R;
+	ssrData: RouteData<R>;
 }) {
 	return (
-		<SolidRouter url={isServer ? props.ssrUrl : ''}>
+		<SolidRouter
+			url={isServer ? props.ssrUrl : ''}
+			root={props => {
+				useBeforeLeave(e => {
+					e.preventDefault();
+					useViewTransition(() => {
+						e.retry(true);
+					});
+				});
+				return (
+					<>
+						<nav class="flex gap-2 bg-black p-3 text-lime-200 underline">
+							<a href="/">Home</a>
+							<a href="/user">Users</a>
+							<a href="/card">Cards</a>
+						</nav>
+						{props.children}
+					</>
+				);
+			}}>
 			{routes.map(route => {
 				return (
 					<Route
 						path={route.route}
 						component={route.component}
-						load={
-							args => {
-								if (route.route === props.ssrRoute?.pattern) {
-									//console.log(props.ssrRoute.data);
-									return props.ssrRoute.data;
-								}
-
-								const resources = new Map<string, any>(
-									route.data.map(key => {
-										const cacheFn = cache(
-											() =>
-												client.get(
-													// @ts-expect-error -- it's fiiiiiine
-													key,
-													args.params
-												),
-											key
-										);
-										const data = createAsync(() => cacheFn());
-										return [key, data] as const;
-									})
-								);
-
-								const data = new Proxy(
-									{} as Record<(typeof route.data)[number], any>,
-									{
-										get(_, prop) {
-											return resources.get(String(prop))?.();
-										},
-									}
-								);
-								return data;
+						load={args => {
+							if (isServer && route.route === props.ssrRoute?.route) {
+								return props.ssrData as RouteData<typeof route>;
 							}
-							// TODO: add resource proxy/getter to fetch all the data
-						}
+
+							const resources: Record<string, (() => any) | undefined> = {};
+							for (const key in route.data) {
+								resources[key] = createData(key as keyof RouteData<typeof route>, args);
+							}
+
+							return new Proxy(
+								{} as RouteData<typeof route>,
+								{
+									get: (_, key) => resources[String(key)]?.(),
+								}
+							);
+						}}
 					/>
 				);
 			})}
-			<Route path="*404" component={() => <div>404</div>} />
+			<Route path="*404" component={lazy(() => import('@/routes/404'))} />
 		</SolidRouter>
 	);
 }

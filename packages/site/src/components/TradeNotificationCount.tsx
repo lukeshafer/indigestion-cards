@@ -1,12 +1,12 @@
 import { Show, createResource, onCleanup, onMount } from 'solid-js';
 import ButtonCount from './ButtonCount';
-import { get } from '@/lib/client/data';
+import { client } from '@/data/data.client';
 
 export default function TradeNotificationCount(props: { username: string }) {
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {
-			const user = await get('user', [username]);
+			const user = await client.get('user', { username });
 			return (
 				user?.tradeNotifications?.reduce(
 					(acc, notif) => acc.add(notif.tradeId),

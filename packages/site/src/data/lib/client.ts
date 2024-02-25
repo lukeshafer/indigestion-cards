@@ -27,9 +27,9 @@ export function createClient<Data extends DataGeneric>() {
     path: Path,
     input?: Params<Data, Path>
   ): Promise<DataOutput<Data, Path>> {
-    const search = new URLSearchParams(input);
+    const url = input ? `/data/${String(path)}?${new URLSearchParams(input).toString()}` : `/data/${String(path)}`;
 
-    const res = await fetch(`/data/${String(path)}?${search.toString()}`);
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
     if (!res.ok) {
       console.error(res);
       throw new Error('Res not okay');

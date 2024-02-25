@@ -3,12 +3,18 @@ import Page from '@/layouts/Page.astro';
 import { getAllCardDesigns } from '@lib/design';
 import { routeNames } from '@/constants';
 import CardPage from '@/routes/card';
+import Router from '@/data/router';
 
 const designs = await getAllCardDesigns();
 
-const filters = [...Astro.url.searchParams.entries()];
+// const filters = [...Astro.url.searchParams.entries()];
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
-	<CardPage client:load data={{ designs }} filters={filters} />
+  <Router
+    ssrUrl={Astro.url.pathname}
+    ssrRoute={CardPage}
+    ssrData={{ designs }}
+    client:load
+  />
 </Page>

@@ -11,8 +11,13 @@ import { PackTypeIsOutOfCardsError } from './errors';
 import { getAllCardDesigns, getCardDesignAndInstancesById } from './design';
 
 export async function getAllPacks(): Promise<Pack[]> {
-  const result = await packs.query.allPacks({}).go();
+  const result = await packs.query.allPacks({}).go({ pages: 'all' });
   return result.data;
+}
+
+export async function getPackCount() {
+  const result = await packs.query.allPacks({}).go({ pages: 'all', attributes: ['packId'] });
+  return result.data.length;
 }
 
 export async function getPackById(args: { packId: string }) {

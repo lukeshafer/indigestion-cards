@@ -3,13 +3,19 @@ import Page from '@/layouts/Page.astro';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
 import Users from '@/routes/user/index';
+import Router from '@/data/router';
 
-import { GET as getUsers } from '@/pages/data/users';
+import { server } from '@/data/data.server';
 
-const { data: users } = await getUsers();
+const users = await server.data.users.load()
 const preorders = await getAllPreorders();
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
-	<Users data={{ users, preorders }} client:load />
+  <Router
+    ssrUrl={Astro.url.pathname}
+    ssrRoute={Users}
+    ssrData={{ users, preorders }}
+    client:load
+  />
 </Page>

@@ -1,17 +1,14 @@
 import FAQ from '@/components/FAQ';
 import { ASSETS } from '@/constants';
-import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
-//import RemainingPackCount from '@/components/RemainingPackCount';
+import { client, createData } from '@/data/data.client';
 
 import { transitionname } from '@/lib/client/utils';
+// @ts-expect-error -- just calling for typescript
+() => void transitionname({}, '');
 
-export default function Index(props: {
-	data: {
-		siteConfig: SiteConfig;
-	};
-}) {
-	// @ts-expect-error -- just calling for typescript
-	void transitionname({}, '');
+export default client.defineRoute('/', ['siteConfig'], props => {
+  const siteConfig = createData('siteConfig', props);
+
 	return (
 		<>
 			<h1 class="sr-only">Indigestion Cards</h1>
@@ -55,8 +52,8 @@ export default function Index(props: {
 						}
 					</h2>
 				</section>
-				<FAQ content={props.data.siteConfig.faq ?? ''} />
+				<FAQ content={siteConfig()?.faq ?? ''} />
 			</div>
 		</>
 	);
-}
+});

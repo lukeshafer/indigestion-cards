@@ -1,8 +1,8 @@
-import { get } from '../data';
+import { client } from '@/data/data.client';
 
 export class DataLists extends HTMLElement {
 	connectedCallback() {
-		this.populateList('usernames', get('usernames'));
+		this.populateList('usernames', client.get('usernames'));
 	}
 
 	async populateList(id: string, inputData: Array<string> | Promise<Array<string>>) {

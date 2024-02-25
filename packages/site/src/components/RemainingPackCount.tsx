@@ -1,9 +1,9 @@
-import { get } from '@/lib/client/data';
+import { client } from '@/data/data.client';
 import { createResource, For } from 'solid-js';
 
 export default function RemainingPackCount() {
 	const [packsRemaining] = createResource(async () =>
-		get('packs-remaining').then(packs =>
+		client.get('packsRemaining').then(packs =>
 			packs.filter(pack => {
 				if (pack.possibleCards < 100) return false;
 				if (pack.seasonId.toLowerCase() === 'moments') return false;

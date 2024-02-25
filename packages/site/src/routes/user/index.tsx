@@ -1,25 +1,22 @@
 import { PageHeader, PageTitle } from '@/components/text';
 import UsersTable from '@/components/user/UsersTable';
-import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
-import type { User } from '@lil-indigestion-cards/core/db/users';
-import type { ParentProps } from 'solid-js';
+import { client, createData } from '@/data/data.client';
+import { Show } from 'solid-js';
 
-export default function Users(
-	props: ParentProps<{
-		data: {
-			users: Array<User>;
-			preorders: Array<Preorder>;
-		};
-	}>
-) {
-	return (
-		<>
-			<PageHeader>
-				<PageTitle>Users</PageTitle>
-			</PageHeader>
-			<div class="mx-auto max-w-2xl">
-        <UsersTable {...props.data} />
+export default client.defineRoute('/user', ['users', 'preorders'], props => {
+  const users = createData('users', props);
+  const preorders = createData('preorders', props);
+
+  return (
+    <>
+      <PageHeader>
+        <PageTitle>Users</PageTitle>
+      </PageHeader>
+      <div class="mx-auto max-w-2xl">
+        <Show when={users()}>
+          {users => <UsersTable users={users()} preorders={preorders()} />}
+        </Show>
       </div>
-		</>
-	);
-}
+    </>
+  );
+});

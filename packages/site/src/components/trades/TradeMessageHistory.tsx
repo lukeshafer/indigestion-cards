@@ -1,14 +1,14 @@
 import type { Trade } from '@lil-indigestion-cards/core/db/trades';
 import { For, Match, Switch, createResource, type ResourceActions, Show, onMount } from 'solid-js';
 import { SubmitButton, TextInput } from '../form/Form';
-import { get } from '@/lib/client/data';
 import { routes } from '@/constants';
+import { client } from '@/data/data.client';
 
 export default function TradeMessageHistory(props: { trade: Trade; loggedInUserId?: string }) {
   const [messages, messagesActions] = createResource(
     () => props.trade.tradeId,
     async tradeId => {
-      const trade = await get('trades', [tradeId]);
+      const trade = await client.get('trades', { tradeId });
       return trade.messages;
     },
     {
