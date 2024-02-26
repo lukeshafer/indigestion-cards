@@ -1,14 +1,14 @@
 import Card from '@/components/cards/Card';
 import CardList from '@/components/cards/CardList';
 import { Heading, PageTitle } from '@/components/text';
-import { ASSETS, LEGACY_CARD_ID } from '@/constants';
+import { ASSETS, LEGACY_CARD_ID, routeNames, routes } from '@/constants';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 import { createQuery } from '@tanstack/solid-query';
 import { Show } from 'solid-js';
-import type { RouteOptions, RouteComponent } from '@/data/router';
+import type { RouteOptions, RouteComponent } from '@/router';
 import { trpc } from '@/trpc/client';
 
 type RouteData = {
@@ -22,6 +22,11 @@ type RouteData = {
 
 export const route = {
 	path: '/card/:designId',
+	title: data => `${data.card.design.cardName} - ${data.card.design.seasonName}`,
+  breadcrumbs: data => [
+						{ label: routeNames.CARDS, href: routes.DESIGNS },
+						{ label: data.card?.design.cardName ?? '' },
+  ],
 	load(args, ssrData) {
 		const card = createQuery(() => ({
 			queryKey: ['card', args.params.designId],

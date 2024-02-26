@@ -3,11 +3,11 @@ import Page from '@/layouts/Page.astro';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
 import UsersPage from '@/routes/user/index';
-import Router from '@/data/router';
+import Router from '@/router';
 
-import { server } from '@/data/data.server';
+import { getAllUsersSortedByName } from '@lil-indigestion-cards/core/lib/user';
 
-const users = await server.data.users.load()
+const users = await getAllUsersSortedByName();
 const preorders = await getAllPreorders();
 ---
 

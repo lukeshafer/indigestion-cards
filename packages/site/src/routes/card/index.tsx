@@ -1,6 +1,7 @@
 import CardList from '@/components/cards/CardList';
 import { PageHeader, PageTitle } from '@/components/text';
-import type { RouteOptions, RouteComponent } from '@/data/router';
+import { routeNames } from '@/constants';
+import type { RouteOptions, RouteComponent } from '@/router';
 import { trpc } from '@/trpc/client';
 import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
 import { createQuery } from '@tanstack/solid-query';
@@ -12,6 +13,8 @@ type RouteData = {
 
 export const route = {
 	path: '/card',
+  title: () => 'All Cards',
+  breadcrumbs: () => [{ label: routeNames.CARDS }],
 	load: (_, ssrData) => {
 		const designs = createQuery(() => ({
 			queryKey: ['designs'],

@@ -1,8 +1,8 @@
-import { client } from '@/data/data.client';
+import { trpc } from '@/trpc/client';
 
 export class DataLists extends HTMLElement {
 	connectedCallback() {
-		this.populateList('usernames', client.get('usernames'));
+		this.populateList('usernames', trpc.users.allUsernames.query());
 	}
 
 	async populateList(id: string, inputData: Array<string> | Promise<Array<string>>) {

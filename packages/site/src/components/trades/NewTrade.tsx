@@ -5,11 +5,11 @@ import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { USER_API, UNTRADEABLE_RARITY_IDS } from '@/constants';
 import { Heading } from '@/components/text';
-import { client } from '@/data/data.client';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 import { navigate } from 'astro:transitions/client';
+import { trpc } from '@/trpc/client';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -54,7 +54,7 @@ export default function NewTrade(props: {
 
 	const [isLoading, setIsLoading] = createSignal(false);
 
-	const [users] = createResource(async () => client.get('usernames'));
+	const [users] = createResource(async () => trpc.users.allUsernames.query());
 
 	createEffect(
 		// When receiverUsername changes, reset requestedCards

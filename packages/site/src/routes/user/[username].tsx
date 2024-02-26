@@ -8,14 +8,14 @@ import Card from '@/components/cards/Card';
 import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
 import { Anchor, Heading } from '@/components/text';
-import { routes } from '@/constants';
+import { routeNames, routes } from '@/constants';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { Show } from 'solid-js';
 import CardList from '@/components/cards/CardList';
 import { createQuery } from '@tanstack/solid-query';
-import type { RouteComponent, RouteOptions } from '@/data/router';
+import type { RouteComponent, RouteOptions } from '@/router';
 import { trpc } from '@/trpc/client';
-import { useSession } from '@/lib/client/context';
+import { useConfig } from '@/lib/client/context';
 
 // @ts-expect-error -- just calling for typescript
 () => void transitionname({}, '');
@@ -30,6 +30,8 @@ type RouteData = {
 
 export const route = {
 	path: '/user/:username',
+  title: data => data?.user?.username,
+  breadcrumbs: data => [{ label: routeNames.USER, href: routes.USERS }, { label: data?.user?.username }],
 	load(args, ssrData) {
 		const twitchData = createQuery(() => ({
 			queryKey: ['twitchData', args.params.username],
@@ -80,11 +82,11 @@ export default (function UserPage(props) {
 		props.data?.cards.filter(
 			card => card.instanceId !== props.data?.user.pinnedCard?.instanceId
 		);
-	const session = useSession();
+	const globalConfig = useConfig();
 
 	const isLoggedInUser = () =>
-		session?.properties.username !== undefined &&
-		session?.properties.username === props.data?.user.username;
+		globalConfig.session?.properties.username !== undefined &&
+		globalConfig.session?.properties.username === props.data?.user.username;
 
 	return (
 		<Show when={props.data?.user}>

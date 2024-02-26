@@ -13,6 +13,7 @@ import {
 	getCardDesignAndOpenedInstances,
 } from '@lil-indigestion-cards/core/lib/design';
 import { getAllPreorders } from '@lil-indigestion-cards/core/lib/preorder';
+import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
 
 export const appRouter = router({
 	users: router({
@@ -26,6 +27,12 @@ export const appRouter = router({
 		byUsernameWithCards: publicProcedure
 			.input(z.object({ username: z.string() }))
 			.query(async ({ input }) => getUserAndOpenedCardInstances(input)),
+	}),
+
+	trades: router({
+		byId: publicProcedure
+			.input(z.object({ tradeId: z.string() }))
+			.query(async ({ input }) => getTrade(input.tradeId)),
 	}),
 
 	designs: router({

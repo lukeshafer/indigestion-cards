@@ -1,12 +1,12 @@
 import { Show, createResource, onCleanup, onMount } from 'solid-js';
 import ButtonCount from './ButtonCount';
-import { client } from '@/data/data.client';
+import { trpc } from '@/trpc/client';
 
 export default function TradeNotificationCount(props: { username: string }) {
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {
-			const user = await client.get('user', { username });
+			const user = await trpc.users.byUsername.query({ username });
 			return (
 				user?.tradeNotifications?.reduce(
 					(acc, notif) => acc.add(notif.tradeId),

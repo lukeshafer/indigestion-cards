@@ -5,7 +5,8 @@ import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
 import type { User } from '@lil-indigestion-cards/core/db/users';
 import { createQuery } from '@tanstack/solid-query';
 import { Show } from 'solid-js';
-import type { RouteOptions, RouteComponent } from '@/data/router';
+import type { RouteOptions, RouteComponent } from '@/router';
+import { routeNames } from '@/constants';
 
 type RouteData = {
 	users: Array<User>;
@@ -14,6 +15,8 @@ type RouteData = {
 
 export const route = {
 	path: '/user',
+  title: () => 'Users',
+  breadcrumbs: () => [{ label: routeNames.USER }],
 	load: (_, ssrData) => {
 		const users = createQuery(() => ({
 			queryKey: ['users'],

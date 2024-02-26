@@ -4,7 +4,7 @@ import { transitionname } from '@/lib/client/utils';
 import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
 import { trpc } from '@/trpc/client';
 import { createQuery } from '@tanstack/solid-query';
-import type { RouteComponent, RouteOptions } from '@/data/router';
+import type { RouteComponent, RouteOptions } from '@/router';
 
 () => void transitionname;
 
@@ -14,6 +14,8 @@ type RouteData = {
 
 export const route = {
 	path: '/',
+  title: () => 'Indigestion Cards',
+  breadcrumbs: null,
 	load: (_, ssrData) => {
 		const siteConfig = createQuery(() => ({
 			queryKey: ['siteConfig'],

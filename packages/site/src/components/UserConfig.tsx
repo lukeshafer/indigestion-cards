@@ -86,6 +86,7 @@ export default function UserConfig(props: {
 					) : (
 						<a
 							class="font-display pt-2 text-center font-bold underline"
+							rel="external"
 							href={authApi.LOGIN}
 							data-astro-reload>
 							Login with Twitch

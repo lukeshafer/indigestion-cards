@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import { getAllCardDesigns } from '@lib/design';
 import { routeNames } from '@/constants';
 import CardPage from '@/routes/card';
-import Router from '@/data/router';
+import Router from '@/router';
 
 const designs = await getAllCardDesigns();
 ---

@@ -5,7 +5,7 @@ import type { Trade } from '@lil-indigestion-cards/core/db/trades';
 import { Match, Show, Switch, onMount } from 'solid-js';
 import { formatTradeLink } from '@/lib/client/utils';
 import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
-import { client } from '@/data/data.client';
+import { trpc } from '@/trpc/client';
 
 export default function TradePage(props: {
 	data: {
@@ -16,7 +16,9 @@ export default function TradePage(props: {
 	onMount(() => {
 		const createTimeout = (time = 1000) => {
 			setTimeout(async () => {
-				const fetchedTrade = await client.get('trades', { tradeId: props.data.trade.tradeId });
+				const fetchedTrade = await trpc.trades.byId.query({
+					tradeId: props.data.trade.tradeId,
+				});
 				if (props.data.trade.status !== fetchedTrade.status)
 					// TODO: reload by just refetching trade data once implemented
 					location.reload();
