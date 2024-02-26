@@ -1,10 +1,10 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 import { createNewUser, getUserAndOpenedCardInstances } from '@lib/user';
 import { getUserByLogin } from '@lib/twitch';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
-import UserPage from '@/routes/user/[username]';
+import UserPage, { route } from '@/routes/user/[username]';
 import type { Props as HeaderProps } from '@/components/Header.astro';
 import Router from '@/router';
 
@@ -58,11 +58,9 @@ const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
 };
 const logo = userLogoMap[id];
-
-const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 ---
 
-<Page
+<Base
 	title={user.username}
 	{logo}
 	class="flex flex-col gap-4"
@@ -71,6 +69,7 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	<Router
 		ssrUrl={Astro.url.pathname}
 		ssrComponent={UserPage}
+    ssrRoute={route}
 		ssrData={{
 			user,
 			cards: cardInstances,
@@ -78,7 +77,8 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 			rarityRanking,
 			twitchData: twitchData || undefined,
 		}}
+    siteConfig={siteConfig}
     session={Astro.locals.session}
 		client:load
 	/>
-</Page>
+</Base>

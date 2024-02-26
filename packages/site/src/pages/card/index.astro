@@ -1,19 +1,22 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 import { getAllCardDesigns } from '@lib/design';
-import { routeNames } from '@/constants';
-import CardPage from '@/routes/card';
+import CardPage, { route } from '@/routes/card';
 import Router from '@/router';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const designs = await getAllCardDesigns();
+const siteConfig = await getSiteConfig();
 ---
 
-<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
-  <Router
-    ssrUrl={Astro.url.pathname}
-    ssrComponent={CardPage}
-    ssrData={{ designs }}
-    session={Astro.locals.session}
-    client:load
-  />
-</Page>
+<Base title="All Cards" pageType="public">
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrComponent={CardPage}
+    ssrRoute={route}
+		ssrData={{ designs }}
+		siteConfig={siteConfig}
+		session={Astro.locals.session}
+		client:load
+	/>
+</Base>

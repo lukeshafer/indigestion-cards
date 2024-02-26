@@ -17,12 +17,12 @@ export default function Page(
 		twitchData: TwitchUser;
 	}>
 ) {
-	useBeforeLeave(e => {
-		e.preventDefault();
-		useViewTransition(() => {
-			e.retry(true);
-		});
-	});
+	//useBeforeLeave(e => {
+		//e.preventDefault();
+		//useViewTransition(() => {
+			//e.retry(true);
+		//});
+	//});
 
 	const config = useConfig();
 	const initialAlerts = () =>

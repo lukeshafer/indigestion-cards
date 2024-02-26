@@ -10,7 +10,7 @@ import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-c
 import { Anchor, Heading } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { Show } from 'solid-js';
+import { Show, createEffect } from 'solid-js';
 import CardList from '@/components/cards/CardList';
 import { createQuery } from '@tanstack/solid-query';
 import type { RouteComponent, RouteOptions } from '@/router';
@@ -28,10 +28,10 @@ type RouteData = {
 	rarityRanking: RarityRankingRecord;
 };
 
-export const route = {
+export const route: RouteOptions<RouteData> = {
 	path: '/user/:username',
-  title: data => data?.user?.username,
-  breadcrumbs: data => [{ label: routeNames.USER, href: routes.USERS }, { label: data?.user?.username }],
+  title: data => data?.user?.username ?? '',
+  breadcrumbs: data => [{ label: routeNames.USER, href: routes.USERS }, { label: data?.user?.username ?? '' }],
 	load(args, ssrData) {
 		const twitchData = createQuery(() => ({
 			queryKey: ['twitchData', args.params.username],
@@ -75,7 +75,7 @@ export const route = {
 			},
 		};
 	},
-} satisfies RouteOptions<RouteData>;
+} 
 
 export default (function UserPage(props) {
 	const unpinnedCards = () =>
@@ -113,7 +113,7 @@ export default (function UserPage(props) {
 									/>
 								</li>
 								{isLoggedInUser() ||
-								!props.data?.siteConfig.tradingIsEnabled ? null : (
+								!props.data?.siteConfig?.tradingIsEnabled ? null : (
 									<li>
 										<Anchor
 											href={`${routes.TRADES}/new?receiverUsername=${user().username}`}>

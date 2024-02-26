@@ -1,8 +1,8 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 import Status404 from '@/routes/404';
 ---
 
-<Page title="Page not found" class="flex flex-col items-center" pageType="public">
+<Base title="Page not found" pageType="public">
   <Status404 client:load />
-</Page>
+</Base>

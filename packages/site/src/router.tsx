@@ -5,17 +5,17 @@ import {
 	type RouteLoadFuncArgs,
 } from '@solidjs/router';
 import { isServer } from 'solid-js/web';
-import { For, JSX, createEffect, on } from 'solid-js';
+import { For, JSX, createEffect, lazy, on } from 'solid-js';
 import { QueryClient, QueryClientProvider, createQuery } from '@tanstack/solid-query';
 import { PageContext, type PageContextData } from '@/lib/client/context';
 import type { Session } from '@lil-indigestion-cards/core/types';
 
 // ROUTES
-import Index, { route as indexRoute } from '@/routes';
-import CardsPage, { route as allCardsRoute } from '@/routes/card';
-import CardDesignPage, { route as designIdRoute } from '@/routes/card/[designId]';
-import UsersPage, { route as usersRoute } from '@/routes/user';
-import UserPage, { route as usernameRoute } from '@/routes/user/[username]';
+import { route as indexRoute } from '@/routes';
+import { route as allCardsRoute } from '@/routes/card';
+import { route as designIdRoute } from '@/routes/card/[designId]';
+import { route as usersRoute } from '@/routes/user';
+import { route as usernameRoute } from '@/routes/user/[username]';
 import { createStore } from 'solid-js/store';
 import { trpc } from './trpc/client';
 import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
@@ -24,8 +24,22 @@ import type { Path } from './components/Breadcrumbs';
 
 export type RouteOptions<T> = {
 	path: string;
-	title: (data: T) => string;
-	breadcrumbs: ((data: T) => Path[]) | null;
+	title: (
+		data:
+			| {
+					[K in keyof T]: T[K] | undefined;
+			  }
+			| undefined
+	) => string;
+	breadcrumbs:
+		| ((
+				data:
+					| {
+							[K in keyof T]: T[K] | undefined;
+					  }
+					| undefined
+		  ) => Path[])
+		| null;
 	load: (
 		args: RouteLoadFuncArgs,
 		ssrData?: T
@@ -37,11 +51,11 @@ export type RouteOptions<T> = {
 export type RouteComponent<T> = (props: RouteSectionProps<T>) => JSX.Element;
 
 const routes = [
-	[Index, indexRoute],
-	[CardsPage, allCardsRoute],
-	[CardDesignPage, designIdRoute],
-	[UsersPage, usersRoute],
-	[UserPage, usernameRoute],
+	[lazy(() => import('@/routes')), indexRoute],
+	[lazy(() => import('@/routes/card')), allCardsRoute],
+	[lazy(() => import('@/routes/card/[designId]')), designIdRoute],
+	[lazy(() => import('@/routes/user')), usersRoute],
+	[lazy(() => import('@/routes/user/[username]')), usernameRoute],
 ] as const satisfies Array<[RouteComponent<any>, RouteOptions<any>]>;
 
 const queryClient = new QueryClient();
@@ -50,9 +64,9 @@ export default function Router<Data>(props: {
 	ssrUrl: string;
 	title: string;
 	ssrComponent: RouteComponent<Data>;
-	ssrData: Data & {
-		siteConfig: SiteConfig;
-	};
+	ssrRoute: RouteOptions<Data>;
+	ssrData: Data;
+	siteConfig: SiteConfig;
 	session: Session | null;
 }) {
 	const [config, setConfig] = createStore<PageContextData>({
@@ -61,7 +75,9 @@ export default function Router<Data>(props: {
 		setDisableAnimations: value => {
 			setConfig('disableAnimations', value);
 		},
-		pageProps: {},
+		pageProps: {
+			...resolveBreadcrumbs(props.ssrRoute.breadcrumbs, props.ssrData),
+		},
 		setPageProps: value => {
 			setConfig('pageProps', value);
 		},
@@ -86,7 +102,7 @@ export default function Router<Data>(props: {
 						const siteConfig = createQuery(() => ({
 							queryKey: ['siteConfig'],
 							queryFn: () => trpc.siteConfig.query(),
-							initialData: props.ssrData?.siteConfig,
+							initialData: props.siteConfig,
 						}));
 
 						const twitchData = () => {
@@ -98,10 +114,6 @@ export default function Router<Data>(props: {
 										trpc.twitch.userByLogin.query({
 											login: username ?? '',
 										}),
-									initialData:
-										'twitchData' in props.ssrData
-											? props.ssrData?.twitchData
-											: undefined,
 								}));
 							else return undefined;
 						};
@@ -120,9 +132,9 @@ export default function Router<Data>(props: {
 						{([Component, route]) => (
 							<Route
 								path={route.path}
-								component={props => {
+								component={componentProps => {
 									createEffect(() => {
-										const title = route.title(props.data);
+										const title = route.title(componentProps.data);
 										if (title && title !== 'Indigestion Cards')
 											document.title = title + ' — Indigestion Cards';
 										else document.title = 'Indigestion Cards';
@@ -130,38 +142,54 @@ export default function Router<Data>(props: {
 
 									createEffect(
 										on(
-											() => props.data,
+											() => ({ ...componentProps.data }),
 											data => {
-												if (route.breadcrumbs) {
-													const breadcrumbs = route.breadcrumbs(data);
-													setConfig(
-														'pageProps',
-														'breadcrumbs',
-														breadcrumbs
-													);
-													setConfig('pageProps', 'hideBreadcrumbs', breadcrumbs.length === 0);
-												} else {
-                          setConfig('pageProps', 'breadcrumbs', undefined);
-                          setConfig('pageProps', 'hideBreadcrumbs', true);
-                        }
+												const { breadcrumbs, hideBreadcrumbs } =
+													resolveBreadcrumbs(route.breadcrumbs, data);
+												setConfig('pageProps', 'breadcrumbs', breadcrumbs);
+												setConfig(
+													'pageProps',
+													'hideBreadcrumbs',
+													hideBreadcrumbs
+												);
 											}
 										)
 									);
-									return <Component {...props} />;
+                  if (isServer) {
+                    const SSRComponent = props.ssrComponent;
+                    return <SSRComponent {...(componentProps as any)} />
+                  }
+                  else return <Component {...(componentProps as any)} />;
 								}}
 								load={args =>
 									route.load(
 										args,
-										isServer && args.location.pathname === props.ssrUrl
-											? props.ssrData
+										args.location.pathname === props.ssrUrl
+											? (props.ssrData as any)
 											: undefined
 									)
 								}
 							/>
 						)}
 					</For>
+					<Route path="*404" component={lazy(() => import('@/routes/404'))} />
 				</SolidRouter>
 			</QueryClientProvider>
 		</PageContext.Provider>
 	);
+}
+
+function resolveBreadcrumbs<T>(route: RouteOptions<T>['breadcrumbs'], data: T) {
+	if (route) {
+		const breadcrumbs = route(data);
+		return {
+			breadcrumbs,
+			hideBreadcrumbs: breadcrumbs.length === 0,
+		};
+	} else {
+		return {
+			breadcrumbs: undefined,
+			hideBreadcrumbs: true,
+		};
+	}
 }

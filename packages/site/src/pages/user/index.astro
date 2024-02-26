@@ -1,22 +1,29 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 import { getAllPreorders } from '@lib/preorder';
 import { routeNames } from '@/constants';
-import UsersPage from '@/routes/user/index';
+import UsersPage, { route } from '@/routes/user/index';
 import Router from '@/router';
 
 import { getAllUsersSortedByName } from '@lil-indigestion-cards/core/lib/user';
+import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import type Base from '@/layouts/Base.astro';
 
 const users = await getAllUsersSortedByName();
 const preorders = await getAllPreorders();
+const siteConfig = await getSiteConfig();
+
+const title = route.title();
 ---
 
-<Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
-  <Router
-    ssrUrl={Astro.url.pathname}
-    ssrComponent={UsersPage}
-    ssrData={{ users, preorders }}
-    session={Astro.locals.session}
-    client:load
-  />
-</Page>
+<Base {title} pageType="public">
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrComponent={UsersPage}
+		ssrRoute={route}
+		ssrData={{ users, preorders }}
+		siteConfig={siteConfig}
+		session={Astro.locals.session}
+		client:load
+	/>
+</Base>

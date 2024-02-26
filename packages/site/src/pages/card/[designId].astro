@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 import { getCardDesignAndOpenedInstances } from '@lib/design';
 import { getRarityRanking, getSiteConfig } from '@lib/site-config';
 import { routes, routeNames } from '@/constants';
-import CardDesignPage from '@/routes/card/[designId]';
+import CardDesignPage, { route } from '@/routes/card/[designId]';
 import Router from '@/router';
 
 const designId = Astro.params.designId;
@@ -12,8 +12,8 @@ if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
 
-const card = await getCardDesignAndOpenedInstances({ designId, });
-console.log(card)
+const card = await getCardDesignAndOpenedInstances({ designId });
+console.log(card);
 
 if (!card.design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
@@ -23,16 +23,21 @@ const siteConfig = await getSiteConfig();
 const rarityRanking = getRarityRanking(siteConfig);
 ---
 
-<Page
+<Base
 	title={`${card.design.cardName} - ${card.design.seasonName}`}
 	class="flex flex-col gap-9"
 	pageType="public"
-	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: card.design.cardName }]}>
-  <Router
-    ssrUrl={Astro.url.pathname}
-    ssrComponent={CardDesignPage}
-    ssrData={{ card, siteConfig, rarityRanking }}
-    session={Astro.locals.session}
-    client:load
-    />
-</Page>
+	breadcrumbs={[
+		{ label: routeNames.CARDS, href: routes.DESIGNS },
+		{ label: card.design.cardName },
+	]}>
+	<Router
+		ssrUrl={Astro.url.pathname}
+		ssrComponent={CardDesignPage}
+		ssrRoute={route}
+		ssrData={{ card, siteConfig, rarityRanking }}
+		siteConfig={siteConfig}
+		session={Astro.locals.session}
+		client:load
+	/>
+</Base>

@@ -1,19 +1,21 @@
 ---
-import Page from '@/layouts/Page.astro';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
-import IndexPage from '@/routes/index';
+import IndexPage, { route } from '@/routes/index';
 import Router from '@/router';
+import Base from '@/layouts/Base.astro';
 
 const siteConfig = await getSiteConfig();
 ---
 
-<Page title="Indigestion Cards" pageType="public">
+<Base title="Indigestion Cards" pageType="public">
 	<Router
     title="Indigestion Cards"
 		ssrUrl={Astro.url.pathname}
     ssrComponent={IndexPage}
+    ssrRoute={route}
     ssrData={{ siteConfig }}
+    siteConfig={siteConfig}
     session={Astro.locals.session}
 		client:load
 	/>
-</Page>
+</Base>
