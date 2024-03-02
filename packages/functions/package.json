@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "openid-client": "^5.6.1",
+    "sharp": "^0.33.2",
     "zod": "^3.22.4"
   }
 }

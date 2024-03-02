@@ -53,4 +53,8 @@ export function Sites({ app, stack }: StackContext) {
   stack.addOutputs({
     SiteUrl: site.url,
   });
+
+  return {
+    site
+  }
 }

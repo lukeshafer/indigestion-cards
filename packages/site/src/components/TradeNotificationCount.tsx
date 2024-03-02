@@ -16,14 +16,15 @@ export default function TradeNotificationCount(props: { username: string }) {
 		}
 	);
 
-  let interval: NodeJS.Timeout;
+  //let interval: NodeJS.Timeout;
 	onMount(() => {
 		globalThis.addEventListener?.('astro:page-load', refetch);
-    interval = setInterval(refetch, 5000);
+    queueMicrotask(refetch);
+    //interval = setInterval(refetch, 5000);
 	});
 	onCleanup(() => {
 		globalThis.removeEventListener?.('astro:page-load', refetch);
-    clearInterval(interval);
+    //clearInterval(interval);
 	});
 
 	return (

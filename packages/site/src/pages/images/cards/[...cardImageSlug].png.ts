@@ -45,12 +45,12 @@ export const GET: APIRoute = async ctx => {
 		headers: {
 			'Content-Type': 'image/png',
 			'Content-Length': String(outputBuffer.length),
-			'Cache-Control': cacheControl({
-        maxAge: 60 * 60 * 24 * 30,
-				//public: ctx.locals.session?.type === 'admin' ? false : true,
-				public: false,
-        staleWhileRevalidate: 60 * 60 * 24 * 365,
-			}),
+			//'Cache-Control': cacheControl({
+        //maxAge: 60 * 60 * 24 * 30,
+				////public: ctx.locals.session?.type === 'admin' ? false : true,
+				//public: false,
+        //staleWhileRevalidate: 60 * 60 * 24 * 365,
+			//}),
 		},
 	});
 };
