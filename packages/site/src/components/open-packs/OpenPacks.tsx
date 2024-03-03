@@ -31,6 +31,7 @@ type Props = {
   startCardScale?: number;
   canTest?: boolean;
   children?: JSX.Element;
+  adminSecret: string;
 };
 
 export default function OpenPacks(props: Props) {
@@ -166,6 +167,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
   const [state, setState] = createStore<OpenPacksState>({
     isTesting: props.canTest ? false : undefined,
     isHidden: true,
+    adminSecret: props.adminSecret,
 
     packs: props.packs,
     activePack: null as PackEntityWithStatus | null,

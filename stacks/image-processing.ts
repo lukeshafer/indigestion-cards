@@ -71,24 +71,4 @@ export function ImageProcessing({ app, stack }: StackContext) {
   })
 
   return { cardCDN, adminImageSecret }
-
-	// TODO:
-	// - [x] create bucket for combined images
-	// - [x] create new distribution
-	// - [ ] create edge function for distribution
-	// - [ ] create regular lambda for image processing
-	//    - checks if image *can* exist
-	//      - if not, check if (secret param) was passed in the url
-	//        - if it was, generate image but don't save it
-	//        - else, 404
-	//      - else:
-	//        - create image
-	//        - send image to S3
-	//        - send image to use
-	// - [ ] in function, if image doesn't exist
-  //
-  // - Will need dependencies:
-  //  - DB
-  // - Will be a dependency of:
-  //  - Site
 }

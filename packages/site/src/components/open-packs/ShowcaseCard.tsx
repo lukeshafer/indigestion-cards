@@ -33,7 +33,7 @@ export function ShowcaseCard(props: {
 						'Content-Type': 'application/x-www-form-urlencoded',
 					},
 					body,
-			  });
+				});
 	};
 
 	const previewCard = () => {
@@ -71,10 +71,18 @@ export function ShowcaseCard(props: {
 					<button class="block origin-top-left" onClick={previewCard}>
 						{isPreviewed() ? (
 							<CardPreview close={closePreview}>
-								<Card {...props.card} scale={state.cardScale * 1.5} />
+								<Card
+									{...props.card}
+									scale={state.cardScale * 1.5}
+									adminSecret={state.adminSecret}
+								/>
 							</CardPreview>
 						) : (
-							<Card {...props.card} scale={state.cardScale} />
+							<Card
+								{...props.card}
+								scale={state.cardScale}
+								adminSecret={state.adminSecret}
+							/>
 						)}
 					</button>
 				</div>

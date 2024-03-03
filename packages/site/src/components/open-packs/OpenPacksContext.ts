@@ -6,6 +6,7 @@ import type { Pack } from '@lil-indigestion-cards/core/db/packs';
 export const OpenPacksContext = createContext<OpenPacksState>({
 	isTesting: undefined,
 	isHidden: false,
+  adminSecret: '',
 	packs: [],
 	activePack: null,
 	packsRemaining: 0,
@@ -34,6 +35,7 @@ export type PackEntityWithStatus = Pack & {
 export type OpenPacksState = {
 	isTesting: boolean | undefined;
 	isHidden: boolean;
+  adminSecret: string;
 
 	packs: PackEntityWithStatus[];
 	activePack: PackEntityWithStatus | null;

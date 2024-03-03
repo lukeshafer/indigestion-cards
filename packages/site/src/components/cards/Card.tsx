@@ -17,6 +17,7 @@ interface Props extends Partial<CardInstance> {
   rarityColor: string;
   rarityId: string;
   username?: string;
+  adminSecret?: string;
 }
 
 export default function Card(
@@ -30,13 +31,21 @@ export default function Card(
   const cardName = () => (isFullArt() || isLegacy() || isSecret() ? '' : props.cardName);
   const cardDescription = () =>
     isFullArt() || isLegacy() || isSecret() ? '' : props.cardDescription;
-  const frameUrl = () => (isSecret() ? '' : props.frameUrl);
-  const imgUrl = () => props.imgUrl;
+  //const frameUrl = () => (isSecret() ? '' : props.frameUrl);
+  //const imgUrl = () => props.imgUrl;
 
   const isShitPack = () => props.stamps?.includes('shit-pack');
 
-  //const combinedImgUrl = () =>
-  //isSecret() ? ASSETS.CARDS.CARD_BACK : `/images/cards/${props.designId}/${props.rarityId}.png`;
+  const combinedImgUrl = () => {
+    if (isSecret()) return ASSETS.CARDS.CARD_BACK;
+
+    const url = new URL(`https://${import.meta.env.PUBLIC_CARD_CDN_URL}`)
+    url.pathname = `/${props.designId}/${props.rarityId}.png`
+    if (props.adminSecret)
+      url.searchParams.set('adminsecret', props.adminSecret);
+
+    return url.toString();
+  }
 
   return (
     <div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
@@ -49,21 +58,24 @@ export default function Card(
               : props.rarityColor,
             'view-transition-name': `card-${props.instanceId ?? props.designId}`,
           }}>
-          <img
-            src={imgUrl()}
-            alt={props.cardName}
-            loading="lazy"
-            class="absolute inset-0"
-          />
-          <img src={frameUrl()} alt="" class="absolute inset-0" />
           {
             //<img
-            //src={combinedImgUrl()}
+            //src={imgUrl()}
             //alt={props.cardName}
-            //loading={props.lazy ? 'lazy' : undefined}
+            //loading="lazy"
             //class="absolute inset-0"
             ///>
+            //<img src={frameUrl()} alt="" class="absolute inset-0" />
           }
+
+          <img
+            src={combinedImgUrl()}
+            alt={props.cardName}
+            loading={props.lazy ? 'lazy' : undefined}
+            class="absolute inset-0"
+          />
+
+
           <h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
             {cardName()}
           </h3>

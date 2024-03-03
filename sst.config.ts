@@ -29,8 +29,8 @@ export default {
 			.stack(Auth)
 			.stack(DesignBucket)
 			.stack(API)
+      .stack(ImageProcessing)
 			.stack(Sites)
 			.stack(AdminSite)
-      .stack(ImageProcessing);
 	},
 } satisfies SSTConfig;
