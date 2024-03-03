@@ -6,6 +6,7 @@ import { Auth } from './auth';
 import { ConfigStack } from './config';
 import { Events } from './events';
 import { getHostedZone, getDomainName } from './constants';
+import { ImageProcessing } from './image-processing';
 
 export function Sites({ app, stack }: StackContext) {
   const table = use(Database);
@@ -14,12 +15,17 @@ export function Sites({ app, stack }: StackContext) {
   const { siteAuth } = use(Auth);
   const bus = use(Events);
   const config = use(ConfigStack);
+  const { cardCDN, adminImageSecret } = use(ImageProcessing);
+
   const hostedZone = getHostedZone(stack.stage);
 
   const baseDomain = getDomainName(stack.stage);
 
   const site = new AstroSite(stack, 'site', {
     path: 'packages/site',
+    environment: {
+      PUBLIC_CARD_CDN_URL: cardCDN.domainName,
+    },
     //dev: {
     //deploy: true,
     //},
@@ -38,6 +44,7 @@ export function Sites({ app, stack }: StackContext) {
       config.TWITCH_TOKENS_PARAM,
       config.DOMAIN_NAME,
       bus,
+      adminImageSecret,
     ],
     customDomain:
       app.mode === 'dev'
@@ -53,4 +60,8 @@ export function Sites({ app, stack }: StackContext) {
   stack.addOutputs({
     SiteUrl: site.url,
   });
+
+  return {
+    site
+  }
 }

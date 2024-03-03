@@ -8,6 +8,7 @@ import { DesignBucket } from './stacks/bucket';
 import { Auth } from './stacks/auth';
 import { AfterDeployStack } from './stacks/script';
 import { AdminSite } from './stacks/admin-site';
+import { ImageProcessing } from './stacks/image-processing'
 
 export default {
 	config() {
@@ -28,7 +29,8 @@ export default {
 			.stack(Auth)
 			.stack(DesignBucket)
 			.stack(API)
+      .stack(ImageProcessing)
 			.stack(Sites)
-			.stack(AdminSite);
+			.stack(AdminSite)
 	},
 } satisfies SSTConfig;

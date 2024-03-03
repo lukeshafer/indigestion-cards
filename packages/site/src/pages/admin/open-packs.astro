@@ -3,6 +3,7 @@ import Page from '@/layouts/Page.astro';
 import OpenPacksComponent from '@/components/open-packs/OpenPacks';
 import { getAllPacks } from '@lib/pack';
 import Header from '@/components/Header.astro';
+import { Config } from 'sst/node/config';
 
 const allPacks = await getAllPacks();
 const packs = allPacks
@@ -19,6 +20,7 @@ const startCardScale = Astro.cookies.get('openPacksScale')?.value;
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
 		startCardScale={startCardScale ? Number(startCardScale) : undefined}
+    adminSecret={Config.AdminImageSecret}
 		client:load>
 		<Header />
 	</OpenPacksComponent>
