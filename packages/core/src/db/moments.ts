@@ -40,11 +40,11 @@ export const momentRedemptions = new Entity(
 			getAll: {
 				index: 'gsi1',
 				pk: {
-					field: 'gsipk1',
+					field: 'gsi1pk',
 					composite: [],
 				},
 				sk: {
-					field: 'gsisk1',
+					field: 'gsi1sk',
 					composite: ['momentDate', 'userId'],
 				},
 			},

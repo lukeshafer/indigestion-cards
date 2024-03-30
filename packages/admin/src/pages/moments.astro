@@ -1,0 +1,28 @@
+---
+import Page from '@/layouts/Page.astro';
+import {
+	getAllMomentRedemptions,
+	groupRedemptionsByMoment,
+} from '@lil-indigestion-cards/core/lib/moments';
+
+const redemptions = await getAllMomentRedemptions();
+
+const moments = groupRedemptionsByMoment(redemptions);
+---
+
+<Page title="Moments">
+	<ul>
+		{
+			Array.from(moments).map(([date, redemptions]) => (
+				<li>
+					{date}
+					<ul>
+						{redemptions.map(r => (
+							<li>{r.username}</li>
+						))}
+					</ul>
+				</li>
+			))
+		}
+	</ul>
+</Page>
