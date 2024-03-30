@@ -14,9 +14,9 @@ export const PUBLIC_ROUTES = [
 	'/login',
 	'/logout',
 	'/data/usernames',
-  '/trades/*',
-  '/data/*',
-  '/images/*'
+	'/trades/*',
+	'/data/*',
+	'/images/*',
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
@@ -30,7 +30,7 @@ const api_paths = {
 	ADMIN_USER: '/admin-user',
 	PACK: '/pack',
 	CARD: '/card',
-  OPEN_CARD: '/open-card',
+	OPEN_CARD: '/open-card',
 	DESIGN: '/design',
 	SITE_CONFIG: '/site-config',
 	UNMATCHED_IMAGE: '/unmatched-image',
@@ -130,7 +130,7 @@ export const routeNames = {
 export const ASSETS = {
 	FAVICON: '/assets/favicon.png',
 	LOGO: '/assets/logo.png',
-  TONGLE: '/assets/lilindpartner.webp',
+	TONGLE: '/assets/lilindpartner.webp',
 	EMOTES: {
 		LILINDDISBLIF: '/assets/emotes/lilinddisblif.png',
 		LILINDBLIF: '/assets/emotes/lilindblif.png',

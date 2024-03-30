@@ -4,10 +4,14 @@ import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@lib/twitch';
 import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@lib/site-config';
 import { getPackTypeById } from '@lib/pack-type';
-import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
+import {
+	MOMENT_REDEMPTION_PACK_TYPE_ID,
+	TWITCH_GIFT_SUB_ID,
+} from '@lil-indigestion-cards/core/constants';
 import { setAdminEnvSession } from '@lib/session';
+import { Moment } from '@lil-indigestion-cards/core/events/moments';
 
-export const handler: APIGatewayProxyHandlerV2 = async (event) => {
+export const handler: APIGatewayProxyHandlerV2 = async event => {
 	if (!verifyDiscordRequest(event)) {
 		console.error('Message not verified');
 		return { statusCode: 403 };
@@ -100,7 +104,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 		}
 		case 'channel.channel_points_custom_reward_redemption.add': {
 			console.log(
-				`Channel point reward redeemed by ${body.event.user_name
+				`Channel point reward redeemed by ${
+					body.event.user_name
 				}. Reward info: ${JSON.stringify(
 					{
 						rewardId: body.event.reward.id,
@@ -117,6 +122,15 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
 				if (!reward) console.log(`No reward found for reward id ${rewardId}`);
 				else console.log(`No pack type found for reward id ${rewardId}`);
 				return { statusCode: 200 };
+			}
+
+			if (reward.packTypeId === MOMENT_REDEMPTION_PACK_TYPE_ID) {
+				console.log(`Moment redeemed by ${body.event.user_name}`);
+				await Moment.Redeemed.publish({
+					userId: body.event.user_id,
+					username: body.event.user_name,
+				});
+				break;
 			}
 
 			console.log(`Giving user 1 pack`);

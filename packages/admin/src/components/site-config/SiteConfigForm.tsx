@@ -2,11 +2,22 @@ import { Checkbox, Form, Select, SubmitButton } from '@/components/form/Form';
 import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
 import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
 import type { TwitchEvent } from '@lil-indigestion-cards/core/db/twitchEvents';
+import { MOMENT_REDEMPTION_PACK_TYPE_ID } from '@lil-indigestion-cards/core/constants';
 import { API } from '@/constants';
 import { Show, createSignal } from 'solid-js';
 import Table from '../table/Table';
 import RarityRanking, { type RarityRankingRecord } from './RarityRanking';
 import { PageHeader, PageTitle } from '../text';
+
+const STATIC_PACK_TYPES: { label: string; value: string }[] = [
+	{
+		label: '[REDEEM MOMENT]',
+		value: JSON.stringify({
+			packTypeId: MOMENT_REDEMPTION_PACK_TYPE_ID,
+			packTypeName: '[REDEEM MOMENT]',
+		}),
+	},
+];
 
 export default function SiteConfigForm(props: {
 	baseRarityValue: string;
@@ -168,7 +179,8 @@ function TwitchEventSelect(props: {
 			value={value()}
 			setValue={val => {
 				console.log(val);
-				props.onChange?.(val);
+				if (val === '') return;
+				else props.onChange?.(val);
 			}}
 			options={[
 				{
@@ -185,6 +197,11 @@ function TwitchEventSelect(props: {
 						packTypeName: packType.packTypeName,
 					}),
 				})),
+				{
+					label: '---',
+					value: '',
+				},
+				...STATIC_PACK_TYPES,
 			]}
 		/>
 	);
