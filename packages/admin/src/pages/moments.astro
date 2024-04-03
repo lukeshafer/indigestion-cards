@@ -18,6 +18,7 @@ const moments = groupRedemptionsByMoment(redemptions);
 	</PageHeader>
 	<ul class="grid gap-8">
 		{
+      moments.size === 0 ? <p class="text-center">No moments to create!</p> :
 			[...moments].map(([date, redemptions]) => (
 				<li class="border-b border-b-gray-500/30 pb-8 grid gap-2 justify-items-start">
 					<Heading>{date}</Heading>
