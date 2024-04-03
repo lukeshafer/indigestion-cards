@@ -1,4 +1,6 @@
 ---
+import { Anchor, Heading, PageHeader, PageTitle } from '@/components/text';
+import { routes } from '@/constants';
 import Page from '@/layouts/Page.astro';
 import {
 	getAllMomentRedemptions,
@@ -11,16 +13,33 @@ const moments = groupRedemptionsByMoment(redemptions);
 ---
 
 <Page title="Moments">
-	<ul>
+	<PageHeader>
+		<PageTitle>Moments</PageTitle>
+	</PageHeader>
+	<ul class="grid gap-8">
 		{
-			Array.from(moments).map(([date, redemptions]) => (
-				<li>
-					{date}
-					<ul>
-						{redemptions.map(r => (
-							<li>{r.username}</li>
-						))}
-					</ul>
+			[...moments].map(([date, redemptions]) => (
+				<li class="border-b border-b-gray-500/30 pb-8 grid gap-2 justify-items-start">
+					<Heading>{date}</Heading>
+					<details>
+						<summary class="cursor-pointer">See Users</summary>
+						<i class="mb-2 block text-sm text-gray-700 dark:text-gray-400">
+							sorted alphabetically
+						</i>
+						<ul>
+							{redemptions
+								.slice()
+								.sort((a, b) =>
+									a.username > b.username ? 1 : a.username < b.username ? -1 : 0
+								)
+								.map(r => (
+									<li>{r.username}</li>
+								))}
+						</ul>
+					</details>
+					<Anchor href={`${routes.ADMIN.CREATE.MOMENT_CARD}/${date}/image`}>
+						Create Card
+					</Anchor>
 				</li>
 			))
 		}

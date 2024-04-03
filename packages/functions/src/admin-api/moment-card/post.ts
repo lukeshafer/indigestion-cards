@@ -1,55 +1,41 @@
-import { SiteHandler } from "@lil-indigestion-cards/core/lib/api";
-import { createCardInstance } from "@lil-indigestion-cards/core/lib/card";
-import { generateInstanceId } from "@lil-indigestion-cards/core/lib/card-pool";
+import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
+import { createCardInstance } from '@lil-indigestion-cards/core/lib/card';
+import { generateInstanceId } from '@lil-indigestion-cards/core/lib/card-pool';
+import { createCardDesign, deleteCardDesignById } from '@lil-indigestion-cards/core/lib/design';
+import { createS3Url, moveImageBetweenBuckets } from '@lil-indigestion-cards/core/lib/images';
 import {
-	createCardDesign,
-	deleteCardDesignById,
-} from "@lil-indigestion-cards/core/lib/design";
-import {
-	createS3Url,
-	moveImageBetweenBuckets,
-} from "@lil-indigestion-cards/core/lib/images";
-import { generatePackId } from "@lil-indigestion-cards/core/lib/pack";
-import { deleteUnmatchedDesignImage } from "@lil-indigestion-cards/core/lib/unmatched-image";
-import { Bucket } from "sst/node/bucket";
-import { z } from "zod";
+	deleteMomentRedemption,
+	momentInputSchemas,
+} from '@lil-indigestion-cards/core/lib/moments';
+import { generatePackId } from '@lil-indigestion-cards/core/lib/pack';
+import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/lib/unmatched-image';
+import { Bucket } from 'sst/node/bucket';
 
 export const handler = SiteHandler(
 	{
 		schema: {
-			season: "string",
-			imgUrl: "string",
-			imageKey: "string",
-			cardName: "string",
-			designId: "string",
-			cardDescription: "string",
-			artist: "string",
-			rarity: "string",
-			users: "string",
+			season: 'string',
+			imgUrl: 'string',
+			imageKey: 'string',
+			cardName: 'string',
+			designId: 'string',
+			cardDescription: 'string',
+			artist: 'string',
+			rarity: 'string',
+			users: 'string',
+			momentDate: 'string',
 		},
-		authorizationType: "admin",
+		authorizationType: 'admin',
 	},
 	async (_, { params }) => {
 		const { seasonId, seasonName } = JSON.parse(params.season);
 
-		const users = z
-			.array(
-				z.object({
-					username: z.string(),
-					userId: z.string(),
-				}),
-			)
-			.parse(JSON.parse(params.users));
+		const users = momentInputSchemas.users.parse(JSON.parse(params.users));
 
-		const rarity = z
-			.object({
-				rarityId: z.string(),
-				rarityName: z.string(),
-				frameUrl: z.string(),
-				rarityColor: z.string(),
-				count: z.number().default(users.length),
-			})
-			.parse(JSON.parse(params.rarity));
+		const rarity = {
+			...momentInputSchemas.rarity.parse(JSON.parse(params.rarity)),
+			count: users.length,
+		};
 
 		const newUrl = createS3Url({
 			bucket: Bucket.CardDesigns.bucketName,
@@ -68,8 +54,7 @@ export const handler = SiteHandler(
 			bestRarityFound: rarity,
 		});
 
-		if (!createDesignResult.success)
-			return { statusCode: 400, body: createDesignResult.error };
+		if (!createDesignResult.success) return { statusCode: 400, body: createDesignResult.error };
 		const design = createDesignResult.data;
 
 		try {
@@ -83,12 +68,12 @@ export const handler = SiteHandler(
 			await deleteCardDesignById({ designId: params.designId });
 			return {
 				statusCode: 500,
-				body: "An error occurred converting draft to design. Please try again and contact support if you have more issues.",
+				body: 'An error occurred converting draft to design. Please try again and contact support if you have more issues.',
 			};
 		}
 		await deleteUnmatchedDesignImage({
 			imageId: params.imageKey,
-			type: "cardDesign",
+			type: 'cardDesign',
 		});
 
 		// give cards to users
@@ -100,9 +85,9 @@ export const handler = SiteHandler(
 						seasonId: design.seasonId,
 						designId: design.designId,
 						rarityId: rarity.rarityId,
-						cardNumber: index,
+						cardNumber: index + 1,
 					}),
-					cardNumber: index,
+					cardNumber: index + 1,
 					userId: user.userId,
 					username: user.username,
 					minterId: user.userId,
@@ -118,15 +103,17 @@ export const handler = SiteHandler(
 					rarityName: rarity.rarityName,
 					rarityColor: rarity.rarityColor,
 					totalOfType: rarity.count,
-					packId: generatePackId({ userId: user.userId, prefix: "moment-" }),
+					packId: generatePackId({ userId: user.userId, prefix: 'moment-' }),
 					openedAt: new Date().toISOString(),
-				}),
-			),
+				}).then(() => {
+					deleteMomentRedemption({ momentDate: params.momentDate, userId: user.userId });
+				})
+			)
 		);
 
 		return {
 			statusCode: 200,
-			body: "Successfully created moment card and assigned to users",
+			body: 'Successfully created moment card and assigned to users',
 		};
-	},
+	}
 );
