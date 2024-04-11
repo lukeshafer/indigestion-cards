@@ -56,7 +56,7 @@ export default function OpenPacks(props: Props) {
 
     setState('packs', sortedList);
 
-    const interval = setInterval(refetchChatters, 10000);
+    const interval = setInterval(refetchChatters, 60000);
     onCleanup(() => clearInterval(interval));
 
     setState('isHidden', false);
