@@ -4,18 +4,17 @@ module.exports = {
 	useTabs: true,
 	overrides: [
 		{
-			files: '*.astro',
+			files: "*.astro",
 			options: {
-				parser: 'astro',
+				parser: "astro",
 			},
 		},
 	],
 	singleQuote: true,
-	trailingComma: 'es5',
+	trailingComma: "es5",
 	tabWidth: 4,
-	useTabs: true,
 	printWidth: 100,
 	bracketSameLine: true,
-	arrowParens: 'avoid',
-	plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
+	arrowParens: "avoid",
+	plugins: ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
 };

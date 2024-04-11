@@ -15,7 +15,8 @@ const api_paths = {
 	TWITCH_CHATTERS: '/twitch/chatters',
 	PREORDER: '/preorder',
 	CONVERT_PREORDERS: '/convert-all-preorders-to-pack',
-  FAQ: '/faq',
+	FAQ: '/faq',
+	MOMENT_CARD: '/moment-card',
 };
 
 export const API = new Proxy(api_paths, {
@@ -53,6 +54,7 @@ export const routes = {
 			ADMIN: '/admin/create/admin',
 			CARD_DESIGN: '/admin/create/card-design',
 			CARD_DESIGN_DETAILS: '/admin/create/card-design-details',
+			MOMENT_CARD: '/admin/create/moment-card',
 			SEASON: '/admin/create/season',
 			RARITY: '/admin/create/rarity',
 			RARITY_DETAILS: '/admin/create/rarity-details',

@@ -88,6 +88,8 @@ export function API({ app, stack }: StackContext) {
         'packages/functions/src/admin-api/convert-all-preorders-to-pack/post.handler',
       // FAQ
       'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
+      // MOMENTS
+      'POST /moment-card': 'packages/functions/src/admin-api/moment-card/post.handler',
 
       // USER ENDPOINTS
       // USER

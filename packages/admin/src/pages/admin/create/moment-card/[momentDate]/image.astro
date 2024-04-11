@@ -1,0 +1,45 @@
+---
+import { Bucket } from 'sst/node/bucket';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
+import { S3Client } from '@aws-sdk/client-s3';
+import crypto from 'crypto';
+import Page from '@/layouts/Page.astro';
+import { Form, FileInput, SubmitButton } from '@/components/form/Form';
+import { routes } from '@/constants';
+import { PageTitle, PageHeader } from '@/components/text';
+
+const { momentDate } = Astro.params;
+
+const s3 = new S3Client({ region: 'us-east-2' });
+const presigned = await createPresignedPost(s3, {
+	Bucket: Bucket.CardDrafts.bucketName,
+	Key: crypto.randomBytes(20).toString('hex') + '.jpg',
+	Fields: {
+		acl: 'public-read',
+		success_action_redirect:
+			Astro.url.origin + routes.ADMIN.CREATE.MOMENT_CARD + `/${momentDate}/details`,
+	},
+});
+---
+
+<Page title="Create New Card">
+	<PageHeader>
+		<PageTitle>Create New Moment Card for {momentDate}</PageTitle>
+	</PageHeader>
+
+	<Form method="post" action={presigned.url} enctype="multipart/form-data">
+		{
+			Object.entries(presigned.fields).map(([key, value]) => (
+				<input type="hidden" name={key} value={value} />
+			))
+		}
+		<FileInput
+			label="Please upload the card image."
+			name="file"
+			accept="image/*"
+			required
+			client:load
+		/>
+		<SubmitButton>Upload</SubmitButton>
+	</Form>
+</Page>

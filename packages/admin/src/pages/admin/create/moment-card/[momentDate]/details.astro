@@ -1,0 +1,48 @@
+---
+import Page from '@/layouts/Page.astro';
+import { ASSETS } from '@/constants';
+import { PageTitle, PageHeader } from '@/components/text';
+import MomentDesignForm from '@/components/moments/MomentDesignForm';
+import { getAllSeasons } from '@lib/season';
+import { getAllRarities } from '@lib/rarity';
+import { getSiteConfig } from '@lib/site-config';
+import { getMomentRedemptionsForDate } from '@lib/moments';
+
+const bucket = Astro.url.searchParams.get('bucket');
+const key = Astro.url.searchParams.get('key');
+
+if (!bucket || !key) {
+	return Astro.redirect('/?alert=Please upload an image first');
+}
+
+const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
+const seasons = await getAllSeasons();
+const rarities = await getAllRarities();
+const config = await getSiteConfig();
+const baseRarity = config?.baseRarity ??
+	rarities[0] ?? {
+		rarityId: 'default',
+		rarityName: 'Default',
+		rarityColor: '#fff',
+		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
+	};
+
+const { momentDate } = Astro.params;
+const redemptions = await getMomentRedemptionsForDate(momentDate!);
+---
+
+<Page title="Add Card Design">
+	<PageHeader>
+		<PageTitle>Add Moment Card</PageTitle>
+	</PageHeader>
+	<MomentDesignForm
+		{imgUrl}
+		{key}
+		{seasons}
+		{rarities}
+		{baseRarity}
+		{redemptions}
+		momentDate={momentDate}
+		client:load
+	/>
+</Page>
