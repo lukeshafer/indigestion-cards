@@ -30,6 +30,8 @@
     "aws-cdk-lib": "2.132.1",
     "constructs": "10.3.0",
     "eslint": "^8.57.0",
+    "eslint-plugin-astro": "^0.34.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-solid": "^0.13.2",
     "graphql": "16.8.1",
     "prettier-plugin-astro": "^0.12.0",

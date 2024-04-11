@@ -8,18 +8,29 @@
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:solid/typescript"
+		"plugin:solid/typescript",
+    "plugin:astro/recommended",
+    "plugin:astro/jsx-a11y-recommended"
 	],
 	"overrides": [
 		{
+			"files": [".eslintrc.{js,cjs}"],
 			"env": {
 				"node": true
 			},
-			"files": [".eslintrc.{js,cjs}"],
 			"parserOptions": {
 				"sourceType": "script"
 			}
-		}
+		},
+    {
+      "files": ["*.astro"],
+      "processor": "astro/client-side-ts",
+      "parser": "astro-eslint-parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "extraFileExtensions": [".astro"]
+      }
+    }
 	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
