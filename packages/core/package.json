@@ -7,17 +7,15 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.554.0",
-    "@aws-sdk/client-s3": "^3.554.0",
-    "@aws-sdk/client-secrets-manager": "^3.554.0",
     "@types/node": "^18.19.31",
-    "astro": "^4.2.1",
     "solid-js": "^1.8.16",
     "sst": "2.41.4"
   },
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.554.0",
     "@aws-sdk/client-ssm": "^3.554.0",
+    "@aws-sdk/client-dynamodb": "^3.554.0",
+    "@aws-sdk/client-s3": "^3.554.0",
     "electrodb": "^2.13.1",
     "node-fetch": "^3.3.1",
     "zod": "^3.22.4"

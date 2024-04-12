@@ -7,13 +7,13 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@aws-sdk/client-eventbridge": "^3.554.0",
-    "@aws-sdk/client-s3": "^3.554.0",
     "@types/aws-lambda": "^8.10.137",
     "@types/node": "^18.19.31",
     "sst": "2.41.4"
   },
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.554.0",
+    "@aws-sdk/client-s3": "^3.554.0",
     "openid-client": "^5.6.5",
     "sharp": "^0.33.3",
     "zod": "^3.22.4"
