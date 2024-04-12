@@ -3,13 +3,17 @@ import type { APIRoute } from 'astro';
 import { Api } from 'sst/node/api';
 
 // Re-route all API requests to the API server
-export const ALL: APIRoute = async (ctx) => {
+export const ALL: APIRoute = async ctx => {
+	const log = (...args: any[]) => console.log({
+    endpoint: ctx.params.endpoint,
+  }, ...args);
+
 	const route = `${Api.AdminApi.url}/${ctx.params.endpoint}${ctx.url.search}`;
 	const token = ctx.cookies.get(AUTH_TOKEN);
 
-	console.log('Fetching from API: ', ctx.params.endpoint);
+	log('Fetching from API: ', ctx.params.endpoint);
 
-	return fetch(route, {
+	const res = await fetch(route, {
 		body: ctx.request.body ?? undefined,
 		method: ctx.request.method,
 		headers: {
@@ -17,6 +21,8 @@ export const ALL: APIRoute = async (ctx) => {
 			Authorization: `Bearer ${token?.value}`,
 		},
 		// @ts-expect-error - This is a valid option
-		duplex: "half",
+		duplex: 'half',
 	});
+
+  return res
 };
