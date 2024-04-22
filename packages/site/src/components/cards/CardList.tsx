@@ -116,6 +116,7 @@ export default function CardList(props: {
 							onInput={async e => {
 								const formData = new FormData(e.currentTarget);
 								syncFormDataWithUrlSearchParams(formData);
+								// @ts-expect-error there aren't any files
 								setFilters(Array.from(formData.entries()));
 							}}>
 							<Show when={filterKeys().includes('seasonId') && seasons().length}>
