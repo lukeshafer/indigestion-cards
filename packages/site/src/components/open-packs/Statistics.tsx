@@ -1,14 +1,14 @@
 import { Show, createEffect, createResource, createSignal, onMount, useContext } from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
-import { API, ASSETS, SHIT_PACK_RARITY_ID } from '@/constants';
+import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@/constants';
 import { Checkbox } from '../form/Form';
 
 export function Statistics() {
 	const ctx = useContext(OpenPacksContext);
 
 	const state = () => ({
-		cardsOpened: ctx.activePack?.cardDetails.filter((card) => card.opened === true),
-		cardsOpenedCount: ctx.activePack?.cardDetails.filter((card) => card.opened).length || 0,
+		cardsOpened: ctx.activePack?.cardDetails.filter(card => card.opened === true),
+		cardsOpenedCount: ctx.activePack?.cardDetails.filter(card => card.opened).length || 0,
 		totalCardCount: ctx.activePack?.cardDetails.length,
 		packTypeId: ctx.activePack?.packTypeId,
 		packId: ctx.activePack?.packId,
@@ -24,18 +24,22 @@ export function Statistics() {
 		localStorage.setItem('isShitpackVisible', isShitpackVisible() ? 'true' : 'false');
 	});
 
-	const [resource] = createResource(state, async (state) => {
+	const [resource] = createResource(state, async state => {
 		if (!state.totalCardCount || !state.packId) {
 			return { shitPackOdds: 0 };
 		}
 
-		if (state.cardsOpened?.some((card) => !card.rarityId.toLowerCase().startsWith(SHIT_PACK_RARITY_ID)))
+		if (
+			state.cardsOpened?.some(
+				card => !card.rarityId.toLowerCase().startsWith(SHIT_PACK_RARITY_ID)
+			)
+		)
 			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 
 		if (state.cardsOpenedCount === state.totalCardCount)
 			// returning a timeout to make sure the card is flipped before we see this number (for suspense)
-			return new Promise<{ shitPackOdds: number }>((res) =>
+			return new Promise<{ shitPackOdds: number }>(res =>
 				setTimeout(() => res({ shitPackOdds: 1 }), 500)
 			);
 
@@ -44,9 +48,11 @@ export function Statistics() {
 			packTypeId: state.packTypeId || '0',
 		});
 
-		const body = await fetch(API.STATS + `?${searchParams.toString()}`).then((res) => {
-			return res.text();
-		});
+		const body = await fetch(resolveLocalPath(API.STATS + `?${searchParams.toString()}`)).then(
+			res => {
+				return res.text();
+			}
+		);
 
 		const json = JSON.parse(body);
 

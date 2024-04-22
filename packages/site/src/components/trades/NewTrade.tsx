@@ -3,7 +3,7 @@ import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
 import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { USER_API, UNTRADEABLE_RARITY_IDS } from '@/constants';
+import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@/constants';
 import { Heading } from '@/components/text';
 import { get } from '@/lib/client/data';
 import CardSearchList from './CardSearchList';
@@ -69,7 +69,7 @@ export default function NewTrade(props: {
 	const [receiverCards] = createResource(
 		() => state.receiverUsername,
 		receiverUsername =>
-			fetch(`${USER_API.CARD}?username=${receiverUsername}`, {
+			fetch(resolveLocalPath(`${USER_API.CARD}?username=${receiverUsername}`), {
 				headers: {
 					'Content-Type': 'application/json',
 					Accept: 'application/json',

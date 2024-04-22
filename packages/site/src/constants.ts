@@ -49,6 +49,16 @@ export const API = new Proxy(api_paths, {
 	},
 });
 
+export function resolveLocalPath(path: string) {
+	if (!import.meta.env.SSR) {
+		return path;
+	} else if (import.meta.env.DOMAIN_NAME?.startsWith('localhost')) {
+		return `http://${import.meta.env.DOMAIN_NAME}${path}`;
+	} else {
+		return `https://${import.meta.env.DOMAIN_NAME}${path}`;
+	}
+}
+
 /** User API Routes */
 const user_api_paths = {
 	USER: '/user',

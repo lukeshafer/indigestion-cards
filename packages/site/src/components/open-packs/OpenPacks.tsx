@@ -11,7 +11,7 @@ import {
 import { createStore, produce, type SetStoreFunction } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
-import { API, SHIT_PACK_RARITY_ID } from '@/constants';
+import { API, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@/constants';
 import { setTotalPackCount } from '@/lib/client/state';
 import { Checkbox } from '../form/Form';
 import { isChatters, type Chatter } from '@/lib/client/chatters';
@@ -38,7 +38,7 @@ export default function OpenPacks(props: Props) {
   const [setAutoAnimate] = createAutoAnimate();
 
   const [chatters, { refetch: refetchChatters }] = createResource(async () => {
-    const res = await fetch(API.TWITCH_CHATTERS);
+    const res = await fetch(resolveLocalPath( API.TWITCH_CHATTERS ));
     const data = await res.json().catch(() => ({}));
     return isChatters(data) ? data : [];
   });

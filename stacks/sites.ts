@@ -9,59 +9,60 @@ import { getHostedZone, getDomainName } from './constants';
 import { ImageProcessing } from './image-processing';
 
 export function Sites({ app, stack }: StackContext) {
-  const table = use(Database);
-  const { adminApi, twitchApi } = use(API);
-  const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
-  const { siteAuth } = use(Auth);
-  const bus = use(Events);
-  const config = use(ConfigStack);
-  const { cardCDN, adminImageSecret } = use(ImageProcessing);
+	const table = use(Database);
+	const { adminApi, twitchApi } = use(API);
+	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
+	const { siteAuth } = use(Auth);
+	const bus = use(Events);
+	const config = use(ConfigStack);
+	const { cardCDN, adminImageSecret } = use(ImageProcessing);
 
-  const hostedZone = getHostedZone(stack.stage);
+	const hostedZone = getHostedZone(stack.stage);
 
-  const baseDomain = getDomainName(stack.stage);
+	const baseDomain = getDomainName(stack.stage);
 
-  const site = new AstroSite(stack, 'site', {
-    path: 'packages/site',
-    environment: {
-      PUBLIC_CARD_CDN_URL: cardCDN.domainName,
-    },
-    //dev: {
-    //deploy: true,
-    //},
-    bind: [
-      table,
-      adminApi,
-      twitchApi,
-      frameBucket,
-      cardDesignBucket,
-      frameDraftBucket,
-      cardDraftBucket,
-      siteAuth,
-      config.TWITCH_CLIENT_ID,
-      config.TWITCH_CLIENT_SECRET,
-      config.STREAMER_USER_ID,
-      config.TWITCH_TOKENS_PARAM,
-      config.DOMAIN_NAME,
-      bus,
-      adminImageSecret,
-    ],
-    customDomain:
-      app.mode === 'dev'
-        ? undefined
-        : {
-          domainName: baseDomain,
-          hostedZone: hostedZone,
-        },
-    permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-    runtime: 'nodejs18.x',
-  });
+	const site = new AstroSite(stack, 'site', {
+		path: 'packages/site',
+		environment: {
+			PUBLIC_CARD_CDN_URL: cardCDN.domainName,
+			DOMAIN_NAME: app.mode === 'dev' ? 'localhost:4321' : baseDomain,
+		},
+		//dev: {
+		//deploy: true,
+		//},
+		bind: [
+			table,
+			adminApi,
+			twitchApi,
+			frameBucket,
+			cardDesignBucket,
+			frameDraftBucket,
+			cardDraftBucket,
+			siteAuth,
+			config.TWITCH_CLIENT_ID,
+			config.TWITCH_CLIENT_SECRET,
+			config.STREAMER_USER_ID,
+			config.TWITCH_TOKENS_PARAM,
+			config.DOMAIN_NAME,
+			bus,
+			adminImageSecret,
+		],
+		customDomain:
+			app.mode === 'dev'
+				? undefined
+				: {
+						domainName: baseDomain,
+						hostedZone: hostedZone,
+					},
+		permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
+		runtime: 'nodejs18.x',
+	});
 
-  stack.addOutputs({
-    SiteUrl: site.url,
-  });
+	stack.addOutputs({
+		SiteUrl: site.url,
+	});
 
-  return {
-    site
-  }
+	return {
+		site,
+	};
 }
