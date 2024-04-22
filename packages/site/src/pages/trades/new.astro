@@ -4,13 +4,19 @@ import { PageHeader, PageTitle } from '@/components/text';
 import { routeNames, routes } from '@/constants';
 import Page, { type Props as PageProps } from '@/layouts/Page.astro';
 import NewTrade from '@/components/trades/NewTrade';
-import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
+import { getUser, getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
 import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
 import { getRarityRanking, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
-const { userId, username } = Astro.locals.user?.properties || {};
+const { userId } = Astro.locals.user?.properties || {};
 
-if (!userId || !username) {
+if (!userId) {
+	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
+}
+
+const { username } = (await getUser(userId)) || {};
+
+if (!username) {
 	return Astro.redirect('/?alert=You must be logged in to view this page.&type=error');
 }
 
@@ -69,6 +75,6 @@ function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInst
 		{initialReceiverUsername}
 		{initialReceiverCards}
 		{rarityRanking}
-		client:load
+		client:only="solid-js"
 	/>
 </Page>

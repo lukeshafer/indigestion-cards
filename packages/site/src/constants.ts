@@ -16,7 +16,6 @@ export const PUBLIC_ROUTES = [
 	'/data/usernames',
 	'/trades/*',
 	'/data/*',
-	'/images/*',
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
@@ -49,6 +48,16 @@ export const API = new Proxy(api_paths, {
 		return '/api/admin' + path;
 	},
 });
+
+export function resolveLocalPath(path: string) {
+	if (!import.meta.env.SSR) {
+		return path;
+	} else if (import.meta.env.DOMAIN_NAME?.startsWith('localhost')) {
+		return `http://${import.meta.env.DOMAIN_NAME}${path}`;
+	} else {
+		return `https://${import.meta.env.DOMAIN_NAME}${path}`;
+	}
+}
 
 /** User API Routes */
 const user_api_paths = {

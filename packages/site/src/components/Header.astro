@@ -55,7 +55,7 @@ const logos = {
 				Astro.locals.session?.type === 'admin' ? (
 					<HeaderLink href={routes.ADMIN.OPEN_PACKS} title="Open Packs">
 						Open Packs
-						<TotalPackCount client:load />
+						<TotalPackCount client:only="solid-js" />
 					</HeaderLink>
 				) : null
 			}
@@ -63,7 +63,7 @@ const logos = {
 			<HeaderLink href={routes.USERS} title="Users">Users</HeaderLink>
 			<Show when={canSeeTradesLink}>
 				<HeaderLink href={routes.TRADES} title="Trades">
-					<TradeNotificationCount username={username!} transition:persist client:load />
+					<TradeNotificationCount username={username!} transition:persist client:only="solid-js" />
 					My Trades
 				</HeaderLink>
 			</Show>

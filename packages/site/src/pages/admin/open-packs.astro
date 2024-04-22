@@ -21,7 +21,7 @@ const startCardScale = Astro.cookies.get('openPacksScale')?.value;
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
 		startCardScale={startCardScale ? Number(startCardScale) : undefined}
     adminSecret={Config.AdminImageSecret}
-		client:load>
+		client:only="solid-js">
 		<Header />
 	</OpenPacksComponent>
 </Page>
