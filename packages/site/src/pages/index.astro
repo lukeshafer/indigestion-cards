@@ -3,7 +3,7 @@ import Page from '@/layouts/Page.astro';
 import FAQ_Old from '@/content/faq.md';
 import FAQ from '@/components/FAQ';
 import { ASSETS } from '@/constants';
-import RemainingPackCount from '@/components/RemainingPackCount';
+// import RemainingPackCount from '@/components/RemainingPackCount';
 import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
 
 const siteConfig = await getSiteConfig();
@@ -18,18 +18,21 @@ const siteConfig = await getSiteConfig();
 				<img
 					transition:name="ryan-of-the-wild-hero-card"
 					src={ASSETS.CARDS.HERO_CARD_1}
+          alt=""
 					width="200"
 					class="w-52 origin-top-right translate-x-12 translate-y-6 -rotate-12 shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:translate-y-2"
 				/>
 				<img
 					transition:name="lilindcult-hero-card"
 					src={ASSETS.CARDS.HERO_CARD_2}
+          alt=""
 					width="200"
 					class="w-52 origin-top-left rotate-6 shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:-translate-y-4"
 				/>
 				<img
 					transition:name="lilindheart-hero-card"
 					src={ASSETS.CARDS.HERO_CARD_3}
+          alt=""
 					width="200"
 					class="w-52 origin-top-left -translate-x-12 translate-y-6 rotate-[18deg] shadow-xl shadow-black/50 transition-transform duration-500 ease-in-out hover:translate-y-2"
 				/>
@@ -45,7 +48,7 @@ const siteConfig = await getSiteConfig();
 						<span class="text-brand-main text-shadow-brand block font-bold">
 							community
 						</span>
-						<RemainingPackCount client:idle />
+						<!-- <RemainingPackCount client:only="solid-js" /> -->
 					</h2>
 				) : (
 					<h2
@@ -61,7 +64,7 @@ const siteConfig = await getSiteConfig();
 							</span>
 						</>
 						<p class="py-8 text-xs">* Cards not yet tradeable.</p>
-						<RemainingPackCount client:idle />
+						<!-- <RemainingPackCount client:only="solid-js" /> -->
 					</h2>
 				)
 			}
@@ -72,10 +75,3 @@ const siteConfig = await getSiteConfig();
 		</article>
 	</div>
 </Page>
-
-<style>
-	.hero-card {
-		left: 50%;
-		transform: translateX(-50%);
-	}
-</style>

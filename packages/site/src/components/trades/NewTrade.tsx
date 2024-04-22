@@ -54,7 +54,10 @@ export default function NewTrade(props: {
 
 	const [isLoading, setIsLoading] = createSignal(false);
 
-	const [users] = createResource(async () => get('usernames'));
+	const [users] = createResource(() => get('usernames'), {
+		ssrLoadFrom: 'initial',
+		initialValue: [],
+	});
 
 	createEffect(
 		// When receiverUsername changes, reset requestedCards
@@ -282,7 +285,9 @@ const updateUrlFromState = (state: TradeState) => {
 function Section(props: { heading: string; children: JSX.Element }) {
 	return (
 		<section class="w-full">
-			<Heading classList={{ 'text-center': true }}>{props.heading}</Heading>
+      <div class='text-center'>
+        <Heading>{props.heading}</Heading>
+      </div>
 			{props.children}
 		</section>
 	);
