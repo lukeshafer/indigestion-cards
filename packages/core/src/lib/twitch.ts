@@ -1,7 +1,6 @@
 import { Config } from 'sst/node/config';
 import crypto from 'crypto';
 import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-schemas';
-import fetch from 'node-fetch';
 import { SSM } from '@aws-sdk/client-ssm';
 import { z } from 'zod';
 

@@ -1,14 +1,17 @@
 {
-	"extends": "@tsconfig/node18/tsconfig.json",
-	"compilerOptions": {
-		"module": "esnext",
-		"lib": ["es2023", "DOM"],
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"strict": true,
-		"verbatimModuleSyntax": true,
-		"jsx": "preserve",
-		"jsxImportSource": "solid-js",
-		"moduleResolution": "node",
-	},
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "es2023",
+      "DOM"
+    ],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+  },
 }
