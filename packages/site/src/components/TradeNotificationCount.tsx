@@ -3,6 +3,7 @@ import ButtonCount from './ButtonCount';
 import { get } from '@/lib/client/data';
 
 export default function TradeNotificationCount(props: { username: string }) {
+  console.log('trade notification count')
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {
@@ -19,7 +20,7 @@ export default function TradeNotificationCount(props: { username: string }) {
   //let interval: NodeJS.Timeout;
 	onMount(() => {
 		globalThis.addEventListener?.('astro:page-load', refetch);
-    queueMicrotask(refetch);
+    // queueMicrotask(refetch);
     //interval = setInterval(refetch, 5000);
 	});
 	onCleanup(() => {
