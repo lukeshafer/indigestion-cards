@@ -3,12 +3,18 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
 import { randomUUID } from 'crypto';
 
-export const config = {
+const config = {
 	table: Table.data.tableName,
 	client: new DynamoDBClient(),
 } satisfies EntityConfiguration;
 
-export const auditAttributes = (entityName: string) =>
+const SERVICE = 'indigestion-cards';
+
+function allItemsPKTemplate(entityName: string, service = SERVICE) {
+	return `$${service}#getall_${entityName}`;
+}
+
+const auditAttributes = (entityName: string) =>
 	({
 		createdAt: {
 			type: 'number',
@@ -51,7 +57,7 @@ const audits = new Entity(
 		model: {
 			entity: 'audit',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			entity: {
@@ -102,12 +108,12 @@ const audits = new Entity(
 	config
 );
 
-export const admins = new Entity(
+const Admins = new Entity(
 	{
 		model: {
 			entity: 'admin',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -126,14 +132,25 @@ export const admins = new Entity(
 			...auditAttributes('admin'),
 		},
 		indexes: {
-			allAdmins: {
-				collection: 'siteConfig',
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['userId'],
 				},
 				sk: {
 					field: 'sk',
+					composite: [],
+				},
+			},
+			allAdmins: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					template: allItemsPKTemplate('admin'),
+					composite: [],
+				},
+				sk: {
+					field: 'gsi1sk',
 					composite: ['userId', 'username', 'isStreamer'],
 				},
 			},
@@ -142,12 +159,12 @@ export const admins = new Entity(
 	config
 );
 
-export const cardDesigns = new Entity(
+const CardDesigns = new Entity(
 	{
 		model: {
 			entity: 'cardDesign',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			cardName: {
@@ -240,8 +257,9 @@ export const cardDesigns = new Entity(
 			...auditAttributes('cardDesign'),
 		},
 		indexes: {
-			byDesignId: {
-				collection: 'designAndCards',
+			primary: {
+				type: 'clustered',
+				collection: 'DesignAndCards',
 				pk: {
 					field: 'pk',
 					composite: ['designId'],
@@ -251,23 +269,26 @@ export const cardDesigns = new Entity(
 					composite: [],
 				},
 			},
-			bySeasonId: {
-				collection: 'seasonAndDesigns',
+			allCardDesigns: {
 				index: 'gsi1',
+				type: 'isolated',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['seasonId'],
+					template: allItemsPKTemplate('cardDesign'),
+					composite: [],
 				},
 				sk: {
 					field: 'gsi1sk',
 					composite: ['designId'],
 				},
 			},
-			allDesigns: {
+			bySeason: {
 				index: 'gsi2',
+				type: 'clustered',
+				collection: 'SeasonAndDesignsAndCards',
 				pk: {
 					field: 'gsi2pk',
-					composite: [],
+					composite: ['seasonId'],
 				},
 				sk: {
 					field: 'gsi2sk',
@@ -279,12 +300,12 @@ export const cardDesigns = new Entity(
 	config
 );
 
-export const cardInstances = new Entity(
+const CardInstances = new Entity(
 	{
 		model: {
 			entity: 'cardInstance',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			instanceId: {
@@ -405,8 +426,9 @@ export const cardInstances = new Entity(
 			...auditAttributes('cardInstance'),
 		},
 		indexes: {
-			byId: {
-				collection: 'designAndCards',
+			primary: {
+				type: 'clustered',
+				collection: 'DesignAndCards',
 				pk: {
 					field: 'pk',
 					composite: ['designId'],
@@ -416,9 +438,34 @@ export const cardInstances = new Entity(
 					composite: ['instanceId'],
 				},
 			},
-			byOwnerId: {
-				collection: 'cardsByOwnerName',
+			byDesignAndRarity: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: ['designId'],
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['rarityId', 'instanceId'],
+				},
+			},
+			bySeason: {
+				index: 'gsi2',
+				type: 'clustered',
+				collection: 'SeasonAndDesignsAndCards',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['seasonId'],
+				},
+				sk: {
+					field: 'gsi2sk',
+					composite: ['designId', 'instanceId'],
+				},
+			},
+			byUser: {
 				index: 'gsi3',
+				type: 'clustered',
+				collection: 'UserAndCards',
 				pk: {
 					field: 'gsi3pk',
 					composite: ['username'],
@@ -429,38 +476,16 @@ export const cardInstances = new Entity(
 				},
 			},
 			byPackId: {
-				index: 'gsi2',
-				collection: 'packsAndCards',
+				index: 'gsi4',
+				type: 'clustered',
+				collection: 'PackAndCards',
 				pk: {
-					field: 'gsi2pk',
+					field: 'gsi4pk',
 					composite: ['packId'],
 				},
 				sk: {
-					field: 'gsi2sk',
-					composite: ['instanceId'],
-				},
-			},
-			bySeasonId: {
-				collection: 'seasonAndDesigns',
-				index: 'gsi1',
-				pk: {
-					field: 'gsi1pk',
-					composite: ['seasonId'],
-				},
-				sk: {
-					field: 'gsi1sk',
-					composite: ['designId', 'instanceId'],
-				},
-			},
-			byDesignAndRarity: {
-				index: 'gsi4',
-				pk: {
-					field: 'gsi4pk',
-					composite: ['designId'],
-				},
-				sk: {
 					field: 'gsi4sk',
-					composite: ['rarityId', 'instanceId'],
+					composite: ['instanceId'],
 				},
 			},
 		},
@@ -468,12 +493,12 @@ export const cardInstances = new Entity(
 	config
 );
 
-export const momentRedemptions = new Entity(
+const MomentRedemptions = new Entity(
 	{
 		model: {
 			entity: 'momentRedemption',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			momentDate: {
@@ -503,11 +528,12 @@ export const momentRedemptions = new Entity(
 					composite: ['userId'],
 				},
 			},
-			getAll: {
+			allMomentRedemptions: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
 					composite: [],
+					template: allItemsPKTemplate('momentRedemption'),
 				},
 				sk: {
 					field: 'gsi1sk',
@@ -519,12 +545,12 @@ export const momentRedemptions = new Entity(
 	config
 );
 
-export const packTypes = new Entity(
+const PackTypes = new Entity(
 	{
 		model: {
 			entity: 'packType',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			packTypeId: {
@@ -575,25 +601,36 @@ export const packTypes = new Entity(
 			...auditAttributes('packType'),
 		},
 		indexes: {
-			allPackTypes: {
-				collection: 'siteConfig',
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['packTypeId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['packTypeId'],
+					composite: [],
 				},
 			},
-			bySeasonId: {
+			allPackTypes: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['seasonId'],
+					composite: [],
+					template: allItemsPKTemplate('packType'),
 				},
 				sk: {
 					field: 'gsi1sk',
+					composite: ['packTypeId'],
+				},
+			},
+			bySeason: {
+				index: 'gsi2',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['seasonId'],
+				},
+				sk: {
+					field: 'gsi2sk',
 					composite: ['packTypeId'],
 				},
 			},
@@ -602,12 +639,12 @@ export const packTypes = new Entity(
 	config
 );
 
-export const packs = new Entity(
+const Packs = new Entity(
 	{
 		model: {
 			entity: 'pack',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			packId: {
@@ -692,36 +729,49 @@ export const packs = new Entity(
 			...auditAttributes('pack'),
 		},
 		indexes: {
-			allPacks: {
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['packId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['packId'],
+					composite: [],
 				},
 			},
-			byUsername: {
+			allPacks: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['username'],
+					composite: [],
+					template: allItemsPKTemplate('pack'),
 				},
 				sk: {
 					field: 'gsi1sk',
 					composite: ['packId'],
 				},
 			},
-			byPackId: {
+			byUsername: {
 				index: 'gsi2',
-				collection: 'packsAndCards',
 				pk: {
 					field: 'gsi2pk',
-					composite: ['packId'],
+					composite: ['username'],
 				},
 				sk: {
 					field: 'gsi2sk',
+					composite: ['packId'],
+				},
+			},
+			byPackId: {
+				index: 'gsi4',
+				type: 'clustered',
+				collection: 'PackAndCards',
+				pk: {
+					field: 'gsi4pk',
+					composite: ['packId'],
+				},
+				sk: {
+					field: 'gsi4sk',
 					composite: [],
 				},
 			},
@@ -730,18 +780,18 @@ export const packs = new Entity(
 	config
 );
 
-export const preorders = new Entity(
+const Preorders = new Entity(
 	{
 		model: {
 			entity: 'preorder',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
-			id: {
+			preorderId: {
 				type: 'string',
 				required: true,
-				default: randomUUID(),
+				default: randomUUID,
 			},
 			userId: {
 				type: 'string',
@@ -757,11 +807,36 @@ export const preorders = new Entity(
 			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['preorderId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['username', 'id', 'createdAt'],
+					composite: [],
+				},
+			},
+			allPreorders: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: [],
+					template: allItemsPKTemplate('preorder'),
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['username', 'preorderId', 'createdAt'],
+				},
+			},
+			byUser: {
+				index: 'gsi3',
+				type: 'clustered',
+				collection: 'UserAndCards',
+				pk: {
+					field: 'gsi3pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi3sk',
+					composite: ['preorderId'],
 				},
 			},
 		},
@@ -769,12 +844,12 @@ export const preorders = new Entity(
 	config
 );
 
-export const rarities = new Entity(
+const Rarities = new Entity(
 	{
 		model: {
 			entity: 'rarity',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			rarityId: {
@@ -800,14 +875,25 @@ export const rarities = new Entity(
 			...auditAttributes('rarity'),
 		},
 		indexes: {
-			allRarities: {
-				collection: 'siteConfig',
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['rarityId'],
 				},
 				sk: {
 					field: 'sk',
+					composite: [],
+				},
+			},
+			allRarities: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: [],
+					template: allItemsPKTemplate('rarity'),
+				},
+				sk: {
+					field: 'gsi1sk',
 					composite: ['rarityId'],
 				},
 			},
@@ -816,12 +902,12 @@ export const rarities = new Entity(
 	config
 );
 
-export const seasons = new Entity(
+const Seasons = new Entity(
 	{
 		model: {
 			entity: 'season',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			seasonName: {
@@ -838,25 +924,38 @@ export const seasons = new Entity(
 			...auditAttributes('season'),
 		},
 		indexes: {
-			allSeasons: {
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['seasonId'],
 				},
 				sk: {
 					field: 'sk',
-					composite: ['seasonId'],
+					composite: [],
 				},
 			},
-			bySeasonId: {
-				collection: 'seasonAndDesigns',
+			allSeasons: {
 				index: 'gsi1',
 				pk: {
 					field: 'gsi1pk',
-					composite: ['seasonId'],
+					composite: [],
+					template: allItemsPKTemplate('season'),
 				},
 				sk: {
 					field: 'gsi1sk',
+					composite: ['seasonId'],
+				},
+			},
+			bySeason: {
+				type: 'clustered',
+				collection: 'SeasonAndDesignsAndCards',
+				index: 'gsi2',
+				pk: {
+					field: 'gsi2pk',
+					composite: ['seasonId'],
+				},
+				sk: {
+					field: 'gsi2sk',
 					composite: [],
 				},
 			},
@@ -865,12 +964,12 @@ export const seasons = new Entity(
 	config
 );
 
-export const siteConfig = new Entity(
+const SiteConfig = new Entity(
 	{
 		model: {
 			entity: 'siteConfig',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			baseRarity: {
@@ -946,6 +1045,7 @@ export const siteConfig = new Entity(
 				pk: {
 					field: 'pk',
 					composite: [],
+					template: allItemsPKTemplate('siteConfig'),
 				},
 				sk: {
 					field: 'sk',
@@ -1010,12 +1110,12 @@ const tradeCardsProperties = {
 	},
 } as const;
 
-export const trades = new Entity(
+const Trades = new Entity(
 	{
 		model: {
 			entity: 'trade',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			tradeId: {
@@ -1157,12 +1257,12 @@ export const trades = new Entity(
 	config
 );
 
-export const twitchEventMessageHistory = new Entity(
+const TwitchEventMessageHistory = new Entity(
 	{
 		model: {
 			entity: 'twitchEventMessageHistory',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			message_id: {
@@ -1195,12 +1295,12 @@ export const twitchEventTypes = [
 	'channel.channel_points_custom_reward_redemption.add',
 	'channel.subscription.gift',
 ] as const;
-export const twitchEvents = new Entity(
+const TwitchEvents = new Entity(
 	{
 		model: {
 			entity: 'twitchEvents',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			eventId: {
@@ -1237,6 +1337,7 @@ export const twitchEvents = new Entity(
 				pk: {
 					field: 'pk',
 					composite: [],
+					template: allItemsPKTemplate('twitchEvents'),
 				},
 				sk: {
 					field: 'sk',
@@ -1248,12 +1349,12 @@ export const twitchEvents = new Entity(
 	config
 );
 
-export const unmatchedImages = new Entity(
+const UnmatchedImages = new Entity(
 	{
 		model: {
 			entity: 'unmatchedImage',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			imageId: {
@@ -1264,7 +1365,7 @@ export const unmatchedImages = new Entity(
 				type: 'string',
 				required: true,
 			},
-			type: {
+			unmatchedImageType: {
 				type: ['cardDesign', 'frame'] as const,
 				required: true,
 			},
@@ -1274,7 +1375,7 @@ export const unmatchedImages = new Entity(
 			byType: {
 				pk: {
 					field: 'pk',
-					composite: ['type'],
+					composite: ['unmatchedImageType'],
 				},
 				sk: {
 					field: 'sk',
@@ -1286,12 +1387,12 @@ export const unmatchedImages = new Entity(
 	config
 );
 
-export const userLogins = new Entity(
+const UserLogins = new Entity(
 	{
 		model: {
 			entity: 'userLogin',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -1306,22 +1407,35 @@ export const userLogins = new Entity(
 			hasProfile: {
 				type: 'boolean',
 			},
-			...auditAttributes('admin'),
+			...auditAttributes('userLogin'),
 		},
 		indexes: {
-			allLogins: {
+			primary: {
 				pk: {
 					field: 'pk',
-					composite: [],
+					composite: ['userId'],
 				},
 				sk: {
 					field: 'sk',
+					composite: [],
+				},
+			},
+			allLogins: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: [],
+					template: allItemsPKTemplate('userLogin'),
+				},
+				sk: {
+					field: 'gsi1sk',
 					composite: ['userId'],
 				},
 			},
 			byUsername: {
 				index: 'gsi3',
-				collection: 'cardsByOwnerName',
+				type: 'clustered',
+				collection: 'UserAndCards',
 				pk: {
 					field: 'gsi3pk',
 					composite: ['username'],
@@ -1336,12 +1450,12 @@ export const userLogins = new Entity(
 	config
 );
 
-export const users = new Entity(
+const Users = new Entity(
 	{
 		model: {
 			entity: 'user',
 			version: '1',
-			service: 'indigestion-cards',
+			service: SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -1464,9 +1578,22 @@ export const users = new Entity(
 					composite: [],
 				},
 			},
+			allUsers: {
+				index: 'gsi1',
+				pk: {
+					field: 'gsi1pk',
+					composite: [],
+					template: allItemsPKTemplate('user'),
+				},
+				sk: {
+					field: 'gsi1sk',
+					composite: ['userId'],
+				},
+			},
 			byUsername: {
 				index: 'gsi3',
-				collection: 'cardsByOwnerName',
+				type: 'clustered',
+				collection: 'UserAndCards',
 				pk: {
 					field: 'gsi3pk',
 					composite: ['username'],
@@ -1483,22 +1610,22 @@ export const users = new Entity(
 
 export const db = new Service(
 	{
-		admins,
-		cardDesigns,
-		cardInstances,
-		momentRedemptions,
-		packs,
-		packTypes,
-		preorders,
-		rarities,
-		seasons,
-		siteConfig,
-		trades,
-		twitchEventMessageHistory,
-		twitchEvents,
-		unmatchedImages,
-		userLogins,
-		users,
+		Admins,
+		CardDesigns,
+		CardInstances,
+		MomentRedemptions,
+		Packs,
+		PackTypes,
+		Preorders,
+		Rarities,
+		Seasons,
+		SiteConfig,
+		Trades,
+		TwitchEventMessageHistory,
+		TwitchEvents,
+		UnmatchedImages,
+		UserLogins,
+		Users,
 	},
 	config
 );

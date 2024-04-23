@@ -1,26 +1,23 @@
-import { packs, type Pack } from "../db/packs";
+import { db } from '../db'
+import type { Pack, CardInstance } from "../db.types";
 import type { DBResult } from "../types";
 import { checkIfUserExists, createNewUser, getUser } from "./user";
-import { Service } from "electrodb";
-import { config } from "../db/_utils";
-import { users } from "../db/users";
-import { type CardInstance, cardInstances } from "../db/cardInstances";
 import { type CardPool, generateCard, getCardPoolFromType } from "./card-pool";
 import type { PackDetails, PackDetailsWithoutUser } from "./entity-schemas";
 import { PackTypeIsOutOfCardsError } from "./errors";
 
 export async function getAllPacks(): Promise<Pack[]> {
-	const result = await packs.query.allPacks({}).go();
+	const result = await db.entities.Packs.query.allPacks({}).go();
 	return result.data;
 }
 
 export async function getPackById(args: { packId: string }) {
-	const result = await packs.query.byPackId(args).go();
+	const result = await db.entities.Packs.query.byPackId(args).go();
 	return result.data[0];
 }
 
 export async function findPackForUser(args: { username: string }) {
-	const result = await packs.query.byUsername({ username: args.username }).go();
+	const result = await db.entities.Packs.query.byUsername({ username: args.username }).go();
 	if (result.data.length === 0) return null;
 	return result.data[0];
 }
@@ -90,33 +87,24 @@ export async function updatePackUser(options: {
 
 	const oldUserList = oldUser ? [oldUser] : [];
 
-	const service = new Service(
-		{
-			packs,
-			users,
-			cardInstances,
-		},
-		config,
-	);
-
-	await service.transaction
-		.write(({ packs, cardInstances, users }) => [
-			packs
+	await db.transaction
+		.write(({ Packs, CardInstances, Users }) => [
+			Packs
 				.patch({ packId: pack.packId })
 				.set({ userId: user.userId, username: user.username })
 				.commit(),
 			...pack.cardDetails.map((card) =>
-				cardInstances
+				CardInstances
 					.patch({ instanceId: card.instanceId, designId: card.designId })
 					.set({ userId: user.userId, username: user.username })
 					.commit(),
 			),
-			users
+			Users
 				.patch({ userId: user.userId })
 				.set({ packCount: (user.packCount || 0) + 1 })
 				.commit(),
 			...oldUserList.map((oldUser) =>
-				users
+				Users
 					.patch({ userId: oldUser.userId })
 					.set({ packCount: (oldUser.packCount || 1) - 1 })
 					.commit(),
@@ -129,27 +117,18 @@ export async function deleteFirstPackForUser(args: {
 	username: string;
 	userId: string;
 }): Promise<DBResult<Pack | null>> {
-	const service = new Service(
-		{
-			packs,
-			users,
-			cardInstances,
-		},
-		config,
-	);
-
 	try {
 		const pack = await findPackForUser(args);
 		if (!pack) return { success: false, error: "User has no pack to delete!" };
 
 		const openedCount = pack.cardDetails.filter((card) => card.opened).length;
 		const user = await getUser(args.userId);
-		const result = await service.transaction
-			.write(({ users, cardInstances, packs }) => [
-				packs.delete({ packId: pack.packId }).commit(),
+		const result = await db.transaction
+			.write(({ Users, CardInstances, Packs }) => [
+				Packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							users
+							Users
 								.patch({ userId: pack.userId })
 								// if packCount is null OR 0, set it to 0, otherwise subtract 1
 								.set({
@@ -160,7 +139,7 @@ export async function deleteFirstPackForUser(args: {
 					  ]
 					: []),
 				...(pack.cardDetails?.map((card) =>
-					cardInstances
+					CardInstances
 						.delete({ designId: card.designId, instanceId: card.instanceId })
 						.commit(),
 				) ?? []),
@@ -189,26 +168,17 @@ export async function deleteFirstPackForUser(args: {
 }
 
 export async function deletePack(args: { packId: string }) {
-	const service = new Service(
-		{
-			packs,
-			users,
-			cardInstances,
-		},
-		config,
-	);
-
 	const pack = await getPackById({ packId: args.packId });
 
 	const user = pack.userId ? await getUser(pack.userId) : null;
 	const openCount = pack.cardDetails.filter((card) => card.opened).length;
 
-	const result = await service.transaction
-		.write(({ users, cardInstances, packs }) => [
-			packs.delete({ packId: args.packId }).commit(),
+	const result = await db.transaction
+		.write(({ Users, CardInstances, Packs }) => [
+			Packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						users
+						Users
 							.patch({ userId: pack.userId })
 							// if packCount is null OR 0, set it to 0, otherwise subtract 1
 							.set({
@@ -219,7 +189,7 @@ export async function deletePack(args: { packId: string }) {
 				  ]
 				: []),
 			...(pack.cardDetails?.map((card) =>
-				cardInstances
+				CardInstances
 					.delete({ designId: card.designId, instanceId: card.instanceId })
 					.commit(),
 			) ?? []),
@@ -242,15 +212,6 @@ export async function createPack(args: {
 		packTypeName: string;
 	};
 }) {
-	const service = new Service(
-		{
-			packs,
-			users,
-			cardInstances,
-		},
-		config,
-	);
-
 	const packId = generatePackId({ userId: args.userId || "_" });
 
 	const user =
@@ -268,7 +229,7 @@ export async function createPack(args: {
 			packId,
 			cardPool,
 		});
-		cardPool.cardInstances.push(card);
+		cardPool.CardInstances.push(card);
 		cards.push(card);
 	}
 
@@ -279,17 +240,17 @@ export async function createPack(args: {
 		cardPool: undefined,
 	});
 
-	const result = await service.transaction
-		.write(({ users, packs, cardInstances }) => [
+	const result = await db.transaction
+		.write(({ Users, Packs, CardInstances }) => [
 			...(user && args.userId && args.username
 				? [
-						users
+						Users
 							.patch({ userId: user.userId })
 							.set({ packCount: (user.packCount ?? 0) + 1 })
 							.commit(),
 				  ]
 				: []),
-			packs
+			Packs
 				.create({
 					packId,
 					packTypeId: args.packType.packTypeId,
@@ -312,7 +273,7 @@ export async function createPack(args: {
 					})),
 				})
 				.commit(),
-			...cards.map((card) => cardInstances.create(card).commit()),
+			...cards.map((card) => CardInstances.create(card).commit()),
 		])
 		.go();
 
@@ -323,11 +284,11 @@ export async function batchUpdatePackUsername(args: {
 	oldUsername: string;
 	newUsername: string;
 }) {
-	const existingPacks = await packs.query
+	const existingPacks = await db.entities.Packs.query
 		.byUsername({ username: args.oldUsername })
 		.go();
 
-	return await packs
+	return await db.entities.Packs
 		.put(
 			existingPacks.data.map((pack) => ({
 				...pack,

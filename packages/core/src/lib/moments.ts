@@ -1,22 +1,23 @@
 import { z } from 'zod';
-import { momentRedemptions, type MomentRedemption } from '../db/moments';
+import { db } from '../db';
+import type { MomentRedemption } from '../db.types';
 
 export async function createMomentRedemption(options: { userId: string; username: string }) {
-	await momentRedemptions.upsert(options).go();
+	await db.entities.MomentRedemptions.upsert(options).go();
 }
 
 export async function getAllMomentRedemptions() {
-	const moments = await momentRedemptions.query.getAll({}).go();
+	const moments = await db.entities.MomentRedemptions.query.allMomentRedemptions({}).go();
 	return moments.data;
 }
 
 export async function getMomentRedemptionsForDate(date: string) {
-	const moments = await momentRedemptions.query.primary({ momentDate: date }).go();
+	const moments = await db.entities.MomentRedemptions.query.primary({ momentDate: date }).go();
 	return moments.data;
 }
 
 export async function deleteMomentRedemption(redemption: { momentDate: string; userId: string }) {
-	const result = await momentRedemptions.delete(redemption).go();
+	const result = await db.entities.MomentRedemptions.delete(redemption).go();
 	return result.data;
 }
 

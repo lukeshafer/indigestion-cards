@@ -2,12 +2,7 @@ import { FULL_ART_ID, LEGACY_CARD_ID, SHIT_PACK_RARITY_ID } from '../constants';
 import { getCardDesignAndInstancesById } from './design';
 import { getPackById } from './pack';
 import { getUser } from './user';
-import { Service } from 'electrodb';
-import { packs } from '../db/packs';
-import { users } from '../db/users';
-import { cardDesigns } from '../db/cardDesigns';
-import { config } from '../db/_utils';
-import { cardInstances } from '../db/cardInstances';
+import { db } from '../db';
 
 interface RarityForComparison {
 	rarityId: string;
@@ -32,24 +27,14 @@ export async function openCardFromPack(args: {
 	packId: string;
 }) {
 	const {
-		cardDesigns: [design],
-		cardInstances: instances,
+		CardDesigns: [design],
+		CardInstances: instances,
 	} = await getCardDesignAndInstancesById({ designId: args.designId });
-	const instance = instances.find((c) => c.instanceId === args.instanceId);
+	const instance = instances.find(c => c.instanceId === args.instanceId);
 
 	if (!instance) {
 		throw new Error('Card not found');
 	}
-
-	const db = new Service(
-		{
-			packs,
-			users,
-			cardDesigns,
-			cardInstances,
-		},
-		config
-	);
 
 	if (instance.openedAt || !instance.packId) {
 		console.log("Card already opened or doesn't belong to a pack");
@@ -62,7 +47,7 @@ export async function openCardFromPack(args: {
 			};
 		}
 
-		const cardInPack = pack.cardDetails?.find((c) => c.instanceId === args.instanceId);
+		const cardInPack = pack.cardDetails?.find(c => c.instanceId === args.instanceId);
 		if (!cardInPack) {
 			return {
 				success: false,
@@ -77,11 +62,11 @@ export async function openCardFromPack(args: {
 			};
 		}
 
-		const newCardDetails = pack.cardDetails?.map((c) =>
+		const newCardDetails = pack.cardDetails?.map(c =>
 			c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 		);
 
-		const deletePack = newCardDetails.every((c) => c.opened);
+		const deletePack = newCardDetails.every(c => c.opened);
 
 		const userId = instance.userId;
 		const user = userId ? await getUser(userId) : null;
@@ -95,41 +80,38 @@ export async function openCardFromPack(args: {
 		);
 
 		await db.transaction
-			.write(({ packs, users, cardDesigns }) => [
+			.write(({ Packs, Users, CardDesigns }) => [
 				deletePack
-					? packs.delete({ packId: args.packId }).commit()
-					: packs
-						.patch({ packId: args.packId })
-						.set({ cardDetails: newCardDetails })
-						.commit(),
+					? Packs.delete({ packId: args.packId }).commit()
+					: Packs.patch({ packId: args.packId })
+							.set({ cardDetails: newCardDetails })
+							.commit(),
 				...(user
 					? [
-						users
-							.patch({ userId: user.userId })
-							.set({
-								cardCount: (user.cardCount ?? 0) + 1,
-								packCount: deletePack
-									? (user.packCount ?? 1) - 1
-									: user.packCount,
-							})
-							.commit(),
-					]
+							Users.patch({ userId: user.userId })
+								.set({
+									cardCount: (user.cardCount ?? 0) + 1,
+									packCount: deletePack
+										? (user.packCount ?? 1) - 1
+										: user.packCount,
+								})
+								.commit(),
+						]
 					: []),
 				...(updateRarity
 					? [
-						cardDesigns
-							.patch({ designId: args.designId })
-							.set({
-								bestRarityFound: {
-									rarityId: instance.rarityId,
-									rarityName: instance.rarityName,
-									count: instance.totalOfType,
-									frameUrl: instance.frameUrl,
-									rarityColor: instance.rarityColor,
-								},
-							})
-							.commit(),
-					]
+							CardDesigns.patch({ designId: args.designId })
+								.set({
+									bestRarityFound: {
+										rarityId: instance.rarityId,
+										rarityName: instance.rarityName,
+										count: instance.totalOfType,
+										frameUrl: instance.frameUrl,
+										rarityColor: instance.rarityColor,
+									},
+								})
+								.commit(),
+						]
 					: []),
 			])
 			.go();
@@ -148,12 +130,12 @@ export async function openCardFromPack(args: {
 	const user = await getUser(userId);
 	if (!user) throw new Error('User not found');
 
-	const newCardDetails = pack.cardDetails?.map((c) =>
+	const newCardDetails = pack.cardDetails?.map(c =>
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
-	const deletePack = newCardDetails.every((c) => c.opened);
+	const deletePack = newCardDetails.every(c => c.opened);
 	const isShitPack = deletePack
-		? newCardDetails.every((c) => c.rarityId.startsWith(SHIT_PACK_RARITY_ID))
+		? newCardDetails.every(c => c.rarityId.startsWith(SHIT_PACK_RARITY_ID))
 		: false;
 
 	const updateRarity = checkIsRarityBetter(
@@ -165,9 +147,8 @@ export async function openCardFromPack(args: {
 	);
 
 	const result = await db.transaction
-		.write(({ cardInstances, cardDesigns, users, packs }) => [
-			cardInstances
-				.patch(args)
+		.write(({ CardInstances, CardDesigns, Users, Packs }) => [
+			CardInstances.patch(args)
 				.set({
 					openedAt: new Date().toISOString(),
 					packId: undefined,
@@ -176,31 +157,29 @@ export async function openCardFromPack(args: {
 						: instance.stamps,
 				})
 				.commit(),
-			users
-				.patch({ userId })
+			Users.patch({ userId })
 				.set({
 					cardCount: (user.cardCount ?? 0) + 1,
 					packCount: deletePack ? (user.packCount ?? 1) - 1 : user.packCount,
 				})
 				.commit(),
 			deletePack
-				? packs.delete({ packId: packId }).commit()
-				: packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
+				? Packs.delete({ packId: packId }).commit()
+				: Packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
 			...(updateRarity
 				? [
-					cardDesigns
-						.patch({ designId: args.designId })
-						.set({
-							bestRarityFound: {
-								rarityId: instance.rarityId,
-								rarityName: instance.rarityName,
-								count: instance.totalOfType,
-								frameUrl: instance.frameUrl,
-								rarityColor: instance.rarityColor,
-							},
-						})
-						.commit(),
-				]
+						CardDesigns.patch({ designId: args.designId })
+							.set({
+								bestRarityFound: {
+									rarityId: instance.rarityId,
+									rarityName: instance.rarityName,
+									count: instance.totalOfType,
+									frameUrl: instance.frameUrl,
+									rarityColor: instance.rarityColor,
+								},
+							})
+							.commit(),
+					]
 				: []),
 		])
 		.go();
