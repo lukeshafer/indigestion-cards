@@ -1,6 +1,6 @@
 import { Auth } from 'sst/node/future/auth';
 import type { APIRoute } from 'astro';
-import { authApi } from '@/constants';
+import { authApi } from '@site/constants';
 import { Config } from 'sst/node/config';
 
 export const GET: APIRoute = async (ctx) => {

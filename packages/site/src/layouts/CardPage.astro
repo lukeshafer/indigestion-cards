@@ -1,13 +1,12 @@
 ---
-import { routes } from '@/constants';
-import { Anchor, Heading, PageTitle } from '@/components/text';
-import PreviewableCard from '@/components/cards/PreviewableCard';
-import PinCardToProfileButton from '@/components/cards/PinCardToProfileButton';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import type { User } from '@lil-indigestion-cards/core/db/users';
-import CardTradeHistory from '@/components/cards/CardTradeHistory.astro';
-import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
-import { checkIsCardTradeable } from '@lil-indigestion-cards/core/lib/trades';
+import { routes } from '@site/constants';
+import { Anchor, Heading, PageTitle } from '@site/components/text';
+import PreviewableCard from '@site/components/cards/PreviewableCard';
+import PinCardToProfileButton from '@site/components/cards/PinCardToProfileButton';
+import CardTradeHistory from '@site/components/cards/CardTradeHistory.astro';
+import type { CardInstance, User } from '@core/types';
+import { getSiteConfig } from '@core/lib/site-config';
+import { checkIsCardTradeable } from '@core/lib/trades';
 
 const session = Astro.locals.session;
 const siteConfig = await getSiteConfig();

@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getCardInstanceById } from '@lib/card';
-import { getUser } from '@lib/user';
-import { routeNames, routes } from '@/constants';
-import CardPage from '@/layouts/CardPage.astro';
+import Page from '@site/layouts/Page.astro';
+import { getCardInstanceById } from '@core/lib/card';
+import { getUser } from '@core/lib/user';
+import { routeNames, routes } from '@site/constants';
+import CardPage from '@site/layouts/CardPage.astro';
 
 const session = Astro.locals.session;
 

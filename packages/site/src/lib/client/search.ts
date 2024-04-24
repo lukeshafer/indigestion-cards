@@ -1,4 +1,4 @@
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import type { CardInstance } from '@core/types';
 import Fuse from 'fuse.js';
 
 export function getCardSearcher(cards: ( CardInstance & { checked: boolean } )[]) {

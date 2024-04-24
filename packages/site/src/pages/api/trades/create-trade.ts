@@ -1,6 +1,6 @@
-import { createApiRoute } from '@/lib/action';
-import { InputValidationError, ServerError } from '@lil-indigestion-cards/core/lib/errors';
-import { createTradeFromApi } from '@lil-indigestion-cards/core/lib/trades';
+import { createApiRoute } from '@site/lib/action';
+import { InputValidationError, ServerError } from '@core/lib/errors';
+import { createTradeFromApi } from '@core/lib/trades';
 
 export const POST = createApiRoute(
 	{

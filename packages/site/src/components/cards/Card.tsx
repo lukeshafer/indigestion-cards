@@ -1,6 +1,6 @@
 import TiltCardEffect from './TiltCardEffect';
-import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@/constants';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@site/constants';
+import type { CardInstance } from '@core/types';
 import { Show } from 'solid-js';
 
 interface Props extends Partial<CardInstance> {

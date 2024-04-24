@@ -1,12 +1,12 @@
 ---
-import Page from '@/layouts/Page.astro';
-import Card from '@/components/cards/Card';
-import CardList from '@/components/cards/CardList';
-import { getCardDesignAndInstancesById } from '@lib/design';
-import { getRarityRanking, getSiteConfig } from '@lib/site-config';
-import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@/constants';
-import { PageTitle } from '@/components/text';
-import { Heading } from '@/components/text';
+import Page from '@site/layouts/Page.astro';
+import Card from '@site/components/cards/Card';
+import CardList from '@site/components/cards/CardList';
+import { getCardDesignAndInstancesById } from '@core/lib/design';
+import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
+import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@site/constants';
+import { PageTitle } from '@site/components/text';
+import { Heading } from '@site/components/text';
 
 const designId = Astro.params.designId;
 

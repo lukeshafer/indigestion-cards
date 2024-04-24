@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { TypedResponse } from '@/lib/api';
-import { getUserByUserName } from '@lil-indigestion-cards/core/lib/user';
+import { TypedResponse } from '@site/lib/api';
+import { getUserByUserName } from '@core/lib/user';
 
 export const GET = (async (ctx) => {
 	const { username } = ctx.params;

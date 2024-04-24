@@ -1,12 +1,12 @@
 ---
 // UI
-import { PageHeader, PageTitle } from '@/components/text';
-import { routeNames, routes } from '@/constants';
-import Page, { type Props as PageProps } from '@/layouts/Page.astro';
-import NewTrade from '@/components/trades/NewTrade';
-import { getUser, getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { getRarityRanking, getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { PageHeader, PageTitle } from '@site/components/text';
+import { routeNames, routes } from '@site/constants';
+import Page, { type Props as PageProps } from '@site/layouts/Page.astro';
+import NewTrade from '@site/components/trades/NewTrade';
+import { getUser, getUserAndOpenedCardInstances } from '@core/lib/user';
+import type { CardInstance } from '@core/types';
+import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
 
 const { userId } = Astro.locals.user?.properties || {};
 
@@ -29,8 +29,8 @@ let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
 
 const rarityRanking = getRarityRanking(await getSiteConfig());
 
-const { cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
-const { cardInstances: initialReceiverCards = [], users: initialReceiverUser = [] } =
+const { CardInstances: cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
+const { CardInstances: initialReceiverCards = [], Users: initialReceiverUser = [] } =
 	initialReceiverUsername
 		? (await getUserAndOpenedCardInstances({ username: initialReceiverUsername })) ?? {}
 		: {};

@@ -1,14 +1,14 @@
 ---
-import CardList from '@/components/cards/CardList';
-import Page from '@/layouts/Page.astro';
-import { createNewUser, getUserAndOpenedCardInstances } from '@lib/user';
-import { getUserByLogin } from '@lib/twitch';
-import { getRarityRanking, getSiteConfig } from '@lib/site-config';
-import { routes, routeNames } from '@/constants';
-import { Anchor, Heading } from '@/components/text';
-import UserLookingFor from '@/components/user/UserLookingFor';
-import Card from '@/components/cards/Card';
-import type { Props as HeaderProps } from '@/components/Header.astro';
+import CardList from '@site/components/cards/CardList';
+import Page from '@site/layouts/Page.astro';
+import { createNewUser, getUserAndOpenedCardInstances } from '@core/lib/user';
+import { getUserByLogin } from '@core/lib/twitch';
+import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
+import { routes, routeNames } from '@site/constants';
+import { Anchor, Heading } from '@site/components/text';
+import UserLookingFor from '@site/components/user/UserLookingFor';
+import Card from '@site/components/cards/Card';
+import type { Props as HeaderProps } from '@site/components/Header.astro';
 
 console.log('username page')
 type Logo = HeaderProps['logo'];

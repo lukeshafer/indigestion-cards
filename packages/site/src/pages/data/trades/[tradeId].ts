@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { TypedResponse } from '@/lib/api';
-import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
+import { TypedResponse } from '@site/lib/api';
+import { getTrade } from '@core/lib/trades';
 
 export const GET = (async (ctx) => {
 	const { tradeId } = ctx.params;

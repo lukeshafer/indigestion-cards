@@ -1,14 +1,14 @@
 ---
-import { DeleteButton, Form, SubmitButton, Anchor } from '@/components/form/Form';
-import { Heading } from '@/components/text';
-import OfferWindow from '@/components/trades/OfferWindow';
-import TradeMessageHistory from '@/components/trades/TradeMessageHistory';
-import { routeNames, routes } from '@/constants';
-import Page from '@/layouts/Page.astro';
-import { removeTradeNotification } from '@lil-indigestion-cards/core/lib/user';
-import { getTrade } from '@lil-indigestion-cards/core/lib/trades';
+import { DeleteButton, Form, SubmitButton, Anchor } from '@site/components/form/Form';
+import { Heading } from '@site/components/text';
+import OfferWindow from '@site/components/trades/OfferWindow';
+import TradeMessageHistory from '@site/components/trades/TradeMessageHistory';
+import { routeNames, routes } from '@site/constants';
+import Page from '@site/layouts/Page.astro';
+import { removeTradeNotification } from '@core/lib/user';
+import { getTrade } from '@core/lib/trades';
 import { Show } from 'solid-js';
-import { formatTradeLink } from '@/lib/client/utils';
+import { formatTradeLink } from '@site/lib/client/utils';
 
 const userId = Astro.locals.session?.properties.userId || undefined;
 

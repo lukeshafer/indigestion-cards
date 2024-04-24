@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
-import CardList from '@/components/cards/CardList';
-import { getAllCardDesigns } from '@lib/design';
-import { routeNames } from '@/constants';
-import { PageTitle, PageHeader } from '@/components/text';
+import Page from '@site/layouts/Page.astro';
+import CardList from '@site/components/cards/CardList';
+import { getAllCardDesigns } from '@core/lib/design';
+import { routeNames } from '@site/constants';
+import { PageTitle, PageHeader } from '@site/components/text';
 
 const designs = await getAllCardDesigns();
 
