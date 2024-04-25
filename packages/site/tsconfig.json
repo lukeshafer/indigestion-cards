@@ -18,7 +18,7 @@
         "../core/src/lib/*"
       ],
       "@core/types": [
-        "../core/src/db.types"
+        "../core/src/types"
       ]
     },
     "jsx": "preserve",

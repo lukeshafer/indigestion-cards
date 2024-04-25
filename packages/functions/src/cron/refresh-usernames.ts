@@ -1,5 +1,5 @@
-import { getListOfTwitchUsersByIds } from '@lib/twitch';
-import { getAllUsers, updateUsername } from '@lib/user';
+import { getListOfTwitchUsersByIds } from '@core/lib/twitch';
+import { getAllUsers, updateUsername } from '@core/lib/user';
 
 export async function handler() {
 	const users = await getAllUsers();

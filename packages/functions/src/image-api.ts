@@ -2,11 +2,11 @@ import { S3 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { Config } from 'sst/node/config';
-import { getCardInstanceByDesignAndRarity } from '@lil-indigestion-cards/core/lib/card';
-import { parseS3Url } from '@lil-indigestion-cards/core/lib/images';
-import { getCardDesignById } from '@lil-indigestion-cards/core/lib/design';
-import { getRarityById } from '@lil-indigestion-cards/core/lib/rarity';
-import { FULL_ART_ID, LEGACY_CARD_ID } from '@lil-indigestion-cards/core/constants';
+import { getCardInstanceByDesignAndRarity } from '@core/lib/card';
+import { parseS3Url } from '@core/lib/images';
+import { getCardDesignById } from '@core/lib/design';
+import { getRarityById } from '@core/lib/rarity';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
 import { Bucket } from 'sst/node/bucket';
 
 const s3 = new S3({ region: 'us-east-2' });

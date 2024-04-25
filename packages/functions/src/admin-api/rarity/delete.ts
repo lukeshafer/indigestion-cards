@@ -1,6 +1,6 @@
-import { SiteHandler } from '@lib/api';
-import { deleteRarityById } from '@lib/rarity';
-import { deleteS3ObjectByUrl } from '@lib/images';
+import { SiteHandler } from '@core/lib/api';
+import { deleteRarityById } from '@core/lib/rarity';
+import { deleteS3ObjectByUrl } from '@core/lib/images';
 
 export const handler = SiteHandler(
 	{

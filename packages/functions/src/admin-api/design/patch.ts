@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { updateCardDesign } from '@lib/design';
+import { SiteHandler } from '@core/lib/api';
+import { updateCardDesign } from '@core/lib/design';
 
 export const handler = SiteHandler(
 	{

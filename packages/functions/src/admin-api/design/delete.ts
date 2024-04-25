@@ -1,6 +1,6 @@
-import { SiteHandler } from '@lib/api';
-import { deleteCardDesignById } from '@lib/design';
-import { deleteS3ObjectByUrl } from '@lib/images';
+import { SiteHandler } from '@core/lib/api';
+import { deleteCardDesignById } from '@core/lib/design';
+import { deleteS3ObjectByUrl } from '@core/lib/images';
 
 export const handler = SiteHandler(
 	{

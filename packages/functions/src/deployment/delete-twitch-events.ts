@@ -2,7 +2,7 @@ import { Api } from 'sst/node/api';
 import {
 	getActiveTwitchEventSubscriptions,
 	deleteTwitchEventSubscription,
-} from '@lib/twitch';
+} from '@core/lib/twitch';
 
 export async function handler() {
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();

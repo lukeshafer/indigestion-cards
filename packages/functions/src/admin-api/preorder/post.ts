@@ -1,7 +1,7 @@
-import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
-import { createNewUser, getUserByUserName } from '@lil-indigestion-cards/core/lib/user';
-import { createPreorder } from '@lil-indigestion-cards/core/lib/preorder';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { SiteHandler } from '@core/lib/api';
+import { createNewUser, getUserByUserName } from '@core/lib/user';
+import { createPreorder } from '@core/lib/preorder';
+import { getUserByLogin } from '@core/lib/twitch';
 
 export const handler = SiteHandler(
 	{

@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { openCardFromPack } from '@lib/open-pack';
+import { SiteHandler } from '@core/lib/api';
+import { openCardFromPack } from '@core/lib/open-pack';
 
 export const handler = SiteHandler(
 	{

@@ -5,6 +5,7 @@ import { migration as cardTradeHistoryFlipToFrom } from './card-trade-history-fl
 import { migration as secretsToSSM } from './secrets-to-ssm'
 import { migration as instances1To2 } from './instances-1-to-2'
 
+// TODO: remove legacy migrations, once final migration to new db is complete
 export async function migration() {
 	await packs1To2();
 	await addBestRarityFound();

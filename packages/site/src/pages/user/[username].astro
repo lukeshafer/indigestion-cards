@@ -37,9 +37,9 @@ if (!userData) {
 			userId: twitchData.id,
 		});
 		userData = {
-			users: [newUser],
-			cardInstances: [],
-			userLogins: [],
+			Users: [newUser],
+			CardInstances: [],
+			UserLogins: [],
 		};
 		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`);
 	}
@@ -48,14 +48,14 @@ if (!userData) {
 
 const siteConfig = await getSiteConfig();
 
-const { users, cardInstances } = userData;
-const user = users[0] || {
+const { Users, CardInstances } = userData;
+const user = Users[0] || {
 	username: id,
 	userId: twitchData?.id,
 };
 
 const pinnedCard = user.pinnedCard;
-const unpinnedCards = cardInstances.filter(
+const unpinnedCards = CardInstances.filter(
 	card => card.instanceId !== pinnedCard?.instanceId
 );
 

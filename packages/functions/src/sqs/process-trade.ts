@@ -4,8 +4,8 @@ import {
   getTrade,
   processTrade,
   setTradeStatusToFailed,
-} from '@lil-indigestion-cards/core/lib/trades';
-import { UserDoesNotOwnCardError } from '@lil-indigestion-cards/core/lib/errors';
+} from '@core/lib/trades';
+import { UserDoesNotOwnCardError } from '@core/lib/errors';
 
 const tradeEvent = z.object({
   detail: z.object({

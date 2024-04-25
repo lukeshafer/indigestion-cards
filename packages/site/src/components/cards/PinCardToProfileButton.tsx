@@ -1,4 +1,4 @@
-import { USER_API } from '@/constants';
+import { USER_API } from '@site/constants';
 import { Form, SubmitButton } from '../form/Form';
 import { createSignal } from 'solid-js';
 

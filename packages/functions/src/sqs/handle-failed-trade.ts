@@ -1,7 +1,7 @@
 import type { SQSEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { getTrade, setTradeStatusToFailed } from '@lil-indigestion-cards/core/lib/trades';
-import { addMessageToSiteConfig } from '@lib/site-config';
+import { getTrade, setTradeStatusToFailed } from '@core/lib/trades';
+import { addMessageToSiteConfig } from '@core/lib/site-config';
 
 const tradeEvent = z.object({
   detail: z.object({

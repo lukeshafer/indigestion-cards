@@ -1,10 +1,10 @@
 import type { SQSEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { givePackToUser } from '@lib/pack';
-import { packSchema } from '@lib/entity-schemas';
-import { setAdminEnvSession } from '@lib/session';
-import { createPreorder } from '@lib/preorder';
-import { PackTypeIsOutOfCardsError } from '@lil-indigestion-cards/core/lib/errors';
+import { givePackToUser } from '@core/lib/pack';
+import { packSchema } from '@core/lib/entity-schemas';
+import { setAdminEnvSession } from '@core/lib/session';
+import { createPreorder } from '@core/lib/preorder';
+import { PackTypeIsOutOfCardsError } from '@core/lib/errors';
 
 export async function handler(event: SQSEvent) {
 	console.log('Received event to give pack to user');

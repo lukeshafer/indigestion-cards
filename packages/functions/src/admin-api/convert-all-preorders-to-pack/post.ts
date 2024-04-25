@@ -1,8 +1,8 @@
-import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
-import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
-import { givePackToUser } from '@lil-indigestion-cards/core/lib/pack';
-import { getPackTypeById } from '@lil-indigestion-cards/core/lib/pack-type';
-import { deletePreorder, getAllPreorders } from '@lil-indigestion-cards/core/lib/preorder';
+import type { Preorder } from '@core/types';
+import { SiteHandler } from '@core/lib/api';
+import { givePackToUser } from '@core/lib/pack';
+import { getPackTypeById } from '@core/lib/pack-type';
+import { deletePreorder, getAllPreorders } from '@core/lib/preorder';
 
 export const handler = SiteHandler(
 	{

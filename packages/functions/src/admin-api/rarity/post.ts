@@ -1,9 +1,9 @@
 import { Bucket } from 'sst/node/bucket';
 
-import { SiteHandler } from '@lib/api';
-import { createRarity } from '@lib/rarity';
-import { deleteUnmatchedDesignImage } from '@lib/unmatched-image';
-import { moveImageBetweenBuckets, createS3Url } from '@lib/images';
+import { SiteHandler } from '@core/lib/api';
+import { createRarity } from '@core/lib/rarity';
+import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
+import { moveImageBetweenBuckets, createS3Url } from '@core/lib/images';
 
 export const handler = SiteHandler(
 	{
@@ -44,7 +44,7 @@ export const handler = SiteHandler(
 			key: params.imageKey,
 			destinationBucket: Bucket.FrameDesigns.bucketName,
 		});
-		await deleteUnmatchedDesignImage({ imageId: params.imageKey, type: 'frame' });
+		await deleteUnmatchedDesignImage({ imageId: params.imageKey, unmatchedImageType: 'frame' });
 
 		return { statusCode: 200, body: 'Rarity created!' };
 	}

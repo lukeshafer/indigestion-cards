@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { updateFaq } from '@lib/site-config';
+import { SiteHandler } from '@core/lib/api';
+import { updateFaq } from '@core/lib/site-config';
 
 export const handler = SiteHandler(
 	{

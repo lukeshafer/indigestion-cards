@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { createSeason } from '@lib/season';
+import { SiteHandler } from '@core/lib/api';
+import { createSeason } from '@core/lib/season';
 
 export const handler = SiteHandler(
 	{

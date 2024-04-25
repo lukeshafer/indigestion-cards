@@ -9,8 +9,8 @@ import {
 	deleteTwitchEventSubscription,
 	type SubscriptionType,
 	type TwitchEvent,
-} from '@lib/twitch';
-import { setAdminEnvSession } from '@lib/session';
+} from '@core/lib/twitch';
+import { setAdminEnvSession } from '@core/lib/session';
 import { useSession } from 'sst/node/future/auth';
 
 export const handler = ApiHandler(async () => {

@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { getAllAdminUsers } from '@lib/admin-user';
+import { SiteHandler } from '@core/lib/api';
+import { getAllAdminUsers } from '@core/lib/admin-user';
 
 export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
 	const users = await getAllAdminUsers();

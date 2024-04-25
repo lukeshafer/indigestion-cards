@@ -1,6 +1,6 @@
 import type { S3Handler } from 'aws-lambda';
-import { createUnmatchedDesignImage } from '@lib/unmatched-image';
-import { setAdminEnvSession } from '@lib/session';
+import { createUnmatchedDesignImage } from '@core/lib/unmatched-image';
+import { setAdminEnvSession } from '@core/lib/session';
 
 export const handler: S3Handler = async (event) => {
 	setAdminEnvSession('S3 Event', 's3_event');
@@ -13,7 +13,7 @@ export const handler: S3Handler = async (event) => {
 		await createUnmatchedDesignImage({
 			url: `https://${record.s3.bucket.name}.s3.amazonaws.com/${key}`,
 			imageId: key,
-			type: 'cardDesign',
+			unmatchedImageType: 'cardDesign',
 		});
 	});
 };

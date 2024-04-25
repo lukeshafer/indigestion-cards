@@ -3,11 +3,11 @@ import { Issuer } from 'openid-client';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { AuthHandler, OauthAdapter } from 'sst/node/future/auth';
-import { createNewUser, getUser } from '@lib/user';
-import { getAdminUserById } from '@lib/admin-user';
-import { createNewUserLogin, getUserLoginById, updateUserLogin } from '@lib/user-login';
-import { setAdminEnvSession } from '@lib/session';
-import { setTwitchTokens, getListOfTwitchUsersByIds } from '@lib/twitch';
+import { createNewUser, getUser } from '@core/lib/user';
+import { getAdminUserById } from '@core/lib/admin-user';
+import { createNewUserLogin, getUserLoginById, updateUserLogin } from '@core/lib/user-login';
+import { setAdminEnvSession } from '@core/lib/session';
+import { setTwitchTokens, getListOfTwitchUsersByIds } from '@core/lib/twitch';
 import { sessions } from './sessions';
 
 //const callbackPath = '/api/auth/callback';
