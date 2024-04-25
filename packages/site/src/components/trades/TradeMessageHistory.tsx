@@ -1,8 +1,8 @@
-import type { Trade } from '@lil-indigestion-cards/core/db/trades';
+import type { Trade } from '@core/types';
 import { For, Match, Switch, createResource, type ResourceActions, Show, onMount } from 'solid-js';
 import { SubmitButton, TextInput } from '../form/Form';
-import { get } from '@/lib/client/data';
-import { routes } from '@/constants';
+import { get } from '@site/lib/client/data';
+import { routes } from '@site/constants';
 
 export default function TradeMessageHistory(props: { trade: Trade; loggedInUserId?: string }) {
   const [messages, messagesActions] = createResource(

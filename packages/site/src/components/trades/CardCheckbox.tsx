@@ -1,4 +1,4 @@
-import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
+import type { TradeCard } from '@core/types';
 import type { TradeCardUi } from './NewTrade';
 import Card from '../cards/Card';
 

@@ -1,8 +1,8 @@
-import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
+import type { TradeCard } from '@core/types';
 import { For } from 'solid-js';
 import Card from '../cards/Card';
 import { produce } from 'solid-js/store';
-import { routes } from '@/constants';
+import { routes } from '@site/constants';
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];

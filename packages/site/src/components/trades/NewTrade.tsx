@@ -1,14 +1,13 @@
 import { createStore } from 'solid-js/store';
-import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
+import type { TradeCard, CardInstance } from '@core/types';
 import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@/constants';
-import { Heading } from '@/components/text';
-import { get } from '@/lib/client/data';
+import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@site/constants';
+import { Heading } from '@site/components/text';
+import { get } from '@site/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
-import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import type { RarityRankingRecord } from '@core/lib/site-config';
 import { navigate } from 'astro:transitions/client';
 
 type TradeState = {
@@ -285,9 +284,9 @@ const updateUrlFromState = (state: TradeState) => {
 function Section(props: { heading: string; children: JSX.Element }) {
 	return (
 		<section class="w-full">
-      <div class='text-center'>
-        <Heading>{props.heading}</Heading>
-      </div>
+			<div class="text-center">
+				<Heading>{props.heading}</Heading>
+			</div>
 			{props.children}
 		</section>
 	);

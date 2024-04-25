@@ -1,6 +1,6 @@
 import { Show, createResource } from 'solid-js';
 import ButtonCount from '../ButtonCount';
-import { get } from '@/lib/client/data';
+import { get } from '@site/lib/client/data';
 
 export default function TotalPackCount() {
 	const [count] = createResource(async () => get('pack-count').then(d => d.packCount));

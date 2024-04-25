@@ -16,8 +16,8 @@
       ],
       "@core/lib/*": [
         "../core/src/lib/*"
-      ]
-			"@core/types": [
+      ],
+      "@core/types": [
         "../core/src/db.types"
       ]
     },

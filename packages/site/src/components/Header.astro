@@ -1,13 +1,13 @@
 ---
-import HeaderLink from '@/components/HeaderLink.astro';
-import UserConfig from '@/components/UserConfig';
-import UserSearch from '@/components/UserSearch';
-import { ASSETS, routes } from '@/constants';
-import { getUserByLogin } from '@lib/twitch';
+import HeaderLink from '@site/components/HeaderLink.astro';
+import UserConfig from '@site/components/UserConfig';
+import UserSearch from '@site/components/UserSearch';
+import { ASSETS, routes } from '@site/constants';
+import { getUserByLogin } from '@core/lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
 import TotalPackCount from './pack/TotalPackCount';
-import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import { getSiteConfig } from '@core/lib/site-config';
 
 export interface Props {
 	logo?: keyof typeof logos;

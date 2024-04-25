@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
-import type { TwitchUser } from '@lib/twitch';
+import type { TwitchUser } from '@core/lib/twitch';
 import UserIcon from './icons/UserIcon';
-import { authApi } from '@/constants';
+import { authApi } from '@site/constants';
 
 export default function UserConfig(props: {
 	disableAnimations?: boolean;

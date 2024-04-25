@@ -1,6 +1,6 @@
 import { createSignal, useContext } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
-import { API, ASSETS } from '@/constants';
+import { API, ASSETS } from '@site/constants';
 import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
 import Card from '../cards/Card';

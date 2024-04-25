@@ -3,7 +3,7 @@ import { OpenPacksContext } from './OpenPacksContext';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 import { Statistics } from './Statistics';
 import { ShowcaseCard } from './ShowcaseCard';
-import { routes } from '@/constants';
+import { routes } from '@site/constants';
 
 export function PackShowcase() {
 	const state = useContext(OpenPacksContext);

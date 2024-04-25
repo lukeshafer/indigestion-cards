@@ -1,4 +1,4 @@
-import { get } from '@/lib/client/data';
+import { get } from '@site/lib/client/data';
 import { createResource, For } from 'solid-js';
 
 export default function RemainingPackCount() {

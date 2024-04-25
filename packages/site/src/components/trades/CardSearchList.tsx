@@ -1,12 +1,12 @@
 import type { TradeCardUi } from './NewTrade';
 import { createMemo, createSignal, For } from 'solid-js';
-import type { TradeCard } from '@lil-indigestion-cards/core/db/trades';
-import { getCardSearcher } from '@/lib/client/search';
+import type { TradeCard } from '@core/types';
+import { getCardSearcher } from '@site/lib/client/search';
 import { Select, TextInput } from '../form/Form';
 import { produce } from 'solid-js/store';
 import CardCheckbox from './CardCheckbox';
 import { sortTypes, type SortType, sortCards } from '../cards/CardList';
-import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import type { RarityRankingRecord } from '@core/lib/site-config';
 
 export default function CardSearchList(props: {
 	label: string;

@@ -1,6 +1,6 @@
 import { createContext } from 'solid-js';
 /***/
-import type { Pack } from '@lil-indigestion-cards/core/db/packs';
+import type { Pack } from '@core/types';
 /***/
 
 export const OpenPacksContext = createContext<OpenPacksState>({
