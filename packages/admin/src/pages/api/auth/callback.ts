@@ -1,4 +1,4 @@
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN } from '@admin/constants';
 import type { APIContext } from 'astro';
 import { Config } from 'sst/node/config';
 import { Auth } from 'sst/node/future/auth';

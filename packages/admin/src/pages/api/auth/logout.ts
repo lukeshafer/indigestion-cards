@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN } from '@admin/constants';
 
 export const POST: APIRoute = async (ctx) => {
 	console.log('Logout request ', {

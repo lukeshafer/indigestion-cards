@@ -1,12 +1,12 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lib/pack-type';
-import { getAllRarities } from '@lib/rarity';
-import { getTwitchEvents, getSiteConfig, getRarityRanking } from '@lib/site-config';
-import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import TwitchLoginButton from '@/components/site-config/TwitchLoginButton.astro';
-import SiteConfigForm from '@/components/site-config/SiteConfigForm';
-import RefreshTwitchEventsButton from '@/components/site-config/RefreshTwitchEventsButton';
+import Page from '@admin/layouts/Page.astro';
+import { getAllPackTypes } from '@core/lib/pack-type';
+import { getAllRarities } from '@core/lib/rarity';
+import { getTwitchEvents, getSiteConfig, getRarityRanking } from '@core/lib/site-config';
+import { TWITCH_GIFT_SUB_ID } from '@core/constants';
+import TwitchLoginButton from '@admin/components/site-config/TwitchLoginButton.astro';
+import SiteConfigForm from '@admin/components/site-config/SiteConfigForm';
+import RefreshTwitchEventsButton from '@admin/components/site-config/RefreshTwitchEventsButton';
 
 const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
 	getTwitchEvents(),

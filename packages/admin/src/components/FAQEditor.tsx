@@ -1,7 +1,7 @@
 import { SolidMarkdown } from 'solid-markdown';
 import { createSignal } from 'solid-js';
 import { Form, SubmitButton, TextArea } from './form/Form';
-import { API } from '@/constants';
+import { API } from '@admin/constants';
 
 export default function FAQEditor(props: { faq: string }) {
   const [content, setContent] = createSignal(props.faq);

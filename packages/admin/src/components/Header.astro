@@ -1,7 +1,7 @@
 ---
-import HeaderLink from '@/components/HeaderLink.astro';
+import HeaderLink from '@admin/components/HeaderLink.astro';
 import UserConfig from './UserConfig';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
+import { getUserByLogin } from '@core/lib/twitch';
 
 const username = Astro.locals.session?.properties.username;
 

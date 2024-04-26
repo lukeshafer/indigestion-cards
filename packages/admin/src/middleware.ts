@@ -1,11 +1,11 @@
-import type { MiddlewareResponseHandler } from 'astro';
+import type { MiddlewareHandler } from 'astro';
 import { sequence } from 'astro/middleware';
-import { getAdminUserById } from '@lib/admin-user';
+import { getAdminUserById } from '@core/lib/admin-user';
 import { AUTH_TOKEN } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
-import type { Session } from '@lil-indigestion-cards/core/types';
+import type { Session } from '@core/types';
 
-const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
+const transformMethod: MiddlewareHandler = async (ctx, next) => {
 	const formMethod = ctx.url.searchParams.get('formmethod');
 	if (!formMethod) return next();
 	if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(formMethod.toUpperCase())) return next();
@@ -17,7 +17,7 @@ const transformMethod: MiddlewareResponseHandler = async (ctx, next) => {
 	return next();
 };
 
-const auth: MiddlewareResponseHandler = async (ctx, next) => {
+const auth: MiddlewareHandler = async (ctx, next) => {
 	const cookie = ctx.cookies.get(AUTH_TOKEN);
 
 	// @ts-expect-error - cookie string is a fine input for this function

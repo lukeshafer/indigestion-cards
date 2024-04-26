@@ -1,4 +1,4 @@
-import Table from '@/components/table/Table';
+import Table from '@admin/components/table/Table';
 
 export default function DesignOverviewTable(props: {
 	rarityStatsArray: {

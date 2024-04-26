@@ -1,5 +1,5 @@
-import { DeleteButton, Form } from '@/components/form/Form';
-import { API } from '@/constants';
+import { DeleteButton, Form } from '@admin/components/form/Form';
+import { API } from '@admin/constants';
 
 export default function DeleteAdminUserButton(props: {
 	userId: string;

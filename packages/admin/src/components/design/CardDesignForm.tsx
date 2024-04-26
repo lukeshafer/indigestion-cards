@@ -1,4 +1,4 @@
-import { API, routes } from '@/constants';
+import { API, routes } from '@admin/constants';
 import {
 	Checkbox,
 	Fieldset,
@@ -9,12 +9,11 @@ import {
 	SubmitButton,
 	TextArea,
 	TextInput,
-} from '@/components/form/Form';
-import Card from '@/components/cards/Card';
-import DeleteImageButton from '@/components/image/DeleteImageButton';
+} from '@admin/components/form/Form';
+import Card from '@admin/components/cards/Card';
+import DeleteImageButton from '@admin/components/image/DeleteImageButton';
 import { For, createSignal } from 'solid-js';
-import type { Season } from '@lil-indigestion-cards/core/db/season';
-import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
+import type { Season, Rarity } from '@core/types';
 
 export default function CardDesignForm(props: {
 	imgUrl: string;

@@ -1,7 +1,7 @@
 ---
-import { getUnmatchedDesignImages } from '@lib/unmatched-image';
+import { getUnmatchedDesignImages } from '@core/lib/unmatched-image';
 import { Bucket } from 'sst/node/bucket';
-import { routes } from '@/constants';
+import { routes } from '@admin/constants';
 
 type UnmatchedImageType = NonNullable<Parameters<typeof getUnmatchedDesignImages>[0]>;
 interface Props {
@@ -31,7 +31,7 @@ const urlByType = {
 			<ul class="flex flex-wrap gap-4">
 				{unmatchedImages.map((image) => (
 					<li>
-						<a rel="prefetch" href={`${urlByType[image.type]}${image.imageId}`}>
+						<a rel="prefetch" href={`${urlByType[image.unmatchedImageType]}${image.imageId}`}>
 							<img
 								src={image.url}
 								width="300"

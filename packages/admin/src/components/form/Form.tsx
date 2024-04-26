@@ -1,7 +1,7 @@
 import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
-import { setAlerts } from '@/lib/client/state';
-import { ASSETS } from '@/constants';
-import { useViewTransition } from '@/lib/client/utils';
+import { setAlerts } from '@admin/lib/client/state';
+import { ASSETS } from '@admin/constants';
+import { useViewTransition } from '@admin/lib/client/utils';
 
 export function Form(props: {
 	children: JSX.Element;

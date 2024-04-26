@@ -3,10 +3,10 @@ import { Bucket } from 'sst/node/bucket';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { S3Client } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
-import Page from '@/layouts/Page.astro';
-import { Form, FileInput, SubmitButton } from '@/components/form/Form';
-import { routes } from '@/constants';
-import { PageTitle, PageHeader } from '@/components/text';
+import Page from '@admin/layouts/Page.astro';
+import { Form, FileInput, SubmitButton } from '@admin/components/form/Form';
+import { routes } from '@admin/constants';
+import { PageTitle, PageHeader } from '@admin/components/text';
 
 const s3 = new S3Client({ region: 'us-east-2' });
 const presigned = await createPresignedPost(s3, {

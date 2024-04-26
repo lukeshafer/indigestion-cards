@@ -1,4 +1,4 @@
-import { API, routes } from '@/constants';
+import { API, routes } from '@admin/constants';
 import { DeleteButton, Form } from '../form/Form';
 
 export default function DeletePackTypeButton(props: { packTypeId: string }) {

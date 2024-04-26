@@ -1,15 +1,15 @@
 ---
-import CardList from '@/components/cards/CardList';
-import Page from '@/layouts/Page.astro';
-import { getUserAndCardInstances, createNewUser } from '@lib/user';
-import { getUserByLogin } from '@lib/twitch';
-import { getRarityRanking } from '@lib/site-config';
-import { routes } from '@/constants';
-import AdminOnly from '@/components/AdminOnly.astro';
-import { getAllPackTypes } from '@lib/pack-type';
-import { Heading } from '@/components/text';
-import UserPackForms from '@/components/pack/UserPackForms';
-import Card from '@/components/cards/Card';
+import CardList from '@admin/components/cards/CardList';
+import Page from '@admin/layouts/Page.astro';
+import { getUserAndCardInstances, createNewUser } from '@core/lib/user';
+import { getUserByLogin } from '@core/lib/twitch';
+import { getRarityRanking } from '@core/lib/site-config';
+import { routes } from '@admin/constants';
+import AdminOnly from '@admin/components/AdminOnly.astro';
+import { getAllPackTypes } from '@core/lib/pack-type';
+import { Heading } from '@admin/components/text';
+import UserPackForms from '@admin/components/pack/UserPackForms';
+import Card from '@admin/components/cards/Card';
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -35,23 +35,23 @@ if (!userData) {
 			userId: twitchData.id,
 		});
 		userData = {
-			users: [newUser],
-			cardInstances: [],
-			userLogins: [],
+			Users: [newUser],
+			CardInstances: [],
+			UserLogins: [],
 		};
 		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`);
 	}
 	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
 }
 
-const { users, cardInstances } = userData;
-const user = users[0] || {
+const { Users, CardInstances } = userData;
+const user = Users[0] || {
 	username: id,
 	userId: twitchData?.id,
 };
 
 const pinnedCard = user.pinnedCard;
-const cardsNotInPack = cardInstances.filter(
+const cardsNotInPack = CardInstances.filter(
 	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
 );
 

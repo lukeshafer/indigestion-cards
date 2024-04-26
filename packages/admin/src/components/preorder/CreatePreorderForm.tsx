@@ -1,4 +1,4 @@
-import { API } from "@/constants";
+import { API } from "@admin/constants";
 import { Form, SubmitButton, TextInput } from "../form/Form";
 
 export default function CreatePreorderForm() {

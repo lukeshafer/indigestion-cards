@@ -1,4 +1,4 @@
-import { getAllUsers } from '@lib/user';
+import { getAllUsers } from '@core/lib/user';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async () => {

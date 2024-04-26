@@ -1,5 +1,5 @@
-import { API, routes } from '@/constants';
-import { Form, TextInput, IdInput, SubmitButton, NumberInput } from '@/components/form/Form';
+import { API, routes } from '@admin/constants';
+import { Form, TextInput, IdInput, SubmitButton, NumberInput } from '@admin/components/form/Form';
 import { createSignal } from 'solid-js';
 import DeleteImageButton from '../image/DeleteImageButton';
 import { css } from '@acab/ecsstatic';

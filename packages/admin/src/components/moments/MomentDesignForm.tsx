@@ -1,12 +1,12 @@
-import { API, routes } from '@/constants';
-import { Form, IdInput, Select, SubmitButton, TextArea, TextInput } from '@/components/form/Form';
-import Card from '@/components/cards/Card';
-import DeleteImageButton from '@/components/image/DeleteImageButton';
+import { API, routes } from '@admin/constants';
+import { Form, IdInput, Select, SubmitButton, TextArea, TextInput } from '@admin/components/form/Form';
+import Card from '@admin/components/cards/Card';
+import DeleteImageButton from '@admin/components/image/DeleteImageButton';
 import { createSignal } from 'solid-js';
-import type { Season } from '@lil-indigestion-cards/core/db/season';
-import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
-import type { MomentRedemption } from '@lil-indigestion-cards/core/db/moments';
-import type { MomentCardInput } from '@lil-indigestion-cards/core/lib/moments';
+import type { Season } from '@core/types';
+import type { Rarity } from '@core/types';
+import type { MomentRedemption } from '@core/types';
+import type { MomentCardInput } from '@core/lib/moments';
 
 export default function CardDesignForm(props: {
 	imgUrl: string;

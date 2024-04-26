@@ -38,7 +38,7 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 			this.rows.value = queryAndFormatRows(this);
 
 			this.columns?.forEach(
-				(column) =>
+				column =>
 					column.sort &&
 					column.element.addEventListener('click', () => {
 						this.#updateSortModeAndColumn(column);
@@ -77,7 +77,7 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 			const searchColumn = this.getAttribute('search-column');
 			if (!filter || !searchColumn) return this.sortedRows.value;
 
-			return this.sortedRows.value.filter((row) => {
+			return this.sortedRows.value.filter(row => {
 				const cell = row.cells.get(searchColumn);
 				if (!cell?.value) return false;
 				return cell.value.toLowerCase().includes(filter);
@@ -88,7 +88,7 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 		attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
 			switch (name) {
 				case 'search': {
-          this.filter.value = newValue;
+					this.filter.value = newValue;
 				}
 			}
 		}
@@ -131,7 +131,9 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 	};
 
 	function queryAndFormatColumns(el: HTMLElement): Array<Column> {
-		return [...el.querySelectorAll<HTMLTableCellElement>('thead th')].map((th) => ({
+		const els = Array.from(el.querySelectorAll<HTMLTableCellElement>('thead th'));
+
+		return els.map(th => ({
 			element: th,
 			name: th.dataset.name || '',
 			label: th.dataset.label || th.textContent || '',
@@ -145,11 +147,12 @@ const { class: className = '', 'search-column': searchColumn, ...props } = Astro
 	}
 
 	function queryAndFormatRows(el: HTMLElement): Array<Row> {
-		return [...el.querySelectorAll<HTMLTableRowElement>('tbody tr')].map((row) => ({
+		const els = Array.from(el.querySelectorAll<HTMLTableRowElement>('tbody tr'));
+		return els.map(row => ({
 			element: row,
 			cells: new Map(
-				[...row.querySelectorAll('td')].map(
-					(cell) =>
+				Array.from(row.querySelectorAll('td')).map(
+					cell =>
 						[
 							cell.dataset.column!,
 							{

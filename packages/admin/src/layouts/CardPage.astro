@@ -1,9 +1,9 @@
 ---
-import { routes } from '@/constants';
-import { Heading, PageTitle } from '@/components/text';
-import PreviewableCard from '@/components/cards/PreviewableCard';
-import AdminOnly from '@/components/AdminOnly.astro';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
+import { routes } from '@admin/constants';
+import { Heading, PageTitle } from '@admin/components/text';
+import PreviewableCard from '@admin/components/cards/PreviewableCard';
+import AdminOnly from '@admin/components/AdminOnly.astro';
+import type { CardInstance } from '@core/types';
 
 interface Props {
 	card: CardInstance;
