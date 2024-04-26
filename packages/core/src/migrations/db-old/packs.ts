@@ -1,60 +1,12 @@
-import { Entity } from 'electrodb';
+import { Entity, type EntityItem } from 'electrodb';
+import { config, auditAttributes } from './_utils';
 
-import { config, auditAttributes } from '../db/_utils';
-import { packs } from '../db/packs';
-import { cardInstances } from '../db/cardInstances';
-
-export async function migration() {
-	const toMove = await oldPacks.scan.go();
-	let count = 0;
-	for (const pack of toMove.data) {
-		console.log(`Processing pack ${++count} of ${toMove.data.length}`);
-		const newPack = {
-			...pack,
-			cardDetails: await Promise.all(
-				pack.cardDetails.map(async (card, index) => {
-					console.log(`Processing card ${index + 1} of ${pack.cardDetails.length}`);
-					const cardEntity = await cardInstances  .query
-						.byId({ designId: card.designId, instanceId: card.instanceId })
-						.go();
-					console.log({
-						message: `Card ${index + 1} of ${pack.cardDetails.length} processed`,
-						card: cardEntity.data,
-					});
-					return {
-						...card,
-						cardNumber: cardEntity.data[0].cardNumber,
-						totalOfType: cardEntity.data[0].totalOfType,
-						rarityColor: cardEntity.data[0].rarityColor,
-					};
-				})
-			),
-		};
-		console.log({
-			message: 'Creating new pack',
-			packId: newPack.packId,
-			pack: JSON.stringify(newPack, null, 2),
-		});
-
-		try {
-			const result = await packs.create(newPack).go();
-			if (result) {
-				await oldPacks.delete(pack).go();
-			}
-		} catch (err) {
-			console.error(err);
-			if (await packs.query.byPackId({ packId: newPack.packId }).go()) {
-				await oldPacks.delete(pack).go();
-			} else throw err;
-		}
-	}
-}
-
-const oldPacks = new Entity(
+export type Pack = EntityItem<typeof packs>;
+export const packs = new Entity(
 	{
 		model: {
 			entity: 'pack',
-			version: '1',
+			version: '2',
 			service: 'card-app',
 		},
 		attributes: {
@@ -113,6 +65,10 @@ const oldPacks = new Entity(
 							type: 'string',
 							required: true,
 						},
+						rarityColor: {
+							type: 'string',
+							required: true,
+						},
 						frameUrl: {
 							type: 'string',
 							required: true,
@@ -121,6 +77,14 @@ const oldPacks = new Entity(
 							type: 'boolean',
 							required: true,
 							default: false,
+						},
+						cardNumber: {
+							type: 'number',
+							required: true,
+						},
+						totalOfType: {
+							type: 'number',
+							required: true,
 						},
 					},
 				},
