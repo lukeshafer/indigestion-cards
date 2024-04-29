@@ -1,4 +1,4 @@
-import { type EntityItem, type CreateEntityItem, type UpdateEntityItem } from 'electrodb';
+import type { EntityItem, CreateEntityItem, UpdateEntityItem } from 'electrodb';
 import type { db } from './db';
 
 export type Admin = EntityItem<typeof db.entities.Admins>;
