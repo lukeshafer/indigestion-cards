@@ -29,7 +29,9 @@ if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
 	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
-const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
+const user = session?.properties.userId
+	? getUser(session.properties.userId)
+	: Promise.resolve(null);
 ---
 
 <Page
@@ -41,5 +43,5 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
 		{ label: `${instance.rarityName} #${instance.cardNumber}` },
 	]}>
-	<CardPage card={instance} user={user ?? undefined} />
+	{user.then(user => <CardPage card={instance} user={user ?? undefined} />)}
 </Page>

@@ -6,7 +6,7 @@ import Page, { type Props as PageProps } from '@site/layouts/Page.astro';
 import NewTrade from '@site/components/trades/NewTrade';
 import { getUser, getUserAndOpenedCardInstances } from '@core/lib/user';
 import type { CardInstance } from '@core/types';
-import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
+import { getRarityRanking, } from '@core/lib/site-config';
 
 const { userId } = Astro.locals.user?.properties || {};
 
@@ -27,7 +27,7 @@ const offeredCardIds = searchParams.getAll('offeredCards');
 const requestedCardIds = searchParams.getAll('requestedCards');
 let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
 
-const rarityRanking = getRarityRanking(await getSiteConfig());
+const rarityRanking = getRarityRanking(Astro.locals.siteConfig);
 
 const { CardInstances: cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
 const { CardInstances: initialReceiverCards = [], Users: initialReceiverUser = [] } =

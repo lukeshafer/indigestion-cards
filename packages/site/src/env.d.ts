@@ -4,6 +4,7 @@
 declare global {
   namespace App {
     interface Locals {
+      siteConfig: SiteConfig;
       session: Session | null;
       admin: AdminSession | null;
       user: UserSession | AdminSession | null;
@@ -12,6 +13,7 @@ declare global {
 }
 
 import type { Session as AuthSession } from '@lil-indigestion-cards/core/types';
+import type { SiteConfig } from '../../core/src/db.types';
 
 declare type Session = AuthSession;
 

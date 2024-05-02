@@ -3,7 +3,7 @@ import Page from '@site/layouts/Page.astro';
 import Card from '@site/components/cards/Card';
 import CardList from '@site/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@core/lib/design';
-import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
+import { getRarityRanking } from '@core/lib/site-config';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@site/constants';
 import { PageTitle } from '@site/components/text';
 import { Heading } from '@site/components/text';
@@ -25,7 +25,7 @@ if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
-const siteConfig = await getSiteConfig();
+const siteConfig = Astro.locals.siteConfig;
 const rarityRanking = getRarityRanking(siteConfig);
 
 const baseRarity = design.bestRarityFound ||
@@ -73,7 +73,14 @@ const openedInstances = instances.filter(instance => instance.openedAt);
 			client:load
 			cards={openedInstances}
 			showUsernames
-			sortOnlyBy={['rarest', 'common', 'owner-asc', 'owner-desc', 'open-date-desc', 'open-date-asc']}
+			sortOnlyBy={[
+				'rarest',
+				'common',
+				'owner-asc',
+				'owner-desc',
+				'open-date-desc',
+				'open-date-asc',
+			]}
 			rarityRanking={rarityRanking}
 		/>
 	</section>

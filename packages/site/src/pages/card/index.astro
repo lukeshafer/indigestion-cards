@@ -5,8 +5,7 @@ import { getAllCardDesigns } from '@core/lib/design';
 import { routeNames } from '@site/constants';
 import { PageTitle, PageHeader } from '@site/components/text';
 
-const designs = await getAllCardDesigns();
-
+const designs = getAllCardDesigns();
 const filters = [...Astro.url.searchParams.entries()];
 ---
 
@@ -14,22 +13,26 @@ const filters = [...Astro.url.searchParams.entries()];
 	<PageHeader>
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
-	<CardList
-		client:load
-		{filters}
-		cards={designs.map(card => {
-			const bestRarity = card.bestRarityFound;
+	{
+		designs.then(designs => (
+			<CardList
+				client:load
+				{filters}
+				cards={designs.map(card => {
+					const bestRarity = card.bestRarityFound;
 
-			return {
-				...card,
-				rarityName: bestRarity?.rarityName ?? '',
-				rarityId: bestRarity?.rarityId ?? '',
-				frameUrl: bestRarity?.frameUrl ?? '',
-				rarityColor: bestRarity?.rarityColor ?? '',
-				totalOfType: bestRarity?.count ?? 1,
-				cardNumber: 1,
-			};
-		})}
-		sortOnlyBy={['card-name-asc', 'card-name-desc']}
-	/>
+					return {
+						...card,
+						rarityName: bestRarity?.rarityName ?? '',
+						rarityId: bestRarity?.rarityId ?? '',
+						frameUrl: bestRarity?.frameUrl ?? '',
+						rarityColor: bestRarity?.rarityColor ?? '',
+						totalOfType: bestRarity?.count ?? 1,
+						cardNumber: 1,
+					};
+				})}
+				sortOnlyBy={['card-name-asc', 'card-name-desc']}
+			/>
+		))
+	}
 </Page>

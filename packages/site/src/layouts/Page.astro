@@ -4,7 +4,6 @@ import Breadcrumbs, { type Path } from '@site/components/Breadcrumbs';
 import Header, { type Props as HeaderProps } from '@site/components/Header.astro';
 import Footer from '@site/components/footer/Footer.astro';
 import AlertBox from '@site/components/AlertBox';
-import { getSiteConfig } from '@core/lib/site-config';
 import { Api } from 'sst/node/api';
 import type { Alert } from '@site/lib/client/state';
 import LoadingBar from '@site/components/LoadingBar';
@@ -20,7 +19,7 @@ export interface Props extends BaseProps {
 }
 
 const isAdmin = Astro.locals.session?.type === 'admin';
-const alerts = isAdmin ? (await getSiteConfig())?.messages ?? [] : [];
+const alerts = isAdmin ? Astro.locals.siteConfig.messages ?? [] : [];
 
 {
 	const alert = Astro.url.searchParams.get('alert');

@@ -5,11 +5,10 @@ import PreviewableCard from '@site/components/cards/PreviewableCard';
 import PinCardToProfileButton from '@site/components/cards/PinCardToProfileButton';
 import CardTradeHistory from '@site/components/cards/CardTradeHistory.astro';
 import type { CardInstance, User } from '@core/types';
-import { getSiteConfig } from '@core/lib/site-config';
 import { checkIsCardTradeable } from '@core/lib/trades';
 
 const session = Astro.locals.session;
-const siteConfig = await getSiteConfig();
+const siteConfig = Astro.locals.siteConfig;
 
 interface Props {
 	card: CardInstance;

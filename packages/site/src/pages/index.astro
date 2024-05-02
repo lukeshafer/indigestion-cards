@@ -2,9 +2,8 @@
 import Page from '@site/layouts/Page.astro';
 import FAQ from '@site/components/FAQ';
 import { ASSETS } from '@site/constants';
-import { getSiteConfig } from '@core/lib/site-config';
 
-const siteConfig = await getSiteConfig();
+const siteConfig = Astro.locals.siteConfig
 ---
 
 <Page title="Indigestion Cards" pageType="public">

@@ -7,7 +7,6 @@ import { getUserByLogin } from '@core/lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
 import TotalPackCount from './pack/TotalPackCount';
-import { getSiteConfig } from '@core/lib/site-config';
 
 export interface Props {
 	logo?: keyof typeof logos;
@@ -19,7 +18,7 @@ const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? 
 
 const username = Astro.locals.session?.properties.username;
 
-const siteConfig = await getSiteConfig();
+const siteConfig = Astro.locals.siteConfig;
 const canSeeTradesLink =
 	(Astro.locals.session?.type === 'user' || Astro.locals.session?.type === 'admin') &&
 	siteConfig.tradingIsEnabled;

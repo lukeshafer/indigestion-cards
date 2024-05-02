@@ -1,16 +1,15 @@
 ---
 import CardList from '@site/components/cards/CardList';
 import Page from '@site/layouts/Page.astro';
-import { createNewUser, getUserAndOpenedCardInstances } from '@core/lib/user';
+import { getUserAndOpenedCardInstances } from '@core/lib/user';
 import { getUserByLogin } from '@core/lib/twitch';
-import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
+import { getRarityRanking } from '@core/lib/site-config';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
 import UserLookingFor from '@site/components/user/UserLookingFor';
 import Card from '@site/components/cards/Card';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
 
-console.log('username page')
 type Logo = HeaderProps['logo'];
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
@@ -24,57 +23,38 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-let [userData, rarityRanking] = await Promise.all([
-	getUserAndOpenedCardInstances({ username: id }),
-	getRarityRanking(),
-]);
-
+let { Users = [], CardInstances = [] } =
+	(await getUserAndOpenedCardInstances({ username: id })) ?? {};
 const twitchData = await getUserByLogin(id).catch(() => null);
-if (!userData) {
-	if (twitchData) {
-		const newUser = await createNewUser({
-			username: twitchData.display_name,
-			userId: twitchData.id,
-		});
-		userData = {
-			Users: [newUser],
-			CardInstances: [],
-			UserLogins: [],
-		};
-		return Astro.redirect(`${routes.USERS}/${id}?redirect=${redirectCount + 1}`);
-	}
-	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
-}
 
-const siteConfig = await getSiteConfig();
+const siteConfig = Astro.locals.siteConfig;
+const rarityRanking = getRarityRanking(siteConfig);
 
-const { Users, CardInstances } = userData;
 const user = Users[0] || {
 	username: id,
 	userId: twitchData?.id,
 };
 
 const pinnedCard = user.pinnedCard;
-const unpinnedCards = CardInstances.filter(
-	card => card.instanceId !== pinnedCard?.instanceId
-);
+const unpinnedCards = CardInstances.filter(card => card.instanceId !== pinnedCard?.instanceId);
 
 const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
 };
-const logo = userLogoMap[id]
+const logo = userLogoMap[id];
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 ---
 
 <Page
 	title={user.username}
-  {logo}
+	{logo}
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
 	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
+			alt={`${user.username}'s profile`}
 			src={twitchData?.profile_image_url}
 			width="150"
 			height="150"
@@ -110,10 +90,10 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 							pinnedCard.designId === 'lilindheart'
 								? 'lilindheart-hero-card'
 								: pinnedCard.designId === 'lilindcult'
-								? 'lilindcult-hero-card'
-								: pinnedCard.designId === 'ryan-of-the-wild'
-								? 'ryan-of-the-wild-hero-card'
-								: undefined
+									? 'lilindcult-hero-card'
+									: pinnedCard.designId === 'ryan-of-the-wild'
+										? 'ryan-of-the-wild-hero-card'
+										: undefined
 						}
 						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
 						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
@@ -127,8 +107,8 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 		<CardList
 			cards={unpinnedCards}
 			rarityRanking={rarityRanking}
-      client:load
-      isUserPage
+			client:load
+			isUserPage
 			sortOnlyBy={[
 				'rarest',
 				'common',

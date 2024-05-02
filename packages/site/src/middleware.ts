@@ -6,6 +6,7 @@ import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@core/types';
 import { getSiteConfig } from '@core/lib/site-config';
 
+
 const transformMethod: MiddlewareHandler = async (ctx, next) => {
   const formMethod = ctx.url.searchParams.get('formmethod');
   if (!formMethod) return next();
@@ -82,4 +83,11 @@ const auth: MiddlewareHandler = async (ctx, next) => {
   return next();
 };
 
-export const onRequest = sequence(auth, transformMethod);
+const loadSiteConfig: MiddlewareHandler = async (ctx, next) => {
+  ctx.locals.siteConfig = await getSiteConfig();
+
+  return next()
+}
+
+
+export const onRequest = sequence(loadSiteConfig, auth, transformMethod);
