@@ -1,10 +1,11 @@
 import type { MiddlewareHandler } from 'astro';
 import { sequence } from 'astro/middleware';
-import { getAdminUserById } from '@lib/admin-user';
+import { getAdminUserById } from '@core/lib/admin-user';
 import { AUTH_TOKEN, PUBLIC_ROUTES, USER_ROUTES } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
-import type { Session } from '@lil-indigestion-cards/core/types';
-import { getSiteConfig } from '@lil-indigestion-cards/core/lib/site-config';
+import type { Session } from '@core/types';
+import { getSiteConfig } from '@core/lib/site-config';
+
 
 const transformMethod: MiddlewareHandler = async (ctx, next) => {
   const formMethod = ctx.url.searchParams.get('formmethod');
@@ -82,4 +83,11 @@ const auth: MiddlewareHandler = async (ctx, next) => {
   return next();
 };
 
-export const onRequest = sequence(auth, transformMethod);
+const loadSiteConfig: MiddlewareHandler = async (ctx, next) => {
+  ctx.locals.siteConfig = await getSiteConfig();
+
+  return next()
+}
+
+
+export const onRequest = sequence(loadSiteConfig, auth, transformMethod);

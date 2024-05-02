@@ -1,4 +1,4 @@
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN } from '@admin/constants';
 import type { APIRoute } from 'astro';
 import { Api } from 'sst/node/api';
 

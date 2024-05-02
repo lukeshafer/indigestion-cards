@@ -1,8 +1,8 @@
-import Table from '@/components/table/Table';
-import type { Pack } from '@lil-indigestion-cards/core/db/packs';
-import { Form, SubmitButton, TextInput } from '@/components/form/Form';
+import Table from '@admin/components/table/Table';
+import type { Pack } from '@core/types';
+import { Form, SubmitButton, TextInput } from '@admin/components/form/Form';
 import { createSignal } from 'solid-js';
-import { API } from '@/constants';
+import { API } from '@admin/constants';
 
 export default function PackTable(props: { packs: Pack[] }) {
 	return (

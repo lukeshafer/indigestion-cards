@@ -1,51 +1,40 @@
-import { ElectroError, Service } from 'electrodb';
-import { type CreateSeason, season, type Season, type UpdateSeason } from '../db/season';
-import { cardDesigns } from '../db/cardDesigns';
-import { config } from '../db/_utils';
+import { ElectroError } from 'electrodb';
 import type { DBResult } from '../types';
-import { cardInstances } from '../db/cardInstances';
+import { db } from '../db';
+import type { CreateSeason, Season, UpdateSeason } from '../db.types';
 
 export async function getAllSeasons() {
-	const result = await season.query.allSeasons({}).go({ pages: 'all' });
+	const result = await db.entities.Seasons.query.allSeasons({}).go({ pages: 'all' });
 	return result.data;
 }
 
 export async function getSeasonById(id: string) {
-	const result = await season.query.bySeasonId({ seasonId: id }).go();
-	return result.data[0];
+	const result = await db.entities.Seasons.get({ seasonId: id }).go();
+	return result.data;
 }
 
 export async function getSeasonAndDesignsBySeasonId(id: string) {
-	const service = new Service(
-		{
-			season,
-			cardDesigns,
-			cardInstances,
-		},
-		config
-	);
-
-	const result = await service.collections
-		.seasonAndDesigns({ seasonId: id })
+	const result = await db.collections
+		.SeasonAndDesignsAndCards({ seasonId: id })
 		.go({ pages: 'all' });
 	return result.data;
 }
 
 export async function deleteSeasonById(id: string) {
 	const seasonData = await getSeasonAndDesignsBySeasonId(id);
-	if (seasonData.cardDesigns.length > 0)
+	if (seasonData.CardDesigns.length > 0)
 		return {
 			success: false,
 			error: 'Cannot delete season with existing designs',
 		};
 
-	const result = await season.delete({ seasonId: id }).go();
+	const result = await db.entities.Seasons.delete({ seasonId: id }).go();
 	return { success: true, data: result.data };
 }
 
 export async function createSeason(inputSeason: CreateSeason) {
 	try {
-		const result = await season.create({ ...inputSeason }).go();
+		const result = await db.entities.Seasons.create({ ...inputSeason }).go();
 		return {
 			success: true,
 			data: result.data,
@@ -74,8 +63,7 @@ export async function updateSeason({
 	seasonDescription,
 }: UpdateSeason & { seasonId: string }): Promise<DBResult<Partial<Season>>> {
 	try {
-		const result = await season
-			.patch({ seasonId })
+		const result = await db.entities.Seasons.patch({ seasonId })
 			.set({ seasonName, seasonDescription })
 			.go();
 		return {

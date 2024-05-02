@@ -1,11 +1,11 @@
 ---
 import Base, { type BaseProps } from './Base.astro';
-import AdminOnly from '@/components/AdminOnly.astro';
-import Header from '@/components/Header.astro';
-import AlertBox from '@/components/AlertBox';
-import { getSiteConfig } from '@lib/site-config';
+import AdminOnly from '@admin/components/AdminOnly.astro';
+import Header from '@admin/components/Header.astro';
+import AlertBox from '@admin/components/AlertBox';
+import { getSiteConfig } from '@core/lib/site-config';
 import { Api } from 'sst/node/api';
-import type { Alert } from '@/lib/client/state';
+import type { Alert } from '@admin/lib/client/state';
 
 export interface Props extends BaseProps {
 	class?: string;

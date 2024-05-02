@@ -1,5 +1,5 @@
-import { batchUpdateUsers, getAllUsers, getUserAndCardInstances } from '@lib/user';
-import { getAllPacks } from '@lib/pack';
+import { batchUpdateUsers, getAllUsers, getUserAndCardInstances } from '@core/lib/user';
+import { getAllPacks } from '@core/lib/pack';
 
 export async function handler() {
 	const users = await getAllUsers();
@@ -10,9 +10,9 @@ export async function handler() {
 
 		if (!data) return;
 
-		const { cardInstances } = data;
+		const { CardInstances } = data;
 
-		const cardCount = cardInstances.filter((c) => c.openedAt).length;
+		const cardCount = CardInstances.filter((c) => c.openedAt).length;
 		const packCount = packs.filter((p) => p.userId === user.userId).length;
 
 		if (user.cardCount !== cardCount || user.packCount !== packCount) {

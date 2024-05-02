@@ -1,13 +1,13 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllAdminUsers, createAdminUser } from '@lib/admin-user';
-import { PageHeader, PageTitle } from '@/components/text';
-import AdminUsersTableAstro from '@/components/admin-users/AdminUsersTable.astro';
-import AddAdminUserForm from '@/components/admin-users/AddAdminUserForm.astro';
-import { getUserByLogin } from '@lil-indigestion-cards/core/lib/twitch';
-import { Action } from '@/lib/action';
-import { createAlerts } from '@/lib/alert';
-import { setAdminEnvSession } from '@lil-indigestion-cards/core/lib/session';
+import Page from '@admin/layouts/Page.astro';
+import { getAllAdminUsers, createAdminUser } from '@core/lib/admin-user';
+import { PageHeader, PageTitle } from '@admin/components/text';
+import AdminUsersTableAstro from '@admin/components/admin-users/AdminUsersTable.astro';
+import AddAdminUserForm from '@admin/components/admin-users/AddAdminUserForm.astro';
+import { getUserByLogin } from '@core/lib/twitch';
+import { Action } from '@admin/lib/action';
+import { createAlerts } from '@admin/lib/alert';
+import { setAdminEnvSession } from '@core/lib/session';
 
 const { output } = await Action(
 	Astro,

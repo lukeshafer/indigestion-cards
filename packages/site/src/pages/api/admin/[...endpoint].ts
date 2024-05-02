@@ -1,10 +1,10 @@
-import { AUTH_TOKEN } from '@/constants';
+import { AUTH_TOKEN } from '@site/constants';
 import type { APIRoute } from 'astro';
 import { Api } from 'sst/node/api';
 
 // Re-route all API requests to the API server
 export const ALL: APIRoute = async ctx => {
-	const log = (...args: any[]) => console.log({
+	const log = (...args: unknown[]) => console.log({
     endpoint: ctx.params.endpoint,
   }, ...args);
 

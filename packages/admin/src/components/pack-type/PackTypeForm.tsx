@@ -1,4 +1,4 @@
-import { API, routes } from '@/constants';
+import { API, routes } from '@admin/constants';
 import {
 	Form,
 	TextInput,
@@ -8,10 +8,9 @@ import {
 	Select,
 	Fieldset,
 	Checkbox,
-} from '@/components/form/Form';
+} from '@admin/components/form/Form';
 import { createSignal, For, Match, Switch } from 'solid-js';
-import type { Season } from '@lil-indigestion-cards/core/db/season';
-import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
+import type { Season, CardDesign } from '@core/types';
 
 export default function PackTypeForm(props: { seasons: Season[]; cardDesigns: CardDesign[] }) {
 	const [packTypeName, setPackTypeName] = createSignal('');

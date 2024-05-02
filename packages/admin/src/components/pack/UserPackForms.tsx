@@ -1,8 +1,7 @@
-import { Form, Select, SubmitButton, DeleteButton } from '@/components/form/Form';
-import { API } from '@/constants';
-import { setTotalPackCount } from '@/lib/client/state';
-import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
-import type { User } from '@lil-indigestion-cards/core/db/users';
+import { Form, Select, SubmitButton, DeleteButton } from '@admin/components/form/Form';
+import { API } from '@admin/constants';
+import { setTotalPackCount } from '@admin/lib/client/state';
+import type { PackType, User } from '@core/types';
 import { createResource } from 'solid-js';
 
 export default function UserPackForms(props: { packTypes: PackType[]; user: User }) {

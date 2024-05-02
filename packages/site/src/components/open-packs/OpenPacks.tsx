@@ -11,10 +11,10 @@ import {
 import { createStore, produce, type SetStoreFunction } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
-import { API, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@/constants';
-import { setTotalPackCount } from '@/lib/client/state';
+import { API, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
+import { setTotalPackCount } from '@site/lib/client/state';
 import { Checkbox } from '../form/Form';
-import { isChatters, type Chatter } from '@/lib/client/chatters';
+import { isChatters, type Chatter } from '@site/lib/client/chatters';
 import {
   OpenPacksContext,
   type OpenPacksState,

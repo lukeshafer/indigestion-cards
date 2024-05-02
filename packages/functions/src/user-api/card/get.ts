@@ -1,5 +1,5 @@
-import { SiteHandler, validateSearchParams } from '@lil-indigestion-cards/core/lib/api';
-import { getUserAndOpenedCardInstances } from '@lil-indigestion-cards/core/lib/user';
+import { SiteHandler, validateSearchParams } from '@core/lib/api';
+import { getUserAndOpenedCardInstances } from '@core/lib/user';
 
 export const handler = SiteHandler({ authorizationType: 'user' }, async (event) => {
 	const result = validateSearchParams(new URLSearchParams(event.rawQueryString), {
@@ -18,7 +18,7 @@ export const handler = SiteHandler({ authorizationType: 'user' }, async (event) 
 		const cards = await getUserAndOpenedCardInstances({ username: params.username });
 		return {
 			statusCode: 200,
-			body: JSON.stringify(cards?.cardInstances ?? []),
+			body: JSON.stringify(cards?.CardInstances ?? []),
 		};
 	} catch (e) {
 		console.error(e);

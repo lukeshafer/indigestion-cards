@@ -3,6 +3,7 @@ import { admins } from './admins';
 import { cardDesigns } from './cardDesigns';
 import { cardInstances } from './cardInstances';
 import { config } from './_utils';
+import { momentRedemptions } from './moments'
 import { packTypes } from './packTypes';
 import { packs } from './packs';
 import { preorders } from './preorders';
@@ -21,6 +22,7 @@ export const db = new Service(
 		cardDesigns,
 		season,
 		cardInstances,
+    momentRedemptions,
 		packs,
 		packTypes,
 		users,

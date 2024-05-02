@@ -1,8 +1,6 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, routes } from '@/constants';
-import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import type { Trade } from '@lil-indigestion-cards/core/db/trades';
-import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import { FULL_ART_ID, LEGACY_CARD_ID, routes } from '@site/constants';
+import type { CardDesign, CardInstance, Trade } from '@core/types';
+import type { RarityRankingRecord } from '@core/lib/site-config';
 import { z } from 'astro/zod';
 
 export const useViewTransition = (cb: () => unknown) =>
@@ -153,8 +151,12 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 		receiverUsername: reverse ? trade.senderUsername : trade.receiverUsername,
 	});
 
-	trade.requestedCards.forEach(c => params.append(reverse ? 'offeredCards' : 'requestedCards', c.instanceId));
-	trade.offeredCards.forEach(c => params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId));
+	trade.requestedCards.forEach(c =>
+		params.append(reverse ? 'offeredCards' : 'requestedCards', c.instanceId)
+	);
+	trade.offeredCards.forEach(c =>
+		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
+	);
 
 	return routes.TRADES + '/new?' + params.toString();
 }

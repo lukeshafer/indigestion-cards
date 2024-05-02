@@ -1,6 +1,6 @@
-import { SiteHandler } from '@lib/api';
-import { createAdminUser } from '@lib/admin-user';
-import { getUserByLogin } from '@lib/twitch';
+import { SiteHandler } from '@core/lib/api';
+import { createAdminUser } from '@core/lib/admin-user';
+import { getUserByLogin } from '@core/lib/twitch';
 
 export const handler = SiteHandler(
 	{

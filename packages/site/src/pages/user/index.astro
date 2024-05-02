@@ -1,14 +1,14 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllPreorders } from '@lib/preorder';
-import { routeNames } from '@/constants';
-import { PageHeader, PageTitle } from '@/components/text';
-import UsersTable from '@/components/user/UsersTable.astro';
+import Page from '@site/layouts/Page.astro';
+import { getAllPreorders } from '@core/lib/preorder';
+import { routeNames } from '@site/constants';
+import { PageHeader, PageTitle } from '@site/components/text';
+import UsersTable from '@site/components/user/UsersTable.astro';
 
-import { GET as getUsers } from '@/pages/data/users';
+import { GET as getUsers } from '@site/pages/data/users';
 
-const { data: users } = await getUsers();
-const preorders = await getAllPreorders();
+const users = getUsers();
+const preorders = getAllPreorders();
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
@@ -16,6 +16,10 @@ const preorders = await getAllPreorders();
 		<PageTitle>Users</PageTitle>
 	</PageHeader>
 	<div class="mx-auto max-w-2xl">
-		<UsersTable {users} {preorders} />
+		{
+			Promise.all([users, preorders]).then(([{ data: users }, preorders]) => (
+				<UsersTable {users} {preorders} />
+			))
+		}
 	</div>
 </Page>

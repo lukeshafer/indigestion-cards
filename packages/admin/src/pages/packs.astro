@@ -1,12 +1,12 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllPacks } from '@lib/pack';
-import { Heading, PageHeader, PageTitle } from '@/components/text';
-import PackTable from '@/components/pack/PackTable';
-import { getAllPreorders } from '@lil-indigestion-cards/core/lib/preorder';
-import CreatePreorderForm from '@/components/preorder/CreatePreorderForm';
-import ConvertPreordersToPacksForm from '@/components/preorder/ConvertPreordersToPacksForm';
-import { getAllPackTypes } from '@lil-indigestion-cards/core/lib/pack-type';
+import Page from '@admin/layouts/Page.astro';
+import { getAllPacks } from '@core/lib/pack';
+import { Heading, PageHeader, PageTitle } from '@admin/components/text';
+import PackTable from '@admin/components/pack/PackTable';
+import { getAllPreorders } from '@core/lib/preorder';
+import CreatePreorderForm from '@admin/components/preorder/CreatePreorderForm';
+import ConvertPreordersToPacksForm from '@admin/components/preorder/ConvertPreordersToPacksForm';
+import { getAllPackTypes } from '@core/lib/pack-type';
 
 const packs = await getAllPacks();
 const preorders = await getAllPreorders();

@@ -2,7 +2,7 @@ import type { JSX } from 'solid-js';
 import type { ParentProps } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-export { Anchor } from '@/components/form/Form';
+export { Anchor } from '@admin/components/form/Form';
 
 export function PageHeader(props: ParentProps) {
 	return (

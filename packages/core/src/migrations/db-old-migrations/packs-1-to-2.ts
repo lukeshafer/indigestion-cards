@@ -1,8 +1,8 @@
 import { Entity } from 'electrodb';
 
-import { config, auditAttributes } from '../db/_utils';
-import { packs } from '../db/packs';
-import { cardInstances } from '../db/cardInstances';
+import { config, auditAttributes } from '../db-old/_utils';
+import { packs } from '../db-old/packs';
+import { cardInstances } from '../db-old/cardInstances';
 
 export async function migration() {
 	const toMove = await oldPacks.scan.go();

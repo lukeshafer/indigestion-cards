@@ -1,8 +1,8 @@
-import { SiteHandler } from '@lib/api';
-import { updatePackUser } from '@lib/pack';
-import { getUserByLogin } from '@lib/twitch';
-import { getUserByUserName } from '@lib/user';
-import { getPackById } from '@lib/pack';
+import { SiteHandler } from '@core/lib/api';
+import { updatePackUser } from '@core/lib/pack';
+import { getUserByLogin } from '@core/lib/twitch';
+import { getUserByUserName } from '@core/lib/user';
+import { getPackById } from '@core/lib/pack';
 
 export const handler = SiteHandler(
 	{

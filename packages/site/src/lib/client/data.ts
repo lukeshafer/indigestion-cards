@@ -1,4 +1,4 @@
-import { resolveLocalPath } from '@/constants';
+import { resolveLocalPath } from '@site/constants';
 
 interface Path {
 	users: typeof import('../../pages/data/users');

@@ -1,10 +1,10 @@
 import { useFormData } from 'sst/node/api';
 import { z } from 'zod';
 
-import { validateSearchParams, SiteHandler } from '@lib/api';
-import { TWITCH_GIFT_SUB_ID } from '@lil-indigestion-cards/core/constants';
-import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
-import { updateBatchTwitchEvents, updateSiteConfig } from '@lib/site-config';
+import { validateSearchParams, SiteHandler } from '@core/lib/api';
+import { TWITCH_GIFT_SUB_ID } from '@core/constants';
+import type { SiteConfig } from '@core/types';
+import { updateBatchTwitchEvents, updateSiteConfig } from '@core/lib/site-config';
 
 type RarityRanking = NonNullable<SiteConfig['rarityRanking']>;
 

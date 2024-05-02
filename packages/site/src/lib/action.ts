@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type { APIContext, APIRoute, AstroGlobal } from 'astro';
-import { UnauthorizedError, InputValidationError } from '@lil-indigestion-cards/core/lib/errors';
+import { UnauthorizedError, InputValidationError } from '@core/lib/errors';
 import {
 	validateSearchParams,
 	type Schema,
 	type ParsedOutput,
-} from '@lil-indigestion-cards/core/lib/api';
+} from '@core/lib/api';
 
 export function createApiRoute<A extends AuthorizationType = 'admin', S extends Schema = {}>(
 	options: ApiRouteOptions<A, S>,

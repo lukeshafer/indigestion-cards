@@ -1,6 +1,6 @@
-import { setAdminEnvSession } from "@lil-indigestion-cards/core/lib/session";
-import { createApiRoute } from "../../../../site/src/lib/action"
-import { updateFaq } from '@lil-indigestion-cards/core/lib/site-config';
+import { setAdminEnvSession } from "@core/lib/session";
+import { createApiRoute } from "@site/lib/action"
+import { updateFaq } from '@core/lib/site-config';
 
 export const POST = createApiRoute({
   schema: {

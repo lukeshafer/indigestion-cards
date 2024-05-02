@@ -1,7 +1,7 @@
-import { cardDesigns } from '../db/cardDesigns';
-import { season } from '../db/season';
-import { cardInstances } from '../db/cardInstances';
-import { FULL_ART_ID, NO_CARDS_OPENED_ID } from '../constants';
+import { cardDesigns } from '../db-old/cardDesigns';
+import { season } from '../db-old/season';
+import { cardInstances } from '../db-old/cardInstances';
+import { FULL_ART_ID, NO_CARDS_OPENED_ID } from '../../constants';
 
 export async function migration({ force = false } = {}) {
 	const seasons = await season.query.allSeasons({}).go();

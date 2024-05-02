@@ -1,16 +1,15 @@
 ---
 // DATA
-import { getAllTradesForUser } from '@lil-indigestion-cards/core/lib/trades';
+import { getAllTradesForUser } from '@core/lib/trades';
 
 // UI
-import { PageHeader, PageTitle } from '@/components/text';
-import { routeNames, routes } from '@/constants';
-import Page from '@/layouts/Page.astro';
-import { Anchor } from '@/components/text';
-import TradesTable from '@/components/trades/TradesTable.astro';
-import { getUser } from '@lil-indigestion-cards/core/lib/user';
-import type { Trade } from '@lil-indigestion-cards/core/db/trades';
-import type { User } from '@lil-indigestion-cards/core/db/users';
+import { PageHeader, PageTitle } from '@site/components/text';
+import { routeNames, routes } from '@site/constants';
+import Page from '@site/layouts/Page.astro';
+import { Anchor } from '@site/components/text';
+import TradesTable from '@site/components/trades/TradesTable.astro';
+import { getUser } from '@core/lib/user';
+import type { Trade, User } from '@core/types';
 
 const userId = Astro.locals.user?.properties.userId;
 const username = Astro.locals.user?.properties.username;

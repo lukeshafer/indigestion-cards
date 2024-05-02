@@ -1,9 +1,10 @@
 import { ElectroError } from 'electrodb';
-import { type Admin, admins } from '../db/admins';
+import { db } from '../db';
+import type { Admin } from '../db.types';
 
 export async function createAdminUser(args: { userId: string; username: string }) {
 	try {
-		const result = await admins.create(args).go();
+		const result = await db.entities.Admins.create(args).go();
 		return { success: true, data: result.data };
 	} catch (err) {
 		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` };
@@ -29,7 +30,7 @@ export async function deleteAdminUser(args: {
 	isStreamer: boolean;
 }) {
 	try {
-		const result = await admins.delete(args).go();
+		const result = await db.entities.Admins.delete(args).go();
 		return { success: true, data: result.data };
 	} catch (err) {
 		if (!(err instanceof ElectroError)) return { success: false, error: `${err}` };
@@ -51,17 +52,17 @@ export async function deleteAdminUser(args: {
 
 export async function getAllAdminUsers(): Promise<Admin[]> {
 	try {
-		const result = await admins.query.allAdmins({}).go();
+		const result = await db.entities.Admins.query.allAdmins({}).go();
 		return result.data;
 	} catch {
 		return [];
 	}
 }
 
-export async function getAdminUserById(userId: string) {
+export async function getAdminUserById(userId: string): Promise<Admin | null> {
 	try {
-		const result = await admins.query.allAdmins({ userId }).go();
-		return result.data[0];
+		const result = await db.entities.Admins.get({ userId }).go();
+		return result.data;
 	} catch {
 		return null;
 	}

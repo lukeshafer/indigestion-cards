@@ -1,6 +1,6 @@
-import Table from '@/components/table/Table';
-import { routes } from '@/constants';
-import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
+import Table from '@admin/components/table/Table';
+import { routes } from '@admin/constants';
+import type { PackType } from '@core/types';
 import CardsIcon from '../icons/CardsIcon';
 
 export default function PackTypeTable(props: { packTypes: PackType[] }) {

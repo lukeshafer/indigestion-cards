@@ -1,5 +1,5 @@
 ---
-import Page from '@/layouts/Page.astro';
+import Page from '@admin/layouts/Page.astro';
 
 if (Astro.url.hostname !== 'localhost') {
 	return Astro.redirect('/?alert=Cannot purge database on production. Must be running locally');

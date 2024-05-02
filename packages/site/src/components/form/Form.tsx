@@ -1,7 +1,7 @@
 import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
-import { setAlerts } from '@/lib/client/state';
-import { ASSETS } from '@/constants';
-import { useViewTransition } from '@/lib/client/utils';
+import { setAlerts } from '@site/lib/client/state';
+import { ASSETS } from '@site/constants';
+import { useViewTransition } from '@site/lib/client/utils';
 import { navigate } from 'astro:transitions/client';
 import { twMerge } from 'tailwind-merge'
 

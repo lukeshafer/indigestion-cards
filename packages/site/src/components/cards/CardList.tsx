@@ -1,12 +1,11 @@
-import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
-import Card from '@/components/cards/Card';
+import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@site/constants';
+import Card from '@site/components/cards/Card';
 import { For, Show, createMemo, createSignal } from 'solid-js';
 import { Fieldset, Select, SubmitButton, TextInput } from '../form/Form';
-import type { CardInstance } from '@lil-indigestion-cards/core/db/cardInstances';
-import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
-import { useViewTransition } from '@/lib/client/utils';
-import type { Session } from '@/env';
-import type { RarityRankingRecord } from '@lil-indigestion-cards/core/lib/site-config';
+import type { CardInstance, CardDesign } from '@core/types';
+import { useViewTransition } from '@site/lib/client/utils';
+import type { Session } from '@site/env';
+import type { RarityRankingRecord } from '@core/lib/site-config';
 import Fuse from 'fuse.js';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;

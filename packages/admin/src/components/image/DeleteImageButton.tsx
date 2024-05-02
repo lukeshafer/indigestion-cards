@@ -1,5 +1,5 @@
-import { DeleteButton, Form } from '@/components/form/Form';
-import { API, routes } from '@/constants';
+import { DeleteButton, Form } from '@admin/components/form/Form';
+import { API, routes } from '@admin/constants';
 
 export default function DeleteImageButton(props: { key: string; type: string }) {
 	return (

@@ -1,6 +1,6 @@
-import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
+import type { PackType } from '@core/types';
 import { Form, Select, SubmitButton } from '../form/Form';
-import { API } from '@/constants';
+import { API } from '@admin/constants';
 
 export default function ConvertPreordersToPacksForm(props: { packTypes: PackType[] }) {
 	return (

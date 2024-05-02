@@ -1,5 +1,5 @@
-import { API, routes } from '@/constants';
-import { Form, DeleteButton } from '@/components/form/Form';
+import { API, routes } from '@admin/constants';
+import { Form, DeleteButton } from '@admin/components/form/Form';
 
 export default function DeleteRarityButton(props: { rarityId: string; frameUrl: string }) {
 	return (

@@ -1,6 +1,6 @@
 import { Show, createEffect, createResource, createSignal, onMount, useContext } from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
-import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@/constants';
+import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
 import { Checkbox } from '../form/Form';
 
 export function Statistics() {

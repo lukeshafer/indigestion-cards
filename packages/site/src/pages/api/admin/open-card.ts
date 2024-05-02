@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { validateSearchParams } from '@lib/api';
-import { openCardFromPack } from '@lib/open-pack';
+import { validateSearchParams } from '@core/lib/api';
+import { openCardFromPack } from '@core/lib/open-pack';
 
 // Re-route all API requests to the API server
 export const POST: APIRoute = async (ctx) => {

@@ -1,11 +1,11 @@
 ---
-import CardList from '@/components/cards/CardList';
-import Page from '@/layouts/Page.astro';
-import { getPackTypesBySeasonId } from '@lib/pack-type';
-import { getSeasonAndDesignsBySeasonId } from '@lib/season';
-import { NO_CARDS_OPENED_ID, routes } from '@/constants';
-import { PageTitle, Heading, PageHeader } from '@/components/text';
-import DeleteSeasonButton from '@/components/seasons/DeleteSeasonButton';
+import CardList from '@admin/components/cards/CardList';
+import Page from '@admin/layouts/Page.astro';
+import { getPackTypesBySeasonId } from '@core/lib/pack-type';
+import { getSeasonAndDesignsBySeasonId } from '@core/lib/season';
+import { NO_CARDS_OPENED_ID, routes } from '@admin/constants';
+import { PageTitle, Heading, PageHeader } from '@admin/components/text';
+import DeleteSeasonButton from '@admin/components/seasons/DeleteSeasonButton';
 
 const id = Astro.params.seasonId;
 
@@ -14,9 +14,9 @@ if (!id) {
 }
 
 const {
-	season: [season],
-	cardDesigns,
-	cardInstances,
+	Seasons: [season],
+	CardDesigns: cardDesigns,
+	CardInstances: cardInstances,
 } = await getSeasonAndDesignsBySeasonId(id);
 
 if (!season) {

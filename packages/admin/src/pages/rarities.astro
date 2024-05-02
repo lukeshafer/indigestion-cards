@@ -1,10 +1,10 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { PageHeader, PageTitle, Anchor } from '@/components/text';
-import UnmatchedImageList from '@/components/UnmatchedImageList.astro';
-import { getAllRarities } from '@lib/rarity';
-import { routes } from '@/constants';
-import RarityTable from '@/components/rarities/RarityTable.astro';
+import Page from '@admin/layouts/Page.astro';
+import { PageHeader, PageTitle, Anchor } from '@admin/components/text';
+import UnmatchedImageList from '@admin/components/UnmatchedImageList.astro';
+import { getAllRarities } from '@core/lib/rarity';
+import { routes } from '@admin/constants';
+import RarityTable from '@admin/components/rarities/RarityTable.astro';
 
 const rarities = await getAllRarities();
 ---

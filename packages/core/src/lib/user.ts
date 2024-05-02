@@ -1,21 +1,17 @@
-import { Service } from 'electrodb';
-
-import { users, type CreateUser, type User } from '../db/users';
-import { type UserLogin, userLogins } from '../db/userLogins';
-import { cardInstances, type CardInstance } from '../db/cardInstances';
-import { config } from '../db/_utils';
+import { db } from '../db';
+import type { CardInstance, CreateUser, User, UserLogin } from '../db.types';
 import { getUserByLogin } from '../lib/twitch';
 import { batchUpdateCardUsernames } from './card';
 import { batchUpdatePackUsername } from './pack';
 
 export async function getUser(userId: string) {
-  const user = await users.get({ userId }).go();
+  const user = await db.entities.Users.get({ userId }).go();
   return user.data;
 }
 
 export async function getUserByUserName(username: string) {
   try {
-    const user = await users.query.byUsername({ username }).go();
+    const user = await db.entities.Users.query.byUsername({ username }).go();
     return user.data[0] ?? null;
   } catch {
     return null;
@@ -24,7 +20,7 @@ export async function getUserByUserName(username: string) {
 
 export async function getAllUsers(): Promise<User[]> {
   try {
-    let { data } = await users.find({}).go({ pages: 'all' });
+    let { data } = await db.entities.Users.find({}).go({ pages: 'all' });
     return data ?? [];
   } catch {
     return [];
@@ -32,24 +28,15 @@ export async function getAllUsers(): Promise<User[]> {
 }
 
 export async function getUserAndCardInstances(args: { username: string }): Promise<{
-  users: User[];
-  userLogins: UserLogin[];
-  cardInstances: CardInstance[];
+  Users: User[];
+  UserLogins: UserLogin[];
+  CardInstances: CardInstance[];
 } | null> {
-  const service = new Service(
-    {
-      users,
-      userLogins,
-      cardInstances,
-    },
-    config
-  );
-
   try {
-    const data = await service.collections
-      .cardsByOwnerName({ username: args.username })
+    const data = await db.collections
+      .UserAndCards({ username: args.username })
       .go({ pages: 'all' });
-    return data.data;
+    return data.data
   } catch {
     console.error('Error while retrieving user and card instance data for user', args.username);
     return null;
@@ -57,43 +44,34 @@ export async function getUserAndCardInstances(args: { username: string }): Promi
 }
 
 export async function getUserAndOpenedCardInstances(args: { username: string }): Promise<{
-  users: User[];
-  userLogins: UserLogin[];
-  cardInstances: CardInstance[];
+  Users: User[];
+  UserLogins: UserLogin[];
+  CardInstances: CardInstance[];
 } | null> {
   const data = await getUserAndCardInstances(args);
 
   if (!data) return null;
 
   return {
-    users: data.users,
-    userLogins: data.userLogins,
-    cardInstances: data.cardInstances.filter(card => card.openedAt),
+    Users: data.Users,
+    UserLogins: data.UserLogins,
+    CardInstances: data.CardInstances.filter(card => card.openedAt),
   };
 }
 
 export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
-  user: User;
-  userLogin: UserLogin;
-  card: CardInstance;
+  User: User;
+  UserLogin: UserLogin;
+  Card: CardInstance;
 } | null> {
-  const service = new Service(
-    {
-      users,
-      userLogins,
-      cardInstances,
-    },
-    config
-  );
-
   try {
-    const data = await service.collections.cardsByOwnerName({ username: args.username }).go();
-    const card = data.data.cardInstances.find(card => card.instanceId === args.instanceId);
+    const data = await db.collections.UserAndCards({ username: args.username }).go();
+    const card = data.data.CardInstances.find(card => card.instanceId === args.instanceId);
     if (!card) throw new Error('Card not found');
     return {
-      user: data.data.users[0],
-      userLogin: data.data.userLogins[0],
-      card,
+      User: data.data.Users[0],
+      UserLogin: data.data.UserLogins[0],
+      Card: card,
     };
   } catch {
     console.error('Error while retrieving user and card instance data for user', args.username);
@@ -122,7 +100,7 @@ export async function createNewUser(args: CreateUser) {
 
   const twitchLogin = await getUserByLogin(args.username);
 
-  const result = await users
+  const result = await db.entities.Users
     .create({
       ...args,
       username: twitchLogin?.display_name ?? args.username,
@@ -161,8 +139,8 @@ export async function updateUsername(
   // TODO: get all minted cards and update those as well
 
   console.log(`Updating username on user from ${args.oldUsername} to ${args.newUsername}`);
-  await users.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
-  await userLogins.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
+  await db.entities.Users.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
+  await db.entities.UserLogins.patch({ userId: args.userId }).set({ username: args.newUsername }).go();
 
   console.log(`Updating username on packs from ${args.oldUsername} to ${args.newUsername}`);
   await batchUpdatePackUsername({
@@ -178,7 +156,7 @@ export async function updateUsername(
 }
 
 export async function batchUpdateUsers(usersInput: CreateUser[]) {
-  await users.put(usersInput).go();
+  await db.entities.Users.put(usersInput).go();
 }
 
 export async function checkIfUserExists(userId: string): Promise<boolean> {
@@ -202,8 +180,8 @@ export async function setUserProfile(args: {
   if (!user) return null;
 
   const card = args.pinnedCard
-    ? await cardInstances.query
-      .byId(args.pinnedCard)
+    ? await db.entities.CardInstances.query
+      .primary(args.pinnedCard)
       .go()
       .then(result =>
         result.data[0]?.userId === args.userId && !!result.data[0]?.openedAt
@@ -230,7 +208,7 @@ export async function setUserProfile(args: {
       } satisfies CardInstance)
       : user.pinnedCard;
 
-  return users
+  return db.entities.Users
     .patch({ userId: args.userId })
     .set({ lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor, pinnedCard: card })
     .go()
@@ -238,13 +216,13 @@ export async function setUserProfile(args: {
 }
 
 export async function removeTradeNotification(args: { userId: string; tradeId: string }) {
-  const queryResult = await users.query.byId({ userId: args.userId }).go();
+  const queryResult = await db.entities.Users.query.byId({ userId: args.userId }).go();
 
   const user = queryResult.data[0];
   console.log({ user });
   if (!user) return;
 
-  return users
+  return db.entities.Users
     .patch({ userId: args.userId })
     .set({
       tradeNotifications: user.tradeNotifications?.filter(

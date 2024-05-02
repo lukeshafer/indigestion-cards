@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getAllUsers, getUserByUserName } from '@lib/user';
-import { routes } from '@/constants';
+import { getAllUsers, getUserByUserName } from '@core/lib/user';
+import { routes } from '@site/constants';
 
 export const GET: APIRoute = async (ctx) => {
 	const username = ctx.url.searchParams.get('username');

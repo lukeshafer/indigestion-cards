@@ -1,8 +1,8 @@
 import { Index, createSignal } from 'solid-js';
-import type { RarityStats } from '@lib/stats';
-import Table from '@/components/table/Table';
-import { routes } from '@/constants';
-import { Checkbox } from '@/components/form/Form';
+import type { RarityStats } from '@core/lib/stats';
+import Table from '@admin/components/table/Table';
+import { routes } from '@admin/constants';
+import { Checkbox } from '@admin/components/form/Form';
 
 export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[] }) {
 	const [hideUnowned, setHideUnowned] = createSignal(false);

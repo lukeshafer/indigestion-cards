@@ -1,5 +1,5 @@
-import { publicApi } from '@/constants';
-import { Form, TextInput } from '@/components/form/Form';
+import { publicApi } from '@site/constants';
+import { Form, TextInput } from '@site/components/form/Form';
 import SearchIcon from './icons/SearchIcon';
 import { createSignal } from 'solid-js';
 import CloseIcon from './icons/CloseIcon';

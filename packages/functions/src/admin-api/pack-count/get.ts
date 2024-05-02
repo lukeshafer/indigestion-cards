@@ -1,7 +1,7 @@
 import { useQueryParam } from 'sst/node/api';
-import { SiteHandler } from '@lib/api';
-import { getUser } from '@lib/user';
-import { getAllPacks } from '@lib/pack';
+import { SiteHandler } from '@core/lib/api';
+import { getUser } from '@core/lib/user';
+import { getAllPacks } from '@core/lib/pack';
 
 export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
 	const userId = useQueryParam('userId');

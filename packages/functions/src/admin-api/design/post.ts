@@ -1,11 +1,11 @@
-import { SiteHandler } from '@lib/api';
-import { deleteUnmatchedDesignImage } from '@lib/unmatched-image';
-import { getAllRarities } from '@lib/rarity';
-import { createCardDesign, deleteCardDesignById } from '@lib/design';
-import { moveImageBetweenBuckets, createS3Url } from '@lib/images';
-import { NO_CARDS_OPENED_ID } from '@lil-indigestion-cards/core/constants';
+import { SiteHandler } from '@core/lib/api';
+import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
+import { getAllRarities } from '@core/lib/rarity';
+import { createCardDesign, deleteCardDesignById } from '@core/lib/design';
+import { moveImageBetweenBuckets, createS3Url } from '@core/lib/images';
+import { NO_CARDS_OPENED_ID } from '@core/constants';
 import { Bucket } from 'sst/node/bucket';
-import { FULL_ART_ID, LEGACY_CARD_ID } from '@lil-indigestion-cards/core/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
 import { useFormValue } from 'sst/node/api';
 
 export const handler = SiteHandler(
@@ -92,7 +92,7 @@ export const handler = SiteHandler(
 				body: 'An error occurred converting draft to design. Please try again and contact support if you have more issues.',
 			};
 		}
-		await deleteUnmatchedDesignImage({ imageId: params.imageKey, type: 'cardDesign' });
+		await deleteUnmatchedDesignImage({ imageId: params.imageKey, unmatchedImageType: 'cardDesign' });
 
 		return { statusCode: 200, body: 'Design created!' };
 	}

@@ -1,6 +1,6 @@
-import { parsePackTypeContents } from '@lib/entity-schemas';
-import { createPackType } from '@lib/pack-type';
-import { SiteHandler } from '@lib/api';
+import { parsePackTypeContents } from '@core/lib/entity-schemas';
+import { createPackType } from '@core/lib/pack-type';
+import { SiteHandler } from '@core/lib/api';
 
 export const handler = SiteHandler(
 	{

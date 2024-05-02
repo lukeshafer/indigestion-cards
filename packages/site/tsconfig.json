@@ -1,19 +1,27 @@
 {
-	"extends": "astro/tsconfigs/strict",
-	"exclude": ["dist"],
-	"compilerOptions": {
+  "extends": "astro/tsconfigs/strict",
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
     "experimentalDecorators": true,
     "target": "ES2020",
-		"allowJs": true,
-		"baseUrl": ".",
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"paths": {
-			"@/*": ["src/*"],
-			"@lil-indigestion-cards/core/*": ["../core/src/*"],
-			"@lib/*": ["../core/src/lib/*"]
-		},
-		"jsx": "preserve",
-		"jsxImportSource": "solid-js"
-	}
+    "allowJs": true,
+    "baseUrl": ".",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@site/*": [
+        "src/*"
+      ],
+      "@core/lib/*": [
+        "../core/src/lib/*"
+      ],
+      "@core/types": [
+        "../core/src/types"
+      ]
+    },
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
 }

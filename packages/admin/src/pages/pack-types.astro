@@ -1,11 +1,11 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lib/pack-type';
-import { routes } from '@/constants';
+import Page from '@admin/layouts/Page.astro';
+import { getAllPackTypes } from '@core/lib/pack-type';
+import { routes } from '@admin/constants';
 
-import { PageHeader, PageTitle, Anchor } from '@/components/text';
+import { PageHeader, PageTitle, Anchor } from '@admin/components/text';
 
-import PackTypeTable from '@/components/pack-type/PackTypeTable';
+import PackTypeTable from '@admin/components/pack-type/PackTypeTable';
 
 const packTypes = await getAllPackTypes();
 ---

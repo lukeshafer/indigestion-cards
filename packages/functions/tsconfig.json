@@ -9,11 +9,23 @@
     "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "paths": {
-      "@lil-indigestion-cards/core/*": [
-        "../core/src/*"
-      ],
-      "@lib/*": [
+      "@core/lib/*": [
         "../core/src/lib/*"
+      ],
+      "@core/types": [
+        "../core/src/types"
+      ],
+      "@core/constants": [
+        "../core/src/constants"
+      ],
+      "@core/events/*": [
+        "../core/src/events/*"
+      ],
+      "@core/migrations": [
+        "../core/src/migrations"
+      ],
+      "@core/db-seeds": [
+        "../core/src/db-seeds"
       ]
     }
   }

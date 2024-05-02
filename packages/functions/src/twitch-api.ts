@@ -1,15 +1,15 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
-import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@lib/twitch';
-import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@lib/site-config';
-import { getPackTypeById } from '@lib/pack-type';
+import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@core/lib/twitch';
+import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@core/lib/site-config';
+import { getPackTypeById } from '@core/lib/pack-type';
 import {
 	MOMENT_REDEMPTION_PACK_TYPE_ID,
 	TWITCH_GIFT_SUB_ID,
-} from '@lil-indigestion-cards/core/constants';
-import { setAdminEnvSession } from '@lib/session';
-import { Moment } from '@lil-indigestion-cards/core/events/moments';
+} from '@core/constants';
+import { setAdminEnvSession } from '@core/lib/session';
+import { Moment } from '@core/events/moments';
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
 	if (!verifyDiscordRequest(event)) {

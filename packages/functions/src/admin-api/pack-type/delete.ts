@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { deletePackTypeById } from '@lib/pack-type';
+import { SiteHandler } from '@core/lib/api';
+import { deletePackTypeById } from '@core/lib/pack-type';
 
 export const handler = SiteHandler(
 	{

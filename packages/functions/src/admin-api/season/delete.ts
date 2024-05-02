@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { deleteSeasonById } from '@lib/season';
+import { SiteHandler } from '@core/lib/api';
+import { deleteSeasonById } from '@core/lib/season';
 
 export const handler = SiteHandler(
 	{

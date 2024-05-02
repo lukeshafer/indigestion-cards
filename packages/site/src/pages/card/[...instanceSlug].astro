@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getCardInstanceById } from '@lib/card';
-import { getUser } from '@lib/user';
-import { routeNames, routes } from '@/constants';
-import CardPage from '@/layouts/CardPage.astro';
+import Page from '@site/layouts/Page.astro';
+import { getCardInstanceById } from '@core/lib/card';
+import { getUser } from '@core/lib/user';
+import { routeNames, routes } from '@site/constants';
+import CardPage from '@site/layouts/CardPage.astro';
 
 const session = Astro.locals.session;
 
@@ -29,7 +29,9 @@ if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
 	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
-const user = session?.properties.userId ? await getUser(session.properties.userId) : null;
+const user = session?.properties.userId
+	? getUser(session.properties.userId)
+	: Promise.resolve(null);
 ---
 
 <Page
@@ -41,5 +43,5 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 		{ label: instance.cardName, href: `${routes.DESIGNS}/${designId}` },
 		{ label: `${instance.rarityName} #${instance.cardNumber}` },
 	]}>
-	<CardPage card={instance} user={user ?? undefined} />
+	{user.then(user => <CardPage card={instance} user={user ?? undefined} />)}
 </Page>

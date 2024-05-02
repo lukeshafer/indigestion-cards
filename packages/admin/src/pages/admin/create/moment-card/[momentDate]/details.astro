@@ -1,12 +1,12 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { ASSETS } from '@/constants';
-import { PageTitle, PageHeader } from '@/components/text';
-import MomentDesignForm from '@/components/moments/MomentDesignForm';
-import { getAllSeasons } from '@lib/season';
-import { getAllRarities } from '@lib/rarity';
-import { getSiteConfig } from '@lib/site-config';
-import { getMomentRedemptionsForDate } from '@lib/moments';
+import Page from '@admin/layouts/Page.astro';
+// import { ASSETS } from '@admin/constants';
+import { PageTitle, PageHeader } from '@admin/components/text';
+import MomentDesignForm from '@admin/components/moments/MomentDesignForm';
+import { getAllSeasons } from '@core/lib/season';
+import { getAllRarities } from '@core/lib/rarity';
+// import { getSiteConfig } from '@core/lib/site-config';
+import { getMomentRedemptionsForDate } from '@core/lib/moments';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');
@@ -18,14 +18,14 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 const seasons = await getAllSeasons();
 const rarities = await getAllRarities();
-const config = await getSiteConfig();
-const baseRarity = config?.baseRarity ??
-	rarities[0] ?? {
-		rarityId: 'default',
-		rarityName: 'Default',
-		rarityColor: '#fff',
-		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
-	};
+// const config = await getSiteConfig();
+// const baseRarity = config?.baseRarity ??
+// 	rarities[0] ?? {
+// 		rarityId: 'default',
+// 		rarityName: 'Default',
+// 		rarityColor: '#fff',
+// 		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
+// 	};
 
 const { momentDate } = Astro.params;
 const redemptions = await getMomentRedemptionsForDate(momentDate!);
@@ -40,9 +40,8 @@ const redemptions = await getMomentRedemptionsForDate(momentDate!);
 		{key}
 		{seasons}
 		{rarities}
-		{baseRarity}
 		{redemptions}
-		momentDate={momentDate}
+		momentDate={momentDate!}
 		client:load
 	/>
 </Page>

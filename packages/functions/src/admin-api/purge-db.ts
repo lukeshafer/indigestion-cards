@@ -1,7 +1,7 @@
 import { ApiHandler, useFormValue } from 'sst/node/api';
 import { useSession } from 'sst/node/future/auth';
-import { db } from '@lil-indigestion-cards/core/db/db-service';
-import { setAdminEnvSession } from '@lib/session';
+import { db } from '../../../core/src/db';
+import { setAdminEnvSession } from '@core/lib/session';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
@@ -28,19 +28,19 @@ export const handler = ApiHandler(async () => {
 	}
 
 	const result = await Promise.all([
-		...(await deleteEntity(db.entities.cardInstances)),
-		...(await deleteEntity(db.entities.packs)),
-		...(await deleteEntity(db.entities.packTypes)),
-		...(await deleteEntity(db.entities.cardDesigns)),
-		...(await deleteEntity(db.entities.season)),
-		...(await deleteEntity(db.entities.rarities)),
-		...(await deleteEntity(db.entities.unmatchedImages)),
-		...(await deleteEntity(db.entities.twitchEvents)),
-		...(await deleteEntity(db.entities.twitchEventMessageHistory)),
-		...(await deleteEntity(db.entities.users)),
-    ...(await deleteEntity(db.entities.userLogins)),
-    ...(await deleteEntity(db.entities.trades)),
-    ...(await deleteEntity(db.entities.preorders)),
+		...(await deleteEntity(db.entities.CardInstances)),
+		...(await deleteEntity(db.entities.Packs)),
+		...(await deleteEntity(db.entities.PackTypes)),
+		...(await deleteEntity(db.entities.CardDesigns)),
+		...(await deleteEntity(db.entities.Seasons)),
+		...(await deleteEntity(db.entities.Rarities)),
+		...(await deleteEntity(db.entities.UnmatchedImages)),
+		...(await deleteEntity(db.entities.TwitchEvents)),
+		...(await deleteEntity(db.entities.TwitchEventMessageHistory)),
+		...(await deleteEntity(db.entities.Users)),
+    ...(await deleteEntity(db.entities.UserLogins)),
+    ...(await deleteEntity(db.entities.Trades)),
+    ...(await deleteEntity(db.entities.Preorders)),
 	]);
 
 	return {

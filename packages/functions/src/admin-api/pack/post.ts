@@ -1,7 +1,7 @@
-import { SiteHandler } from '@lib/api';
-import { packSchema, packSchemaWithoutUser } from '@lib/entity-schemas';
-import { createPackForNoUser, givePackToUser } from '@lib/pack';
-import { getUserByLogin } from '@lib/twitch';
+import { SiteHandler } from '@core/lib/api';
+import { packSchema, packSchemaWithoutUser } from '@core/lib/entity-schemas';
+import { createPackForNoUser, givePackToUser } from '@core/lib/pack';
+import { getUserByLogin } from '@core/lib/twitch';
 
 export const handler = SiteHandler(
 	{

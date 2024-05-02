@@ -1,7 +1,7 @@
-import { Form, SubmitButton, TextArea } from '@/components/form/Form';
-import { API } from '@/constants';
+import { Form, SubmitButton, TextArea } from '@admin/components/form/Form';
+import { API } from '@admin/constants';
 import { Show, createSignal } from 'solid-js';
-import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
+import type { CardDesign } from '@core/types';
 
 export default function EditDesignForm(props: CardDesign) {
 	const [isEditing, setIsEditing] = createSignal(false);

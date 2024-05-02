@@ -1,9 +1,9 @@
 ---
-import { PageTitle } from '@/components/text';
-import Page from '@/layouts/Page.astro';
-import { getAllPackTypes } from '@lib/pack-type';
-import { Form, Select, SubmitButton, TextInput } from '@/components/form/Form';
-import { API } from '@/constants';
+import { PageTitle } from '@admin/components/text';
+import Page from '@admin/layouts/Page.astro';
+import { getAllPackTypes } from '@core/lib/pack-type';
+import { Form, Select, SubmitButton, TextInput } from '@admin/components/form/Form';
+import { API } from '@admin/constants';
 
 const packTypes = await getAllPackTypes();
 ---

@@ -1,4 +1,4 @@
-import { getAllPackTypes } from '@lib/pack-type';
+import { getAllPackTypes } from '@core/lib/pack-type';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async () => {

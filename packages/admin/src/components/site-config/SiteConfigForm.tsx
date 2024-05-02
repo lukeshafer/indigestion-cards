@@ -1,9 +1,7 @@
-import { Checkbox, Form, Select, SubmitButton } from '@/components/form/Form';
-import type { Rarity } from '@lil-indigestion-cards/core/db/rarities';
-import type { PackType } from '@lil-indigestion-cards/core/db/packTypes';
-import type { TwitchEvent } from '@lil-indigestion-cards/core/db/twitchEvents';
-import { MOMENT_REDEMPTION_PACK_TYPE_ID } from '@lil-indigestion-cards/core/constants';
-import { API } from '@/constants';
+import { Checkbox, Form, Select, SubmitButton } from '@admin/components/form/Form';
+import type { Rarity, PackType, TwitchEvent, } from '@core/types';
+import { MOMENT_REDEMPTION_PACK_TYPE_ID } from '@core/constants';
+import { API } from '@admin/constants';
 import { Show, createSignal } from 'solid-js';
 import Table from '../table/Table';
 import RarityRanking, { type RarityRankingRecord } from './RarityRanking';

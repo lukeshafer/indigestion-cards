@@ -1,7 +1,7 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { PageTitle, PageHeader } from '@/components/text';
-import RarityForm from '@/components/rarities/RarityForm';
+import Page from '@admin/layouts/Page.astro';
+import { PageTitle, PageHeader } from '@admin/components/text';
+import RarityForm from '@admin/components/rarities/RarityForm';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');

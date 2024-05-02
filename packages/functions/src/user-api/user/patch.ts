@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { setUserProfile } from '@lib/user';
+import { SiteHandler } from '@core/lib/api';
+import { setUserProfile } from '@core/lib/user';
 
 export const handler = SiteHandler(
 	{

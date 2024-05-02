@@ -1,15 +1,5 @@
-import {
-	trades,
-	type CreateTrade,
-	type UpdateTrade,
-	type Trade,
-	type TradeCard,
-} from '../db/trades';
+import { db } from '../db'
 import { getUserAndCardInstances } from './user';
-import { cardInstances, type CardInstance } from '../db/cardInstances';
-import { users, type User } from '../db/users';
-import { Service } from 'electrodb';
-import { config } from '../db/_utils';
 import {
 	InputValidationError,
 	NotFoundError,
@@ -19,6 +9,7 @@ import {
 } from './errors';
 import { sendTradeAcceptedEvent } from '../events/trades';
 import { LEGACY_CARD_ID } from '../constants';
+import type { CardInstance, CreateTrade, Trade, TradeCard, UpdateTrade, User } from '../db.types';
 
 const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
 
@@ -44,8 +35,8 @@ export async function createTradeFromApi(params: {
 	const senderData = await getUserAndCardInstances({ username: params.senderUsername });
 	const receiverData = await getUserAndCardInstances({ username: params.receiverUsername });
 
-	const sender = senderData?.users[0];
-	const receiver = receiverData?.users[0];
+	const sender = senderData?.Users[0];
+	const receiver = receiverData?.Users[0];
 	if (!sender || !receiver) {
 		throw new InputValidationError('Invalid users provided');
 	}
@@ -77,8 +68,8 @@ export async function createTradeFromApi(params: {
 		});
 	}
 
-	const offeredCards = getCardData(params.offeredCards, senderData.cardInstances);
-	const requestedCards = getCardData(params.requestedCards, receiverData.cardInstances);
+	const offeredCards = getCardData(params.offeredCards, senderData.CardInstances);
+	const requestedCards = getCardData(params.requestedCards, receiverData.CardInstances);
 
 	if (!offeredCards.length && !requestedCards.length) {
 		throw new InputValidationError(
@@ -98,8 +89,8 @@ export async function createTradeFromApi(params: {
 
 	try {
 		console.log({ tradeOptions: JSON.stringify(tradeOptions) });
-		const trade = await trades.create(tradeOptions).go();
-		const user = await users
+		const trade = await db.entities.Trades.create(tradeOptions).go();
+		const user = await db.entities.Users
 			.patch({ userId: tradeOptions.receiverUserId })
 			.append({
 				tradeNotifications: [
@@ -120,12 +111,12 @@ export async function createTradeFromApi(params: {
 }
 
 export async function getOutgoingTradesByUserId(senderUserId: string) {
-	const result = await trades.query.bySenderId({ senderUserId }).go();
+	const result = await db.entities.Trades.query.bySenderId({ senderUserId }).go();
 	return result.data;
 }
 
 export async function getIncomingTradesByUserId(receiverUserId: string) {
-	const result = await trades.query.byReceiverId({ receiverUserId }).go();
+	const result = await db.entities.Trades.query.byReceiverId({ receiverUserId }).go();
 	return result.data;
 }
 
@@ -138,26 +129,26 @@ export async function getAllTradesForUser(userId: string) {
 }
 
 export async function getSentTradeById(args: { tradeId: string; senderUserId: string }) {
-	const result = await trades.query
+	const result = await db.entities.Trades.query
 		.bySenderId({ tradeId: args.tradeId, senderUserId: args.senderUserId })
 		.go();
 	return result.data[0];
 }
 
 export async function getReceivedTradeById(args: { tradeId: string; receiverUserId: string }) {
-	const result = await trades.query
+	const result = await db.entities.Trades.query
 		.byReceiverId({ tradeId: args.tradeId, receiverUserId: args.receiverUserId })
 		.go();
 	return result.data[0];
 }
 
 export async function getTrade(tradeId: string) {
-	const result = await trades.query.primary({ tradeId }).go();
+	const result = await db.entities.Trades.query.primary({ tradeId }).go();
 	return result.data[0];
 }
 
 export async function updateTrade(tradeId: string, updates: UpdateTrade, userId?: string) {
-	const set = trades.patch({ tradeId }).set(updates);
+	const set = db.entities.Trades.patch({ tradeId }).set(updates);
 	const status = updates.status;
 	const result = status
 		? set
@@ -196,12 +187,11 @@ export async function updateTradeStatus({
 	const otherUserId =
 		trade.senderUserId === loggedInUserId ? trade.receiverUserId : trade.senderUserId;
 
-	const service = new Service({ trades, users }, config);
 	const newStatus = checkIsValidStatus({ status, trade, loggedInUserId });
 
-	const result = await service.transaction
-		.write(({ users, trades }) => [
-			trades
+	const result = await db.transaction
+		.write(({ Users, Trades }) => [
+			Trades
 				.patch({ tradeId: trade.tradeId })
 				.set({ status: newStatus, statusMessage })
 				.append({
@@ -214,7 +204,7 @@ export async function updateTradeStatus({
 					],
 				})
 				.commit(),
-			users
+			Users
 				.patch({ userId: otherUserId })
 				.append({
 					tradeNotifications: [
@@ -286,11 +276,9 @@ export async function addMessageToTrade(params: {
 	const otherUserId =
 		trade.senderUserId === params.loggedInUserId ? trade.receiverUserId : trade.senderUserId;
 
-	const service = new Service({ users, trades }, config);
-
-	const result = await service.transaction
-		.write(({ users, trades }) => [
-			trades
+	const result = await db.transaction
+		.write(({ Users, Trades }) => [
+			Trades
 				.patch({ tradeId: params.tradeId })
 				.append({
 					messages: [
@@ -301,7 +289,7 @@ export async function addMessageToTrade(params: {
 					],
 				})
 				.commit(),
-			users
+			Users
 				.patch({ userId: otherUserId })
 				.append({
 					tradeNotifications: [
@@ -327,19 +315,10 @@ export async function processTrade(trade: Trade) {
 	const sender = await getAndValidateUserAndCardInstances(trade.senderUsername);
 	const receiver = await getAndValidateUserAndCardInstances(trade.receiverUsername);
 
-	const service = new Service(
-		{
-			users,
-			cardInstances,
-			trades,
-		},
-		config
-	);
-
 	try {
-		await service.transaction.write(({ users }) => [
-			users.patch({ userId: sender.user.userId }).set({ isTrading: true }).commit(),
-			users.patch({ userId: receiver.user.userId }).set({ isTrading: true }).commit(),
+		await db.transaction.write(({ Users }) => [
+			Users.patch({ userId: sender.user.userId }).set({ isTrading: true }).commit(),
+			Users.patch({ userId: receiver.user.userId }).set({ isTrading: true }).commit(),
 		]);
 
 		const offeredCardsMoveToReceiver = trade.offeredCards.map(
@@ -358,9 +337,9 @@ export async function processTrade(trade: Trade) {
 			})
 		) satisfies CardInstance[];
 
-		await service.transaction
-			.write(({ cardInstances, users, trades }) => [
-				users
+		await db.transaction
+			.write(({ CardInstances, Users, Trades }) => [
+				Users
 					.patch({ userId: sender.user.userId })
 					.set({
 						pinnedCard: trade.offeredCards.some(
@@ -392,7 +371,7 @@ export async function processTrade(trade: Trade) {
 						],
 					})
 					.commit(),
-				users
+				Users
 					.patch({ userId: receiver.user.userId })
 					.set({
 						pinnedCard: trade.requestedCards.some(
@@ -416,7 +395,7 @@ export async function processTrade(trade: Trade) {
 					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
 					.commit(),
 				...offeredCardsMoveToReceiver.map(card =>
-					cardInstances
+					CardInstances
 						.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
@@ -433,7 +412,7 @@ export async function processTrade(trade: Trade) {
 						.commit()
 				),
 				...requestedCardsMoveToSender.map(card =>
-					cardInstances
+					CardInstances
 						.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
@@ -449,13 +428,13 @@ export async function processTrade(trade: Trade) {
 						})
 						.commit()
 				),
-				trades.patch({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
+				Trades.patch({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
 			])
 			.go();
 	} finally {
-		await service.transaction.write(({ users }) => [
-			users.patch({ userId: sender.user.userId }).set({ isTrading: false }).commit(),
-			users.patch({ userId: receiver.user.userId }).set({ isTrading: false }).commit(),
+		await db.transaction.write(({ Users }) => [
+			Users.patch({ userId: sender.user.userId }).set({ isTrading: false }).commit(),
+			Users.patch({ userId: receiver.user.userId }).set({ isTrading: false }).commit(),
 		]);
 	}
 }
@@ -486,8 +465,8 @@ function formatToAndFromUsers(args: { card: CardInstance; trade: Trade }): {
 async function getAndValidateUserAndCardInstances(username: string) {
 	const userdata = await getUserAndCardInstances({ username });
 
-	const user = userdata?.users[0];
-	const cards = userdata?.cardInstances.filter(
+	const user = userdata?.Users[0];
+	const cards = userdata?.CardInstances.filter(
 		card => !UNTRADEABLE_RARITY_IDS.includes(card.rarityId)
 	);
 
@@ -545,11 +524,9 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 		throw new Error('Cannot set a trade to failed unless accepted.');
 	}
 
-	const service = new Service({ trades, users }, config);
-
-	const result = await service.transaction
-		.write(({ users, trades }) => [
-			trades
+	const result = await db.transaction
+		.write(({ Users, Trades }) => [
+			Trades
 				.patch({ tradeId: trade.tradeId })
 				.set({ status: 'failed', statusMessage })
 				.append({
@@ -562,7 +539,7 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 					],
 				})
 				.commit(),
-			users
+			Users
 				.patch({ userId: trade.senderUserId })
 				.append({
 					tradeNotifications: [
@@ -574,7 +551,7 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 					],
 				})
 				.commit(),
-			users
+			Users
 				.patch({ userId: trade.receiverUserId })
 				.append({
 					tradeNotifications: [

@@ -1,11 +1,11 @@
 ---
-import { Anchor, Heading, PageHeader, PageTitle } from '@/components/text';
-import { routes } from '@/constants';
-import Page from '@/layouts/Page.astro';
+import { Anchor, Heading, PageHeader, PageTitle } from '@admin/components/text';
+import { routes } from '@admin/constants';
+import Page from '@admin/layouts/Page.astro';
 import {
 	getAllMomentRedemptions,
 	groupRedemptionsByMoment,
-} from '@lil-indigestion-cards/core/lib/moments';
+} from '@core/lib/moments';
 
 const redemptions = await getAllMomentRedemptions();
 

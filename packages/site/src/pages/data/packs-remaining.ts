@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { TypedResponse } from '@/lib/api';
-import { getAllCardDesigns, getCardDesignAndInstancesById } from '@lib/design'
-import type { CardDesign } from '@lil-indigestion-cards/core/db/cardDesigns';
+import { TypedResponse } from '@site/lib/api';
+import { getAllCardDesigns, getCardDesignAndInstancesById } from '@core/lib/design'
+import type { CardDesign } from '@core/types';
 
 export const GET = (async () => {
   const designs = await getAllCardDesigns();
@@ -21,9 +21,9 @@ export interface DesignCountData {
 }
 
 async function getDesignCountData(design: CardDesign): Promise<DesignCountData> {
-  const { cardInstances } = await getCardDesignAndInstancesById(design)
+  const { CardInstances } = await getCardDesignAndInstancesById(design)
 
-  const ownedCards = cardInstances.length;
+  const ownedCards = CardInstances.length;
   const possibleCards = design.rarityDetails?.reduce((acc, rarity) => {
     return acc + rarity.count
   }, 0) ?? 0;

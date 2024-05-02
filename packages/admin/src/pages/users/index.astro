@@ -1,10 +1,10 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllPreorders } from '@lib/preorder';
-import { PageHeader, PageTitle } from '@/components/text';
-import UsersTable from '@/components/user/UsersTable';
+import Page from '@admin/layouts/Page.astro';
+import { getAllPreorders } from '@core/lib/preorder';
+import { PageHeader, PageTitle } from '@admin/components/text';
+import UsersTable from '@admin/components/user/UsersTable';
 
-import { GET as getUsers } from '@/pages/data/users';
+import { GET as getUsers } from '@admin/pages/data/users';
 
 const { data: users } = await getUsers();
 const preorders = await getAllPreorders();

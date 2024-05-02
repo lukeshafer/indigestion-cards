@@ -1,8 +1,8 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllSeasons } from '@lib/season';
-import { routes } from '@/constants';
-import { PageTitle, PageHeader, Anchor } from '@/components/text';
+import Page from '@admin/layouts/Page.astro';
+import { getAllSeasons } from '@core/lib/season';
+import { routes } from '@admin/constants';
+import { PageTitle, PageHeader, Anchor } from '@admin/components/text';
 
 const seasons = await getAllSeasons();
 ---

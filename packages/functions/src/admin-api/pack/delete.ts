@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { deleteFirstPackForUser } from '@lib/pack';
+import { SiteHandler } from '@core/lib/api';
+import { deleteFirstPackForUser } from '@core/lib/pack';
 
 export const handler = SiteHandler(
 	{

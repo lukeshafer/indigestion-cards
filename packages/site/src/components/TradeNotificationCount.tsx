@@ -1,6 +1,6 @@
 import { Show, createResource, onCleanup, onMount } from 'solid-js';
 import ButtonCount from './ButtonCount';
-import { get } from '@/lib/client/data';
+import { get } from '@site/lib/client/data';
 
 export default function TradeNotificationCount(props: { username: string }) {
   console.log('trade notification count')

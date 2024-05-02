@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
-import type { TwitchUser } from '@lib/twitch';
+import type { TwitchUser } from '@core/lib/twitch';
 import UserIcon from './icons/UserIcon';
-import { authApi } from '@/constants';
+import { authApi } from '@admin/constants';
 
 function clickOutside(el: Element, close: () => void) {
 	const onClick = (e: MouseEvent) => {

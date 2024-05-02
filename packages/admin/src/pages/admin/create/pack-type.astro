@@ -1,9 +1,9 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getAllSeasons } from '@lib/season';
-import { getAllCardDesigns } from '@lib/design';
-import { PageTitle } from '@/components/text';
-import PackTypeForm from '@/components/pack-type/PackTypeForm';
+import Page from '@admin/layouts/Page.astro';
+import { getAllSeasons } from '@core/lib/season';
+import { getAllCardDesigns } from '@core/lib/design';
+import { PageTitle } from '@admin/components/text';
+import PackTypeForm from '@admin/components/pack-type/PackTypeForm';
 
 const seasons = await getAllSeasons();
 const cardDesigns = await getAllCardDesigns();

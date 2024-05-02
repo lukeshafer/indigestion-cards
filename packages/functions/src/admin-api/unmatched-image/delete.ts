@@ -1,6 +1,6 @@
-import { SiteHandler } from '@lib/api';
+import { SiteHandler } from '@core/lib/api';
 import { S3 } from '@aws-sdk/client-s3';
-import { deleteUnmatchedDesignImage } from '@lib/unmatched-image';
+import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
 import { Bucket } from 'sst/node/bucket';
 
 export const handler = SiteHandler(
@@ -28,7 +28,7 @@ export const handler = SiteHandler(
 
 		const s3 = new S3();
 		try {
-			await deleteUnmatchedDesignImage({ imageId: key, type });
+			await deleteUnmatchedDesignImage({ imageId: key, unmatchedImageType: type });
 			await s3.deleteObject({
 				Bucket: bucketName,
 				Key: key,

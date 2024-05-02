@@ -1,14 +1,14 @@
-import { SiteHandler } from '@lil-indigestion-cards/core/lib/api';
-import { createCardInstance } from '@lil-indigestion-cards/core/lib/card';
-import { generateInstanceId } from '@lil-indigestion-cards/core/lib/card-pool';
-import { createCardDesign, deleteCardDesignById } from '@lil-indigestion-cards/core/lib/design';
-import { createS3Url, moveImageBetweenBuckets } from '@lil-indigestion-cards/core/lib/images';
+import { SiteHandler } from '@core/lib/api';
+import { createCardInstance } from '@core/lib/card';
+import { generateInstanceId } from '@core/lib/card-pool';
+import { createCardDesign, deleteCardDesignById } from '@core/lib/design';
+import { createS3Url, moveImageBetweenBuckets } from '@core/lib/images';
 import {
 	deleteMomentRedemption,
 	momentInputSchemas,
-} from '@lil-indigestion-cards/core/lib/moments';
-import { generatePackId } from '@lil-indigestion-cards/core/lib/pack';
-import { deleteUnmatchedDesignImage } from '@lil-indigestion-cards/core/lib/unmatched-image';
+} from '@core/lib/moments';
+import { generatePackId } from '@core/lib/pack';
+import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
 import { Bucket } from 'sst/node/bucket';
 
 export const handler = SiteHandler(
@@ -73,7 +73,7 @@ export const handler = SiteHandler(
 		}
 		await deleteUnmatchedDesignImage({
 			imageId: params.imageKey,
-			type: 'cardDesign',
+			unmatchedImageType: 'cardDesign',
 		});
 
 		// give cards to users

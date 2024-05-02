@@ -1,10 +1,10 @@
 ---
-import { PageTitle, Heading } from '@/components/text';
-import DeletePackTypeButton from '@/components/pack-type/DeletePackTypeButton';
-import Page from '@/layouts/Page.astro';
-import { getPackTypeById } from '@lib/pack-type';
-import { getCardPoolFromType } from '@lib/card-pool';
-import Table from '@/components/table/Table';
+import { PageTitle, Heading } from '@admin/components/text';
+import DeletePackTypeButton from '@admin/components/pack-type/DeletePackTypeButton';
+import Page from '@admin/layouts/Page.astro';
+import { getPackTypeById } from '@core/lib/pack-type';
+import { getCardPoolFromType } from '@core/lib/card-pool';
+import Table from '@admin/components/table/Table';
 
 const packTypeId = Astro.params.packTypeId;
 if (!packTypeId) {
@@ -36,7 +36,7 @@ const cardPool = await getCardPoolFromType(packType);
 					label: 'Season Name',
 				},
 			]}
-			rows={cardPool.cardDesigns.map((card) => ({
+			rows={cardPool.CardDesigns.map((card) => ({
 				cardName: card.cardName,
 				seasonName: card.seasonName,
 			}))}

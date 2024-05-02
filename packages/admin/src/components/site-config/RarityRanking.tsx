@@ -1,8 +1,8 @@
-import type { SiteConfig } from '@lil-indigestion-cards/core/db/siteConfig';
+import type { SiteConfig } from '@core/types';
 import { For, createSignal, createUniqueId } from 'solid-js';
-import { FULL_ART_ID, LEGACY_CARD_ID } from '@/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@admin/constants';
 import { createStore, produce } from 'solid-js/store';
-import { useViewTransition } from '@/lib/client/utils';
+import { useViewTransition } from '@admin/lib/client/utils';
 import { Heading } from '../text';
 
 type RarityRankingType = NonNullable<SiteConfig['rarityRanking']>[number];

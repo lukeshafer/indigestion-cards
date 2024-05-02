@@ -1,7 +1,8 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { getCardInstanceByUsername } from '@lib/card';
-import CardPage from '@/layouts/CardPage.astro';
+import Page from '@admin/layouts/Page.astro';
+import { getCardInstanceByUsername } from '@core/lib/card';
+import CardPage from '@admin/layouts/CardPage.astro';
+import { routes } from '@admin/constants';
 
 const slug = Astro.params.userInstanceSlug;
 if (!slug) {

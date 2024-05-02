@@ -1,8 +1,8 @@
 ---
-import Page from '@/layouts/Page.astro';
-import OpenPacksComponent from '@/components/open-packs/OpenPacks';
-import { getAllPacks } from '@lib/pack';
-import Header from '@/components/Header.astro';
+import Page from '@site/layouts/Page.astro';
+import OpenPacksComponent from '@site/components/open-packs/OpenPacks';
+import { getAllPacks } from '@core/lib/pack';
+import Header from '@site/components/Header.astro';
 import { Config } from 'sst/node/config';
 
 const allPacks = await getAllPacks();

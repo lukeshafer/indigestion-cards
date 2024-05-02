@@ -1,7 +1,6 @@
-import Table from '@/components/table/Table';
-import type { User } from '@lil-indigestion-cards/core/db/users';
-import type { Preorder } from '@lil-indigestion-cards/core/db/preorders';
-import { routes } from '@/constants';
+import Table from '@admin/components/table/Table';
+import type { User, Preorder } from '@core/types';
+import { routes } from '@admin/constants';
 import CardsIcon from '../icons/CardsIcon';
 import PacksIcon from '../icons/PacksIcon';
 import { createMemo } from 'solid-js';

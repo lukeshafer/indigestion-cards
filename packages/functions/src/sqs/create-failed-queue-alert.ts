@@ -1,5 +1,5 @@
 import type { SQSEvent } from 'aws-lambda';
-import { addMessageToSiteConfig } from '@lib/site-config';
+import { addMessageToSiteConfig } from '@core/lib/site-config';
 
 export async function handler(event: SQSEvent) {
 	await Promise.all(

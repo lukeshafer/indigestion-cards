@@ -1,12 +1,11 @@
-import type { CardDesign } from "../db/cardDesigns";
-import type { CardInstance } from "../db/cardInstances";
-import type { PackDetails } from "./entity-schemas";
-import { db } from "../db/db-service";
-import { PackTypeIsOutOfCardsError } from "./errors";
+import type { CardDesign, CardInstance } from '../db.types';
+import type { PackDetails } from './entity-schemas';
+import { db } from '../db';
+import { PackTypeIsOutOfCardsError } from './errors';
 
 export type CardPool = {
-	cardDesigns: CardDesign[];
-	cardInstances: CardInstance[];
+	CardDesigns: CardDesign[];
+	CardInstances: CardInstance[];
 };
 
 export function generateCard(info: {
@@ -15,21 +14,19 @@ export function generateCard(info: {
 	packId: string | undefined;
 	cardPool: CardPool;
 }) {
-	console.log("Generating card: ", { ...info, cardPool: [] });
+	console.log('Generating card: ', { ...info, cardPool: [] });
 	// Steps:
 	// 1. Take all the designs and instances, and generate a list of remaining possible cards that can be generated
-	const { cardDesigns } = info.cardPool;
+	const { CardDesigns } = info.cardPool;
 
-	if (cardDesigns.length === 0) {
-		throw new PackTypeIsOutOfCardsError("No designs found");
+	if (CardDesigns.length === 0) {
+		throw new PackTypeIsOutOfCardsError('No designs found');
 	}
 
-	const possibleCardsList = getRemainingPossibleCardsFromCardPool(
-		info.cardPool,
-	);
+	const possibleCardsList = getRemainingPossibleCardsFromCardPool(info.cardPool);
 
 	if (possibleCardsList.length === 0) {
-		throw new PackTypeIsOutOfCardsError("No cards remaining");
+		throw new PackTypeIsOutOfCardsError('No cards remaining');
 	}
 
 	const {
@@ -37,14 +34,10 @@ export function generateCard(info: {
 		rarityId: assignedRarityId,
 		cardNumber: assignedCardNumber,
 	} = possibleCardsList[Math.floor(Math.random() * possibleCardsList.length)];
-	const design = cardDesigns.find(
-		(design) => design.designId === assignedDesignId,
-	)!;
-	const rarity = design.rarityDetails?.find(
-		(rarity) => rarity.rarityId === assignedRarityId,
-	);
+	const design = CardDesigns.find(design => design.designId === assignedDesignId)!;
+	const rarity = design.rarityDetails?.find(rarity => rarity.rarityId === assignedRarityId);
 
-	if (!rarity) throw new PackTypeIsOutOfCardsError("No rarity found");
+	if (!rarity) throw new PackTypeIsOutOfCardsError('No rarity found');
 
 	const totalOfType = rarity?.count;
 	const instanceId = generateInstanceId({
@@ -76,7 +69,7 @@ export function generateCard(info: {
 		totalOfType,
 	} satisfies CardInstance;
 
-	console.log("Generated card", {
+	console.log('Generated card', {
 		seasonId: design.seasonId,
 		seasonName: design.seasonName,
 		designId: design.designId,
@@ -93,14 +86,14 @@ export function generateCard(info: {
 }
 
 export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
-	const { cardDesigns, cardInstances: existingInstances } = cardPool;
+	const { CardDesigns, CardInstances: existingInstances } = cardPool;
 
-	if (cardDesigns.length === 0) {
-		throw new Error("No designs found");
+	if (CardDesigns.length === 0) {
+		throw new Error('No designs found');
 	}
 
 	const possibleCardsList = [];
-	for (const design of cardDesigns) {
+	for (const design of CardDesigns) {
 		if (!design.rarityDetails) continue;
 		for (const rarity of design.rarityDetails) {
 			for (let i = 0; i < rarity.count; i++) {
@@ -117,10 +110,10 @@ export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
 	for (const card of existingInstances) {
 		// remove the card from the list of possible cards
 		const index = possibleCardsList.findIndex(
-			(possibleCard) =>
+			possibleCard =>
 				possibleCard.designId === card.designId &&
 				possibleCard.rarityId === card.rarityId &&
-				possibleCard.cardNumber === card.cardNumber,
+				possibleCard.cardNumber === card.cardNumber
 		);
 		if (index !== -1) {
 			possibleCardsList.splice(index, 1);
@@ -130,43 +123,42 @@ export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
 	return possibleCardsList;
 }
 
-export async function getCardPoolFromType(
-	packType: PackDetails["packType"],
-): Promise<CardPool> {
-	if (packType.packTypeCategory === "season") {
+export async function getCardPoolFromType(packType: PackDetails['packType']): Promise<CardPool> {
+	if (packType.packTypeCategory === 'season') {
 		const seasonId = packType.seasonId;
-		if (!seasonId) throw new Error("SeasonId is required for season packs");
+		if (!seasonId) throw new Error('SeasonId is required for season packs');
 		const cardPool = await db.collections
-			.seasonAndDesigns({ seasonId })
-			.go({ pages: "all" });
+			.SeasonAndDesignsAndCards({ seasonId })
+			.go({ pages: 'all' });
 		return cardPool.data;
 	}
-	if (packType.packTypeCategory === "custom") {
-		if (!packType.designs)
-			throw new Error("Designs are required for custom packs");
+	if (packType.packTypeCategory === 'custom') {
+		if (!packType.designs) throw new Error('Designs are required for custom packs');
 		const cardPool = await Promise.all(
-			packType.designs.map(async (design) => {
+			packType.designs.map(async design => {
 				const results = await db.collections
-					.designAndCards({ designId: design.designId })
-					.go({ pages: "all" });
+					.DesignAndCards({ designId: design.designId })
+					.go({
+						pages: 'all',
+					});
 				return results.data;
-			}),
-		).then((res) =>
+			})
+		).then(res =>
 			res.reduce(
 				(accum, design) => ({
-					cardDesigns: [...accum.cardDesigns, ...design.cardDesigns],
-					cardInstances: [...accum.cardInstances, ...design.cardInstances],
+					CardDesigns: [...accum.CardDesigns, ...design.CardDesigns],
+					CardInstances: [...accum.CardInstances, ...design.CardInstances],
 				}),
 				{
-					cardDesigns: [],
-					cardInstances: [],
-				},
-			),
+					CardDesigns: [],
+					CardInstances: [],
+				}
+			)
 		);
 		return cardPool;
 	}
 
-	throw new Error("Invalid packTypeCategory");
+	throw new Error('Invalid packTypeCategory');
 }
 
 /**

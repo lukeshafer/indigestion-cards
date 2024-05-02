@@ -3,9 +3,9 @@ import {
 	refreshChannelPointRewards,
 	addMessageToSiteConfig,
 	removeMessageFromSiteConfig,
-} from '@lib/site-config';
-import { getAllChannelPointRewards } from '@lib/twitch';
-import { setAdminEnvSession } from '@lib/session';
+} from '@core/lib/site-config';
+import { getAllChannelPointRewards } from '@core/lib/twitch';
+import { setAdminEnvSession } from '@core/lib/session';
 
 export async function handler() {
 	setAdminEnvSession(

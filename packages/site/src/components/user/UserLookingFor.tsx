@@ -1,7 +1,7 @@
-import type { User } from '@lil-indigestion-cards/core/db/users';
+import type { User } from '@core/types';
 import { Form, TextArea, SubmitButton, DeleteButton } from '../form/Form';
 import { createSignal } from 'solid-js';
-import { USER_API } from '@/constants';
+import { USER_API } from '@site/constants';
 
 export default function UserLookingFor(props: { user: User; isLoggedInUser: boolean }) {
   // eslint-disable-next-line solid/reactivity

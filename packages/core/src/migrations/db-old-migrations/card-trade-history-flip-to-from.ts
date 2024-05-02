@@ -1,4 +1,4 @@
-import { cardInstances } from '../db/cardInstances';
+import { cardInstances } from '../db-old/cardInstances';
 
 export async function migration() {
 	const cards = await cardInstances.scan.go({ pages: 'all' });

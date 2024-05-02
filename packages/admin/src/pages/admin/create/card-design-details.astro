@@ -1,11 +1,11 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { ASSETS } from '@/constants';
-import { PageTitle, PageHeader } from '@/components/text';
-import CardDesignForm from '@/components/design/CardDesignForm';
-import { getAllSeasons } from '@lib/season';
-import { getAllRarities } from '@lib/rarity';
-import { getSiteConfig } from '@lib/site-config';
+import Page from '@admin/layouts/Page.astro';
+import { ASSETS } from '@admin/constants';
+import { PageTitle, PageHeader } from '@admin/components/text';
+import CardDesignForm from '@admin/components/design/CardDesignForm';
+import { getAllSeasons } from '@core/lib/season';
+import { getAllRarities } from '@core/lib/rarity';
+import { getSiteConfig } from '@core/lib/site-config';
 
 const bucket = Astro.url.searchParams.get('bucket');
 const key = Astro.url.searchParams.get('key');

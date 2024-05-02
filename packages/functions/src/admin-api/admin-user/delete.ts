@@ -1,5 +1,5 @@
-import { SiteHandler } from '@lib/api';
-import { deleteAdminUser } from '@lib/admin-user';
+import { SiteHandler } from '@core/lib/api';
+import { deleteAdminUser } from '@core/lib/admin-user';
 
 export const handler = SiteHandler(
 	{
