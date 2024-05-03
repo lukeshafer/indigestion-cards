@@ -20,7 +20,7 @@ export function Database({ stack }: StackContext) {
 			gsi5sk: 'string',
 			gsi6pk: 'string',
 			gsi6sk: 'string',
-			// lsi1sk: 'string',
+			lsi1sk: 'string',
 		},
 		primaryIndex: {
 			partitionKey: 'pk',
