@@ -52,10 +52,10 @@ export function Database({ stack }: StackContext) {
 				partitionKey: 'gsi6pk',
 				sortKey: 'gsi6sk',
 			},
-			// gsi7: {
-			// 	partitionKey: 'gsi7pk',
-			// 	sortKey: 'gsi7sk',
-			// },
+			gsi7: {
+				partitionKey: 'gsi7pk',
+				sortKey: 'gsi7sk',
+			},
 		},
 	});
 
