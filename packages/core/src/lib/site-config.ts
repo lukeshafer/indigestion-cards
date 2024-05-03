@@ -136,13 +136,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
 
 export async function getRarityRankForRarity(
 	rarity: { rarityId: string },
-	siteConfig?: SiteConfig
+	rarityRanking?: SiteConfig['rarityRanking']
 ) {
-	if (!siteConfig) {
-		siteConfig = await getSiteConfig();
+	if (!rarityRanking) {
+		let siteConfig = await getSiteConfig();
+		rarityRanking = siteConfig.rarityRanking;
 	}
 
-	let matchedRanking = siteConfig.rarityRanking?.find(
+	let matchedRanking = rarityRanking?.find(
 		({ rarityId }) => rarityId === rarity.rarityId
 	);
 

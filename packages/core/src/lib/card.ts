@@ -1,6 +1,7 @@
 import { db } from '../db';
 import type { CardInstance, SiteConfig } from '../db.types';
 import { getUser } from './user';
+import { getRarityRankForRarity, getSiteConfig } from './site-config';
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
 	const { data: card } = await db.entities.CardInstances.get(args).go();
@@ -83,5 +84,21 @@ export async function getCardsByUsername(options: { username: string; cursor?: s
 export async function updateAllCardRarityRanks(
 	newRanking: NonNullable<SiteConfig['rarityRanking']>
 ) {
-  // TODO: scan all cards and update rankings accordingly 
+	let allCards = await db.entities.CardInstances.scan.go({ pages: 'all' });
+
+	const errors = [];
+	for (const card of allCards.data) {
+		try {
+			const updatedRarity = await getRarityRankForRarity(card, newRanking);
+			await db.entities.CardInstances.patch(card).set({ rarityRank: updatedRarity }).go();
+		} catch (error) {
+			console.error(error);
+			errors.push(error);
+		}
+	}
+
+	if (errors.length > 0) {
+		console.error('Errors found:', errors.length);
+		return Promise.reject('An error has occurred. Check log for details.');
+	}
 }
