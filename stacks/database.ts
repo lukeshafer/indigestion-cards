@@ -26,11 +26,11 @@ export function Database({ stack }: StackContext) {
 			partitionKey: 'pk',
 			sortKey: 'sk',
 		},
-		// localIndexes: {
-		// 	lsi1: {
-		// 		sortKey: 'lsi1sk',
-		// 	},
-		// },
+		localIndexes: {
+			lsi1: {
+				sortKey: 'lsi1sk',
+			},
+		},
 		globalIndexes: {
 			gsi1: {
 				partitionKey: 'gsi1pk',
