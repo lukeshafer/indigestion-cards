@@ -34,7 +34,7 @@ export default async function MEGA_SUPER_MIGRATION() {
 		await migrate<DB.User>('Users', Old.users, New.Users);
 	} catch (error) {
 		console.error(error);
-		console.log(error.fields);
+		// console.log(error.fields);
 		throw error;
 	}
 }

@@ -1,5 +1,5 @@
 import { db } from '../db';
-import type { CardInstance } from '../db.types';
+import type { CardInstance, SiteConfig } from '../db.types';
 import { getUser } from './user';
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
@@ -40,7 +40,9 @@ export async function getCardInstanceByDesignAndRarity(args: {
 	designId: string;
 	rarityId: string;
 }) {
-	const result = await db.entities.CardInstances.query.byDesignAndRarity(args).go({ pages: 'all' });
+	const result = await db.entities.CardInstances.query
+		.byDesignAndRarity(args)
+		.go({ pages: 'all' });
 	return result.data;
 }
 
@@ -68,4 +70,18 @@ export async function batchUpdateCardUsernames(args: { oldUsername: string; newU
 
 export async function createCardInstance(card: CardInstance) {
 	return db.entities.CardInstances.create(card).go();
+}
+
+export async function getCardsByUsername(options: { username: string; cursor?: string }) {
+	const results = await db.entities.CardInstances.query
+		.byUser({ username: options.username })
+		.go({ cursor: options.cursor, count: 30 });
+
+	return results;
+}
+
+export async function updateAllCardRarityRanks(
+	newRanking: NonNullable<SiteConfig['rarityRanking']>
+) {
+  // TODO: scan all cards and update rankings accordingly 
 }

@@ -304,7 +304,7 @@ const CardInstances = new Entity(
 	{
 		model: {
 			entity: 'cardInstance',
-			version: '1',
+			version: '2',
 			service: SERVICE,
 		},
 		attributes: {
@@ -344,6 +344,15 @@ const CardInstances = new Entity(
 				type: 'string',
 				required: true,
 			},
+			rarityRank: {
+				type: 'number',
+				required: true,
+			},
+			rarityRankPadded: {
+				type: 'string',
+				watch: ['rarityRank'],
+				set: (_, { rarityRank }) => padNumberForSorting(rarityRank),
+			},
 			frameUrl: {
 				type: 'string',
 				required: true,
@@ -373,6 +382,11 @@ const CardInstances = new Entity(
 			cardNumber: {
 				type: 'number',
 				required: true,
+			},
+			cardNumberPadded: {
+				type: 'string',
+				watch: ['cardNumber'],
+				set: (_, { cardNumber }) => padNumberForSorting(cardNumber),
 			},
 			totalOfType: {
 				type: 'number',
@@ -488,10 +502,47 @@ const CardInstances = new Entity(
 					composite: ['instanceId'],
 				},
 			},
+			byUserSortedByRarity: {
+				index: 'gsi5',
+				pk: {
+					field: 'gsi5pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi5sk',
+					composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
+				},
+			},
+			byUserSortedByCardName: {
+				index: 'gsi6',
+				pk: {
+					field: 'gsi6pk',
+					composite: ['username'],
+				},
+				sk: {
+					field: 'gsi6sk',
+					composite: ['cardName', 'rarityRankPadded', 'cardNumberPadded'],
+				},
+			},
+			byDesignSortedByRarity: {
+				index: 'lsi1',
+				pk: {
+					field: 'pk',
+					composite: ['designId'],
+				},
+				sk: {
+					field: 'lsi1sk',
+					composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
+				},
+			},
 		},
 	},
 	config
 );
+
+export function padNumberForSorting(value: number) {
+	return String(value).padStart(4, '0');
+}
 
 const MomentRedemptions = new Entity(
 	{

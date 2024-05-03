@@ -223,7 +223,7 @@ export async function createPack(args: {
 	const cards: CardInstance[] = [];
 	const cardPool = Object.assign(args.cardPool) as CardPool;
 	for (let i = 0; i < args.count; i++) {
-		const card = generateCard({
+		const card = await generateCard({
 			userId: user?.userId,
 			username: user?.username,
 			packId,
