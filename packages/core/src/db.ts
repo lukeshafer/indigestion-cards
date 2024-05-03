@@ -502,39 +502,39 @@ const CardInstances = new Entity(
 					composite: ['instanceId'],
 				},
 			},
-			byUserSortedByRarity: {
-				index: 'gsi5',
-				pk: {
-					field: 'gsi5pk',
-					composite: ['username'],
-				},
-				sk: {
-					field: 'gsi5sk',
-					composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
-				},
-			},
-			byUserSortedByCardName: {
-				index: 'gsi6',
-				pk: {
-					field: 'gsi6pk',
-					composite: ['username'],
-				},
-				sk: {
-					field: 'gsi6sk',
-					composite: ['cardName', 'rarityRankPadded', 'cardNumberPadded'],
-				},
-			},
-			byDesignSortedByRarity: {
-				index: 'gsi7',
-				pk: {
-					field: 'pk',
-					composite: ['designId'],
-				},
-				sk: {
-					field: 'gsi7sk',
-					composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
-				},
-			},
+			// byUserSortedByRarity: {
+			// 	index: 'gsi5',
+			// 	pk: {
+			// 		field: 'gsi5pk',
+			// 		composite: ['username'],
+			// 	},
+			// 	sk: {
+			// 		field: 'gsi5sk',
+			// 		composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
+			// 	},
+			// },
+			// byUserSortedByCardName: {
+			// 	index: 'gsi6',
+			// 	pk: {
+			// 		field: 'gsi6pk',
+			// 		composite: ['username'],
+			// 	},
+			// 	sk: {
+			// 		field: 'gsi6sk',
+			// 		composite: ['cardName', 'rarityRankPadded', 'cardNumberPadded'],
+			// 	},
+			// },
+			// byDesignSortedByRarity: {
+			// 	index: 'gsi7',
+			// 	pk: {
+			// 		field: 'gsi7pk',
+			// 		composite: ['designId'],
+			// 	},
+			// 	sk: {
+			// 		field: 'gsi7sk',
+			// 		composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
+			// 	},
+			// },
 		},
 	},
 	config

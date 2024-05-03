@@ -48,14 +48,14 @@ export function Database({ stack }: StackContext) {
 				partitionKey: 'gsi5pk',
 				sortKey: 'gsi5sk',
 			},
-			gsi6: {
-				partitionKey: 'gsi6pk',
-				sortKey: 'gsi6sk',
-			},
-			gsi7: {
-				partitionKey: 'gsi7pk',
-				sortKey: 'gsi7sk',
-			},
+			// gsi6: {
+			// 	partitionKey: 'gsi6pk',
+			// 	sortKey: 'gsi6sk',
+			// },
+			// gsi7: {
+			// 	partitionKey: 'gsi7pk',
+			// 	sortKey: 'gsi7sk',
+			// },
 		},
 	});
 
