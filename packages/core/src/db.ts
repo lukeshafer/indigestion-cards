@@ -525,13 +525,13 @@ const CardInstances = new Entity(
 				},
 			},
 			byDesignSortedByRarity: {
-				index: 'lsi1',
+				index: 'gsi7',
 				pk: {
 					field: 'pk',
 					composite: ['designId'],
 				},
 				sk: {
-					field: 'lsi1sk',
+					field: 'gsi7sk',
 					composite: ['rarityRankPadded', 'cardName', 'cardNumberPadded'],
 				},
 			},

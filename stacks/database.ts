@@ -20,17 +20,13 @@ export function Database({ stack }: StackContext) {
 			gsi5sk: 'string',
 			gsi6pk: 'string',
 			gsi6sk: 'string',
-			lsi1sk: 'string',
+			gsi7pk: 'string',
+			gsi7sk: 'string',
 		},
 		primaryIndex: {
 			partitionKey: 'pk',
 			sortKey: 'sk',
 		},
-		// localIndexes: {
-		// 	lsi1: {
-		// 		sortKey: 'lsi1sk',
-		// 	},
-		// },
 		globalIndexes: {
 			gsi1: {
 				partitionKey: 'gsi1pk',
@@ -52,10 +48,14 @@ export function Database({ stack }: StackContext) {
 				partitionKey: 'gsi5pk',
 				sortKey: 'gsi5sk',
 			},
-			// gsi6: {
-			// 	partitionKey: 'gsi6pk',
-			// 	sortKey: 'gsi6sk',
-			// },
+			gsi6: {
+				partitionKey: 'gsi6pk',
+				sortKey: 'gsi6sk',
+			},
+			gsi7: {
+				partitionKey: 'gsi7pk',
+				sortKey: 'gsi7sk',
+			},
 		},
 	});
 
