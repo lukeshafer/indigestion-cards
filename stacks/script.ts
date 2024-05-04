@@ -6,13 +6,6 @@ export function AfterDeployStack({ stack }: StackContext) {
 	const db = use(Database);
 	const config = use(ConfigStack);
 
-	new Script(stack, 'RefactorFn', {
-		onCreate: {
-			handler: 'packages/functions/src/deployment/mega-refactor-migration.handler',
-			bind: [db],
-		},
-	});
-
 	const script = new Script(stack, 'AfterDeployScript', {
 		onCreate: 'packages/functions/src/deployment/seed-db.handler',
 		onDelete: 'packages/functions/src/deployment/delete-twitch-events.handler',

@@ -3,18 +3,18 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
 import { randomUUID } from 'crypto';
 
-const config = {
+export const dbConfig = {
 	table: Table.data.tableName,
 	client: new DynamoDBClient(),
 } satisfies EntityConfiguration;
 
-const SERVICE = 'indigestion-cards';
+export const DB_SERVICE = 'indigestion-cards';
 
-function allItemsPKTemplate(entityName: string, service = SERVICE) {
+function allItemsPKTemplate(entityName: string, service = DB_SERVICE) {
 	return `$${service}#getall_${entityName}`;
 }
 
-const auditAttributes = (entityName: string) =>
+export const auditAttributes = (entityName: string) =>
 	({
 		createdAt: {
 			type: 'number',
@@ -57,7 +57,7 @@ const audits = new Entity(
 		model: {
 			entity: 'audit',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			entity: {
@@ -105,7 +105,7 @@ const audits = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Admins = new Entity(
@@ -113,7 +113,7 @@ const Admins = new Entity(
 		model: {
 			entity: 'admin',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -156,7 +156,7 @@ const Admins = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const CardDesigns = new Entity(
@@ -164,7 +164,7 @@ const CardDesigns = new Entity(
 		model: {
 			entity: 'cardDesign',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			cardName: {
@@ -297,7 +297,7 @@ const CardDesigns = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const CardInstances = new Entity(
@@ -305,7 +305,7 @@ const CardInstances = new Entity(
 		model: {
 			entity: 'cardInstance',
 			version: '2',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			instanceId: {
@@ -537,7 +537,7 @@ const CardInstances = new Entity(
 			// },
 		},
 	},
-	config
+	dbConfig
 );
 
 export function padNumberForSorting(value: number) {
@@ -549,7 +549,7 @@ const MomentRedemptions = new Entity(
 		model: {
 			entity: 'momentRedemption',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			momentDate: {
@@ -593,7 +593,7 @@ const MomentRedemptions = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const PackTypes = new Entity(
@@ -601,7 +601,7 @@ const PackTypes = new Entity(
 		model: {
 			entity: 'packType',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			packTypeId: {
@@ -687,7 +687,7 @@ const PackTypes = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Packs = new Entity(
@@ -695,7 +695,7 @@ const Packs = new Entity(
 		model: {
 			entity: 'pack',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			packId: {
@@ -828,7 +828,7 @@ const Packs = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Preorders = new Entity(
@@ -836,7 +836,7 @@ const Preorders = new Entity(
 		model: {
 			entity: 'preorder',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			preorderId: {
@@ -892,7 +892,7 @@ const Preorders = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Rarities = new Entity(
@@ -900,7 +900,7 @@ const Rarities = new Entity(
 		model: {
 			entity: 'rarity',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			rarityId: {
@@ -950,7 +950,7 @@ const Rarities = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Seasons = new Entity(
@@ -958,7 +958,7 @@ const Seasons = new Entity(
 		model: {
 			entity: 'season',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			seasonName: {
@@ -1012,7 +1012,7 @@ const Seasons = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const SiteConfig = new Entity(
@@ -1020,7 +1020,7 @@ const SiteConfig = new Entity(
 		model: {
 			entity: 'siteConfig',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			baseRarity: {
@@ -1105,7 +1105,7 @@ const SiteConfig = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const tradeCardsProperties = {
@@ -1166,7 +1166,7 @@ const Trades = new Entity(
 		model: {
 			entity: 'trade',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			tradeId: {
@@ -1305,7 +1305,7 @@ const Trades = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const TwitchEventMessageHistory = new Entity(
@@ -1313,7 +1313,7 @@ const TwitchEventMessageHistory = new Entity(
 		model: {
 			entity: 'twitchEventMessageHistory',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			message_id: {
@@ -1339,7 +1339,7 @@ const TwitchEventMessageHistory = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 export const twitchEventTypes = [
@@ -1351,7 +1351,7 @@ const TwitchEvents = new Entity(
 		model: {
 			entity: 'twitchEvents',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			eventId: {
@@ -1397,7 +1397,7 @@ const TwitchEvents = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const UnmatchedImages = new Entity(
@@ -1405,7 +1405,7 @@ const UnmatchedImages = new Entity(
 		model: {
 			entity: 'unmatchedImage',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			imageId: {
@@ -1435,7 +1435,7 @@ const UnmatchedImages = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const UserLogins = new Entity(
@@ -1443,7 +1443,7 @@ const UserLogins = new Entity(
 		model: {
 			entity: 'userLogin',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -1498,7 +1498,7 @@ const UserLogins = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 const Users = new Entity(
@@ -1506,7 +1506,7 @@ const Users = new Entity(
 		model: {
 			entity: 'user',
 			version: '1',
-			service: SERVICE,
+			service: DB_SERVICE,
 		},
 		attributes: {
 			userId: {
@@ -1656,7 +1656,7 @@ const Users = new Entity(
 			},
 		},
 	},
-	config
+	dbConfig
 );
 
 export const db = new Service(
@@ -1678,5 +1678,5 @@ export const db = new Service(
 		UserLogins,
 		Users,
 	},
-	config
+	dbConfig
 );
