@@ -1,7 +1,7 @@
 import { db } from '../db';
 import type { CardInstance, SiteConfig } from '../db.types';
 import { getUser } from './user';
-import { getRarityRankForRarity, getSiteConfig } from './site-config';
+import { getRarityRankForRarity } from './site-config';
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
 	const { data: card } = await db.entities.CardInstances.get(args).go();
@@ -73,9 +73,22 @@ export async function createCardInstance(card: CardInstance) {
 	return db.entities.CardInstances.create(card).go();
 }
 
-export async function getCardsByUsername(options: { username: string; cursor?: string }) {
+export async function getCardsByUserSortedByRarity(options: { username: string; cursor?: string }) {
 	const results = await db.entities.CardInstances.query
-		.byUser({ username: options.username })
+		.byUserSortedByRarity({ username: options.username })
+		.where((attr, op) => op.exists(attr.openedAt))
+		.go({ cursor: options.cursor, count: 30 });
+
+	return results;
+}
+
+export async function getCardsByUserSortedByCardName(options: {
+	username: string;
+	cursor?: string;
+}) {
+	const results = await db.entities.CardInstances.query
+		.byUserSortedByCardName({ username: options.username })
+		.where((attr, op) => op.exists(attr.openedAt))
 		.go({ cursor: options.cursor, count: 30 });
 
 	return results;
