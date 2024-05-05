@@ -121,12 +121,37 @@ export async function updateSiteConfig(config: CreateSiteConfig) {
 
 export async function getSiteConfig(): Promise<SiteConfig> {
 	const result = await db.entities.SiteConfig.get({}).go();
-	return result.data ?? { messages: [], baseRarity: {
-		rarityId: '',
-		rarityName: '',
-		frameUrl: "",
-		rarityColor: '',
-  }};
+	return (
+		result.data ?? {
+			messages: [],
+			baseRarity: {
+				rarityId: '',
+				rarityName: '',
+				frameUrl: '',
+				rarityColor: '',
+			},
+		}
+	);
+}
+
+export async function getRarityRankForRarity(
+	rarity: { rarityId: string },
+	rarityRanking?: SiteConfig['rarityRanking']
+) {
+	if (!rarityRanking) {
+		let siteConfig = await getSiteConfig();
+		rarityRanking = siteConfig.rarityRanking;
+	}
+
+	let matchedRanking = rarityRanking?.find(
+		({ rarityId }) => rarityId === rarity.rarityId
+	);
+
+	if (!matchedRanking) {
+		throw Error(`No matched ranking found for rarity ${rarity.rarityId}`);
+	}
+
+	return matchedRanking.ranking;
 }
 
 export async function addMessageToSiteConfig(args: SiteConfig['messages'][number]) {

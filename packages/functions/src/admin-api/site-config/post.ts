@@ -5,6 +5,7 @@ import { validateSearchParams, SiteHandler } from '@core/lib/api';
 import { TWITCH_GIFT_SUB_ID } from '@core/constants';
 import type { SiteConfig } from '@core/types';
 import { updateBatchTwitchEvents, updateSiteConfig } from '@core/lib/site-config';
+import { updateAllCardRarityRanks } from '@core/lib/card';
 
 type RarityRanking = NonNullable<SiteConfig['rarityRanking']>;
 
@@ -55,8 +56,9 @@ export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
     tradingIsEnabled,
   });
   const batchTwitchEvents = updateBatchTwitchEvents(events);
+  const updatedCardsPromise = updateAllCardRarityRanks(rarityRanking)
 
-  await Promise.all([siteConfig, batchTwitchEvents]);
+  await Promise.all([siteConfig, batchTwitchEvents, updatedCardsPromise]);
 
   return { statusCode: 200, body: 'Site config saved.' };
 });
