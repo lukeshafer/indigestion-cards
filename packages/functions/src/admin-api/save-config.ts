@@ -40,9 +40,10 @@ export const handler = ApiHandler(async () => {
 	const body = parseResult.data;
 
 	await updateBatchTwitchEvents(
-		body.channelPointRewards.map((event) => ({
+		body.channelPointRewards.map(event => ({
 			eventId: event.twitchEventId,
-			eventName: event.twitchEventName,
+			eventName:
+				event.twitchEventId === TWITCH_GIFT_SUB_ID ? '5 Gift Subs' : event.twitchEventName,
 			packTypeId: event.packTypeId,
 			packTypeName: event.packTypeName,
 			cost: event.cost,
