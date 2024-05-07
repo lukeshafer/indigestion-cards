@@ -39,11 +39,30 @@ export default function UserCardList(props: {
 					]}></CardList>
 
 				<Show when={nextCursor()}>
-					<button class="border-brand-main w-full border p-2" onClick={loadCards}>
-						Click to load
-					</button>
+					<LoadMoreCardsButton load={loadCards}>Load more cards</LoadMoreCardsButton>
 				</Show>
 			</ul>
 		</>
+	);
+}
+
+function LoadMoreCardsButton(props: { load: () => void; children?: string }) {
+	return (
+		<button class="m-8 border-brand-main mx-auto w-full max-w-52 border p-2 relative" onClick={() => props.load()}>
+			<div class="w-px h-px absolute -top-96 bg-red-500"
+				ref={div => {
+					const observer = new IntersectionObserver(entries => {
+						for (let entry of entries) {
+							if (entry.isIntersecting) {
+								props.load()
+							}
+						}
+					});
+
+					observer.observe(div);
+				}}
+			/>
+			{ props.children || "Click to load more" }
+		</button>
 	);
 }
