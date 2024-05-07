@@ -36,6 +36,7 @@ export default function CardList(props: {
 	rarityRanking?: RarityRankingRecord;
 	filters?: Array<[string, string]>;
 	filterKeys?: Array<FilterKey>;
+  cursor?: string;
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length

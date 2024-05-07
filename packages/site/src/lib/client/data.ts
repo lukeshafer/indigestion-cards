@@ -48,17 +48,23 @@ type Params<PathName extends PathKey> = PathName extends keyof ParamPath
 export async function get<PathName extends keyof Path>(path: PathName): Promise<PathData<PathName>>;
 export async function get<PathName extends keyof ParamPath>(
 	path: PathName,
-	params: Params<PathName>
+	params: Params<PathName>,
+	searchParams?: Record<string, string>
 ): Promise<PathData<PathName>>;
 export async function get<PathName extends PathKey>(
 	path: PathName,
-	params?: Params<PathName>
+	params?: Params<PathName>,
+	searchParams?: Record<string, string>
 ): Promise<PathData<PathName>> {
 	console.log('get', { path, params });
 	const pathParams = params ? `/${params.join('/')}` : '';
+	let search = '';
+	if (searchParams) {
+		search = '?' + new URLSearchParams(searchParams).toString();
+	}
 
 	try {
-		const res = await fetch(resolveLocalPath(`/data/${path}${pathParams}`));
+		const res = await fetch(resolveLocalPath(`/data/${path}${pathParams}${search}`));
 
 		if (!res.ok) {
 			console.error(res);

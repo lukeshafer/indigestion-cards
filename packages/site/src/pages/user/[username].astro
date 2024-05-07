@@ -1,5 +1,6 @@
 ---
 import CardList from '@site/components/cards/CardList';
+import UserCardList from '@site/components/cards/UserCardList';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
@@ -109,19 +110,25 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-		<CardList
-			cards={unpinnedCards}
-			rarityRanking={rarityRanking}
-			client:load
-			isUserPage
-			sortOnlyBy={[
-				'rarest',
-				'common',
-				'card-name-asc',
-				'card-name-desc',
-				'open-date-asc',
-				'open-date-desc',
-			]}
-		/>
+    <UserCardList
+      initialCards={unpinnedCards}
+      username={user.username}
+      initialCursor={cursor}
+      client:load
+/>
+		<!-- <CardList -->
+		<!-- 	cards={unpinnedCards} -->
+		<!-- 	rarityRanking={rarityRanking} -->
+		<!-- 	client:load -->
+		<!-- 	isUserPage -->
+		<!-- 	sortOnlyBy={[ -->
+		<!-- 		'rarest', -->
+		<!-- 		'common', -->
+		<!-- 		'card-name-asc', -->
+		<!-- 		'card-name-desc', -->
+		<!-- 		'open-date-asc', -->
+		<!-- 		'open-date-desc', -->
+		<!-- 	]} -->
+		<!-- /> -->
 	</section>
 </Page>

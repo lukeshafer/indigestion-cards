@@ -73,7 +73,13 @@ export async function createCardInstance(card: CardInstance) {
 	return db.entities.CardInstances.create(card).go();
 }
 
-export async function getCardsByUserSortedByRarity(options: { username: string; cursor?: string }) {
+export async function getCardsByUserSortedByRarity(options: {
+	username: string;
+	cursor?: string;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: string | null;
+}> {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByRarity({ username: options.username })
 		.where((attr, op) => op.exists(attr.openedAt))
