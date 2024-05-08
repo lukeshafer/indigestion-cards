@@ -56,7 +56,7 @@ export async function get<PathName extends PathKey>(
 	params?: Params<PathName>,
 	searchParams?: Record<string, string>
 ): Promise<PathData<PathName>> {
-	console.log('get', { path, params });
+	// console.log('get', { path, params });
 	const pathParams = params ? `/${params.join('/')}` : '';
 	let search = '';
 	if (searchParams) {

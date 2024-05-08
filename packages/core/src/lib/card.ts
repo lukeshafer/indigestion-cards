@@ -76,6 +76,7 @@ export async function createCardInstance(card: CardInstance) {
 export async function getCardsByUserSortedByRarity(options: {
 	username: string;
 	cursor?: string;
+	isReversed?: boolean;
 }): Promise<{
 	data: Array<CardInstance>;
 	cursor: string | null;
@@ -83,7 +84,7 @@ export async function getCardsByUserSortedByRarity(options: {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByRarity({ username: options.username })
 		.where((attr, op) => op.exists(attr.openedAt))
-		.go({ cursor: options.cursor, count: 30 });
+		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
 
 	return results;
 }
@@ -91,11 +92,12 @@ export async function getCardsByUserSortedByRarity(options: {
 export async function getCardsByUserSortedByCardName(options: {
 	username: string;
 	cursor?: string;
+	isReversed?: boolean;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByCardName({ username: options.username })
 		.where((attr, op) => op.exists(attr.openedAt))
-		.go({ cursor: options.cursor, count: 30 });
+		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
 
 	return results;
 }
@@ -109,7 +111,10 @@ export async function updateAllCardRarityRanks(
 	for (const card of allCards.data) {
 		try {
 			const updatedRarity = await getRarityRankForRarity(card, newRanking);
-			await db.entities.CardInstances.patch(card).set({ rarityRank: updatedRarity }).go();
+			await db.entities.CardInstances.patch(card)
+				.set({ rarityRank: updatedRarity })
+				.composite({ cardName: card.cardName, cardNumberPadded: card.cardNumberPadded })
+				.go();
 		} catch (error) {
 			console.error(error);
 			errors.push(error);

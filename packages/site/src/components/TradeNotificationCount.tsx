@@ -3,7 +3,6 @@ import ButtonCount from './ButtonCount';
 import { get } from '@site/lib/client/data';
 
 export default function TradeNotificationCount(props: { username: string }) {
-  console.log('trade notification count')
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {

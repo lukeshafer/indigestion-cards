@@ -18,6 +18,7 @@ const filters = [...Astro.url.searchParams.entries()];
 			<CardList
 				client:load
 				{filters}
+				filterKeys={['seasonId']}
 				cards={designs.map(card => {
 					const bestRarity = card.bestRarityFound;
 

@@ -56,6 +56,38 @@ export const sortTypes = [
 
 export type SortType = (typeof sortTypes)[number]['value'];
 
+export type SortInfo = {
+	by: 'rarity' | 'cardName';
+	isReversed: boolean;
+};
+export function getSortInfo(sortType: SortType): SortInfo {
+	switch (sortType) {
+		case 'rarest':
+			return {
+				by: 'rarity',
+				isReversed: false,
+			};
+		case 'common':
+			return {
+				by: 'rarity',
+				isReversed: true,
+			};
+		case 'card-name-asc':
+			return {
+				by: 'cardName',
+				isReversed: false,
+			};
+		case 'card-name-desc':
+			return {
+				by: 'cardName',
+				isReversed: true,
+			};
+		default: {
+			throw new Error('invalid (for now)');
+		}
+	}
+}
+
 export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
 	// eslint-disable-next-line @typescript-eslint/ban-types

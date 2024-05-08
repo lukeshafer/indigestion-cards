@@ -1,12 +1,17 @@
 import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@site/constants';
 import Card from '@site/components/cards/Card';
-import { For, Show, createMemo, createSignal } from 'solid-js';
-import { Fieldset, Select, SubmitButton, TextInput } from '../form/Form';
+import { For, Show, createMemo, createSignal, type JSXElement } from 'solid-js';
+import { Select, TextInput } from '../form/Form';
 import type { CardInstance, CardDesign } from '@core/types';
 import { useViewTransition } from '@site/lib/client/utils';
-import type { Session } from '@site/env';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import Fuse from 'fuse.js';
+import CardListFilter, {
+	createFilters,
+	filterCards,
+	type Filters,
+	type SeasonFilterParams,
+} from './CardListFilter';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
 
@@ -26,17 +31,76 @@ export type SortType = (typeof sortTypes)[number]['value'];
 const possibleFilterKeys = ['seasonId', 'minterId'] as const;
 type FilterKey = (typeof possibleFilterKeys)[number];
 
+export function BaseCardList(props: {
+	cards: Array<CardType>;
+	showUsernames?: boolean;
+	isUserPage?: boolean;
+}): JSXElement {
+	return (
+		<ul
+			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
+			style={{
+				'grid-template-columns':
+					'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+			}}>
+			<Show when={props.cards.length > 0} fallback={<p>No cards found</p>}>
+				<For each={props.cards}>
+					{(card, index) => (
+						<li class="w-fit">
+							{card.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID ? (
+								<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
+							) : (
+								<>
+									<a
+										href={
+											props.isUserPage && card.username
+												? `${routes.USERS}/${card.username}/${
+														card.instanceId ?? ''
+													}`
+												: `${routes.INSTANCES}/${card.designId}/${
+														card.instanceId ?? ''
+													}`
+										}>
+										<Card
+											{...card}
+											lazy={index() > 5}
+											scale="var(--card-scale)"
+										/>
+									</a>
+									<Show when={props.showUsernames}>
+										<p class="mt-2">
+											Owner:{' '}
+											<a
+												href={`${routes.USERS}/${card.username}`}
+												class="inline font-bold hover:underline">
+												{card.username}
+											</a>
+										</p>
+									</Show>
+								</>
+							)}
+						</li>
+					)}
+				</For>
+			</Show>
+		</ul>
+	);
+}
+
+export const CardListMenu = (props: { children: JSXElement }) => (
+	<div class="flex px-4">{props.children}</div>
+);
+
 export default function CardList(props: {
 	cards: CardType[];
 	showUsernames?: boolean;
 	noSort?: boolean;
 	sortOnlyBy?: SortType[];
-	sessionType?: Session['type'];
 	isUserPage?: boolean;
 	rarityRanking?: RarityRankingRecord;
 	filters?: Array<[string, string]>;
 	filterKeys?: Array<FilterKey>;
-  cursor?: string;
+	cursor?: string;
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
@@ -47,44 +111,26 @@ export default function CardList(props: {
 	const [searchText, setSearchText] = createSignal('');
 
 	const filterKeys = () => props.filterKeys ?? possibleFilterKeys;
-	const [filters, setFilters] = createSignal<[string, string][]>(
-		// eslint-disable-next-line solid/reactivity
-		props.filters?.filter(([f]) => filterKeys().some(k => k === f)) ?? []
-	);
 
-	const pageUserId = () => (props.isUserPage ? props.cards[0]?.userId : undefined);
+	const [filters, setFilters] = createSignal<Filters>(createFilters());
 
-	const seasons = () => [
-		...props.cards.reduce<Map<string, string>>(
-			(map, card) =>
-				card.seasonId && card.seasonName ? map.set(card.seasonId, card.seasonName) : map,
-			new Map()
-		),
-	];
+	const seasons = () =>
+		Array.from(
+			props.cards
+				.reduce<Map<string, SeasonFilterParams>>(
+					(map, card) =>
+						card.seasonId && card.seasonName
+							? map.set(card.seasonId, {
+									seasonId: card.seasonId,
+									seasonName: card.seasonName,
+								})
+							: map,
+					new Map()
+				)
+				.values()
+		);
 
-	const NOT_EQUAL = '~';
-
-	const filteredCards = createMemo(() => {
-		if (filters().length === 0) return props.cards;
-
-		const filterParams = new URLSearchParams(filters());
-		const uniqueFilterKeys = new Set(filters().map(([k]) => k));
-
-		return props.cards.filter(card => {
-			for (const key of uniqueFilterKeys) {
-				const valueFromCard = card[key as keyof typeof card];
-				const params = filterParams.getAll(key);
-				const doesKeyMatchFilter = params.some(filter =>
-					filter.startsWith(NOT_EQUAL)
-						? valueFromCard !== filter.slice(NOT_EQUAL.length)
-						: valueFromCard === filter
-				);
-				if (!doesKeyMatchFilter) return false;
-				else continue;
-			}
-			return true;
-		});
-	});
+	const filteredCards = (() => filterCards(props.cards, filters()));
 
 	const sortedCards = createMemo(() => {
 		//console.log('sorting', sort());
@@ -106,80 +152,15 @@ export default function CardList(props: {
 
 	return (
 		<div class="flex flex-col gap-3 ">
-			<div class="flex px-4">
+			<CardListMenu>
 				<Show when={filterKeys().length}>
-					<details class="w-fit min-w-32 max-w-72 self-end">
-						<summary>Filter</summary>
-						<form
-							class="flex flex-wrap gap-2"
-							onSubmit={e => e.preventDefault()}
-							onInput={async e => {
-								const formData = new FormData(e.currentTarget);
-								syncFormDataWithUrlSearchParams(formData);
-								// @ts-expect-error there aren't any files
-								setFilters(Array.from(formData.entries()));
-							}}>
-							<Show when={filterKeys().includes('seasonId') && seasons().length}>
-								<div class="w-fit">
-									<Fieldset legend="Season">
-										{seasons().map(([seasonId, seasonName]) => (
-											<label class="flex gap-2">
-												<input
-													type="checkbox"
-													name="seasonId"
-													checked={props.filters?.some(
-														([key, value]) =>
-															key === 'seasonId' && value === seasonId
-													)}
-													value={seasonId}
-													class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-												/>
-												{seasonName}
-											</label>
-										))}
-									</Fieldset>
-								</div>
-							</Show>
-							<Show when={filterKeys().includes('minterId') && pageUserId()}>
-								<div class="w-fit">
-									<Fieldset legend="Origin">
-										<label class="flex gap-2">
-											<input
-												type="checkbox"
-												name="minterId"
-												checked={props.filters?.some(
-													([key, value]) =>
-														key === 'minterId' && value === pageUserId()
-												)}
-												value={pageUserId()}
-												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-											/>
-											Minted
-										</label>
-										<label class="flex gap-2">
-											<input
-												type="checkbox"
-												name="minterId"
-												checked={props.filters?.some(
-													([key, value]) =>
-														key === 'minterId' && value === pageUserId()
-												)}
-												value={NOT_EQUAL + pageUserId()}
-												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-											/>
-											Traded
-										</label>
-									</Fieldset>
-								</div>
-							</Show>
-							<div ref={e => e.remove()}>
-								<SubmitButton>Save</SubmitButton>
-							</div>
-						</form>
-					</details>
+					<CardListFilter
+						params={{
+							seasons: filterKeys().includes('seasonId') ? seasons() : undefined,
+							minterId: filterKeys().includes('minterId'),
+						}}
+						setFilters={setFilters}
+					/>
 				</Show>
 				<div class="ml-auto flex gap-4">
 					<TextInput
@@ -199,54 +180,12 @@ export default function CardList(props: {
 						/>
 					)}
 				</div>
-			</div>
-			<ul
-				class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
-				style={{
-					'grid-template-columns':
-						'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
-				}}>
-				<Show when={cards().length > 0} fallback={<p>No cards found</p>}>
-					<For each={cards()}>
-						{(card, index) => (
-							<li class="w-fit">
-								{card.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID ? (
-									<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
-								) : (
-									<>
-										<a
-											href={
-												props.isUserPage && card.username
-													? `${routes.USERS}/${card.username}/${
-															card.instanceId ?? ''
-														}`
-													: `${routes.INSTANCES}/${card.designId}/${
-															card.instanceId ?? ''
-														}`
-											}>
-											<Card
-												{...card}
-												lazy={index() > 5}
-												scale="var(--card-scale)"
-											/>
-										</a>
-										<Show when={props.showUsernames}>
-											<p class="mt-2">
-												Owner:{' '}
-												<a
-													href={`${routes.USERS}/${card.username}`}
-													class="inline font-bold hover:underline">
-													{card.username}
-												</a>
-											</p>
-										</Show>
-									</>
-								)}
-							</li>
-						)}
-					</For>
-				</Show>
-			</ul>
+			</CardListMenu>
+			<BaseCardList
+				cards={cards()}
+				isUserPage={props.isUserPage}
+				showUsernames={props.showUsernames}
+			/>
 		</div>
 	);
 }
@@ -374,10 +313,4 @@ export function getCardSearcher(cards: CardType[]) {
 	});
 
 	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
-}
-
-function syncFormDataWithUrlSearchParams(formData: FormData) {
-	const url = new URL(window.location.href);
-	url.search = new URLSearchParams(formData as unknown as string).toString();
-	window.history.replaceState({}, '', url.toString());
 }

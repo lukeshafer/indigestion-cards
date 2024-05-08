@@ -12,8 +12,7 @@ declare global {
   }
 }
 
-import type { Session as AuthSession } from '@lil-indigestion-cards/core/types';
-import type { SiteConfig } from '../../core/src/db.types';
+import type { Session as AuthSession, SiteConfig } from '@core/types';
 
 declare type Session = AuthSession;
 

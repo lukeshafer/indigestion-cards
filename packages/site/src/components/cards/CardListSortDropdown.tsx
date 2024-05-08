@@ -7,7 +7,7 @@ import { Select } from '../form/Form';
 
 export default function CardListSortDropdown(props: {
 	sortTypes: Array<SortType> | 'all';
-	setSort: (value: string) => void;
+	setSort: (value: SortType) => void;
 }) {
 	const selectedSortTypes = () =>
 		props.sortTypes === 'all'
@@ -19,7 +19,7 @@ export default function CardListSortDropdown(props: {
 			name="sort"
 			class="h-8 self-end p-1"
 			label="Sort by"
-			setValue={val => useViewTransition(() => props.setSort(val))}
+			setValue={val => useViewTransition(() => props.setSort(val as SortType))}
 			options={selectedSortTypes()}
 		/>
 	);
