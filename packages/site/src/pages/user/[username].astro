@@ -1,11 +1,9 @@
 ---
-import CardList from '@site/components/cards/CardList';
 import UserCardList from '@site/components/cards/UserCardList';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
 import { getUserByLogin } from '@core/lib/twitch';
-import { getRarityRanking } from '@core/lib/site-config';
 import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
@@ -26,23 +24,24 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-// TODO: use the cursor and do real pagination
-
-let { data: CardInstances, cursor } = (await getCardsByUserSortedByRarity({ username: id })) ?? {};
 const twitchData = await getUserByLogin(id).catch(() => null);
 
 const siteConfig = Astro.locals.siteConfig;
-const rarityRanking = getRarityRanking(siteConfig);
 
 const user: User = (await getUserByUserName(id)) || {
 	username: id,
-  cardCount: 0,
-  packCount: 0,
+	cardCount: 0,
+	packCount: 0,
 	userId: twitchData?.id ?? '',
 };
 
 const pinnedCard = user.pinnedCard;
-const unpinnedCards = CardInstances.filter(card => card.instanceId !== pinnedCard?.instanceId);
+
+let { data: CardInstances, cursor } =
+	(await getCardsByUserSortedByRarity({
+		username: id,
+		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
+	})) ?? {};
 
 const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
@@ -110,25 +109,12 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-    <UserCardList
-      initialCards={unpinnedCards}
-      username={user.username}
-      initialCursor={cursor}
-      client:load
-/>
-		<!-- <CardList -->
-		<!-- 	cards={unpinnedCards} -->
-		<!-- 	rarityRanking={rarityRanking} -->
-		<!-- 	client:load -->
-		<!-- 	isUserPage -->
-		<!-- 	sortOnlyBy={[ -->
-		<!-- 		'rarest', -->
-		<!-- 		'common', -->
-		<!-- 		'card-name-asc', -->
-		<!-- 		'card-name-desc', -->
-		<!-- 		'open-date-asc', -->
-		<!-- 		'open-date-desc', -->
-		<!-- 	]} -->
-		<!-- /> -->
+		<UserCardList
+			initialCards={CardInstances}
+			username={user.username}
+			initialCursor={cursor ?? undefined}
+			pinnedCardId={pinnedCard?.instanceId}
+			client:load
+		/>
 	</section>
 </Page>

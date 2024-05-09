@@ -77,13 +77,20 @@ export async function getCardsByUserSortedByRarity(options: {
 	username: string;
 	cursor?: string;
 	isReversed?: boolean;
+	ignoredIds?: Array<string>;
 }): Promise<{
 	data: Array<CardInstance>;
 	cursor: string | null;
 }> {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByRarity({ username: options.username })
-		.where((attr, op) => op.exists(attr.openedAt))
+		.where((attr, op) => {
+			const conditions = [op.exists(attr.openedAt)];
+			for (const id of options.ignoredIds ?? []) {
+				conditions.push(op.ne(attr.instanceId, id));
+			}
+			return conditions.join(' and ');
+		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
 
 	return results;

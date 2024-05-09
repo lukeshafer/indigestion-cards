@@ -9,8 +9,8 @@ import Fuse from 'fuse.js';
 import CardListFilter, {
 	createFilters,
 	filterCards,
+	parseUniqueSeasons,
 	type Filters,
-	type SeasonFilterParams,
 } from './CardListFilter';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
@@ -88,7 +88,7 @@ export function BaseCardList(props: {
 }
 
 export const CardListMenu = (props: { children: JSXElement }) => (
-	<div class="flex px-4">{props.children}</div>
+	<div class="mb-3 flex px-4">{props.children}</div>
 );
 
 export default function CardList(props: {
@@ -114,23 +114,8 @@ export default function CardList(props: {
 
 	const [filters, setFilters] = createSignal<Filters>(createFilters());
 
-	const seasons = () =>
-		Array.from(
-			props.cards
-				.reduce<Map<string, SeasonFilterParams>>(
-					(map, card) =>
-						card.seasonId && card.seasonName
-							? map.set(card.seasonId, {
-									seasonId: card.seasonId,
-									seasonName: card.seasonName,
-								})
-							: map,
-					new Map()
-				)
-				.values()
-		);
-
-	const filteredCards = (() => filterCards(props.cards, filters()));
+	const seasons = () => parseUniqueSeasons(props.cards);
+	const filteredCards = () => filterCards(props.cards, filters());
 
 	const sortedCards = createMemo(() => {
 		//console.log('sorting', sort());

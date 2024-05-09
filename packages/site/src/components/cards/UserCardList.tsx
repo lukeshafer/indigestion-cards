@@ -1,74 +1,77 @@
 import { type SortInfo, getSortInfo, type CardType } from '@site/lib/client/utils';
-import { Show, createEffect, createSignal, on } from 'solid-js';
-import { createStore, produce } from 'solid-js/store';
+import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
 import { BaseCardList } from './CardList';
 import { trpc } from '@site/lib/client/trpc';
 import { CardListMenu } from './CardList';
 import CardListSortDropdown from './CardListSortDropdown';
+import CardListFilter, { createFilters, filterCards, parseUniqueSeasons } from './CardListFilter';
+import PlaceholderCardList from './PlaceholderCardList';
 
 export default function UserCardList(props: {
 	initialCards: CardType[];
 	username: string;
-	filters?: Array<[string, string]>;
 	initialCursor?: string;
+	pinnedCardId?: string;
 }) {
-	const [cards, setCards] = createStore(props.initialCards);
 	const [nextCursor, setNextCursor] = createSignal(props.initialCursor ?? null);
 	const [sortInfo, setSortInfo] = createSignal<SortInfo>({
 		by: 'rarity',
 		isReversed: false,
 	});
+	const [filters, setFilters] = createSignal(createFilters());
 
-	createEffect(
-		on(
-			() => ({ sortInfo: sortInfo(), username: props.username }),
-			async ({ sortInfo, username }) => {
-				let queryFn;
-				if (sortInfo.by === 'rarity') {
-					queryFn = trpc.userCards.sortedByRarity;
-				} else if (sortInfo.by === 'cardName') {
-					queryFn = trpc.userCards.sortedByName;
-				}
-				if (!queryFn) return;
-
-				const result = await queryFn.query({
-					username: username,
-					isReversed: sortInfo.isReversed,
-				});
-
-				setCards(result.data);
-				setNextCursor(result.cursor);
-			}
-		)
+	const [cardsResource, { mutate: mutateCards }] = createResource(
+		() => ({
+			sortInfo: sortInfo(),
+			username: props.username,
+			setNextCursor,
+			pinnedCardId: props.pinnedCardId,
+		}),
+		queryCards,
+		{ initialValue: props.initialCards, ssrLoadFrom: 'initial' }
 	);
 
-	const loadCards = async () => {
-		let result = await trpc.userCards.sortedByRarity.query({
-			username: props.username,
-			cursor: nextCursor() || undefined,
-		});
-
-		setCards(produce(cards => cards.push(...result.data)));
-		setNextCursor(result.cursor);
-	};
+	const filteredCards = () => filterCards(cardsResource() ?? [], filters());
 
 	return (
 		<>
 			<div>
 				<CardListMenu>
-					<CardListSortDropdown
-						sortTypes={['rarest', 'common', 'card-name-asc', 'card-name-desc']}
-            setSort={(sortType) => {
-              setSortInfo(getSortInfo(sortType))
-            }}
+					<CardListFilter
+						params={{
+							seasons: parseUniqueSeasons(cardsResource.latest),
+							minterId: true,
+						}}
+						setFilters={setFilters}
 					/>
+					<div class="ml-auto flex gap-4">
+						<CardListSortDropdown
+							sortTypes={['rarest', 'common', 'card-name-asc', 'card-name-desc']}
+							setSort={sortType => {
+								setSortInfo(getSortInfo(sortType));
+							}}
+						/>
+					</div>
 				</CardListMenu>
-				<BaseCardList cards={cards} isUserPage />
+				<Suspense fallback={<PlaceholderCardList />}>
+					<BaseCardList cards={filteredCards() ?? []} isUserPage />
+					<Show when={nextCursor()}>
+						<LoadMoreCardsButton
+							load={() => {
+								queryCards({
+									username: props.username,
+									sortInfo: sortInfo(),
+									cursor: nextCursor() || undefined,
+									setNextCursor,
+								}).then(result =>
+									mutateCards(cards => [...(cards ?? []), ...result])
+								);
+							}}>
+							Load more cards
+						</LoadMoreCardsButton>
+					</Show>
+				</Suspense>
 			</div>
-
-			<Show when={nextCursor()}>
-				<LoadMoreCardsButton load={loadCards}>Load more cards</LoadMoreCardsButton>
-			</Show>
 		</>
 	);
 }
@@ -95,4 +98,27 @@ function LoadMoreCardsButton(props: { load: () => void; children?: string }) {
 			{props.children || 'Click to load more'}
 		</button>
 	);
+}
+
+async function queryCards(opts: {
+	sortInfo: SortInfo;
+	username: string;
+	cursor?: string;
+	pinnedCardId?: string;
+	setNextCursor: Setter<string | null>;
+}): Promise<Array<CardType>> {
+	const query =
+		opts.sortInfo.by === 'cardName'
+			? trpc.userCards.sortedByName.query
+			: trpc.userCards.sortedByRarity.query;
+
+	const result = await query({
+		username: opts.username,
+		isReversed: opts.sortInfo.isReversed,
+		cursor: opts.cursor,
+		ignoredIds: opts.pinnedCardId ? [opts.pinnedCardId] : undefined,
+	});
+
+	opts.setNextCursor(result.cursor);
+	return result.data;
 }

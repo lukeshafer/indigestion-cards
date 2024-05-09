@@ -16,29 +16,24 @@ export const authedProcedure = t.procedure.use(args => {
 	return args.next({ ctx: { session } });
 });
 
+const userCardsInputSchema = z.object({
+	username: z.string(),
+	cursor: z.string().optional(),
+	isReversed: z.boolean().default(false),
+	filter: z.string().optional(),
+  ignoredIds: z.array(z.string()).optional(),
+});
+
 export const appRouter = t.router({
 	userCards: {
 		sortedByRarity: publicProcedure
-			.input(
-				z.object({
-					username: z.string(),
-					cursor: z.string().optional(),
-					isReversed: z.boolean().default(false),
-					filter: z.string().optional(),
-				})
-			)
+			.input(userCardsInputSchema)
 			.query(async ({ input }) => await getCardsByUserSortedByRarity(input)),
 		sortedByName: publicProcedure
-			.input(
-				z.object({
-					username: z.string(),
-					cursor: z.string().optional(),
-					isReversed: z.boolean().default(false),
-					filter: z.string().optional(),
-				})
-			)
+			.input(userCardsInputSchema)
 			.query(async ({ input }) => await getCardsByUserSortedByCardName(input)),
 	},
 });
 
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter;
+export type UserCardsInput = z.infer<typeof userCardsInputSchema>

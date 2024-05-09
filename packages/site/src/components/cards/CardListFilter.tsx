@@ -1,4 +1,4 @@
-import { For, Show } from 'solid-js';
+import { For, Show, createSignal } from 'solid-js';
 import { Fieldset, SubmitButton } from '../form/Form';
 import type { CardType } from '@site/lib/client/utils';
 
@@ -17,10 +17,27 @@ const OTHER_USER = 'other-user';
 type MinterIdValue = typeof PAGE_USER | typeof OTHER_USER;
 
 export type Filters = ReturnType<typeof createFilters>;
+
 export const createFilters = (opts?: { seasonIds?: Array<string> }) => ({
 	seasonIds: new Set<string>(opts?.seasonIds),
 	minterId: new Set<MinterIdValue>(),
 });
+
+export const parseUniqueSeasons = (list: Array<Partial<SeasonFilterParams>>) =>
+	Array.from(
+		list
+			.reduce<Map<string, SeasonFilterParams>>(
+				(map, item) =>
+					item.seasonId && item.seasonName
+						? map.set(item.seasonId, {
+								seasonId: item.seasonId,
+								seasonName: item.seasonName,
+							})
+						: map,
+				new Map()
+			)
+			.values()
+	);
 
 export default function CardListFilter(props: {
 	params: FilterParams;
