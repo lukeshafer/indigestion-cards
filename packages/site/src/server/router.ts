@@ -2,6 +2,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { z } from 'astro/zod';
 import type { TRPCContext } from './context';
 import {
+	getCardsByDesignSortedByRarity,
 	getCardsByUserSortedByCardName,
 	getCardsByUserSortedByOpenDate,
 	getCardsByUserSortedByRarity,
@@ -28,6 +29,12 @@ const userCardsInputSchema = z.object({
 	ignoredIds: z.array(z.string()).optional(),
 });
 
+const designCardsInputSchema = z.object({
+	designId: z.string(),
+	cursor: z.string().optional(),
+	isReversed: z.boolean().default(false),
+});
+
 export const appRouter = t.router({
 	userCards: {
 		sortedByRarity: publicProcedure
@@ -50,6 +57,17 @@ export const appRouter = t.router({
 				})
 			)
 			.query(async ({ input }) => await searchUserCards(input)),
+	},
+	designCards: {
+		sortedByRarity: publicProcedure
+			.input(designCardsInputSchema)
+			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
+		sortedByOpenDate: publicProcedure
+			.input(designCardsInputSchema)
+			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
+		sortedByOwner: publicProcedure
+			.input(designCardsInputSchema)
+			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
 	},
 });
 

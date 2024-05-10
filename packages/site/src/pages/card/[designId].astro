@@ -1,12 +1,12 @@
 ---
 import Page from '@site/layouts/Page.astro';
 import Card from '@site/components/cards/Card';
-import CardList from '@site/components/cards/CardList';
-import { getCardDesignAndInstancesById } from '@core/lib/design';
-import { getRarityRanking } from '@core/lib/site-config';
+import { getCardDesignById } from '@core/lib/design';
+import { getCardsByDesignSortedByRarity } from '@core/lib/card';
 import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@site/constants';
 import { PageTitle } from '@site/components/text';
 import { Heading } from '@site/components/text';
+import DesignInstancesCardList from '@site/components/cards/DesignInstancesCardList';
 
 const designId = Astro.params.designId;
 
@@ -14,19 +14,15 @@ if (!designId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
 }
 
-const {
-	CardDesigns: [design],
-	CardInstances: instances,
-} = await getCardDesignAndInstancesById({
-	designId,
-});
+const design = await getCardDesignById({ designId });
 
 if (!design) {
 	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
 }
 
+const { data: instances, cursor } = await getCardsByDesignSortedByRarity({ designId });
+
 const siteConfig = Astro.locals.siteConfig;
-const rarityRanking = getRarityRanking(siteConfig);
 
 const baseRarity = design.bestRarityFound ||
 	design.rarityDetails?.find(r => r.rarityId === LEGACY_CARD_ID) ||
@@ -36,16 +32,6 @@ const baseRarity = design.bestRarityFound ||
 		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
 		rarityColor: '#fff',
 	};
-
-instances.sort((a, b) =>
-	+a.totalOfType === +b.totalOfType
-		? a.designId !== b.designId
-			? a.designId.localeCompare(b.designId)
-			: +a.cardNumber - +b.cardNumber
-		: +a.totalOfType - +b.totalOfType
-);
-
-const openedInstances = instances.filter(instance => instance.openedAt);
 ---
 
 <Page
@@ -69,19 +55,25 @@ const openedInstances = instances.filter(instance => instance.openedAt);
 	</header>
 	<section class="flex flex-col text-center">
 		<Heading>Cards Opened</Heading>
-		<CardList
+		<DesignInstancesCardList
 			client:load
-			cards={openedInstances}
-			showUsernames
-			sortOnlyBy={[
-				'rarest',
-				'common',
-				'owner-asc',
-				'owner-desc',
-				'open-date-desc',
-				'open-date-asc',
-			]}
-			rarityRanking={rarityRanking}
+			initialCursor={cursor ?? undefined}
+			initialCards={instances}
+			designId={designId}
 		/>
+		<!-- <CardList -->
+		<!-- 	client:load -->
+		<!-- 	cards={openedInstances} -->
+		<!-- 	showUsernames -->
+		<!-- 	sortOnlyBy={[ -->
+		<!-- 		'rarest', -->
+		<!-- 		'common', -->
+		<!-- 		'owner-asc', -->
+		<!-- 		'owner-desc', -->
+		<!-- 		'open-date-desc', -->
+		<!-- 		'open-date-asc', -->
+		<!-- 	]} -->
+		<!-- 	rarityRanking={rarityRanking} -->
+		<!-- /> -->
 	</section>
 </Page>

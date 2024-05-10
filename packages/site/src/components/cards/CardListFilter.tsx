@@ -1,4 +1,4 @@
-import { For, Show, createSignal } from 'solid-js';
+import { For, Show } from 'solid-js';
 import { Fieldset, SubmitButton } from '../form/Form';
 import type { CardType } from '@site/lib/client/utils';
 

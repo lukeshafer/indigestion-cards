@@ -133,16 +133,35 @@ export async function getCardsByUserSortedByOpenDate(options: {
 		})
 		.go({ pages: 'all' });
 
-  return { data: results.data.sort((a, b) => {
-    const returnValue =
-      new Date(a.openedAt!).getTime() - new Date(b.openedAt!).getTime() ||
-        a.cardName.localeCompare(b.cardName) ||
-        +a.cardNumber - +b.cardNumber;
+	return {
+		data: results.data.sort((a, b) => {
+			const returnValue =
+				new Date(a.openedAt!).getTime() - new Date(b.openedAt!).getTime() ||
+				a.cardName.localeCompare(b.cardName) ||
+				+a.cardNumber - +b.cardNumber;
 
-    if (options.isReversed) {
-      return returnValue * -1;
-    } else return returnValue;
-  }), cursor: null };
+			if (options.isReversed) {
+				return returnValue * -1;
+			} else return returnValue;
+		}),
+		cursor: null,
+	};
+}
+
+export async function getCardsByDesignSortedByRarity(options: {
+	designId: string;
+	cursor?: string;
+	isReversed?: boolean;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: string | null;
+}> {
+	const results = await db.entities.CardInstances.query
+		.byDesignSortedByRarity({ designId: options.designId })
+		.where((attr, op) => op.exists(attr.openedAt))
+		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
+
+	return results;
 }
 
 export async function updateAllCardRarityRanks(
