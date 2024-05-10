@@ -2,6 +2,7 @@ import { db } from '../db';
 import type { CardInstance, SiteConfig } from '../db.types';
 import { getUser } from './user';
 import { getRarityRankForRarity } from './site-config';
+import Fuse from 'fuse.js';
 
 export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
 	const { data: card } = await db.entities.CardInstances.get(args).go();
@@ -100,10 +101,17 @@ export async function getCardsByUserSortedByCardName(options: {
 	username: string;
 	cursor?: string;
 	isReversed?: boolean;
+	ignoredIds?: Array<string>;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByCardName({ username: options.username })
-		.where((attr, op) => op.exists(attr.openedAt))
+		.where((attr, op) => {
+			const conditions = [op.exists(attr.openedAt)];
+			for (const id of options.ignoredIds ?? []) {
+				conditions.push(op.ne(attr.instanceId, id));
+			}
+			return conditions.join(' and ');
+		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
 
 	return results;
@@ -132,4 +140,62 @@ export async function updateAllCardRarityRanks(
 		console.error('Errors found:', errors.length);
 		return Promise.reject('An error has occurred. Check log for details.');
 	}
+}
+
+export async function searchUserCards(options: {
+	username: string;
+	searchText: string;
+	sortType: 'rarity' | 'cardName';
+	isReversed?: boolean;
+	ignoredIds?: Array<string>;
+}) {
+	const query =
+		options.sortType === 'rarity'
+			? db.entities.CardInstances.query.byUserSortedByRarity
+			: db.entities.CardInstances.query.byUserSortedByCardName;
+
+	const cards = await query({ username: options.username })
+		.where((attr, op) => {
+			const conditions = [op.exists(attr.openedAt)];
+			for (const id of options.ignoredIds ?? []) {
+				conditions.push(op.ne(attr.instanceId, id));
+			}
+			return conditions.join(' and ');
+		})
+		.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+
+	return searchCards(options.searchText, cards.data);
+}
+
+function searchCards(searchText: string, cards: Array<CardInstance>) {
+	const fuse = new Fuse(cards, {
+		keys: [
+			{
+				name: 'cardName',
+				weight: 5,
+			},
+			{
+				name: 'rarityName',
+				weight: 5,
+			},
+			{
+				name: 'seasonName',
+				weight: 2,
+			},
+			{
+				name: 'cardNumber',
+				weight: 2,
+			},
+			{
+				name: 'username',
+				weight: 1,
+			},
+			{
+				name: 'stamps',
+				weight: 1,
+			},
+		],
+	});
+
+	return fuse.search(searchText).map(result => result.item);
 }

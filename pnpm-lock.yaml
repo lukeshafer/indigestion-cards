@@ -156,6 +156,9 @@ importers:
       electrodb:
         specifier: ^2.13.1
         version: 2.13.1(@aws-sdk/client-dynamodb@3.554.0)
+      fuse.js:
+        specifier: ^7.0.0
+        version: 7.0.0
       node-fetch:
         specifier: ^3.3.1
         version: 3.3.2
