@@ -3,6 +3,7 @@ import { z } from 'astro/zod';
 import type { TRPCContext } from './context';
 import {
 	getCardsByUserSortedByCardName,
+	getCardsByUserSortedByOpenDate,
 	getCardsByUserSortedByRarity,
 	searchUserCards,
 } from '@core/lib/card';
@@ -24,7 +25,6 @@ const userCardsInputSchema = z.object({
 	username: z.string(),
 	cursor: z.string().optional(),
 	isReversed: z.boolean().default(false),
-	filter: z.string().optional(),
 	ignoredIds: z.array(z.string()).optional(),
 });
 
@@ -36,12 +36,15 @@ export const appRouter = t.router({
 		sortedByName: publicProcedure
 			.input(userCardsInputSchema)
 			.query(async ({ input }) => await getCardsByUserSortedByCardName(input)),
+		sortedByOpenDate: publicProcedure
+			.input(userCardsInputSchema)
+			.query(async ({ input }) => await getCardsByUserSortedByOpenDate(input)),
 		search: publicProcedure
 			.input(
 				z.object({
 					searchText: z.string(),
 					username: z.string(),
-					sortType: z.enum(['rarity', 'cardName']),
+					sortType: z.enum(['rarity', 'cardName', 'owner', 'openDate']),
 					ignoredIds: z.array(z.string()).optional(),
 					isReversed: z.boolean().optional(),
 				})

@@ -1,4 +1,4 @@
-import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@site/constants';
+import { FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID, routes } from '@site/constants';
 import Card from '@site/components/cards/Card';
 import { For, Show, createMemo, createSignal, type JSXElement } from 'solid-js';
 import { Select, TextInput } from '../form/Form';
@@ -31,10 +31,11 @@ export type SortType = (typeof sortTypes)[number]['value'];
 const possibleFilterKeys = ['seasonId', 'minterId'] as const;
 type FilterKey = (typeof possibleFilterKeys)[number];
 
-export function BaseCardList(props: {
+export function CardList(props: {
 	cards: Array<CardType>;
 	showUsernames?: boolean;
 	isUserPage?: boolean;
+	children: (card: CardType, index: () => number) => JSXElement;
 }): JSXElement {
 	return (
 		<ul
@@ -45,42 +46,7 @@ export function BaseCardList(props: {
 			}}>
 			<Show when={props.cards.length > 0} fallback={<p>No cards found</p>}>
 				<For each={props.cards}>
-					{(card, index) => (
-						<li class="w-fit">
-							{card.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID ? (
-								<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
-							) : (
-								<>
-									<a
-										href={
-											props.isUserPage && card.username
-												? `${routes.USERS}/${card.username}/${
-														card.instanceId ?? ''
-													}`
-												: `${routes.INSTANCES}/${card.designId}/${
-														card.instanceId ?? ''
-													}`
-										}>
-										<Card
-											{...card}
-											lazy={index() > 5}
-											scale="var(--card-scale)"
-										/>
-									</a>
-									<Show when={props.showUsernames}>
-										<p class="mt-2">
-											Owner:{' '}
-											<a
-												href={`${routes.USERS}/${card.username}`}
-												class="inline font-bold hover:underline">
-												{card.username}
-											</a>
-										</p>
-									</Show>
-								</>
-							)}
-						</li>
-					)}
+					{(card, index) => <li class="w-fit">{props.children(card, index)}</li>}
 				</For>
 			</Show>
 		</ul>
@@ -91,7 +57,7 @@ export const CardListMenu = (props: { children: JSXElement }) => (
 	<div class="mb-3 flex px-4">{props.children}</div>
 );
 
-export default function CardList(props: {
+export default function GenericCardList(props: {
 	cards: CardType[];
 	showUsernames?: boolean;
 	noSort?: boolean;
@@ -166,11 +132,41 @@ export default function CardList(props: {
 					)}
 				</div>
 			</CardListMenu>
-			<BaseCardList
+			<CardList
 				cards={cards()}
 				isUserPage={props.isUserPage}
-				showUsernames={props.showUsernames}
-			/>
+				showUsernames={props.showUsernames}>
+				{(card, index) =>
+					card.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID ? (
+						<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
+					) : (
+						<>
+							<a
+								href={
+									props.isUserPage && card.username
+										? `${routes.USERS}/${card.username}/${
+												card.instanceId ?? ''
+											}`
+										: `${routes.INSTANCES}/${card.designId}/${
+												card.instanceId ?? ''
+											}`
+								}>
+								<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
+							</a>
+							<Show when={props.showUsernames}>
+								<p class="mt-2">
+									Owner:{' '}
+									<a
+										href={`${routes.USERS}/${card.username}`}
+										class="inline font-bold hover:underline">
+										{card.username}
+									</a>
+								</p>
+							</Show>
+						</>
+					)
+				}
+			</CardList>
 		</div>
 	);
 }

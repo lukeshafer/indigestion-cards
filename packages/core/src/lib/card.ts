@@ -117,6 +117,34 @@ export async function getCardsByUserSortedByCardName(options: {
 	return results;
 }
 
+export async function getCardsByUserSortedByOpenDate(options: {
+	username: string;
+	isReversed?: boolean;
+	ignoredIds?: Array<string>;
+}) {
+	const results = await db.entities.CardInstances.query
+		.byUser({ username: options.username })
+		.where((attr, op) => {
+			const conditions = [op.exists(attr.openedAt)];
+			for (const id of options.ignoredIds ?? []) {
+				conditions.push(op.ne(attr.instanceId, id));
+			}
+			return conditions.join(' and ');
+		})
+		.go({ pages: 'all' });
+
+  return { data: results.data.sort((a, b) => {
+    const returnValue =
+      new Date(a.openedAt!).getTime() - new Date(b.openedAt!).getTime() ||
+        a.cardName.localeCompare(b.cardName) ||
+        +a.cardNumber - +b.cardNumber;
+
+    if (options.isReversed) {
+      return returnValue * -1;
+    } else return returnValue;
+  }), cursor: null };
+}
+
 export async function updateAllCardRarityRanks(
 	newRanking: NonNullable<SiteConfig['rarityRanking']>
 ) {
@@ -145,26 +173,55 @@ export async function updateAllCardRarityRanks(
 export async function searchUserCards(options: {
 	username: string;
 	searchText: string;
-	sortType: 'rarity' | 'cardName';
+	sortType: 'rarity' | 'cardName' | 'openDate' | 'owner';
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
 }) {
-	const query =
-		options.sortType === 'rarity'
-			? db.entities.CardInstances.query.byUserSortedByRarity
-			: db.entities.CardInstances.query.byUserSortedByCardName;
-
-	const cards = await query({ username: options.username })
-		.where((attr, op) => {
-			const conditions = [op.exists(attr.openedAt)];
-			for (const id of options.ignoredIds ?? []) {
-				conditions.push(op.ne(attr.instanceId, id));
-			}
-			return conditions.join(' and ');
-		})
-		.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
-
-	return searchCards(options.searchText, cards.data);
+	switch (options.sortType) {
+		case 'cardName': {
+			const cards = await db.entities.CardInstances.query
+				.byUserSortedByCardName({ username: options.username })
+				.where((attr, op) => {
+					const conditions = [op.exists(attr.openedAt)];
+					for (const id of options.ignoredIds ?? []) {
+						conditions.push(op.ne(attr.instanceId, id));
+					}
+					return conditions.join(' and ');
+				})
+				.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+			return searchCards(options.searchText, cards.data);
+		}
+		case 'rarity': {
+			const cards = await db.entities.CardInstances.query
+				.byUserSortedByRarity({ username: options.username })
+				.where((attr, op) => {
+					const conditions = [op.exists(attr.openedAt)];
+					for (const id of options.ignoredIds ?? []) {
+						conditions.push(op.ne(attr.instanceId, id));
+					}
+					return conditions.join(' and ');
+				})
+				.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+			return searchCards(options.searchText, cards.data);
+		}
+		case 'openDate': {
+			const cards = await getCardsByUserSortedByOpenDate(options);
+			return searchCards(options.searchText, cards.data);
+		}
+		default: {
+			const cards = await db.entities.CardInstances.query
+				.byUserSortedByRarity({ username: options.username })
+				.where((attr, op) => {
+					const conditions = [op.exists(attr.openedAt)];
+					for (const id of options.ignoredIds ?? []) {
+						conditions.push(op.ne(attr.instanceId, id));
+					}
+					return conditions.join(' and ');
+				})
+				.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+			return searchCards(options.searchText, cards.data);
+		}
+	}
 }
 
 function searchCards(searchText: string, cards: Array<CardInstance>) {

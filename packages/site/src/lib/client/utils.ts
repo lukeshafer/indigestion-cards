@@ -57,7 +57,7 @@ export const sortTypes = [
 export type SortType = (typeof sortTypes)[number]['value'];
 
 export type SortInfo = {
-	by: 'rarity' | 'cardName';
+	by: 'rarity' | 'cardName' | 'owner' | 'openDate';
 	isReversed: boolean;
 };
 export function getSortInfo(sortType: SortType): SortInfo {
@@ -82,6 +82,26 @@ export function getSortInfo(sortType: SortType): SortInfo {
 				by: 'cardName',
 				isReversed: true,
 			};
+    case 'open-date-asc':
+      return {
+        by: 'openDate',
+        isReversed: false,
+      }
+    case 'open-date-desc':
+      return {
+        by: 'openDate',
+        isReversed: true,
+      }
+    case 'owner-asc':
+      return {
+        by: 'owner',
+        isReversed: false,
+      }
+    case 'owner-desc':
+      return {
+        by: 'owner',
+        isReversed: true,
+      }
 		default: {
 			throw new Error('invalid (for now)');
 		}

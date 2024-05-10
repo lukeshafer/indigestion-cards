@@ -1,12 +1,14 @@
 import { type SortInfo, getSortInfo, type CardType } from '@site/lib/client/utils';
 import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
-import { BaseCardList } from './CardList';
+import { CardList as CardList } from './CardList';
 import { trpc } from '@site/lib/client/trpc';
 import { CardListMenu } from './CardList';
 import CardListSortDropdown from './CardListSortDropdown';
 import CardListFilter, { createFilters, filterCards, parseUniqueSeasons } from './CardListFilter';
 import PlaceholderCardList from './PlaceholderCardList';
 import CardListSearch from './CardListSearch';
+import { routes } from '@site/constants';
+import Card from './Card';
 
 export default function UserCardList(props: {
 	initialCards: CardType[];
@@ -54,7 +56,14 @@ export default function UserCardList(props: {
 				<div class="ml-auto flex gap-4">
 					<CardListSearch setSearchText={setSearchText} />
 					<CardListSortDropdown
-						sortTypes={['rarest', 'common', 'card-name-asc', 'card-name-desc']}
+						sortTypes={[
+							'rarest',
+							'common',
+							'card-name-asc',
+							'card-name-desc',
+							'open-date-asc',
+							'open-date-desc',
+						]}
 						setSort={sortType => {
 							setSortInfo(getSortInfo(sortType));
 						}}
@@ -62,18 +71,24 @@ export default function UserCardList(props: {
 				</div>
 			</CardListMenu>
 			<Suspense fallback={<PlaceholderCardList />}>
-				<BaseCardList cards={filteredCards() ?? []} isUserPage />
+				<CardList cards={filteredCards() ?? []}>
+					{(card, index) => (
+						<a href={`${routes.USERS}/${card.username}/${card.instanceId ?? ''}`}>
+							<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
+						</a>
+					)}
+				</CardList>
 				<Show when={nextCursor() && !searchText()}>
 					<LoadMoreCardsButton
-						load={() => {
+						load={() =>
 							queryCards({
 								username: props.username,
 								sortInfo: sortInfo(),
 								cursor: nextCursor() || undefined,
 								setNextCursor,
 								searchText: '',
-							}).then(result => mutateCards(cards => [...(cards ?? []), ...result]));
-						}}>
+							}).then(result => mutateCards(cards => [...(cards ?? []), ...result]))
+						}>
 						Load more cards
 					</LoadMoreCardsButton>
 				</Show>
@@ -82,7 +97,7 @@ export default function UserCardList(props: {
 	);
 }
 
-function LoadMoreCardsButton(props: { load: () => void; children?: string }) {
+function LoadMoreCardsButton(props: { load: () => Promise<any>; children?: string }) {
 	return (
 		<button
 			class="border-brand-main relative m-8 mx-auto w-full max-w-52 border p-2"
@@ -93,12 +108,32 @@ function LoadMoreCardsButton(props: { load: () => void; children?: string }) {
 					const observer = new IntersectionObserver(entries => {
 						for (let entry of entries) {
 							if (entry.isIntersecting) {
-								props.load();
+								const viewportHeight = entry.rootBounds?.height ?? 0;
+								(function load(count = 0) {
+									props.load().then(() => {
+										if (!entry.target.checkVisibility()) {
+											return;
+										}
+										if (count > 50)
+											throw new Error(
+												'Loaded too many times: there is likely a bug'
+											);
+										setTimeout(() => {
+											if (
+												entry.target.getBoundingClientRect().top <
+												viewportHeight
+											) {
+												load(count + 1);
+											}
+										}, 50);
+									});
+								})();
 							}
 						}
 					});
 
 					observer.observe(div);
+					observer.takeRecords;
 				}}
 			/>
 			{props.children || 'Click to load more'}
@@ -129,7 +164,9 @@ async function queryCards(opts: {
 	const query =
 		opts.sortInfo.by === 'cardName'
 			? trpc.userCards.sortedByName.query
-			: trpc.userCards.sortedByRarity.query;
+			: opts.sortInfo.by === 'rarity'
+				? trpc.userCards.sortedByRarity.query
+				: trpc.userCards.sortedByOpenDate.query;
 
 	const result = await query({
 		username: opts.username,
