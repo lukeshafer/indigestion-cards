@@ -1,14 +1,16 @@
 ---
-import CardList from '@site/components/cards/CardList';
+import UserCardList from '@site/components/cards/UserCardList';
 import Page from '@site/layouts/Page.astro';
-import { getUserAndOpenedCardInstances } from '@core/lib/user';
+import { getUserByUserName } from '@core/lib/user';
+import { getCardsByUserSortedByRarity } from '@core/lib/card';
 import { getUserByLogin } from '@core/lib/twitch';
-import { getRarityRanking } from '@core/lib/site-config';
+import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
 import UserLookingFor from '@site/components/user/UserLookingFor';
 import Card from '@site/components/cards/Card';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
+import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
 
 type Logo = HeaderProps['logo'];
 
@@ -23,20 +25,24 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-let { Users = [], CardInstances = [] } =
-	(await getUserAndOpenedCardInstances({ username: id })) ?? {};
 const twitchData = await getUserByLogin(id).catch(() => null);
 
 const siteConfig = Astro.locals.siteConfig;
-const rarityRanking = getRarityRanking(siteConfig);
 
-const user = Users[0] || {
+const user: User = (await getUserByUserName(id)) || {
 	username: id,
-	userId: twitchData?.id,
+	cardCount: 0,
+	packCount: 0,
+	userId: twitchData?.id ?? '',
 };
 
 const pinnedCard = user.pinnedCard;
-const unpinnedCards = CardInstances.filter(card => card.instanceId !== pinnedCard?.instanceId);
+
+let { data: CardInstances, cursor } =
+	(await getCardsByUserSortedByRarity({
+		username: id,
+		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
+	})) ?? {};
 
 const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
@@ -44,6 +50,8 @@ const userLogoMap: Record<string, Logo | undefined> = {
 const logo = userLogoMap[id];
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
+
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 ---
 
 <Page
@@ -104,19 +112,13 @@ const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 	</header>
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
-		<CardList
-			cards={unpinnedCards}
-			rarityRanking={rarityRanking}
+		<UserCardList
+			initialCards={CardInstances}
+			username={user.username}
+			initialCursor={cursor ?? undefined}
+			pinnedCardId={pinnedCard?.instanceId}
+      ssrFilters={filters}
 			client:load
-			isUserPage
-			sortOnlyBy={[
-				'rarest',
-				'common',
-				'card-name-asc',
-				'card-name-desc',
-				'open-date-asc',
-				'open-date-desc',
-			]}
 		/>
 	</section>
 </Page>

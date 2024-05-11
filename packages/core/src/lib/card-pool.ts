@@ -2,13 +2,14 @@ import type { CardDesign, CardInstance } from '../db.types';
 import type { PackDetails } from './entity-schemas';
 import { db } from '../db';
 import { PackTypeIsOutOfCardsError } from './errors';
+import { getRarityRankForRarity } from './site-config';
 
 export type CardPool = {
 	CardDesigns: CardDesign[];
 	CardInstances: CardInstance[];
 };
 
-export function generateCard(info: {
+export async function generateCard(info: {
 	userId?: string;
 	username?: string;
 	packId: string | undefined;
@@ -54,6 +55,7 @@ export function generateCard(info: {
 		rarityId: assignedRarityId,
 		rarityName: rarity.rarityName,
 		rarityColor: rarity.rarityColor,
+    rarityRank: await getRarityRankForRarity(rarity),
 		frameUrl: rarity.frameUrl,
 		imgUrl: design.imgUrl,
 		cardName: design.cardName,

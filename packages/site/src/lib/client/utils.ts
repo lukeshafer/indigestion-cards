@@ -2,6 +2,7 @@ import { FULL_ART_ID, LEGACY_CARD_ID, routes } from '@site/constants';
 import type { CardDesign, CardInstance, Trade } from '@core/types';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import { z } from 'astro/zod';
+import Fuse from 'fuse.js';
 
 export const useViewTransition = (cb: () => unknown) =>
 	// @ts-expect-error - startViewTransition is not on Document yet
@@ -56,14 +57,73 @@ export const sortTypes = [
 
 export type SortType = (typeof sortTypes)[number]['value'];
 
+export type SortInfo = {
+	by: 'rarity' | 'cardName' | 'owner' | 'openDate';
+	isReversed: boolean;
+};
+export function getSortInfo(sortType: SortType): SortInfo {
+	switch (sortType) {
+		case 'rarest':
+			return {
+				by: 'rarity',
+				isReversed: false,
+			};
+		case 'common':
+			return {
+				by: 'rarity',
+				isReversed: true,
+			};
+		case 'card-name-asc':
+			return {
+				by: 'cardName',
+				isReversed: false,
+			};
+		case 'card-name-desc':
+			return {
+				by: 'cardName',
+				isReversed: true,
+			};
+		case 'open-date-asc':
+			return {
+				by: 'openDate',
+				isReversed: false,
+			};
+		case 'open-date-desc':
+			return {
+				by: 'openDate',
+				isReversed: true,
+			};
+		case 'owner-asc':
+			return {
+				by: 'owner',
+				isReversed: false,
+			};
+		case 'owner-desc':
+			return {
+				by: 'owner',
+				isReversed: true,
+			};
+		default: {
+			throw new Error('invalid (for now)');
+		}
+	}
+}
+
+export function sortCardsByName(order: 'asc' | 'desc') {
+	return (a: CardType, b: CardType) =>
+		a.cardName.localeCompare(b.cardName) ||
+		a.totalOfType - b.totalOfType ||
+		+a.cardNumber - +b.cardNumber * (order === 'asc' ? 1 : -1);
+}
+
 export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
 }) {
-	const { cards: originalCards, sort } = args;
-	const cards = originalCards.slice();
+	const { cards: inputCards, sort } = args;
+	const cards = inputCards.slice();
 
 	switch (sort) {
 		case 'card-name-asc':
@@ -159,4 +219,37 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 	);
 
 	return routes.TRADES + '/new?' + params.toString();
+}
+
+export function getCardSearcher<T extends CardType>(cards: T[]) {
+	const fuse = new Fuse(cards, {
+		keys: [
+			{
+				name: 'cardName',
+				weight: 5,
+			},
+			{
+				name: 'rarityName',
+				weight: 5,
+			},
+			{
+				name: 'seasonName',
+				weight: 2,
+			},
+			{
+				name: 'cardNumber',
+				weight: 2,
+			},
+			{
+				name: 'username',
+				weight: 1,
+			},
+			{
+				name: 'stamps',
+				weight: 1,
+			},
+		],
+	});
+
+	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
 }
