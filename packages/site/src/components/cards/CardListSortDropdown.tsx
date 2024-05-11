@@ -5,9 +5,9 @@ import {
 } from '@site/lib/client/utils';
 import { Select } from '../form/Form';
 
-export default function CardListSortDropdown(props: {
-	sortTypes: Array<SortType> | 'all';
-	setSort: (value: SortType) => void;
+export default function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
+	sortTypes: T | 'all';
+	setSort: (value: T[number]) => void;
 }) {
 	const selectedSortTypes = () =>
 		props.sortTypes === 'all'

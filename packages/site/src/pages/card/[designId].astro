@@ -7,6 +7,7 @@ import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@site/constants';
 import { PageTitle } from '@site/components/text';
 import { Heading } from '@site/components/text';
 import DesignInstancesCardList from '@site/components/cards/DesignInstancesCardList';
+import { parseFiltersFromSearchParams } from '@site/components/cards/CardListFilter';
 
 const designId = Astro.params.designId;
 
@@ -32,6 +33,8 @@ const baseRarity = design.bestRarityFound ||
 		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
 		rarityColor: '#fff',
 	};
+
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 ---
 
 <Page
@@ -60,20 +63,7 @@ const baseRarity = design.bestRarityFound ||
 			initialCursor={cursor ?? undefined}
 			initialCards={instances}
 			designId={designId}
+      ssrFilters={filters}
 		/>
-		<!-- <CardList -->
-		<!-- 	client:load -->
-		<!-- 	cards={openedInstances} -->
-		<!-- 	showUsernames -->
-		<!-- 	sortOnlyBy={[ -->
-		<!-- 		'rarest', -->
-		<!-- 		'common', -->
-		<!-- 		'owner-asc', -->
-		<!-- 		'owner-desc', -->
-		<!-- 		'open-date-desc', -->
-		<!-- 		'open-date-asc', -->
-		<!-- 	]} -->
-		<!-- 	rarityRanking={rarityRanking} -->
-		<!-- /> -->
 	</section>
 </Page>

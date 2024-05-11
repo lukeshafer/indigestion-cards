@@ -134,16 +134,7 @@ export async function getCardsByUserSortedByOpenDate(options: {
 		.go({ pages: 'all' });
 
 	return {
-		data: results.data.sort((a, b) => {
-			const returnValue =
-				new Date(a.openedAt!).getTime() - new Date(b.openedAt!).getTime() ||
-				a.cardName.localeCompare(b.cardName) ||
-				+a.cardNumber - +b.cardNumber;
-
-			if (options.isReversed) {
-				return returnValue * -1;
-			} else return returnValue;
-		}),
+		data: results.data.sort(sortCardsByOpenDate(options.isReversed ? 'desc' : 'asc')),
 		cursor: null,
 	};
 }
@@ -162,6 +153,42 @@ export async function getCardsByDesignSortedByRarity(options: {
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
 
 	return results;
+}
+
+export async function getCardsByDesignSortedByOwnerName(options: {
+	designId: string;
+	isReversed?: boolean;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: null;
+}> {
+	const results = await db.entities.CardInstances.query
+		.byDesignSortedByRarity({ designId: options.designId })
+		.where((attr, op) => op.exists(attr.openedAt))
+		.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+
+	return {
+		data: results.data.sort(sortCardsByOwnerName(options.isReversed ? 'desc' : 'asc')),
+		cursor: null,
+	};
+}
+
+export async function getCardsByDesignSortedByOpenDate(options: {
+	designId: string;
+	isReversed?: boolean;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: null;
+}> {
+	const results = await db.entities.CardInstances.query
+		.byDesignSortedByRarity({ designId: options.designId })
+		.where((attr, op) => op.exists(attr.openedAt))
+		.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+
+	return {
+		data: results.data.sort(sortCardsByOpenDate(options.isReversed ? 'desc' : 'asc')),
+		cursor: null,
+	};
 }
 
 export async function updateAllCardRarityRanks(
@@ -243,6 +270,29 @@ export async function searchUserCards(options: {
 	}
 }
 
+export async function searchDesignCards(options: {
+	designId: string;
+	searchText: string;
+	sortType: 'rarity' | 'cardName' | 'openDate' | 'owner';
+	isReversed?: boolean;
+}) {
+	const cards = await db.entities.CardInstances.query
+		.byDesignSortedByRarity({ designId: options.designId })
+		.where((attr, op) => op.exists(attr.openedAt))
+		.go({ pages: 'all', order: options.isReversed ? 'desc' : 'asc' });
+
+	switch (options.sortType) {
+		case 'owner': {
+			cards.data.sort(sortCardsByOwnerName(options.isReversed ? 'desc' : 'asc'));
+		}
+		case 'openDate': {
+			cards.data.sort(sortCardsByOpenDate(options.isReversed ? 'desc' : 'asc'));
+		}
+	}
+
+	return searchCards(options.searchText, cards.data);
+}
+
 function searchCards(searchText: string, cards: Array<CardInstance>) {
 	const fuse = new Fuse(cards, {
 		keys: [
@@ -274,4 +324,29 @@ function searchCards(searchText: string, cards: Array<CardInstance>) {
 	});
 
 	return fuse.search(searchText).map(result => result.item);
+}
+
+function sortCardsByOwnerName(order: 'asc' | 'desc') {
+	return (cardA: CardInstance, cardB: CardInstance) => {
+		const sortValue = !(cardA.username && cardB.username)
+			? 0
+			: cardA.username.localeCompare(cardB.username) ||
+				cardA.cardName.localeCompare(cardB.cardName) ||
+				+cardA.cardNumber - +cardB.cardNumber;
+
+		if (order === 'desc') return sortValue * -1;
+		else return sortValue;
+	};
+}
+
+function sortCardsByOpenDate(order: 'asc' | 'desc') {
+	return (cardA: CardInstance, cardB: CardInstance) => {
+		const sortValue =
+			new Date(cardA.openedAt!).getTime() - new Date(cardB.openedAt!).getTime() ||
+			cardA.cardName.localeCompare(cardB.cardName) ||
+			+cardA.cardNumber - +cardB.cardNumber;
+
+		if (order === 'desc') return sortValue * -1;
+		else return sortValue;
+	};
 }

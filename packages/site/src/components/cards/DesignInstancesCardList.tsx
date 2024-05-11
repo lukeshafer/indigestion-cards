@@ -1,6 +1,6 @@
 import { getSortInfo, type CardType, type SortInfo } from '@site/lib/client/utils';
 import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
-import CardListFilter, { createFilters, filterCards } from './CardListFilter';
+import CardListFilter, { filterCards, type Filters } from './CardListFilter';
 import { trpc } from '@site/lib/client/trpc';
 import { CardList, CardListMenu } from './CardList';
 import CardListSearch from './CardListSearch';
@@ -13,6 +13,7 @@ import CardListLoader from './CardListLoader';
 export default function DesignInstancesCardList(props: {
 	initialCards: CardType[];
 	designId: string;
+	ssrFilters: Filters;
 	initialCursor?: string;
 }) {
 	const [nextCursor, setNextCursor] = createSignal(props.initialCursor ?? null);
@@ -20,7 +21,7 @@ export default function DesignInstancesCardList(props: {
 		by: 'rarity',
 		isReversed: false,
 	});
-	const [filters, setFilters] = createSignal(createFilters());
+	const [filters, setFilters] = createSignal(props.ssrFilters);
 	const [searchText, setSearchText] = createSignal('');
 
 	const [cardsResource, { mutate: mutateCards }] = createResource(
@@ -39,7 +40,11 @@ export default function DesignInstancesCardList(props: {
 	return (
 		<div>
 			<CardListMenu>
-				<CardListFilter params={{ minterId: true, }} setFilters={setFilters} />
+				<CardListFilter
+					params={{ minterId: true }}
+					setFilters={setFilters}
+					ssrFilters={/*@once*/ props.ssrFilters}
+				/>
 				<div class="ml-auto flex gap-4">
 					<CardListSearch setSearchText={setSearchText} />
 					<CardListSortDropdown
@@ -48,8 +53,8 @@ export default function DesignInstancesCardList(props: {
 							'common',
 							'open-date-asc',
 							'open-date-desc',
-              'owner-asc',
-              'owner-desc'
+							'owner-asc',
+							'owner-desc',
 						]}
 						setSort={sortType => {
 							setSortInfo(getSortInfo(sortType));
@@ -60,11 +65,22 @@ export default function DesignInstancesCardList(props: {
 			<Suspense fallback={<PlaceholderCardList />}>
 				<CardList cards={filteredCards() ?? []}>
 					{(card, index) => (
-						<a href={`${routes.INSTANCES}/${card.designId}/${
-												card.instanceId ?? ''
-											}`}>
-							<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
-						</a>
+						<>
+							<a
+								href={`${routes.INSTANCES}/${card.designId}/${
+									card.instanceId ?? ''
+								}`}>
+								<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
+							</a>
+							<p class="mt-2">
+								Owner:{' '}
+								<a
+									href={`${routes.USERS}/${card.username}`}
+									class="inline font-bold hover:underline">
+									{card.username}
+								</a>
+							</p>
+						</>
 					)}
 				</CardList>
 				<Show when={nextCursor() && !searchText()}>
@@ -93,16 +109,16 @@ async function queryCards(opts: {
 	setNextCursor: Setter<string | null>;
 	searchText: string;
 }): Promise<Array<CardType>> {
-	// if (opts.searchText.length > 0) {
-	// 	const result = await trpc.designCards.search.query({
-	// 		searchText: opts.searchText,
-	// 		designId: opts.designId,
-	// 		sortType: opts.sortInfo.by,
-	// 		isReversed: opts.sortInfo.isReversed,
-	// 	});
-	//
-	// 	return result;
-	// }
+	if (opts.searchText.length > 0) {
+		const result = await trpc.designCards.search.query({
+			searchText: opts.searchText,
+			designId: opts.designId,
+			sortType: opts.sortInfo.by,
+			isReversed: opts.sortInfo.isReversed,
+		});
+
+		return result;
+	}
 
 	const query =
 		opts.sortInfo.by === 'rarity'

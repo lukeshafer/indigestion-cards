@@ -1,12 +1,13 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import CardList from '@site/components/cards/CardList';
+import AllDesignsCardList from '@site/components/cards/AllDesignsCardList';
 import { getAllCardDesigns } from '@core/lib/design';
 import { routeNames } from '@site/constants';
 import { PageTitle, PageHeader } from '@site/components/text';
+import { parseFiltersFromSearchParams } from '@site/components/cards/CardListFilter';
 
 const designs = getAllCardDesigns();
-const filters = [...Astro.url.searchParams.entries()];
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 ---
 
 <Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
@@ -15,24 +16,18 @@ const filters = [...Astro.url.searchParams.entries()];
 	</PageHeader>
 	{
 		designs.then(designs => (
-			<CardList
+			<AllDesignsCardList
 				client:load
-				{filters}
-				filterKeys={['seasonId']}
-				cards={designs.map(card => {
-					const bestRarity = card.bestRarityFound;
-
-					return {
-						...card,
-						rarityName: bestRarity?.rarityName ?? '',
-						rarityId: bestRarity?.rarityId ?? '',
-						frameUrl: bestRarity?.frameUrl ?? '',
-						rarityColor: bestRarity?.rarityColor ?? '',
-						totalOfType: bestRarity?.count ?? 1,
-						cardNumber: 1,
-					};
-				})}
-				sortOnlyBy={['card-name-asc', 'card-name-desc']}
+				initialCards={designs.map(card => ({
+					...card,
+					rarityName: card.bestRarityFound?.rarityName ?? '',
+					rarityId: card.bestRarityFound?.rarityId ?? '',
+					frameUrl: card.bestRarityFound?.frameUrl ?? '',
+					rarityColor: card.bestRarityFound?.rarityColor ?? '',
+					totalOfType: card.bestRarityFound?.count ?? 1,
+					cardNumber: 1,
+				}))}
+				ssrFilters={filters}
 			/>
 		))
 	}

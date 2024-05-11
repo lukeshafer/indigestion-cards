@@ -4,7 +4,7 @@ import { CardList as CardList } from './CardList';
 import { trpc } from '@site/lib/client/trpc';
 import { CardListMenu } from './CardList';
 import CardListSortDropdown from './CardListSortDropdown';
-import CardListFilter, { createFilters, filterCards, parseUniqueSeasons } from './CardListFilter';
+import CardListFilter, { filterCards, parseUniqueSeasons, type Filters } from './CardListFilter';
 import PlaceholderCardList from './PlaceholderCardList';
 import CardListSearch from './CardListSearch';
 import { routes } from '@site/constants';
@@ -14,6 +14,7 @@ import CardListLoader from './CardListLoader';
 export default function UserCardList(props: {
 	initialCards: CardType[];
 	username: string;
+	ssrFilters: Filters;
 	initialCursor?: string;
 	pinnedCardId?: string;
 }) {
@@ -22,7 +23,7 @@ export default function UserCardList(props: {
 		by: 'rarity',
 		isReversed: false,
 	});
-	const [filters, setFilters] = createSignal(createFilters());
+	const [filters, setFilters] = createSignal(props.ssrFilters);
 	const [searchText, setSearchText] = createSignal('');
 
 	const [cardsResource, { mutate: mutateCards }] = createResource(
@@ -47,6 +48,7 @@ export default function UserCardList(props: {
 						minterId: true,
 					}}
 					setFilters={setFilters}
+					ssrFilters={/*@once*/ props.ssrFilters}
 				/>
 				<div class="ml-auto flex gap-4">
 					<CardListSearch setSearchText={setSearchText} />

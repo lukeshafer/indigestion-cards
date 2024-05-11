@@ -1,11 +1,16 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID, routes } from '@site/constants';
+import { NO_CARDS_OPENED_ID, routes } from '@site/constants';
 import Card from '@site/components/cards/Card';
 import { For, Show, createMemo, createSignal, type JSXElement } from 'solid-js';
 import { Select, TextInput } from '../form/Form';
 import type { CardInstance, CardDesign } from '@core/types';
-import { useViewTransition } from '@site/lib/client/utils';
+import {
+	getCardSearcher,
+	sortCards,
+	sortTypes,
+	useViewTransition,
+	type SortType,
+} from '@site/lib/client/utils';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import Fuse from 'fuse.js';
 import CardListFilter, {
 	createFilters,
 	filterCards,
@@ -14,19 +19,6 @@ import CardListFilter, {
 } from './CardListFilter';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
-
-export const sortTypes = [
-	{ value: 'rarest', label: 'Most to Least Rare' },
-	{ value: 'common', label: 'Least to Most Rare' },
-	{ value: 'card-name-asc', label: 'Card Name (A-Z)' },
-	{ value: 'card-name-desc', label: 'Card Name (Z-A)' },
-	{ value: 'open-date-desc', label: 'Date Opened (Newest to Oldest)' },
-	{ value: 'open-date-asc', label: 'Date Opened (Oldest to Newest)' },
-	{ value: 'owner-asc', label: 'Owner (A-Z)' },
-	{ value: 'owner-desc', label: 'Owner (Z-A)' },
-] as const;
-
-export type SortType = (typeof sortTypes)[number]['value'];
 
 const possibleFilterKeys = ['seasonId', 'minterId'] as const;
 type FilterKey = (typeof possibleFilterKeys)[number];
@@ -95,7 +87,6 @@ export default function GenericCardList(props: {
 	});
 
 	const searcher = createMemo(() => {
-		//console.log('creating searcher');
 		return getCardSearcher(sortedCards());
 	});
 
@@ -169,129 +160,4 @@ export default function GenericCardList(props: {
 			</CardList>
 		</div>
 	);
-}
-
-export function sortCards<T extends CardType>(args: {
-	cards: T[];
-	// eslint-disable-next-line @typescript-eslint/ban-types
-	sort: SortType | (string & {});
-	rarityRanking?: RarityRankingRecord;
-}) {
-	const { cards: inputCards, sort } = args;
-	const cards = inputCards.slice();
-
-	switch (sort) {
-		case 'card-name-asc':
-			//console.debug('card-name-asc', cards);
-			return cards.sort(
-				(a, b) =>
-					a.cardName.localeCompare(b.cardName) ||
-					a.totalOfType - b.totalOfType ||
-					+a.cardNumber - +b.cardNumber
-			);
-		case 'card-name-desc':
-			//console.debug('card-name-desc', cards);
-			return cards.sort(
-				(a, b) =>
-					b.cardName.localeCompare(a.cardName) ||
-					a.totalOfType - b.totalOfType ||
-					+a.cardNumber - +b.cardNumber
-			);
-		case 'rarest':
-			return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking));
-		case 'common':
-			return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking)).reverse();
-		case 'open-date-desc':
-			return cards.sort((a, b) =>
-				!(a.openedAt && b.openedAt)
-					? 0
-					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
-			);
-		case 'open-date-asc':
-			return cards.sort((a, b) =>
-				!(a.openedAt && b.openedAt)
-					? 0
-					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
-			);
-		case 'owner-asc':
-			return cards.sort((a, b) =>
-				!(a.username && b.username)
-					? 0
-					: a.username.localeCompare(b.username) ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
-			);
-		case 'owner-desc':
-			return cards.sort((a, b) =>
-				!(a.username && b.username)
-					? 0
-					: b.username.localeCompare(a.username) ||
-						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
-			);
-		default:
-			return cards;
-	}
-}
-
-function rarestCardSort(a: CardType, b: CardType, rarityRanking?: RarityRankingRecord) {
-	if (rarityRanking) {
-		const aRank = rarityRanking[a.rarityId]?.ranking ?? Infinity;
-		const bRank = rarityRanking[b.rarityId]?.ranking ?? Infinity;
-		return aRank - bRank;
-	}
-
-	if (a.totalOfType !== b.totalOfType) {
-		return a.totalOfType - b.totalOfType;
-	}
-
-	if (a.rarityId === LEGACY_CARD_ID && b.rarityId !== LEGACY_CARD_ID) {
-		return -1;
-	} else if (b.rarityId === LEGACY_CARD_ID && a.rarityId !== LEGACY_CARD_ID) {
-		return 1;
-	}
-	if (a.rarityId === FULL_ART_ID && b.rarityId !== FULL_ART_ID) {
-		return -1;
-	} else if (b.rarityId === FULL_ART_ID && a.rarityId !== FULL_ART_ID) {
-		return 1;
-	}
-
-	return a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber;
-}
-
-export function getCardSearcher(cards: CardType[]) {
-	const fuse = new Fuse(cards, {
-		keys: [
-			{
-				name: 'cardName',
-				weight: 5,
-			},
-			{
-				name: 'rarityName',
-				weight: 5,
-			},
-			{
-				name: 'seasonName',
-				weight: 2,
-			},
-			{
-				name: 'cardNumber',
-				weight: 2,
-			},
-			{
-				name: 'username',
-				weight: 1,
-			},
-			{
-				name: 'stamps',
-				weight: 1,
-			},
-		],
-	});
-
-	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
 }

@@ -2,10 +2,13 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { z } from 'astro/zod';
 import type { TRPCContext } from './context';
 import {
+    getCardsByDesignSortedByOpenDate,
+	getCardsByDesignSortedByOwnerName,
 	getCardsByDesignSortedByRarity,
 	getCardsByUserSortedByCardName,
 	getCardsByUserSortedByOpenDate,
 	getCardsByUserSortedByRarity,
+	searchDesignCards,
 	searchUserCards,
 } from '@core/lib/card';
 
@@ -64,10 +67,20 @@ export const appRouter = t.router({
 			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
 		sortedByOpenDate: publicProcedure
 			.input(designCardsInputSchema)
-			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
+			.query(async ({ input }) => await getCardsByDesignSortedByOpenDate(input)),
 		sortedByOwner: publicProcedure
 			.input(designCardsInputSchema)
-			.query(async ({ input }) => await getCardsByDesignSortedByRarity(input)),
+			.query(async ({ input }) => await getCardsByDesignSortedByOwnerName(input)),
+		search: publicProcedure
+			.input(
+				z.object({
+					searchText: z.string(),
+					designId: z.string(),
+					sortType: z.enum(['rarity', 'cardName', 'owner', 'openDate']),
+					isReversed: z.boolean().optional(),
+				})
+			)
+			.query(async ({ input }) => await searchDesignCards(input)),
 	},
 });
 

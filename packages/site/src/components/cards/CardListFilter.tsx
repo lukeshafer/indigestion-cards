@@ -42,6 +42,7 @@ export const parseUniqueSeasons = (list: Array<Partial<SeasonFilterParams>>) =>
 export default function CardListFilter(props: {
 	params: FilterParams;
 	setFilters: (filters: Filters) => void;
+	ssrFilters?: Filters;
 }) {
 	return (
 		<details class="w-fit min-w-32 max-w-72 self-end">
@@ -68,6 +69,7 @@ export default function CardListFilter(props: {
 												type="checkbox"
 												name="seasonId"
 												value={seasonId}
+												checked={props.ssrFilters?.seasonIds.has(seasonId)}
 												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
                           rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 											/>
@@ -87,6 +89,7 @@ export default function CardListFilter(props: {
 									type="checkbox"
 									name="minterId"
 									value={PAGE_USER}
+									checked={props.ssrFilters?.minterId.has(PAGE_USER)}
 									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
                           rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 								/>
@@ -97,6 +100,7 @@ export default function CardListFilter(props: {
 									type="checkbox"
 									name="minterId"
 									value={OTHER_USER}
+									checked={props.ssrFilters?.minterId.has(OTHER_USER)}
 									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
                           rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 								/>
@@ -155,4 +159,18 @@ function checkCardHasValidMinterId(card: CardType, minterId: Set<MinterIdValue>)
 	} else {
 		return false;
 	}
+}
+
+export function parseFiltersFromSearchParams(params: URLSearchParams) {
+	const filters = createFilters();
+
+	for (const [key, value] of Array.from(params)) {
+		if (key === 'seasonId') {
+			filters.seasonIds.add(value);
+		} else if (key === 'minterId' && (value === PAGE_USER || value === OTHER_USER)) {
+			filters.minterId.add(value);
+		}
+	}
+
+	return filters;
 }
