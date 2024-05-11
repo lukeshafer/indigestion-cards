@@ -1,10 +1,16 @@
+import {
+	CardList,
+	CardListFilter,
+	CardListMenu,
+	CardListSearch,
+	CardListSortDropdown,
+	filterCards,
+	parseUniqueSeasons,
+	type Filters,
+} from './CardList';
 import { getCardSearcher, sortCardsByName, type CardType } from '@site/lib/client/utils';
 import { createMemo, createSignal } from 'solid-js';
-import CardListFilter, { filterCards, parseUniqueSeasons, type Filters } from './CardListFilter';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import { CardList, CardListMenu } from './CardList';
-import CardListSearch from './CardListSearch';
-import CardListSortDropdown from './CardListSortDropdown';
 import { NO_CARDS_OPENED_ID, routes } from '@site/constants';
 import Card from './Card';
 

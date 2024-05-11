@@ -24,8 +24,8 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 				return;
 			}
 			el.addEventListener('mousemove', handleMoveEvent);
-			//el.addEventListener('touchmove', handleMoveEvent);
 			el.addEventListener('mouseleave', handleLeaveEvent);
+			//el.addEventListener('touchmove', handleMoveEvent);
 			//el.addEventListener('touchend', handleLeaveEvent);
 
 			el.style.removeProperty('transition');
@@ -54,8 +54,8 @@ export default function TiltCardEffect(props: { children?: JSX.Element; shiny?: 
 
 		function handleLeaveEvent() {
 			el.removeEventListener('mousemove', handleMoveEvent);
-			//el.removeEventListener('touchmove', handleMoveEvent);
 			el.removeEventListener('mouseleave', handleLeaveEvent);
+			//el.removeEventListener('touchmove', handleMoveEvent);
 			//el.removeEventListener('touchend', handleLeaveEvent);
 
 			if (

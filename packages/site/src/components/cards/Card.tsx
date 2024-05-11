@@ -58,24 +58,12 @@ export default function Card(
               : props.rarityColor,
             'view-transition-name': `card-${props.instanceId ?? props.designId}`,
           }}>
-          {
-            //<img
-            //src={imgUrl()}
-            //alt={props.cardName}
-            //loading="lazy"
-            //class="absolute inset-0"
-            ///>
-            //<img src={frameUrl()} alt="" class="absolute inset-0" />
-          }
-
           <img
             src={combinedImgUrl()}
             alt={props.cardName}
             loading={props.lazy ? 'lazy' : undefined}
             class="absolute inset-0"
           />
-
-
           <h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
             {cardName()}
           </h3>

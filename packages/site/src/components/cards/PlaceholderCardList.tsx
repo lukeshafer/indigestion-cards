@@ -10,7 +10,7 @@ export default function PlaceholderCardList(props: { length?: number }) {
 			}}>
 			<For each={[...Array(props.length || 6).keys()]}>
 				{() => (
-					<li class="w-fit">
+					<li class="w-fit" style={ { 'font-size': `calc(1rem * var(--card-scale))` } }>
 						<article class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left">
 							<img
 								src="/assets/cards/placeholder.png"

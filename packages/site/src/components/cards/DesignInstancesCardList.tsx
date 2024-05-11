@@ -1,14 +1,19 @@
 import { getSortInfo, type CardType, type SortInfo } from '@site/lib/client/utils';
 import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
-import CardListFilter, { filterCards, type Filters } from './CardListFilter';
 import { trpc } from '@site/lib/client/trpc';
-import { CardList, CardListMenu } from './CardList';
-import CardListSearch from './CardListSearch';
-import CardListSortDropdown from './CardListSortDropdown';
+import {
+	type Filters,
+	filterCards,
+	CardList,
+	CardListMenu,
+	CardListFilter,
+	CardListSearch,
+	CardListSortDropdown,
+	CardListLoader,
+} from './CardList';
 import PlaceholderCardList from './PlaceholderCardList';
 import { routes } from '@site/constants';
 import Card from './Card';
-import CardListLoader from './CardListLoader';
 
 export default function DesignInstancesCardList(props: {
 	initialCards: CardType[];

@@ -1,15 +1,11 @@
+import { CardList as CardList, CardListFilter, CardListLoader, CardListSearch, CardListSortDropdown, filterCards, parseUniqueSeasons, type Filters } from './CardList';
 import { type SortInfo, getSortInfo, type CardType } from '@site/lib/client/utils';
 import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
-import { CardList as CardList } from './CardList';
 import { trpc } from '@site/lib/client/trpc';
 import { CardListMenu } from './CardList';
-import CardListSortDropdown from './CardListSortDropdown';
-import CardListFilter, { filterCards, parseUniqueSeasons, type Filters } from './CardListFilter';
 import PlaceholderCardList from './PlaceholderCardList';
-import CardListSearch from './CardListSearch';
 import { routes } from '@site/constants';
 import Card from './Card';
-import CardListLoader from './CardListLoader';
 
 export default function UserCardList(props: {
 	initialCards: CardType[];
