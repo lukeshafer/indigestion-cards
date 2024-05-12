@@ -8,7 +8,7 @@ export async function migration() {
 
 	const CardInstancesV2 = db.entities.CardInstances;
 
-	const oldCards = await CardInstancesV1.scan.go();
+	const oldCards = await CardInstancesV1.scan.go({ pages: 'all' });
 
 	let updatedCards: Array<CardInstance> = [];
 	for (let card of oldCards.data) {
