@@ -45,6 +45,7 @@
 		"solid/self-closing-comp": "off",
 		"no-mixed-spaces-and-tabs": "off",
 		"@typescript-eslint/triple-slash-reference": "off",
-		"@typescript-eslint/no-namespace": "off"
+		"@typescript-eslint/no-namespace": "off",
+		"@typescript-eslint/no-var-requires": "off"
 	}
 }
