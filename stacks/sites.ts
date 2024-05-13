@@ -1,4 +1,4 @@
-import { StackContext, AstroSite, use } from 'sst/constructs';
+import { StackContext, AstroSite, use, SolidStartSite } from 'sst/constructs';
 import { Database } from './database';
 import { API } from './api';
 import { DesignBucket } from './bucket';
@@ -20,6 +20,42 @@ export function Sites({ app, stack }: StackContext) {
 	const hostedZone = getHostedZone(stack.stage);
 
 	const baseDomain = getDomainName(stack.stage);
+
+	const betaSiteDomain =
+		app.mode === 'dev'
+			? undefined
+			: {
+					domainName: `admin.${baseDomain}`,
+					hostedZone: hostedZone,
+				};
+
+	const betaSite = new SolidStartSite(stack, 'SolidStartFrontend', {
+		path: 'packages/beta-site',
+		environment: {
+			PUBLIC_CARD_CDN_URL: cardCDN.domainName,
+			DOMAIN_NAME: betaSiteDomain?.domainName ?? 'localhost:3000',
+		},
+		bind: [
+			table,
+			adminApi,
+			twitchApi,
+			frameBucket,
+			cardDesignBucket,
+			frameDraftBucket,
+			cardDraftBucket,
+			siteAuth,
+			config.TWITCH_CLIENT_ID,
+			config.TWITCH_CLIENT_SECRET,
+			config.STREAMER_USER_ID,
+			config.TWITCH_TOKENS_PARAM,
+			config.DOMAIN_NAME,
+			bus,
+			adminImageSecret,
+		],
+		customDomain: betaSiteDomain,
+		permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
+		runtime: 'nodejs18.x',
+	});
 
 	const site = new AstroSite(stack, 'site', {
 		path: 'packages/site',
@@ -60,9 +96,11 @@ export function Sites({ app, stack }: StackContext) {
 
 	stack.addOutputs({
 		SiteUrl: site.url,
+		BetaSiteUrl: betaSite.url,
 	});
 
 	return {
 		site,
+		betaSite,
 	};
 }
