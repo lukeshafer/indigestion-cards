@@ -163,6 +163,8 @@ const CardInstancesV1 = (table: string) =>
 			},
 			indexes: {
 				primary: {
+					type: 'clustered',
+					collection: 'DesignAndCards',
 					pk: {
 						field: 'pk',
 						composite: ['designId'],
