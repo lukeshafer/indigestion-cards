@@ -42,9 +42,9 @@ export const auditAttributes = (entityName: string) =>
 					entity: entityName,
 					username: process.env.SESSION_USERNAME,
 					userId: process.env.SESSION_USER_ID,
-					timestamp: Date.now(),
+					timestamp: new Date().toISOString(),
 					item: JSON.stringify(i),
-				});
+				}).go();
 
 				return Date.now();
 			},
@@ -60,17 +60,17 @@ const audits = new Entity(
 			item: { type: 'string', required: true },
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			timestamp: { type: 'number', required: true },
+			timestamp: { type: 'string', required: true },
 		},
 		indexes: {
 			byEntity: {
 				pk: { field: 'pk', composite: ['entity'] },
-				sk: { field: 'sk', composite: ['item', 'userId', 'username', 'timestamp'] },
+				sk: { field: 'sk', composite: ['userId', 'username', 'timestamp'] },
 			},
 			byUserId: {
 				index: 'gsi1',
 				pk: { field: 'gsi1pk', composite: ['userId'] },
-				sk: { field: 'gsi1sk', composite: ['entity', 'item', 'username', 'timestamp'] },
+				sk: { field: 'gsi1sk', composite: ['entity', 'username', 'timestamp'] },
 			},
 		},
 	},
