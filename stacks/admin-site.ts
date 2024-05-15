@@ -1,17 +1,17 @@
 import { StackContext, AstroSite, use } from 'sst/constructs';
 import { Database } from './database';
 import { API } from './api';
-import { DesignBucket } from './bucket';
+import { DataRecoveryBucket, DesignBucket } from './bucket';
 import { Auth } from './auth';
 import { ConfigStack } from './config';
 import { Events } from './events';
 import { getHostedZone, getDomainName } from './constants';
-import * as iam from 'aws-cdk-lib/aws-iam';
 
 export function AdminSite({ app, stack }: StackContext) {
 	const table = use(Database);
 	const { adminApi, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
+	const { dataRecoveryBucket } = use(DataRecoveryBucket);
 	const { siteAuth } = use(Auth);
 	const bus = use(Events);
 	const config = use(ConfigStack);
@@ -34,6 +34,7 @@ export function AdminSite({ app, stack }: StackContext) {
 			cardDesignBucket,
 			frameDraftBucket,
 			cardDraftBucket,
+			dataRecoveryBucket,
 			siteAuth,
 			config.TWITCH_CLIENT_ID,
 			config.TWITCH_CLIENT_SECRET,
@@ -52,18 +53,6 @@ export function AdminSite({ app, stack }: StackContext) {
 		permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 		runtime: 'nodejs18.x',
 	});
-
-	if (app.mode !== 'dev') {
-		admin.attachPermissions([
-			new iam.PolicyStatement({
-				actions: ['dynamodb:Scan'],
-				effect: iam.Effect.ALLOW,
-				resources: [
-					`arn:aws:dynamodb:${app.region}:${app.account}:table/${backupTableName}`,
-				],
-			}),
-		]);
-	}
 
 	stack.addOutputs({
 		AdminUrl: admin.url,

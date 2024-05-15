@@ -77,3 +77,8 @@ export function DesignBucket({ stack, app }: StackContext) {
 
 	return { cardDesignBucket, frameBucket, cardDraftBucket, frameDraftBucket };
 }
+
+export function DataRecoveryBucket({ stack }: StackContext) {
+	const dataRecoveryBucket = new Bucket(stack, 'DataRecoveryBucket');
+	return { dataRecoveryBucket };
+}

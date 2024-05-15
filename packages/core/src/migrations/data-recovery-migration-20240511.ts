@@ -1,9 +1,19 @@
 import { db as toDB, DB_SERVICE, auditAttributes } from '../db';
 import { Entity } from 'electrodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { putDataRecoveryInfo } from '../lib/data-recovery';
 
-export async function migrateFromBackupTable(backupTableName: string) {
-	const fromCards = CardInstancesV1(backupTableName);
+export async function migrateFromBackupTable() {
+	if (!process.env.BACKUP_TABLE_NAME) {
+		throw new Error('backup table not setup');
+	}
+
+	if (process.env.BACKUP_TABLE_NAME === 'dev mode') {
+		console.log('process.env', process.env);
+		return;
+	}
+
+	const fromCards = CardInstancesV1(process.env.BACKUP_TABLE_NAME);
 	const toCards = toDB.entities.CardInstances;
 
 	const oldCards = await fromCards.scan.go({ pages: 'all' });
@@ -14,8 +24,8 @@ export async function migrateFromBackupTable(backupTableName: string) {
 			doesNotExist: 0,
 			replaced: 0,
 		},
-		doesNotExist: <unknown[]>[],
-		replaced: <unknown[]>[],
+		doesNotExist: <object[]>[],
+		replaced: <object[]>[],
 	};
 	for (const card of oldCards.data) {
 		const existingCard = await toCards
@@ -31,6 +41,8 @@ export async function migrateFromBackupTable(backupTableName: string) {
 			results.counts.exists += 1;
 		}
 	}
+
+	await putDataRecoveryInfo('20230511', results);
 
 	return results;
 }

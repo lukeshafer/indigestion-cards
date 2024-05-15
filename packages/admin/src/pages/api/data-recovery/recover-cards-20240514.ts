@@ -1,10 +1,14 @@
 import type { APIRoute } from 'astro';
-import { migrateFromBackupTable } from '@core/lib/data-recovery-migration-20240511';
+import { getDataRecoveryInfo } from '@core/lib/data-recovery';
 
 export const GET: APIRoute = async () => {
-	const result = await migrateFromBackupTable(import.meta.env.BACKUP_TABLE_NAME);
+	try {
+		const result = await getDataRecoveryInfo('20230511');
 
-	return new Response(JSON.stringify(result), {
-		headers: { 'content-type': 'application/json' },
-	});
+		return new Response(result, {
+			headers: { 'content-type': 'application/json' },
+		});
+	} catch {
+		return new Response('Not found');
+	}
 };

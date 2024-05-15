@@ -4,7 +4,7 @@ import { API } from './stacks/api';
 import { Database } from './stacks/database';
 import { Events } from './stacks/events';
 import { Sites } from './stacks/sites';
-import { DesignBucket } from './stacks/bucket';
+import { DesignBucket, DataRecoveryBucket } from './stacks/bucket';
 import { Auth } from './stacks/auth';
 import { AfterDeployStack } from './stacks/script';
 import { AdminSite } from './stacks/admin-site';
@@ -24,6 +24,7 @@ export default {
 
 		app.stack(ConfigStack)
 			.stack(Database)
+			.stack(DataRecoveryBucket)
 			.stack(AfterDeployStack)
 			.stack(Events)
 			.stack(Auth)
