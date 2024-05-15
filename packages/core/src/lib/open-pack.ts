@@ -33,6 +33,9 @@ export async function openCardFromPack(args: {
 	const instance = instances.find(c => c.instanceId === args.instanceId);
 
 	if (!instance) {
+    console.log("Found instances")
+    console.log(JSON.stringify(instances, null, 2))
+    console.log(`Card instance '${args.instanceId}' does not exist`)
 		throw new Error('Card not found');
 	}
 
