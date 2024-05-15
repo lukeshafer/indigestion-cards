@@ -2,8 +2,12 @@ import { db as toDB, DB_SERVICE, auditAttributes } from '../db';
 import { Entity } from 'electrodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { putDataRecoveryInfo } from '../lib/data-recovery';
+import type { CardInstance } from '../db.types';
+import { getRarityRankForRarity, getSiteConfig } from '../lib/site-config';
 
 export async function migrateFromBackupTable() {
+	const siteConfig = await getSiteConfig();
+
 	if (!process.env.BACKUP_TABLE_NAME) {
 		throw new Error('backup table not setup');
 	}
@@ -21,21 +25,34 @@ export async function migrateFromBackupTable() {
 	const results = {
 		counts: {
 			exists: 0,
-			doesNotExist: 0,
+			added: 0,
+			failed: 0,
 			replaced: 0,
 		},
-		doesNotExist: <object[]>[],
-		replaced: <object[]>[],
+		replaced: <{ old: object; new: object }[]>[],
+		added: <object[]>[],
+		failed: <object[]>[],
 	};
 	for (const card of oldCards.data) {
 		const existingCard = await toCards
 			.get({ designId: card.designId, instanceId: card.instanceId })
 			.go();
 		if (existingCard.data == null) {
-			results.doesNotExist.push(card);
-			results.counts.doesNotExist += 1;
+			try {
+				await toCards
+					.put({
+						...card,
+						rarityRank: await getRarityRankForRarity(card, siteConfig.rarityRanking),
+					})
+					.go();
+				results.added.push(trimCard(card));
+				results.counts.added += 1;
+			} catch {
+				results.failed.push(trimCard(card));
+				results.counts.failed += 1;
+			}
 		} else if (existingCard.data.createdAt !== card.createdAt) {
-			results.replaced.push(card);
+			results.replaced.push({ old: trimCard(card), new: trimCard(existingCard.data) });
 			results.counts.replaced += 1;
 		} else {
 			results.counts.exists += 1;
@@ -45,6 +62,37 @@ export async function migrateFromBackupTable() {
 	await putDataRecoveryInfo('20230511', results);
 
 	return results;
+}
+
+function trimCard(
+	card: Pick<
+		CardInstance,
+		| 'instanceId'
+		| 'cardName'
+		| 'rarityName'
+		| 'cardNumber'
+		| 'totalOfType'
+		| 'username'
+		| 'createdAt'
+		| 'minterUsername'
+		| 'seasonName'
+		| 'packId'
+		| 'openedAt'
+	>
+) {
+	return {
+		instanceId: card.instanceId,
+		cardName: card.cardName,
+		rarityName: card.rarityName,
+		cardNumber: card.cardNumber,
+		totalOfType: card.totalOfType,
+		username: card.username,
+		createdAt: card.createdAt,
+		minterUsername: card.minterUsername,
+		seasonName: card.seasonName,
+		packId: card.packId,
+		openedAt: card.openedAt,
+	};
 }
 
 const CardInstancesV1 = (table: string) =>
