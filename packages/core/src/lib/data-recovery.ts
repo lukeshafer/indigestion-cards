@@ -11,7 +11,7 @@ export async function getDataRecoveryInfo(name: string) {
 		})
 	);
 
-	return JSON.parse(await result.Body?.transformToString('utf8') ?? '{}');
+	return result.Body?.transformToString('utf8');
 }
 
 export async function putDataRecoveryInfo(name: string, data: object) {
