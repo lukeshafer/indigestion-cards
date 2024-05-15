@@ -2,6 +2,7 @@ import { db as toDB, DB_SERVICE, auditAttributes } from '../db';
 import { Entity } from 'electrodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { putDataRecoveryInfo } from '../lib/data-recovery';
+import type { CardInstance } from '../db.types';
 
 export async function migrateFromBackupTable() {
 	if (!process.env.BACKUP_TABLE_NAME) {
@@ -24,18 +25,19 @@ export async function migrateFromBackupTable() {
 			doesNotExist: 0,
 			replaced: 0,
 		},
+		replaced: { old: <object[]>[], new: <object[]>[] },
 		doesNotExist: <object[]>[],
-		replaced: <object[]>[],
 	};
 	for (const card of oldCards.data) {
 		const existingCard = await toCards
 			.get({ designId: card.designId, instanceId: card.instanceId })
 			.go();
 		if (existingCard.data == null) {
-			results.doesNotExist.push(card);
+			results.doesNotExist.push(trimCard(card));
 			results.counts.doesNotExist += 1;
 		} else if (existingCard.data.createdAt !== card.createdAt) {
-			results.replaced.push(card);
+			results.replaced.old.push(trimCard(card));
+			results.replaced.new.push(trimCard(existingCard.data));
 			results.counts.replaced += 1;
 		} else {
 			results.counts.exists += 1;
@@ -45,6 +47,37 @@ export async function migrateFromBackupTable() {
 	await putDataRecoveryInfo('20230511', results);
 
 	return results;
+}
+
+function trimCard(
+	card: Pick<
+		CardInstance,
+		| 'instanceId'
+		| 'cardName'
+		| 'rarityName'
+		| 'cardNumber'
+		| 'totalOfType'
+		| 'username'
+		| 'createdAt'
+		| 'minterUsername'
+		| 'seasonName'
+		| 'packId'
+		| 'openedAt'
+	>
+) {
+	return {
+		instanceId: card.instanceId,
+		cardName: card.cardName,
+		rarityName: card.rarityName,
+		cardNumber: card.cardNumber,
+		totalOfType: card.totalOfType,
+		username: card.username,
+		createdAt: card.createdAt,
+		minterUsername: card.minterUsername,
+		seasonName: card.seasonName,
+		packId: card.packId,
+		openedAt: card.openedAt,
+	};
 }
 
 const CardInstancesV1 = (table: string) =>
