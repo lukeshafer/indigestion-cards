@@ -157,6 +157,16 @@ export const ASSETS = {
 		HIDDEN_CARD: '/assets/cards/hiddencard.png',
 		SHIT_PACK: '/assets/cards/shit_pack_brown.png',
 	},
+  STAMPS: {
+    SHIT: {
+      BRONZE: '/assets/stamps/shit/bronze.png',
+      SILVER: '/assets/stamps/shit/silver.png',
+      GOLD: '/assets/stamps/shit/gold.png',
+      WHITE: '/assets/stamps/shit/white.png',
+      RAINBOW: '/assets/stamps/shit/rainbow.png',
+      PINK: '/assets/stamps/shit/pink.png',
+    }
+  }
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
