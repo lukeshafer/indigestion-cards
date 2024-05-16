@@ -9,6 +9,7 @@ import { Auth } from './stacks/auth';
 import { AfterDeployStack } from './stacks/script';
 import { AdminSite } from './stacks/admin-site';
 import { ImageProcessing } from './stacks/image-processing'
+import { Minecraft } from './stacks/minecraft';
 
 export default {
 	config() {
@@ -31,6 +32,7 @@ export default {
 			.stack(DesignBucket)
 			.stack(API)
       .stack(ImageProcessing)
+      .stack(Minecraft)
 			.stack(Sites)
 			.stack(AdminSite)
 	},
