@@ -15,6 +15,13 @@ function allItemsPKTemplate(entityName: string, service = DB_SERVICE) {
 	return `$${service}#getall_${entityName}`;
 }
 
+export const twitchEventTypes = [
+	'channel.channel_points_custom_reward_redemption.add',
+	'channel.subscription.gift',
+] as const;
+
+export const packEventTypes = [...twitchEventTypes, 'admin-site'] as const;
+
 export const auditAttributes = (entityName: string) =>
 	({
 		createdAt: {
@@ -405,6 +412,13 @@ const Packs = new Entity(
 			seasonId: { type: 'string' },
 			username: { type: 'string' },
 			userId: { type: 'string' },
+			event: {
+				type: 'map',
+				properties: {
+					eventId: { type: 'string' },
+					eventType: { type: packEventTypes },
+				},
+			},
 			cardDetails: {
 				type: 'list',
 				required: true,
@@ -715,10 +729,6 @@ const TwitchEventMessageHistory = new Entity(
 	dbConfig
 );
 
-export const twitchEventTypes = [
-	'channel.channel_points_custom_reward_redemption.add',
-	'channel.subscription.gift',
-] as const;
 const TwitchEvents = new Entity(
 	{
 		model: { entity: 'twitchEvents', version: '1', service: DB_SERVICE },

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { packEventTypes } from '../db';
 
 export type PackDetails = z.infer<typeof packSchema>;
 export type PackDetailsWithoutUser = z.infer<typeof packSchemaWithoutUser>;
@@ -23,6 +24,12 @@ export const packSchema = z.object({
 		seasonId: z.string().optional(),
 		seasonName: z.string().optional(),
 	}),
+	event: z
+		.object({
+			eventId: z.string().optional(),
+			eventType: z.enum(packEventTypes).optional(),
+		})
+		.optional(),
 });
 export const packSchemaWithoutUser = packSchema.omit({ userId: true, username: true });
 
