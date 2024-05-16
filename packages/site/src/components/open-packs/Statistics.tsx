@@ -1,4 +1,12 @@
-import { Show, createEffect, createResource, createSignal, onMount, useContext } from 'solid-js';
+import {
+	Show,
+	Suspense,
+	createEffect,
+	createResource,
+	createSignal,
+	onMount,
+	useContext,
+} from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
 import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
 import { Checkbox } from '../form/Form';
@@ -7,11 +15,16 @@ export function Statistics() {
 	const ctx = useContext(OpenPacksContext);
 
 	const state = () => ({
-		cardsOpened: ctx.activePack?.cardDetails.filter(card => card.opened === true),
+		cardsOpened: ctx.activePack?.cardDetails
+			.filter(card => card.opened === true)
+			.sort((a, b) => b.totalOfType - a.totalOfType),
 		cardsOpenedCount: ctx.activePack?.cardDetails.filter(card => card.opened).length || 0,
 		totalCardCount: ctx.activePack?.cardDetails.length,
 		packTypeId: ctx.activePack?.packTypeId,
 		packId: ctx.activePack?.packId,
+		get firstCardOpened() {
+			return state().cardsOpened?.at(0);
+		},
 	});
 
 	const [isShitpackVisible, setIsShitpackVisible] = createSignal(false);
@@ -29,11 +42,7 @@ export function Statistics() {
 			return { shitPackOdds: 0 };
 		}
 
-		if (
-			state.cardsOpened?.some(
-				card => !card.rarityId.toLowerCase().startsWith(SHIT_PACK_RARITY_ID)
-			)
-		)
+		if (state.cardsOpened?.some(card => card.rarityId !== state.cardsOpened?.[0]?.rarityId))
 			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 
@@ -48,10 +57,12 @@ export function Statistics() {
 			packTypeId: state.packTypeId || '0',
 		});
 
+		if (state.firstCardOpened) {
+			searchParams.set('rarityId', state.firstCardOpened.rarityId);
+		}
+
 		const body = await fetch(resolveLocalPath(API.STATS + `?${searchParams.toString()}`)).then(
-			res => {
-				return res.text();
-			}
+			res => res.text()
 		);
 
 		const json = JSON.parse(body);
@@ -62,7 +73,19 @@ export function Statistics() {
 	});
 
 	const shitPackOdds = () => resource()?.shitPackOdds || 0;
-	const formattedShitPack = () => `${Math.floor(shitPackOdds() * 10000) / 100}%`;
+	const formattedShitPack = () => {
+		if (shitPackOdds() === 0) {
+			return '0%';
+		} else if (shitPackOdds() < 0.0001) {
+			const odds = Math.floor(shitPackOdds() * 1000000) / 10000;
+			if (odds >= 0.0001) {
+				return `${odds}%`;
+			} else {
+				return '< 0.0001%';
+			}
+		}
+		return `${Math.floor(shitPackOdds() * 10000) / 100}%`;
+	};
 	const hasOneMoreCard = (chance: number) =>
 		chance > 0 && chance < 1 && (state().totalCardCount || 0) - 1 === state().cardsOpenedCount;
 
@@ -75,10 +98,15 @@ export function Statistics() {
 						'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100':
 							!isShitpackVisible(),
 					}}>
-					Shit pack:{' '}
-					{resource.loading ? (
-						<span class="text-gray-500">Calculating...</span>
-					) : (
+					<Show
+						when={
+							state().firstCardOpened?.rarityId !== SHIT_PACK_RARITY_ID &&
+							state().firstCardOpened
+						}
+						fallback="Shit pack: ">
+						{card => <>{card().rarityName.toUpperCase()} SHIT PACK: </>}
+					</Show>
+					<Suspense fallback={<span class="text-gray-500">Calculating...</span>}>
 						<div class="inline-flex items-center gap-2">
 							{formattedShitPack()}{' '}
 							{hasOneMoreCard(shitPackOdds()) ? (
@@ -89,7 +117,7 @@ export function Statistics() {
 								<img src={ASSETS.EMOTES.LILINDDISBLIF} width="30" />
 							) : null}
 						</div>
-					)}
+					</Suspense>
 				</p>
 				<div class="cursor-pointer opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
 					<Checkbox

@@ -2,6 +2,7 @@ import { Table } from 'sst/node/table';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
 import { randomUUID } from 'crypto';
+import { useSession } from 'sst/node/future/auth';
 
 export const dbConfig = {
 	table: Table.data.tableName,
@@ -34,17 +35,41 @@ export const auditAttributes = (entityName: string) =>
 					(process.env.SESSION_TYPE !== 'admin' && process.env.SESSION_TYPE !== 'user') ||
 					!process.env.SESSION_USERNAME
 				) {
-					throw new Error('Username and ID are required in process.env');
-					return;
+					try {
+						const session = useSession();
+						if (
+							(session.type === 'user' || session.type === 'admin') &&
+							session.properties.userId
+						) {
+							process.env.SESSION_USER_ID = session.properties.userId;
+							process.env.SESSION_USERNAME =
+								session.properties.username || session.properties.userId;
+						} else {
+							throw new Error();
+						}
+					} catch (error) {
+						console.error(error);
+						throw new Error('Username and ID are required in process.env');
+					}
 				}
 
-				audits.create({
-					entity: entityName,
-					username: process.env.SESSION_USERNAME,
-					userId: process.env.SESSION_USER_ID,
-					timestamp: new Date().toISOString(),
-					item: JSON.stringify(i),
-				}).go();
+				try {
+					audits
+						.put({
+							entity: entityName,
+							username: process.env.SESSION_USERNAME,
+							userId: process.env.SESSION_USER_ID,
+							item: JSON.stringify(i),
+						})
+						.go();
+				} catch (error) {
+					console.error({
+						message: 'An error occurred while saving the audit.',
+						error,
+					});
+
+					// TODO: send to a queue to try again
+				}
 
 				return Date.now();
 			},
@@ -60,7 +85,10 @@ const audits = new Entity(
 			item: { type: 'string', required: true },
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			timestamp: { type: 'string', required: true },
+			timestamp: {
+				type: 'string',
+				default: () => `${new Date().toISOString()}---${Date.now()}`,
+			},
 		},
 		indexes: {
 			byEntity: {

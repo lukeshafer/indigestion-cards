@@ -62,6 +62,7 @@ const packTypes = await getAllPackTypes();
 	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
 			src={twitchData?.profile_image_url}
+      alt=""
 			width="150"
 			height="150"
 			class="col-start-1 row-span-full h-fit rounded-full"
@@ -77,7 +78,7 @@ const packTypes = await getAllPackTypes();
 					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
 					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
 						<p>User Id: {user.userId}</p>
-						<UserPackForms {user} {packTypes} client:load />
+						<UserPackForms {user} {packTypes} client:only="solid-js" />
 					</div>
 				</details>
 			</AdminOnly>
@@ -115,7 +116,7 @@ const packTypes = await getAllPackTypes();
 								: undefined
 						}
 						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
-						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
+						<Card {...pinnedCard} scale="var(--card-scale)" client:only="solid-js" />
 					</a>
 				</div>
 			) : null
@@ -126,7 +127,7 @@ const packTypes = await getAllPackTypes();
 		<CardList
 			cards={cardsNotInPack}
 			rarityRanking={rarityRanking}
-			client:load
+			client:only="solid-js"
 			isUserPage
 			sortOnlyBy={[
 				'rarest',
