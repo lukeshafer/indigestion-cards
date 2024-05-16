@@ -38,13 +38,14 @@ export const auditAttributes = (entityName: string) =>
 					return;
 				}
 
-				audits.create({
-					entity: entityName,
-					username: process.env.SESSION_USERNAME,
-					userId: process.env.SESSION_USER_ID,
-					timestamp: new Date().toISOString(),
-					item: JSON.stringify(i),
-				}).go();
+				audits
+					.put({
+						entity: entityName,
+						username: process.env.SESSION_USERNAME,
+						userId: process.env.SESSION_USER_ID,
+						item: JSON.stringify(i),
+					})
+					.go();
 
 				return Date.now();
 			},
@@ -60,7 +61,10 @@ const audits = new Entity(
 			item: { type: 'string', required: true },
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			timestamp: { type: 'string', required: true },
+			timestamp: {
+				type: 'string',
+				default: () => `${new Date().toISOString()}---${Date.now()}`,
+			},
 		},
 		indexes: {
 			byEntity: {
