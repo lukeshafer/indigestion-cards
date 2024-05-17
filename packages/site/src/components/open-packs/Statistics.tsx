@@ -100,7 +100,7 @@ export function Statistics() {
 					}}>
 					<Show
 						when={
-							state().firstCardOpened?.rarityId !== SHIT_PACK_RARITY_ID &&
+							!state().firstCardOpened?.rarityId.startsWith(SHIT_PACK_RARITY_ID) &&
 							state().firstCardOpened
 						}
 						fallback="Shit pack: ">

@@ -1,10 +1,10 @@
-import { db } from '../db'
-import type { Pack, CardInstance } from "../db.types";
-import type { DBResult } from "../types";
-import { checkIfUserExists, createNewUser, getUser } from "./user";
-import { type CardPool, generateCard, getCardPoolFromType } from "./card-pool";
-import type { PackDetails, PackDetailsWithoutUser } from "./entity-schemas";
-import { PackTypeIsOutOfCardsError } from "./errors";
+import { db, packEventTypes } from '../db';
+import type { Pack, CardInstance } from '../db.types';
+import type { DBResult } from '../types';
+import { checkIfUserExists, createNewUser, getUser } from './user';
+import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
+import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
+import { PackTypeIsOutOfCardsError } from './errors';
 
 export async function getAllPacks(): Promise<Pack[]> {
 	const result = await db.entities.Packs.query.allPacks({}).go();
@@ -29,6 +29,7 @@ export async function createPackForNoUser(packDetails: PackDetailsWithoutUser) {
 		await createPack({
 			count: packDetails.packType.cardCount,
 			cardPool: cardPool,
+			event: packDetails.event,
 			packType: {
 				packTypeId: packDetails.packType.packTypeId,
 				packTypeName: packDetails.packType.packTypeName,
@@ -54,11 +55,12 @@ export async function givePackToUser(packDetails: PackDetails) {
 			userId: packDetails.userId,
 			count: packDetails.packType.cardCount,
 			cardPool: cardPool,
+			event: packDetails.event,
 			packType: {
 				packTypeId: packDetails.packType.packTypeId,
 				packTypeName: packDetails.packType.packTypeName,
 			},
-		}).catch((err) => {
+		}).catch(err => {
 			if (err instanceof PackTypeIsOutOfCardsError) errors.push(err);
 			else throw err;
 		});
@@ -89,25 +91,21 @@ export async function updatePackUser(options: {
 
 	await db.transaction
 		.write(({ Packs, CardInstances, Users }) => [
-			Packs
-				.patch({ packId: pack.packId })
+			Packs.patch({ packId: pack.packId })
 				.set({ userId: user.userId, username: user.username })
 				.commit(),
-			...pack.cardDetails.map((card) =>
-				CardInstances
-					.patch({ instanceId: card.instanceId, designId: card.designId })
+			...pack.cardDetails.map(card =>
+				CardInstances.patch({ instanceId: card.instanceId, designId: card.designId })
 					.set({ userId: user.userId, username: user.username })
-					.commit(),
+					.commit()
 			),
-			Users
-				.patch({ userId: user.userId })
+			Users.patch({ userId: user.userId })
 				.set({ packCount: (user.packCount || 0) + 1 })
 				.commit(),
-			...oldUserList.map((oldUser) =>
-				Users
-					.patch({ userId: oldUser.userId })
+			...oldUserList.map(oldUser =>
+				Users.patch({ userId: oldUser.userId })
 					.set({ packCount: (oldUser.packCount || 1) - 1 })
-					.commit(),
+					.commit()
 			),
 		])
 		.go();
@@ -119,34 +117,34 @@ export async function deleteFirstPackForUser(args: {
 }): Promise<DBResult<Pack | null>> {
 	try {
 		const pack = await findPackForUser(args);
-		if (!pack) return { success: false, error: "User has no pack to delete!" };
+		if (!pack) return { success: false, error: 'User has no pack to delete!' };
 
-		const openedCount = pack.cardDetails.filter((card) => card.opened).length;
+		const openedCount = pack.cardDetails.filter(card => card.opened).length;
 		const user = await getUser(args.userId);
 		const result = await db.transaction
 			.write(({ Users, CardInstances, Packs }) => [
 				Packs.delete({ packId: pack.packId }).commit(),
 				...(pack.userId && user
 					? [
-							Users
-								.patch({ userId: pack.userId })
+							Users.patch({ userId: pack.userId })
 								// if packCount is null OR 0, set it to 0, otherwise subtract 1
 								.set({
 									packCount: (user?.packCount || 1) - 1,
 									cardCount: user?.cardCount ? user.cardCount - openedCount : 0,
 								})
 								.commit(),
-					  ]
+						]
 					: []),
-				...(pack.cardDetails?.map((card) =>
-					CardInstances
-						.delete({ designId: card.designId, instanceId: card.instanceId })
-						.commit(),
+				...(pack.cardDetails?.map(card =>
+					CardInstances.delete({
+						designId: card.designId,
+						instanceId: card.instanceId,
+					}).commit()
 				) ?? []),
 			])
 			.go();
 
-		if (result.canceled) throw new Error("Canceled transaction");
+		if (result.canceled) throw new Error('Canceled transaction');
 
 		return {
 			success: true,
@@ -162,7 +160,7 @@ export async function deleteFirstPackForUser(args: {
 
 		return {
 			success: false,
-			error: "Unknown error",
+			error: 'Unknown error',
 		};
 	}
 }
@@ -171,32 +169,32 @@ export async function deletePack(args: { packId: string }) {
 	const pack = await getPackById({ packId: args.packId });
 
 	const user = pack.userId ? await getUser(pack.userId) : null;
-	const openCount = pack.cardDetails.filter((card) => card.opened).length;
+	const openCount = pack.cardDetails.filter(card => card.opened).length;
 
 	const result = await db.transaction
 		.write(({ Users, CardInstances, Packs }) => [
 			Packs.delete({ packId: args.packId }).commit(),
 			...(pack.userId && user
 				? [
-						Users
-							.patch({ userId: pack.userId })
+						Users.patch({ userId: pack.userId })
 							// if packCount is null OR 0, set it to 0, otherwise subtract 1
 							.set({
 								packCount: (user?.packCount || 1) - 1,
 								cardCount: user?.cardCount ? user.cardCount - openCount : 0,
 							})
 							.commit(),
-				  ]
+					]
 				: []),
-			...(pack.cardDetails?.map((card) =>
-				CardInstances
-					.delete({ designId: card.designId, instanceId: card.instanceId })
-					.commit(),
+			...(pack.cardDetails?.map(card =>
+				CardInstances.delete({
+					designId: card.designId,
+					instanceId: card.instanceId,
+				}).commit()
 			) ?? []),
 		])
 		.go();
 
-	if (result.canceled) throw new Error("Error deleting pack");
+	if (result.canceled) throw new Error('Error deleting pack');
 
 	return result.data[0].item;
 }
@@ -207,17 +205,21 @@ export async function createPack(args: {
 	count: number;
 	cardPool: CardPool;
 	seasonId?: string;
+	event?: {
+		eventId?: string;
+		eventType?: (typeof packEventTypes)[number];
+	};
 	packType: {
 		packTypeId: string;
 		packTypeName: string;
 	};
 }) {
-	const packId = generatePackId({ userId: args.userId || "_" });
+	const packId = generatePackId({ userId: args.userId || '_' });
 
 	const user =
 		args.userId && args.username
 			? (await getUser(args.userId)) ??
-			  (await createNewUser({ userId: args.userId, username: args.username }))
+				(await createNewUser({ userId: args.userId, username: args.username }))
 			: null;
 
 	const cards: CardInstance[] = [];
@@ -233,7 +235,7 @@ export async function createPack(args: {
 		cards.push(card);
 	}
 
-	console.log("Creating pack: ", {
+	console.log('Creating pack: ', {
 		cards,
 		packId,
 		...args,
@@ -244,66 +246,59 @@ export async function createPack(args: {
 		.write(({ Users, Packs, CardInstances }) => [
 			...(user && args.userId && args.username
 				? [
-						Users
-							.patch({ userId: user.userId })
+						Users.patch({ userId: user.userId })
 							.set({ packCount: (user.packCount ?? 0) + 1 })
 							.commit(),
-				  ]
+					]
 				: []),
-			Packs
-				.create({
-					packId,
-					packTypeId: args.packType.packTypeId,
-					packTypeName: args.packType.packTypeName,
-					userId: user?.userId,
-					username: user?.username,
-					seasonId: args.seasonId,
-					cardDetails: cards.map((card) => ({
-						instanceId: card.instanceId,
-						designId: card.designId,
-						cardName: card.cardName,
-						cardDescription: card.cardDescription,
-						imgUrl: card.imgUrl,
-						rarityId: card.rarityId,
-						rarityName: card.rarityName,
-						rarityColor: card.rarityColor,
-						frameUrl: card.frameUrl,
-						totalOfType: card.totalOfType,
-						cardNumber: card.cardNumber,
-					})),
-				})
-				.commit(),
-			...cards.map((card) => CardInstances.create(card).commit()),
+			Packs.create({
+				packId,
+				packTypeId: args.packType.packTypeId,
+				packTypeName: args.packType.packTypeName,
+				userId: user?.userId,
+				username: user?.username,
+				seasonId: args.seasonId,
+				event: {
+					eventType: args.event?.eventType,
+					eventId: args.event?.eventId,
+				},
+				cardDetails: cards.map(card => ({
+					instanceId: card.instanceId,
+					designId: card.designId,
+					cardName: card.cardName,
+					cardDescription: card.cardDescription,
+					imgUrl: card.imgUrl,
+					rarityId: card.rarityId,
+					rarityName: card.rarityName,
+					rarityColor: card.rarityColor,
+					frameUrl: card.frameUrl,
+					totalOfType: card.totalOfType,
+					cardNumber: card.cardNumber,
+				})),
+			}).commit(),
+			...cards.map(card => CardInstances.create(card).commit()),
 		])
 		.go();
 
 	console.log(result);
 }
 
-export async function batchUpdatePackUsername(args: {
-	oldUsername: string;
-	newUsername: string;
-}) {
+export async function batchUpdatePackUsername(args: { oldUsername: string; newUsername: string }) {
 	const existingPacks = await db.entities.Packs.query
 		.byUsername({ username: args.oldUsername })
 		.go();
 
-	return await db.entities.Packs
-		.put(
-			existingPacks.data.map((pack) => ({
-				...pack,
-				username:
-					pack.username?.toLowerCase() === args.oldUsername.toLowerCase()
-						? args.newUsername
-						: pack.username,
-			})),
-		)
-		.go();
+	return await db.entities.Packs.put(
+		existingPacks.data.map(pack => ({
+			...pack,
+			username:
+				pack.username?.toLowerCase() === args.oldUsername.toLowerCase()
+					? args.newUsername
+					: pack.username,
+		}))
+	).go();
 }
 
-export function generatePackId(opts: {
-	userId: string;
-	prefix?: string;
-}) {
-	return `${opts.prefix || ""}pack-${opts.userId}-${Date.now()}`;
+export function generatePackId(opts: { userId: string; prefix?: string }) {
+	return `${opts.prefix || ''}pack-${opts.userId}-${Date.now()}`;
 }
