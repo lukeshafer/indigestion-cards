@@ -43,7 +43,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 	}
 
 	process.env.FONTCONFIG_PATH = dirname(fileURLToPath(import.meta.url)) + '/fonts';
-	const minecraftFontPath = `${process.env.FONTCONFIG_PATH}/fonts/minecraft.ttf`;
+	let minecraftFontPath: string;
+	if (process.env.IS_LOCAL === 'true') {
+		minecraftFontPath = './packages/functions/src/minecraft/fonts';
+	} else {
+		minecraftFontPath = `${process.env.FONTCONFIG_PATH}/minecraft.ttf`;
+	}
+	console.log(minecraftFontPath);
 
 	const img = await sharp(cardImageBuffer)
 		.resize({
