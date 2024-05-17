@@ -15,7 +15,7 @@ export function Minecraft({ app, stack }: StackContext) {
 	const minecraftApi = new Api(stack, 'MinecraftApi', {
 		routes: {
 			'GET /card/{username}/{instanceId}/card.png':
-				'packages/functions/src/minecraft/cards-by-id.handler',
+				'packages/functions/src/minecraft/get-card-image.handler',
 		},
 		defaults: {
 			function: {
