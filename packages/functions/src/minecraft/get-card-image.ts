@@ -2,8 +2,6 @@ import { getCardInstanceByUsername } from '@core/lib/card';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import sharp from 'sharp';
 import type { CardInstance } from '../../../core/src/db.types';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
 	const { instanceId, username } = event.pathParameters ?? {};
@@ -42,19 +40,19 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 		};
 	}
 
-	process.env.FONTCONFIG_PATH = dirname(fileURLToPath(import.meta.url)) + '/fonts';
-	let minecraftFontPath: string;
+	let filePathPrefix;
 	if (process.env.IS_LOCAL === 'true') {
-		minecraftFontPath = './packages/functions/src/minecraft/fonts';
+		filePathPrefix = './packages/functions/src/minecraft/fonts';
 	} else {
-		minecraftFontPath = `${process.env.FONTCONFIG_PATH}/minecraft.ttf`;
+		filePathPrefix = './fonts';
 	}
-	console.log(minecraftFontPath);
+
+	process.env.FONTCONFIG_PATH = filePathPrefix;
 
 	const img = await sharp(cardImageBuffer)
 		.resize({
 			width: 128,
-			kernel: sharp.kernel.mitchell,
+			kernel: sharp.kernel.nearest,
 		})
 		.composite([
 			{
@@ -62,7 +60,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 					text: {
 						text: card.cardName,
 						rgba: true,
-						fontfile: minecraftFontPath,
+						fontfile: filePathPrefix + '/minecraft.ttf',
 						dpi: 49,
 					},
 				},
@@ -74,7 +72,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 					text: {
 						text: card.cardDescription,
 						rgba: true,
-						fontfile: minecraftFontPath,
+						fontfile: filePathPrefix + '/minecraft.ttf',
 						dpi: 32,
 						width: 95,
 					},

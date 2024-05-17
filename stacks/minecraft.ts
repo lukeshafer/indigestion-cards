@@ -19,6 +19,7 @@ export function Minecraft({ app, stack }: StackContext) {
 		},
 		defaults: {
 			function: {
+        // enableLiveDev: false,
 				copyFiles: [
 					{
 						from: 'packages/functions/src/minecraft/fonts',
