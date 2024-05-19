@@ -8,6 +8,7 @@ import {
 	momentInputSchemas,
 } from '@core/lib/moments';
 import { generatePackId } from '@core/lib/pack';
+import { getRarityRankForRarity } from '@core/lib/site-config';
 import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
 import { Bucket } from 'sst/node/bucket';
 
@@ -101,6 +102,7 @@ export const handler = SiteHandler(
 					rarityId: rarity.rarityId,
 					frameUrl: rarity.frameUrl,
 					rarityName: rarity.rarityName,
+          rarityRank: await getRarityRankForRarity(rarity),
 					rarityColor: rarity.rarityColor,
 					totalOfType: rarity.count,
 					packId: generatePackId({ userId: user.userId, prefix: 'moment-' }),

@@ -25,20 +25,34 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 
 	const user = pick(data.user, ['userId', 'minecraftUsername', 'username']);
 
-	data.cards.sort((a, b) => (a.designId > b.designId ? -1 : b.designId > a.designId ? 1 : 0));
+	data.cards.sort((a, b) =>
+		a.designId > b.designId
+			? -1
+			: b.designId > a.designId
+				? 1
+				: a.rarityRank - b.rarityRank || a.cardNumber - b.cardNumber
+	);
 
 	const cards = [];
-	const designs = new Map<string, number>();
-	let nextDesignId = 1;
+	const mc_designIds = new Map<string, number>();
+	let mc_nextDesignId = 1;
+	const mc_rarityIds = new Map<string, number>();
+	let mc_nextRarityId = 1;
 	for (const card of data.cards) {
-		let designId = designs.get(card.designId);
-		if (!designId) {
-			designId = nextDesignId++;
-			designs.set(card.designId, designId);
+		let mc_designId = mc_designIds.get(card.designId);
+		if (!mc_designId) {
+			mc_designId = mc_nextDesignId++;
+			mc_designIds.set(card.designId, mc_designId);
+		}
+
+		let mc_rarityId = mc_rarityIds.get(card.rarityId);
+		if (!mc_rarityId) {
+			mc_rarityId = mc_nextRarityId++;
+			mc_rarityIds.set(card.rarityId, mc_rarityId);
 		}
 
 		cards.push({
-			MC_CARD_ID: `${designId}_${card.totalOfType}_${card.cardNumber}`,
+			MC_CARD_ID: `${mc_designId}_${mc_rarityId}_${card.cardNumber}`,
 			...pick(card, [
 				'cardName',
 				'designId',
