@@ -1,34 +1,55 @@
-import { getCardInstanceByUsername } from '@core/lib/card';
+import { getCardInstanceByUsernameDesignRarityCardNumber } from '@core/lib/card';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import sharp from 'sharp';
 import type { CardInstance } from '../../../core/src/db.types';
 
 export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
-	const { instanceId, username } = event.pathParameters ?? {};
+	const { designId, username, rarityId, cardNumber } = event.pathParameters ?? {};
 
 	let missingParameters = [];
-	if (!instanceId) {
-		missingParameters.push('instanceId');
+	if (!designId) {
+		missingParameters.push('designId');
 	}
 	if (!username) {
 		missingParameters.push('username');
 	}
+	if (!rarityId) {
+		missingParameters.push('rarityId');
+	}
+	if (!cardNumber) {
+		missingParameters.push('cardNumber');
+	}
 
-	if (!instanceId || !username) {
+	if (!designId || !username || !rarityId || !cardNumber) {
 		return {
 			statusCode: 400,
 			body: `Missing required parameters: ${missingParameters.join()}`,
 		};
 	}
+	console.log({
+		designId,
+		username,
+		cardNumber,
+		rarityId,
+	});
 
-	let card = await getCardInstanceByUsername({ instanceId, username });
+	let card = await getCardInstanceByUsernameDesignRarityCardNumber({
+		designId,
+		username,
+		cardNumber,
+		rarityId,
+	});
 
 	if (!card) {
 		return {
 			statusCode: 404,
-			body: `Card not found with instanceId ${instanceId} for username ${username}`,
+			body: `Card not found: ${JSON.stringify({ designId, username, rarityId, cardNumber }, null, 2)}`,
 		};
 	}
+
+	// UNCOMMENT FOR TESTING PURPOSES ONLY
+	// card.cardDescription =
+	// 	"Go touch some grass, do your homework, go back to school, your mother doesn't love you, watch out for campfires";
 
 	let cardImageBuffer;
 	try {
@@ -51,9 +72,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 
 	const img = await sharp(cardImageBuffer)
 		.resize({
-			width: 128,
+			height: 128,
 			kernel: sharp.kernel.nearest,
 		})
+		.flatten({ background: card.rarityColor })
 		.composite([
 			{
 				input: {
@@ -61,11 +83,11 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 						text: card.cardName,
 						rgba: true,
 						fontfile: filePathPrefix + '/minecraft.ttf',
-						dpi: 49,
+						dpi: 40,
 					},
 				},
-				left: 16,
-				top: 9,
+				left: 11,
+				top: 6,
 			},
 			{
 				input: {
@@ -73,12 +95,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 						text: card.cardDescription,
 						rgba: true,
 						fontfile: filePathPrefix + '/minecraft.ttf',
-						dpi: 32,
-						width: 95,
+						dpi: 26,
+						spacing: -1,
+						width: 70,
 					},
 				},
-				left: 17,
-				top: 126,
+				left: 12,
+				top: 90,
 			},
 		])
 		.png()

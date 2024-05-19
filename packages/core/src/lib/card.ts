@@ -48,6 +48,25 @@ export async function getCardInstanceByDesignAndRarity(args: {
 	return result.data;
 }
 
+export async function getCardInstanceByUsernameDesignRarityCardNumber(args: {
+	username: string;
+	designId: string;
+	rarityId: string;
+	cardNumber: string;
+}) {
+	const result = await db.entities.CardInstances.query
+		.byDesignAndRarity({ rarityId: args.rarityId, designId: args.designId })
+		.go({ pages: 'all' });
+
+	const card = result.data.find(
+		({ username, cardNumber }) =>
+			username?.toLowerCase() === args.username.toLowerCase() &&
+			String(cardNumber) === args.cardNumber
+	);
+
+	return card || null;
+}
+
 export async function batchUpdateCardUsernames(args: { oldUsername: string; newUsername: string }) {
 	const cards = await db.entities.CardInstances.query
 		.byUser({ username: args.oldUsername })
@@ -284,9 +303,11 @@ export async function searchDesignCards(options: {
 	switch (options.sortType) {
 		case 'owner': {
 			cards.data.sort(sortCardsByOwnerName(options.isReversed ? 'desc' : 'asc'));
+			break;
 		}
 		case 'openDate': {
 			cards.data.sort(sortCardsByOpenDate(options.isReversed ? 'desc' : 'asc'));
+			break;
 		}
 	}
 
