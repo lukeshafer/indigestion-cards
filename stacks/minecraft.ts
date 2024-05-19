@@ -14,23 +14,19 @@ export function Minecraft({ app, stack }: StackContext) {
 
 	const minecraftApi = new Api(stack, 'MinecraftApi', {
 		routes: {
-			'GET /card/{username}/{designId}/{rarityId}/{cardNumber}/card.png':
-				'packages/functions/src/minecraft/get-card-image.handler',
-		},
-		defaults: {
-			function: {
-        // enableLiveDev: false,
-				copyFiles: [
-					{
-						from: 'packages/functions/src/minecraft/fonts',
-						to: 'fonts',
-					},
-				],
-				environment: {
-					CARD_CDN_URL: cardCDN.domainName,
+			'GET /card/{username}/{designId}/{rarityId}/{cardNumber}/card.png': {
+				function: {
+					handler: 'packages/functions/src/minecraft/get-card-image.handler',
+					copyFiles: [{ from: 'packages/functions/src/minecraft/fonts', to: 'fonts' }],
+					environment: { CARD_CDN_URL: cardCDN.domainName },
+					bind: [table, frameBucket, cardDesignBucket],
 				},
-				bind: [table, frameBucket, cardDesignBucket],
-				runtime: 'nodejs18.x',
+			},
+			'GET /usercards/{username}': {
+				function: {
+					handler: 'packages/functions/src/minecraft/get-user-cards.handler',
+					bind: [table],
+				},
 			},
 		},
 		customDomain:

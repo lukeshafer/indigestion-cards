@@ -814,6 +814,7 @@ const Users = new Entity(
 			packCount: { type: 'number', required: true, default: 0 },
 			lookingFor: { type: 'string' },
 			isTrading: { type: 'boolean' },
+			minecraftUsername: { type: 'string' },
 			tradeNotifications: {
 				type: 'list',
 				items: {
@@ -861,6 +862,11 @@ const Users = new Entity(
 				collection: 'UserAndCards',
 				pk: { field: 'gsi3pk', composite: ['username'] },
 				sk: { field: 'gsi3sk', composite: [] },
+			},
+			byMinecraftUsername: {
+				index: 'gsi4',
+				pk: { field: 'gsi4pk', composite: ['minecraftUsername'] },
+				sk: { field: 'gsi4sk', composite: [] },
 			},
 		},
 	},

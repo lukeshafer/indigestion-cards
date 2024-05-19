@@ -70,23 +70,28 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 
 	process.env.FONTCONFIG_PATH = filePathPrefix;
 
+	const background =
+		card.rarityColor.match(/#[a-f0-9]{6}/)?.at(0) ??
+		card.rarityColor.match(/#[a-f0-9]{3}/)?.at(0) ??
+		'#fff';
+
 	const img = await sharp(cardImageBuffer)
 		.resize({
 			height: 128,
 			kernel: sharp.kernel.nearest,
 		})
-		.flatten({ background: card.rarityColor })
+		.flatten({ background })
 		.composite([
 			{
 				input: {
 					text: {
-						text: card.cardName,
+						text: `<span size="6pt">${card.cardName}</span>`,
 						rgba: true,
 						fontfile: filePathPrefix + '/minecraft.ttf',
-						dpi: 40,
+						dpi: 72,
 					},
 				},
-				left: 11,
+				left: 10,
 				top: 6,
 			},
 			{
