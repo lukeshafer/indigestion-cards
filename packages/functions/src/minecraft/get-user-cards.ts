@@ -26,7 +26,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 	const user = pick(data.user, ['userId', 'minecraftUsername', 'username']);
 
 	data.cards.sort((a, b) =>
-		a.cardName > b.cardName
+		a.cardName.toLowerCase() > b.cardName.toLowerCase()
 			? 1
 			: b.cardName > a.cardName
 				? -1
