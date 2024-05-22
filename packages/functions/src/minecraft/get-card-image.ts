@@ -1,6 +1,6 @@
 import { getCardInstanceByUsernameDesignRarityCardNumber } from '@core/lib/card';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import sharp from 'sharp';
+import sharp, { type OverlayOptions } from 'sharp';
 import type { CardInstance } from '../../../core/src/db.types';
 import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
 
@@ -83,39 +83,61 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 		})
 		.flatten({ background });
 
+	// TODO:
+	// add the card numbers in the bottom right
+	//
+
 	let img: Buffer;
+
+	let cardTitle: OverlayOptions = {
+		input: {
+			text: {
+				text: `<span size="4.5pt">${card.cardName}</span>`,
+				rgba: true,
+				fontfile: filePathPrefix + '/minecraft.ttf',
+				dpi: 72,
+				width: 80,
+			},
+		},
+		left: 10,
+		top: 7,
+	};
+
+	let cardDescription: OverlayOptions = {
+		input: {
+			text: {
+				text: card.cardDescription,
+				rgba: true,
+				fontfile: filePathPrefix + '/minecraft.ttf',
+				dpi: 26,
+				spacing: -1,
+				width: 70,
+			},
+		},
+		left: 12,
+		top: 90,
+	};
+
+	let cardNumberText: OverlayOptions = {
+		input: {
+			text: {
+				text: `${card.cardNumber}/${card.totalOfType}`,
+				rgba: true,
+				fontfile: filePathPrefix + '/minecraft.ttf',
+				dpi: 30,
+				width: 100,
+				//align: 'right',
+			},
+		},
+		left: 60,
+		top: 120,
+	};
+
 	if (card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID) {
 		img = await baseImg.png().toBuffer();
 	} else {
 		img = await baseImg
-			.composite([
-				{
-					input: {
-						text: {
-							text: `<span size="6pt">${card.cardName}</span>`,
-							rgba: true,
-							fontfile: filePathPrefix + '/minecraft.ttf',
-							dpi: 72,
-						},
-					},
-					left: 10,
-					top: 6,
-				},
-				{
-					input: {
-						text: {
-							text: card.cardDescription,
-							rgba: true,
-							fontfile: filePathPrefix + '/minecraft.ttf',
-							dpi: 26,
-							spacing: -1,
-							width: 70,
-						},
-					},
-					left: 12,
-					top: 90,
-				},
-			])
+			.composite([cardTitle, cardTitle, cardDescription, cardNumberText, cardNumberText])
 			.png()
 			.toBuffer();
 	}
