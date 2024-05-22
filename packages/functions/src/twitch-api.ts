@@ -4,12 +4,10 @@ import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@core/lib/twitch';
 import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@core/lib/site-config';
 import { getPackTypeById } from '@core/lib/pack-type';
-import {
-	MOMENT_REDEMPTION_PACK_TYPE_ID,
-	TWITCH_GIFT_SUB_ID,
-} from '@core/constants';
+import { MOMENT_REDEMPTION_PACK_TYPE_ID, TWITCH_GIFT_SUB_ID } from '@core/constants';
 import { setAdminEnvSession } from '@core/lib/session';
 import { Moment } from '@core/events/moments';
+import type { PackDetails } from '@core/lib/entity-schemas';
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
 	if (!verifyDiscordRequest(event)) {
@@ -95,7 +93,10 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 							username: body.event.user_name,
 							packCount: totalPacks,
 							packType: giftSubPackType,
-						}),
+							event: {
+								eventType: body.type,
+							},
+						} satisfies PackDetails),
 						EventBusName: EventBus.eventBus.eventBusName,
 					},
 				],
@@ -146,7 +147,10 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 							username: body.event.user_name,
 							packCount: 1,
 							packType: rewardPackType,
-						}),
+              event: {
+                eventType: body.type,
+              }
+						} satisfies PackDetails),
 						EventBusName: EventBus.eventBus.eventBusName,
 					},
 				],

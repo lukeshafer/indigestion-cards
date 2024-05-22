@@ -8,6 +8,7 @@ import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
 import UserLookingFor from '@site/components/user/UserLookingFor';
+import UserMinecraftUsername from '@site/components/user/UserMinecraftUsername';
 import Card from '@site/components/cards/Card';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
@@ -51,7 +52,7 @@ const logo = userLogoMap[id];
 
 const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 
-const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 ---
 
 <Page
@@ -77,6 +78,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 			<ul>
 				<li>
 					<UserLookingFor {user} {isLoggedInUser} client:load />
+					{isLoggedInUser && <UserMinecraftUsername initialUser={user} client:load />}
 				</li>
 				{
 					isLoggedInUser || !siteConfig.tradingIsEnabled ? null : (
@@ -117,7 +119,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 			username={user.username}
 			initialCursor={cursor ?? undefined}
 			pinnedCardId={pinnedCard?.instanceId}
-      ssrFilters={filters}
+			ssrFilters={filters}
 			client:load
 		/>
 	</section>

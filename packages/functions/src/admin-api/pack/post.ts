@@ -34,17 +34,31 @@ export const handler = SiteHandler(
 			const packType = JSON.parse(params.packType);
 
 			if (!username || !userId) {
-				const parseResult = packSchemaWithoutUser.safeParse({ packCount, packType });
+				const parseResult = packSchemaWithoutUser.safeParse({
+					packCount,
+					packType,
+					event: {},
+				});
 				if (!parseResult.success) {
 					return { statusCode: 400, body: parseResult.error.message };
 				}
-				await createPackForNoUser(parseResult.data);
+				await createPackForNoUser({
+					...parseResult.data,
+					event: {
+						eventType: 'admin-site',
+					},
+				});
 			} else {
 				const parseResult = packSchema.safeParse({ userId, username, packCount, packType });
 				if (!parseResult.success) {
 					return { statusCode: 400, body: parseResult.error.message };
 				}
-				await givePackToUser(parseResult.data);
+				await givePackToUser({
+					...parseResult.data,
+					event: {
+						eventType: 'admin-site',
+					},
+				});
 			}
 			return {
 				statusCode: 200,

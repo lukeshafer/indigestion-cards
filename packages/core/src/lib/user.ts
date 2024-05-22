@@ -175,6 +175,7 @@ export async function setUserProfile(args: {
 	userId: string;
 	lookingFor?: string;
 	pinnedCard?: PinnedCard | null;
+	minecraftUsername?: string;
 }) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
@@ -209,7 +210,11 @@ export async function setUserProfile(args: {
 			: user.pinnedCard;
 
 	return db.entities.Users.patch({ userId: args.userId })
-		.set({ lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor, pinnedCard: card })
+		.set({
+			lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor,
+			pinnedCard: card,
+			minecraftUsername: args.minecraftUsername?.toLowerCase() || user.minecraftUsername,
+		})
 		.go()
 		.then(result => result.data);
 }
@@ -228,4 +233,19 @@ export async function removeTradeNotification(args: { userId: string; tradeId: s
 			),
 		})
 		.go();
+}
+
+export async function getUserAndCardsByMinecraftUsername(args: { minecraftUsername: string }) {
+	const {
+		data: [user],
+	} = await db.entities.Users.query
+		.byMinecraftUsername({ minecraftUsername: args.minecraftUsername.toLowerCase() })
+		.go({ pages: 'all' });
+	if (!user) return null;
+
+	const {
+		data: { CardInstances: cards },
+	} = await db.collections.UserAndCards(user).go({ pages: 'all' });
+
+	return { user, cards };
 }

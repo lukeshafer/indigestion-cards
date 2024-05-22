@@ -9,6 +9,7 @@ export const handler = SiteHandler(
 			lookingFor: 'string?',
 			pinnedCardId: 'string?',
 			pinnedCardDesignId: 'string?',
+      minecraftUsername: 'string?',
 		},
 	},
 	async (_, ctx) => {
@@ -20,6 +21,7 @@ export const handler = SiteHandler(
 		await setUserProfile({
 			userId: ctx.params.userId,
 			lookingFor: ctx.params.lookingFor,
+      minecraftUsername: ctx.params.minecraftUsername?.toLowerCase(),
 			pinnedCard: deletePinnedCard
 				? null
 				: ctx.params.pinnedCardId && ctx.params.pinnedCardDesignId
