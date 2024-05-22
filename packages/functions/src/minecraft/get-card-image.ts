@@ -2,6 +2,7 @@ import { getCardInstanceByUsernameDesignRarityCardNumber } from '@core/lib/card'
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import sharp from 'sharp';
 import type { CardInstance } from '../../../core/src/db.types';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
 
 export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
 	const { designId, username, rarityId, cardNumber } = event.pathParameters ?? {};
@@ -85,7 +86,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 			{
 				input: {
 					text: {
-						text: `<span size="6pt">${card.cardName}</span>`,
+						text:
+							card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID
+								? ''
+								: `<span size="6pt">${card.cardName}</span>`,
 						rgba: true,
 						fontfile: filePathPrefix + '/minecraft.ttf',
 						dpi: 72,
@@ -97,7 +101,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 			{
 				input: {
 					text: {
-						text: card.cardDescription,
+						text:
+							card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID
+								? ''
+								: card.cardDescription,
 						rgba: true,
 						fontfile: filePathPrefix + '/minecraft.ttf',
 						dpi: 26,
