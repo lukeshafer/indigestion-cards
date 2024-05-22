@@ -71,54 +71,54 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 
 	process.env.FONTCONFIG_PATH = filePathPrefix;
 
-	const background =
+	let background =
 		card.rarityColor.match(/#[a-f0-9]{6}/)?.at(0) ??
 		card.rarityColor.match(/#[a-f0-9]{3}/)?.at(0) ??
 		'#fff';
 
-	const img = await sharp(cardImageBuffer)
+	let baseImg = sharp(cardImageBuffer)
 		.resize({
 			height: 128,
 			kernel: sharp.kernel.nearest,
 		})
-		.flatten({ background })
-		.composite([
-			{
-				input: {
-					text: {
-						text:
-							card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID
-								? ''
-								: `<span size="6pt">${card.cardName}</span>`,
-						rgba: true,
-						fontfile: filePathPrefix + '/minecraft.ttf',
-						dpi: 72,
-					},
-				},
-				left: 10,
-				top: 6,
-			},
-			{
-				input: {
-					text: {
-						text:
-							card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID
-								? ''
-								: card.cardDescription,
-						rgba: true,
-						fontfile: filePathPrefix + '/minecraft.ttf',
-						dpi: 26,
-						spacing: -1,
-						width: 70,
-					},
-				},
-				left: 12,
-				top: 90,
-			},
-		])
-		.png()
-		.toBuffer();
+		.flatten({ background });
 
+	let img: Buffer;
+	if (card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID) {
+		img = await baseImg.png().toBuffer();
+	} else {
+		img = await baseImg
+			.composite([
+				{
+					input: {
+						text: {
+							text: `<span size="6pt">${card.cardName}</span>`,
+							rgba: true,
+							fontfile: filePathPrefix + '/minecraft.ttf',
+							dpi: 72,
+						},
+					},
+					left: 10,
+					top: 6,
+				},
+				{
+					input: {
+						text: {
+							text: card.cardDescription,
+							rgba: true,
+							fontfile: filePathPrefix + '/minecraft.ttf',
+							dpi: 26,
+							spacing: -1,
+							width: 70,
+						},
+					},
+					left: 12,
+					top: 90,
+				},
+			])
+			.png()
+			.toBuffer();
+	}
 	// Convert said card into an image in minecraft style
 	return {
 		body: img.toString('base64'),
