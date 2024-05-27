@@ -76,9 +76,10 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 		card.rarityColor.match(/#[a-f0-9]{3}/)?.at(0) ??
 		'#fff';
 
+	const sizeModifier = Math.min(Number( event.queryStringParameters?.size ) || 1, 10);
 	let baseImg = sharp(cardImageBuffer)
 		.resize({
-			height: 128,
+			height: 128 * sizeModifier,
 			kernel: sharp.kernel.nearest,
 		})
 		.flatten({ background });
@@ -95,12 +96,12 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 				text: `<span size="4.5pt">${card.cardName}</span>`,
 				rgba: true,
 				fontfile: filePathPrefix + '/minecraft.ttf',
-				dpi: 72,
-				width: 80,
+				dpi: 72 * sizeModifier,
+				width: 80 * sizeModifier,
 			},
 		},
-		left: 10,
-		top: 7,
+		left: 11 * sizeModifier,
+		top: 7 * sizeModifier,
 	};
 
 	let cardDescription: OverlayOptions = {
@@ -109,13 +110,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 				text: card.cardDescription,
 				rgba: true,
 				fontfile: filePathPrefix + '/minecraft.ttf',
-				dpi: 26,
+				dpi: 26 * sizeModifier,
 				spacing: -1,
-				width: 70,
+				width: 70 * sizeModifier,
 			},
 		},
-		left: 12,
-		top: 90,
+		left: 12 * sizeModifier,
+		top: 90 * sizeModifier,
 	};
 
 	let cardNumberText: OverlayOptions = {
@@ -124,13 +125,13 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
 				text: `${card.cardNumber}/${card.totalOfType}`,
 				rgba: true,
 				fontfile: filePathPrefix + '/minecraft.ttf',
-				dpi: 30,
-				width: 100,
+				dpi: 30 * sizeModifier,
+				width: 100 * sizeModifier,
 				//align: 'right',
 			},
 		},
-		left: 60,
-		top: 120,
+		left: 70 * sizeModifier,
+		top: 120 * sizeModifier,
 	};
 
 	if (card.rarityId === FULL_ART_ID || card.rarityId === LEGACY_CARD_ID) {
