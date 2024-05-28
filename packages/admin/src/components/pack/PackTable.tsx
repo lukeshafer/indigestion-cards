@@ -8,26 +8,33 @@ export default function PackTable(props: { packs: Pack[] }) {
 	return (
 		<>
 			{props.packs.length > 0 ? (
-			<Table
-				columns={[
-					{
-						name: 'username',
-						label: 'Owner',
-						width: '50%',
-						font: 'title',
-					},
-					{
-						name: 'packTypeName',
-						label: 'Pack Type',
-					},
-					{
-						name: 'actions',
-						label: 'Actions',
-						sort: false,
-					},
-				]}
-				rows={props.packs.map(PackRow)}
-			/>
+				<Table
+					columns={[
+						{
+							name: 'username',
+							label: 'Owner',
+							font: 'title',
+						},
+						{
+							name: 'packTypeName',
+							label: 'Pack Type',
+						},
+						{
+							name: 'date',
+							label: 'Date',
+						},
+						{
+							name: 'event',
+							label: 'Event',
+						},
+						{
+							name: 'actions',
+							label: 'Actions',
+							sort: false,
+						},
+					]}
+					rows={props.packs.map(PackRow)}
+				/>
 			) : (
 				<div class="text-center">
 					<p class="text-lg">No packs found.</p>
@@ -42,11 +49,9 @@ function PackRow(props: Pack) {
 	// eslint-disable-next-line solid/reactivity
 	const [username, setUsername] = createSignal(props.username);
 
-	const usernameElement = <Username
-		username={username()}
-		isEditing={isEditing()}
-		setUsername={setUsername}
-	/>
+	const usernameElement = (
+		<Username username={username()} isEditing={isEditing()} setUsername={setUsername} />
+	);
 
 	return {
 		get username() {
@@ -58,6 +63,20 @@ function PackRow(props: Pack) {
 		get packTypeName() {
 			return props.packTypeName;
 		},
+		get date() {
+			return {
+				element: props.createdAt ? new Date(props.createdAt).toLocaleString() : '',
+				value: props.createdAt ?? Infinity,
+			};
+		},
+		event:
+			props.event?.eventType === 'channel.subscription.gift'
+				? 'Gift Subs'
+				: props.event?.eventType === 'channel.channel_points_custom_reward_redemption.add'
+					? 'Channel point redemption'
+					: props.event?.eventType === 'admin-site'
+						? 'Admin Site Gift'
+						: '',
 		actions: {
 			element: (
 				<div>
@@ -87,14 +106,19 @@ function Username(props: {
 	isEditing: boolean;
 	setUsername: (value: string) => void;
 }) {
-	return <>{
-		props.isEditing ?
-			<TextInput
-				inputOnly
-				name="username"
-				label="Username"
-				value={props.username ?? ''}
-				setValue={(value) => props.setUsername(value)}
-			/> : (props.username ?? 'None')
-	}</>
+	return (
+		<>
+			{props.isEditing ? (
+				<TextInput
+					inputOnly
+					name="username"
+					label="Username"
+					value={props.username ?? ''}
+					setValue={value => props.setUsername(value)}
+				/>
+			) : (
+				props.username ?? 'None'
+			)}
+		</>
+	);
 }

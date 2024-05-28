@@ -1,8 +1,9 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, SHIT_PACK_RARITY_ID } from '../constants';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '../constants';
 import { getCardDesignAndInstancesById } from './design';
 import { getPackById } from './pack';
 import { getUser } from './user';
 import { db } from '../db';
+import { checkIsShitPack } from './shared';
 
 interface RarityForComparison {
 	rarityId: string;
@@ -33,6 +34,9 @@ export async function openCardFromPack(args: {
 	const instance = instances.find(c => c.instanceId === args.instanceId);
 
 	if (!instance) {
+		console.log('Found instances');
+		console.log(JSON.stringify(instances, null, 2));
+		console.log(`Card instance '${args.instanceId}' does not exist`);
 		throw new Error('Card not found');
 	}
 
@@ -134,9 +138,7 @@ export async function openCardFromPack(args: {
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
 	const deletePack = newCardDetails.every(c => c.opened);
-	const isShitPack = deletePack
-		? newCardDetails.every(c => c.rarityId.startsWith(SHIT_PACK_RARITY_ID))
-		: false;
+	const isShitPack = deletePack === true && checkIsShitPack(newCardDetails) === true;
 
 	const updateRarity = checkIsRarityBetter(
 		{ rarityId: instance.rarityId, count: instance.totalOfType },

@@ -55,7 +55,7 @@ export async function generateCard(info: {
 		rarityId: assignedRarityId,
 		rarityName: rarity.rarityName,
 		rarityColor: rarity.rarityColor,
-    rarityRank: await getRarityRankForRarity(rarity),
+		rarityRank: await getRarityRankForRarity(rarity),
 		frameUrl: rarity.frameUrl,
 		imgUrl: design.imgUrl,
 		cardName: design.cardName,
@@ -132,8 +132,11 @@ export async function getCardPoolFromType(packType: PackDetails['packType']): Pr
 		const cardPool = await db.collections
 			.SeasonAndDesignsAndCards({ seasonId })
 			.go({ pages: 'all' });
+
+		console.debug('cardPool length:', cardPool.data.CardInstances.length);
 		return cardPool.data;
 	}
+
 	if (packType.packTypeCategory === 'custom') {
 		if (!packType.designs) throw new Error('Designs are required for custom packs');
 		const cardPool = await Promise.all(

@@ -1,6 +1,5 @@
 import { Entity } from 'electrodb';
 import { db, dbConfig, DB_SERVICE, auditAttributes } from '../db';
-import type { CardInstance } from '../db.types';
 import { getRarityRankForRarity, getSiteConfig } from '../lib/site-config';
 
 export async function migration() {
@@ -10,19 +9,16 @@ export async function migration() {
 
 	const oldCards = await CardInstancesV1.scan.go({ pages: 'all' });
 
-	let updatedCards: Array<CardInstance> = [];
 	for (let card of oldCards.data) {
 		let newCard = {
 			...card,
 			rarityRank: await getRarityRankForRarity(card, siteConfig.rarityRanking),
 		};
-		updatedCards.push(newCard);
-	}
 
-	await CardInstancesV2.put(updatedCards).go();
-
-	for (let card of oldCards.data) {
-		await CardInstancesV1.delete(card).go();
+		const result = await CardInstancesV2.put(newCard).go();
+		if (result) {
+			await CardInstancesV1.delete(card).go();
+		}
 	}
 }
 

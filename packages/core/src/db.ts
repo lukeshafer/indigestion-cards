@@ -2,6 +2,7 @@ import { Table } from 'sst/node/table';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
 import { randomUUID } from 'crypto';
+import { useSession } from 'sst/node/future/auth';
 
 export const dbConfig = {
 	table: Table.data.tableName,
@@ -13,6 +14,13 @@ export const DB_SERVICE = 'indigestion-cards';
 function allItemsPKTemplate(entityName: string, service = DB_SERVICE) {
 	return `$${service}#getall_${entityName}`;
 }
+
+export const twitchEventTypes = [
+	'channel.channel_points_custom_reward_redemption.add',
+	'channel.subscription.gift',
+] as const;
+
+export const packEventTypes = [...twitchEventTypes, 'admin-site'] as const;
 
 export const auditAttributes = (entityName: string) =>
 	({
@@ -34,17 +42,41 @@ export const auditAttributes = (entityName: string) =>
 					(process.env.SESSION_TYPE !== 'admin' && process.env.SESSION_TYPE !== 'user') ||
 					!process.env.SESSION_USERNAME
 				) {
-					throw new Error('Username and ID are required in process.env');
-					return;
+					try {
+						const session = useSession();
+						if (
+							(session.type === 'user' || session.type === 'admin') &&
+							session.properties.userId
+						) {
+							process.env.SESSION_USER_ID = session.properties.userId;
+							process.env.SESSION_USERNAME =
+								session.properties.username || session.properties.userId;
+						} else {
+							throw new Error();
+						}
+					} catch (error) {
+						console.error(error);
+						throw new Error('Username and ID are required in process.env');
+					}
 				}
 
-				audits.create({
-					entity: entityName,
-					username: process.env.SESSION_USERNAME,
-					userId: process.env.SESSION_USER_ID,
-					timestamp: Date.now(),
-					item: JSON.stringify(i),
-				});
+				try {
+					audits
+						.put({
+							entity: entityName,
+							username: process.env.SESSION_USERNAME,
+							userId: process.env.SESSION_USER_ID,
+							item: JSON.stringify(i),
+						})
+						.go();
+				} catch (error) {
+					console.error({
+						message: 'An error occurred while saving the audit.',
+						error,
+					});
+
+					// TODO: send to a queue to try again
+				}
 
 				return Date.now();
 			},
@@ -60,17 +92,20 @@ const audits = new Entity(
 			item: { type: 'string', required: true },
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			timestamp: { type: 'number', required: true },
+			timestamp: {
+				type: 'string',
+				default: () => `${new Date().toISOString()}---${Date.now()}`,
+			},
 		},
 		indexes: {
 			byEntity: {
 				pk: { field: 'pk', composite: ['entity'] },
-				sk: { field: 'sk', composite: ['item', 'userId', 'username', 'timestamp'] },
+				sk: { field: 'sk', composite: ['userId', 'username', 'timestamp'] },
 			},
 			byUserId: {
 				index: 'gsi1',
 				pk: { field: 'gsi1pk', composite: ['userId'] },
-				sk: { field: 'gsi1sk', composite: ['entity', 'item', 'username', 'timestamp'] },
+				sk: { field: 'gsi1sk', composite: ['entity', 'username', 'timestamp'] },
 			},
 		},
 	},
@@ -377,6 +412,13 @@ const Packs = new Entity(
 			seasonId: { type: 'string' },
 			username: { type: 'string' },
 			userId: { type: 'string' },
+			event: {
+				type: 'map',
+				properties: {
+					eventId: { type: 'string' },
+					eventType: { type: packEventTypes },
+				},
+			},
 			cardDetails: {
 				type: 'list',
 				required: true,
@@ -687,10 +729,6 @@ const TwitchEventMessageHistory = new Entity(
 	dbConfig
 );
 
-export const twitchEventTypes = [
-	'channel.channel_points_custom_reward_redemption.add',
-	'channel.subscription.gift',
-] as const;
 const TwitchEvents = new Entity(
 	{
 		model: { entity: 'twitchEvents', version: '1', service: DB_SERVICE },
@@ -776,6 +814,7 @@ const Users = new Entity(
 			packCount: { type: 'number', required: true, default: 0 },
 			lookingFor: { type: 'string' },
 			isTrading: { type: 'boolean' },
+			minecraftUsername: { type: 'string' },
 			tradeNotifications: {
 				type: 'list',
 				items: {
@@ -823,6 +862,11 @@ const Users = new Entity(
 				collection: 'UserAndCards',
 				pk: { field: 'gsi3pk', composite: ['username'] },
 				sk: { field: 'gsi3sk', composite: [] },
+			},
+			byMinecraftUsername: {
+				index: 'gsi4',
+				pk: { field: 'gsi4pk', composite: ['minecraftUsername'] },
+				sk: { field: 'gsi4sk', composite: [] },
 			},
 		},
 	},
