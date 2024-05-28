@@ -9,7 +9,7 @@
   "dependencies": {
     "@solidjs/meta": "^0.29.3",
     "@solidjs/router": "^0.13.3",
-    "@solidjs/start": "^1.0.0-rc.1",
+    "@solidjs/start": "^1.0.0",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/typography": "^0.5.13",
     "autoprefixer": "^10.4.19",
