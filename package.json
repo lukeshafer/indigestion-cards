@@ -27,7 +27,7 @@
     "@tsconfig/node18": "^18.2.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "aws-cdk-lib": "2.132.1",
+    "aws-cdk-lib": "2.142.1",
     "constructs": "10.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-astro": "^0.34.0",
@@ -35,7 +35,7 @@
     "eslint-plugin-solid": "^0.13.2",
     "prettier-plugin-astro": "^0.12.0",
     "prettier-plugin-tailwindcss": "^0.5.13",
-    "sst": "2.41.4",
+    "sst": "2.42.0",
     "typescript": "^5.4.5"
   },
   "workspaces": [
