@@ -30,18 +30,6 @@ function Root(props: RouteSectionProps) {
 				<div
 					class="relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950"
 					id="page-scroll-wrapper">
-					{/* 
-        <LoadingBar client:load transition:persist transition:name="loadingbar" /> 
-			{noHeader ? null : <Header {logo} />}
-			<AlertBox client:load {alerts} />
-			{
-				hideBreadcrumbs ? null : (
-					<div class="max-w-main mx-auto w-full">
-						<Breadcrumbs path={breadcrumbs ?? []} currentPath={Astro.url.pathname} />
-					</div>
-				)
-			}
-        */}
 					<main
 						style={{ 'view-transition-name': context.wide ? undefined : 'main' }}
 						classList={{
@@ -51,7 +39,6 @@ function Root(props: RouteSectionProps) {
 						<Suspense>{props.children}</Suspense>
 					</main>
 					<div id="card-preview"></div>
-					{/* <Footer /> */}
 				</div>
 			</div>
 		</PageContext.Provider>

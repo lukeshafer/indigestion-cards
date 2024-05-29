@@ -15,7 +15,7 @@
     ],
     "isolatedModules": true,
     "paths": {
-      "~/*": [
+      "@site/*": [
         "./src/*"
       ],
       "@core/lib/*": [
