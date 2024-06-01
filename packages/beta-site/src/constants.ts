@@ -16,8 +16,8 @@ export const PUBLIC_ROUTES = [
 	'/data/usernames',
 	'/trades/*',
 	'/data/*',
-  '/trpc/*',
-  '/trpc',
+	'/trpc/*',
+	'/trpc',
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
@@ -157,6 +157,16 @@ export const ASSETS = {
 		HIDDEN_CARD: '/assets/cards/hiddencard.png',
 		SHIT_PACK: '/assets/cards/shit_pack_brown.png',
 	},
+  STAMPS: {
+    SHIT: {
+      BRONZE: '/assets/stamps/shit/bronze.png',
+      SILVER: '/assets/stamps/shit/silver.png',
+      GOLD: '/assets/stamps/shit/gold.png',
+      WHITE: '/assets/stamps/shit/white.png',
+      RAINBOW: '/assets/stamps/shit/rainbow.png',
+      PINK: '/assets/stamps/shit/pink.png',
+    }
+  }
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';
@@ -166,3 +176,10 @@ export const NO_CARDS_OPENED_ID = 'no-cards-opened';
 export const SHIT_PACK_RARITY_ID = 'bronze';
 
 export const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
+
+export const logos = {
+	default: ASSETS.LOGO,
+	tongle: ASSETS.TONGLE as string,
+};
+
+export type Logo = keyof typeof logos;
