@@ -32,7 +32,7 @@ export function Sites({ app, stack }: StackContext) {
 	const betaSite = new SolidStartSite(stack, 'SolidStartFrontend', {
 		path: 'packages/beta-site',
 		environment: {
-			PUBLIC_CARD_CDN_URL: cardCDN.domainName,
+			VITE_CARD_CDN_URL: cardCDN.domainName,
 			DOMAIN_NAME: betaSiteDomain?.domainName ?? 'localhost:3000',
 		},
 		bind: [

@@ -116,7 +116,7 @@ const getShitStampImage = (rarityId: string) => {
 
 const createImageUrl = (props: CardComponentProps, flags: CardFlags) => () => {
 	if (flags.isSecret) return ASSETS.CARDS.CARD_BACK;
-	const url = new URL(`https://${import.meta.env.PUBLIC_CARD_CDN_URL}`);
+	const url = new URL(`https://${import.meta.env.VITE_CARD_CDN_URL}`);
 	url.pathname = `/${props.designId}/${props.rarityId}.png`;
 	if (props.adminSecret) url.searchParams.set('adminsecret', props.adminSecret);
 

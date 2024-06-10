@@ -1,6 +1,6 @@
 import { PageContextProvider, initPageContext, usePageContext } from '@site/context';
-import { JSX, Suspense } from 'solid-js';
-import { RouteSectionProps } from '@solidjs/router';
+import { type JSX, Suspense } from 'solid-js';
+import { type RouteSectionProps } from '@solidjs/router';
 import { logos } from '@site/constants';
 
 export default function PageRoot(props: RouteSectionProps) {
