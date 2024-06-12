@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/node": "^18.19.31",
     "solid-js": "^1.8.16",
-    "sst": "2.41.4"
+    "sst": "2.42.0"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.554.0",
