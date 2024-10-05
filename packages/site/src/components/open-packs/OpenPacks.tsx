@@ -25,6 +25,8 @@ import { CardScaleAdjuster } from './CardScaleAdjuster';
 import { PackShowcase } from './PackShowcase';
 import { PackToOpenItem } from './PackToOpenItem';
 import { checkIsShitPack } from '@core/lib/shared';
+import { createWSClient } from '@site/lib/ws-client';
+import { trpc } from '@site/lib/client/trpc';
 
 type Props = {
 	packs: PackEntityWithStatus[];
@@ -62,6 +64,15 @@ export default function OpenPacks(props: Props) {
 		onCleanup(() => clearInterval(interval));
 
 		setState('isHidden', false);
+
+		const wsClient = createWSClient({
+			onmessage: {
+				REFRESH_PACKS: () => {
+          state.refreshPacks();
+				},
+			},
+		});
+		if (wsClient) onCleanup(() => wsClient.close());
 	});
 
 	useSideEffects(state, setState);
@@ -104,7 +115,7 @@ export default function OpenPacks(props: Props) {
 							<For each={state.packs}>
 								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
 							</For>
-							<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic " />
+							<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic" />
 						</ul>
 					</section>
 					<div class="flex-1">{props.children}</div>
@@ -199,7 +210,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 			);
 		},
 		setNextPack() {
-			setState('activePack', { ...this.packs[0] } || null);
+			setState('activePack', { ...this.packs[0] });
 		},
 
 		cardScale: Math.max(props.startCardScale ?? 1, 0.25),
@@ -219,7 +230,10 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 			if (index === undefined) return;
 			setState('activePack', 'cardDetails', index, 'opened', true);
 
-			if (this.activePack?.cardDetails && checkIsShitPack(this.activePack.cardDetails.filter(card => card.opened)))
+			if (
+				this.activePack?.cardDetails &&
+				checkIsShitPack(this.activePack.cardDetails.filter(card => card.opened))
+			)
 				setTimeout(
 					() =>
 						setState('activePack', 'cardDetails', index, 'stamps', [
@@ -255,6 +269,14 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 					draft.splice(toIndex, 0, draggingPack);
 				})
 			);
+		},
+
+		refreshPacks() {
+			trpc.packs.all.query().then(packs => {
+				const savedPackOrder = getSavedPackOrderFromStorage();
+				const merged = mergeStoredListWithCurrentList(packs, savedPackOrder);
+				setState('packs', merged);
+			});
 		},
 	});
 
