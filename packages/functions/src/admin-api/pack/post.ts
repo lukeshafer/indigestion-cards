@@ -60,6 +60,10 @@ export const handler = SiteHandler(
 					},
 				});
 			}
+
+      // Send message that pack is created to websockets
+
+
 			return {
 				statusCode: 200,
 				body: username ? `Pack given to ${username}` : `Pack created`,

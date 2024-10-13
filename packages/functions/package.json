@@ -7,15 +7,15 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.137",
-    "@types/node": "^18.19.31",
-    "sst": "2.43.0"
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^18.19.54",
+    "sst": "2.44.0"
   },
   "dependencies": {
-    "@aws-sdk/client-eventbridge": "^3.554.0",
-    "@aws-sdk/client-s3": "^3.554.0",
-    "openid-client": "^5.6.5",
-    "sharp": "^0.33.4",
-    "zod": "^3.22.4"
+    "@aws-sdk/client-eventbridge": "^3.658.1",
+    "@aws-sdk/client-s3": "^3.658.1",
+    "openid-client": "^5.7.0",
+    "sharp": "^0.33.5",
+    "zod": "^3.23.8"
   }
 }

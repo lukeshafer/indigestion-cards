@@ -10,6 +10,7 @@ import { AfterDeployStack } from './stacks/script';
 import { AdminSite } from './stacks/admin-site';
 import { ImageProcessing } from './stacks/image-processing'
 import { Minecraft } from './stacks/minecraft';
+import { WebsocketsAPI } from './stacks/websockets-api';
 
 export default {
 	config() {
@@ -27,6 +28,7 @@ export default {
 			.stack(Database)
 			.stack(DataRecoveryBucket)
 			.stack(AfterDeployStack)
+      .stack(WebsocketsAPI)
 			.stack(Events)
 			.stack(Auth)
 			.stack(DesignBucket)

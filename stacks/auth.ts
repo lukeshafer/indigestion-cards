@@ -7,7 +7,7 @@ import { Database } from './database';
 export function Auth({ stack }: StackContext) {
   const config = use(ConfigStack);
   const db = use(Database);
-  const events = use(Events);
+  const { eventBus } = use(Events);
 
   const siteAuth = new SSTAuth(stack, 'AdminSiteAuth', {
     authenticator: {
@@ -19,7 +19,7 @@ export function Auth({ stack }: StackContext) {
         config.STREAMER_USER_ID,
         config.TWITCH_TOKENS_PARAM,
         config.DOMAIN_NAME,
-        events,
+        eventBus,
       ],
       permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
       runtime: 'nodejs18.x',

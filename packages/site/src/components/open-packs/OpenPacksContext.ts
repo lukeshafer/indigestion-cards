@@ -23,6 +23,7 @@ export const OpenPacksContext = createContext<OpenPacksState>({
 	listHeightString: '0px',
 	setListHeight: () => { },
 	movePackToIndex: () => { },
+  refreshPacks: () => { },
 });
 
 export type PackEntityWithStatus = Pack & {
@@ -59,4 +60,5 @@ export type OpenPacksState = {
 	setListHeight(height: number): void;
 
 	movePackToIndex(fromIndex: number, toIndex: number): void;
+  refreshPacks(): void;
 };

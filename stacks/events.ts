@@ -21,7 +21,7 @@ export function Events({ stack }: StackContext) {
 		},
 	});
 
-	const queue = new Queue(stack, 'queue', {
+	const packQueue = new Queue(stack, 'queue', {
 		cdk: {
 			queue: {
 				deadLetterQueue: {
@@ -129,7 +129,7 @@ export function Events({ stack }: StackContext) {
 					detailType: ['give-pack-to-user'],
 				},
 				targets: {
-					queue,
+					queue: packQueue,
 				},
 			},
 			'trade-accepted': {
@@ -150,5 +150,5 @@ export function Events({ stack }: StackContext) {
 		bind: [table],
 	});
 
-	return eventBus;
+	return { eventBus, packQueue };
 }
