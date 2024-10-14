@@ -27,5 +27,5 @@ export function WebsocketsAPI({ stack }: StackContext) {
 		WebsocketApiEndpoint: wsApi.url,
 	});
 
-	return { wsApi };
+	return { wsApi, wsConnectionsTable };
 }

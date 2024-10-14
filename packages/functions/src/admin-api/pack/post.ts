@@ -2,6 +2,7 @@ import { SiteHandler } from '@core/lib/api';
 import { packSchema, packSchemaWithoutUser } from '@core/lib/entity-schemas';
 import { createPackForNoUser, givePackToUser } from '@core/lib/pack';
 import { getUserByLogin } from '@core/lib/twitch';
+import { broadcastMessage } from '@core/lib/ws';
 
 export const handler = SiteHandler(
 	{
@@ -16,7 +17,7 @@ export const handler = SiteHandler(
 	async (_, { params }) => {
 		const username = params.username;
 		const userId = username
-			? params.userId ?? (await getUserByLogin(username))?.id ?? null
+			? (params.userId ?? (await getUserByLogin(username))?.id ?? null)
 			: null;
 		const packCount = params.count || 1;
 
@@ -61,8 +62,8 @@ export const handler = SiteHandler(
 				});
 			}
 
-      // Send message that pack is created to websockets
-
+			// Send message that pack is created to websockets
+			await broadcastMessage({ messageData: 'REFRESH_PACKS' }).then(console.log);
 
 			return {
 				statusCode: 200,

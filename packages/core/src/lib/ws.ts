@@ -95,5 +95,3 @@ export const broadcastMessage = LibraryFn(async (args: { messageData: MessageTyp
 
 const messageTypes = ['REFRESH_PACKS'] as const;
 export type MessageType = (typeof messageTypes)[number];
-
-export const refreshPackList = LibraryFn(async () => {});
