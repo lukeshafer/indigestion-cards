@@ -5,6 +5,7 @@ import { DesignBucket } from './bucket';
 import { ConfigStack } from './config';
 import { Auth } from './auth';
 import { API_VERSION, getHostedZone, getDomainName } from './constants';
+import { WebsocketsAPI } from './websockets-api';
 
 export function API({ app, stack }: StackContext) {
 	const table = use(Database);
@@ -12,6 +13,7 @@ export function API({ app, stack }: StackContext) {
 	const { frameBucket, cardDesignBucket, cardDraftBucket, frameDraftBucket } = use(DesignBucket);
 	const config = use(ConfigStack);
 	const { siteAuth } = use(Auth);
+	const { wsApi, wsConnectionsTable } = use(WebsocketsAPI);
 
 	const hostedZone = getHostedZone(app.stage);
 	const baseDomain = getDomainName(app.stage);
@@ -112,6 +114,8 @@ export function API({ app, stack }: StackContext) {
 					frameDraftBucket,
 					siteAuth,
 					twitchApi,
+					wsApi,
+					wsConnectionsTable,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 				runtime: 'nodejs18.x',

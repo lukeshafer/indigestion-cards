@@ -48,7 +48,7 @@ export async function handler(event: SQSEvent) {
 				} else throw error;
 			});
 
-			await broadcastMessage({ messageData: 'REFRESH_PACKS' });
+			await broadcastMessage({ messageData: 'REFRESH_PACKS' }).then(console.log);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				throw new Error('Invalid event');
