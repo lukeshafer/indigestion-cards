@@ -28,7 +28,7 @@ export default function Card(props: CardComponentProps) {
 	return (
 		<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
 			<article
-				class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left"
+				class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left text-gray-950"
 				style={{
 					background: flags.isFullArt
 						? 'radial-gradient(circle at 50% 50%, #404040, #343434, #282828, #1d1d1d, #121212, #000000)'
@@ -41,7 +41,7 @@ export default function Card(props: CardComponentProps) {
 					loading={props.lazy ? 'lazy' : undefined}
 					class="absolute inset-0"
 				/>
-				<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
+				<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-gray-900">
 					{displayName()}
 				</h3>
 				<p

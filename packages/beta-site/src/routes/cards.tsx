@@ -1,6 +1,6 @@
 import Card from '@site/components/Card';
 import { loadAllCardDesigns } from '@site/data';
-import { createAsync, type RouteDefinition } from '@solidjs/router';
+import { cache, createAsync, type RouteDefinition } from '@solidjs/router';
 import { For } from 'solid-js';
 
 export const route = {
@@ -13,7 +13,7 @@ export default function () {
 	const cards = createAsync(() => loadAllCardDesigns());
 
 	return (
-		<ul>
+		<ul class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center justify-items-center gap-x-10 gap-y-8">
 			<For each={cards() || []}>
 				{card => (
 					<li>

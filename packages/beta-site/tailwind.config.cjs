@@ -9,6 +9,8 @@ module.exports = {
 	theme: {
 		colors: {
 			gray: colors.gray,
+			black: colors.black,
+			white: colors.white,
 			brand: {
 				50: '#fef5fc',
 				100: '#fee9fd',

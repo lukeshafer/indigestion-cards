@@ -51,7 +51,7 @@ export function Sites({ app, stack }: StackContext) {
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_PARAM,
 			config.DOMAIN_NAME,
-			bus,
+			eventBus,
 			adminImageSecret,
 		],
 		customDomain: betaSiteDomain,

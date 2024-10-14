@@ -1,5 +1,5 @@
 import { defineConfig } from '@solidjs/start/config';
-import path from "node:path"
+import path from 'node:path';
 
 export default defineConfig({
 	middleware: './src/middleware.ts',
@@ -9,20 +9,25 @@ export default defineConfig({
 			dir: 'dist',
 			publicDir: 'dist/client',
 		},
-		esbuild: {
-			options: {
-				target: 'esnext',
-				treeShaking: true,
+		//esbuild: {
+		//	options: {
+		//		target: 'esnext',
+		//		treeShaking: true,
+		//	},
+		//},
+	},
+	vite: {
+		ssr: {
+			external: ['electrodb'],
+		},
+		optimizeDeps: {
+			exclude: ['sst'],
+		},
+		resolve: {
+			alias: {
+				'@site': path.resolve(process.cwd(), 'src'),
+				'@core/lib': path.resolve(process.cwd(), '../core/src/lib'),
 			},
 		},
 	},
-  vite: {
-    resolve: {
-      alias: {
-        "@site": path.resolve(process.cwd(), "src"),
-        "@core/lib": path.resolve(process.cwd(), "../core/src/lib"),
-      }
-    }
-  }
-
 });

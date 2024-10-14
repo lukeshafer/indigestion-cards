@@ -7,25 +7,27 @@ export default function PageRoot(props: RouteSectionProps) {
 	const context = initPageContext();
 	return (
 		<PageContextProvider value={context}>
-			<header class="max-w-main mx-auto flex items-center gap-8 py-4">
+			<header class="max-w-main mx-auto flex items-center gap-8 px-8 py-4">
 				<a href="/" title="Home">
 					<SiteLogo />
 				</a>
 				<nav class="flex gap-6">
-					<A href="/cards">Cards</A>
-					<A href="/users">Users</A>
-					<A href="/trades">Trade</A>
-					<A href="/me">My Cards</A>
+					<NavLink href="/cards">Cards</NavLink>
+					<NavLink href="/users">Users</NavLink>
+					<NavLink href="/trades">Trade</NavLink>
+				</nav>
+				<nav class="flex flex-1 justify-end">
+					<NavLink href="/me">snailyLuke</NavLink>
 				</nav>
 			</header>
 
 			<main
 				style={{ 'view-transition-name': context.wide ? undefined : 'main' }}
-        data-wide={String(context.wide)}
+				data-wide={String(context.wide)}
 				classList={{
 					[context.class]: true,
 				}}
-				class="@container/main max-w-main mx-auto mb-8 mt-4 w-full flex-1">
+				class="@container/main max-w-main mx-auto mb-8 mt-4 w-full flex-1 px-8">
 				<Suspense>{props.children}</Suspense>
 			</main>
 			<div id="card-preview"></div>
@@ -33,8 +35,13 @@ export default function PageRoot(props: RouteSectionProps) {
 	);
 }
 
-function A(props: Omit<JSX.AnchorHTMLAttributes<HTMLAnchorElement>, 'class'>) {
-	return <a class="text-gray-900 dark:text-gray-100" {...props} />;
+function NavLink(props: Omit<JSX.AnchorHTMLAttributes<HTMLAnchorElement>, 'class'>) {
+	return (
+		<a
+			class="rounded-md px-2 py-1 text-gray-900 hover:bg-gray-200 dark:text-gray-100 hover:dark:bg-gray-800"
+			{...props}
+		/>
+	);
 }
 
 function SiteLogo() {
