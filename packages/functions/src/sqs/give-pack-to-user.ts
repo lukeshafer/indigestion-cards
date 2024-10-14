@@ -5,6 +5,7 @@ import { packSchema } from '@core/lib/entity-schemas';
 import { setAdminEnvSession } from '@core/lib/session';
 import { createPreorder } from '@core/lib/preorder';
 import { PackTypeIsOutOfCardsError } from '@core/lib/errors';
+import { broadcastMessage } from '@core/lib/ws';
 
 export async function handler(event: SQSEvent) {
 	console.log('Received event to give pack to user');
@@ -31,10 +32,12 @@ export async function handler(event: SQSEvent) {
 					2
 				)
 			);
-			await givePackToUser(packDetails).catch((error) => {
+			await givePackToUser(packDetails).catch(error => {
 				console.log('Error giving pack to user: ', error?.message);
 				if (error instanceof PackTypeIsOutOfCardsError) {
-					console.log('Pack type is out of cards, creating preorder(s) instead', { error })
+					console.log('Pack type is out of cards, creating preorder(s) instead', {
+						error,
+					});
 
 					for (let i = 0; i < error.count; i++) {
 						createPreorder({
@@ -44,6 +47,8 @@ export async function handler(event: SQSEvent) {
 					}
 				} else throw error;
 			});
+
+			await broadcastMessage({ messageData: 'REFRESH_PACKS' }).then(console.log);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				throw new Error('Invalid event');

@@ -2,7 +2,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import { z } from 'astro/zod';
 import type { TRPCContext } from './context';
 import {
-    getCardsByDesignSortedByOpenDate,
+	getCardsByDesignSortedByOpenDate,
 	getCardsByDesignSortedByOwnerName,
 	getCardsByDesignSortedByRarity,
 	getCardsByUserSortedByCardName,
@@ -11,6 +11,7 @@ import {
 	searchDesignCards,
 	searchUserCards,
 } from '@core/lib/card';
+import { getAllPacks } from '@core/lib/pack';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -19,6 +20,15 @@ export const authedProcedure = t.procedure.use(args => {
 	const session = args.ctx.session;
 
 	if (session?.type !== 'user' && session?.type !== 'admin') {
+		throw new TRPCError({ code: 'UNAUTHORIZED' });
+	}
+
+	return args.next({ ctx: { session } });
+});
+export const adminProcedure = t.procedure.use(args => {
+	const session = args.ctx.session;
+
+	if (session?.type !== 'admin') {
 		throw new TRPCError({ code: 'UNAUTHORIZED' });
 	}
 
@@ -81,6 +91,9 @@ export const appRouter = t.router({
 				})
 			)
 			.query(async ({ input }) => await searchDesignCards(input)),
+	},
+	packs: {
+		all: adminProcedure.query(async () => await getAllPacks()),
 	},
 });
 

@@ -13,7 +13,7 @@ export function AdminSite({ app, stack }: StackContext) {
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { dataRecoveryBucket } = use(DataRecoveryBucket);
 	const { siteAuth } = use(Auth);
-	const bus = use(Events);
+	const { eventBus } = use(Events);
 	const config = use(ConfigStack);
 	const hostedZone = getHostedZone(stack.stage);
 
@@ -41,7 +41,7 @@ export function AdminSite({ app, stack }: StackContext) {
 			config.STREAMER_USER_ID,
 			config.TWITCH_TOKENS_PARAM,
 			config.DOMAIN_NAME,
-			bus,
+			eventBus,
 		],
 		customDomain:
 			app.mode === 'dev'

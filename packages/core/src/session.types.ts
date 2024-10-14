@@ -5,7 +5,7 @@ export interface PublicSession {
 	properties: {
 		userId?: null | undefined;
 		username?: null | undefined;
-    version?: null | undefined;
+		version?: null | undefined;
 	};
 }
 
@@ -14,7 +14,7 @@ export interface UserSession {
 	properties: {
 		userId: string;
 		username: string;
-    version?: number;
+		version?: number;
 	};
 }
 
@@ -23,16 +23,20 @@ export interface AdminSession {
 	properties: {
 		userId: string;
 		username: string;
-    version?: number;
+		version?: number;
 	};
 }
 
 export type DBResult<T> =
 	| {
-		success: true;
-		data: T;
-	}
+			success: true;
+			data: T;
+	  }
 	| {
-		success: false;
-		error: string;
-	};
+			success: false;
+			error: string;
+	  };
+
+export type LibraryOutput<T> =
+	| { success: true; data: T; error?: undefined }
+	| { success: false; error: unknown; data?: undefined };
