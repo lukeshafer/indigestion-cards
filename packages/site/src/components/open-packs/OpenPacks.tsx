@@ -41,10 +41,13 @@ export default function OpenPacks(props: Props) {
 	const [setAutoAnimate] = createAutoAnimate();
 
 	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
-		const res = await fetch(resolveLocalPath(API.TWITCH_CHATTERS));
-		const data = await res.json().catch(() => ({}));
-		return isChatters(data) ? data : [];
-		return [];
+		try {
+			const res = await fetch(resolveLocalPath(API.TWITCH_CHATTERS));
+			const data = await res.json().catch(() => ({}));
+			return isChatters(data) ? data : [];
+		} catch {
+			return [];
+		}
 	});
 
 	const [state, setState] = createState(props, chatters);
@@ -60,15 +63,20 @@ export default function OpenPacks(props: Props) {
 
 		setState('packs', sortedList);
 
-		const interval = setInterval(refetchChatters, 60000);
-		onCleanup(() => clearInterval(interval));
+		function refreshChattersTimeout() {
+			if (chatters()?.length) {
+				refetchChatters();
+				setTimeout(refreshChattersTimeout, 60000);
+			}
+		}
+		setTimeout(refreshChattersTimeout, 60000);
 
 		setState('isHidden', false);
 
 		const wsClient = createWSClient({
 			onmessage: {
 				REFRESH_PACKS: () => {
-          state.refreshPacks();
+					state.refreshPacks();
 				},
 			},
 		});
