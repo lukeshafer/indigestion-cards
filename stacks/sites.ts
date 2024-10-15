@@ -27,7 +27,7 @@ export function Sites({ app, stack }: StackContext) {
 		app.mode === 'dev'
 			? undefined
 			: {
-					domainName: `admin.${baseDomain}`,
+					domainName: `beta.${baseDomain}`,
 					hostedZone: hostedZone,
 				};
 

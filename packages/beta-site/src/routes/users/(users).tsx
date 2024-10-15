@@ -7,7 +7,13 @@ export default function Home() {
 
 	return (
 		<ul>
-			<For each={users()}>{card => <p>{card.username}</p>}</For>
+			<For each={users()}>
+				{user => (
+					<div>
+						<a href={`/users/${user.username}`}>{user.username}</a>
+					</div>
+				)}
+			</For>
 		</ul>
 	);
 }
