@@ -89,72 +89,94 @@ export const Card: Component<CardComponentProps> = props => {
 };
 
 export const AnimatedCard: ParentComponent = props => {
-	const SIZE = 300;
+	const SIZE = 18.75;
 
 	const [animationState, setAnimationState] = createStore({
 		isVisible: false,
 		mouseX: 0,
 		mouseY: 0,
+		rotateX: 0,
+		rotateY: 0,
 		element: null as HTMLDivElement | null,
-		get mouseXPercent() {
-			return `${Math.round(((this.mouseX + SIZE / 2) / (this.element?.clientWidth ?? 0)) * 25)}%`;
+		get hue() {
+			return `${animationState.mouseX + animationState.mouseY / 2 + 100}deg`;
+		},
+		get shineOpacity() {
+			return animationState.isVisible
+				? Math.round(
+						Math.max(
+							0.5 - Math.abs(animationState.mouseY + animationState.mouseX) / 400,
+							0
+						) * 100
+					) / 100
+				: 0;
 		},
 	});
 
 	return (
 		<div
 			ref={el => setAnimationState('element', el)}
+			class="relative w-fit transition-transform duration-100 ease-out hover:-translate-y-2 hover:scale-[1.02]"
 			style={{
 				'--mouse-x': `${animationState.mouseX}px`,
 				'--mouse-y': `${animationState.mouseY}px`,
-				'--hue': `${animationState.mouseX / 2 + animationState.mouseY / 4 + 100}`,
-				'--shine-opacity': animationState.isVisible
-					? Math.max(
-							0.5 - Math.abs(animationState.mouseY + animationState.mouseX) / 400,
-							0.1
-						)
-					: 0,
+				'--hue': animationState.hue,
+				'--shine-opacity': animationState.shineOpacity,
+				'--rotate-x': animationState.rotateX,
+				'--rotate-y': animationState.rotateY,
+				perspective: '800px',
 			}}
 			onMouseEnter={e => {
 				setAnimationState('isVisible', true);
 			}}
 			onMouseLeave={e => {
 				setAnimationState('isVisible', false);
+				setAnimationState('rotateX', 0);
+				setAnimationState('rotateY', 0);
 			}}
 			onMouseMove={e => {
+				const bounds = animationState.element?.getBoundingClientRect();
+				if (!bounds) return;
+
 				setAnimationState({
-					mouseX: e.x - animationState.element!.offsetLeft - SIZE / 2,
-					mouseY: e.y - animationState.element!.offsetTop - SIZE / 2,
+					mouseX: e.x - bounds.x - SIZE * 8,
+					mouseY: e.y - bounds.y - SIZE * 8,
+					rotateX: (0.5 - (e.x - bounds.x) / bounds.width) * 0.1,
+					rotateY: ((e.y - bounds.y) / bounds.height - 0.5) * 0.1,
 				});
-			}}
-			class="relative transition-transform duration-100 ease-out hover:-translate-y-2 hover:scale-[1.02]">
-			{props.children}
+			}}>
 			<div
-				class="absolute inset-0 h-full w-full overflow-hidden"
 				style={{
-					'--transparent': 'hsl(0 100 100 / 0)',
-					'--white': `hsl(var(--hue) 100 90 / var(--shine-opacity))`,
-					'background-image':
-						'linear-gradient(135deg, var(--transparent), var(--white) 30%, var(--transparent) 60%, var(--white) 90%, var(--transparent) 100%);',
-					'background-size': '120% 100%',
-					'background-position-x': animationState.mouseXPercent,
+					transform: 'rotate3d(var(--rotate-y), var(--rotate-x), 0, 10deg)',
 				}}>
-				<div
-					style={{
-						height: `${SIZE}px`,
-						width: `${SIZE}px`,
-						opacity: animationState.isVisible ? 0.4 : 0,
-						'background-image':
-							'radial-gradient(circle, hsl(var(--hue) 100 90 / 1) 0%, #ffffff00 73%)',
-					}}
-					class="absolute left-0 top-0 translate-x-[--mouse-x] translate-y-[--mouse-y] rounded-full transition-opacity"></div>
+				{props.children}
+				<div class="absolute inset-0 h-full w-full overflow-hidden">
+					<div
+						style={{
+							'--y': 'calc(var(--mouse-y) / 2)',
+							'--hue-rotated': 'calc(var(--hue) - 180deg)',
+							height: `${SIZE}em`,
+							width: `${SIZE}em`,
+							opacity: animationState.isVisible ? 0.4 : 0,
+							'background-image':
+								'radial-gradient(circle, hsl(var(--hue) 100 90 / 0.3) 0%, #ffffff00 53%), linear-gradient(-30deg, transparent 40%, hsl(var(--hue-rotated) 100 90 / var(--shine-opacity)) 50%, transparent 60%)',
+						}}
+						class="absolute left-0 top-0 translate-x-[--mouse-x] translate-y-[--y] scale-[3] transition-opacity"></div>
+				</div>
 			</div>
 			{
+				//
 				//<pre>{JSON.stringify(animationState, null, 2)}</pre>
 			}
 		</div>
 	);
 };
+
+export const CardList: ParentComponent = props => (
+	<ul class="grid grid-cols-[repeat(auto-fit,minmax(210px,1fr))] justify-center justify-items-center gap-x-10 gap-y-4">
+		{props.children}
+	</ul>
+);
 
 type CardFlags = ReturnType<typeof getCardFlags>;
 const getCardFlags = (props: CardComponentProps) => ({

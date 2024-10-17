@@ -171,9 +171,6 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.13
         version: 0.5.15(tailwindcss@3.4.13)
-      '@tanstack/solid-query':
-        specifier: ^5.40.1
-        version: 5.59.13(solid-js@1.9.2)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.20(postcss@8.4.47)
@@ -6051,19 +6048,6 @@ packages:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.13
-
-  /@tanstack/query-core@5.59.13:
-    resolution: {integrity: sha512-Oou0bBu/P8+oYjXsJQ11j+gcpLAMpqW42UlokQYEz4dE7+hOtVO9rVuolJKgEccqzvyFzqX4/zZWY+R/v1wVsQ==}
-    dev: false
-
-  /@tanstack/solid-query@5.59.13(solid-js@1.9.2):
-    resolution: {integrity: sha512-+6rAG0awDr+jzE2v4TsyvyxmTVFUzySIM9U+DOplr4wlWCTuxNSC8xASPocfsSaR9a1+01abc1LOcOQH36c4tQ==}
-    peerDependencies:
-      solid-js: ^1.6.0
-    dependencies:
-      '@tanstack/query-core': 5.59.13
-      solid-js: 1.9.2
-    dev: false
 
   /@trpc/client@11.0.0-rc.366(@trpc/server@11.0.0-rc.366):
     resolution: {integrity: sha512-bIbcF/UhCifU5i9hbbaMlmOS2NgnRq5W0pJH2SJhrp6jyIIaCF+uNAIZtkfO0GriBb0agBmGIXqvGLFEexiTKA==}

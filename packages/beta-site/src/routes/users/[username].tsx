@@ -1,4 +1,3 @@
-import { loadUserAndCardsByUsername } from '@site/data';
 import {
 	cache,
 	createAsyncStore,
@@ -7,7 +6,7 @@ import {
 	type RouteDefinition,
 } from '@solidjs/router';
 import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
-import { Card, type CardComponentProps } from '@site/components/Card';
+import { AnimatedCard, Card, CardList, type CardComponentProps } from '@site/components/Card';
 import type { CardInstance } from '@core/types';
 
 const loadUserPageData = cache(async (username: string) => {
@@ -40,31 +39,61 @@ const UserPage: Component<RouteSectionProps> = props => {
 	const user = () => data()?.user;
 	const collections = createMemo(() => getCollectionsFromCards(data()?.cards.data ?? []));
 
-	return (
-		<div class="mx-auto max-w-6xl">
-			<section
-				title="User identity"
-				class="grid h-32 w-fit grid-rows-[repeat(2,60px)] content-center gap-x-4">
-				<img
-					alt={`${params.username}'s profile image`}
-					src={profileImage()}
-					width="120"
-					height="120"
-					class="row-span-2 h-fit rounded-full"
-				/>
-				<h1 class="font-display col-start-2 self-end text-4xl italic">{params.username}</h1>
+	const IMG_SIZE = 100;
 
-				<Show when={user()?.lookingFor}>
-					{lookingFor => <UserLookingFor lookingFor={lookingFor()} />}
-				</Show>
+	return (
+		<div class="max-w-main mx-auto">
+			<div class="flex flex-wrap justify-items-center">
+				<div class="w-fit">
+					<section
+						title="User identity"
+						style={{
+							'grid-template-rows': `repeat(2,${IMG_SIZE / 2}px)`,
+						}}
+						class="col-start-1 grid h-32 w-fit content-center gap-x-4">
+						<img
+							alt={`${params.username}'s profile image`}
+							src={profileImage()}
+							width={IMG_SIZE}
+							height={IMG_SIZE}
+							class="row-span-2 rounded-full"
+						/>
+						<h1 class="font-display col-start-2 self-end text-2xl italic">
+							{params.username}
+						</h1>
+
+						<Show when={user()?.lookingFor}>
+							{lookingFor => <UserLookingFor lookingFor={lookingFor()} />}
+						</Show>
+					</section>
+
+					<Show when={user()?.pinnedCard}>
+						{pinnedCard => <PinnedCard {...pinnedCard()} />}
+					</Show>
+				</div>
+				<section title="collections" class="min-w-xl mx-auto w-full max-w-4xl mt-8">
+					<header class="flex justify-center">
+						<h2 class="text-center text-3xl font-normal">Collections</h2>
+					</header>
+					<div class="grid grid-cols-2">
+						<For each={collections()}>{Collection}</For>
+					</div>
+				</section>
+			</div>
+			<section title="all cards">
+				<h2 class="text-center text-3xl font-normal py-8">All Cards</h2>
+				<CardList>
+					<For each={data()?.cards.data}>
+						{card => (
+							<li>
+								<AnimatedCard>
+									<Card {...card}></Card>
+								</AnimatedCard>
+							</li>
+						)}
+					</For>
+				</CardList>
 			</section>
-			<Show when={user()?.pinnedCard}>{pinnedCard => <PinnedCard {...pinnedCard()} />}</Show>
-      <section title="collections">
-        <header class="flex justify-center">
-          <h2 class="font-normal text-4xl text-center w-fit">Collections</h2>
-        </header>
-        <For each={collections()}>{collection => <p>{collection.collectionName}</p>}</For>
-      </section>
 		</div>
 	);
 };
@@ -76,9 +105,9 @@ const UserLookingFor: Component<{
 	return (
 		<p
 			data-open={isOpen()}
-			class="relative col-start-2 max-h-32 max-w-80 self-start overflow-hidden break-words pb-8 transition-all data-[open=true]:max-h-full">
-			<span class="font-light italic">I'm looking for</span>
-			<span class="block break-words text-2xl font-normal">{props.lookingFor}</span>
+			class="relative col-start-2 grid max-h-32 max-w-80 gap-0 self-start overflow-hidden break-words pb-8 transition-all data-[open=true]:max-h-full">
+			<span class="text-sm font-light italic">I'm looking for</span>
+			<span class="block break-words text-lg font-normal leading-5">{props.lookingFor}</span>
 			<Show when={props.lookingFor.length > 40}>
 				<button
 					class="absolute bottom-0 h-8 w-full bg-gray-900/70 bg-gradient-to-t from-gray-900 to-gray-900/0"
@@ -93,8 +122,8 @@ const UserLookingFor: Component<{
 const PinnedCard: Component<CardComponentProps> = props => {
 	return (
 		<div class="relative w-fit origin-top-left rotate-3 p-12">
-			<Card {...props} scale={1.3} />
-			<div class="absolute left-48 top-4">
+			<Card {...props} scale={1.0} />
+			<div class="absolute left-40 top-4">
 				<Pin />
 			</div>
 		</div>
@@ -132,29 +161,53 @@ const Pin: Component = () => {
 					</g>
 				</g>
 			</svg>
-			{
-				//<div class="bg-brand-300 absolute right-0 h-8 w-8 rounded-full"></div>
-			}
 		</div>
 	);
 };
 
-const Collection: Component = () => {
-  // collection!
+const Collection: Component<CollectionProps> = props => {
+	const previewCards = (): [CardInstance, CardInstance, CardInstance] => [
+		props.cards[0] || {},
+		props.cards[1] || {},
+		props.cards[2] || {},
+	];
 
-}
+	const CARD_SCALE = 0.55;
+
+	return (
+		<div class="relative grid max-w-md gap-2 p-3 pb-12">
+			<h3 class="py-3 text-center text-lg font-normal">{props.collectionName}</h3>
+			<div class="relative mx-auto flex justify-center">
+				<div class="relative w-24 translate-y-4 -rotate-6 justify-items-center">
+					<AnimatedCard>
+						<Card {...previewCards()[2]} scale={CARD_SCALE}></Card>
+					</AnimatedCard>
+				</div>
+				<div class="w-24 rotate-2 justify-items-center">
+					<AnimatedCard>
+						<Card {...previewCards()[1]} scale={CARD_SCALE}></Card>
+					</AnimatedCard>
+				</div>
+				<div class="w-24 translate-y-4 rotate-12 justify-items-center">
+					<AnimatedCard>
+						<Card {...previewCards()[0]} scale={CARD_SCALE}></Card>
+					</AnimatedCard>
+				</div>
+			</div>
+		</div>
+	);
+};
 
 export default UserPage;
 
+type CollectionProps = {
+	collectionId: string;
+	collectionName: string;
+	cards: CardInstance[];
+};
+
 function getCollectionsFromCards(cards: CardInstance[]) {
-	const collections = new Map<
-		string,
-		{
-			collectionId: string;
-			collectionName: string;
-			cards: CardInstance[];
-		}
-	>();
+	const collections = new Map<string, CollectionProps>();
 	for (let card of cards) {
 		if (!collections.has(card.seasonId)) {
 			collections.set(card.seasonId, {

@@ -56,7 +56,7 @@ function SiteLogo() {
 				width="55"
 			/>
 			<div class="font-display hidden pt-1 lowercase sm:grid">
-				<span class="text-brand-500 dark:text-brand-300 mt-1 text-2xl italic">
+				<span class="text-brand-500 dark:text-brand-400 mt-1 text-2xl italic">
 					Indigestion
 				</span>
 				<span class="-mt-2 text-lg text-gray-600 dark:text-gray-200">Cards</span>

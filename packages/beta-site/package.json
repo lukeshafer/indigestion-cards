@@ -13,7 +13,6 @@
     "@solidjs/start": "^1.0.0",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/typography": "^0.5.13",
-    "@tanstack/solid-query": "^5.40.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "solid-js": "^1.9.2",
