@@ -1,16 +1,21 @@
 import { Card, AnimatedCard, CardList } from '@site/components/Card';
-import { loadAllCardDesigns } from '@site/data';
 import { cache, createAsync, type RouteDefinition } from '@solidjs/router';
 import { For } from 'solid-js';
 
+const fetchDesigns = cache(async () => {
+	'use server';
+	const { getAllCardDesigns } = await import('@core/lib/design');
+	return getAllCardDesigns();
+}, 'carddesigns');
+
 export const route = {
-	preload() {
-		loadAllCardDesigns();
+	async preload() {
+		return fetchDesigns();
 	},
 } satisfies RouteDefinition;
 
 export default function () {
-	const cards = createAsync(() => loadAllCardDesigns());
+	const cards = createAsync(() => fetchDesigns());
 
 	return (
 		<CardList>

@@ -844,6 +844,10 @@ const Users = new Entity(
 					stamps: { type: 'list', items: { type: 'string' } },
 				},
 			},
+      // TODO: add collections which have the following info:
+      //  - collection name
+      //  - collection id ?
+      //  - previewed cards (3 cards?)
 			...auditAttributes('user'),
 		},
 		indexes: {

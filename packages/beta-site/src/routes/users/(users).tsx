@@ -1,9 +1,20 @@
-import { loadAllUsers } from '@site/data';
-import { createAsync } from '@solidjs/router';
-import { For } from 'solid-js';
+import { cache, createAsync, type RouteSectionProps } from '@solidjs/router';
+import { For, type Component } from 'solid-js';
 
-export default function Home() {
-	const users = createAsync(() => loadAllUsers());
+const fetchUsers = cache(async () => {
+	'use server';
+	const { getAllUsers } = await import('@core/lib/user');
+	return getAllUsers();
+}, 'users');
+
+export const route = {
+	preload() {
+		return fetchUsers();
+	},
+};
+
+const UsersPage: Component<RouteSectionProps> = () => {
+	const users = createAsync(() => fetchUsers());
 
 	return (
 		<ul>
@@ -16,4 +27,6 @@ export default function Home() {
 			</For>
 		</ul>
 	);
-}
+};
+
+export default UsersPage;

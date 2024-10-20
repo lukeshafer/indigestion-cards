@@ -8,8 +8,11 @@ import {
 import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
 import { AnimatedCard, Card, CardList, type CardComponentProps } from '@site/components/Card';
 import type { CardInstance } from '@core/types';
+import { clientOnly } from '@solidjs/start';
 
-const loadUserPageData = cache(async (username: string) => {
+const UserCardList = clientOnly(() => import('@site/components/UserCardList'));
+
+const fetchUserData = cache(async (username: string) => {
 	'use server';
 	const { getUserByUserName } = await import('@core/lib/user');
 	const { getCardsByUserSortedByRarity } = await import('@core/lib/card');
@@ -24,17 +27,22 @@ const loadUserPageData = cache(async (username: string) => {
 		cards: await cards,
 		twitchData: await twitchData,
 	};
-}, 'users');
+}, 'user');
+
+const fetchUserCardsByRarity = cache(async (username: string, cursor?: string) => {
+	const { getCardsByUserSortedByRarity } = await import('@core/lib/card');
+	const cards = await getCardsByUserSortedByRarity({ username, cursor });
+}, 'user-cards-rarity');
 
 export const route: RouteDefinition = {
 	preload({ params }) {
-		loadUserPageData(params.username);
+		fetchUserData(params.username);
 	},
 };
 
 const UserPage: Component<RouteSectionProps> = props => {
 	const params = useParams();
-	const data = createAsyncStore(() => loadUserPageData(params.username));
+	const data = createAsyncStore(() => fetchUserData(params.username));
 	const profileImage = () => data()?.twitchData?.profile_image_url;
 	const user = () => data()?.user;
 	const collections = createMemo(() => getCollectionsFromCards(data()?.cards.data ?? []));
@@ -71,7 +79,7 @@ const UserPage: Component<RouteSectionProps> = props => {
 						{pinnedCard => <PinnedCard {...pinnedCard()} />}
 					</Show>
 				</div>
-				<section title="collections" class="min-w-xl mx-auto w-full max-w-4xl mt-8">
+				<section title="collections" class="min-w-xl mx-auto mt-8 w-full max-w-4xl">
 					<header class="flex justify-center">
 						<h2 class="text-center text-3xl font-normal">Collections</h2>
 					</header>
@@ -81,7 +89,8 @@ const UserPage: Component<RouteSectionProps> = props => {
 				</section>
 			</div>
 			<section title="all cards">
-				<h2 class="text-center text-3xl font-normal py-8">All Cards</h2>
+				<h2 class="py-8 text-center text-3xl font-normal">All Cards</h2>
+				<UserCardList />
 				<CardList>
 					<For each={data()?.cards.data}>
 						{card => (
