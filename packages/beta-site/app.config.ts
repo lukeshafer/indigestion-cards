@@ -5,10 +5,10 @@ export default defineConfig({
 	middleware: './src/middleware.ts',
 	server: {
 		preset: 'aws-lambda',
-		output: {
-			dir: 'dist',
-			publicDir: 'dist/client',
-		},
+		//output: {
+		//	dir: 'dist',
+		//	publicDir: 'dist/client',
+		//},
 		esbuild: {
 			options: {
 				target: 'esnext',
@@ -21,14 +21,7 @@ export default defineConfig({
 			external: ['electrodb'],
 		},
 		optimizeDeps: {
-			exclude: [
-				'sst',
-				'@aws-sdk/client-apigatewaymanagementapi',
-				'@aws-sdk/client-dynamodb',
-				'@aws-sdk/client-eventbridge',
-				'@aws-sdk/client-s3',
-				'@aws-sdk/client-ssm',
-			],
+			exclude: ['sst'],
 		},
 		resolve: {
 			alias: {
