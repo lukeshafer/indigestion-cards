@@ -1,11 +1,8 @@
+import { $_allUsers } from '@site/lib/data.server';
 import { cache, createAsync, type RouteSectionProps } from '@solidjs/router';
 import { For, type Component } from 'solid-js';
 
-const fetchUsers = cache(async () => {
-	'use server';
-	const { getAllUsers } = await import('@core/lib/user');
-	return getAllUsers();
-}, 'users');
+const fetchUsers = cache($_allUsers, 'users');
 
 export const route = {
 	preload() {

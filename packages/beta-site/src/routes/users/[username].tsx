@@ -11,26 +11,10 @@ import type { CardInstance } from '@core/types';
 import { clientOnly } from '@solidjs/start';
 import { createInfiniteScroll } from '@site/lib/infinite-scroll';
 import InfiniteLoadButton from '@site/components/InfiniteLoadButton';
+import { $_userData, $_userCardsByRarity } from '@site/lib/data.server';
 
-const fetchUserData = cache(async (username: string) => {
-	'use server';
-	const { getUserByUserName } = await import('@core/lib/user');
-	const { getUserByLogin } = await import('@core/lib/twitch');
-
-	const user = getUserByUserName(username);
-	const twitchData = getUserByLogin(username);
-
-	return {
-		user: await user,
-		twitchData: await twitchData,
-	};
-}, 'user');
-
-const fetchUserCardsByRarity = cache(async (username: string, cursor?: string) => {
-	'use server';
-	const { getCardsByUserSortedByRarity } = await import('@core/lib/card');
-	return getCardsByUserSortedByRarity({ username, cursor });
-}, 'user-cards-rarity');
+const fetchUserData = cache($_userData, 'user');
+const fetchUserCardsByRarity = cache($_userCardsByRarity, 'user-cards-rarity');
 
 export const route: RouteDefinition = {
 	preload({ params }) {

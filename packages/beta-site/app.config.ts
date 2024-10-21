@@ -21,7 +21,14 @@ export default defineConfig({
 			external: ['electrodb'],
 		},
 		optimizeDeps: {
-			exclude: ['sst'],
+			exclude: [
+				'sst',
+				'@aws-sdk/client-apigatewaymanagementapi',
+				'@aws-sdk/client-dynamodb',
+				'@aws-sdk/client-eventbridge',
+				'@aws-sdk/client-s3',
+				'@aws-sdk/client-ssm',
+			],
 		},
 		resolve: {
 			alias: {
