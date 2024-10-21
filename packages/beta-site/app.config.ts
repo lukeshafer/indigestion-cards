@@ -9,12 +9,12 @@ export default defineConfig({
 			dir: 'dist',
 			publicDir: 'dist/client',
 		},
-		//esbuild: {
-		//	options: {
-		//		target: 'esnext',
-		//		treeShaking: true,
-		//	},
-		//},
+		esbuild: {
+			options: {
+				target: 'esnext',
+				treeShaking: true,
+			},
+		},
 	},
 	vite: {
 		ssr: {
