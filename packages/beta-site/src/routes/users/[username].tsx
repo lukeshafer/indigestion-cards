@@ -9,29 +9,27 @@ import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
 import { AnimatedCard, Card, CardList, type CardComponentProps } from '@site/components/Card';
 import type { CardInstance } from '@core/types';
 import { clientOnly } from '@solidjs/start';
-
-const UserCardList = clientOnly(() => import('@site/components/UserCardList'));
+import { createInfiniteScroll } from '@site/lib/infinite-scroll';
+import InfiniteLoadButton from '@site/components/InfiniteLoadButton';
 
 const fetchUserData = cache(async (username: string) => {
 	'use server';
 	const { getUserByUserName } = await import('@core/lib/user');
-	const { getCardsByUserSortedByRarity } = await import('@core/lib/card');
 	const { getUserByLogin } = await import('@core/lib/twitch');
 
 	const user = getUserByUserName(username);
-	const cards = getCardsByUserSortedByRarity({ username });
 	const twitchData = getUserByLogin(username);
 
 	return {
 		user: await user,
-		cards: await cards,
 		twitchData: await twitchData,
 	};
 }, 'user');
 
 const fetchUserCardsByRarity = cache(async (username: string, cursor?: string) => {
+	'use server';
 	const { getCardsByUserSortedByRarity } = await import('@core/lib/card');
-	const cards = await getCardsByUserSortedByRarity({ username, cursor });
+	return getCardsByUserSortedByRarity({ username, cursor });
 }, 'user-cards-rarity');
 
 export const route: RouteDefinition = {
@@ -45,7 +43,11 @@ const UserPage: Component<RouteSectionProps> = props => {
 	const data = createAsyncStore(() => fetchUserData(params.username));
 	const profileImage = () => data()?.twitchData?.profile_image_url;
 	const user = () => data()?.user;
-	const collections = createMemo(() => getCollectionsFromCards(data()?.cards.data ?? []));
+	const userCards = createInfiniteScroll(async cursor =>
+		fetchUserCardsByRarity(params.username, cursor)
+	);
+
+	const collections = createMemo(() => getCollectionsFromCards(userCards.data));
 
 	const IMG_SIZE = 100;
 
@@ -90,9 +92,8 @@ const UserPage: Component<RouteSectionProps> = props => {
 			</div>
 			<section title="all cards">
 				<h2 class="py-8 text-center text-3xl font-normal">All Cards</h2>
-				<UserCardList />
 				<CardList>
-					<For each={data()?.cards.data}>
+					<For each={userCards.data}>
 						{card => (
 							<li>
 								<AnimatedCard>
@@ -102,6 +103,9 @@ const UserPage: Component<RouteSectionProps> = props => {
 						)}
 					</For>
 				</CardList>
+				<Show when={!userCards.isComplete}>
+					<InfiniteLoadButton load={() => userCards.loadNext()}></InfiniteLoadButton>
+				</Show>
 			</section>
 		</div>
 	);
