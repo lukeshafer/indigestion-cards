@@ -1,5 +1,5 @@
 import { db, packEventTypes } from '../db';
-import type { Pack, CardInstance } from '../db.types';
+import type { Pack, CardInstance, PackCardsHidden } from '../db.types';
 import type { DBResult } from '../types';
 import { checkIfUserExists, createNewUser, getUser } from './user';
 import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
@@ -11,7 +11,19 @@ export async function getAllPacks(): Promise<Pack[]> {
 	return result.data;
 }
 
-export async function getPackById(args: { packId: string }) {
+export async function getPacksByUsername(args: { username: string }): Promise<Pack[]> {
+	const result = await db.entities.Packs.query.byUsername({ username: args.username }).go();
+	return result.data;
+}
+
+export function hidePackCards(pack: Pack): PackCardsHidden {
+	return {
+		...pack,
+		cardDetails: undefined,
+	};
+}
+
+export async function getPackById(args: { packId: string }): Promise<Pack> {
 	const result = await db.entities.Packs.query.byPackId(args).go();
 	return result.data[0];
 }
@@ -218,8 +230,8 @@ export async function createPack(args: {
 
 	const user =
 		args.userId && args.username
-			? (await getUser(args.userId)) ??
-				(await createNewUser({ userId: args.userId, username: args.username }))
+			? ((await getUser(args.userId)) ??
+				(await createNewUser({ userId: args.userId, username: args.username })))
 			: null;
 
 	const cards: CardInstance[] = [];

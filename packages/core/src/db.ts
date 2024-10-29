@@ -625,6 +625,12 @@ const tradeCardsProperties = {
 	totalOfType: { type: 'number', required: true },
 	stamps: { type: 'list', items: { type: 'string' } },
 } as const;
+const tradePacksProperties = {
+	packId: { type: 'string', required: true },
+	packTypeName: { type: 'string', required: true },
+	packTypeId: { type: 'string', required: true },
+	createdAt: { type: 'number' },
+} as const;
 
 const Trades = new Entity(
 	{
@@ -640,10 +646,18 @@ const Trades = new Entity(
 				required: true,
 				items: { type: 'map', properties: tradeCardsProperties },
 			},
+			offeredPacks: {
+				type: 'list',
+				items: { type: 'map', properties: tradePacksProperties },
+			},
 			requestedCards: {
 				type: 'list',
 				required: true,
 				items: { type: 'map', properties: tradeCardsProperties },
+			},
+			requestedPacks: {
+				type: 'list',
+				items: { type: 'map', properties: tradePacksProperties },
 			},
 			notificationsForSender: { type: 'list', items: { type: 'string' } },
 			notificationsForReceiver: { type: 'list', items: { type: 'string' } },

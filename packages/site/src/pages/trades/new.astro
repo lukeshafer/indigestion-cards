@@ -5,8 +5,9 @@ import { routeNames, routes } from '@site/constants';
 import Page, { type Props as PageProps } from '@site/layouts/Page.astro';
 import NewTrade from '@site/components/trades/NewTrade';
 import { getUser, getUserAndOpenedCardInstances } from '@core/lib/user';
-import type { CardInstance } from '@core/types';
-import { getRarityRanking, } from '@core/lib/site-config';
+import type { CardInstance, PackCardsHidden } from '@core/types';
+import { getRarityRanking } from '@core/lib/site-config';
+import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
 
 const { userId } = Astro.locals.user?.properties || {};
 
@@ -25,15 +26,24 @@ const alerts: PageProps['alerts'] = [];
 const searchParams = Astro.url.searchParams;
 const offeredCardIds = searchParams.getAll('offeredCards');
 const requestedCardIds = searchParams.getAll('requestedCards');
+const offeredPackIds = searchParams.getAll('offeredPacks');
+const requestedPackIds = searchParams.getAll('requestedPacks');
 let initialReceiverUsername = searchParams.get('receiverUsername') ?? undefined;
 
 const rarityRanking = getRarityRanking(Astro.locals.siteConfig);
 
-const { CardInstances: cardInstances = [] } = (await getUserAndOpenedCardInstances({ username })) ?? {};
+const { CardInstances: cardInstances = [] } =
+	(await getUserAndOpenedCardInstances({ username })) ?? {};
+const packs = await getPacksByUsername({ username }).then(packs => packs.map(hidePackCards));
 const { CardInstances: initialReceiverCards = [], Users: initialReceiverUser = [] } =
 	initialReceiverUsername
-		? (await getUserAndOpenedCardInstances({ username: initialReceiverUsername })) ?? {}
+		? ((await getUserAndOpenedCardInstances({ username: initialReceiverUsername })) ?? {})
 		: {};
+const initialReceiverPacks = initialReceiverUsername
+	? await getPacksByUsername({ username: initialReceiverUsername }).then(packs =>
+			packs.map(hidePackCards)
+		)
+	: [];
 
 if (initialReceiverUsername && !initialReceiverUser.length) {
 	alerts.push({ type: 'error', message: 'Invalid username.' });
@@ -41,19 +51,34 @@ if (initialReceiverUsername && !initialReceiverUser.length) {
 }
 
 const initialOfferedCards = offeredCardIds
-	? parseCardIdListFromString(offeredCardIds, cardInstances)
+	? parseValidCardsFromCardIdList(offeredCardIds, cardInstances)
 	: undefined;
 const initialRequestedCards = requestedCardIds
-	? parseCardIdListFromString(requestedCardIds, initialReceiverCards)
+	? parseValidCardsFromCardIdList(requestedCardIds, initialReceiverCards)
 	: undefined;
 
-function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInstance[]) {
+const initialOfferedPacks = offeredPackIds
+	? parseValidPacksFromPackIdList(offeredPackIds, packs)
+	: undefined;
+const initialRequestedPacks = requestedPackIds
+	? parseValidPacksFromPackIdList(requestedPackIds, packs)
+	: undefined;
+
+function parseValidCardsFromCardIdList(cardIdList: string[], cardInstances: CardInstance[]) {
 	const cards = [];
 	for (const cardId of cardIdList) {
 		const card = cardInstances.find(cardInstance => cardInstance.instanceId === cardId);
 		if (card) cards.push(card);
 	}
 	return cards;
+}
+function parseValidPacksFromPackIdList(packIdList: string[], packs: PackCardsHidden[]) {
+	const validPacks = [];
+	for (const packId of packIdList) {
+		const pack = packs.find(pack => pack.packId === packId);
+		if (pack) validPacks.push(pack);
+	}
+	return validPacks;
 }
 ---
 
@@ -70,10 +95,14 @@ function parseCardIdListFromString(cardIdList: string[], cardInstances: CardInst
 		{userId}
 		{username}
 		{cardInstances}
+		{packs}
 		{initialOfferedCards}
 		{initialRequestedCards}
 		{initialReceiverUsername}
 		{initialReceiverCards}
+		{initialOfferedPacks}
+		{initialRequestedPacks}
+		{initialReceiverPacks}
 		{rarityRanking}
 		client:only="solid-js"
 	/>

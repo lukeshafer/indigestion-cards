@@ -253,3 +253,15 @@ export function getCardSearcher<T extends CardType>(cards: T[]) {
 
 	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
 }
+
+export function transformPackTypeName(name: string): string {
+	const regex = /season(\d*)default/i;
+	const result = name.match(regex);
+	const number = result?.[1];
+
+	if (number) {
+		return `Season ${number}`;
+	}
+
+	return name;
+}
