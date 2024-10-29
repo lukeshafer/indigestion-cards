@@ -13,7 +13,9 @@ export async function getAllPacks(): Promise<Pack[]> {
 
 export async function getPacksByUsername(args: { username: string }): Promise<Pack[]> {
 	try {
-		const result = await db.entities.Packs.query.byUsername({ username: args.username }).go();
+		const result = await db.entities.Packs.query
+			.byUsername({ username: args.username })
+			.go({ pages: 'all' });
 		return result.data;
 	} catch {
 		return [];
