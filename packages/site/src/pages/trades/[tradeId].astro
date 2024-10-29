@@ -108,13 +108,17 @@ const tradeStatus = (() => {
 			<h2 class="font-heading my-2 text-xl font-semibold text-gray-800 dark:text-gray-200">
 				{isSender ? 'Your offer' : `${trade.senderUsername}'s offer`}
 			</h2>
-			<OfferWindow cards={trade.offeredCards} client:load />
+			<OfferWindow cards={trade.offeredCards} packs={trade.offeredPacks ?? []} client:load />
 		</div>
 		<div class="text-center">
 			<h2 class="font-heading my-2 text-xl font-semibold text-gray-800 dark:text-gray-200">
 				{isReceiver ? 'Requested from you' : `Requested from ${trade.receiverUsername}`}
 			</h2>
-			<OfferWindow cards={trade.requestedCards} client:load />
+			<OfferWindow
+				cards={trade.requestedCards}
+				packs={trade.offeredPacks ?? []}
+				client:load
+			/>
 		</div>
 		<TradeMessageHistory {trade} loggedInUserId={userId} client:load />
 		<Show when={trade.status === 'pending'}>
@@ -162,11 +166,13 @@ const tradeStatus = (() => {
 				}
 			</div>
 		</Show>
-    {isSender || isReceiver ? (
-      <div class="col-span-2 mx-auto w-fit">
-        <Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
-      </div>
-    ) : null}
+		{
+			isSender || isReceiver ? (
+				<div class="col-span-2 mx-auto w-fit">
+					<Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
+				</div>
+			) : null
+		}
 	</div>
 
 	<trade-fetcher trade-id={trade.tradeId} status={trade.status}></trade-fetcher>

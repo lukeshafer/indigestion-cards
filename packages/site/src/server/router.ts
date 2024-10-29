@@ -13,10 +13,8 @@ import {
 } from '@core/lib/card';
 import {
 	getAllPacks,
-	getPackById,
 	getPacksByUsername,
 	hidePackCards,
-	updatePackUser,
 } from '@core/lib/pack';
 
 const t = initTRPC.context<TRPCContext>().create();
@@ -108,43 +106,6 @@ export const appRouter = t.router({
 						packs.map(hidePackCards)
 					)
 			),
-		give: authedProcedure
-			.input(
-				z.object({
-					packId: z.string(),
-					username: z.string(),
-					userId: z.string(),
-				})
-			)
-			.mutation(async ({ input, ctx }) => {
-				const gifter = ctx.session.properties;
-
-				const pack = await getPackById({ packId: input.packId })
-					.then(pack => pack || undefined)
-					.catch(() => undefined);
-
-				if (!pack?.userId || pack.userId !== gifter.userId) {
-					throw new TRPCError({
-						code: 'UNAUTHORIZED',
-						message: 'You do not own this pack.',
-					});
-				}
-
-				try {
-					await updatePackUser({
-						packId: input.packId,
-						userId: input.userId,
-						username: input.username,
-					});
-				} catch (error) {
-					console.error('An error occurred while updating the pack user.', { error });
-					throw new TRPCError({
-						code: 'INTERNAL_SERVER_ERROR',
-						message:
-							'An error occurred while gifting the pack. Please try again or contact an administrator if the error persists.',
-					});
-				}
-			}),
 	},
 });
 

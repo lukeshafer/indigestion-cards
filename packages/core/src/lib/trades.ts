@@ -1,4 +1,4 @@
-import { db } from '../db'
+import { db } from '../db';
 import { getUserAndCardInstances } from './user';
 import {
 	InputValidationError,
@@ -6,10 +6,21 @@ import {
 	ServerError,
 	UnauthorizedError,
 	UserDoesNotOwnCardError,
+	UserDoesNotOwnPackError,
 } from './errors';
 import { sendTradeAcceptedEvent } from '../events/trades';
 import { LEGACY_CARD_ID } from '../constants';
-import type { CardInstance, CreateTrade, Trade, TradeCard, UpdateTrade, User } from '../db.types';
+import type {
+	CardInstance,
+	CreateTrade,
+	Pack,
+	Trade,
+	TradeCard,
+	TradePack,
+	UpdateTrade,
+	User,
+} from '../db.types';
+import { getPacksByUsername } from './pack';
 
 const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
 
@@ -19,11 +30,50 @@ export function checkIsCardTradeable(card: CardInstance): boolean {
 	return true;
 }
 
+export function checkIsPackTradeable(pack: Pack): boolean {
+	if (pack.cardDetails.some(card => card.opened)) return false;
+	return true;
+}
+
+function getValidCardInstancesFromProvidedCardIds(
+	providedCardIds: string[],
+	userCards: CardInstance[]
+): CardInstance[] {
+	const userCardMap = new Map(userCards.map(card => [card.instanceId, card]));
+
+	const cards: CardInstance[] = [];
+	for (const id of providedCardIds) {
+		const card = userCardMap.get(id);
+		if (card && checkIsCardTradeable(card) && card.openedAt) cards.push(card);
+	}
+
+	return cards;
+}
+
+function getValidPacksFromProvidedPackIds(
+	providedPackIds: string[],
+	userPacks: Array<Pack>
+): Array<Pack> {
+	const packMap = new Map(userPacks.map(pack => [pack.packId, pack]));
+	const packs: Array<Pack> = [];
+
+	for (let packId of providedPackIds) {
+		const pack = packMap.get(packId);
+		if (pack && checkIsPackTradeable(pack)) {
+			packs.push(pack);
+		}
+	}
+
+	return packs;
+}
+
 export async function createTradeFromApi(params: {
 	senderUsername: string;
 	receiverUsername: string;
 	offeredCards: string[];
 	requestedCards: string[];
+	offeredPacks: string[];
+	requestedPacks: string[];
 	message?: string;
 }) {
 	console.log('Creating trade', { params });
@@ -41,17 +91,8 @@ export async function createTradeFromApi(params: {
 		throw new InputValidationError('Invalid users provided');
 	}
 
-	const getCardData = (providedCardIds: string[], userCards: CardInstance[]) => {
-		const userCardMap = new Map(userCards.map(card => [card.instanceId, card]));
-
-		const cards: CardInstance[] = [];
-		for (const id of providedCardIds) {
-			const card = userCardMap.get(id);
-			if (card && checkIsCardTradeable(card) && card.openedAt) cards.push(card);
-		}
-
-		return cards;
-	};
+	const senderPacks = await getPacksByUsername({ username: params.senderUsername });
+	const receiverPacks = await getPacksByUsername({ username: params.receiverUsername });
 
 	const messages: CreateTrade['messages'] = [
 		{
@@ -68,12 +109,20 @@ export async function createTradeFromApi(params: {
 		});
 	}
 
-	const offeredCards = getCardData(params.offeredCards, senderData.CardInstances);
-	const requestedCards = getCardData(params.requestedCards, receiverData.CardInstances);
+	const offeredCards = getValidCardInstancesFromProvidedCardIds(
+		params.offeredCards,
+		senderData.CardInstances
+	);
+	const requestedCards = getValidCardInstancesFromProvidedCardIds(
+		params.requestedCards,
+		receiverData.CardInstances
+	);
+	const offeredPacks = getValidPacksFromProvidedPackIds(params.offeredPacks, senderPacks);
+	const requestedPacks = getValidPacksFromProvidedPackIds(params.requestedPacks, receiverPacks);
 
-	if (!offeredCards.length && !requestedCards.length) {
+	if (!offeredCards.length && !requestedCards.length && !offeredPacks.length && !requestedPacks.length) {
 		throw new InputValidationError(
-			'Must offer or request at least one valid card. Moment Cards and Legacy Cards cannot be traded.'
+			'Must offer or request at least one valid card or pack. Moment Cards and Legacy Cards cannot be traded.'
 		);
 	}
 
@@ -84,14 +133,15 @@ export async function createTradeFromApi(params: {
 		receiverUsername: params.receiverUsername,
 		offeredCards,
 		requestedCards,
+		offeredPacks,
+		requestedPacks,
 		messages,
 	};
 
 	try {
 		console.log({ tradeOptions: JSON.stringify(tradeOptions) });
 		const trade = await db.entities.Trades.create(tradeOptions).go();
-		const user = await db.entities.Users
-			.patch({ userId: tradeOptions.receiverUserId })
+		const user = await db.entities.Users.patch({ userId: tradeOptions.receiverUserId })
 			.append({
 				tradeNotifications: [
 					{
@@ -191,8 +241,7 @@ export async function updateTradeStatus({
 
 	const result = await db.transaction
 		.write(({ Users, Trades }) => [
-			Trades
-				.patch({ tradeId: trade.tradeId })
+			Trades.patch({ tradeId: trade.tradeId })
 				.set({ status: newStatus, statusMessage })
 				.append({
 					messages: [
@@ -204,8 +253,7 @@ export async function updateTradeStatus({
 					],
 				})
 				.commit(),
-			Users
-				.patch({ userId: otherUserId })
+			Users.patch({ userId: otherUserId })
 				.append({
 					tradeNotifications: [
 						{
@@ -278,8 +326,7 @@ export async function addMessageToTrade(params: {
 
 	const result = await db.transaction
 		.write(({ Users, Trades }) => [
-			Trades
-				.patch({ tradeId: params.tradeId })
+			Trades.patch({ tradeId: params.tradeId })
 				.append({
 					messages: [
 						{
@@ -289,8 +336,7 @@ export async function addMessageToTrade(params: {
 					],
 				})
 				.commit(),
-			Users
-				.patch({ userId: otherUserId })
+			Users.patch({ userId: otherUserId })
 				.append({
 					tradeNotifications: [
 						{
@@ -312,8 +358,8 @@ export async function processTrade(trade: Trade) {
 		throw new Error('Trade not accepted, should not process.');
 	}
 
-	const sender = await getAndValidateUserAndCardInstances(trade.senderUsername);
-	const receiver = await getAndValidateUserAndCardInstances(trade.receiverUsername);
+	const sender = await getAndValidateUserCardInstancesAndPacks(trade.senderUsername);
+	const receiver = await getAndValidateUserCardInstancesAndPacks(trade.receiverUsername);
 
 	try {
 		await db.transaction.write(({ Users }) => [
@@ -337,10 +383,27 @@ export async function processTrade(trade: Trade) {
 			})
 		) satisfies CardInstance[];
 
+		const offeredPacksMoveToReceiver =
+			trade.offeredPacks?.map(
+				stagePackTransactionBetweenUsers({
+					previous: sender,
+					next: receiver,
+					tradeId: trade.tradeId,
+				})
+			) || [];
+
+		const requestedPacksMoveToSender =
+			trade.requestedPacks?.map(
+				stagePackTransactionBetweenUsers({
+					previous: receiver,
+					next: sender,
+					tradeId: trade.tradeId,
+				})
+			) || [];
+
 		await db.transaction
-			.write(({ CardInstances, Users, Trades }) => [
-				Users
-					.patch({ userId: sender.user.userId })
+			.write(({ CardInstances, Users, Trades, Packs }) => [
+				Users.patch({ userId: sender.user.userId })
 					.set({
 						pinnedCard: trade.offeredCards.some(
 							card => card.instanceId === sender.user.pinnedCard?.instanceId
@@ -371,8 +434,7 @@ export async function processTrade(trade: Trade) {
 						],
 					})
 					.commit(),
-				Users
-					.patch({ userId: receiver.user.userId })
+				Users.patch({ userId: receiver.user.userId })
 					.set({
 						pinnedCard: trade.requestedCards.some(
 							card => card.instanceId === receiver.user.pinnedCard?.instanceId
@@ -395,8 +457,7 @@ export async function processTrade(trade: Trade) {
 					.add({ cardCount: trade.offeredCards.length - trade.requestedCards.length })
 					.commit(),
 				...offeredCardsMoveToReceiver.map(card =>
-					CardInstances
-						.patch({ instanceId: card.instanceId, designId: card.designId })
+					CardInstances.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
 							tradeHistory: [
@@ -412,8 +473,7 @@ export async function processTrade(trade: Trade) {
 						.commit()
 				),
 				...requestedCardsMoveToSender.map(card =>
-					CardInstances
-						.patch({ instanceId: card.instanceId, designId: card.designId })
+					CardInstances.patch({ instanceId: card.instanceId, designId: card.designId })
 						.set({ username: card.username, userId: card.userId })
 						.append({
 							tradeHistory: [
@@ -428,6 +488,42 @@ export async function processTrade(trade: Trade) {
 						})
 						.commit()
 				),
+				...offeredPacksMoveToReceiver.flatMap(({ pack, cards }) => [
+					Packs.patch({ packId: pack.packId })
+						.set({ username: pack.username, userId: pack.userId })
+						.commit(),
+					...cards.map(card =>
+						CardInstances.patch({
+							instanceId: card.instanceId,
+							designId: card.designId,
+						})
+							.set({
+								username: card.username,
+								userId: card.userId,
+								minterUsername: card.username,
+								minterId: card.userId,
+							})
+							.commit()
+					),
+				]),
+				...requestedPacksMoveToSender.flatMap(({ pack, cards }) => [
+					Packs.patch({ packId: pack.packId })
+						.set({ username: pack.username, userId: pack.userId })
+						.commit(),
+					...cards.map(card =>
+						CardInstances.patch({
+							instanceId: card.instanceId,
+							designId: card.designId,
+						})
+							.set({
+								username: card.username,
+								userId: card.userId,
+								minterUsername: card.username,
+								minterId: card.userId,
+							})
+							.commit()
+					),
+				]),
 				Trades.patch({ tradeId: trade.tradeId }).set({ status: 'completed' }).commit(),
 			])
 			.go();
@@ -462,8 +558,9 @@ function formatToAndFromUsers(args: { card: CardInstance; trade: Trade }): {
 	} else throw new Error('Card cannot be traded between these two users.');
 }
 
-async function getAndValidateUserAndCardInstances(username: string) {
+async function getAndValidateUserCardInstancesAndPacks(username: string) {
 	const userdata = await getUserAndCardInstances({ username });
+	const packs = await getPacksByUsername({ username });
 
 	const user = userdata?.Users[0];
 	const cards = userdata?.CardInstances.filter(
@@ -479,7 +576,7 @@ async function getAndValidateUserAndCardInstances(username: string) {
 		throw new Error('User is currently trading and cannot trade.');
 	}
 
-	return { user, cards };
+	return { user, cards, packs };
 }
 
 function stageCardTransactionBetweenUsers({
@@ -490,7 +587,7 @@ function stageCardTransactionBetweenUsers({
 	previous: { cards: CardInstance[]; user: User };
 	next: { user: User };
 	tradeId: string;
-}) {
+}): (card: TradeCard) => CardInstance {
 	const previousCards = new Map(previous.cards.map(card => [card.instanceId, card]));
 
 	return (cardToMove: TradeCard) => {
@@ -516,6 +613,76 @@ function stageCardTransactionBetweenUsers({
 	};
 }
 
+type StagedPackTrade = {
+	pack: Pack;
+	cards: Array<CardInstance>;
+};
+
+function stagePackTransactionBetweenUsers({
+	previous,
+	next,
+	tradeId,
+}: {
+	previous: { packs: Array<Pack>; user: User; cards: Array<CardInstance> };
+	next: { user: User };
+	tradeId: string;
+}): (pack: TradePack) => StagedPackTrade {
+	const previousPacks = new Map(previous.packs.map(pack => [pack.packId, pack]));
+	const previousCards = new Map(previous.cards.map(card => [card.instanceId, card]));
+
+	return (packToMove: TradePack) => {
+		const pack = previousPacks.get(packToMove.packId);
+		if (!pack || !checkIsPackTradeable(pack)) {
+			if (pack) console.error('Pack has been at least partially opened and cannot be traded');
+			console.error(`User does not own pack ${packToMove.packId}`, {
+				packId: packToMove.packId,
+				previousPacks: [...previousPacks],
+				prevOwner: previous.user,
+			});
+			throw new UserDoesNotOwnPackError(
+				`User ${previous.user.username} does not own pack ${packToMove.packId}`,
+				{ username: previous.user.username, pack: packToMove, tradeId }
+			);
+		}
+
+		const cards = pack.cardDetails.map(cardToMove => {
+			const card = previousCards.get(cardToMove.instanceId);
+			if (!card) {
+				console.error(
+					`Card ${cardToMove.instanceId} is no longer in pack ${pack.packId}. This should not happen.`,
+					{
+						packId: packToMove.packId,
+						previousPacks: [...previousPacks],
+						previousCards: [...previousCards],
+						prevOwner: previous.user,
+						tradeId,
+					}
+				);
+
+				throw new UserDoesNotOwnCardError(
+					`Requested card is no longer in pack ${pack.packId}`,
+					{ username: previous.user.username, card: cardToMove, tradeId }
+				);
+			}
+
+			return {
+				...card,
+				username: next.user.username,
+				userId: next.user.userId,
+			};
+		});
+
+		return {
+			pack: {
+				...pack,
+				username: next.user.username,
+				userId: next.user.userId,
+			},
+			cards,
+		};
+	};
+}
+
 export async function setTradeStatusToFailed(tradeId: string, statusMessage: string) {
 	const trade = await getTrade(tradeId);
 	if (!trade) throw new NotFoundError('Trade not found');
@@ -526,8 +693,7 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 
 	const result = await db.transaction
 		.write(({ Users, Trades }) => [
-			Trades
-				.patch({ tradeId: trade.tradeId })
+			Trades.patch({ tradeId: trade.tradeId })
 				.set({ status: 'failed', statusMessage })
 				.append({
 					messages: [
@@ -539,8 +705,7 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 					],
 				})
 				.commit(),
-			Users
-				.patch({ userId: trade.senderUserId })
+			Users.patch({ userId: trade.senderUserId })
 				.append({
 					tradeNotifications: [
 						{
@@ -551,8 +716,7 @@ export async function setTradeStatusToFailed(tradeId: string, statusMessage: str
 					],
 				})
 				.commit(),
-			Users
-				.patch({ userId: trade.receiverUserId })
+			Users.patch({ userId: trade.receiverUserId })
 				.append({
 					tradeNotifications: [
 						{

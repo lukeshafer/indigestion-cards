@@ -9,6 +9,8 @@ export const POST = createApiRoute(
 			receiverUsername: 'string',
 			offeredCards: 'string[]',
 			requestedCards: 'string[]',
+			offeredPacks: 'string[]',
+			requestedPacks: 'string[]',
 			message: 'string?',
 		},
 		validationErrorResponse: (ctx, errors) => {
@@ -18,7 +20,10 @@ export const POST = createApiRoute(
 			return ctx.redirect(`/trades/new?${params.toString()}`);
 		},
 	},
-	async ({ receiverUsername, offeredCards, requestedCards, message }, ctx) => {
+	async (
+		{ receiverUsername, offeredCards, requestedCards, offeredPacks, requestedPacks, message },
+		ctx
+	) => {
 		try {
 			const username = ctx.locals.user?.properties.username!;
 			const trade = await createTradeFromApi({
@@ -26,6 +31,8 @@ export const POST = createApiRoute(
 				receiverUsername,
 				offeredCards,
 				requestedCards,
+				offeredPacks,
+				requestedPacks,
 				message,
 			});
 

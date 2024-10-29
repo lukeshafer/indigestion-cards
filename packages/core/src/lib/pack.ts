@@ -12,8 +12,12 @@ export async function getAllPacks(): Promise<Pack[]> {
 }
 
 export async function getPacksByUsername(args: { username: string }): Promise<Pack[]> {
-	const result = await db.entities.Packs.query.byUsername({ username: args.username }).go();
-	return result.data;
+	try {
+		const result = await db.entities.Packs.query.byUsername({ username: args.username }).go();
+		return result.data;
+	} catch {
+		return [];
+	}
 }
 
 export function hidePackCards(pack: Pack): PackCardsHidden {
