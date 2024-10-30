@@ -7,13 +7,14 @@ import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
+	prefetch: {
+		prefetchAll: true,
+	},
 	output: 'server',
 	adapter: aws({
 		serverRoutes: ['api/*', 'trades/*'],
 	}),
-	integrations: [tailwind(), 
-    solid(), 
-    icon()],
+	integrations: [tailwind(), solid(), icon()],
 	vite: {
 		ssr: {
 			external: ['electrodb'],

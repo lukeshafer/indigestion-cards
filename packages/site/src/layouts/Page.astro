@@ -52,7 +52,6 @@ alerts.push(...(alertsProp ?? []));
 		<div
 			class="relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950"
 			id="page-scroll-wrapper">
-			<LoadingBar client:load transition:persist transition:name="loadingbar" />
 			{noHeader ? null : <Header {logo} />}
 			<data-lists></data-lists>
 			<AlertBox client:load {alerts} />
