@@ -14,7 +14,7 @@ const { title, pageType = 'admin' } = Astro.props;
 
 const session = Astro.locals.session;
 
-//const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
 ---
 
@@ -35,6 +35,13 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
+    {!disableAnimations && (
+    <style>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
+    )}
 		<script is:inline>
 			if (
 				localStorage.theme === 'dark' ||
@@ -56,7 +63,9 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 			}
 		</title>
 	</head>
-	<body class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
+	<body
+		class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50"
+		class:list={{ 'disable-animations': disableAnimations }}>
 		{
 			session?.type === 'admin' ||
 			(session?.type === 'user' && pageType === 'user') ||

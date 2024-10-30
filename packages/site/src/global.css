@@ -8,10 +8,6 @@
 	display: none !important;
 }
 
-@view-transition {
-  navigation: auto;
-}
-
 body.disable-animations * {
 	transition: none !important;
 	animation: none !important;
