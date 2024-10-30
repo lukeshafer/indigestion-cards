@@ -67,8 +67,8 @@ export default function PackTradeList(props: {
 export const PackListItem: Component<{
 	pack: TradePack;
 }> = props => (
-	<div class="flex w-48 flex-col items-center text-center">
-		<p class="whitespace-break-spaces font-bold">
+	<div class="flex w-48 flex-col items-center text-center border-brand-main/50 bg-brand-main/25 border w-card card-aspect-ratio justify-center">
+		<p class="whitespace-break-spaces font-bold text-xl">
 			{transformPackTypeName(props.pack.packTypeName)} pack
 		</p>
 		<Show when={props.pack.createdAt}>

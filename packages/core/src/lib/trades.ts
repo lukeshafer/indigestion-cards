@@ -120,7 +120,12 @@ export async function createTradeFromApi(params: {
 	const offeredPacks = getValidPacksFromProvidedPackIds(params.offeredPacks, senderPacks);
 	const requestedPacks = getValidPacksFromProvidedPackIds(params.requestedPacks, receiverPacks);
 
-	if (!offeredCards.length && !requestedCards.length && !offeredPacks.length && !requestedPacks.length) {
+	if (
+		!offeredCards.length &&
+		!requestedCards.length &&
+		!offeredPacks.length &&
+		!requestedPacks.length
+	) {
 		throw new InputValidationError(
 			'Must offer or request at least one valid card or pack. Moment Cards and Legacy Cards cannot be traded.'
 		);
@@ -161,12 +166,12 @@ export async function createTradeFromApi(params: {
 }
 
 export async function getOutgoingTradesByUserId(senderUserId: string) {
-	const result = await db.entities.Trades.query.bySenderId({ senderUserId }).go();
+	const result = await db.entities.Trades.query.bySenderId({ senderUserId }).go({ pages: 'all' });
 	return result.data;
 }
 
 export async function getIncomingTradesByUserId(receiverUserId: string) {
-	const result = await db.entities.Trades.query.byReceiverId({ receiverUserId }).go();
+	const result = await db.entities.Trades.query.byReceiverId({ receiverUserId }).go({ pages: 'all' });
 	return result.data;
 }
 

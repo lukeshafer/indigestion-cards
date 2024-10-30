@@ -52,9 +52,15 @@ export default function NewTrade(props: {
 			const formData = new FormData(form);
 			formData.delete('offeredCards');
 			formData.delete('requestedCards');
+			formData.delete('offeredPacks');
+			formData.delete('requestedPacks');
 			state.offeredCards.forEach(card => formData.append('offeredCards', card.instanceId));
 			state.requestedCards.forEach(card =>
 				formData.append('requestedCards', card.instanceId)
+			);
+			state.offeredPacks.forEach(pack => formData.append('offeredPacks', pack.packId));
+			state.requestedPacks.forEach(pack =>
+				formData.append('requestedPacks', pack.packId)
 			);
 
 			// @ts-expect-error - there are no files in this form
@@ -322,6 +328,8 @@ const updateUrlFromState = (state: TradeState) => {
 			[
 				() => state.offeredCards.length,
 				() => state.requestedCards.length,
+				() => state.offeredPacks.length,
+				() => state.requestedPacks.length,
 				() => state.receiverUsername,
 			],
 			() => {
