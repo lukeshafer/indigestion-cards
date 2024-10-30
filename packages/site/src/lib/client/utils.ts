@@ -5,7 +5,6 @@ import { z } from 'astro/zod';
 import Fuse from 'fuse.js';
 
 export const useViewTransition = (cb: () => unknown) =>
-	// @ts-expect-error - startViewTransition is not on Document yet
 	document.startViewTransition ? document.startViewTransition(cb) : cb();
 
 export type CardProps = Partial<CardInstance> &

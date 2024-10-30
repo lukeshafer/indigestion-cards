@@ -4,6 +4,7 @@ import Card from '../cards/Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
 import { PackListItem } from './PackTradeList';
+import { transformPackTypeName } from '@site/lib/client/utils';
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];
@@ -49,10 +50,10 @@ export default function OfferWindow(props: {
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-pack-' + pack.packId }}>
-						<PackListItem pack={pack} />
+						<PackListItem name={transformPackTypeName(pack.packTypeName)} />
 						<Show when={props.setPacks}>
 							<DeleteItemButton
-								title="Remove Card"
+								title="Remove Pack"
 								onClick={() => {
 									props.setPacks?.(
 										produce(draft => {
@@ -82,9 +83,12 @@ const DeleteItemButton: Component<{
 	onClick: () => void;
 }> = props => (
 	<button
-		title="Remove Card"
-		class="absolute left-2 top-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-white p-1 font-black text-red-600 hover:brightness-75"
-		onClick={() => props.onClick()}>
+		title={props.title}
+		class="bg-brand-dark border-brand-950 absolute left-2 top-2 z-50 flex h-5 w-5 items-center justify-center rounded border-2 p-px font-black text-white opacity-75 hover:opacity-100"
+		onClick={e => {
+			e.preventDefault();
+			props.onClick();
+		}}>
 		<span aria-hidden="true">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -97,6 +101,6 @@ const DeleteItemButton: Component<{
 				/>
 			</svg>
 		</span>
-		<span class="sr-only">Remove Card</span>
+		<span class="sr-only">{props.title}</span>
 	</button>
 );

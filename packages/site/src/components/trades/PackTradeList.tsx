@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
+import { createMemo, createSignal, For, type Component } from 'solid-js';
 import { Select } from '../form/Form';
 import { produce } from 'solid-js/store';
 import { transformPackTypeName } from '@site/lib/client/utils';
@@ -55,7 +55,7 @@ export default function PackTradeList(props: {
 									})
 								)
 							}>
-							<PackListItem pack={pack} />
+							<PackListItem name={transformPackTypeName(pack.packTypeName)} small />
 						</TradeInventoryItemCheckbox>
 					)}
 				</For>
@@ -65,15 +65,24 @@ export default function PackTradeList(props: {
 }
 
 export const PackListItem: Component<{
-	pack: TradePack;
+	name: string;
+	small?: boolean;
 }> = props => (
-	<div class="flex w-48 flex-col items-center text-center border-brand-main/50 bg-brand-main/25 border w-card card-aspect-ratio justify-center">
-		<p class="whitespace-break-spaces font-bold text-xl">
-			{transformPackTypeName(props.pack.packTypeName)} pack
+	<div
+		class="border-brand-main/50 bg-brand-main/25 card-aspect-ratio relative flex flex-col justify-center border px-[2.5em] py-[1.5em] text-center"
+		style={{
+			width: '18em',
+			'font-size': props.small ? '0.5rem' : 'default',
+		}}>
+		<p class="font-display absolute bottom-0 right-0 whitespace-break-spaces p-[0.5em] font-bold lowercase italic leading-[0.7em]">
+			Indigestion
 		</p>
-		<Show when={props.pack.createdAt}>
-			{date => <p>Created {new Date(date()).toLocaleDateString()}</p>}
-		</Show>
+		<p class="self-center whitespace-break-spaces text-center">
+      <span class="text-[2em] font-bold">{props.name}</span>
+      {
+        <span class="block leading-[0.5em]">pack</span>
+      }
+		</p>
 	</div>
 );
 
