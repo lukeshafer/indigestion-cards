@@ -1,6 +1,8 @@
 import { ElectroError } from 'electrodb';
 import { db } from '../db';
 import type { CreatePackType } from '../db.types';
+import { InputValidationError, ServerError } from './errors';
+import { getAllPacks } from './pack';
 
 export async function getAllPackTypes() {
 	const result = await db.entities.PackTypes.query.allPackTypes({}).go();
@@ -43,3 +45,33 @@ export async function deletePackTypeById(args: { packTypeId: string }) {
 	const result = await db.entities.PackTypes.delete(args).go();
 	return { success: true, data: result.data };
 }
+
+export const updatePackTypeName = async (args: { packTypeId: string; packTypeName: string }) => {
+	if (!args.packTypeName.length) {
+		throw new InputValidationError('Pack Type Name must have a length of 1 or more');
+	}
+
+	const packs = await getAllPacks();
+
+	const result = await db.transaction
+		.write(({ Packs, PackTypes }) => [
+			PackTypes.patch({ packTypeId: args.packTypeId })
+				.set({ packTypeName: args.packTypeName })
+				.commit(),
+			...packs
+				.filter(pack => pack.packTypeId === args.packTypeId)
+				.map(pack =>
+					Packs.patch({ packId: pack.packId })
+						.set({ packTypeName: args.packTypeName })
+						.commit()
+				),
+		])
+		.go();
+
+	if (result.canceled) {
+		console.log('canceled');
+		throw new ServerError('The packtype name update was canceled.');
+	}
+
+	return result.data;
+};

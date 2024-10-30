@@ -4,6 +4,7 @@ import { getAdminUserById } from '@core/lib/admin-user';
 import { AUTH_TOKEN } from './constants';
 import { Session as SSTSession } from 'sst/node/future/auth';
 import type { Session } from '@core/types';
+import { setAdminEnvSession } from '@core/lib/session';
 
 const transformMethod: MiddlewareHandler = async (ctx, next) => {
 	const formMethod = ctx.url.searchParams.get('formmethod');
@@ -30,12 +31,13 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 			ctx.locals.session = null;
 			ctx.cookies.delete(AUTH_TOKEN);
 		} else {
-      if (ctx.url.pathname === '/login') return ctx.redirect('/')
+			setAdminEnvSession(adminUser.username, adminUser.userId);
+			if (ctx.url.pathname === '/login') return ctx.redirect('/');
 			return next();
 		}
 	}
 
-  console.log(ctx.url.pathname)
+	console.log(ctx.url.pathname);
 	if (ctx.url.pathname === '/login' || ctx.url.pathname.startsWith('/api/auth/')) return next();
 	else return ctx.redirect('/login' + ctx.url.search);
 };
