@@ -10,7 +10,7 @@ import icon from 'astro-icon';
 export default defineConfig({
 	output: 'server',
 	adapter: aws({
-		serverRoutes: ['/*', 'api/*', 'admin-users'],
+		serverRoutes: ['api/*', 'admin-users', 'pack-types/*'],
 	}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {
