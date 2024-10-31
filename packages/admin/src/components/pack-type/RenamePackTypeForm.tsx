@@ -12,13 +12,20 @@ export const RenamePackTypeForm: Component<{
 		<form
 			method="post"
 			class="my-4"
-			onSubmit={e => {
+			onSubmit={async e => {
 				e.preventDefault();
-				actions.packTypes
-					.renamePackType({ packTypeId: props.packTypeId, packTypeName: packTypeName() })
-					.then(() => {
-						alert('updated!');
-					});
+				const result = await actions.packTypes.renamePackType({
+					packTypeId: props.packTypeId,
+					packTypeName: packTypeName(),
+				});
+
+				if (result.error) {
+					alert('There was an error changing the pack type name!');
+					console.error(result.error);
+					return;
+				}
+
+				location.reload();
 			}}>
 			<input type="hidden" name="packTypeId" value={props.packTypeId} />
 			<div class="my-2 flex w-fit gap-2">

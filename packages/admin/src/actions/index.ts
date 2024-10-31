@@ -5,13 +5,12 @@ import { z } from 'astro:schema';
 export const server = {
 	packTypes: {
 		renamePackType: defineAction({
-			//accept: 'form',
 			input: z.object({
 				packTypeId: z.string(),
 				packTypeName: z.string(),
 			}),
 			handler: async (input, context) => {
-        console.debug("Server action handler: packTypes.renamePackType")
+        //console.debug("Server action handler: packTypes.renamePackType")
 				if (context.locals.session?.type !== 'admin') {
 					throw new ActionError({
 						code: 'UNAUTHORIZED',

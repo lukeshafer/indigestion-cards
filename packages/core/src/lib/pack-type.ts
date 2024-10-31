@@ -1,7 +1,7 @@
 import { ElectroError } from 'electrodb';
 import { db } from '../db';
 import type { CreatePackType } from '../db.types';
-import { InputValidationError,  } from './errors';
+import { InputValidationError } from './errors';
 import { getAllPacks } from './pack';
 
 export async function getAllPackTypes() {
