@@ -25,7 +25,7 @@ const cardPool = await getCardPoolFromType(packType);
 
 	<DeletePackTypeButton packTypeId={packType.packTypeId} client:load />
 
-	<form method="POST" action={actions.packTypes.renamePackType} class="my-4">
+	<form method="post" action={actions.packTypes.renamePackType} class="my-4">
 		<input type="hidden" name="packTypeId" value={packType.packTypeId} />
 		<div class="my-2 w-fit flex gap-2">
 			<TextInput label="Update name" name="packTypeName" value={packType.packTypeName} />
