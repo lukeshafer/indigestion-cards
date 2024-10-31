@@ -5,7 +5,7 @@ import { z } from 'astro:schema';
 export const server = {
 	packTypes: {
 		renamePackType: defineAction({
-			accept: 'form',
+			//accept: 'form',
 			input: z.object({
 				packTypeId: z.string(),
 				packTypeName: z.string(),
