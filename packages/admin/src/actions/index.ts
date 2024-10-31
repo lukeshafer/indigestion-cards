@@ -11,6 +11,7 @@ export const server = {
 				packTypeName: z.string(),
 			}),
 			handler: async (input, context) => {
+        console.debug("Server action handler: packTypes.renamePackType")
 				if (context.locals.session?.type !== 'admin') {
 					throw new ActionError({
 						code: 'UNAUTHORIZED',
@@ -18,7 +19,10 @@ export const server = {
 					});
 				}
 
-				await updatePackTypeName(input);
+				await updatePackTypeName(input).catch(err => {
+					console.error(err);
+					throw err;
+				});
 			},
 		}),
 	},

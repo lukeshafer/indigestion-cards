@@ -1,7 +1,7 @@
 import { ElectroError } from 'electrodb';
 import { db } from '../db';
 import type { CreatePackType } from '../db.types';
-import { InputValidationError, ServerError } from './errors';
+import { InputValidationError,  } from './errors';
 import { getAllPacks } from './pack';
 
 export async function getAllPackTypes() {
@@ -51,27 +51,44 @@ export const updatePackTypeName = async (args: { packTypeId: string; packTypeNam
 		throw new InputValidationError('Pack Type Name must have a length of 1 or more');
 	}
 
-	const packs = await getAllPacks();
+	const packs = await getAllPacks().then(packs =>
+		packs.filter(pack => pack.packTypeId === args.packTypeId)
+	);
 
-	const result = await db.transaction
-		.write(({ Packs, PackTypes }) => [
-			PackTypes.patch({ packTypeId: args.packTypeId })
+	try {
+		await db.entities.PackTypes.patch({ packTypeId: args.packTypeId })
+			.set({ packTypeName: args.packTypeName })
+			.go();
+
+		for (let pack of packs) {
+			await db.entities.Packs.patch({ packId: pack.packId })
 				.set({ packTypeName: args.packTypeName })
-				.commit(),
-			...packs
-				.filter(pack => pack.packTypeId === args.packTypeId)
-				.map(pack =>
-					Packs.patch({ packId: pack.packId })
-						.set({ packTypeName: args.packTypeName })
-						.commit()
-				),
-		])
-		.go();
-
-	if (result.canceled) {
-		console.log('canceled');
-		throw new ServerError('The packtype name update was canceled.');
+				.go();
+		}
+	} catch (error) {
+		console.error(error);
+		throw error;
 	}
 
-	return result.data;
+	//const result = await db.transaction
+	//	.write(({ Packs, PackTypes }) => [
+	//		PackTypes.patch({ packTypeId: args.packTypeId })
+	//			.set({ packTypeName: args.packTypeName })
+	//			.commit(),
+	//		...packs
+	//			.filter(pack => pack.packTypeId === args.packTypeId)
+	//			.map(pack =>
+	//				Packs.patch({ packId: pack.packId })
+	//					.set({ packTypeName: args.packTypeName })
+	//					.commit()
+	//			),
+	//	])
+	//	.go();
+	//
+	//if (result.canceled) {
+	//	console.log('canceled');
+	//	throw new ServerError('The packtype name update was canceled.');
+	//}
+	//
+	//return result.data;
 };
