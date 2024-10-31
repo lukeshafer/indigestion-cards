@@ -50,7 +50,7 @@ const alerts = output?.error
 	? createAlerts({
 			type: 'error',
 			message: output.error,
-	  })
+		})
 	: undefined;
 
 const currentUser = Astro.locals.session?.properties?.userId;
