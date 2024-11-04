@@ -117,7 +117,6 @@ export function sortCardsByName(order: 'asc' | 'desc') {
 
 export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
-	// eslint-disable-next-line @typescript-eslint/ban-types
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
 }) {
@@ -216,6 +215,12 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 	trade.offeredCards.forEach(c =>
 		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
 	);
+  trade.requestedPacks?.forEach(p => 
+		params.append(reverse ? 'offeredPacks' : 'requestedPacks', p.packId)
+  )
+  trade.offeredPacks?.forEach(p => 
+		params.append(reverse ? 'requestedPacks' : 'offeredPacks', p.packId)
+  )
 
 	return routes.TRADES + '/new?' + params.toString();
 }
