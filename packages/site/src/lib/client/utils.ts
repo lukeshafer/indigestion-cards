@@ -107,13 +107,19 @@ export function getSortInfo(sortType: SortType): SortInfo {
 		}
 	}
 }
-
-export function sortCardsByName(order: 'asc' | 'desc') {
-	return (a: CardType, b: CardType) =>
+type CardInstanceForSorting =
+	| Pick<CardInstance, 'cardName' | 'totalOfType' | 'cardNumber'>
+	| Pick<CardDesign, 'cardName' | 'bestRarityFound'>;
+export const sortCardsByName =
+	(order: 'asc' | 'desc') => (a: CardInstanceForSorting, b: CardInstanceForSorting) =>
 		a.cardName.localeCompare(b.cardName) ||
-		a.totalOfType - b.totalOfType ||
-		+a.cardNumber - +b.cardNumber * (order === 'asc' ? 1 : -1);
-}
+		getTotalOfTypeForSorting(a) - getTotalOfTypeForSorting(b) ||
+		getCardNumberForSorting(a) - getCardNumberForSorting(b) * (order === 'asc' ? 1 : -1);
+
+const getTotalOfTypeForSorting = (card: CardInstanceForSorting): number =>
+	'totalOfType' in card ? card.totalOfType : (card.bestRarityFound?.count ?? 0);
+const getCardNumberForSorting = (card: CardInstanceForSorting): number =>
+	'cardNumber' in card ? card.cardNumber : 0;
 
 export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
@@ -215,17 +221,17 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 	trade.offeredCards.forEach(c =>
 		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
 	);
-  trade.requestedPacks?.forEach(p => 
+	trade.requestedPacks?.forEach(p =>
 		params.append(reverse ? 'offeredPacks' : 'requestedPacks', p.packId)
-  )
-  trade.offeredPacks?.forEach(p => 
+	);
+	trade.offeredPacks?.forEach(p =>
 		params.append(reverse ? 'requestedPacks' : 'offeredPacks', p.packId)
-  )
+	);
 
 	return routes.TRADES + '/new?' + params.toString();
 }
 
-export function getCardSearcher<T extends CardType>(cards: T[]) {
+export function getCardSearcher<T extends CardDesign | CardInstance>(cards: T[]) {
 	const fuse = new Fuse(cards, {
 		keys: [
 			{

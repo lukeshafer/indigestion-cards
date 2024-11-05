@@ -1,11 +1,11 @@
 import { For, Show, type JSXElement } from 'solid-js';
-import type { CardType } from '@site/lib/client/utils';
+//import type { CardType } from '@site/lib/client/utils';
 
-export function CardList(props: {
-	cards: Array<CardType>;
+export function CardList<T extends CardDesign | CardInstance>(props: {
+	cards: Array<T>;
 	showUsernames?: boolean;
 	isUserPage?: boolean;
-	children: (card: CardType, index: () => number) => JSXElement;
+	children: (card: T, index: () => number) => JSXElement;
 }): JSXElement {
 	return (
 		<ul
@@ -98,8 +98,7 @@ export function CardListFilter(props: {
 												name="seasonId"
 												value={seasonId}
 												checked={props.ssrFilters?.seasonIds.has(seasonId)}
-												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 											/>
 											{seasonName}
 										</label>
@@ -118,8 +117,7 @@ export function CardListFilter(props: {
 									name="minterId"
 									value={PAGE_USER}
 									checked={props.ssrFilters?.minterId.has(PAGE_USER)}
-									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 								/>
 								Minted
 							</label>
@@ -129,8 +127,7 @@ export function CardListFilter(props: {
 									name="minterId"
 									value={OTHER_USER}
 									checked={props.ssrFilters?.minterId.has(OTHER_USER)}
-									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-                          rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
 								/>
 								Traded
 							</label>
@@ -151,7 +148,10 @@ function syncFormDataWithUrlSearchParams(formData: FormData) {
 	window.history.replaceState({}, '', url.toString());
 }
 
-export function filterCards(cards: Array<CardType>, filters: Filters) {
+export function filterCards<T extends Pick<CardInstance, 'minterId' | 'userId' | 'seasonId'>>(
+	cards: Array<T>,
+	filters: Filters
+): Array<T> {
 	// console.log('filtering cards', { cards, filters });
 	if (Object.values(filters).every(f => f.size === 0)) return cards;
 
@@ -170,8 +170,7 @@ export function filterCards(cards: Array<CardType>, filters: Filters) {
 	});
 }
 
-function checkCardHasValidSeason(card: CardType, seasons: Set<string>) {
-	// console.log(card.seasonId, seasons);
+function checkCardHasValidSeason(card: Pick<CardInstance, 'seasonId'>, seasons: Set<string>) {
 	for (const seasonId of seasons) {
 		if (card.seasonId === seasonId) return true;
 		else continue;
@@ -179,7 +178,10 @@ function checkCardHasValidSeason(card: CardType, seasons: Set<string>) {
 	return false;
 }
 
-function checkCardHasValidMinterId(card: CardType, minterId: Set<MinterIdValue>) {
+function checkCardHasValidMinterId(
+	card: Pick<CardInstance, 'minterId' | 'userId'>,
+	minterId: Set<MinterIdValue>
+) {
 	if (minterId.has(PAGE_USER) && card.minterId === card.userId) {
 		return true;
 	} else if (minterId.has(OTHER_USER) && card.minterId !== card.userId) {
@@ -252,7 +254,7 @@ export function CardListLoader(props: { load: () => Promise<any>; children?: str
 import { TextInput } from '../form/Form';
 
 export function CardListSearch(props: { setSearchText: (text: string) => void }) {
-	let timeout: NodeJS.Timeout
+	let timeout: NodeJS.Timeout;
 
 	return (
 		<TextInput
@@ -264,20 +266,20 @@ export function CardListSearch(props: { setSearchText: (text: string) => void })
 				if (timeout) {
 					clearTimeout(timeout);
 				}
-        timeout = setTimeout(props.setSearchText, 200, text)
+				timeout = setTimeout(props.setSearchText, 200, text);
 			}}
 		/>
 	);
 }
 
-
-// SORT 
+// SORT
 import {
 	useViewTransition,
 	type SortType,
 	sortTypes as validSortTypes,
 } from '@site/lib/client/utils';
 import { Select } from '../form/Form';
+import type { CardDesign, CardInstance } from '@core/types';
 
 export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 	sortTypes: T | 'all';
@@ -298,5 +300,3 @@ export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 		/>
 	);
 }
-
-
