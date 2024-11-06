@@ -23,4 +23,7 @@ export default defineConfig({
 			exclude: ['sst'],
 		},
 	},
+  redirects:{
+    '/admin/open-packs': '/open-packs',
+  }
 });

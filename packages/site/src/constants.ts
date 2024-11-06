@@ -99,11 +99,11 @@ export const routes = {
 	INSTANCES: '/card',
 	CARDS: '/card',
 	TRADES: '/trades',
+  OPEN_PACKS: '/open-packs',
 	ADMIN: {
 		LOGIN: '/admin',
 		GIVE_CARD: '/admin/give-card',
 		GIVE_PACK: '/admin/give-pack',
-		OPEN_PACKS: '/admin/open-packs',
 		SITE_CONFIG: '/admin/site-config',
 		CREATE: {
 			ADMIN: '/admin/create/admin',

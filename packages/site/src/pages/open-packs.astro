@@ -1,6 +1,6 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import OpenPacksComponent from '@site/components/open-packs/OpenPacks';
+import OpenPacksPage from '@site/components/open-packs/OpenPacks';
 import { getAllPacks } from '@core/lib/pack';
 import Header from '@site/components/Header.astro';
 import { Config } from 'sst/node/config';
@@ -15,7 +15,7 @@ const startCardScale = Astro.cookies.get('openPacksScale')?.value;
 ---
 
 <Page title="Open Packs" hide-breadcrumbs wide no-header>
-	<OpenPacksComponent
+	<OpenPacksPage
 		packs={packs}
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
@@ -23,5 +23,5 @@ const startCardScale = Astro.cookies.get('openPacksScale')?.value;
     adminSecret={Config.AdminImageSecret}
 		client:only="solid-js">
 		<Header />
-	</OpenPacksComponent>
+	</OpenPacksPage>
 </Page>

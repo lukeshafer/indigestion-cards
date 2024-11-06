@@ -309,6 +309,7 @@ function mergeStoredListWithCurrentList(
 ): Array<PackEntityWithStatus> {
 	const remainingPacks = Array.from(currentPacks);
 	const mergedPacks: Array<PackEntityWithStatus> = [];
+
 	for (const savedPackId of storedPacks) {
 		const index = remainingPacks.findIndex(p => p.packId === savedPackId);
 		if (index < 0) continue;
