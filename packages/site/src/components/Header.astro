@@ -80,32 +80,3 @@ const logos = {
 		<UserConfig client:load {disableAnimations} user={twitchData} />
 	</header>
 </div>
-
-<style>
-	.toggle-btn {
-		display: none;
-		--color: black;
-		--open-color: white;
-		--spacing: 0.3em;
-		--thickness: 3px;
-		--size: 1rem;
-		--width: 1.2em;
-		--text-value: calc(255 - 255 * var(--isClosed));
-		padding-left: 1rem;
-		color: rgb(var(--text-value), var(--text-value), var(--text-value));
-		z-index: 1;
-		background: transparent;
-		font-weight: 900;
-		transition:
-			transform 0.3s ease-in-out,
-			color 0.3s ease-in-out;
-		align-self: center;
-	}
-
-	@media (max-width: 768px) {
-		.toggle-btn {
-			display: block;
-			transform: translateX(calc(var(--isClosed) * 100%));
-		}
-	}
-</style>

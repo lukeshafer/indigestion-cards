@@ -1,6 +1,23 @@
 import type { TradeCard, TradePack } from '@core/types';
 import { For, Show, type Component } from 'solid-js';
-import Card from '../cards/Card';
+import {
+	Card,
+	CardDescription,
+	CardName,
+	CardNumber,
+	checkIfCanShowCardText,
+	checkIsFullArt,
+	checkIsLegacyCard,
+	checkIsShitPack,
+	formatCardNumber,
+	FULL_ART_BACKGROUND_CSS,
+	getCardImageUrl,
+	getShitStampPath,
+	GlowOnHover,
+	ShineMouseEffect,
+	ShitStamp,
+	TiltEffectWrapper,
+} from '../cards/Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
 import { PackListItem } from './PackTradeList';
@@ -19,29 +36,25 @@ export default function OfferWindow(props: {
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-card-' + card.instanceId }}>
-						<a href={`${routes.INSTANCES}/${card.designId}/${card.instanceId}`}>
-							<Card {...card} />
-						</a>
-						<Show when={props.setCards}>
-							<DeleteItemButton
-								title="Remove Card"
-								onClick={() => {
-									props.setCards?.(
-										produce(draft => {
-											let index = draft.findIndex(
+						<OfferWindowCard card={card} />
+						<DeleteItemButton
+							title="Remove Card"
+							onClick={() =>
+								props.setCards?.(
+									produce(draft => {
+										let index = draft.findIndex(
+											c => c.instanceId === card.instanceId
+										);
+										while (index !== -1) {
+											draft.splice(index, 1);
+											index = draft.findIndex(
 												c => c.instanceId === card.instanceId
 											);
-											while (index !== -1) {
-												draft.splice(index, 1);
-												index = draft.findIndex(
-													c => c.instanceId === card.instanceId
-												);
-											}
-										})
-									);
-								}}
-							/>
-						</Show>
+										}
+									})
+								)
+							}
+						/>
 					</li>
 				)}
 			</For>
@@ -78,6 +91,39 @@ export default function OfferWindow(props: {
 	);
 }
 
+const OfferWindowCard: Component<{ card: TradeCard }> = props => (
+		<a
+			href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}
+			class="group">
+			<TiltEffectWrapper angleMultiplier={0.5}>
+				<GlowOnHover color={props.card.rarityColor} />
+				<Card
+					lazy={false}
+					alt={props.card.cardName}
+					imgSrc={getCardImageUrl(props.card)}
+					viewTransitionName={`card-${props.card.instanceId}`}
+					background={
+						checkIsFullArt(props.card.rarityId)
+							? FULL_ART_BACKGROUND_CSS
+							: props.card.rarityColor
+					}>
+					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+						<CardName>{props.card.cardName}</CardName>
+						<CardDescription>{props.card.cardDescription}</CardDescription>
+					</Show>
+					<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+						<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+							{formatCardNumber(props.card)}
+						</CardNumber>
+					</Show>
+					<Show when={checkIsShitPack(props.card.stamps)}>
+						<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+					</Show>
+				</Card>
+				<ShineMouseEffect />
+			</TiltEffectWrapper>
+		</a>
+);
 const DeleteItemButton: Component<{
 	title: string;
 	onClick: () => void;

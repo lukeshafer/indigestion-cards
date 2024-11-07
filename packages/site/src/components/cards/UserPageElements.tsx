@@ -25,9 +25,12 @@ import {
 	FullAnimatedCardEffect,
 	getCardImageUrl,
 	getShitStampPath,
+	GlowOnHover,
+	ShineMouseEffect,
 	ShitStamp,
+	TiltEffectWrapper,
 } from './Card';
-import type { CardInstance } from '@core/types';
+import type { CardInstance, User } from '@core/types';
 
 export default function UserCardList(props: {
 	initialCards: CardInstance[];
@@ -114,7 +117,7 @@ const UserCardListItem: Component<{
 }> = props => (
 	<a
 		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
-		class="outline-brand-main group">
+		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 		<FullAnimatedCardEffect
 			glowColor={checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor}>
 			<Card
@@ -181,3 +184,46 @@ async function queryCards(opts: {
 	opts.setNextCursor(result.cursor);
 	return result.data;
 }
+
+export const UserPinnedCard: Component<{
+	card: NonNullable<User['pinnedCard']>;
+	username: string;
+}> = props => {
+	return (
+		<div class="ml-auto">
+			<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
+			<a
+				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
+				class="outline-brand-main group inline-block">
+				<TiltEffectWrapper>
+					<GlowOnHover focusOnly color={props.card.rarityColor} />
+					<Card
+						lazy={false}
+						alt={props.card.cardName}
+						imgSrc={getCardImageUrl(props.card)}
+						viewTransitionName={`card-${props.card.instanceId}`}
+						background={
+							checkIsFullArt(props.card.rarityId)
+								? FULL_ART_BACKGROUND_CSS
+								: props.card.rarityColor
+						}>
+						<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+							<CardName>{props.card.cardName}</CardName>
+							<CardDescription>{props.card.cardName}</CardDescription>
+						</Show>
+						<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+							<CardNumber
+								color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+								{formatCardNumber(props.card)}
+							</CardNumber>
+						</Show>
+						<Show when={checkIsShitPack(props.card.stamps)}>
+							<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+						</Show>
+					</Card>
+					<ShineMouseEffect />
+				</TiltEffectWrapper>
+			</a>
+		</div>
+	);
+};

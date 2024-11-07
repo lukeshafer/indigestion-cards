@@ -1,5 +1,5 @@
 ---
-import UserCardList from '@site/components/cards/UserCardList';
+import UserCardList, { UserPinnedCard } from '@site/components/cards/UserPageElements';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
@@ -8,7 +8,6 @@ import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
 import UserLookingFor from '@site/components/user/UserLookingFor';
-import Card from '@site/components/cards/Card';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
 
@@ -92,22 +91,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 		</section>
 		{
 			pinnedCard && pinnedCard.instanceId ? (
-				<div class="ml-auto">
-					<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
-					<a
-						transition:name={
-							pinnedCard.designId === 'lilindheart'
-								? 'lilindheart-hero-card'
-								: pinnedCard.designId === 'lilindcult'
-									? 'lilindcult-hero-card'
-									: pinnedCard.designId === 'ryan-of-the-wild'
-										? 'ryan-of-the-wild-hero-card'
-										: undefined
-						}
-						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
-						<Card {...pinnedCard} scale="var(--card-scale)" client:load />
-					</a>
-				</div>
+				<UserPinnedCard card={pinnedCard} username={user.username} client:load />
 			) : null
 		}
 	</header>

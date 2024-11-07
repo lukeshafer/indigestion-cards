@@ -111,7 +111,9 @@ const DesignInstancesCardListItem: Component<{
 	lazy: boolean;
 }> = props => (
 	<div class="w-min">
-		<a href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}>
+		<a
+			href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}
+			class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 			<FullAnimatedCardEffect glowColor={props.card.rarityColor}>
 				<Card
 					lazy={props.lazy}

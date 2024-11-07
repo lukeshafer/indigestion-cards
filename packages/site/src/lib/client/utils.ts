@@ -275,3 +275,10 @@ export function transformPackTypeName(name: string): string {
 
 	return name;
 }
+
+export function checkAreAnimationsDisabled(): boolean {
+	return (
+		window.localStorage.getItem('disableAnimations') === 'true' ||
+		document.body.classList.contains('disable-animations')
+	);
+}

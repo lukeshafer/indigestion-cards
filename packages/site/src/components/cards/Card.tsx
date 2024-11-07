@@ -5,6 +5,7 @@ import type { CardInstance } from '@core/types';
 import { type JSX, Show, type Component, type ParentComponent, type FlowComponent } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { Dynamic } from 'solid-js/web';
+import { checkAreAnimationsDisabled } from '@site/lib/client/utils';
 
 interface Props extends Partial<CardInstance> {
 	rarityName: string;
@@ -243,6 +244,18 @@ export const ShitStamp: Component<{
 	);
 };
 
+export const CardLinkWrapper: ParentComponent<{
+	href: string;
+	title?: string;
+}> = props => (
+	<a
+		href={props.href}
+		title={props.title}
+		class="outline-brand-main group inline-block transition-transform focus-within:-translate-y-2 hover:-translate-y-2">
+		{props.children}
+	</a>
+);
+
 export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = props => (
 	<TiltEffectWrapper>
 		<GlowOnHover color={props.glowColor} />
@@ -271,6 +284,10 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number }> = 
 				let lastTime = 0;
 
 				requestAnimationFrame(function animate(t) {
+					if (checkAreAnimationsDisabled()) {
+						return;
+					}
+
 					let dt = t - lastTime;
 					lastTime = t;
 
@@ -315,12 +332,15 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number }> = 
 	);
 };
 
-export const GlowOnHover: Component<{ color?: string }> = props => (
+export const GlowOnHover: Component<{ color?: string; focusOnly?: boolean }> = props => (
 	<div
-		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] [--default-glow-color:theme(colors.brand.main)] group-focus-within:opacity-100 group-hover:opacity-75 dark:[--default-glow-color:theme(colors.brand.light)]"
+		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] group-focus:opacity-100"
+		classList={{
+			'bg-brand-main dark:bg-brand-light': !props.color,
+			'group-hover:opacity-75': props.focusOnly !== true,
+		}}
 		style={{
-			'--glow-color-prop': props.color,
-			background: 'var(--glow-color-prop, var(--default-glow-color))',
+			background: props.color || undefined,
 		}}
 	/>
 );
@@ -336,6 +356,13 @@ export const ShineMouseEffect: Component = () => {
 		<div
 			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-color-dodge transition-opacity group-hover:opacity-100"
 			onMouseMove={e => {
+				if (checkAreAnimationsDisabled()) {
+					e.currentTarget.classList.remove('group-hover:opacity-100');
+					return;
+				} else {
+					e.currentTarget.classList.add('group-hover:opacity-100');
+				}
+
 				const bounds = e.currentTarget.getBoundingClientRect();
 				if (!bounds) return;
 				setState({

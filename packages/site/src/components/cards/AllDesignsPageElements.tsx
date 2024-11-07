@@ -22,14 +22,15 @@ import {
 	checkIfCanShowCardText,
 	CardName,
 	CardDescription,
+	CardLinkWrapper,
 } from './Card';
 import type { CardDesign } from '@core/types';
 
-export default function AllDesignsCardList(props: {
+export const AllDesignsCardList: Component<{
 	initialCards: CardDesign[];
 	rarityRanking?: RarityRankingRecord;
 	initialFilters: Filters;
-}) {
+}> = props => {
 	const [sortOrder, setSortOrder] = createSignal<'asc' | 'desc'>('asc');
 	const [filters, setFilters] = createSignal(props.initialFilters);
 	const [searchText, setSearchText] = createSignal('');
@@ -72,31 +73,30 @@ export default function AllDesignsCardList(props: {
 			</CardList>
 		</div>
 	);
-}
+};
 
 const AllDesignsCardListItem: Component<{
 	card: CardDesign;
 	lazy: boolean;
 }> = props => {
 	const rarityId = () => props.card.bestRarityFound?.rarityId ?? '';
+	const background = () =>
+		checkIsFullArt(rarityId())
+			? FULL_ART_BACKGROUND_CSS
+			: props.card.bestRarityFound?.rarityColor;
 
 	const card = (
-		<FullAnimatedCardEffect>
+		<FullAnimatedCardEffect glowColor={background()}>
 			<Card
 				lazy={props.lazy}
 				scale="var(--card-scale)"
 				alt={props.card.cardName}
 				viewTransitionName={`design-${props.card.designId}`}
-				centerStamp={undefined}
 				imgSrc={getCardImageUrl({
 					designId: props.card.designId,
 					rarityId: rarityId(),
 				})}
-				background={
-					checkIsFullArt(rarityId())
-						? FULL_ART_BACKGROUND_CSS
-						: props.card.bestRarityFound?.rarityColor
-				}>
+				background={background()}>
 				<Show when={checkIfCanShowCardText(rarityId())}>
 					<CardName>{props.card.cardName}</CardName>
 					<CardDescription>{props.card.cardDescription}</CardDescription>
@@ -107,7 +107,9 @@ const AllDesignsCardListItem: Component<{
 
 	return (
 		<Show when={!checkIsSecret(rarityId())} fallback={card}>
-			<a href={`${routes.INSTANCES}/${props.card.designId}`}>{card}</a>
+			<CardLinkWrapper href={`${routes.INSTANCES}/${props.card.designId}`}>
+				{card}
+			</CardLinkWrapper>
 		</Show>
 	);
 };

@@ -12,7 +12,7 @@ export default defineConfig({
 	},
 	output: 'server',
 	adapter: aws({
-		serverRoutes: ['api/*', 'trades/*'],
+		serverRoutes: ['api/*', 'trades/*', '_actions/*'],
 	}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {
@@ -26,8 +26,10 @@ export default defineConfig({
 	redirects: {
 		'/admin/open-packs': '/open-packs',
 		'/card': '/cards',
-		'/card/[...slug]': '/cards/[...slug]',
+		'/card/[designId]': '/cards/[designId]',
+		'/card/[...instanceSlug]': '/cards/[...instanceSlug]',
 		'/user': '/users',
-		'/user/[...slug]': '/users/[...slug]',
+		'/user/[username]': '/users/[username]',
+		'/user/[...userInstanceSlug]': '/users/[...userInstanceSlug]',
 	},
 });
