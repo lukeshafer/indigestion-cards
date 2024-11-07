@@ -15,22 +15,23 @@ import { routes } from '@site/constants';
 import {
 	checkIsSecret,
 	Card,
-	TiltEffect,
+	FullAnimatedCardEffect,
 	getCardImageUrl,
 	checkIsFullArt,
 	FULL_ART_BACKGROUND_CSS,
 	checkIfCanShowCardText,
-	checkIsLegacyCard,
+	CardName,
+	CardDescription,
 } from './Card';
 import type { CardDesign } from '@core/types';
 
 export default function AllDesignsCardList(props: {
 	initialCards: CardDesign[];
 	rarityRanking?: RarityRankingRecord;
-	ssrFilters: Filters;
+	initialFilters: Filters;
 }) {
 	const [sortOrder, setSortOrder] = createSignal<'asc' | 'desc'>('asc');
-	const [filters, setFilters] = createSignal(props.ssrFilters);
+	const [filters, setFilters] = createSignal(props.initialFilters);
 	const [searchText, setSearchText] = createSignal('');
 
 	const seasons = () => parseUniqueSeasons(props.initialCards);
@@ -50,7 +51,7 @@ export default function AllDesignsCardList(props: {
 				<CardListFilter
 					params={{ seasons: seasons() }}
 					setFilters={setFilters}
-					ssrFilters={/*@once*/ props.ssrFilters}
+					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 				<div class="ml-auto flex gap-4">
 					<CardListSearch setSearchText={setSearchText} />
@@ -80,34 +81,32 @@ const AllDesignsCardListItem: Component<{
 	const rarityId = () => props.card.bestRarityFound?.rarityId ?? '';
 
 	const card = (
-		<TiltEffect>
+		<FullAnimatedCardEffect>
 			<Card
 				lazy={props.lazy}
 				scale="var(--card-scale)"
 				alt={props.card.cardName}
-				cardName={checkIfCanShowCardText(rarityId()) && props.card.cardName}
-				cardDescription={checkIfCanShowCardText(rarityId()) && props.card.cardDescription}
-				secret={checkIsSecret(rarityId())}
-				legacy={checkIsLegacyCard(rarityId())}
 				viewTransitionName={`design-${props.card.designId}`}
 				centerStamp={undefined}
-				cardNumberColor={undefined}
-				cardNumberString={undefined}
 				imgSrc={getCardImageUrl({
 					designId: props.card.designId,
 					rarityId: rarityId(),
 				})}
-				backgroundCSS={
+				background={
 					checkIsFullArt(rarityId())
 						? FULL_ART_BACKGROUND_CSS
 						: props.card.bestRarityFound?.rarityColor
-				}
-			/>
-		</TiltEffect>
+				}>
+				<Show when={checkIfCanShowCardText(rarityId())}>
+					<CardName>{props.card.cardName}</CardName>
+					<CardDescription>{props.card.cardDescription}</CardDescription>
+				</Show>
+			</Card>
+		</FullAnimatedCardEffect>
 	);
 
 	return (
-		<Show when={!checkIsSecret('')} fallback={card}>
+		<Show when={!checkIsSecret(rarityId())} fallback={card}>
 			<a href={`${routes.INSTANCES}/${props.card.designId}`}>{card}</a>
 		</Show>
 	);

@@ -2,8 +2,9 @@ import TiltCardEffect from './TiltCardEffect';
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@site/constants';
 import type { CardInstance } from '@core/types';
 
-import { type JSX, Show, type Component, type ParentComponent } from 'solid-js';
+import { type JSX, Show, type Component, type ParentComponent, type FlowComponent } from 'solid-js';
 import { createStore } from 'solid-js/store';
+import { Dynamic } from 'solid-js/web';
 
 interface Props extends Partial<CardInstance> {
 	rarityName: string;
@@ -53,6 +54,10 @@ export function getCardImageUrl(args: {
 	if (args.adminSecret) url.searchParams.set('adminsecret', args.adminSecret);
 
 	return url.toString();
+}
+
+export function formatCardNumber(args: { cardNumber: number; totalOfType: number }): string {
+	return `${args.cardNumber} / ${args.totalOfType}`;
 }
 
 export default function OldCard(
@@ -159,23 +164,17 @@ export type CardComponentProps = {
 	alt: string;
 	lazy: boolean;
 	imgSrc: string;
-	legacy: boolean;
-	secret: boolean;
-	scale: number | string;
-	cardName: string | false;
+	scale?: number | string;
 	centerStamp: JSX.Element | null;
-	cardDescription: string | false;
-	backgroundCSS: string | undefined;
-	cardNumberString: string | undefined;
+	background: string | undefined;
 	viewTransitionName: string | undefined;
-	cardNumberColor: 'black' | 'white' | undefined;
 };
-export const Card: Component<CardComponentProps> = props => (
+export const Card: ParentComponent<CardComponentProps> = props => (
 	<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
 		<article
 			class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left shadow-xl shadow-black/25"
 			style={{
-				background: props.backgroundCSS,
+				background: props.background,
 				'view-transition-name': props.viewTransitionName,
 			}}>
 			<img
@@ -184,40 +183,42 @@ export const Card: Component<CardComponentProps> = props => (
 				loading={props.lazy ? 'lazy' : undefined}
 				class="absolute inset-0"
 			/>
-			<Show when={props.cardName}>
-				{cardName => (
-					<h3 class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
-						{cardName()}
-					</h3>
-				)}
-			</Show>
-			<Show when={props.cardDescription}>
-				{description => (
-					<p
-						style={{
-							'--left': '11.5%',
-							top: '69.420%',
-							left: 'var(--left)',
-							width: 'calc(100% - var(--left) * 2)',
-						}}
-						class="card-description font-heading absolute p-[0.5em] text-[0.85em] font-medium leading-[1.30em] text-black">
-						{description()}
-					</p>
-				)}
-			</Show>
-			<Show when={props.cardNumberString}>
-				<p
-					class="font-display absolute bottom-[0.5em] right-[1em] text-[0.75em] font-bold italic"
-					classList={{
-						'text-black': props.cardNumberColor === 'black' || !props.cardNumberColor,
-						'text-white': props.cardNumberColor === 'white',
-					}}>
-					{props.cardNumberString}
-				</p>
-			</Show>
+			{props.children}
 			{props.centerStamp}
 		</article>
 	</div>
+);
+
+export const CardName: FlowComponent<{ element?: keyof JSX.IntrinsicElements }, string> = props => (
+	<Dynamic
+		component={props.element || 'h3'}
+		class="font-display absolute left-[12%] top-[4.9%] w-[66%] text-[0.9em] font-bold italic text-slate-900">
+		{props.children}
+	</Dynamic>
+);
+
+export const CardDescription: FlowComponent<{}, string> = props => (
+	<p
+		style={{
+			'--left': '11.5%',
+			top: '69.420%',
+			left: 'var(--left)',
+			width: 'calc(100% - var(--left) * 2)',
+		}}
+		class="card-description font-heading absolute p-[0.5em] text-[0.85em] font-medium leading-[1.30em] text-black">
+		{props.children}
+	</p>
+);
+
+export const CardNumber: FlowComponent<{ color?: 'white' | 'black' }, string> = props => (
+	<p
+		class="font-display absolute bottom-[0.5em] right-[1em] text-[0.75em] font-bold italic"
+		classList={{
+			'text-black': props.color === 'black' || !props.color,
+			'text-white': props.color === 'white',
+		}}>
+		{props.children}
+	</p>
 );
 
 export const FULL_ART_BACKGROUND_CSS =
@@ -244,129 +245,128 @@ export const ShitStamp: Component<{
 	);
 };
 
-export const TiltEffect: ParentComponent = props => {
-	const SIZE = 18.75;
+export const FullAnimatedCardEffect: ParentComponent = props => (
+	<TiltEffectWrapper>
+		<GlowOnHover />
+		{props.children}
+		<ShineMouseEffect />
+	</TiltEffectWrapper>
+);
 
-	const [animationState, setAnimationState] = createStore({
-		isVisible: false,
-		canStop: false,
-		mouseX: 0,
-		mouseY: 0,
-		rotateX: 0,
-		rotateY: 0,
-		targetRotateX: 0,
-		targetRotateY: 0,
-		element: null as HTMLDivElement | null,
-		get hue() {
-			return `${animationState.mouseX + animationState.mouseY / 2 + 100}deg`;
-		},
-		get shineOpacity() {
-			return animationState.isVisible
-				? Math.round(
-						Math.max(
-							0.5 - Math.abs(animationState.mouseY + animationState.mouseX) / 400,
-							0
-						) * 100
-					) / 100
-				: 0;
-		},
-		//get tiltMagnitude() {
-		//	return (
-		//		Math.floor(
-		//			Math.sqrt(Math.pow(this.rotateX, 2) + Math.pow(this.rotateY, 2)) * 15000
-		//		) / 100
-		//	);
-		//},
-	});
+export const TiltEffectWrapper: ParentComponent = props => {
+	let canStop = false;
+	let rotateX = 0;
+	let rotateY = 0;
+	let targetRotateX = 0;
+	let targetRotateY = 0;
 
+	let wrapperEl: HTMLDivElement;
 	let rotateEl: HTMLDivElement;
 
-	const startAnimation = () => {
-		setAnimationState('canStop', false);
-		const { kill } = setupAnimationFrame(dt => {
-			const result = tiltEffectAnimationFrame({ ...animationState, dt });
-			rotateEl.style.setProperty(
-				'transform',
-				`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees}deg)`
-			);
-
-			setAnimationState({
-				rotateX: result.rotateX,
-				rotateY: result.rotateY,
-			});
-
-			if (
-				roundTo(result.rotateX, 2) === 0 &&
-				roundTo(result.rotateY, 2) === 0 &&
-				animationState.canStop === true
-			) {
-				kill();
-			}
-		});
-	};
-
 	return (
-		<>
-			<div
-				ref={el => setAnimationState('element', el)}
-				class="shover:-translate-y-2 relative w-fit transition-transform duration-100 ease-out hover:scale-105"
-				style={{
-					'--mouse-x': `${animationState.mouseX}px`,
-					'--mouse-y': `${animationState.mouseY}px`,
-					'--hue': animationState.hue,
-					'--shine-opacity': animationState.shineOpacity,
-					perspective: '900px',
-				}}
-				onMouseEnter={() => {
-					setAnimationState('isVisible', true);
-					startAnimation();
-				}}
-				onMouseLeave={() => {
-					setAnimationState('isVisible', false);
-					setAnimationState({
-						isVisible: false,
-						canStop: true,
-						targetRotateY: 0,
-						targetRotateX: 0,
-					});
-				}}
-				onMouseMove={e => {
-					const bounds = animationState.element?.getBoundingClientRect();
-					if (!bounds) return;
+		<div
+			ref={wrapperEl!}
+			class="group relative w-fit transition-transform duration-100 ease-out"
+			style={{ perspective: '900px' }}
+			onMouseEnter={() => {
+				canStop = false;
+				let lastTime = 0;
 
-					setAnimationState({
-						mouseX: e.x - bounds.x - SIZE * 8,
-						mouseY: e.y - bounds.y - SIZE * 8,
-						targetRotateX: Math.floor((0.5 - (e.x - bounds.x) / bounds.width) * 100),
-						targetRotateY: Math.floor(((e.y - bounds.y) / bounds.height - 0.5) * 100),
+				requestAnimationFrame(function animate(t) {
+					let dt = t - lastTime;
+					lastTime = t;
+
+					const result = tiltEffectAnimationFrame({
+						rotateX,
+						rotateY,
+						targetRotateX,
+						targetRotateY,
+						dt,
 					});
-				}}>
-				<div ref={rotateEl!}>
-					{props.children}
-					<div class="absolute inset-0 h-full w-full overflow-hidden">
-						<div
-							style={{
-								'--y': 'calc(var(--mouse-y) / 2)',
-								'--hue-rotated': 'calc(var(--hue) - 180deg)',
-								height: `${SIZE}em`,
-								width: `${SIZE}em`,
-								opacity: animationState.isVisible ? 0.4 : 0,
-								'background-image':
-									'radial-gradient(circle, hsl(var(--hue) 100 90 / 0.3) 0%, #ffffff00 53%), linear-gradient(-30deg, transparent 40%, hsl(var(--hue-rotated) 100 90 / var(--shine-opacity)) 50%, transparent 60%)',
-							}}
-							class="absolute left-0 top-0 translate-x-[--mouse-x] translate-y-[--y] scale-[3] transition-opacity"></div>
-					</div>
-				</div>
-			</div>
-			{
-				//
-				//<pre>{JSON.stringify(animationState, null, 2)}</pre>
-			}
-		</>
+					rotateEl.style.setProperty(
+						'transform',
+						`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees}deg)`
+					);
+
+					rotateX = result.rotateX;
+					rotateY = result.rotateY;
+
+					if (
+						roundTo(result.rotateX, 1) !== 0 ||
+						roundTo(result.rotateY, 1) !== 0 ||
+						canStop === false
+					) {
+						requestAnimationFrame(animate);
+					}
+				});
+			}}
+			onMouseLeave={() => {
+				canStop = true;
+				targetRotateY = 0;
+				targetRotateX = 0;
+			}}
+			onMouseMove={e => {
+				const bounds = e.currentTarget.getBoundingClientRect();
+				if (!bounds) return;
+
+				targetRotateX = Math.floor((0.5 - (e.x - bounds.x) / bounds.width) * 100);
+				targetRotateY = Math.floor(((e.y - bounds.y) / bounds.height - 0.5) * 100);
+			}}>
+			<div ref={rotateEl!}>{props.children}</div>
+		</div>
 	);
 };
 
-const MAX_MOVE = 10;
+export const GlowOnHover: Component = () => (
+	<div class="absolute inset-0 h-full w-full opacity-0 shadow transition-opacity ease-out [--glow-color:theme(colors.brand.main)] [box-shadow:0_0_5px_5px_var(--glow-color)] group-hover:opacity-75 dark:[--glow-color:theme(colors.brand.light)]" />
+);
+
+const SIZE = 18.75;
+export const ShineMouseEffect: Component = () => {
+	const [state, setState] = createStore({
+		x: 0,
+		y: 0,
+	});
+
+	return (
+		<div
+			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 group-hover:opacity-100"
+			onMouseMove={e => {
+				const bounds = e.currentTarget.getBoundingClientRect();
+				if (!bounds) return;
+				setState({
+					x: e.x - bounds.x - SIZE * 8,
+					y: e.y - bounds.y - SIZE * 8,
+				});
+			}}>
+			<div
+				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-color-dodge transition-opacity"
+				style={{
+					// good mix-blend options: overlay, color-dodge
+					translate: `${state.x}px ${state.y}px`,
+					'--hue': `${state.x + state.y / 2 + 100}deg`,
+					'--hue-rotated': 'calc(var(--hue) - 180deg)',
+					height: `${SIZE}em`,
+					width: `${SIZE}em`,
+					'--shine-opacity': roundTo(
+						Math.max(0.3 - Math.abs(state.x + state.y) / 500, 0.01),
+						2
+					),
+					opacity: 1.0,
+					'background-image': `
+          radial-gradient(circle, ${RADIAL_GRADIENT_COLOR_INNER} 0%, ${RADIAL_GRADIENT_COLOR_OUTER} 13%, transparent 53%), 
+          linear-gradient(-30deg, transparent 35%, ${LINEAR_GRADIENT_COLOR} 50%, transparent 55%)`,
+				}}
+			/>
+		</div>
+	);
+};
+
+const RADIAL_GRADIENT_COLOR_OUTER = `hsl(var(--hue) 90 90 / 0.1)`;
+const RADIAL_GRADIENT_COLOR_INNER = `hsl(100 100 100 / 0.1)`;
+const LINEAR_GRADIENT_COLOR = `hsl(var(--hue-rotated) 50 85 / var(--shine-opacity))`;
+
+const MAX_MOVE = 8;
 function tiltEffectAnimationFrame(args: {
 	targetRotateX: number;
 	targetRotateY: number;
@@ -393,29 +393,9 @@ function tiltEffectAnimationFrame(args: {
 		}
 	}
 
-	let rotateDegrees = Math.max(Math.abs(rotateX) + Math.abs(rotateY)) * 0.1;
+	let rotateDegrees = Math.max(Math.abs(rotateX) + Math.abs(rotateY)) * 0.2;
 	return { rotateX: roundTo(rotateX, 5), rotateY: roundTo(rotateY, 5), rotateDegrees };
 }
-
-type AnimationFrameOutput = { kill: () => void };
-const setupAnimationFrame = (cb: (dt: number, t: number) => void): AnimationFrameOutput => {
-	let lastTime = 0;
-	let killed = false;
-	const animation: FrameRequestCallback = t => {
-		let dt = t - lastTime;
-		lastTime = t;
-		cb(dt, t);
-		if (!killed) {
-			requestAnimationFrame(animation);
-		}
-	};
-
-	requestAnimationFrame(animation);
-
-	return {
-		kill: () => (killed = true),
-	};
-};
 
 function roundTo(input: number, decimals: number) {
 	const multiplyAmount = Math.pow(10, decimals);

@@ -18,6 +18,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 		designs.then(designs => (
 			<AllDesignsCardList
 				client:load
+				initialFilters={filters}
 				initialCards={designs.map(card => ({
 					...card,
 					rarityName: card.bestRarityFound?.rarityName ?? '',
@@ -27,7 +28,6 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 					totalOfType: card.bestRarityFound?.count ?? 1,
 					cardNumber: 1,
 				}))}
-				ssrFilters={filters}
 			/>
 		))
 	}

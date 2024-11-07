@@ -1,12 +1,13 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import Card from '@site/components/cards/Card';
 import { getCardDesignById } from '@core/lib/design';
 import { getCardsByDesignSortedByRarity } from '@core/lib/card';
-import { routes, routeNames, LEGACY_CARD_ID, ASSETS } from '@site/constants';
-import { PageTitle } from '@site/components/text';
-import { Heading } from '@site/components/text';
-import DesignInstancesCardList from '@site/components/cards/DesignInstancesCardList';
+import { routes, routeNames } from '@site/constants';
+import { Heading, PageTitle } from '@site/components/text';
+import {
+	DesignHeaderCard,
+	DesignInstancesCardList,
+} from '@site/components/cards/CardDesignPageElements';
 import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
 
 const designId = Astro.params.designId;
@@ -23,18 +24,7 @@ if (!design) {
 
 const { data: instances, cursor } = await getCardsByDesignSortedByRarity({ designId });
 
-const siteConfig = Astro.locals.siteConfig;
-
-const baseRarity = design.bestRarityFound ||
-	design.rarityDetails?.find(r => r.rarityId === LEGACY_CARD_ID) ||
-	siteConfig?.baseRarity || {
-		rarityId: 'default',
-		rarityName: 'Default',
-		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
-		rarityColor: '#fff',
-	};
-
-const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 ---
 
 <Page
@@ -44,7 +34,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
 	<header class="flex flex-col items-center gap-4">
 		<PageTitle>{design.cardName}</PageTitle>
-		<Card {...design} {...baseRarity} cardNumber={1} totalOfType={1} client:load />
+		<DesignHeaderCard {design} client:load />
 		<section class="mx-auto text-lg">
 			<p>
 				<b>Season:{' '}</b>
@@ -60,10 +50,10 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams)
 		<Heading>Cards Opened</Heading>
 		<DesignInstancesCardList
 			client:load
+			designId={designId}
 			initialCursor={cursor ?? undefined}
 			initialCards={instances}
-			designId={designId}
-      ssrFilters={filters}
+			initialFilters={filters}
 		/>
 	</section>
 </Page>

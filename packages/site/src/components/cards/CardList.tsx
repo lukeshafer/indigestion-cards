@@ -300,3 +300,12 @@ export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 		/>
 	);
 }
+
+export default {
+	List: CardList,
+	Menu: CardListMenu,
+	Filter: CardListFilter,
+	LoadButton: CardListLoader,
+	Search: CardListSearch,
+	SortDropdown: CardListSortDropdown,
+};
