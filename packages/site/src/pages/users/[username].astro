@@ -118,7 +118,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 			username={user.username}
 			initialCursor={cursor ?? undefined}
 			pinnedCardId={pinnedCard?.instanceId}
-			ssrFilters={filters}
+			initialFilters={filters}
 			client:load
 		/>
 	</section>

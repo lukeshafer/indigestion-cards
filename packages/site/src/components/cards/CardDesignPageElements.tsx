@@ -25,6 +25,9 @@ import {
 	checkIsLegacyCard,
 	CardNumber,
 	formatCardNumber,
+	checkIsShitPack,
+	ShitStamp,
+	getShitStampPath,
 } from './Card';
 import type { CardDesign, CardInstance } from '@core/types';
 
@@ -79,7 +82,7 @@ export const DesignInstancesCardList: Component<{
 				</div>
 			</CardList.Menu>
 			<Suspense fallback={<PlaceholderCardList />}>
-				<CardList.List cards={filteredCards() ?? []}>
+				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
 					{(card, index) => (
 						<DesignInstancesCardListItem lazy={index() > 5} card={card} />
 					)}
@@ -107,15 +110,13 @@ const DesignInstancesCardListItem: Component<{
 	card: CardInstance;
 	lazy: boolean;
 }> = props => (
-	<>
+	<div class="w-min">
 		<a href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}>
-			<FullAnimatedCardEffect>
+			<FullAnimatedCardEffect glowColor={props.card.rarityColor}>
 				<Card
 					lazy={props.lazy}
-					scale={0.65}
 					alt={props.card.cardName}
 					imgSrc={getCardImageUrl(props.card)}
-					centerStamp={undefined}
 					viewTransitionName={`card-${props.card.instanceId}`}
 					background={
 						checkIsFullArt(props.card.rarityId)
@@ -131,6 +132,9 @@ const DesignInstancesCardListItem: Component<{
 							{formatCardNumber(props.card)}
 						</CardNumber>
 					</Show>
+					<Show when={checkIsShitPack(props.card.stamps)}>
+						<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+					</Show>
 				</Card>
 			</FullAnimatedCardEffect>
 		</a>
@@ -142,7 +146,7 @@ const DesignInstancesCardListItem: Component<{
 				{props.card.username}
 			</a>
 		</p>
-	</>
+	</div>
 );
 
 async function queryCards(opts: {
@@ -191,7 +195,6 @@ export const DesignHeaderCard: Component<{
 				lazy={false}
 				alt={props.design.cardName}
 				viewTransitionName={`design-${props.design.designId}`}
-				centerStamp={undefined}
 				imgSrc={getCardImageUrl({
 					designId: props.design.designId,
 					rarityId: rarityId(),

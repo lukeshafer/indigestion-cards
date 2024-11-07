@@ -1,23 +1,23 @@
 /** Only routes that are accessible without logging in */
 export const PUBLIC_ROUTES = [
 	'/',
-	'/user',
-	'/user/*',
+	'/users',
+	'/users/*',
 	'/404',
 	'/admin',
 	'/api/get-all-usernames',
 	'/api/search',
 	'/api/auth/*',
 	'/api/user/*',
-	'/card',
-	'/card/*',
+	'/cards',
+	'/cards/*',
 	'/login',
 	'/logout',
 	'/data/usernames',
 	'/trades/*',
 	'/data/*',
-  '/trpc/*',
-  '/trpc',
+	'/trpc/*',
+	'/trpc',
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
@@ -89,39 +89,17 @@ export const authApi = {
 } as const;
 
 export const routes = {
-	USERS: '/user',
-	DESIGNS: '/card',
+	USERS: '/users',
+	DESIGNS: '/cards',
 	SEASONS: '/season',
 	RARITIES: '/rarity',
 	ADMIN_USERS: '/admin-users',
 	PACK_TYPES: '/pack-type',
 	PACKS: '/packs',
-	INSTANCES: '/card',
-	CARDS: '/card',
+	INSTANCES: '/cards',
+	CARDS: '/cards',
 	TRADES: '/trades',
-  OPEN_PACKS: '/open-packs',
-	ADMIN: {
-		LOGIN: '/admin',
-		GIVE_CARD: '/admin/give-card',
-		GIVE_PACK: '/admin/give-pack',
-		SITE_CONFIG: '/admin/site-config',
-		CREATE: {
-			ADMIN: '/admin/create/admin',
-			CARD_DESIGN: '/admin/create/card-design',
-			CARD_DESIGN_DETAILS: '/admin/create/card-design-details',
-			SEASON: '/admin/create/season',
-			RARITY: '/admin/create/rarity',
-			RARITY_DETAILS: '/admin/create/rarity-details',
-			PACK_TYPE: '/admin/create/pack-type',
-		},
-		EDIT: {
-			ADMIN: '/admin/edit/admin',
-			CARD_DESIGN: '/admin/edit/card-design',
-			SEASON: '/admin/edit/season',
-			RARITY: '/admin/edit/rarity',
-			PACK_TYPE: '/admin/edit/pack-type',
-		},
-	},
+	OPEN_PACKS: '/open-packs',
 } as const;
 
 export const routeNames = {
@@ -157,16 +135,16 @@ export const ASSETS = {
 		HIDDEN_CARD: '/assets/cards/hiddencard.png',
 		SHIT_PACK: '/assets/cards/shit_pack_brown.png',
 	},
-  STAMPS: {
-    SHIT: {
-      BRONZE: '/assets/stamps/shit/bronze.png',
-      SILVER: '/assets/stamps/shit/silver.png',
-      GOLD: '/assets/stamps/shit/gold.png',
-      WHITE: '/assets/stamps/shit/white.png',
-      RAINBOW: '/assets/stamps/shit/rainbow.png',
-      PINK: '/assets/stamps/shit/pink.png',
-    }
-  }
+	STAMPS: {
+		SHIT: {
+			BRONZE: '/assets/stamps/shit/bronze.png',
+			SILVER: '/assets/stamps/shit/silver.png',
+			GOLD: '/assets/stamps/shit/gold.png',
+			WHITE: '/assets/stamps/shit/white.png',
+			RAINBOW: '/assets/stamps/shit/rainbow.png',
+			PINK: '/assets/stamps/shit/pink.png',
+		},
+	},
 } as const;
 
 export const AUTH_TOKEN = 'sst_auth_token';

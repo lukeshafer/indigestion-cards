@@ -1,16 +1,38 @@
-import { CardList as CardList, CardListFilter, CardListLoader, CardListSearch, CardListSortDropdown, filterCards, parseUniqueSeasons, type Filters } from './CardList';
-import { type SortInfo, getSortInfo, type CardType } from '@site/lib/client/utils';
-import { Show, Suspense, createResource, createSignal, type Setter } from 'solid-js';
+import { default as CardList, filterCards, parseUniqueSeasons, type Filters } from './CardList';
+import { type SortInfo, getSortInfo } from '@site/lib/client/utils';
+import {
+	Show,
+	Suspense,
+	createResource,
+	createSignal,
+	type Component,
+	type Setter,
+} from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import { CardListMenu } from './CardList';
 import PlaceholderCardList from './PlaceholderCardList';
 import { routes } from '@site/constants';
-import Card from './Card';
+import {
+	Card,
+	CardDescription,
+	CardName,
+	CardNumber,
+	checkIfCanShowCardText,
+	checkIsFullArt,
+	checkIsLegacyCard,
+	checkIsShitPack,
+	formatCardNumber,
+	FULL_ART_BACKGROUND_CSS,
+	FullAnimatedCardEffect,
+	getCardImageUrl,
+	getShitStampPath,
+	ShitStamp,
+} from './Card';
+import type { CardInstance } from '@core/types';
 
 export default function UserCardList(props: {
-	initialCards: CardType[];
+	initialCards: CardInstance[];
 	username: string;
-	ssrFilters: Filters;
+	initialFilters: Filters;
 	initialCursor?: string;
 	pinnedCardId?: string;
 }) {
@@ -19,7 +41,7 @@ export default function UserCardList(props: {
 		by: 'rarity',
 		isReversed: false,
 	});
-	const [filters, setFilters] = createSignal(props.ssrFilters);
+	const [filters, setFilters] = createSignal(props.initialFilters);
 	const [searchText, setSearchText] = createSignal('');
 
 	const [cardsResource, { mutate: mutateCards }] = createResource(
@@ -37,18 +59,18 @@ export default function UserCardList(props: {
 	const filteredCards = () => filterCards(cardsResource() ?? [], filters());
 	return (
 		<div>
-			<CardListMenu>
-				<CardListFilter
+			<CardList.Menu>
+				<CardList.Filter
 					params={{
 						seasons: parseUniqueSeasons(cardsResource.latest),
 						minterId: true,
 					}}
 					setFilters={setFilters}
-					ssrFilters={/*@once*/ props.ssrFilters}
+					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 				<div class="ml-auto flex gap-4">
-					<CardListSearch setSearchText={setSearchText} />
-					<CardListSortDropdown
+					<CardList.Search setSearchText={setSearchText} />
+					<CardList.SortDropdown
 						sortTypes={[
 							'rarest',
 							'common',
@@ -62,17 +84,13 @@ export default function UserCardList(props: {
 						}}
 					/>
 				</div>
-			</CardListMenu>
+			</CardList.Menu>
 			<Suspense fallback={<PlaceholderCardList />}>
-				<CardList cards={filteredCards() ?? []}>
-					{(card, index) => (
-						<a href={`${routes.USERS}/${card.username}/${card.instanceId ?? ''}`}>
-							<Card {...card} lazy={index() > 5} scale="var(--card-scale)" />
-						</a>
-					)}
-				</CardList>
+				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
+					{(card, index) => <UserCardListItem card={card} lazy={index() > 10} />}
+				</CardList.List>
 				<Show when={nextCursor() && !searchText()}>
-					<CardListLoader
+					<CardList.LoadButton
 						load={() =>
 							queryCards({
 								username: props.username,
@@ -83,12 +101,48 @@ export default function UserCardList(props: {
 							}).then(result => mutateCards(cards => [...(cards ?? []), ...result]))
 						}>
 						Load more cards
-					</CardListLoader>
+					</CardList.LoadButton>
 				</Show>
 			</Suspense>
 		</div>
 	);
 }
+
+const UserCardListItem: Component<{
+	card: CardInstance;
+	lazy: boolean;
+}> = props => (
+	<a
+		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
+		class="outline-brand-main group">
+		<FullAnimatedCardEffect
+			glowColor={checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor}>
+			<Card
+				lazy={props.lazy}
+				alt={props.card.cardName}
+				imgSrc={getCardImageUrl(props.card)}
+				viewTransitionName={`card-${props.card.instanceId}`}
+				background={
+					checkIsFullArt(props.card.rarityId)
+						? FULL_ART_BACKGROUND_CSS
+						: props.card.rarityColor
+				}>
+				<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+					<CardName>{props.card.cardName}</CardName>
+					<CardDescription>{props.card.cardName}</CardDescription>
+				</Show>
+				<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+					<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+						{formatCardNumber(props.card)}
+					</CardNumber>
+				</Show>
+				<Show when={checkIsShitPack(props.card.stamps)}>
+					<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+				</Show>
+			</Card>
+		</FullAnimatedCardEffect>
+	</a>
+);
 
 async function queryCards(opts: {
 	sortInfo: SortInfo;
@@ -97,7 +151,7 @@ async function queryCards(opts: {
 	pinnedCardId?: string;
 	setNextCursor: Setter<string | null>;
 	searchText: string;
-}): Promise<Array<CardType>> {
+}): Promise<Array<CardInstance>> {
 	if (opts.searchText.length > 0) {
 		const result = await trpc.userCards.search.query({
 			searchText: opts.searchText,

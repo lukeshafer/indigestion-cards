@@ -165,12 +165,11 @@ export type CardComponentProps = {
 	lazy: boolean;
 	imgSrc: string;
 	scale?: number | string;
-	centerStamp: JSX.Element | null;
 	background: string | undefined;
 	viewTransitionName: string | undefined;
 };
 export const Card: ParentComponent<CardComponentProps> = props => (
-	<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 1})` }}>
+	<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 'var(--card-scale, 1)'})` }}>
 		<article
 			class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left shadow-xl shadow-black/25"
 			style={{
@@ -184,7 +183,6 @@ export const Card: ParentComponent<CardComponentProps> = props => (
 				class="absolute inset-0"
 			/>
 			{props.children}
-			{props.centerStamp}
 		</article>
 	</div>
 );
@@ -245,15 +243,15 @@ export const ShitStamp: Component<{
 	);
 };
 
-export const FullAnimatedCardEffect: ParentComponent = props => (
+export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = props => (
 	<TiltEffectWrapper>
-		<GlowOnHover />
+		<GlowOnHover color={props.glowColor} />
 		{props.children}
 		<ShineMouseEffect />
 	</TiltEffectWrapper>
 );
 
-export const TiltEffectWrapper: ParentComponent = props => {
+export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number }> = props => {
 	let canStop = false;
 	let rotateX = 0;
 	let rotateY = 0;
@@ -285,7 +283,7 @@ export const TiltEffectWrapper: ParentComponent = props => {
 					});
 					rotateEl.style.setProperty(
 						'transform',
-						`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees}deg)`
+						`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
 					);
 
 					rotateX = result.rotateX;
@@ -317,8 +315,14 @@ export const TiltEffectWrapper: ParentComponent = props => {
 	);
 };
 
-export const GlowOnHover: Component = () => (
-	<div class="absolute inset-0 h-full w-full opacity-0 shadow transition-opacity ease-out [--glow-color:theme(colors.brand.main)] [box-shadow:0_0_5px_5px_var(--glow-color)] group-hover:opacity-75 dark:[--glow-color:theme(colors.brand.light)]" />
+export const GlowOnHover: Component<{ color?: string }> = props => (
+	<div
+		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] [--default-glow-color:theme(colors.brand.main)] group-focus-within:opacity-100 group-hover:opacity-75 dark:[--default-glow-color:theme(colors.brand.light)]"
+		style={{
+			'--glow-color-prop': props.color,
+			background: 'var(--glow-color-prop, var(--default-glow-color))',
+		}}
+	/>
 );
 
 const SIZE = 18.75;
@@ -330,7 +334,7 @@ export const ShineMouseEffect: Component = () => {
 
 	return (
 		<div
-			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 group-hover:opacity-100"
+			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-color-dodge transition-opacity group-hover:opacity-100"
 			onMouseMove={e => {
 				const bounds = e.currentTarget.getBoundingClientRect();
 				if (!bounds) return;
@@ -340,7 +344,7 @@ export const ShineMouseEffect: Component = () => {
 				});
 			}}>
 			<div
-				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-color-dodge transition-opacity"
+				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-color-dodge"
 				style={{
 					// good mix-blend options: overlay, color-dodge
 					translate: `${state.x}px ${state.y}px`,

@@ -1,18 +1,17 @@
 import { For, Show, type JSXElement } from 'solid-js';
-//import type { CardType } from '@site/lib/client/utils';
 
 export function CardList<T extends CardDesign | CardInstance>(props: {
 	cards: Array<T>;
-	showUsernames?: boolean;
-	isUserPage?: boolean;
 	children: (card: T, index: () => number) => JSXElement;
+	scale?: number;
 }): JSXElement {
 	return (
 		<ul
-			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
+			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--base-card-scale:0.75] sm:[--base-card-scale:1] md:gap-x-6"
 			style={{
+				'--card-scale': `calc(${props.scale ?? 1} * var(--base-card-scale))`,
 				'grid-template-columns':
-					'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+					'repeat(auto-fit, minmax(auto, calc(var(--card-scale) * 18rem)))',
 			}}>
 			<Show when={props.cards.length > 0} fallback={<p>No cards found</p>}>
 				<For each={props.cards}>
