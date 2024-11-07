@@ -233,7 +233,8 @@ body.disable-animations * {
 	0% {
 		scale: 4;
 		opacity: 0%;
-		filter: blur(6px);
+    transform: translateZ(1000px);
+		filter: blur(4px);
 	}
 	100% {
 		scale: 1;

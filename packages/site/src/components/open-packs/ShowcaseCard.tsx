@@ -1,9 +1,24 @@
-import { createSignal, useContext } from 'solid-js';
+import { createSignal, Show, useContext, type Component } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
 import { API, ASSETS } from '@site/constants';
-import TiltCardEffect from '../cards/TiltCardEffect';
 import CardPreview from '../cards/CardPreview';
-import Card from '../cards/Card';
+import {
+	Card,
+	CardDescription,
+	CardName,
+	CardNumber,
+	checkIfCanShowCardText,
+	checkIsFullArt,
+	checkIsLegacyCard,
+	checkIsShitPack,
+	formatCardNumber,
+	FULL_ART_BACKGROUND_CSS,
+	FullAnimatedCardEffect,
+	getCardImageUrl,
+	getShitStampPath,
+	ShitStamp,
+	TiltEffectWrapper,
+} from '../cards/Card';
 
 export function ShowcaseCard(props: {
 	card: PackEntityWithStatus['cardDetails'][number];
@@ -25,15 +40,17 @@ export function ShowcaseCard(props: {
 			packId: props.packId,
 		}).toString();
 
-		state.isTesting
-			? console.log('Card flipped: ', body)
-			: await fetch(API.OPEN_CARD, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body,
-				});
+		if (state.isTesting) {
+			console.log('Card flipped: ', body);
+		} else {
+			await fetch(API.OPEN_CARD, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body,
+			});
+		}
 	};
 
 	const previewCard = () => {
@@ -58,28 +75,32 @@ export function ShowcaseCard(props: {
 					class="backface-hidden absolute inset-0 h-full w-full cursor-pointer"
 					title="Click to reveal">
 					<div style={{ scale: 1 }} class="origin-top-left">
-						<TiltCardEffect>
-							<img
-								src={ASSETS.CARDS.CARD_BACK}
-								class="w-72"
-								style={{ width: `calc(18rem * ${state.cardScale})` }}
+						<TiltEffectWrapper>
+							<Card
+								scale={state.cardScale}
+								alt=""
+								viewTransitionName={undefined}
+								background={undefined}
+								lazy={false}
+								imgSrc={ASSETS.CARDS.CARD_BACK}
 							/>
-						</TiltCardEffect>
+							<img />
+						</TiltEffectWrapper>
 					</div>
 				</button>
 				<div class="backface-hidden flipped absolute inset-0 h-full w-full">
 					<button class="block origin-top-left" onClick={previewCard}>
 						{isPreviewed() ? (
 							<CardPreview close={closePreview}>
-								<Card
-									{...props.card}
+								<ShowcaseCardLayout
+									card={props.card}
 									scale={state.cardScale * 1.5}
 									adminSecret={state.adminSecret}
 								/>
 							</CardPreview>
 						) : (
-							<Card
-								{...props.card}
+							<ShowcaseCardLayout
+								card={props.card}
 								scale={state.cardScale}
 								adminSecret={state.adminSecret}
 							/>
@@ -90,3 +111,54 @@ export function ShowcaseCard(props: {
 		</li>
 	);
 }
+
+const ShowcaseCardLayout: Component<{
+	card: PackEntityWithStatus['cardDetails'][number];
+	scale: number;
+	adminSecret: string;
+}> = props => {
+	return (
+		<FullAnimatedCardEffect
+			glowColor={checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor}>
+			<Card
+				scale={props.scale}
+				alt={props.card.cardName}
+				lazy={false}
+				viewTransitionName={`card-${props.card.instanceId}`}
+				background={
+					checkIsFullArt(props.card.rarityId)
+						? FULL_ART_BACKGROUND_CSS
+						: props.card.rarityColor
+				}
+				imgSrc={getCardImageUrl({
+					adminSecret: props.adminSecret,
+					designId: props.card.designId,
+					rarityId: props.card.rarityId,
+				})}>
+				<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+					<CardName>{props.card.cardName}</CardName>
+					<CardDescription>{props.card.cardDescription}</CardDescription>
+				</Show>
+				<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+					<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+						{formatCardNumber(props.card)}
+					</CardNumber>
+				</Show>
+				<Show when={checkIsShitPack(props.card.stamps)}>
+					<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+					<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+						<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+							{formatCardNumber(props.card)}
+						</CardNumber>
+					</Show>
+					<Show when={checkIsShitPack(props.card.stamps)}>
+						<ShitStamp
+							src={getShitStampPath(props.card.rarityId)}
+							animation={props.card.stamps?.includes('new-stamp') ? 'slam' : 'none'}
+						/>
+					</Show>
+				</Show>
+			</Card>
+		</FullAnimatedCardEffect>
+	);
+};

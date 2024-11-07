@@ -68,27 +68,21 @@ export default function UserConfig(props: {
 		<div class="relative z-10">
 			<UserConfigButton
 				user={props.user}
-				onClick={() => setIsOpen((v) => !v)}
+				onClick={() => setIsOpen(v => !v)}
 				open={isOpen()}
 			/>
 			<Show when={isOpen()}>
 				<menu
 					class="bg-brand-100 dark:bg-brand-dark absolute right-0 mt-4 flex w-max flex-col items-end gap-3 rounded-md px-4 py-2 text-gray-800 shadow-md shadow-black/20 dark:text-gray-100"
-					ref={(el) => clickOutside(el, () => setIsOpen(false))}>
-					{props.user ? (
-						<a
-							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
-							href={`/user/${props.user.login.toLowerCase()}`}>
-							{props.user.display_name}
-						</a>
-					) : (
+					ref={el => clickOutside(el, () => setIsOpen(false))}>
+					<Show when={!props.user}>
 						<a
 							class="font-display pt-2 text-center font-bold underline"
 							href={authApi.LOGIN}
 							data-astro-reload>
 							Login with Twitch
 						</a>
-					)}
+					</Show>
 					<ul class="flex w-max flex-col items-end gap-1">
 						<button
 							class="flex items-center gap-4 font-medium before:flex before:h-4 before:w-4 before:items-center before:justify-center before:border before:border-gray-600 dark:before:border-gray-200"
@@ -98,7 +92,7 @@ export default function UserConfig(props: {
 							}}
 							aria-pressed={disableAnimations()}
 							onClick={() => {
-								setDisableAnimations((v) => !v);
+								setDisableAnimations(v => !v);
 							}}>
 							Disable Animations
 						</button>
@@ -110,7 +104,7 @@ export default function UserConfig(props: {
 							}}
 							aria-pressed={colorTheme() === 'dark'}
 							onClick={() => {
-								setColorTheme((v) => (v === 'dark' ? 'light' : 'dark'));
+								setColorTheme(v => (v === 'dark' ? 'light' : 'dark'));
 							}}>
 							Dark Mode
 						</button>

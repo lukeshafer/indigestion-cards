@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import type { TwitchUser } from '@core/lib/twitch';
 import UserIcon from './icons/UserIcon';
-import { authApi } from '@site/constants';
+import { authApi, routes } from '@site/constants';
 
 export default function UserConfig(props: {
 	disableAnimations?: boolean;
@@ -80,7 +80,7 @@ export default function UserConfig(props: {
 					{props.user ? (
 						<a
 							class="font-display pt-2 text-center font-bold italic text-gray-900 hover:underline dark:text-gray-50"
-							href={`/user/${props.user.login.toLowerCase()}`}>
+							href={`${routes.USERS}/${props.user.login.toLowerCase()}`}>
 							{props.user.display_name}
 						</a>
 					) : (
