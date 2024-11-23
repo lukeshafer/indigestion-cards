@@ -1,25 +1,30 @@
 ---
 import Page from '@site/layouts/Page.astro';
 import { getAllPreorders } from '@core/lib/preorder';
+import { getAllUsers } from '@core/lib/user';
 import { routeNames } from '@site/constants';
 import { PageHeader, PageTitle } from '@site/components/text';
-import UsersTable from '@site/components/user/UsersTable.astro';
+import { UsersList } from '@site/components/user/UsersList';
 
-import { GET as getUsers } from '@site/pages/data/users';
+import { getUserByLogin } from '@core/lib/twitch';
 
-const users = getUsers();
+const users = await getAllUsers();
 const preorders = getAllPreorders();
+
+const userListData = await Promise.all(
+	users.map(async user => ({
+		user: user,
+		twitch: await getUserByLogin(user.username),
+		preorders: (await preorders).filter(p => p.userId === user.userId),
+	}))
+);
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
 	<PageHeader>
 		<PageTitle>Users</PageTitle>
 	</PageHeader>
-	<div class="mx-auto max-w-2xl">
-		{
-			Promise.all([users, preorders]).then(([{ data: users }, preorders]) => (
-				<UsersTable {users} {preorders} />
-			))
-		}
+	<div class="mx-auto">
+		<UsersList users={userListData} client:load />
 	</div>
 </Page>

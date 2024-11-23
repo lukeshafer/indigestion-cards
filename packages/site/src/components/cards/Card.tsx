@@ -41,6 +41,17 @@ export function formatCardNumber(args: { cardNumber: number; totalOfType: number
 	return `${args.cardNumber} / ${args.totalOfType}`;
 }
 
+export const cardUtils = {
+	checkIsFullArt,
+	checkIsLegacyCard,
+	checkIsSecret,
+	checkIfCanShowCardText,
+	checkIsShitPack,
+	getShitStampPath,
+	getCardImageUrl,
+	formatCardNumber,
+};
+
 export type CardComponentProps = {
 	alt: string;
 	lazy: boolean;
@@ -278,6 +289,19 @@ export const ShineMouseEffect: Component = () => {
 			/>
 		</div>
 	);
+};
+
+export const CardEls = {
+	Card,
+	CardName,
+	CardDescription,
+	CardNumber,
+	ShitStamp,
+	CardLinkWrapper,
+	FullAnimatedCardEffect,
+	TiltEffectWrapper,
+	GlowOnHover,
+	ShineMouseEffect,
 };
 
 const RADIAL_GRADIENT_COLOR_OUTER = `hsl(var(--hue) 90 90 / 0.1)`;

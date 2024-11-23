@@ -63,6 +63,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 		<img
 			alt={`${user.username}'s profile`}
 			src={twitchData?.profile_image_url}
+      transition:name={`profile-pic-${user.username}`}
 			width="150"
 			height="150"
 			class="col-start-1 row-span-full h-fit rounded-full"
