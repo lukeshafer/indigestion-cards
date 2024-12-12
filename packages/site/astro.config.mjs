@@ -12,7 +12,7 @@ export default defineConfig({
 	},
 	output: 'server',
 	adapter: aws({
-		serverRoutes: ['api/*', 'trades/*'],
+		serverRoutes: ['api/*', 'trades/*', '_actions/*'],
 	}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {
