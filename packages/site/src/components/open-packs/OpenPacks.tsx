@@ -307,15 +307,20 @@ function mergeStoredListWithCurrentList(
 	currentPacks: Array<PackEntityWithStatus>,
 	storedPacks: Array<string>
 ): Array<PackEntityWithStatus> {
-	const remainingPacks = Array.from(currentPacks);
+	const remainingPacks = Array.from(currentPacks); // copy array for mutation
 	const mergedPacks: Array<PackEntityWithStatus> = [];
+	const lockedPacks: Array<PackEntityWithStatus> = [];
 	for (const savedPackId of storedPacks) {
 		const index = remainingPacks.findIndex(p => p.packId === savedPackId);
 		if (index < 0) continue;
 
 		const [pack] = remainingPacks.splice(index, 1);
-		mergedPacks.push(pack);
+		if (pack.isLocked) {
+			lockedPacks.push(pack);
+		} else {
+			mergedPacks.push(pack);
+		}
 	}
 
-	return mergedPacks.concat(remainingPacks);
+	return mergedPacks.concat(remainingPacks).concat(lockedPacks);
 }

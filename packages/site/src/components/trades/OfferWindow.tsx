@@ -3,8 +3,8 @@ import { For, Show, type Component } from 'solid-js';
 import Card from '../cards/Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
-import { PackListItem } from './PackTradeList';
 import { transformPackTypeName } from '@site/lib/client/utils';
+import { Pack } from '../pack/Pack';
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];
@@ -50,7 +50,7 @@ export default function OfferWindow(props: {
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-pack-' + pack.packId }}>
-						<PackListItem name={transformPackTypeName(pack.packTypeName)} />
+						<Pack name={transformPackTypeName(pack.packTypeName)} />
 						<Show when={props.setPacks}>
 							<DeleteItemButton
 								title="Remove Pack"

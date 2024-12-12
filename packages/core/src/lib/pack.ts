@@ -317,6 +317,12 @@ export async function batchUpdatePackUsername(args: { oldUsername: string; newUs
 	).go();
 }
 
-export function generatePackId(opts: { userId: string; prefix?: string }) {
+export function generatePackId(opts: { userId: string; prefix?: string }): string {
 	return `${opts.prefix || ''}pack-${opts.userId}-${Date.now()}`;
+}
+
+export async function lockPack(opts: { packId: string }): Promise<void> {
+	await db.entities.Packs.patch({ packId: opts.packId })
+		.set({ isLocked: true })
+		.go();
 }

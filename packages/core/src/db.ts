@@ -412,6 +412,7 @@ const Packs = new Entity(
 			seasonId: { type: 'string' },
 			username: { type: 'string' },
 			userId: { type: 'string' },
+			isLocked: { type: 'boolean' },
 			event: {
 				type: 'map',
 				properties: {

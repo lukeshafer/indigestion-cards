@@ -171,7 +171,9 @@ export async function getOutgoingTradesByUserId(senderUserId: string) {
 }
 
 export async function getIncomingTradesByUserId(receiverUserId: string) {
-	const result = await db.entities.Trades.query.byReceiverId({ receiverUserId }).go({ pages: 'all' });
+	const result = await db.entities.Trades.query
+		.byReceiverId({ receiverUserId })
+		.go({ pages: 'all' });
 	return result.data;
 }
 
@@ -495,7 +497,7 @@ export async function processTrade(trade: Trade) {
 				),
 				...offeredPacksMoveToReceiver.flatMap(({ pack, cards }) => [
 					Packs.patch({ packId: pack.packId })
-						.set({ username: pack.username, userId: pack.userId })
+						.set({ username: pack.username, userId: pack.userId, isLocked: false })
 						.commit(),
 					...cards.map(card =>
 						CardInstances.patch({
@@ -513,7 +515,7 @@ export async function processTrade(trade: Trade) {
 				]),
 				...requestedPacksMoveToSender.flatMap(({ pack, cards }) => [
 					Packs.patch({ packId: pack.packId })
-						.set({ username: pack.username, userId: pack.userId })
+						.set({ username: pack.username, userId: pack.userId, isLocked: false })
 						.commit(),
 					...cards.map(card =>
 						CardInstances.patch({
