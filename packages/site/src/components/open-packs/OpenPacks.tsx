@@ -8,7 +8,7 @@ import {
 	type Resource,
 	untrack,
 } from 'solid-js';
-import { createStore, produce, type SetStoreFunction } from 'solid-js/store';
+import { createStore, produce, reconcile, type SetStoreFunction } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, resolveLocalPath } from '@site/constants';
@@ -76,7 +76,7 @@ export default function OpenPacks(props: Props) {
 		const wsClient = createWSClient({
 			onmessage: {
 				REFRESH_PACKS: () => {
-          console.log("Refreshing packs...")
+					console.log('Refreshing packs...');
 					state.refreshPacks();
 				},
 			},
@@ -163,6 +163,18 @@ function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPa
 					})
 				);
 				setTotalPackCount(val => val - 1);
+			});
+		}
+	});
+
+	createEffect(() => {
+		// If the active pack becomes locked,
+		//  set active pack to null
+		const activePack = state.packs.find(p => p.packId === state.activePack?.packId);
+		if (activePack?.isLocked === true) {
+			console.log('active pack is locked now');
+			untrack(() => {
+				setState('activePack', null);
 			});
 		}
 	});
@@ -284,7 +296,7 @@ function createState(props: Props, chatters: Resource<Chatter[]>) {
 			trpc.packs.all.query().then(packs => {
 				const savedPackOrder = getSavedPackOrderFromStorage();
 				const merged = mergeStoredListWithCurrentList(packs, savedPackOrder);
-				setState('packs', merged);
+				setState('packs', reconcile(merged));
 			});
 		},
 	});

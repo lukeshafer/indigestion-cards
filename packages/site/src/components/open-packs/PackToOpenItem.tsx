@@ -46,9 +46,8 @@ export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatu
 					'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-2':
 						!isLocked(),
 					'bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-200': isActive(),
-					'opacity-75': !isOnline() && !isActive(),
-					'opacity-50': isDragging(),
-					'opacity-25': isLocked(),
+					'opacity-75': !isOnline() && !isActive() && !isLocked() && !isDragging(),
+					'opacity-25': isDragging() || isLocked(),
 				}}
 				style={{
 					'transform-origin': 'center left',
