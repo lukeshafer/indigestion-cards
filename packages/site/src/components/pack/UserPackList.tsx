@@ -16,7 +16,7 @@ export default function UserPackList(props: {
 					'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 			}}>
 			<For each={props.packs}>
-				{pack => <PackListItem pack={pack} canChangeLock={props.isLoggedInUser} />}
+				{pack => <PackListItem pack={pack} canChangeLock={false} />}
 			</For>
 		</ul>
 	);
