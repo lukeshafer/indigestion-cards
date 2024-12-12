@@ -56,7 +56,7 @@ export default function OpenPacks(props: Props) {
 		const savedActivePack = state.packs.find(
 			pack => pack.packId === window.localStorage.getItem('activePackId')
 		);
-		if (savedActivePack) state.setActivePack(savedActivePack);
+		if (savedActivePack && !savedActivePack.isLocked) state.setActivePack(savedActivePack);
 
 		const savedPackOrder = getSavedPackOrderFromStorage();
 		const sortedList = mergeStoredListWithCurrentList(state.packs, savedPackOrder);
