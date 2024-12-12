@@ -9,6 +9,6 @@
     //"noUnusedParameters": true,
     "strict": true,
     "module": "esnext",
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "bundler"
   }
 }

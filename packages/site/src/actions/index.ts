@@ -1,4 +1,4 @@
-import { getPackById, setPackIsLocked } from '@core/lib/pack';
+import { getPackById, sendPacksUpdatedEvent, setPackIsLocked } from '@core/lib/pack';
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 
@@ -36,6 +36,8 @@ export const server = {
 					console.error(err);
 					throw err;
 				});
+
+				await sendPacksUpdatedEvent();
 			},
 		}),
 	},

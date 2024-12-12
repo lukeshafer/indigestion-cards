@@ -76,6 +76,7 @@ export default function OpenPacks(props: Props) {
 		const wsClient = createWSClient({
 			onmessage: {
 				REFRESH_PACKS: () => {
+          console.log("Refreshing packs...")
 					state.refreshPacks();
 				},
 			},
