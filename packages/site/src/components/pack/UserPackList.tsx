@@ -1,9 +1,13 @@
 import type { PackCardsHidden } from '@core/types';
-import { createSignal, For, Show, type Component } from 'solid-js';
+import { createEffect, createSignal, For, Show, type Component } from 'solid-js';
 import { Pack } from './Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
+import { actions } from 'astro:actions';
 
-export default function UserPackList(props: { packs: Array<PackCardsHidden> }) {
+export default function UserPackList(props: {
+	packs: Array<PackCardsHidden>;
+	isLoggedInUser: boolean;
+}) {
 	return (
 		<ul
 			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
@@ -11,30 +15,48 @@ export default function UserPackList(props: { packs: Array<PackCardsHidden> }) {
 				'grid-template-columns':
 					'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 			}}>
-			<For each={props.packs}>{pack => <PackListItem pack={pack} />}</For>
+			<For each={props.packs}>
+				{pack => <PackListItem pack={pack} canChangeLock={props.isLoggedInUser} />}
+			</For>
 		</ul>
 	);
 }
 
-const PackListItem: Component<{ pack: PackCardsHidden }> = props => {
-	//const [isLocked, setIsLocked] = createSignal(props.pack.isLocked || false);
+const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }> = props => {
+	const [isLocked, setIsLocked] = createSignal(props.pack.isLocked || false);
 
 	return (
 		<li class="relative w-fit">
 			<Pack name={transformPackTypeName(props.pack.packTypeName)} />
-			{
-				/*uncomment someday*/
-				//<Show when={isLocked()}>
-				//  <div class="absolute inset-0 bg-black/50">
-				//    <p class="my-14">
-				//      <span class="block text-xl">Locked.</span>Cannot be opened.
-				//    </p>
-				//  </div>
-				//</Show>
-				//  <div class="absolute left-2 top-7">
-				//    <LockButton isLocked={isLocked()} onClick={() => setIsLocked(value => !value)} />
-				//      </div>
-			}
+
+			<Show when={isLocked()}>
+				<div class="absolute inset-0 bg-black/50">
+					<p class="my-14">
+						<span class="block text-xl">Locked.</span>Cannot be opened.
+					</p>
+				</div>
+			</Show>
+			<Show when={props.canChangeLock}>
+				<div class="absolute left-2 top-7">
+					<LockButton
+						isLocked={isLocked()}
+						onClick={() => {
+							let newValue = !isLocked();
+							actions.packs
+								.setIsLocked({
+									packId: props.pack.packId,
+									isLocked: newValue,
+								})
+								.then(val => {
+									if (val.error) {
+										setIsLocked(!newValue);
+									}
+								});
+							setIsLocked(newValue);
+						}}
+					/>
+				</div>
+			</Show>
 		</li>
 	);
 };

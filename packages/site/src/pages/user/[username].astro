@@ -118,7 +118,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 		packs.length > 0 && (
 			<section class="my-4 grid gap-4 text-center">
 				<Heading>Packs</Heading>
-				<UserPackList {packs} client:load />
+    <UserPackList {packs} {isLoggedInUser} client:load />
 			</section>
 		)
 	}

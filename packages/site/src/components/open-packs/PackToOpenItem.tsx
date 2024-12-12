@@ -1,5 +1,6 @@
-import { createSignal, createUniqueId, useContext } from 'solid-js';
+import { createSignal, createUniqueId, Show, useContext } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
+import LockIcon from '../icons/LockIcon';
 
 export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatus }) {
 	const state = useContext(OpenPacksContext);
@@ -39,22 +40,33 @@ export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatu
 			}}>
 			<button
 				title={isOnline() ? 'Online' : 'Offline'}
-				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 hover:bg-gray-300 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+        disabled={isLocked()}
+				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 dark:text-gray-300"
 				classList={{
+					'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-2':
+						!isLocked(),
 					'bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-200': isActive(),
 					'opacity-75': !isOnline() && !isActive(),
 					'opacity-50': isDragging(),
+					'opacity-25': isLocked(),
 				}}
 				style={{
 					'transform-origin': 'center left',
 				}}
 				onClick={() => (isLocked() ? null : state.setActivePack(props.pack))}>
 				<span
-					class="mb-1 mr-2 inline-block h-2 w-2 rounded-full"
+					class="mb-1 mr-2 inline-block h-2 w-2"
 					classList={{
+						'rounded-full': !isLocked(),
 						'bg-brand-main': !isLocked() && isOnline(),
 						'': !isOnline(),
-					}}></span>
+					}}>
+					<Show when={isLocked()}>
+						<div class="mx-auto">
+							<LockIcon />
+						</div>
+					</Show>
+				</span>
 				{props.pack.username}
 			</button>
 		</li>
