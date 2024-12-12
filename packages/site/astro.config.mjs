@@ -12,7 +12,6 @@ export default defineConfig({
 	},
 	output: 'server',
 	adapter: aws({
-    responseMode: 'stream',
 		serverRoutes: ['api/*', 'trades/*', '_actions/*'],
 	}),
 	integrations: [tailwind(), solid(), icon()],

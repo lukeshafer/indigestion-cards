@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, type Component } from 'solid-js';
+import { createMemo, createSignal, For } from 'solid-js';
 import { Select } from '../form/Form';
 import { produce } from 'solid-js/store';
 import { transformPackTypeName } from '@site/lib/client/utils';
@@ -10,6 +10,7 @@ import {
 } from './TradeInventoryList';
 import type { TradePackUi } from './NewTrade';
 import type { TradePack } from '@core/types';
+import { Pack } from '../pack/Pack';
 
 export default function PackTradeList(props: {
 	label: string;
@@ -55,7 +56,7 @@ export default function PackTradeList(props: {
 									})
 								)
 							}>
-							<PackListItem name={transformPackTypeName(pack.packTypeName)} small />
+							<Pack name={transformPackTypeName(pack.packTypeName)} scale={0.5} />
 						</TradeInventoryItemCheckbox>
 					)}
 				</For>
@@ -63,28 +64,6 @@ export default function PackTradeList(props: {
 		</TradeInventoryDetails>
 	);
 }
-
-export const PackListItem: Component<{
-	name: string;
-	small?: boolean;
-}> = props => (
-	<div
-		class="border-brand-main/50 bg-brand-main/25 card-aspect-ratio relative flex flex-col justify-center border px-[2.5em] py-[1.5em] text-center"
-		style={{
-			width: '18em',
-			'font-size': props.small ? '0.5rem' : 'default',
-		}}>
-		<p class="font-display absolute bottom-0 right-0 whitespace-break-spaces p-[0.5em] font-bold lowercase italic leading-[0.7em]">
-			Indigestion
-		</p>
-		<p class="self-center whitespace-break-spaces text-center">
-      <span class="text-[2em] font-bold">{props.name}</span>
-      {
-        <span class="block leading-[0.5em]">pack</span>
-      }
-		</p>
-	</div>
-);
 
 type SortType = 'oldest' | 'newest';
 function sortPacks(packs: Array<TradePackUi>, sortType: SortType): Array<TradePackUi> {
