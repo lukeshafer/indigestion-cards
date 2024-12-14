@@ -1,4 +1,11 @@
-import { For, type JSX, type ParentProps, Show, createSignal } from 'solid-js';
+import {
+	For,
+	type JSX,
+	type ParentComponent,
+	type ParentProps,
+	Show,
+	createSignal,
+} from 'solid-js';
 import { setAlerts } from '@site/lib/client/state';
 import { ASSETS } from '@site/constants';
 import { useViewTransition } from '@site/lib/client/utils';
@@ -414,15 +421,23 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 	);
 }
 
-const BUTTON_CLASS =
-	/* tw */ 'text-outline dark:text-outline-dark font-heading block w-fit rounded-2xl px-3 py-[0.3rem] font-bold uppercase text-white transition-colors';
+const BrandButtonWrapper: ParentComponent<{ color?: 'default' | 'red' }> = props => (
+	<div
+		class="font-heading block w-fit px-2 py-[0.3rem] text-center text-sm rounded font-semibold dark:font-bold transition-colors hover:brightness-75"
+		classList={{
+			'bg-brand-light dark:bg-brand-dark text-brand-950 dark:text-brand-100':
+				props.color === 'default' || !props.color,
+			'bg-red-300 dark:bg-red-800 text-red-900 dark:text-red-100':
+				props.color === 'red',
+		}}>
+		{props.children}
+	</div>
+);
 
 export function Anchor(props: { children: string; href: string }) {
 	return (
-		<a
-			href={props.href}
-			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark text-center outline outline-gray-200 dark:outline-gray-800`}>
-			{props.children}
+		<a href={props.href}>
+			<BrandButtonWrapper>{props.children}</BrandButtonWrapper>
 		</a>
 	);
 }
@@ -441,15 +456,15 @@ export function SubmitButton(props: {
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
+			class="group"
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
-			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}
 				props.onClick?.();
 			}}>
-			{props.children ?? 'Submit'}
+			<BrandButtonWrapper>{props.children ?? 'Submit'}</BrandButtonWrapper>
 		</button>
 	);
 }
@@ -458,14 +473,14 @@ export function DeleteButton(props: { children?: string; onClick?: () => void; c
 	return (
 		<button
 			type="submit"
-			class={`${BUTTON_CLASS} bg-red-400 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-800`}
+			class="group"
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}
 				props.onClick?.();
 			}}>
-			{props.children ?? 'Delete'}
+			<BrandButtonWrapper color="red">{props.children ?? 'Delete'}</BrandButtonWrapper>
 		</button>
 	);
 }

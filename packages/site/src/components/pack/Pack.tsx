@@ -8,7 +8,7 @@ export const Pack: Component<{
 		class="border-brand-main/50 bg-brand-main/25 card-aspect-ratio relative flex flex-col justify-center border px-[2.5em] py-[1.5em] text-center"
 		style={{
 			width: '18em',
-			'font-size': `${props.scale ?? 1}rem`,
+			'font-size': `calc(${props.scale ?? 1}rem * var(--card-scale))`,
 		}}>
 		<p class="font-display absolute bottom-0 right-0 whitespace-break-spaces p-[0.5em] font-bold lowercase italic leading-[0.7em]">
 			Indigestion

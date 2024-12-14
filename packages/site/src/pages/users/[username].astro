@@ -1,6 +1,9 @@
 ---
-import UserCardList, { UserPinnedCard } from '@site/components/cards/UserPageElements';
-import UserPackList from '@site/components/pack/UserPackList';
+import {
+	UserCardList,
+	UserPinnedCard,
+	UserPackList,
+} from '@site/components/cards/UserPageElements';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
