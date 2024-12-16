@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import type { TradeCard, CardInstance } from '@core/types';
+import type { TradeCard, CardInstance, PackCardsHidden, TradePack } from '@core/types';
 import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
 import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
 import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@site/constants';
@@ -9,30 +9,41 @@ import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import { navigate } from 'astro:transitions/client';
+import { trpc } from '@site/lib/client/trpc';
+import PackTradeList from './PackTradeList';
 
 type TradeState = {
 	offeredCards: TradeCard[];
 	requestedCards: TradeCard[];
+	offeredPacks: TradePack[];
+	requestedPacks: TradePack[];
 	receiverUsername: string | null;
 	form: HTMLFormElement | null;
 	formDataParams: URLSearchParams | undefined;
 };
 
 export type TradeCardUi = CardInstance & { checked: boolean };
+export type TradePackUi = PackCardsHidden & { checked: boolean };
 
 export default function NewTrade(props: {
 	userId: string;
 	username: string;
 	cardInstances: CardInstance[];
+	packs: PackCardsHidden[];
 	initialOfferedCards?: CardInstance[];
+	initialOfferedPacks?: PackCardsHidden[];
 	initialRequestedCards?: CardInstance[];
+	initialRequestedPacks?: PackCardsHidden[];
 	initialReceiverUsername?: string;
 	initialReceiverCards?: CardInstance[];
+	initialReceiverPacks?: PackCardsHidden[];
 	rarityRanking?: RarityRankingRecord;
 }) {
 	const [state, setState] = createStore<TradeState>({
 		offeredCards: props.initialOfferedCards ?? [],
+		offeredPacks: props.initialOfferedPacks ?? [],
 		requestedCards: props.initialRequestedCards ?? [],
+		requestedPacks: props.initialRequestedPacks ?? [],
 		receiverUsername: props.initialReceiverUsername ?? null,
 		form: null,
 		get formDataParams() {
@@ -41,9 +52,15 @@ export default function NewTrade(props: {
 			const formData = new FormData(form);
 			formData.delete('offeredCards');
 			formData.delete('requestedCards');
+			formData.delete('offeredPacks');
+			formData.delete('requestedPacks');
 			state.offeredCards.forEach(card => formData.append('offeredCards', card.instanceId));
 			state.requestedCards.forEach(card =>
 				formData.append('requestedCards', card.instanceId)
+			);
+			state.offeredPacks.forEach(pack => formData.append('offeredPacks', pack.packId));
+			state.requestedPacks.forEach(pack =>
+				formData.append('requestedPacks', pack.packId)
 			);
 
 			// @ts-expect-error - there are no files in this form
@@ -63,7 +80,10 @@ export default function NewTrade(props: {
 		on(
 			() => state.receiverUsername,
 			() => {
-				if (!state.receiverUsername) setState('requestedCards', []);
+				if (!state.receiverUsername) {
+					setState('requestedPacks', []);
+					setState('requestedCards', []);
+				}
 			}
 		)
 	);
@@ -83,6 +103,15 @@ export default function NewTrade(props: {
 		}
 	);
 
+	const [receiverPacks] = createResource(
+		() => state.receiverUsername,
+		receiverUsername => trpc.packs.byUser.query({ username: receiverUsername }),
+		{
+			initialValue: props.initialReceiverPacks ?? [],
+			ssrLoadFrom: 'initial',
+		}
+	);
+
 	const receiverCardsUi = () =>
 		receiverCards()
 			.map(card => ({
@@ -97,6 +126,14 @@ export default function NewTrade(props: {
 				card => card.openedAt && !UNTRADEABLE_RARITY_IDS.includes(card.rarityId)
 			) satisfies TradeCardUi[];
 
+	const receiverPacksUi = () =>
+		receiverPacks().map(pack => ({
+			...pack,
+			get checked() {
+				return state.requestedPacks.some(requested => requested.packId === pack.packId);
+			},
+		}));
+
 	const yourCards = () =>
 		props.cardInstances
 			.map(card => ({
@@ -110,6 +147,14 @@ export default function NewTrade(props: {
 			.filter(
 				card => card.openedAt && !UNTRADEABLE_RARITY_IDS.includes(card.rarityId)
 			) satisfies TradeCardUi[];
+
+	const yourPacks = () =>
+		props.packs.map(pack => ({
+			...pack,
+			get checked() {
+				return state.offeredPacks.some(requested => requested.packId === pack.packId);
+			},
+		}));
 
 	updateUrlFromState(state);
 
@@ -152,6 +197,8 @@ export default function NewTrade(props: {
 						<OfferWindow
 							cards={state.offeredCards}
 							setCards={setter => setState('offeredCards', setter)}
+							packs={state.offeredPacks}
+							setPacks={setter => setState('offeredPacks', setter)}
 						/>
 						<CardSearchList
 							type="offer"
@@ -160,6 +207,14 @@ export default function NewTrade(props: {
 							setCards={setter => setState('offeredCards', setter)}
 							rarityRanking={props.rarityRanking}
 						/>
+						<Show when={yourPacks().length}>
+							<PackTradeList
+								type="offer"
+								label="Your Packs"
+								packs={yourPacks()}
+								setPacks={setter => setState('offeredPacks', setter)}
+							/>
+						</Show>
 					</Section>
 					<Section heading="Request">
 						<Username>
@@ -224,6 +279,8 @@ export default function NewTrade(props: {
 						<OfferWindow
 							cards={state.requestedCards}
 							setCards={setter => setState('requestedCards', setter)}
+							packs={state.requestedPacks}
+							setPacks={setter => setState('requestedPacks', setter)}
 						/>
 						<Show when={state.receiverUsername !== null}>
 							<Suspense
@@ -239,6 +296,14 @@ export default function NewTrade(props: {
 									setCards={setter => setState('requestedCards', setter)}
 									rarityRanking={props.rarityRanking}
 								/>
+								<Show when={receiverPacksUi().length}>
+									<PackTradeList
+										type="request"
+										label={`${state.receiverUsername}'s packs`}
+										packs={receiverPacksUi()}
+										setPacks={setter => setState('requestedPacks', setter)}
+									/>
+								</Show>
 							</Suspense>
 						</Show>
 					</Section>
@@ -263,6 +328,8 @@ const updateUrlFromState = (state: TradeState) => {
 			[
 				() => state.offeredCards.length,
 				() => state.requestedCards.length,
+				() => state.offeredPacks.length,
+				() => state.requestedPacks.length,
 				() => state.receiverUsername,
 			],
 			() => {

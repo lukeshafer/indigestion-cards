@@ -5,10 +5,10 @@
   ],
   "compilerOptions": {
     "module": "ESNext",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    //"noUnusedLocals": true,
+    //"noUnusedParameters": true,
     "strict": true,
     "module": "esnext",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   }
 }

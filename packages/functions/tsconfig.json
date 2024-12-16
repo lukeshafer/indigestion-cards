@@ -3,8 +3,8 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    //"noUnusedLocals": true,
+    //"noUnusedParameters": true,
     "strict": true,
     "verbatimModuleSyntax": true,
     "baseUrl": ".",

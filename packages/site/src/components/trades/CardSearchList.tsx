@@ -3,9 +3,15 @@ import { createMemo, createSignal, For } from 'solid-js';
 import type { TradeCard } from '@core/types';
 import { Select, TextInput } from '../form/Form';
 import { produce } from 'solid-js/store';
-import CardCheckbox from './CardCheckbox';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import { sortCards, sortTypes, type SortType, getCardSearcher } from '@site/lib/client/utils';
+import {
+	TradeInventoryDetails,
+	TradeInventoryItemCheckbox,
+	TradeInventoryList,
+	TradeInventoryStickyHeading,
+} from './TradeInventoryList';
+import Card from '../cards/Card';
 
 export default function CardSearchList(props: {
 	label: string;
@@ -27,45 +33,51 @@ export default function CardSearchList(props: {
 	};
 
 	return (
-		<details class="bg-brand-100 dark:bg-brand-950 scrollbar-narrow scrollbar-brand m-4 max-h-screen overflow-y-scroll">
-			<summary class="bg-brand-100 dark:bg-brand-950 sticky top-0 z-10 h-14 p-4 text-lg">
-				{props.label}
-			</summary>
-			<div class="bg-brand-100 dark:bg-brand-950 border-b-brand-main sticky top-14 z-10 border-b p-4 pt-0">
+		<TradeInventoryDetails summary={props.label}>
+			<TradeInventoryStickyHeading>
 				<Select
 					name="sort"
 					label="Sort by"
-					setValue={(val) => setSort(val)}
+					setValue={val => setSort(val)}
 					options={Array.from(sortTypes)}
 				/>
 				<TextInput label="Search" name="search" setValue={setSearchText} />
-			</div>
-			<ul class="flex flex-wrap justify-center gap-4 py-4">
+			</TradeInventoryStickyHeading>
+			<TradeInventoryList>
 				<For each={searchResults()}>
-					{(card) => (
-						<CardCheckbox
-							type={props.type}
-							card={card}
-							addCard={() => props.setCards(produce((draft) => draft.push(card)))}
-							removeCard={() =>
+					{card => (
+						<TradeInventoryItemCheckbox
+							checked={card.checked}
+							value={card.instanceId}
+							name={`${props.type}edCards`}
+							onSelect={() => props.setCards(produce(draft => draft.push(card)))}
+							onDeselect={() =>
 								props.setCards(
-									produce((draft) => {
+									produce(draft => {
 										let index = draft.findIndex(
-											(c) => c.instanceId === card.instanceId
+											c => c.instanceId === card.instanceId
 										);
 										while (index !== -1) {
 											draft.splice(index, 1);
 											index = draft.findIndex(
-												(c) => c.instanceId === card.instanceId
+												c => c.instanceId === card.instanceId
 											);
 										}
 									})
 								)
-							}
-						/>
+							}>
+							<div class="flex w-40 flex-col items-center text-center">
+								<Card {...card} scale={0.5} />
+								<p class="whitespace-break-spaces font-bold">{card.cardName}</p>
+								<p>{card.rarityName}</p>
+								<p>
+									{card.cardNumber} / {card.totalOfType}
+								</p>
+							</div>
+						</TradeInventoryItemCheckbox>
 					)}
 				</For>
-			</ul>
-		</details>
+			</TradeInventoryList>
+		</TradeInventoryDetails>
 	);
 }

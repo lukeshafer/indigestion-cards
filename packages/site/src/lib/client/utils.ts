@@ -5,7 +5,6 @@ import { z } from 'astro/zod';
 import Fuse from 'fuse.js';
 
 export const useViewTransition = (cb: () => unknown) =>
-	// @ts-expect-error - startViewTransition is not on Document yet
 	document.startViewTransition ? document.startViewTransition(cb) : cb();
 
 export type CardProps = Partial<CardInstance> &
@@ -118,7 +117,6 @@ export function sortCardsByName(order: 'asc' | 'desc') {
 
 export function sortCards<T extends CardListItem>(args: {
 	cards: T[];
-	// eslint-disable-next-line @typescript-eslint/ban-types
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
 }) {
@@ -217,6 +215,12 @@ export function formatTradeLink(trade: Trade, reverse = false): string {
 	trade.offeredCards.forEach(c =>
 		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
 	);
+  trade.requestedPacks?.forEach(p => 
+		params.append(reverse ? 'offeredPacks' : 'requestedPacks', p.packId)
+  )
+  trade.offeredPacks?.forEach(p => 
+		params.append(reverse ? 'requestedPacks' : 'offeredPacks', p.packId)
+  )
 
 	return routes.TRADES + '/new?' + params.toString();
 }
@@ -252,4 +256,16 @@ export function getCardSearcher<T extends CardType>(cards: T[]) {
 	});
 
 	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
+}
+
+export function transformPackTypeName(name: string): string {
+	const regex = /season(\d*)default/i;
+	const result = name.match(regex);
+	const number = result?.[1];
+
+	if (number) {
+		return `Season ${number}`;
+	}
+
+	return name;
 }

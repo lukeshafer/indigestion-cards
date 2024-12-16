@@ -6,7 +6,8 @@ import { ASSETS, routes } from '@site/constants';
 import { getUserByLogin } from '@core/lib/twitch';
 import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
-import TotalPackCount from './pack/TotalPackCount';
+import { getAllPacks } from '@core/lib/pack';
+import ButtonCount from './ButtonCount';
 
 export interface Props {
 	logo?: keyof typeof logos;
@@ -24,6 +25,10 @@ const canSeeTradesLink =
 	siteConfig.tradingIsEnabled;
 
 const twitchData = username ? await getUserByLogin(username) : undefined;
+const packCount: number = 
+  Astro.locals.session?.type === 'admin' 
+    ? await getAllPacks().then(p => p.length)
+    : 0;
 
 const logos = {
 	default: ASSETS.LOGO,
@@ -44,8 +49,8 @@ const logos = {
 					width="192"
 				/>
 				<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
-					<span class="text-brand-main mt-1 text-2xl lowercase italic">Indigestion</span>
-					<span class="-mt-2 text-lg lowercase text-gray-700 dark:text-gray-200"
+          <span class="text-brand-main contrast-100 hover:contrast-200 transition-all ease-in-out duration-1000 mt-1 text-2xl lowercase italic shadow-brand-main/0 drop-shadow-[0_0px_5px_#EF6EDA00] hover:drop-shadow-[0_0px_5px_#EF6EDA88]">Indigestion</span>
+					<span class="-mt-2 text-lg lowercase text-gray-700 dark:text-gray-200 contrast-100 duration-500 hover:contrast-200 transition-all"
 						>Cards</span
 					>
 				</div>
@@ -54,7 +59,7 @@ const logos = {
 				Astro.locals.session?.type === 'admin' ? (
 					<HeaderLink href={routes.ADMIN.OPEN_PACKS} title="Open Packs">
 						Open Packs
-						<TotalPackCount client:only="solid-js" />
+            <ButtonCount>{packCount}</ButtonCount>
 					</HeaderLink>
 				) : null
 			}
@@ -62,7 +67,11 @@ const logos = {
 			<HeaderLink href={routes.USERS} title="Users">Users</HeaderLink>
 			<Show when={canSeeTradesLink}>
 				<HeaderLink href={routes.TRADES} title="Trades">
-					<TradeNotificationCount username={username!} transition:persist client:only="solid-js" />
+					<TradeNotificationCount
+						username={username!}
+						transition:persist
+						client:only="solid-js"
+					/>
 					My Trades
 				</HeaderLink>
 			</Show>

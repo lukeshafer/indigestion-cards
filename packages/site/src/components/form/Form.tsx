@@ -349,13 +349,16 @@ export function FileInput(props: {
   );
 }
 
-export function Select(props: {
+type SelectOptions = ReadonlyArray<{value: string; label: string}>
+type Value<O extends SelectOptions> = O[number]['value']
+
+export function Select<Options extends ReadonlyArray<{value: string; label: string}>>(props: {
   label?: string;
   name: string;
-  value?: string;
+  value?: Value<Options>;
   required?: boolean;
-  setValue?: (value: string) => void;
-  options: { value: string; label: string }[];
+  setValue?: (value: Value<Options>) => void;
+  options: Options
   class?: string;
 }) {
   return (

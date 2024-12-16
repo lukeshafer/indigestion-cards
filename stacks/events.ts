@@ -154,5 +154,10 @@ export function Events({ stack }: StackContext) {
 		bind: [table],
 	});
 
+	eventBus.subscribe('packs.updated', {
+		handler: 'packages/functions/src/event-bridge/packs-updated.handler',
+		bind: [wsApi, wsConnectionsTable],
+	});
+
 	return { eventBus, packQueue };
 }

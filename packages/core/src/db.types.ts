@@ -15,6 +15,7 @@ export type PackType = EntityItem<typeof db.entities.PackTypes>;
 export type CreatePackType = CreateEntityItem<typeof db.entities.PackTypes>;
 
 export type Pack = EntityItem<typeof db.entities.Packs>;
+export type PackCardsHidden = Omit<Pack, 'cardDetails'> & { cardDetails?: undefined };
 
 export type Preorder = EntityItem<typeof db.entities.Preorders>;
 export type CreatePreorder = CreateEntityItem<typeof db.entities.Preorders>;
@@ -34,6 +35,7 @@ export type Trade = EntityItem<typeof db.entities.Trades>;
 export type CreateTrade = CreateEntityItem<typeof db.entities.Trades>;
 export type UpdateTrade = UpdateEntityItem<typeof db.entities.Trades>;
 export type TradeCard = Trade['offeredCards'][number];
+export type TradePack = NonNullable<Trade['offeredPacks']>[number];
 
 export type TwitchEventMessageHistory = EntityItem<typeof db.entities.TwitchEventMessageHistory>;
 

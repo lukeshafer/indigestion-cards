@@ -11,7 +11,11 @@ import {
 	searchDesignCards,
 	searchUserCards,
 } from '@core/lib/card';
-import { getAllPacks } from '@core/lib/pack';
+import {
+	getAllPacks,
+	getPacksByUsername,
+	hidePackCards,
+} from '@core/lib/pack';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -94,6 +98,14 @@ export const appRouter = t.router({
 	},
 	packs: {
 		all: adminProcedure.query(async () => await getAllPacks()),
+		byUser: authedProcedure
+			.input(z.object({ username: z.string() }))
+			.query(
+				async ({ input }) =>
+					await getPacksByUsername({ username: input.username }).then(packs =>
+						packs.map(hidePackCards)
+					)
+			),
 	},
 });
 

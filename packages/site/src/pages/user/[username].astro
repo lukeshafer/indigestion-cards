@@ -1,14 +1,15 @@
 ---
 import UserCardList from '@site/components/cards/UserCardList';
+import UserPackList from '@site/components/pack/UserPackList';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
+import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
 import { getUserByLogin } from '@core/lib/twitch';
 import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
 import { Anchor, Heading } from '@site/components/text';
 import UserLookingFor from '@site/components/user/UserLookingFor';
-import UserMinecraftUsername from '@site/components/user/UserMinecraftUsername';
 import Card from '@site/components/cards/Card';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
@@ -44,6 +45,7 @@ let { data: CardInstances, cursor } =
 		username: id,
 		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
 	})) ?? {};
+let packs = await getPacksByUsername({ username: id }).then(packs => packs.map(hidePackCards));
 
 const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
@@ -78,7 +80,7 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 			<ul>
 				<li>
 					<UserLookingFor {user} {isLoggedInUser} client:load />
-					{isLoggedInUser && <UserMinecraftUsername initialUser={user} client:load />}
+					{/*isLoggedInUser && <UserMinecraftUsername initialUser={user} client:load />*/}
 				</li>
 				{
 					isLoggedInUser || !siteConfig.tradingIsEnabled ? null : (
@@ -112,6 +114,14 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 			) : null
 		}
 	</header>
+	{
+		packs.length > 0 && (
+			<section class="my-4 grid gap-4 text-center">
+				<Heading>Packs</Heading>
+    <UserPackList {packs} {isLoggedInUser} client:load />
+			</section>
+		)
+	}
 	<section class="my-4 grid gap-4 text-center">
 		<Heading>Cards</Heading>
 		<UserCardList
