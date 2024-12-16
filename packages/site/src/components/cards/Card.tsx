@@ -154,7 +154,7 @@ export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = p
 	</TiltEffectWrapper>
 );
 
-export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number }> = props => {
+export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number; transformOrigin?: string }> = props => {
 	let canStop = false;
 	let rotateX = 0;
 	let rotateY = 0;
@@ -217,7 +217,9 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number }> = 
 				targetRotateX = Math.floor((0.5 - (e.x - bounds.x) / bounds.width) * 100);
 				targetRotateY = Math.floor(((e.y - bounds.y) / bounds.height - 0.5) * 100);
 			}}>
-			<div ref={rotateEl!}>{props.children}</div>
+			<div ref={rotateEl!} style={{
+        'transform-origin': props.transformOrigin ?? 'center'
+      }}>{props.children}</div>
 		</div>
 	);
 };

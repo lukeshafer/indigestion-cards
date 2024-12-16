@@ -3,6 +3,7 @@ import {
 	UserCardList,
 	UserPinnedCard,
 	UserPackList,
+	UserIdentitySection,
 } from '@site/components/cards/UserPageElements';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
@@ -65,6 +66,15 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
+	<UserIdentitySection
+		username={user.username}
+		profileImageUrl={twitchData?.profile_image_url ?? ''}
+		pinnedCard={user.pinnedCard}
+		lookingFor={user.lookingFor}
+		isLoggedInUser={isLoggedInUser}
+		client:load
+	/>
+
 	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
 			alt={`${user.username}'s profile`}

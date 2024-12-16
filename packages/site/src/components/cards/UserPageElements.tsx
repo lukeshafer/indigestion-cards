@@ -36,6 +36,160 @@ import type { PackCardsHidden } from '@core/types';
 import { Pack } from '../pack/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import { actions } from 'astro:actions';
+import { SubmitButton } from '../form/Form';
+import EditIcon from '../icons/EditIcon';
+
+export const UserIdentitySection: Component<{
+	username: string;
+	profileImageUrl: string;
+	isLoggedInUser: boolean;
+	lookingFor?: string;
+	pinnedCard?: User['pinnedCard'];
+}> = props => {
+	const IMG_SIZE = 100;
+	return (
+		<div class="w-fit">
+			<section
+				style={{
+					'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)`,
+				}}
+				class="col-start-1 grid w-fit content-center gap-x-4">
+				<img
+					alt={`${props.username}'s profile image`}
+					src={props.profileImageUrl}
+					width={IMG_SIZE}
+					height={IMG_SIZE}
+					class="row-span-2 rounded-full"
+				/>
+				<h1 class="font-display col-start-2 self-end text-2xl italic">{props.username}</h1>
+
+				<Show when={props.lookingFor}>
+					{lookingFor => (
+						<UserLookingFor
+							lookingFor={lookingFor()}
+							isLoggedInUser={props.isLoggedInUser}
+						/>
+					)}
+				</Show>
+			</section>
+
+			<Show when={props.pinnedCard}>
+				{pinnedCard => <UserPinnedCard card={pinnedCard()} username={props.username} />}
+			</Show>
+		</div>
+	);
+};
+
+const UserLookingFor: Component<{
+	lookingFor: string;
+	isLoggedInUser: boolean;
+}> = props => {
+	const [isOpen, setIsOpen] = createSignal(false);
+	return (
+		<p
+			data-open={isOpen()}
+			class="relative col-start-2 grid max-h-32 max-w-80 gap-0 self-start overflow-hidden break-words pb-8 transition-all data-[open=true]:max-h-max">
+			<span class="text-sm font-normal italic opacity-80 flex gap-2">
+				I'm looking for
+				<Show when={props.isLoggedInUser}>
+					<button title="Edit looking for">
+						<EditIcon size={15} />
+					</button>
+				</Show>
+			</span>
+			<span class="block max-w-80 break-words text-lg font-normal leading-5">
+				{props.lookingFor}
+			</span>
+			<Show when={props.lookingFor.length > 40}>
+				<button
+					class="absolute bottom-0 h-8 w-full bg-gray-900/70 bg-gradient-to-t from-gray-900 to-gray-900/0"
+					onClick={() => setIsOpen(v => !v)}>
+					Show {isOpen() ? 'less' : 'more'}
+				</button>
+			</Show>
+		</p>
+	);
+};
+
+export const UserPinnedCard: Component<{
+	card: NonNullable<User['pinnedCard']>;
+	username: string;
+}> = props => {
+	return (
+		<div class="relative w-fit origin-top-left rotate-3 p-12">
+			<a
+				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
+				class="outline-brand-main group inline-block">
+				<TiltEffectWrapper transformOrigin="7rem 1rem" angleMultiplier={0.2}>
+					<GlowOnHover focusOnly color={props.card.rarityColor} />
+					<Card
+						lazy={false}
+						alt={props.card.cardName}
+						imgSrc={getCardImageUrl(props.card)}
+						viewTransitionName={`card-${props.card.instanceId}`}
+						background={
+							checkIsFullArt(props.card.rarityId)
+								? FULL_ART_BACKGROUND_CSS
+								: props.card.rarityColor
+						}>
+						<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+							<CardName>{props.card.cardName}</CardName>
+							<CardDescription>{props.card.cardName}</CardDescription>
+						</Show>
+						<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+							<CardNumber
+								color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+								{formatCardNumber(props.card)}
+							</CardNumber>
+						</Show>
+						<Show when={checkIsShitPack(props.card.stamps)}>
+							<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+						</Show>
+					</Card>
+					<ShineMouseEffect />
+				</TiltEffectWrapper>
+			</a>
+			<div class="absolute left-40 top-4">
+				<Pin />
+			</div>
+		</div>
+	);
+};
+
+const Pin: Component = () => {
+	return (
+		<div class="h-12 w-12 drop-shadow-[-3px_2px_5px_#000f]">
+			<svg
+				class="fill-brand-main dark:fill-brand-main"
+				version="1.1"
+				id="Capa_1"
+				xmlns="http://www.w3.org/2000/svg"
+				width="100%"
+				height="100%"
+				viewBox="0 0 340.001 340.001">
+				<g>
+					<g>
+						<path
+							class="fill-brand-100"
+							d="M2.69,320.439c-3.768,4.305-3.553,10.796,0.494,14.842l1.535,1.536c4.047,4.046,10.537,4.262,14.842,0.493l105.377-92.199
+			l-30.049-30.049L2.69,320.439z"
+						/>
+						<path
+							d="M339.481,119.739c-0.359-1.118-9.269-27.873-50.31-68.912C248.133,9.788,221.377,0.878,220.262,0.52
+			c-3.879-1.244-8.127-0.217-11.008,2.664l-40.963,40.963c-4.242,4.243-4.242,11.125,0,15.369l4.533,4.534L65.086,147.171
+			c-2.473,1.909-4.006,4.79-4.207,7.908c-0.199,3.118,0.953,6.172,3.162,8.381l41.225,41.226l30.051,30.051l41.225,41.226
+			c2.211,2.209,5.266,3.361,8.381,3.161c3.119-0.201,6-1.732,7.91-4.207l83.119-107.738l4.535,4.533
+			c4.239,4.244,11.123,4.244,15.367,0l40.963-40.962C339.698,127.866,340.726,123.618,339.481,119.739z M187.751,109.478
+			l-66.539,56.51c-4.346,3.691-10.75,3.372-14.713-0.589c-0.209-0.209-0.412-0.429-0.607-0.659
+			c-3.883-4.574-3.324-11.434,1.25-15.318l66.537-56.509c4.574-3.886,11.428-3.333,15.318,1.249
+			C192.882,98.735,192.322,105.595,187.751,109.478z"
+						/>
+					</g>
+				</g>
+			</svg>
+		</div>
+	);
+};
 
 export const UserCardList: Component<{
 	initialCards: CardInstance[];
@@ -189,49 +343,6 @@ async function queryCards(opts: {
 	opts.setNextCursor(result.cursor);
 	return result.data;
 }
-
-export const UserPinnedCard: Component<{
-	card: NonNullable<User['pinnedCard']>;
-	username: string;
-}> = props => {
-	return (
-		<div class="ml-auto">
-			<p class="text-center font-semibold uppercase text-gray-400">Pinned</p>
-			<a
-				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
-				class="outline-brand-main group inline-block">
-				<TiltEffectWrapper>
-					<GlowOnHover focusOnly color={props.card.rarityColor} />
-					<Card
-						lazy={false}
-						alt={props.card.cardName}
-						imgSrc={getCardImageUrl(props.card)}
-						viewTransitionName={`card-${props.card.instanceId}`}
-						background={
-							checkIsFullArt(props.card.rarityId)
-								? FULL_ART_BACKGROUND_CSS
-								: props.card.rarityColor
-						}>
-						<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-							<CardName>{props.card.cardName}</CardName>
-							<CardDescription>{props.card.cardName}</CardDescription>
-						</Show>
-						<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-							<CardNumber
-								color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-								{formatCardNumber(props.card)}
-							</CardNumber>
-						</Show>
-						<Show when={checkIsShitPack(props.card.stamps)}>
-							<ShitStamp src={getShitStampPath(props.card.rarityId)} />
-						</Show>
-					</Card>
-					<ShineMouseEffect />
-				</TiltEffectWrapper>
-			</a>
-		</div>
-	);
-};
 
 export const UserPackList: Component<{
 	packs: Array<PackCardsHidden>;
