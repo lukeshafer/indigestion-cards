@@ -18,6 +18,8 @@ export const PUBLIC_ROUTES = [
 	'/data/*',
   '/trpc/*',
   '/trpc',
+  '/_actions',
+  '/_actions/*',
 ] as const;
 
 /** Routes that aren't admin only, but require a user login */
