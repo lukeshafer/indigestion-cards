@@ -50,8 +50,8 @@ export const UserPage: Component<{
 	packs: Array<PackCardsHidden>;
 	cards: Array<CardInstance>;
 	pinnedCard?: User['pinnedCard'];
-  cursor: string | null;
-  initialFilters: Filters;
+	cursor: string | null;
+	initialFilters: Filters;
 }> = props => {
 	return (
 		<div class="flex max-h-[calc(100vh-10rem)]">
@@ -64,25 +64,25 @@ export const UserPage: Component<{
 				isLoggedInUser={props.isLoggedInUser}
 			/>
 
-      <div class="w-full overflow-scroll h-full overflow-x-hidden">
-        <Show when={props.packs.length > 0}>
-          <section class="my-4 grid gap-4 text-center">
-            <Heading>Packs</Heading>
-            <UserPackList packs={props.packs} isLoggedInUser={props.isLoggedInUser} />
-          </section>
-        </Show>
+			<div class="h-full w-full overflow-scroll overflow-x-hidden">
+				<Show when={props.packs.length > 0}>
+					<section class="my-4 grid gap-4 text-center">
+						<Heading>Packs</Heading>
+						<UserPackList packs={props.packs} isLoggedInUser={props.isLoggedInUser} />
+					</section>
+				</Show>
 
-        <section class="my-4 grid gap-4 text-center">
-          <Heading>Cards</Heading>
-          <UserCardList
-            initialCards={props.cards}
-            username={props.user.username}
-            initialCursor={props.cursor ?? undefined}
-            pinnedCardId={props.user.pinnedCard?.instanceId}
-            initialFilters={props.initialFilters}
-          />
-        </section>
-      </div>
+				<section class="my-4 grid gap-4 text-center">
+					<Heading>Cards</Heading>
+					<UserCardList
+						initialCards={props.cards}
+						username={props.user.username}
+						initialCursor={props.cursor ?? undefined}
+						pinnedCardId={props.user.pinnedCard?.instanceId}
+						initialFilters={props.initialFilters}
+					/>
+				</section>
+			</div>
 		</div>
 	);
 };
@@ -470,6 +470,7 @@ export const UserPackList: Component<{
 
 const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }> = props => {
 	const [isLocked, setIsLocked] = createSignal(props.pack.isLocked || false);
+	const [alertText, setAlertText] = createSignal<string | false>(false);
 
 	return (
 		<li class="relative w-fit">
@@ -481,6 +482,11 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 						<span class="block text-xl">Locked.</span>Cannot be opened.
 					</p>
 				</div>
+			</Show>
+			<Show when={alertText()}>
+				{message => (
+					<ErrorAlert text={message()} hide={() => setAlertText(false)}></ErrorAlert>
+				)}
 			</Show>
 			<Show when={props.canChangeLock}>
 				<div class="absolute left-2 top-7">
@@ -495,6 +501,11 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 								})
 								.then(val => {
 									if (val.error) {
+										setAlertText(
+											'An error occurred while ' +
+												(newValue == true ? 'lock' : 'unlock') +
+												'ing the pack.'
+										);
 										setIsLocked(!newValue);
 									}
 								});
@@ -504,6 +515,29 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 				</div>
 			</Show>
 		</li>
+	);
+};
+
+const ErrorAlert: Component<{
+	hide: () => void;
+	text: string;
+}> = props => {
+	const DURATION = 3000;
+	return (
+		<p
+			class="absolute inset-0 bg-black/50 pt-32 text-xl opacity-100 transition-opacity ease-in-out data-[hiding=true]:opacity-0"
+			data-hiding="false"
+			style={{
+				'transition-duration': `${DURATION}ms`,
+			}}
+			ref={p =>
+				setTimeout(() => {
+					p.dataset.hiding = 'true';
+					setTimeout(() => props.hide(), DURATION);
+				}, 1000)
+			}>
+			{props.text}
+		</p>
 	);
 };
 
