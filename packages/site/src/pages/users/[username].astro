@@ -1,10 +1,5 @@
 ---
-import {
-	UserCardList,
-	UserPinnedCard,
-	UserPackList,
-	UserIdentitySection,
-} from '@site/components/cards/UserPageElements';
+import { UserPage } from '@site/components/cards/UserPageElements';
 import Page from '@site/layouts/Page.astro';
 import { getUserByUserName } from '@core/lib/user';
 import { getCardsByUserSortedByRarity } from '@core/lib/card';
@@ -12,8 +7,6 @@ import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
 import { getUserByLogin } from '@core/lib/twitch';
 import type { User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
-import { Anchor, Heading } from '@site/components/text';
-import UserLookingFor from '@site/components/user/UserLookingFor';
 import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
 
@@ -30,9 +23,7 @@ if (!id) {
 	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
 }
 
-const twitchData = await getUserByLogin(id).catch(() => null);
-
-const siteConfig = Astro.locals.siteConfig;
+const twitchData = (await getUserByLogin(id).catch(() => null)) ?? null;
 
 const user: User = (await getUserByUserName(id)) || {
 	username: id,
@@ -66,69 +57,14 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 	class="flex flex-col gap-4"
 	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
 	pageType="public">
-	<UserIdentitySection
-		username={user.username}
-		profileImageUrl={twitchData?.profile_image_url ?? ''}
-		pinnedCard={user.pinnedCard}
-		lookingFor={user.lookingFor}
-		isLoggedInUser={isLoggedInUser}
+	<UserPage
+		{user}
+		{twitchData}
+		{packs}
+		cards={CardInstances}
+		{isLoggedInUser}
+		{cursor}
+		initialFilters={filters}
 		client:load
 	/>
-
-	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
-		<img
-			alt={`${user.username}'s profile`}
-			src={twitchData?.profile_image_url}
-			transition:name={`profile-pic-${user.username}`}
-			width="150"
-			height="150"
-			class="col-start-1 row-span-full h-fit rounded-full"
-		/>
-		<section class="mt-4 flex flex-col">
-			<h1
-				class="font-display my-2 text-4xl font-bold italic text-gray-600 dark:text-gray-200"
-				style={{ 'view-transition-name': `${user.username}-username` }}>
-				{user.username}
-			</h1>
-			<ul>
-				<li>
-					<UserLookingFor {user} {isLoggedInUser} client:load />
-					{/*isLoggedInUser && <UserMinecraftUsername initialUser={user} client:load />*/}
-				</li>
-				{
-					isLoggedInUser || !siteConfig.tradingIsEnabled ? null : (
-						<li>
-							<Anchor href={`${routes.TRADES}/new?receiverUsername=${user.username}`}>
-								New Trade
-							</Anchor>
-						</li>
-					)
-				}
-			</ul>
-		</section>
-		{
-			pinnedCard && pinnedCard.instanceId ? (
-				<UserPinnedCard card={pinnedCard} username={user.username} client:load />
-			) : null
-		}
-	</header>
-	{
-		packs.length > 0 && (
-			<section class="my-4 grid gap-4 text-center">
-				<Heading>Packs</Heading>
-				<UserPackList {packs} {isLoggedInUser} client:load />
-			</section>
-		)
-	}
-	<section class="my-4 grid gap-4 text-center">
-		<Heading>Cards</Heading>
-		<UserCardList
-			initialCards={CardInstances}
-			username={user.username}
-			initialCursor={cursor ?? undefined}
-			pinnedCardId={pinnedCard?.instanceId}
-			initialFilters={filters}
-			client:load
-		/>
-	</section>
 </Page>

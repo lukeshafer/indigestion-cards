@@ -8,10 +8,12 @@ import {
 	createSignal,
 	type Component,
 	type Setter,
+	Switch,
+	Match,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
 import PlaceholderCardList from './PlaceholderCardList';
-import { routes } from '@site/constants';
+import { routes, USER_API } from '@site/constants';
 import {
 	Card,
 	CardDescription,
@@ -36,11 +38,58 @@ import type { PackCardsHidden } from '@core/types';
 import { Pack } from '../pack/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import { actions } from 'astro:actions';
-import { SubmitButton } from '../form/Form';
+import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '../form/Form';
 import EditIcon from '../icons/EditIcon';
+import type { TwitchUser } from '@core/lib/twitch';
+import { Heading } from '../text';
+
+export const UserPage: Component<{
+	user: User;
+	twitchData: TwitchUser | null;
+	isLoggedInUser: boolean;
+	packs: Array<PackCardsHidden>;
+	cards: Array<CardInstance>;
+	pinnedCard?: User['pinnedCard'];
+  cursor: string | null;
+  initialFilters: Filters;
+}> = props => {
+	return (
+		<div class="flex max-h-[calc(100vh-10rem)]">
+			<UserIdentitySection
+				username={props.user.username}
+				userId={props.user.userId}
+				profileImageUrl={props.twitchData?.profile_image_url ?? ''}
+				pinnedCard={props.user.pinnedCard}
+				lookingFor={props.user.lookingFor}
+				isLoggedInUser={props.isLoggedInUser}
+			/>
+
+      <div class="w-full overflow-scroll h-full overflow-x-hidden">
+        <Show when={props.packs.length > 0}>
+          <section class="my-4 grid gap-4 text-center">
+            <Heading>Packs</Heading>
+            <UserPackList packs={props.packs} isLoggedInUser={props.isLoggedInUser} />
+          </section>
+        </Show>
+
+        <section class="my-4 grid gap-4 text-center">
+          <Heading>Cards</Heading>
+          <UserCardList
+            initialCards={props.cards}
+            username={props.user.username}
+            initialCursor={props.cursor ?? undefined}
+            pinnedCardId={props.user.pinnedCard?.instanceId}
+            initialFilters={props.initialFilters}
+          />
+        </section>
+      </div>
+		</div>
+	);
+};
 
 export const UserIdentitySection: Component<{
 	username: string;
+	userId: string;
 	profileImageUrl: string;
 	isLoggedInUser: boolean;
 	lookingFor?: string;
@@ -66,11 +115,20 @@ export const UserIdentitySection: Component<{
 				<Show when={props.lookingFor}>
 					{lookingFor => (
 						<UserLookingFor
-							lookingFor={lookingFor()}
+							userId={props.userId}
+							initialLookingFor={lookingFor()}
 							isLoggedInUser={props.isLoggedInUser}
 						/>
 					)}
 				</Show>
+
+				<div class="col-start-2">
+					<Show when={!props.isLoggedInUser}>
+						<Anchor href={`${routes.TRADES}/new?receiverUsername=${props.username}`}>
+							New Trade
+						</Anchor>
+					</Show>
+				</div>
 			</section>
 
 			<Show when={props.pinnedCard}>
@@ -81,33 +139,81 @@ export const UserIdentitySection: Component<{
 };
 
 const UserLookingFor: Component<{
-	lookingFor: string;
+	userId: string;
+	initialLookingFor: string;
 	isLoggedInUser: boolean;
 }> = props => {
 	const [isOpen, setIsOpen] = createSignal(false);
+	const [isEditing, setIsEditing] = createSignal(false);
+	const [lookingFor, setLookingFor] = createSignal(props.initialLookingFor);
 	return (
 		<p
 			data-open={isOpen()}
 			class="relative col-start-2 grid max-h-32 max-w-80 gap-0 self-start overflow-hidden break-words pb-8 transition-all data-[open=true]:max-h-max">
-			<span class="text-sm font-normal italic opacity-80 flex gap-2">
+			<span class="flex gap-2 text-sm font-normal italic opacity-80">
 				I'm looking for
-				<Show when={props.isLoggedInUser}>
-					<button title="Edit looking for">
+				<Show when={props.isLoggedInUser && !isEditing()}>
+					<button title="Edit looking for" onClick={() => setIsEditing(true)}>
 						<EditIcon size={15} />
 					</button>
 				</Show>
 			</span>
-			<span class="block max-w-80 break-words text-lg font-normal leading-5">
-				{props.lookingFor}
-			</span>
-			<Show when={props.lookingFor.length > 40}>
-				<button
-					class="absolute bottom-0 h-8 w-full bg-gray-900/70 bg-gradient-to-t from-gray-900 to-gray-900/0"
-					onClick={() => setIsOpen(v => !v)}>
-					Show {isOpen() ? 'less' : 'more'}
-				</button>
-			</Show>
+			<Switch>
+				<Match when={!isEditing()}>
+					<span class="block max-w-80 break-words text-lg font-normal leading-5">
+						{lookingFor()}
+					</span>
+					<Show when={lookingFor().length > 40}>
+						<button
+							class="absolute bottom-0 h-8 w-full bg-gray-900/70 bg-gradient-to-t from-gray-900 to-gray-900/0"
+							onClick={() => setIsOpen(v => !v)}>
+							Show {isOpen() ? 'less' : 'more'}
+						</button>
+					</Show>
+				</Match>
+				<Match when={isEditing()}>
+					<UserLookingForForm
+						userId={props.userId}
+						initialLookingFor={lookingFor()}
+						onSubmit={newValue => {
+							setLookingFor(newValue);
+							setIsEditing(false);
+						}}
+						onCancel={() => setIsEditing(false)}
+					/>
+				</Match>
+			</Switch>
 		</p>
+	);
+};
+
+const UserLookingForForm: Component<{
+	userId: string;
+	initialLookingFor: string;
+	onSubmit: (value: string) => void;
+	onCancel: () => void;
+}> = props => {
+	const [uiValue, setUIValue] = createSignal(props.initialLookingFor);
+
+	return (
+		<Form action={USER_API.USER} method="patch" onsubmit={() => props.onSubmit(uiValue())}>
+			<input type="hidden" name="userId" value={props.userId} />
+			<div class="block max-w-80 break-words text-lg font-normal leading-5">
+				<TextArea
+					inputOnly
+					label="Looking For"
+					name="lookingFor"
+					value={uiValue()}
+					maxLength={500}
+					setValue={setUIValue}
+					height="2rem"
+				/>
+			</div>
+			<div class="flex items-center gap-2">
+				<SubmitButton>Save</SubmitButton>
+				<DeleteButton onClick={() => props.onCancel()}>Cancel</DeleteButton>
+			</div>
+		</Form>
 	);
 };
 
@@ -119,7 +225,7 @@ export const UserPinnedCard: Component<{
 		<div class="relative w-fit origin-top-left rotate-3 p-12">
 			<a
 				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
-				class="outline-brand-main group inline-block">
+				class="outline-brand-main group inline-block origin-[7rem_1rem] transition-transform ease-out hover:-rotate-3">
 				<TiltEffectWrapper transformOrigin="7rem 1rem" angleMultiplier={0.2}>
 					<GlowOnHover focusOnly color={props.card.rarityColor} />
 					<Card

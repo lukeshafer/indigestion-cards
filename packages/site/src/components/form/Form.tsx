@@ -249,7 +249,9 @@ export function TextArea(
 ) {
 	return (
 		<InputGroup>
-			<Label {...props} />
+			<Show when={!props.inputOnly} fallback={<label class="sr-only" for={props.name}>{props.label}</label>}>
+				<Label {...props} />
+			</Show>
 			<textarea
 				maxLength={props.maxLength}
 				id={props.name}
@@ -423,12 +425,11 @@ export function Fieldset(props: { children?: JSX.Element; legend?: string }) {
 
 const BrandButtonWrapper: ParentComponent<{ color?: 'default' | 'red' }> = props => (
 	<div
-		class="font-heading block w-fit px-2 py-[0.3rem] text-center text-sm rounded font-semibold dark:font-bold transition-colors hover:brightness-75"
+		class="font-heading block w-fit rounded px-2 py-[0.3rem] text-center text-sm font-semibold transition-colors hover:brightness-75 dark:font-bold"
 		classList={{
 			'bg-brand-light dark:bg-brand-dark text-brand-950 dark:text-brand-100':
 				props.color === 'default' || !props.color,
-			'bg-red-300 dark:bg-red-800 text-red-900 dark:text-red-100':
-				props.color === 'red',
+			'bg-red-300 dark:bg-red-800 text-red-900 dark:text-red-100': props.color === 'red',
 		}}>
 		{props.children}
 	</div>
