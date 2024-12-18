@@ -1,5 +1,5 @@
 import type { PackCardsHidden } from '@core/types';
-import { createEffect, createSignal, For, Show, type Component } from 'solid-js';
+import { createSignal, For, Show, type Component } from 'solid-js';
 import { Pack } from './Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import { actions } from 'astro:actions';
@@ -24,6 +24,7 @@ export default function UserPackList(props: {
 
 const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }> = props => {
 	const [isLocked, setIsLocked] = createSignal(props.pack.isLocked || false);
+	const [alertText, setAlertText] = createSignal<string | false>(false);
 
 	return (
 		<li class="relative w-fit">
@@ -35,6 +36,11 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 						<span class="block text-xl">Locked.</span>Cannot be opened.
 					</p>
 				</div>
+			</Show>
+			<Show when={alertText()}>
+				{message => (
+					<ErrorAlert text={message()} hide={() => setAlertText(false)}></ErrorAlert>
+				)}
 			</Show>
 			<Show when={props.canChangeLock}>
 				<div class="absolute left-2 top-7">
@@ -49,6 +55,11 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 								})
 								.then(val => {
 									if (val.error) {
+										setAlertText(
+											'An error occurred while ' +
+												(newValue == true ? 'lock' : 'unlock') +
+												'ing the pack.'
+										);
 										setIsLocked(!newValue);
 									}
 								});
@@ -58,6 +69,29 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 				</div>
 			</Show>
 		</li>
+	);
+};
+
+const ErrorAlert: Component<{
+	hide: () => void;
+	text: string;
+}> = props => {
+	const DURATION = 3000;
+	return (
+		<p
+			class="absolute inset-0 bg-black/50 pt-32 text-xl opacity-100 transition-opacity ease-in-out data-[hiding=true]:opacity-0"
+			data-hiding="false"
+			style={{
+				'transition-duration': `${DURATION}ms`,
+			}}
+			ref={p =>
+				setTimeout(() => {
+					p.dataset.hiding = 'true';
+					setTimeout(() => props.hide(), DURATION);
+				}, 1000)
+			}>
+			{props.text}
+		</p>
 	);
 };
 
