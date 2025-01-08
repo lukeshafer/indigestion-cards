@@ -102,6 +102,9 @@ export default function OpenPacks(props: Props) {
 									// Sort online users' packs to the top
 									produce(draft => {
 										draft.sort((a, b) => {
+											if (b.isLocked) return -1;
+											if (a.isLocked) return 1;
+
 											const aStatus = state.getIsOnline(a.username);
 											const bStatus = state.getIsOnline(b.username);
 											if (aStatus && !bStatus) return -1;
