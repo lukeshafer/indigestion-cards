@@ -23,7 +23,7 @@ export function CardList<T extends CardDesign | CardInstance>(props: {
 }
 
 export const CardListMenu = (props: { children: JSXElement }) => (
-	<div class="mb-3 flex px-4">{props.children}</div>
+	<div class="mb-3 flex max-w-3xl px-4 mx-auto gap-4">{props.children}</div>
 );
 
 // FILTERING
@@ -72,71 +72,75 @@ export function CardListFilter(props: {
 	ssrFilters?: Filters;
 }) {
 	return (
-		<details class="w-fit min-w-32 max-w-72 self-end">
-			<summary>Filter</summary>
-			<form
-				class="flex flex-wrap gap-2"
-				onSubmit={e => e.preventDefault()}
-				onInput={async e => {
-					const formData = new FormData(e.currentTarget);
-					syncFormDataWithUrlSearchParams(formData);
-					props.setFilters({
-						seasonIds: new Set(formData.getAll('seasonId') as Array<string>),
-						minterId: new Set(formData.getAll('minterId') as Array<MinterIdValue>),
-					});
-				}}>
-				<Show when={props.params.seasons}>
-					{seasons => (
-						<div class="w-fit">
-							<Fieldset legend="Season">
-								<For each={seasons()}>
-									{({ seasonId, seasonName }) => (
-										<label class="flex gap-2">
-											<input
-												type="checkbox"
-												name="seasonId"
-												value={seasonId}
-												checked={props.ssrFilters?.seasonIds.has(seasonId)}
-												class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-											/>
-											{seasonName}
-										</label>
-									)}
-								</For>
+		<details class="relative w-96 self-end bg-gray-100 px-4 py-2 dark:bg-gray-900 rounded">
+			<summary class="cursor-pointer">Filter</summary>
+			<div class="absolute top-full left-0 w-full z-10 bg-gray-900">
+				<form
+					class="flex flex-wrap gap-2 p-4"
+					onSubmit={e => e.preventDefault()}
+					onInput={async e => {
+						const formData = new FormData(e.currentTarget);
+						syncFormDataWithUrlSearchParams(formData);
+						props.setFilters({
+							seasonIds: new Set(formData.getAll('seasonId') as Array<string>),
+							minterId: new Set(formData.getAll('minterId') as Array<MinterIdValue>),
+						});
+					}}>
+					<Show when={props.params.seasons}>
+						{seasons => (
+							<div class="w-full">
+								<Fieldset legend="Season">
+									<For each={seasons()}>
+										{({ seasonId, seasonName }) => (
+											<label class="flex gap-2">
+												<input
+													type="checkbox"
+													name="seasonId"
+													value={seasonId}
+													checked={props.ssrFilters?.seasonIds.has(
+														seasonId
+													)}
+													class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+												/>
+												{seasonName}
+											</label>
+										)}
+									</For>
+								</Fieldset>
+							</div>
+						)}
+					</Show>
+					<Show when={props.params.minterId}>
+						<div class="w-full">
+							<Fieldset legend="Origin">
+								<label class="flex gap-2">
+									<input
+										type="checkbox"
+										name="minterId"
+										value={PAGE_USER}
+										checked={props.ssrFilters?.minterId.has(PAGE_USER)}
+										class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+									/>
+									Minted
+								</label>
+								<label class="flex gap-2">
+									<input
+										type="checkbox"
+										name="minterId"
+										value={OTHER_USER}
+										checked={props.ssrFilters?.minterId.has(OTHER_USER)}
+										class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+									/>
+									Traded
+								</label>
 							</Fieldset>
 						</div>
-					)}
-				</Show>
-				<Show when={props.params.minterId}>
-					<div class="w-fit">
-						<Fieldset legend="Origin">
-							<label class="flex gap-2">
-								<input
-									type="checkbox"
-									name="minterId"
-									value={PAGE_USER}
-									checked={props.ssrFilters?.minterId.has(PAGE_USER)}
-									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-								/>
-								Minted
-							</label>
-							<label class="flex gap-2">
-								<input
-									type="checkbox"
-									name="minterId"
-									value={OTHER_USER}
-									checked={props.ssrFilters?.minterId.has(OTHER_USER)}
-									class="focus:border-brand-main focus:ring-brand-main inline-block w-auto rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
-								/>
-								Traded
-							</label>
-						</Fieldset>
+					</Show>
+					<div ref={e => e.remove()}>
+						<SubmitButton>Save</SubmitButton>
 					</div>
-				</Show>
-				<div ref={e => e.remove()}>
-					<SubmitButton>Save</SubmitButton>
-				</div>
-			</form>
+				</form>
+			</div>
 		</details>
 	);
 }

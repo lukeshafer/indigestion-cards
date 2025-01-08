@@ -64,16 +64,29 @@ export const UserPage: Component<{
 				isLoggedInUser={props.isLoggedInUser}
 			/>
 
-			<div class="h-full w-full overflow-scroll overflow-x-hidden scrollbar-narrow">
+			<div class="scrollbar-narrow h-full w-full overflow-scroll overflow-x-hidden">
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
-						<Heading>Packs</Heading>
-						<UserPackList packs={props.packs} isLoggedInUser={props.isLoggedInUser} />
+						<details>
+							<summary class="ml-16 cursor-pointer py-4 text-left text-xl">
+								<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
+									Packs ({props.packs.length})
+								</h2>
+							</summary>
+							<UserPackList
+								packs={props.packs}
+								isLoggedInUser={props.isLoggedInUser}
+							/>
+						</details>
 					</section>
 				</Show>
 
-				<section class="my-4 grid gap-4 text-center">
-					<Heading>Cards</Heading>
+				<section class="my-4 grid gap-4 text-left">
+					<div class="ml-20">
+						<h2 class="font-display my-2 text-4xl text-gray-800 dark:text-gray-200 text-center">
+							Cards
+						</h2>
+					</div>
 					<UserCardList
 						initialCards={props.cards}
 						username={props.user.username}
@@ -328,15 +341,6 @@ const UserCardList: Component<{
 	return (
 		<div>
 			<CardList.Menu>
-				<CardList.Filter
-					params={{
-						seasons: parseUniqueSeasons(cardsResource.latest),
-						minterId: true,
-					}}
-					setFilters={setFilters}
-					ssrFilters={/*@once*/ props.initialFilters}
-				/>
-				<div class="ml-auto flex gap-4">
 					<CardList.Search setSearchText={setSearchText} />
 					<CardList.SortDropdown
 						sortTypes={[
@@ -351,7 +355,14 @@ const UserCardList: Component<{
 							setSortInfo(getSortInfo(sortType));
 						}}
 					/>
-				</div>
+					<CardList.Filter
+						params={{
+							seasons: parseUniqueSeasons(cardsResource.latest),
+							minterId: true,
+						}}
+						setFilters={setFilters}
+						ssrFilters={/*@once*/ props.initialFilters}
+					/>
 			</CardList.Menu>
 			<Suspense fallback={<PlaceholderCardList />}>
 				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
@@ -456,10 +467,11 @@ const UserPackList: Component<{
 }> = props => {
 	return (
 		<ul
-			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] sm:[--card-scale:1] md:gap-x-6"
+			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] md:gap-x-6"
 			style={{
 				'grid-template-columns':
-					'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+					'repeat(auto-fit, minmax(auto, calc(var(--card-scale) * 18rem)))',
+				//'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 			}}>
 			<For each={props.packs}>
 				{pack => <PackListItem pack={pack} canChangeLock={props.isLoggedInUser} />}

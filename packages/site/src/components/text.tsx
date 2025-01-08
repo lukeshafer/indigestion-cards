@@ -44,7 +44,7 @@ export function Heading(
 		<Dynamic
 			component={props.heading ?? 'h2'}
 			{...props}
-			class="font-heading my-2 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+			class="font-display my-2 text-2xl text-gray-800 dark:text-gray-200">
 			{props.children}
 		</Dynamic>
 	);
