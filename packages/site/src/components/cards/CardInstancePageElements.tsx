@@ -1,4 +1,4 @@
-import { createSignal, Show, type Component } from 'solid-js';
+import { createEffect, createSignal, Show, type Component } from 'solid-js';
 import { Heading } from '@site/components/text';
 import type { CardInstance } from '@core/types';
 import {
@@ -25,8 +25,20 @@ import { routes } from '@site/constants';
 export const PreviewableCard: Component<{ card: CardInstance }> = props => {
 	const [isPreviewed, setIsPreviewed] = createSignal(false);
 
+	createEffect(() => {
+		if (isPreviewed()) {
+			document.body.style.setProperty('overflow', 'hidden');
+			document
+				.getElementById('page-scroll-wrapper')
+				?.style.setProperty('overflow', 'hidden');
+		} else {
+			document.body.style.removeProperty('overflow');
+			document.getElementById('page-scroll-wrapper')?.style.removeProperty('overflow');
+		}
+	});
+
 	const cardElement = (
-		<TiltEffectWrapper>
+		<TiltEffectWrapper angleMultiplier={isPreviewed() ? 2 : 1}>
 			<Card
 				scale={isPreviewed() ? 1.6 : 1.2}
 				lazy={false}

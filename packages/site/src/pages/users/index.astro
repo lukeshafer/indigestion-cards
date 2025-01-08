@@ -4,20 +4,24 @@ import { getAllPreorders } from '@core/lib/preorder';
 import { getAllUsers } from '@core/lib/user';
 import { routeNames } from '@site/constants';
 import { PageHeader, PageTitle } from '@site/components/text';
-import { UsersList } from '@site/components/user/UsersList';
+import { UsersPage } from '@site/components/user/UsersList';
 
 import { getUserByLogin } from '@core/lib/twitch';
 
 const users = await getAllUsers();
 const preorders = getAllPreorders();
 
-const userListData = await Promise.all(
-	users.map(async user => ({
-		user: user,
-		twitch: await getUserByLogin(user.username),
-		preorders: (await preorders).filter(p => p.userId === user.userId),
-	}))
-);
+const userListData = (
+	await Promise.all(
+		users
+			.sort((a, b) => a.username.localeCompare(b.username))
+			.map(async user => ({
+				user: user,
+				twitch: await getUserByLogin(user.username),
+				preorders: (await preorders).filter(p => p.userId === user.userId),
+			}))
+	)
+)
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
@@ -25,6 +29,6 @@ const userListData = await Promise.all(
 		<PageTitle>Users</PageTitle>
 	</PageHeader>
 	<div class="mx-auto">
-		<UsersList users={userListData} client:load />
+		<UsersPage users={userListData} client:load />
 	</div>
 </Page>

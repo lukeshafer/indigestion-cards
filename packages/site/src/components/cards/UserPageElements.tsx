@@ -64,7 +64,7 @@ export const UserPage: Component<{
 				isLoggedInUser={props.isLoggedInUser}
 			/>
 
-			<div class="h-full w-full overflow-scroll overflow-x-hidden">
+			<div class="h-full w-full overflow-scroll overflow-x-hidden scrollbar-narrow">
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
 						<Heading>Packs</Heading>
@@ -87,7 +87,7 @@ export const UserPage: Component<{
 	);
 };
 
-export const UserIdentitySection: Component<{
+const UserIdentitySection: Component<{
 	username: string;
 	userId: string;
 	profileImageUrl: string;
@@ -217,7 +217,7 @@ const UserLookingForForm: Component<{
 	);
 };
 
-export const UserPinnedCard: Component<{
+const UserPinnedCard: Component<{
 	card: NonNullable<User['pinnedCard']>;
 	username: string;
 }> = props => {
@@ -297,7 +297,7 @@ const Pin: Component = () => {
 	);
 };
 
-export const UserCardList: Component<{
+const UserCardList: Component<{
 	initialCards: CardInstance[];
 	username: string;
 	initialFilters: Filters;
@@ -450,7 +450,7 @@ async function queryCards(opts: {
 	return result.data;
 }
 
-export const UserPackList: Component<{
+const UserPackList: Component<{
 	packs: Array<PackCardsHidden>;
 	isLoggedInUser: boolean;
 }> = props => {

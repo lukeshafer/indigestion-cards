@@ -42,7 +42,7 @@ export const THeading = <ColumnName extends string>(props: {
 			data-mode={sortMode()}
 			style={{ width: props.width }}
 			classList={{
-				'px-2 py-2 data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]':
+				'px-4 py-2 data-[mode=ascending]:after:content-["▲"] data-[mode=descending]:after:content-["▼"]':
 					true, // required in classList due to being unable to escape quotes
 				'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700': !props['no-sort'],
 				hidden: props.showOnBreakpoint !== undefined,
@@ -85,15 +85,13 @@ export const TRow: ParentComponent<{
 );
 
 export const TCell: ParentComponent<{
-	//column: string;
-	//value: string | number;
 	showOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
 	hideOnBreakpoint?: 'sm' | 'md' | 'lg' | 'xl';
 	font?: 'default' | 'title';
 	align?: 'left' | 'center' | 'right';
 }> = props => (
 	<td
-		class="relative px-2 py-3 group-[compact]:p-2"
+		class="relative px-4 py-3 group-[compact]:p-2"
 		classList={{
 			hidden: !!props.showOnBreakpoint,
 			'sm:table-cell': props.showOnBreakpoint === 'sm',
@@ -111,7 +109,7 @@ export const TCell: ParentComponent<{
 			'text-center': props.align === 'center',
 			'text-right': props.align === 'right',
 		}}>
-		{props.children /*|| props.value*/}
+		{props.children}
 	</td>
 );
 

@@ -154,7 +154,10 @@ export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = p
 	</TiltEffectWrapper>
 );
 
-export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number; transformOrigin?: string }> = props => {
+export const TiltEffectWrapper: ParentComponent<{
+	angleMultiplier?: number;
+	transformOrigin?: string;
+}> = props => {
 	let canStop = false;
 	let rotateX = 0;
 	let rotateY = 0;
@@ -164,6 +167,38 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number; tran
 	let wrapperEl: HTMLDivElement;
 	let rotateEl: HTMLDivElement;
 
+	let prevTime = 0;
+	function animate(t: number) {
+		if (checkAreAnimationsDisabled()) {
+			return;
+		}
+
+		let dt = t - prevTime;
+		prevTime = t;
+
+		const result = tiltEffectAnimationFrame({
+			rotateX,
+			rotateY,
+			targetRotateX,
+			targetRotateY,
+			dt,
+		});
+		rotateEl.style.setProperty(
+			'transform',
+			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
+		);
+
+		rotateX = result.rotateX;
+		rotateY = result.rotateY;
+
+		if (
+			roundTo(result.rotateX, 1) !== 0 ||
+			roundTo(result.rotateY, 1) !== 0 ||
+			canStop === false
+		) {
+			requestAnimationFrame(animate);
+		}
+	}
 	return (
 		<div
 			ref={wrapperEl!}
@@ -171,44 +206,34 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number; tran
 			style={{ perspective: '900px' }}
 			onMouseEnter={() => {
 				canStop = false;
-				let lastTime = 0;
-
-				requestAnimationFrame(function animate(t) {
-					if (checkAreAnimationsDisabled()) {
-						return;
-					}
-
-					let dt = t - lastTime;
-					lastTime = t;
-
-					const result = tiltEffectAnimationFrame({
-						rotateX,
-						rotateY,
-						targetRotateX,
-						targetRotateY,
-						dt,
-					});
-					rotateEl.style.setProperty(
-						'transform',
-						`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
-					);
-
-					rotateX = result.rotateX;
-					rotateY = result.rotateY;
-
-					if (
-						roundTo(result.rotateX, 1) !== 0 ||
-						roundTo(result.rotateY, 1) !== 0 ||
-						canStop === false
-					) {
-						requestAnimationFrame(animate);
-					}
-				});
+				requestAnimationFrame(animate);
+			}}
+			onTouchStart={() => {
+				canStop = false;
+				requestAnimationFrame(animate);
 			}}
 			onMouseLeave={() => {
 				canStop = true;
 				targetRotateY = 0;
 				targetRotateX = 0;
+			}}
+      onTouchEnd={() => {
+				canStop = true;
+				targetRotateY = 0;
+				targetRotateX = 0;
+      }}
+			onTouchMove={e => {
+				const bounds = e.currentTarget.getBoundingClientRect();
+				const touches = e.touches[0];
+				if (!bounds || !touches) return;
+				e.preventDefault();
+
+				targetRotateX = Math.floor(
+					(0.5 - (touches.clientX - bounds.x) / bounds.width) * 100
+				);
+				targetRotateY = Math.floor(
+					((touches.clientY - bounds.y) / bounds.height - 0.5) * 100
+				);
 			}}
 			onMouseMove={e => {
 				const bounds = e.currentTarget.getBoundingClientRect();
@@ -217,9 +242,13 @@ export const TiltEffectWrapper: ParentComponent<{ angleMultiplier?: number; tran
 				targetRotateX = Math.floor((0.5 - (e.x - bounds.x) / bounds.width) * 100);
 				targetRotateY = Math.floor(((e.y - bounds.y) / bounds.height - 0.5) * 100);
 			}}>
-			<div ref={rotateEl!} style={{
-        'transform-origin': props.transformOrigin ?? 'center'
-      }}>{props.children}</div>
+			<div
+				ref={rotateEl!}
+				style={{
+					'transform-origin': props.transformOrigin ?? 'center',
+				}}>
+				{props.children}
+			</div>
 		</div>
 	);
 };
