@@ -3,10 +3,6 @@
 
 _Indigestion Cards_ is a project from **lil indigestion**, a creator named Ryan who makes blind playthroughs of games on Youtube and Twitch! A full FAQ for the project is available at [indigestioncards.com](https://indigestioncards.com).
 
-## Editing the FAQ (for Ryan)
-
-[Click here to edit the FAQ](https://github.com/lukeshafer/twitch-api-project/edit/main/packages/site/src/content/faq.md), or navigate to `packages/site/src/content/faq.md` to edit manually.
-
 ## Project tech
 
 The project is primarily written in TypeScript and syntaxes based on it, like JSX and Astro.
