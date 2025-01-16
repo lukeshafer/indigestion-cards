@@ -41,7 +41,7 @@ export function parseRequestBody(request: unknown): TwitchBody {
 	return bodySchema.parse(request);
 }
 
-export function verifyDiscordRequest(request: TwitchRequest) {
+export function verifyTwitchRequest(request: TwitchRequest) {
 	try {
 		const secret = Config.TWITCH_CLIENT_SECRET;
 		const message = getHmacMessage(request);
@@ -90,17 +90,6 @@ export function getHeaders(headers: TwitchRequest['headers']) {
 		subscriptionType: headers[TWITCH_HEADERS.SUBSCRIPTION_TYPE],
 		subscriptionVersion: headers[TWITCH_HEADERS.SUBSCRIPTION_VERSION],
 	};
-}
-
-export function handleTwitchEvent(body: TwitchBody) {
-	switch (body.type) {
-		case SUBSCRIPTION_TYPE.GIFT_SUB:
-			break;
-		case SUBSCRIPTION_TYPE.REDEEM_REWARD:
-			body.event;
-			break;
-	}
-	return { statusCode: 200 };
 }
 
 export async function getListOfTwitchUsersByIds(ids: string[]) {

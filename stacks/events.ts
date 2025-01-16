@@ -34,6 +34,7 @@ export function Events({ stack }: StackContext) {
 		},
 		consumer: {
 			function: {
+        timeout: "60 seconds",
 				bind: [
 					table,
 					config.TWITCH_CLIENT_ID,
