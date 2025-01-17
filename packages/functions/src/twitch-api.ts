@@ -1,7 +1,7 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { EventBus } from 'sst/node/event-bus';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
-import { verifyDiscordRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@core/lib/twitch';
+import { verifyTwitchRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@core/lib/twitch';
 import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@core/lib/site-config';
 import { getPackTypeById } from '@core/lib/pack-type';
 import { MOMENT_REDEMPTION_PACK_TYPE_ID, TWITCH_GIFT_SUB_ID } from '@core/constants';
@@ -10,7 +10,7 @@ import { Moment } from '@core/events/moments';
 import type { PackDetails } from '@core/lib/entity-schemas';
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
-	if (!verifyDiscordRequest(event)) {
+	if (!verifyTwitchRequest(event)) {
 		console.error('Message not verified');
 		return { statusCode: 403 };
 	}
@@ -83,24 +83,31 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 
 			const giftSubPackType = await getPackTypeById({ packTypeId: event.packTypeId });
 
-			await eventBridge.putEvents({
-				Entries: [
-					{
-						Source: 'twitch',
-						DetailType: 'give-pack-to-user',
-						Detail: JSON.stringify({
-							userId: body.event.user_id,
-							username: body.event.user_name,
-							packCount: totalPacks,
-							packType: giftSubPackType,
-							event: {
-								eventType: body.type,
+			let promises = [];
+			for (let i = 0; i < totalPacks; i++) {
+				promises.push(
+					eventBridge.putEvents({
+						Entries: [
+							{
+								Source: 'twitch',
+								DetailType: 'give-pack-to-user',
+								Detail: JSON.stringify({
+									userId: body.event.user_id,
+									username: body.event.user_name,
+									packCount: 1,
+									packType: giftSubPackType,
+									event: {
+										eventType: body.type,
+									},
+								} satisfies PackDetails),
+								EventBusName: EventBus.eventBus.eventBusName,
 							},
-						} satisfies PackDetails),
-						EventBusName: EventBus.eventBus.eventBusName,
-					},
-				],
-			});
+						],
+					})
+				);
+			}
+
+      await Promise.all(promises);
 			break;
 		}
 		case 'channel.channel_points_custom_reward_redemption.add': {
@@ -147,9 +154,9 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 							username: body.event.user_name,
 							packCount: 1,
 							packType: rewardPackType,
-              event: {
-                eventType: body.type,
-              }
+							event: {
+								eventType: body.type,
+							},
 						} satisfies PackDetails),
 						EventBusName: EventBus.eventBus.eventBusName,
 					},
