@@ -1,11 +1,7 @@
 # Indigestion Cards 
-[![Deploy Production](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-prod.yml) [![Deploy Staging on update main](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-staging.yml/badge.svg)](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-staging.yml) [![Deploy Dev and QA](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-dev.yml/badge.svg)](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-dev.yml)
+[![Deploy Production](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-prod.yml) [![Deploy Dev](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-dev.yml/badge.svg)](https://github.com/lukeshafer/twitch-api-project/actions/workflows/deploy-dev.yml)
 
 _Indigestion Cards_ is a project from **lil indigestion**, a creator named Ryan who makes blind playthroughs of games on Youtube and Twitch! A full FAQ for the project is available at [indigestioncards.com](https://indigestioncards.com).
-
-## Editing the FAQ (for Ryan)
-
-[Click here to edit the FAQ](https://github.com/lukeshafer/twitch-api-project/edit/main/packages/site/src/content/faq.md), or navigate to `packages/site/src/content/faq.md` to edit manually.
 
 ## Project tech
 
