@@ -49,24 +49,22 @@ export const AllDesignsCardList: Component<{
 	return (
 		<div>
 			<CardListMenu>
+				<CardListSearch setSearchText={setSearchText} />
+				<CardListSortDropdown
+					sortTypes={['card-name-asc', 'card-name-desc']}
+					setSort={sortType => {
+						if (sortType === 'card-name-desc') {
+							setSortOrder('desc');
+						} else {
+							setSortOrder('asc');
+						}
+					}}
+				/>
 				<CardListFilter
 					params={{ seasons: seasons() }}
 					setFilters={setFilters}
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
-				<div class="ml-auto flex gap-4">
-					<CardListSearch setSearchText={setSearchText} />
-					<CardListSortDropdown
-						sortTypes={['card-name-asc', 'card-name-desc']}
-						setSort={sortType => {
-							if (sortType === 'card-name-desc') {
-								setSortOrder('desc');
-							} else {
-								setSortOrder('asc');
-							}
-						}}
-					/>
-				</div>
 			</CardListMenu>
 			<CardList cards={cards()}>
 				{(card, index) => <AllDesignsCardListItem card={card} lazy={index() > 5} />}

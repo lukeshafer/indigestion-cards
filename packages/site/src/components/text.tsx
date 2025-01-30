@@ -23,7 +23,7 @@ export function PageTitle(
 		<Dynamic
 			{...props}
 			component={props.heading ?? 'h1'}
-			class="font-heading my-2 text-3xl font-bold text-gray-600 dark:text-gray-300">
+			class="font-display my-2 text-3xl font-bold text-gray-600 dark:text-gray-300">
 			{props.children}
 		</Dynamic>
 	);

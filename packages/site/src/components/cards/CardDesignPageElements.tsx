@@ -61,25 +61,23 @@ export const DesignInstancesCardList: Component<{
 	return (
 		<div>
 			<CardList.Menu>
+				<CardList.Search setSearchText={setSearchText} />
+				<CardList.SortDropdown
+					sortTypes={[
+						'rarest',
+						'common',
+						'open-date-asc',
+						'open-date-desc',
+						'owner-asc',
+						'owner-desc',
+					]}
+					setSort={sortType => setSortInfo(getSortInfo(sortType))}
+				/>
 				<CardList.Filter
 					params={{ minterId: true }}
 					setFilters={setFilters}
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
-				<div class="ml-auto flex gap-4">
-					<CardList.Search setSearchText={setSearchText} />
-					<CardList.SortDropdown
-						sortTypes={[
-							'rarest',
-							'common',
-							'open-date-asc',
-							'open-date-desc',
-							'owner-asc',
-							'owner-desc',
-						]}
-						setSort={sortType => setSortInfo(getSortInfo(sortType))}
-					/>
-				</div>
 			</CardList.Menu>
 			<Suspense fallback={<PlaceholderCardList />}>
 				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
