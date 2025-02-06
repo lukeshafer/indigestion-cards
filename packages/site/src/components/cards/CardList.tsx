@@ -7,7 +7,7 @@ export function CardList<T extends CardDesign | CardInstance>(props: {
 }): JSXElement {
 	return (
 		<ul
-			class="grid w-full justify-between justify-items-center gap-x-2 gap-y-14 px-3 [--base-card-scale:0.75] sm:[--base-card-scale:1] md:gap-x-6"
+			class="grid w-full justify-around justify-items-center gap-x-2 gap-y-14 px-3 [--base-card-scale:0.75] sm:[--base-card-scale:1] md:gap-x-6"
 			style={{
 				'--card-scale': `calc(${props.scale ?? 1} * var(--base-card-scale))`,
 				'grid-template-columns':
@@ -23,7 +23,7 @@ export function CardList<T extends CardDesign | CardInstance>(props: {
 }
 
 export const CardListMenu = (props: { children: JSXElement }) => (
-	<div class="mb-6 flex max-w-3xl px-2 gap-4">{props.children}</div>
+	<div class="mb-6 flex max-w-3xl px-2 gap-4 mx-auto">{props.children}</div>
 );
 
 // FILTERING
@@ -72,9 +72,9 @@ export function CardListFilter(props: {
 	ssrFilters?: Filters;
 }) {
 	return (
-		<details class="relative w-96 self-end bg-gray-100 px-4 py-2 dark:bg-gray-900 rounded">
+		<details class="relative w-96 self-end bg-gray-200 px-4 py-2 dark:bg-gray-900 rounded">
 			<summary class="text-left cursor-pointer">Filter</summary>
-			<div class="absolute top-full left-0 w-full z-10 bg-gray-900">
+			<div class="absolute top-full left-0 w-full z-10 bg-gray-200 dark:bg-gray-900">
 				<form
 					class="flex flex-wrap gap-2 p-4"
 					onSubmit={e => e.preventDefault()}

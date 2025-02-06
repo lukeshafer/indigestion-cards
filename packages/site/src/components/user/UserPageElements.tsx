@@ -19,25 +19,7 @@ import {
 import { trpc } from '@site/lib/client/trpc';
 import PlaceholderCardList from '@site/components/cards/PlaceholderCardList';
 import { routes, USER_API } from '@site/constants';
-import {
-	Card,
-	CardDescription,
-	CardName,
-	CardNumber,
-	checkIfCanShowCardText,
-	checkIsFullArt,
-	checkIsLegacyCard,
-	checkIsShitPack,
-	formatCardNumber,
-	FULL_ART_BACKGROUND_CSS,
-	FullAnimatedCardEffect,
-	getCardImageUrl,
-	getShitStampPath,
-	GlowOnHover,
-	ShineMouseEffect,
-	ShitStamp,
-	TiltEffectWrapper,
-} from '@site/components/cards/Card';
+import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/cards/Card';
 import type { CardInstance, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '../pack/Pack';
@@ -58,7 +40,7 @@ export const UserPage: Component<{
 	initialFilters: Filters;
 }> = props => {
 	return (
-		<div class="flex max-h-[calc(100vh-10rem)]">
+		<div class="md:flex md:max-h-[calc(100vh-10rem)]">
 			<UserIdentitySection
 				username={props.user.username}
 				userId={props.user.userId}
@@ -68,7 +50,7 @@ export const UserPage: Component<{
 				isLoggedInUser={props.isLoggedInUser}
 			/>
 
-			<div class="scrollbar-narrow h-full w-full overflow-scroll overflow-x-hidden">
+			<div class="scrollbar-narrow h-full w-full md:overflow-scroll md:overflow-x-hidden">
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
 						<details>
@@ -85,12 +67,10 @@ export const UserPage: Component<{
 					</section>
 				</Show>
 
-				<section class="my-4 grid gap-4 text-left">
-					<div class="ml-20">
-						<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
-							Cards
-						</h2>
-					</div>
+				<section class="my-4 gap-4 text-left">
+					<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
+						Cards
+					</h2>
 					<UserCardList
 						initialCards={props.cards}
 						username={props.user.username}
@@ -114,20 +94,20 @@ const UserIdentitySection: Component<{
 }> = props => {
 	const IMG_SIZE = 100;
 	return (
-		<div class="w-fit">
+		<div class="min-w-96 w-fit mx-auto">
 			<section
-				style={{
-					'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)`,
-				}}
-				class="col-start-1 grid w-fit content-center gap-x-4">
+				style={{ 'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)` }}
+				class="grid w-fit content-center gap-x-4">
 				<img
 					alt={`${props.username}'s profile image`}
 					src={props.profileImageUrl}
 					width={IMG_SIZE}
 					height={IMG_SIZE}
-					class="row-span-2 rounded-full"
+					class="row-span-2 rounded-full col-span-1"
 				/>
-				<h1 class="font-display col-start-2 self-end text-2xl italic">{props.username}</h1>
+				<h1 class="font-display col-start-2 self-end text-2xl italic mt-0">
+					{props.username}
+				</h1>
 
 				<Show when={props.lookingFor}>
 					{lookingFor => (
@@ -243,34 +223,40 @@ const UserPinnedCard: Component<{
 			<a
 				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
 				class="outline-brand-main group inline-block origin-[7rem_1rem] transition-transform ease-out hover:-rotate-3">
-				<TiltEffectWrapper transformOrigin="7rem 1rem" angleMultiplier={0.2}>
-					<GlowOnHover focusOnly color={props.card.rarityColor} />
-					<Card
+				<CardEls.TiltEffectWrapper transformOrigin="7rem 1rem" angleMultiplier={0.2}>
+					<CardEls.GlowOnHover focusOnly color={props.card.rarityColor} />
+					<CardEls.Card
 						lazy={false}
 						alt={props.card.cardName}
-						imgSrc={getCardImageUrl(props.card)}
+						imgSrc={cardUtils.getCardImageUrl(props.card)}
 						viewTransitionName={`card-${props.card.instanceId}`}
 						background={
-							checkIsFullArt(props.card.rarityId)
+							cardUtils.checkIsFullArt(props.card.rarityId)
 								? FULL_ART_BACKGROUND_CSS
 								: props.card.rarityColor
 						}>
-						<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-							<CardName>{props.card.cardName}</CardName>
-							<CardDescription>{props.card.cardName}</CardDescription>
+						<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+							<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+							<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
 						</Show>
-						<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-							<CardNumber
-								color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-								{formatCardNumber(props.card)}
-							</CardNumber>
+						<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+							<CardEls.CardNumber
+								color={
+									cardUtils.checkIsFullArt(props.card.rarityId)
+										? 'white'
+										: 'black'
+								}>
+								{cardUtils.formatCardNumber(props.card)}
+							</CardEls.CardNumber>
 						</Show>
-						<Show when={checkIsShitPack(props.card.stamps)}>
-							<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+						<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+							<CardEls.ShitStamp
+								src={cardUtils.getShitStampPath(props.card.rarityId)}
+							/>
 						</Show>
-					</Card>
-					<ShineMouseEffect />
-				</TiltEffectWrapper>
+					</CardEls.Card>
+					<CardEls.ShineMouseEffect />
+				</CardEls.TiltEffectWrapper>
 			</a>
 			<div class="absolute left-40 top-4">
 				<Pin />
@@ -368,8 +354,8 @@ const UserCardList: Component<{
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 			</CardList.Menu>
-			<Suspense fallback={<PlaceholderCardList scale={0.7} length={12} />}>
-				<CardList.List cards={filteredCards() ?? []} scale={0.7}>
+			<Suspense fallback={<PlaceholderCardList scale={0.6} length={12} />}>
+				<CardList.List cards={filteredCards() ?? []} scale={0.6}>
 					{(card, index) => <UserCardListItem card={card} lazy={index() > 10} />}
 				</CardList.List>
 				<Show when={nextCursor() && !searchText()}>
@@ -398,32 +384,35 @@ const UserCardListItem: Component<{
 	<a
 		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
 		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-		<FullAnimatedCardEffect
-			glowColor={checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor}>
-			<Card
+		<CardEls.FullAnimatedCardEffect
+			glowColor={
+				cardUtils.checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor
+			}>
+			<CardEls.Card
 				lazy={props.lazy}
 				alt={props.card.cardName}
-				imgSrc={getCardImageUrl(props.card)}
+				imgSrc={cardUtils.getCardImageUrl(props.card)}
 				viewTransitionName={`card-${props.card.instanceId}`}
 				background={
-					checkIsFullArt(props.card.rarityId)
+					cardUtils.checkIsFullArt(props.card.rarityId)
 						? FULL_ART_BACKGROUND_CSS
 						: props.card.rarityColor
 				}>
-				<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-					<CardName>{props.card.cardName}</CardName>
-					<CardDescription>{props.card.cardName}</CardDescription>
+				<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+					<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+					<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
 				</Show>
-				<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-					<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-						{formatCardNumber(props.card)}
-					</CardNumber>
+				<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+					<CardEls.CardNumber
+						color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+						{cardUtils.formatCardNumber(props.card)}
+					</CardEls.CardNumber>
 				</Show>
-				<Show when={checkIsShitPack(props.card.stamps)}>
-					<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+				<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+					<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
 				</Show>
-			</Card>
-		</FullAnimatedCardEffect>
+			</CardEls.Card>
+		</CardEls.FullAnimatedCardEffect>
 	</a>
 );
 
