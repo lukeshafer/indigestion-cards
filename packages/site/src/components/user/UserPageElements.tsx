@@ -1,4 +1,9 @@
-import { default as CardList, filterCards, parseUniqueSeasons, type Filters } from './CardList';
+import {
+	default as CardList,
+	filterCards,
+	parseUniqueSeasons,
+	type Filters,
+} from '@site/components/cards/CardList';
 import { type SortInfo, getSortInfo } from '@site/lib/client/utils';
 import {
 	Show,
@@ -12,7 +17,7 @@ import {
 	Match,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import PlaceholderCardList from './PlaceholderCardList';
+import PlaceholderCardList from '@site/components/cards/PlaceholderCardList';
 import { routes, USER_API } from '@site/constants';
 import {
 	Card,
@@ -32,7 +37,7 @@ import {
 	ShineMouseEffect,
 	ShitStamp,
 	TiltEffectWrapper,
-} from './Card';
+} from '@site/components/cards/Card';
 import type { CardInstance, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '../pack/Pack';
@@ -41,7 +46,6 @@ import { actions } from 'astro:actions';
 import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '../form/Form';
 import EditIcon from '../icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
-import { Heading } from '../text';
 
 export const UserPage: Component<{
 	user: User;
@@ -83,7 +87,7 @@ export const UserPage: Component<{
 
 				<section class="my-4 grid gap-4 text-left">
 					<div class="ml-20">
-						<h2 class="font-display my-2 text-4xl text-gray-800 dark:text-gray-200 text-center">
+						<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
 							Cards
 						</h2>
 					</div>
@@ -341,31 +345,31 @@ const UserCardList: Component<{
 	return (
 		<div>
 			<CardList.Menu>
-					<CardList.Search setSearchText={setSearchText} />
-					<CardList.SortDropdown
-						sortTypes={[
-							'rarest',
-							'common',
-							'card-name-asc',
-							'card-name-desc',
-							'open-date-asc',
-							'open-date-desc',
-						]}
-						setSort={sortType => {
-							setSortInfo(getSortInfo(sortType));
-						}}
-					/>
-					<CardList.Filter
-						params={{
-							seasons: parseUniqueSeasons(cardsResource.latest),
-							minterId: true,
-						}}
-						setFilters={setFilters}
-						ssrFilters={/*@once*/ props.initialFilters}
-					/>
+				<CardList.Search setSearchText={setSearchText} />
+				<CardList.SortDropdown
+					sortTypes={[
+						'rarest',
+						'common',
+						'card-name-asc',
+						'card-name-desc',
+						'open-date-asc',
+						'open-date-desc',
+					]}
+					setSort={sortType => {
+						setSortInfo(getSortInfo(sortType));
+					}}
+				/>
+				<CardList.Filter
+					params={{
+						seasons: parseUniqueSeasons(cardsResource.latest),
+						minterId: true,
+					}}
+					setFilters={setFilters}
+					ssrFilters={/*@once*/ props.initialFilters}
+				/>
 			</CardList.Menu>
-			<Suspense fallback={<PlaceholderCardList />}>
-				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
+			<Suspense fallback={<PlaceholderCardList scale={0.7} length={12} />}>
+				<CardList.List cards={filteredCards() ?? []} scale={0.7}>
 					{(card, index) => <UserCardListItem card={card} lazy={index() > 10} />}
 				</CardList.List>
 				<Show when={nextCursor() && !searchText()}>

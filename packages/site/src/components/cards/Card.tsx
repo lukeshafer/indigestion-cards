@@ -183,7 +183,7 @@ export const TiltEffectWrapper: ParentComponent<{
 			targetRotateY,
 			dt,
 		});
-		rotateEl.style.setProperty(
+		rotateEl!.style.setProperty(
 			'transform',
 			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
 		);

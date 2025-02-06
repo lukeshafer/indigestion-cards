@@ -149,6 +149,11 @@ export const ASSETS = {
 	},
 } as const;
 
+export const LOGOS = {
+	default: ASSETS.LOGO,
+	tongle: ASSETS.TONGLE as string,
+} satisfies Record<string, string>;
+
 export const AUTH_TOKEN = 'sst_auth_token';
 export const FULL_ART_ID = 'full-art';
 export const LEGACY_CARD_ID = 'legacy';

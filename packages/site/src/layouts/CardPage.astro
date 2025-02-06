@@ -3,7 +3,7 @@ import { routes } from '@site/constants';
 import { Anchor, PageTitle } from '@site/components/text';
 import { PreviewableCard, CardInstanceInfo } from '@site/components/cards/CardInstancePageElements';
 import PinCardToProfileButton from '@site/components/cards/PinCardToProfileButton';
-import CardTradeHistory from '@site/components/cards/CardTradeHistory.astro';
+import { CardTradeHistory } from '@site/components/cards/CardTradeHistory';
 import type { CardInstance, User } from '@core/types';
 import { checkIsCardTradeable } from '@core/lib/trades';
 
@@ -55,6 +55,6 @@ const isOwnedByCurrentUser =
 
 {
 	card.tradeHistory && siteConfig.tradingIsEnabled ? (
-		<CardTradeHistory history={card.tradeHistory} />
+		<CardTradeHistory history={card.tradeHistory} client:load />
 	) : null
 }
