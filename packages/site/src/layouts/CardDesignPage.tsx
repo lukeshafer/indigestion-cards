@@ -8,8 +8,8 @@ import {
 	type Setter,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import CardList, { type Filters, filterCards } from './CardList';
-import PlaceholderCardList from './PlaceholderCardList';
+import CardList, { type Filters, filterCards } from '@site/components/cards/CardList';
+import PlaceholderCardList from '@site/components/cards/PlaceholderCardList';
 import { routes } from '@site/constants';
 import {
 	Card,
@@ -28,7 +28,7 @@ import {
 	checkIsShitPack,
 	ShitStamp,
 	getShitStampPath,
-} from './Card';
+} from '@site/components/cards/Card';
 import type { CardDesign, CardInstance } from '@core/types';
 
 export const DesignInstancesCardList: Component<{

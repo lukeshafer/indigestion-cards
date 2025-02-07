@@ -3,7 +3,8 @@ import Page from '@site/layouts/Page.astro';
 import { getCardInstanceByUsername } from '@core/lib/card';
 import { getUser } from '@core/lib/user';
 import { routeNames, routes } from '@site/constants';
-import CardPage from '@site/layouts/CardPage.astro';
+import { CardInstancePage } from '@site/layouts/CardInstancePage';
+import { checkIsCardTradeable } from '@core/lib/trades';
 
 const session = Astro.locals.session;
 
@@ -41,5 +42,10 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 		{ label: username, href: `${routes.USERS}/${username}` },
 		{ label: `${instance.rarityName} #${instance.cardNumber}` },
 	]}>
-	<CardPage card={instance} user={user ?? undefined} />
+	<CardInstancePage
+		card={instance}
+		user={user ?? undefined}
+		isTradeable={checkIsCardTradeable(instance)}
+		client:load
+	/>
 </Page>

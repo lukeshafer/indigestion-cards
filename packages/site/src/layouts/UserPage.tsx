@@ -22,11 +22,11 @@ import { routes, USER_API } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/cards/Card';
 import type { CardInstance, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
-import { Pack } from '../pack/Pack';
+import { Pack } from '@site/components/pack/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import { actions } from 'astro:actions';
-import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '../form/Form';
-import EditIcon from '../icons/EditIcon';
+import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '@site/components/form/Form';
+import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
 
 export const UserPage: Component<{
@@ -94,7 +94,7 @@ const UserIdentitySection: Component<{
 }> = props => {
 	const IMG_SIZE = 100;
 	return (
-		<div class="min-w-96 w-fit mx-auto">
+		<div class="mx-auto w-fit min-w-96">
 			<section
 				style={{ 'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)` }}
 				class="grid w-fit content-center gap-x-4">
@@ -103,9 +103,9 @@ const UserIdentitySection: Component<{
 					src={props.profileImageUrl}
 					width={IMG_SIZE}
 					height={IMG_SIZE}
-					class="row-span-2 rounded-full col-span-1"
+					class="col-span-1 row-span-2 rounded-full"
 				/>
-				<h1 class="font-display col-start-2 self-end text-2xl italic mt-0">
+				<h1 class="font-display col-start-2 mt-0 self-end text-2xl italic">
 					{props.username}
 				</h1>
 

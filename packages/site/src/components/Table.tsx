@@ -277,3 +277,13 @@ function getNewSortMode(args: {
 		return SORT_MODES.at(nextModeIndex)!;
 	}
 }
+
+export const TableEls = {
+	Table,
+	THead,
+	THeading,
+	TBody,
+	TRow,
+	TCell,
+	TSearch,
+};

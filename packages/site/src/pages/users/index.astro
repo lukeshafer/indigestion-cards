@@ -8,7 +8,7 @@ import { UsersPage } from '@site/components/user/UsersList';
 
 import { getUserByLogin } from '@core/lib/twitch';
 
-async function loadUserData() {
+let pageData = (async () => {
 	const users = await getAllUsers();
 	const preorders = await getAllPreorders();
 
@@ -21,9 +21,7 @@ async function loadUserData() {
 				preorders: preorders.filter(p => p.userId === user.userId),
 			}))
 	);
-}
-
-let pageData = loadUserData();
+})();
 ---
 
 <Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
