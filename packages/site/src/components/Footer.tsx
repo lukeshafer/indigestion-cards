@@ -32,7 +32,7 @@ export const Footer: Component = () => {
 					<span class="sr-only">Patreon</span>
 				</a>
 			</nav>
-			<p>&copy; 2023-{new Date().getFullYear()} lil_indigestion</p>
+			<p>&copy; 2023 - {new Date().getFullYear()} lil_indigestion</p>
 		</footer>
 	);
 };

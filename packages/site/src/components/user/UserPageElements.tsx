@@ -354,8 +354,8 @@ const UserCardList: Component<{
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 			</CardList.Menu>
-			<Suspense fallback={<PlaceholderCardList scale={0.6} length={12} />}>
-				<CardList.List cards={filteredCards() ?? []} scale={0.6}>
+			<Suspense fallback={<PlaceholderCardList scale={0.7} length={12} />}>
+				<CardList.List cards={filteredCards() ?? []} scale={0.7}>
 					{(card, index) => <UserCardListItem card={card} lazy={index() > 10} />}
 				</CardList.List>
 				<Show when={nextCursor() && !searchText()}>

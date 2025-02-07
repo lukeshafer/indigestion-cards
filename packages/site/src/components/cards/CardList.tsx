@@ -245,7 +245,7 @@ export function CardListLoader(props: { load: () => Promise<any>; children?: str
 					});
 
 					observer.observe(div);
-					observer.takeRecords;
+					observer.takeRecords();
 				}}
 			/>
 			{props.children || 'Click to load more'}
