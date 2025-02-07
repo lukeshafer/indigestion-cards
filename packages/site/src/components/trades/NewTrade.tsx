@@ -1,7 +1,7 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard, CardInstance, PackCardsHidden, TradePack } from '@core/types';
 import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
-import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
+import { Loading, SubmitButton, TextArea, TextInput } from '../Form';
 import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@site/constants';
 import { Heading } from '@site/components/text';
 import { get } from '@site/lib/client/data';

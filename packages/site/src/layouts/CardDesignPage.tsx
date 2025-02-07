@@ -8,8 +8,7 @@ import {
 	type Setter,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import CardList, { type Filters, filterCards } from '@site/components/cards/CardList';
-import PlaceholderCardList from '@site/components/cards/PlaceholderCardList';
+import CardList, { type Filters, PlaceholderCardList, filterCards } from '@site/components/CardList';
 import { routes } from '@site/constants';
 import {
 	Card,
@@ -28,7 +27,7 @@ import {
 	checkIsShitPack,
 	ShitStamp,
 	getShitStampPath,
-} from '@site/components/cards/Card';
+} from '@site/components/Card';
 import type { CardDesign, CardInstance } from '@core/types';
 
 export const DesignInstancesCardList: Component<{
@@ -79,7 +78,7 @@ export const DesignInstancesCardList: Component<{
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 			</CardList.Menu>
-			<Suspense fallback={<PlaceholderCardList />}>
+			<Suspense fallback={<PlaceholderCardList scale={0.8} />}>
 				<CardList.List cards={filteredCards() ?? []} scale={0.8}>
 					{(card, index) => (
 						<DesignInstancesCardListItem lazy={index() > 5} card={card} />

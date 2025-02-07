@@ -4,7 +4,7 @@ import { AllDesignsCardList } from '@site/layouts/AllDesignsPage';
 import { getAllCardDesigns } from '@core/lib/design';
 import { routeNames } from '@site/constants';
 import { PageTitle, PageHeader } from '@site/components/text';
-import { parseFiltersFromSearchParams } from '@site/components/cards/CardList';
+import { parseFiltersFromSearchParams } from '@site/components/CardList';
 
 const designs = getAllCardDesigns();
 const filters = parseFiltersFromSearchParams(Astro.url.searchParams);

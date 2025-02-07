@@ -1,5 +1,7 @@
 ---
-import Base, { type BaseProps } from './Base.astro';
+import '@site/global.css';
+import '@fontsource-variable/montserrat';
+import { ASSETS } from '@site/constants';
 import Breadcrumbs, { type Path } from '@site/components/Breadcrumbs';
 import Header, { type Props as HeaderProps } from '@site/components/Header.astro';
 import { Footer } from '@site/components/Footer';
@@ -7,7 +9,7 @@ import AlertBox from '@site/components/AlertBox';
 import { Api } from 'sst/node/api';
 import type { Alert } from '@site/lib/client/state';
 
-export interface Props extends BaseProps {
+export interface Props {
 	class?: string;
 	breadcrumbs?: Path[];
 	wide?: boolean;
@@ -15,19 +17,23 @@ export interface Props extends BaseProps {
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
 	logo?: HeaderProps['logo'];
+	title: string;
+	pageType?: 'public' | 'user' | 'admin';
 }
 
-const isAdmin = Astro.locals.session?.type === 'admin';
-const alerts = isAdmin ? Astro.locals.siteConfig.messages ?? [] : [];
+const session = Astro.locals.session;
+const isAdmin = session?.type === 'admin';
+const alerts = isAdmin ? (Astro.locals.siteConfig.messages ?? []) : [];
 
-{
-	const alert = Astro.url.searchParams.get('alert');
-	const alertType =
-		Astro.url.searchParams.get('alertType') ||
-		Astro.url.searchParams.get('alerttype') ||
-		Astro.url.searchParams.get('type');
-	if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
-}
+const alert = Astro.url.searchParams.get('alert');
+const alertType =
+	Astro.url.searchParams.get('alertType') ||
+	Astro.url.searchParams.get('alerttype') ||
+	Astro.url.searchParams.get('type');
+if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', message: alert });
+
+const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
+const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
 
 let {
 	class: className,
@@ -37,42 +43,99 @@ let {
 	'no-header': noHeader = false,
 	alerts: alertsProp,
 	logo,
-	...baseProps
+	title,
+	pageType = 'admin',
 } = Astro.props;
+
+let pageTitle =
+	title !== 'Indigestion Cards' ? title + ' — Indigestion Cards' : 'Indigestion Cards';
 
 alerts.push(...(alertsProp ?? []));
 ---
 
-<Base {...baseProps}>
-	<div
-		class="grid h-[100dvh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
-		id="page-layout-wrapper"
-		data-api-url={Api.AdminApi.url}>
-		<div
-			class="relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950 scrollbar-narrow"
-			id="page-scroll-wrapper">
-			{noHeader ? null : <Header {logo} />}
-			<data-lists></data-lists>
-			<AlertBox client:load {alerts} />
-			{
-				hideBreadcrumbs ? null : (
-					<div class="max-w-main mx-auto w-full">
-						<Breadcrumbs path={breadcrumbs ?? []} currentPath={Astro.url.pathname} />
-					</div>
-				)
+<html
+	lang="en"
+	class:list={{ dark: colorTheme === 'dark' }}
+	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
+	<!--
+Hello beautiful people of the internet!
+
+If you're reading this -- good job! You've decided to click "view source" and take a look at what the heck I did to make this cool site.
+
+If you have any questions or concerns, please reach out to me, snailyLuke, on Discord!
+-->
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href={ASSETS.FAVICON} />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
+    {!disableAnimations && (
+    <style>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
+    )}
+		<script is:inline>
+			if (
+				localStorage.theme === 'dark' ||
+				(!('theme' in localStorage) &&
+					window.matchMedia('(prefers-color-scheme: dark)').matches)
+			) {
+				document.documentElement.classList.add('dark');
+				localStorage.theme = 'dark';
+			} else {
+				document.documentElement.classList.remove('dark');
+				localStorage.theme = 'light';
 			}
-			<main
-				transition:name={wide ? undefined : 'main'}
-				class:list={{ 'max-w-main': !wide, [className ?? '']: true, 'p-3': !noHeader }}
-				class="@container/main z-0 col-start-2 mx-auto mb-8 w-full flex-1">
-				<slot />
-			</main>
-			<div id="card-preview"></div>
-			<Footer />
-		</div>
-	</div>
-	<script>
-		// import custom elements
-		import '../lib/client/elements/data-lists';
-	</script>
-</Base>
+		</script>
+		<title>{pageTitle}</title>
+	</head>
+	<body
+		class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50"
+		class:list={{ 'disable-animations': disableAnimations }}>
+		{
+			session?.type === 'admin' ||
+			(session?.type === 'user' && pageType === 'user') ||
+			pageType === 'public' ? (
+				<>
+					<div
+						class="grid h-[100dvh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
+						id="page-layout-wrapper"
+						data-api-url={Api.AdminApi.url}>
+						<div
+							class="scrollbar-narrow relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950"
+							id="page-scroll-wrapper">
+							{noHeader ? null : <Header {logo} />}
+							<data-lists />
+							<AlertBox client:load {alerts} />
+							{hideBreadcrumbs ? null : (
+								<div class="max-w-main mx-auto w-full">
+									<Breadcrumbs
+										path={breadcrumbs ?? []}
+										currentPath={Astro.url.pathname}
+									/>
+								</div>
+							)}
+							<main
+								transition:name={wide ? undefined : 'main'}
+								class:list={{
+									'max-w-main': !wide,
+									[className ?? '']: true,
+									'p-3': !noHeader,
+								}}
+								class="@container/main z-0 col-start-2 mx-auto mb-8 w-full flex-1">
+								<slot />
+							</main>
+							<div id="card-preview" />
+							<Footer />
+						</div>
+					</div>
+				</>
+			) : (
+				<script> window.location.href = '/' </script>
+			)
+		}
+	</body>
+</html>

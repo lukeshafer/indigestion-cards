@@ -2,8 +2,9 @@ import {
 	default as CardList,
 	filterCards,
 	parseUniqueSeasons,
+	PlaceholderCardList,
 	type Filters,
-} from '@site/components/cards/CardList';
+} from '@site/components/CardList';
 import { type SortInfo, getSortInfo } from '@site/lib/client/utils';
 import {
 	Show,
@@ -17,15 +18,14 @@ import {
 	Match,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import PlaceholderCardList from '@site/components/cards/PlaceholderCardList';
 import { routes, USER_API } from '@site/constants';
-import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/cards/Card';
+import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import type { CardInstance, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
-import { Pack } from '@site/components/pack/Pack';
+import { Pack } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import { actions } from 'astro:actions';
-import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '@site/components/form/Form';
+import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
 

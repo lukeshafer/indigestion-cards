@@ -9,7 +9,7 @@ import {
 	onMount,
 	Suspense,
 } from 'solid-js';
-import { SubmitButton, TextInput } from '../form/Form';
+import { SubmitButton, TextInput } from '../Form';
 import { get } from '@site/lib/client/data';
 import { routes } from '@site/constants';
 

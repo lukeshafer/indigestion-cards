@@ -13,8 +13,7 @@ import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, resolveLocalPath } from '@site/constants';
 import { setTotalPackCount } from '@site/lib/client/state';
-import { Checkbox } from '../form/Form';
-import { isChatters, type Chatter } from '@site/lib/client/chatters';
+import { Checkbox } from '../Form';
 import {
 	OpenPacksContext,
 	type OpenPacksState,
@@ -44,7 +43,7 @@ export default function OpenPacks(props: Props) {
 		try {
 			const res = await fetch(resolveLocalPath(API.TWITCH_CHATTERS));
 			const data = await res.json().catch(() => ({}));
-			return isChatters(data) ? data : [];
+			return checkIsChatters(data) ? data : [];
 		} catch {
 			return [];
 		}
@@ -339,4 +338,26 @@ function mergeStoredListWithCurrentList(
 	}
 
 	return mergedPacks.concat(remainingPacks).concat(lockedPacks);
+}
+
+interface Chatter {
+	user_id: string;
+	user_login: string;
+	user_name: string;
+}
+function checkIsChatters(data: unknown): data is Chatter[] {
+	return (
+		Array.isArray(data) &&
+		data.every(
+			(item) =>
+				typeof item === 'object' &&
+				item !== null &&
+				'user_id' in item &&
+				'user_login' in item &&
+				'user_name' in item &&
+				typeof item.user_id === 'string' &&
+				typeof item.user_login === 'string' &&
+				typeof item.user_name === 'string'
+		)
+	);
 }

@@ -17,11 +17,11 @@ import {
 	ShineMouseEffect,
 	ShitStamp,
 	TiltEffectWrapper,
-} from '../cards/Card';
+} from '../Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
 import { transformPackTypeName } from '@site/lib/client/utils';
-import { Pack } from '../pack/Pack';
+import { Pack } from '@site/components/Pack';
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];

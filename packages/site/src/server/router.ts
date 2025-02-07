@@ -11,11 +11,8 @@ import {
 	searchDesignCards,
 	searchUserCards,
 } from '@core/lib/card';
-import {
-	getAllPacks,
-	getPacksByUsername,
-	hidePackCards,
-} from '@core/lib/pack';
+import { getAllPacks, getPacksByUsername, hidePackCards } from '@core/lib/pack';
+import { getAllUsers } from '@core/lib/user';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -53,6 +50,11 @@ const designCardsInputSchema = z.object({
 });
 
 export const appRouter = t.router({
+	users: {
+		allUsernames: publicProcedure.query(async () =>
+			(await getAllUsers()).map(user => user.username).sort((a, b) => a.localeCompare(b))
+		),
+	},
 	userCards: {
 		sortedByRarity: publicProcedure
 			.input(userCardsInputSchema)

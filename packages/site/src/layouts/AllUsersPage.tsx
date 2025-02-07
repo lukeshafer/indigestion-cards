@@ -8,12 +8,12 @@ import {
 	type Component,
 	type ParentComponent,
 } from 'solid-js';
-import { CardEls, FULL_ART_BACKGROUND_CSS, cardUtils } from '../cards/Card';
+import { CardEls, FULL_ART_BACKGROUND_CSS, cardUtils } from '@site/components/Card';
 import type { TwitchUser } from '@core/lib/twitch';
 import { routes } from '@site/constants';
-import { createTable, Table, TBody, TCell, THead, THeading, TRow, TSearch } from '../Table';
-import CardsIcon from '../icons/CardsIcon';
-import PacksIcon from '../icons/PacksIcon';
+import { createTable, Table, TBody, TCell, THead, THeading, TRow, TSearch } from '@site/components/Table';
+import CardsIcon from '@site/components/icons/CardsIcon';
+import PacksIcon from '@site/components/icons/PacksIcon';
 
 type UserPageRecord = {
 	user: User;

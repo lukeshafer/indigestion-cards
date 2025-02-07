@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For } from 'solid-js';
-import { Select } from '../form/Form';
+import { Select } from '../Form';
 import { produce } from 'solid-js/store';
 import { transformPackTypeName } from '@site/lib/client/utils';
 import {
@@ -10,7 +10,7 @@ import {
 } from './TradeInventoryList';
 import type { TradePackUi } from './NewTrade';
 import type { TradePack } from '@core/types';
-import { Pack } from '../pack/Pack';
+import { Pack } from '@site/components/Pack';
 
 export default function PackTradeList(props: {
 	label: string;

@@ -9,7 +9,7 @@ import {
 } from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
 import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
-import { Checkbox } from '../form/Form';
+import { Checkbox } from '../Form';
 
 export function Statistics() {
 	const ctx = useContext(OpenPacksContext);

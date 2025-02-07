@@ -1,12 +1,16 @@
 import { createEffect, createSignal, Match, Show, Switch, For, type Component } from 'solid-js';
 import { Anchor, Heading, PageTitle } from '@site/components/text';
 import type { CardInstance, User } from '@core/types';
-import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/cards/Card';
-import CardPreview from '@site/components/cards/CardPreview';
+import {
+	CardEls,
+	CardPreview,
+	cardUtils,
+	FULL_ART_BACKGROUND_CSS,
+} from '@site/components/Card';
 import { useViewTransition } from '@site/lib/client/utils';
-import { routes } from '@site/constants';
-import PinCardToProfileButton from '@site/components/cards/PinCardToProfileButton';
+import { routes, USER_API } from '@site/constants';
 import { createTable, TableEls } from '@site/components/Table';
+import { Form, SubmitButton } from '@site/components/Form';
 
 export const CardInstancePage: Component<{
 	card: CardInstance;
@@ -58,7 +62,7 @@ export const CardInstancePage: Component<{
 	);
 };
 
-export const PreviewableCard: Component<{ card: CardInstance }> = props => {
+const PreviewableCard: Component<{ card: CardInstance }> = props => {
 	const [isPreviewed, setIsPreviewed] = createSignal(false);
 
 	createEffect(() => {
@@ -114,7 +118,7 @@ export const PreviewableCard: Component<{ card: CardInstance }> = props => {
 	);
 };
 
-export const CardInstanceInfo: Component<{ card: CardInstance }> = props => {
+const CardInstanceInfo: Component<{ card: CardInstance }> = props => {
 	const openDate = () => formatOpenDateString(props.card.openedAt);
 
 	return (
@@ -237,6 +241,34 @@ const CardTradeHistory: Component<{
 				</TableEls.TBody>
 			</TableEls.Table>
 		</article>
+	);
+};
+
+const PinCardToProfileButton: Component<{
+	userId: string;
+	instanceId: string;
+	designId: string;
+	isPinned?: boolean;
+}> = props => {
+	const [isPinnedUI, setIsPinnedUI] = createSignal(undefined as boolean | undefined);
+	const isPinned = () => isPinnedUI() ?? props.isPinned;
+	const text = () => (isPinned() ? 'Unpin from profile' : 'Pin to profile');
+
+	return (
+		<Form action={USER_API.USER} method="patch" onsuccess={() => setIsPinnedUI(!isPinned())}>
+			<input type="hidden" name="userId" value={props.userId} />
+			<input
+				type="hidden"
+				name="pinnedCardId"
+				value={props.isPinned ? 'null' : props.instanceId}
+			/>
+			<input
+				type="hidden"
+				name="pinnedCardDesignId"
+				value={props.isPinned ? 'null' : props.designId}
+			/>
+			<SubmitButton>{text()}</SubmitButton>
+		</Form>
 	);
 };
 

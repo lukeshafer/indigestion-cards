@@ -1,12 +1,12 @@
 import { createSignal, Show, useContext, type Component } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
 import { API, ASSETS } from '@site/constants';
-import CardPreview from '../cards/CardPreview';
 import {
 	Card,
 	CardDescription,
 	CardName,
 	CardNumber,
+  CardPreview,
 	checkIfCanShowCardText,
 	checkIsFullArt,
 	checkIsLegacyCard,
@@ -18,7 +18,7 @@ import {
 	getShitStampPath,
 	ShitStamp,
 	TiltEffectWrapper,
-} from '../cards/Card';
+} from '../Card';
 
 export function ShowcaseCard(props: {
 	card: PackEntityWithStatus['cardDetails'][number];

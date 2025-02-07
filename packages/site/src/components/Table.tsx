@@ -1,6 +1,6 @@
 import { createMemo, type JSX, type Component, type ParentComponent } from 'solid-js';
 import { twMerge } from 'tailwind-merge';
-import { TextInput } from './form/Form';
+import { TextInput } from './Form';
 import { createStore } from 'solid-js/store';
 
 export const Table: ParentComponent<{ class?: string }> = props => {

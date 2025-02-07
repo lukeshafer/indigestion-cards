@@ -7,7 +7,7 @@ import {
 	filterCards,
 	parseUniqueSeasons,
 	type Filters,
-} from '@site/components/cards/CardList';
+} from '@site/components/CardList';
 import { getCardSearcher, sortCardsByName } from '@site/lib/client/utils';
 import { createMemo, createSignal, Show, type Component } from 'solid-js';
 import type { RarityRankingRecord } from '@core/lib/site-config';
@@ -23,7 +23,7 @@ import {
 	CardName,
 	CardDescription,
 	CardLinkWrapper,
-} from '@site/components/cards/Card';
+} from '@site/components/Card';
 import type { CardDesign } from '@core/types';
 
 export const AllDesignsCardList: Component<{

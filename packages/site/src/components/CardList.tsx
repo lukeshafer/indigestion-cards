@@ -1,4 +1,4 @@
-import { For, Show, type JSXElement } from 'solid-js';
+import { For, Show, type Component, type JSXElement } from 'solid-js';
 
 export function CardList<T extends CardDesign | CardInstance>(props: {
 	cards: Array<T>;
@@ -22,12 +22,12 @@ export function CardList<T extends CardDesign | CardInstance>(props: {
 	);
 }
 
-export const CardListMenu = (props: { children: JSXElement }) => (
-	<div class="mb-6 flex max-w-3xl px-2 gap-4 mx-auto">{props.children}</div>
+export const CardListMenu: Component<{ children: JSXElement }> = props => (
+	<div class="mx-auto mb-6 flex max-w-3xl gap-4 px-2">{props.children}</div>
 );
 
 // FILTERING
-import { Fieldset, SubmitButton } from '../form/Form';
+import { Fieldset, SubmitButton } from '@site/components/Form';
 
 export type SeasonFilterParams = {
 	seasonId: string;
@@ -72,9 +72,9 @@ export function CardListFilter(props: {
 	ssrFilters?: Filters;
 }) {
 	return (
-		<details class="relative w-96 self-end bg-gray-200 px-4 py-2 dark:bg-gray-900 rounded">
-			<summary class="text-left cursor-pointer">Filter</summary>
-			<div class="absolute top-full left-0 w-full z-10 bg-gray-200 dark:bg-gray-900">
+		<details class="relative w-96 self-end rounded bg-gray-200 px-4 py-2 dark:bg-gray-900">
+			<summary class="cursor-pointer text-left">Filter</summary>
+			<div class="absolute left-0 top-full z-10 w-full bg-gray-200 dark:bg-gray-900">
 				<form
 					class="flex flex-wrap gap-2 p-4"
 					onSubmit={e => e.preventDefault()}
@@ -209,7 +209,7 @@ export function parseFiltersFromSearchParams(params: URLSearchParams) {
 }
 
 /// LOAD BUTTON
-export function CardListLoader(props: { load: () => Promise<any>; children?: string }) {
+export function CardListLoader(props: { load: () => Promise<unknown>; children?: string }) {
 	return (
 		<button
 			class="border-brand-main relative m-8 mx-auto w-full max-w-52 border p-2"
@@ -254,7 +254,7 @@ export function CardListLoader(props: { load: () => Promise<any>; children?: str
 }
 
 // SEARCH
-import { TextInput } from '../form/Form';
+import { TextInput } from '@site/components/Form';
 
 export function CardListSearch(props: { setSearchText: (text: string) => void }) {
 	let timeout: NodeJS.Timeout;
@@ -281,7 +281,7 @@ import {
 	type SortType,
 	sortTypes as validSortTypes,
 } from '@site/lib/client/utils';
-import { Select } from '../form/Form';
+import { Select } from '@site/components/Form';
 import type { CardDesign, CardInstance } from '@core/types';
 
 export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
@@ -303,6 +303,26 @@ export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 		/>
 	);
 }
+
+export const PlaceholderCardList: Component<{ length?: number; scale?: number }> = props => (
+	<ul
+		class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--base-card-scale:0.75] sm:[--base-card-scale:1] md:gap-x-6"
+		style={{
+			'--card-scale': `calc(${props.scale ?? 1} * var(--base-card-scale))`,
+			'grid-template-columns':
+				'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+		}}>
+		<For each={[...Array(props.length || 6).keys()]}>
+			{() => (
+				<li class="w-fit" style={{ 'font-size': `calc(1rem * var(--card-scale))` }}>
+					<article class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left">
+						<img src="/assets/cards/placeholder.png" alt="" class="absolute inset-0" />
+					</article>
+				</li>
+			)}
+		</For>
+	</ul>
+);
 
 export default {
 	List: CardList,

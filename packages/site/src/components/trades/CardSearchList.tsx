@@ -1,7 +1,7 @@
 import type { TradeCardUi } from './NewTrade';
 import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
 import type { CardInstance, TradeCard } from '@core/types';
-import { Select, TextInput } from '../form/Form';
+import { Select, TextInput } from '../Form';
 import { produce } from 'solid-js/store';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import { sortCards, sortTypes, type SortType, getCardSearcher } from '@site/lib/client/utils';
@@ -19,7 +19,7 @@ import {
 	getCardImageUrl,
 	GlowOnHover,
 	ShineMouseEffect,
-} from '../cards/Card';
+} from '../Card';
 
 export default function CardSearchList(props: {
 	label: string;

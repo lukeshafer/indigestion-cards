@@ -1,7 +1,7 @@
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@site/constants';
 import { type JSX, type Component, type ParentComponent, type FlowComponent } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import { Dynamic } from 'solid-js/web';
+import { Dynamic, Portal } from 'solid-js/web';
 import { checkAreAnimationsDisabled } from '@site/lib/client/utils';
 
 export const checkIsFullArt = (rarityId: string): boolean => rarityId === FULL_ART_ID;
@@ -217,11 +217,11 @@ export const TiltEffectWrapper: ParentComponent<{
 				targetRotateY = 0;
 				targetRotateX = 0;
 			}}
-      onTouchEnd={() => {
+			onTouchEnd={() => {
 				canStop = true;
 				targetRotateY = 0;
 				targetRotateX = 0;
-      }}
+			}}
 			onTouchMove={e => {
 				const bounds = e.currentTarget.getBoundingClientRect();
 				const touches = e.touches[0];
@@ -321,6 +321,16 @@ export const ShineMouseEffect: Component = () => {
 		</div>
 	);
 };
+
+export const CardPreview: ParentComponent<{ close: () => void }> = props => (
+	<Portal mount={document.getElementById('card-preview') ?? undefined}>
+		<div
+			class="absolute inset-0 z-50 m-auto flex h-full w-full items-center justify-center pt-4 backdrop-blur-sm"
+			onClick={() => props.close()}>
+			{props.children}
+		</div>
+	</Portal>
+);
 
 export const CardEls = {
 	Card,

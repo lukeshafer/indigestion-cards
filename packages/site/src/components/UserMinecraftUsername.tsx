@@ -1,5 +1,5 @@
 import type { User } from '@core/types';
-import { DeleteButton, Form, SubmitButton, TextInput } from '../form/Form';
+import { DeleteButton, Form, SubmitButton, TextInput } from '@site/components/Form';
 import { USER_API } from '@site/constants';
 import { Show, createSignal, type Setter } from 'solid-js';
 
