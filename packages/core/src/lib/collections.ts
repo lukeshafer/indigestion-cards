@@ -1,14 +1,13 @@
 import { db } from '../db';
-import type { CardInstance, Collection, User } from '../db.types';
+import type { CardInstance, Collection } from '../db.types';
 import { getUser } from './user';
 
 export async function createSetCollection(args: {
 	userId: string;
-	collectionId: string;
 	collectionName: string;
 	collectionCards: Array<string>;
 }) {
-	const verifyResult = await verifyUserAndCollectionId(args);
+	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
 		return verifyResult;
 	}
@@ -18,7 +17,6 @@ export async function createSetCollection(args: {
 		.append({
 			collections: [
 				{
-					collectionId: args.collectionId,
 					collectionName: args.collectionName,
 					cards: args.collectionCards,
 					collectionType: 'set',
@@ -27,16 +25,18 @@ export async function createSetCollection(args: {
 		})
 		.go();
 
-	return { success: true, data: result.data } as const;
+	return {
+		success: true,
+		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+	} as const;
 }
 
 export async function createRuleCollection(args: {
 	userId: string;
-	collectionId: string;
 	collectionName: string;
 	collectionRules: NonNullable<Collection['rules']>;
 }) {
-	const verifyResult = await verifyUserAndCollectionId(args);
+	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
 		return verifyResult;
 	}
@@ -46,7 +46,6 @@ export async function createRuleCollection(args: {
 		.append({
 			collections: [
 				{
-					collectionId: args.collectionId,
 					collectionName: args.collectionName,
 					rules: args.collectionRules,
 					collectionType: 'set',
@@ -55,10 +54,13 @@ export async function createRuleCollection(args: {
 		})
 		.go();
 
-	return { success: true, data: result.data } as const;
+	return {
+		success: true,
+		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+	} as const;
 }
 
-async function verifyUserAndCollectionId(args: { userId: string; collectionId: string }) {
+async function verifyUser(args: { userId: string }) {
 	const user = await getUser(args.userId);
 
 	if (!user) {
@@ -66,12 +68,6 @@ async function verifyUserAndCollectionId(args: { userId: string; collectionId: s
 	}
 
 	const existingCollections = user.collections ?? [];
-
-	const idAlreadyExists = existingCollections.some(c => c.collectionId === args.collectionId);
-
-	if (idAlreadyExists) {
-		return { success: false, message: 'ID_ALREADY_EXISTS' } as const;
-	}
 
 	return { success: true, data: { user, existingCollections } } as const;
 }
@@ -113,29 +109,40 @@ export async function getCollectionCards(args: { userId: string; collectionId: s
 
 	switch (collection.collectionType) {
 		case 'set':
-			return { success: true, data: getSetCollectionCards({ collection, user }) };
+			return {
+				success: true,
+				data: getSetCollectionCards({ cards: collection.cards, username: user.username }),
+			};
 		case 'rule':
-			return { success: true, data: getRuleCollectionCards({ collection, user }) };
+			return {
+				success: true,
+				data: getRuleCollectionCards({
+					rules: collection.rules,
+					username: user.username,
+					userId: user.userId,
+				}),
+			};
 	}
 }
 
-async function getSetCollectionCards(args: {
-	user: User;
-	collection: Collection;
+export async function getSetCollectionCards(args: {
+	username: string;
+	cards: Collection['cards'];
 }): Promise<Array<CardInstance>> {
-	const cardIds = args.collection.cards ?? [];
+	const cardIds = args.cards ?? [];
 
 	const result = await db.entities.CardInstances.query
-		.byUser({ username: args.user.username })
+		.byUser({ username: args.username })
 		.where((attr, op) => cardIds.map(id => op.eq(attr.instanceId, id)).join(' OR '))
 		.go({ pages: 'all' });
 
 	return result.data;
 }
 
-async function getRuleCollectionCards(args: {
-	user: User;
-	collection: Collection;
+export async function getRuleCollectionCards(args: {
+	username: string;
+	userId: string;
+	rules: Collection['rules'];
 }): Promise<Array<CardInstance>> {
 	const {
 		cardDesignIds,
@@ -146,10 +153,10 @@ async function getRuleCollectionCards(args: {
 		mintedByIds,
 		//tags, TODO:
 		//cardNumerators, TODO:
-	} = args.collection.rules ?? {};
+	} = args.rules ?? {};
 
 	const result = await db.entities.CardInstances.query
-		.byUser({ username: args.user.username })
+		.byUser({ username: args.username })
 		.where((attr, op) => {
 			let conditions: Array<string> = [];
 
@@ -162,9 +169,9 @@ async function getRuleCollectionCards(args: {
 			}
 
 			if (isMinter === true) {
-				conditions.push(op.eq(attr.minterId, args.user.userId));
+				conditions.push(op.eq(attr.minterId, args.userId));
 			} else if (isMinter === false) {
-				conditions.push(op.ne(attr.minterId, args.user.userId));
+				conditions.push(op.ne(attr.minterId, args.userId));
 			}
 
 			if (rarityIds) {

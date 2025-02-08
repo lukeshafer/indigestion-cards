@@ -13,6 +13,11 @@ import {
 } from '@core/lib/card';
 import { getAllPacks, getPacksByUsername, hidePackCards } from '@core/lib/pack';
 import { getAllUsers } from '@core/lib/user';
+import {
+	getCollectionCards,
+	getRuleCollectionCards,
+	getSetCollectionCards,
+} from '@core/lib/collections';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -108,6 +113,51 @@ export const appRouter = t.router({
 						packs.map(hidePackCards)
 					)
 			),
+	},
+	collections: {
+		cards: authedProcedure.input(z.object({ collectionId: z.string() })).query(
+			async ({ input, ctx }) =>
+				await getCollectionCards({
+					userId: ctx.session.properties.userId,
+					collectionId: input.collectionId,
+				})
+		),
+		mockLoadCardsSet: adminProcedure
+			.input(
+				z.object({
+					cards: z.array(z.string()),
+				})
+			)
+			.query(async ({ input, ctx }) => {
+				const data = await getSetCollectionCards({
+					username: ctx.session.properties.username,
+					cards: input.cards,
+				});
+
+				return { cards: data };
+			}),
+		mockLoadCardsRule: adminProcedure
+			.input(
+				z.object({
+					cardDesignIds: z.array(z.string()).optional(),
+					cardNumerators: z.array(z.string()).optional(),
+					seasonIds: z.array(z.string()).optional(),
+					stamps: z.array(z.string()).optional(),
+					tags: z.array(z.string()).optional(),
+					rarityIds: z.array(z.string()).optional(),
+					isMinter: z.boolean().optional(),
+					mintedByIds: z.array(z.string()).optional(),
+				})
+			)
+			.query(async ({ input, ctx }) => {
+				const data = await getRuleCollectionCards({
+					username: ctx.session.properties.username,
+					userId: ctx.session.properties.userId,
+					rules: input,
+				});
+
+				return { cards: data };
+			}),
 	},
 });
 

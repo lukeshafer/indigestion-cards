@@ -1,13 +1,13 @@
 import { InputValidationError, ServerError, UnauthorizedError } from '@core/lib/errors';
 import { addMessageToTrade, createTradeFromApi, updateTradeStatus } from '@core/lib/trades';
 import { ActionError, defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { array, object, string } from 'astro:schema';
 
 export const updateTrade = defineAction({
-	input: z.object({
-		tradeId: z.string().min(1, 'Trade ID cannot be empty.'),
-		status: z.string().optional(),
-		message: z.string().optional(),
+	input: object({
+		tradeId: string().min(1, 'Trade ID cannot be empty.'),
+		status: string().optional(),
+		message: string().optional(),
 	}),
 	async handler({ tradeId, status, message }, context) {
 		let user = context.locals.user;
@@ -50,13 +50,13 @@ export const updateTrade = defineAction({
 });
 
 export const createTrade = defineAction({
-	input: z.object({
-		receiverUsername: z.string(),
-		offeredCards: z.array(z.string()),
-		requestedCards: z.array(z.string()),
-		offeredPacks: z.array(z.string()),
-		requestedPacks: z.array(z.string()),
-		message: z.string().optional(),
+	input: object({
+		receiverUsername: string(),
+		offeredCards: array(string()),
+		requestedCards: array(string()),
+		offeredPacks: array(string()),
+		requestedPacks: array(string()),
+		message: string().optional(),
 	}),
 	async handler(input, context) {
 		let user = context.locals.user;
