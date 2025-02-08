@@ -58,3 +58,37 @@ export async function updateCardDesign(args: UpdateCardDesign & { designId: stri
 	const result = await db.entities.CardDesigns.patch({ designId }).set(rest).go();
 	return { success: true, data: result.data };
 }
+
+export async function addCardDesignTag(args: { designId: string; tags: Array<string> }) {
+	const result = await db.entities.CardDesigns.patch({ designId: args.designId })
+		.append({
+			tags: args.tags,
+		})
+		.go();
+
+	return { success: true, data: result.data };
+}
+
+export async function removeCardDesignTag(args: { designId: string; tag: string }) {
+	const { data: designs } = await db.entities.CardDesigns.query
+		.primary({ designId: args.designId })
+		.go();
+	if (!designs.length) return { success: false, message: 'No design found' } as const;
+	const design = designs[0];
+
+	if (!design.tags?.includes(args.tag)) {
+		return { success: false, message: 'Tag does not exist' } as const;
+	}
+
+	const tagIndex = design.tags.findIndex(tag => tag === args.tag);
+	const tagsCopy = design.tags.slice();
+	tagsCopy.splice(tagIndex, 1);
+
+	const result = await db.entities.CardDesigns.patch({ designId: args.designId })
+		.set({
+			tags: tagsCopy,
+		})
+		.go();
+
+	return { success: true, data: result.data };
+}

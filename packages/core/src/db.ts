@@ -1,6 +1,12 @@
 import { Table } from 'sst/node/table';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
+import {
+	type Attribute,
+	type EntityConfiguration,
+	type NestedMapAttribute,
+	Entity,
+	Service,
+} from 'electrodb';
 import { randomUUID } from 'crypto';
 import { useSession } from 'sst/node/future/auth';
 
@@ -172,6 +178,7 @@ const CardDesigns = new Entity(
 					},
 				},
 			},
+			tags: { type: 'list', items: { type: 'string' } },
 			...auditAttributes('cardDesign'),
 		},
 		indexes: {
@@ -818,6 +825,29 @@ const UserLogins = new Entity(
 	dbConfig
 );
 
+const CollectionAttributes = {
+	type: 'map',
+	properties: {
+		collectionName: { type: 'string', required: true },
+		collectionId: { type: 'string', required: true },
+		collectionType: { type: ['rule', 'set'] as const, required: true },
+		cards: { type: 'list', items: { type: 'string' } },
+		rules: {
+			type: 'map',
+			properties: {
+				cardDesignIds: { type: 'list', items: { type: 'string' } },
+				cardNumerators: { type: 'list', items: { type: 'string' } },
+				seasonIds: { type: 'list', items: { type: 'string' } },
+				stamps: { type: 'list', items: { type: 'string' } },
+				tags: { type: 'list', items: { type: 'string' } },
+				rarityIds: { type: 'list', items: { type: 'string' } },
+				isMinter: { type: 'boolean' },
+				mintedByIds: { type: 'list', items: { type: 'string' } },
+			},
+		},
+	},
+} satisfies NestedMapAttribute;
+
 const Users = new Entity(
 	{
 		model: { entity: 'user', version: '1', service: DB_SERVICE },
@@ -858,6 +888,10 @@ const Users = new Entity(
 					totalOfType: { type: 'number', required: true },
 					stamps: { type: 'list', items: { type: 'string' } },
 				},
+			},
+			collections: {
+				type: 'list',
+				items: CollectionAttributes,
 			},
 			...auditAttributes('user'),
 		},

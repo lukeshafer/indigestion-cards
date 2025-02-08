@@ -52,3 +52,4 @@ export type CreateUserLogin = CreateEntityItem<typeof db.entities.UserLogins>;
 
 export type User = EntityItem<typeof db.entities.Users>;
 export type CreateUser = CreateEntityItem<typeof db.entities.Users>;
+export type Collection = NonNullable<User['collections']>[number]

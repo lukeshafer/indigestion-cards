@@ -9,7 +9,7 @@
     "deploy": "sst deploy",
     "remove": "sst remove",
     "console": "sst console",
-    "check": "pnpm run root:check & pnpm run core:check & pnpm run functions:check & pnpm run site:check",
+    "check": "pnpm run root:check & pnpm run core:check & pnpm run functions:check & pnpm run site:check & pnpm run admin:check",
     "root:check": "tsc --noEmit",
     "core:check": "pnpm --filter core run typecheck",
     "functions:check": "pnpm --filter functions run typecheck",
