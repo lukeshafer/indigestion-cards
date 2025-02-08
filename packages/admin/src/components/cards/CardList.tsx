@@ -1,7 +1,7 @@
 import { routes, NO_CARDS_OPENED_ID, FULL_ART_ID, LEGACY_CARD_ID } from '@admin/constants';
 import Card from '@admin/components/cards/Card';
 import { For, Show, createSignal } from 'solid-js';
-import { Select } from '../Form';
+import { Select } from '../form/Form';
 import type { CardInstance, CardDesign } from '@core/types';
 import { useViewTransition } from '@admin/lib/client/utils';
 import type { Session } from '@admin/env';
