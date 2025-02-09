@@ -130,6 +130,7 @@ export async function getSetCollectionCards(args: {
 	cards: Collection['cards'];
 }): Promise<Array<CardInstance>> {
 	const cardIds = args.cards ?? [];
+  if (cardIds.length === 0) return []
 
 	const result = await db.entities.CardInstances.query
 		.byUser({ username: args.username })
@@ -144,6 +145,11 @@ export async function getRuleCollectionCards(args: {
 	userId: string;
 	rules: Collection['rules'];
 }): Promise<Array<CardInstance>> {
+  if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
+    console.log("Empty rules, returning empty array");
+    return [];
+  }
+
 	const {
 		cardDesignIds,
 		stamps,
@@ -186,7 +192,10 @@ export async function getRuleCollectionCards(args: {
 				conditions.push(mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR '));
 			}
 
-			return `(${conditions.join(') AND (')}`;
+      const conditionString = `(${conditions.join(') AND (')})`;
+      console.log({conditionString})
+
+			return conditionString;
 		})
 		.go({ pages: 'all' });
 

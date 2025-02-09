@@ -12,12 +12,14 @@ import {
 	searchUserCards,
 } from '@core/lib/card';
 import { getAllPacks, getPacksByUsername, hidePackCards } from '@core/lib/pack';
-import { getAllUsers } from '@core/lib/user';
+import { getAllUsers, searchUsers } from '@core/lib/user';
 import {
 	getCollectionCards,
 	getRuleCollectionCards,
 	getSetCollectionCards,
 } from '@core/lib/collections';
+import { getAllCardDesigns } from '@core/lib/design';
+import { getAllSeasons } from '@core/lib/season';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -59,6 +61,9 @@ export const appRouter = t.router({
 		allUsernames: publicProcedure.query(async () =>
 			(await getAllUsers()).map(user => user.username).sort((a, b) => a.localeCompare(b))
 		),
+		search: publicProcedure
+			.input(z.object({ searchString: z.string().min(1) }))
+			.query(async ({ input }) => await searchUsers(input)),
 	},
 	userCards: {
 		sortedByRarity: publicProcedure
@@ -81,6 +86,12 @@ export const appRouter = t.router({
 				})
 			)
 			.query(async ({ input }) => await searchUserCards(input)),
+	},
+	designs: {
+		getAll: publicProcedure.query(async () => await getAllCardDesigns()),
+	},
+	seasons: {
+		getAll: publicProcedure.query(async () => await getAllSeasons()),
 	},
 	designCards: {
 		sortedByRarity: publicProcedure
@@ -134,7 +145,7 @@ export const appRouter = t.router({
 					cards: input.cards,
 				});
 
-				return { cards: data };
+				return data;
 			}),
 		mockLoadCardsRule: adminProcedure
 			.input(
@@ -156,7 +167,7 @@ export const appRouter = t.router({
 					rules: input,
 				});
 
-				return { cards: data };
+				return data;
 			}),
 	},
 });

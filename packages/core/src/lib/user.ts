@@ -27,6 +27,18 @@ export async function getAllUsers(): Promise<User[]> {
 	}
 }
 
+export async function searchUsers(args: { searchString: string }): Promise<User[]> {
+	try {
+		let { data } = await db.entities.Users.query
+			.allUsers({})
+			.where((attr, op) => op.contains(attr.username, args.searchString.toLowerCase()))
+			.go({ pages: 'all' });
+		return data.sort((a,b) => a.username.localeCompare(b.username)) ?? [];
+	} catch {
+		return [];
+	}
+}
+
 export async function getUserAndCardInstances(args: { username: string }): Promise<{
 	Users: User[];
 	UserLogins: UserLogin[];
