@@ -137,7 +137,12 @@ export async function getSetCollectionCards(args: {
 		.where((attr, op) => cardIds.map(id => op.eq(attr.instanceId, id)).join(' OR '))
 		.go({ pages: 'all' });
 
-	return result.data;
+	return result.data.slice().sort((a,b) => {
+    let aIndex = cardIds.findIndex(c => c === a.instanceId);
+    let bIndex = cardIds.findIndex(c => c === b.instanceId);
+
+    return aIndex - bIndex;
+  });
 }
 
 export async function getRuleCollectionCards(args: {

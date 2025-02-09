@@ -1,11 +1,12 @@
 import type { CardDesign, CardInstance, Collection } from '@core/types';
 import { trpc } from '@site/lib/client/trpc';
 import {
+	createEffect,
 	createResource,
 	createSignal,
 	For,
 	Match,
-	onMount,
+	on,
 	Show,
 	Suspense,
 	Switch,
@@ -15,9 +16,14 @@ import {
 import { Checkbox, Fieldset } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { FULL_ART_ID } from '@site/constants';
+import { createStore, produce, reconcile } from 'solid-js/store';
 
-export const CollectionBuilder: Component = () => {
-	const [collectionType, setCollectionType] = createSignal<'set' | 'rule'>('set');
+export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
+	const [state, setState] = createStore({
+		collectionType: 'set' as 'set' | 'rule',
+		previewCards: [] as Array<CardInstance>,
+	});
+
 	return (
 		<>
 			<label class="flex gap-2">
@@ -25,8 +31,8 @@ export const CollectionBuilder: Component = () => {
 					type="radio"
 					name="collectionType"
 					value="set"
-          checked
-					onChange={() => setCollectionType('set')}
+					checked
+					onChange={() => setState('collectionType', 'set')}
 				/>
 				Standard
 			</label>
@@ -35,61 +41,106 @@ export const CollectionBuilder: Component = () => {
 					type="radio"
 					name="collectionType"
 					value="rule"
-					onChange={() => setCollectionType('rule')}
+					onChange={() => setState('collectionType', 'rule')}
 				/>
 				Advanced
 			</label>
-			<Switch>
-				<Match when={collectionType() === 'set'}>
-					<SetCollectionBuilder />
-				</Match>
-				<Match when={collectionType() === 'rule'}>
-					<RuleCollectionBuilder />
-				</Match>
-			</Switch>
+			<div
+				class="grid"
+				style={{
+					'grid-template-columns': '1fr 40rem',
+				}}>
+				<Switch>
+					<Match when={state.collectionType === 'set'}>
+						<SetCollectionBuilder
+							cards={props.cards}
+							setPreviewCards={cards => setState('previewCards', reconcile(cards))}
+						/>
+					</Match>
+					<Match when={state.collectionType === 'rule'}>
+						<RuleCollectionBuilder
+							setPreviewCards={cards => setState('previewCards', reconcile(cards))}
+						/>
+					</Match>
+				</Switch>
+				<CollectionCardsPreviewList cards={state.previewCards} />
+			</div>
 		</>
 	);
 };
 
-export const SetCollectionBuilder: Component = () => {
-	const [cardIds, setCardIds] = createSignal<Array<string>>([]);
-	const [previewCards] = createResource(cardIds, async cardIds => {
-		if (cardIds.length === 0) return [];
-		return trpc.collections.mockLoadCardsSet.query({ cards: cardIds });
-	});
+const CollectionCardsPreviewList: Component<{ cards: Array<CardInstance> }> = props => {
+	return (
+		<ul class="flex h-fit w-full flex-wrap gap-4">
+			<For each={props.cards} fallback={<p>Collection is empty.</p>}>
+				{card => (
+					<li>
+						<InstanceCard card={card} />
+					</li>
+				)}
+			</For>
+		</ul>
+	);
+};
 
-	const [userCards, setUserCards] = createSignal<Array<CardInstance>>([]);
-	onMount(() => {
-		trpc.userCards.authUserCards.query().then(setUserCards);
-	});
+const SetCollectionBuilder: Component<{
+	cards: Array<CardInstance>;
+	setPreviewCards(previewCards: Array<CardInstance>): void;
+}> = props => {
+	const [cardIds, setCardIds] = createStore<Array<string>>([]);
+
+	createEffect(
+		on(
+			() => [...cardIds],
+			ids => {
+				console.log(ids);
+				if (ids.length === 0) {
+					props.setPreviewCards([]);
+				} else {
+					trpc.collections.mockLoadCardsSet
+						.query({ cards: ids })
+						.then(props.setPreviewCards);
+				}
+			}
+		)
+	);
 
 	return (
 		<div>
-			<ul class="flex h-80 flex-wrap gap-4 overflow-y-scroll">
-				<Suspense>
-					<For each={previewCards.latest} fallback={<p>Collection is empty.</p>}>
-						{card => (
-							<li>
-								<InstanceCard card={card} />
-							</li>
-						)}
-					</For>
-				</Suspense>
-			</ul>
-			<form
-				onChange={e => {
-					let form = e.currentTarget;
-
-					let formData = new FormData(form);
-					let cardIds = formData.getAll('cards').filter(c => typeof c === 'string');
-					setCardIds(cardIds);
-				}}>
+			<form>
 				<fieldset>
 					<legend>Cards</legend>
 					<div class="flex flex-wrap gap-4">
-						<For each={userCards()}>
+						<For each={props.cards}>
 							{card => (
-								<CardCheckbox name="cards" value={card.instanceId}>
+								<CardCheckbox
+									name="cards"
+									value={card.instanceId}
+									onInput={e => {
+										console.log({
+											checked: e.currentTarget.checked,
+											value: e.currentTarget.value,
+										});
+										if (
+											e.currentTarget.checked &&
+											!cardIds.includes(card.instanceId)
+										) {
+											setCardIds(ids => [...ids, card.instanceId]);
+										} else if (!e.currentTarget.checked) {
+											let indexes = cardIds.reduce(
+												(indexes, value, index) => {
+													if (value === card.instanceId) {
+														return [...indexes, index];
+													} else return indexes;
+												},
+												[] as Array<number>
+											);
+
+											indexes.forEach(i =>
+												setCardIds(produce(draft => draft.splice(i, 1)))
+											);
+										}
+									}}>
 									<InstanceCard card={card} />
 									<p class="text-center">{card.cardName}</p>
 								</CardCheckbox>
@@ -102,28 +153,23 @@ export const SetCollectionBuilder: Component = () => {
 	);
 };
 
-export const RuleCollectionBuilder: Component = () => {
+const RuleCollectionBuilder: Component<{
+	setPreviewCards(previewCards: Array<CardInstance>): void;
+}> = props => {
 	const [rules, setRules] = createSignal<NonNullable<Collection['rules']>>({});
-	const [previewCards] = createResource(rules, async rules => {
-		if (Object.values(rules).filter(v => v !== null).length === 0) {
-			return [];
-		}
-		return trpc.collections.mockLoadCardsRule.query(rules);
-	});
+
+	createEffect(
+		on(rules, rules => {
+			if (Object.values(rules).filter(v => v !== null).length === 0) {
+				props.setPreviewCards([]);
+			} else {
+				trpc.collections.mockLoadCardsRule.query(rules).then(props.setPreviewCards);
+			}
+		})
+	);
 
 	return (
 		<div>
-			<ul class="flex h-80 flex-wrap gap-4 overflow-y-scroll">
-				<Suspense>
-					<For each={previewCards.latest} fallback={<p>Collection is empty.</p>}>
-						{card => (
-							<li>
-								<InstanceCard card={card} />
-							</li>
-						)}
-					</For>
-				</Suspense>
-			</ul>
 			<form
 				class="grid gap-2"
 				onChange={e => {
@@ -273,10 +319,17 @@ const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
 const CardCheckbox: ParentComponent<{
 	name: string;
 	value: string;
+	onInput?: (
+		e: InputEvent & {
+			currentTarget: HTMLInputElement;
+			target: HTMLInputElement;
+		}
+	) => void;
 }> = props => {
 	return (
 		<label class="relative grid w-40 cursor-pointer place-items-center opacity-40 has-[:checked]:opacity-100">
 			<input
+				onInput={e => props.onInput?.(e)}
 				class="absolute opacity-0 checked:left-4 checked:top-4 checked:z-50 checked:opacity-100"
 				name={props.name}
 				value={props.value}
