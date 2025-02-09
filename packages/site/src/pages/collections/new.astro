@@ -1,11 +1,11 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import { RuleCollectionBuilder } from '@site/components/CollectionBuilder';
+import { CollectionBuilder } from '@site/components/CollectionBuilder';
 
 const user = Astro.locals.user;
 if (!user) return Astro.redirect('/');
 ---
 
 <Page title="New collection" pageType="user">
-	<RuleCollectionBuilder client:load />
+	<CollectionBuilder client:load />
 </Page>

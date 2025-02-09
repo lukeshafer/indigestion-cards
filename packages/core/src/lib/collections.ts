@@ -157,8 +157,8 @@ export async function getRuleCollectionCards(args: {
 		rarityIds,
 		seasonIds,
 		mintedByIds,
-		//tags, TODO:
-		//cardNumerators, TODO:
+		cardNumbers,
+		//tags, //TODO:
 	} = args.rules ?? {};
 
 	const result = await db.entities.CardInstances.query
@@ -181,7 +181,7 @@ export async function getRuleCollectionCards(args: {
 			}
 
 			if (rarityIds) {
-				conditions.push(rarityIds.map(stamp => op.eq(attr.rarityId, stamp)).join(' OR '));
+				conditions.push(rarityIds.map(ids => op.begins(attr.rarityId, ids)).join(' OR '));
 			}
 
 			if (seasonIds) {
@@ -191,6 +191,10 @@ export async function getRuleCollectionCards(args: {
 			if (mintedByIds) {
 				conditions.push(mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR '));
 			}
+
+      if (cardNumbers) {
+				conditions.push(cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR '));
+      }
 
       const conditionString = `(${conditions.join(') AND (')})`;
       console.log({conditionString})

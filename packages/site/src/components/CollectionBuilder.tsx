@@ -4,65 +4,70 @@ import {
 	createResource,
 	createSignal,
 	For,
+	Match,
+	onMount,
 	Show,
 	Suspense,
+	Switch,
 	type Component,
 	type ParentComponent,
 } from 'solid-js';
 import { Checkbox, Fieldset } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
+import { FULL_ART_ID } from '@site/constants';
 
-export const CardCollectionBuilder: Component<{
-	cards: Array<CardInstance>;
-}> = props => {
-	const [cardIds, setCardIds] = createSignal<Array<string>>([]);
-	const [cards] = createResource(cardIds, async cardIds =>
-		trpc.collections.mockLoadCardsSet.query({ cards: cardIds })
-	);
-
+export const CollectionBuilder: Component = () => {
+	const [collectionType, setCollectionType] = createSignal<'set' | 'rule'>('set');
 	return (
-		<div>
-			<ul>
-				<For each={cards()}>{card => <li>{card.instanceId}</li>}</For>
-			</ul>
-			<form
-				onChange={e => {
-					let form = e.currentTarget;
-
-					let formData = new FormData(form);
-					let cardIds = formData.getAll('cards').filter(c => typeof c === 'string');
-					setCardIds(cardIds);
-				}}>
-				<fieldset>
-					<legend>Cards</legend>
-					<For each={props.cards}>{card => <CardCheckBox card={card} />}</For>
-				</fieldset>
-			</form>
-		</div>
+		<>
+			<label class="flex gap-2">
+				<input
+					type="radio"
+					name="collectionType"
+					value="set"
+          checked
+					onChange={() => setCollectionType('set')}
+				/>
+				Standard
+			</label>
+			<label class="flex gap-2">
+				<input
+					type="radio"
+					name="collectionType"
+					value="rule"
+					onChange={() => setCollectionType('rule')}
+				/>
+				Advanced
+			</label>
+			<Switch>
+				<Match when={collectionType() === 'set'}>
+					<SetCollectionBuilder />
+				</Match>
+				<Match when={collectionType() === 'rule'}>
+					<RuleCollectionBuilder />
+				</Match>
+			</Switch>
+		</>
 	);
 };
 
-const CardCheckBox: Component<{ card: CardInstance }> = props => (
-	<label class="flex gap-2">
-		<input type="checkbox" name="cards" value={props.card.instanceId} />
-		{props.card.instanceId}
-	</label>
-);
+export const SetCollectionBuilder: Component = () => {
+	const [cardIds, setCardIds] = createSignal<Array<string>>([]);
+	const [previewCards] = createResource(cardIds, async cardIds => {
+		if (cardIds.length === 0) return [];
+		return trpc.collections.mockLoadCardsSet.query({ cards: cardIds });
+	});
 
-export const RuleCollectionBuilder: Component = () => {
-	const [rules, setRules] = createSignal<NonNullable<Collection['rules']>>({});
-	const [cards] = createResource(rules, async rules => {
-		if (Object.values(rules).filter(v => v !== null).length === 0) {
-			return [];
-		}
-		return trpc.collections.mockLoadCardsRule.query(rules);
+	const [userCards, setUserCards] = createSignal<Array<CardInstance>>([]);
+	onMount(() => {
+		trpc.userCards.authUserCards.query().then(setUserCards);
 	});
 
 	return (
 		<div>
-			<ul class="h-80 overflow-y-scroll flex gap-4 flex-wrap">
+			<ul class="flex h-80 flex-wrap gap-4 overflow-y-scroll">
 				<Suspense>
-					<For each={cards.latest} fallback={<p>Collection is empty.</p>}>
+					<For each={previewCards.latest} fallback={<p>Collection is empty.</p>}>
 						{card => (
 							<li>
 								<InstanceCard card={card} />
@@ -74,23 +79,91 @@ export const RuleCollectionBuilder: Component = () => {
 			<form
 				onChange={e => {
 					let form = e.currentTarget;
+
+					let formData = new FormData(form);
+					let cardIds = formData.getAll('cards').filter(c => typeof c === 'string');
+					setCardIds(cardIds);
+				}}>
+				<fieldset>
+					<legend>Cards</legend>
+					<div class="flex flex-wrap gap-4">
+						<For each={userCards()}>
+							{card => (
+								<CardCheckbox name="cards" value={card.instanceId}>
+									<InstanceCard card={card} />
+									<p class="text-center">{card.cardName}</p>
+								</CardCheckbox>
+							)}
+						</For>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	);
+};
+
+export const RuleCollectionBuilder: Component = () => {
+	const [rules, setRules] = createSignal<NonNullable<Collection['rules']>>({});
+	const [previewCards] = createResource(rules, async rules => {
+		if (Object.values(rules).filter(v => v !== null).length === 0) {
+			return [];
+		}
+		return trpc.collections.mockLoadCardsRule.query(rules);
+	});
+
+	return (
+		<div>
+			<ul class="flex h-80 flex-wrap gap-4 overflow-y-scroll">
+				<Suspense>
+					<For each={previewCards.latest} fallback={<p>Collection is empty.</p>}>
+						{card => (
+							<li>
+								<InstanceCard card={card} />
+							</li>
+						)}
+					</For>
+				</Suspense>
+			</ul>
+			<form
+				class="grid gap-2"
+				onChange={e => {
+					let form = e.currentTarget;
 					let formData = new FormData(form);
 
 					let designIds = formData.getAll('designIds').map(String);
 					let seasonIds = formData.getAll('seasonIds').map(String);
+					let isShitStamped = formData.get('isShitStamped') === 'checked';
+					let rarityIds = formData.getAll('rarityIds').map(String);
+					let isMinter = formData.get('isMinter');
 					setRules({
 						cardDesignIds: designIds.length ? designIds : undefined,
 						seasonIds: seasonIds.length ? seasonIds : undefined,
-            stamps: undefined,
-            rarityIds: undefined,
-            mintedByIds: undefined,
-            isMinter: undefined,
-            cardNumerators: undefined,
-            tags: undefined,
+						stamps: isShitStamped ? ['shit-pack'] : undefined,
+						rarityIds: rarityIds.length ? rarityIds : undefined,
+						mintedByIds: undefined,
+						isMinter:
+							isMinter === 'true' ? true : isMinter === 'false' ? false : undefined,
+						cardNumbers: undefined,
 					});
 				}}>
 				<RuleCollectionBuilderDesignInput name="designIds" />
 				<RuleCollectionBuilderSeasonInput name="seasonIds" />
+				<Checkbox name="isShitStamped" label="Shit pack stamps only?" />
+				<RuleCollectionBuilderRarityInput name="rarityIds" />
+				<Fieldset legend="Minted by">
+					<label class="flex gap-2">
+						<input type="radio" name="isMinter" value="" checked />
+						Anyone
+					</label>
+					<label class="flex gap-2">
+						<input type="radio" name="isMinter" value="true" />
+						Me
+					</label>
+					<label class="flex gap-2">
+						<input type="radio" name="isMinter" value="false" />
+						Anyone besides me
+					</label>
+				</Fieldset>
 			</form>
 		</div>
 	);
@@ -133,7 +206,7 @@ const RuleCollectionBuilderSeasonInput: Component<{ name: string }> = props => {
 				name="includeSeasonIds"
 				label="By season"
 				setValue={setIsVisible}
-        value={isVisible()}
+				value={isVisible()}
 			/>
 			<Show when={isVisible()}>
 				<Suspense fallback="Loading...">
@@ -154,6 +227,44 @@ const RuleCollectionBuilderSeasonInput: Component<{ name: string }> = props => {
 						</div>
 					</Fieldset>
 				</Suspense>
+			</Show>
+		</div>
+	);
+};
+
+const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
+	const [isVisible, setIsVisible] = createSignal(false);
+	const rarities: Array<[id: string, name: string]> = [
+		[FULL_ART_ID, 'Full Art'],
+		['pink', 'Pink'],
+		['rainbow', 'Rainbow'],
+		['white', 'White'],
+		['gold', 'Gold'],
+		['silver', 'Silver'],
+		['bronze', 'Bronze'],
+	];
+
+	return (
+		<div>
+			<Checkbox
+				name="includeRarityIds"
+				label="By rarity"
+				setValue={setIsVisible}
+				value={isVisible()}
+			/>
+			<Show when={isVisible()}>
+				<Fieldset legend="Rarities">
+					<div class="grid gap-2">
+						<For each={rarities}>
+							{([rarityId, rarityName]) => (
+								<label class="flex gap-2">
+									<input type="checkbox" name={props.name} value={rarityId} />
+									{rarityName}
+								</label>
+							)}
+						</For>
+					</div>
+				</Fieldset>
 			</Show>
 		</div>
 	);
@@ -235,4 +346,3 @@ const InstanceCard: Component<{
 		</CardEls.Card>
 	);
 };
-

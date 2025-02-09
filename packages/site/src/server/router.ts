@@ -12,7 +12,7 @@ import {
 	searchUserCards,
 } from '@core/lib/card';
 import { getAllPacks, getPacksByUsername, hidePackCards } from '@core/lib/pack';
-import { getAllUsers, searchUsers } from '@core/lib/user';
+import { getAllUsers, getUserAndOpenedCardInstances, searchUsers } from '@core/lib/user';
 import {
 	getCollectionCards,
 	getRuleCollectionCards,
@@ -86,6 +86,11 @@ export const appRouter = t.router({
 				})
 			)
 			.query(async ({ input }) => await searchUserCards(input)),
+		authUserCards: authedProcedure.query(
+			async ({ ctx }) =>
+				(await getUserAndOpenedCardInstances({ username: ctx.session.properties.username }))
+					?.CardInstances ?? []
+		),
 	},
 	designs: {
 		getAll: publicProcedure.query(async () => await getAllCardDesigns()),
