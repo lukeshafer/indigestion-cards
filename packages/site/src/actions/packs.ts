@@ -1,11 +1,11 @@
 import { getPackById, sendPacksUpdatedEvent, setPackIsLocked } from '@core/lib/pack';
 import { ActionError, defineAction } from 'astro:actions';
-import { boolean, object, string } from 'astro:schema';
+import { z } from 'astro:schema';
 
 export const setIsLocked = defineAction({
-	input: object({
-		packId: string(),
-		isLocked: boolean(),
+	input: z.object({
+		packId: z.string(),
+		isLocked: z.boolean(),
 	}),
 	handler: async (input, context) => {
 		if (context.locals.session?.type !== 'admin' && context.locals.session?.type !== 'user') {

@@ -1,30 +1,34 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { array, boolean, literal, object, string } from 'astro:schema';
+import { z } from 'astro:schema';
 import { createRuleCollection, createSetCollection, deleteCollection } from '@core/lib/collections';
 
 export const createCollection = defineAction({
-	input: object({
-		collectionName: string(),
-	}).and(
-		object({
-			collectionType: literal('set'),
-			collectionCards: array(string()),
-		}).or(
-			object({
-				collectionType: literal('rule'),
-				collectionRules: object({
-					cardDesignIds: array(string()).optional(),
-					cardNumerators: array(string()).optional(),
-					seasonIds: array(string()).optional(),
-					stamps: array(string()).optional(),
-					tags: array(string()).optional(),
-					rarityIds: array(string()).optional(),
-					isMinter: boolean().optional(),
-					mintedByIds: array(string()).optional(),
-				}),
-			})
-		)
-	),
+	input: z
+		.object({
+			collectionName: z.string(),
+		})
+		.and(
+			z
+				.object({
+					collectionType: z.literal('set'),
+					collectionCards: z.array(z.string()),
+				})
+				.or(
+					z.object({
+						collectionType: z.literal('rule'),
+						collectionRules: z.object({
+							cardDesignIds: z.array(z.string()).optional(),
+							cardNumerators: z.array(z.string()).optional(),
+							seasonIds: z.array(z.string()).optional(),
+							stamps: z.array(z.string()).optional(),
+							tags: z.array(z.string()).optional(),
+							rarityIds: z.array(z.string()).optional(),
+							isMinter: z.boolean().optional(),
+							mintedByIds: z.array(z.string()).optional(),
+						}),
+					})
+				)
+		),
 	async handler(input, context) {
 		let user = context.locals.user;
 		if (!user) {
@@ -87,8 +91,8 @@ export const createCollection = defineAction({
 });
 
 export const deleteCollectionAction = defineAction({
-	input: object({
-		collectionId: string(),
+	input: z.object({
+		collectionId: z.string(),
 	}),
 	async handler(input, context) {
 		let user = context.locals.user;
