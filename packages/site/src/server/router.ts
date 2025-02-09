@@ -20,6 +20,7 @@ import {
 } from '@core/lib/collections';
 import { getAllCardDesigns } from '@core/lib/design';
 import { getAllSeasons } from '@core/lib/season';
+import type { CardDesign } from '@core/types';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -97,6 +98,24 @@ export const appRouter = t.router({
 	},
 	seasons: {
 		getAll: publicProcedure.query(async () => await getAllSeasons()),
+		getAllWithDesigns: publicProcedure.query(async () => {
+			const [cards, seasons] = await Promise.all([getAllCardDesigns(), getAllSeasons()]);
+
+			return Array.from(
+				cards.reduce(
+					(seasons, card) => {
+						seasons.get(card.seasonId)?.cards.push(card);
+						return seasons;
+					},
+					new Map(
+						seasons.map(season => [
+							season.seasonId,
+							{ season, cards: [] as Array<CardDesign> },
+						])
+					)
+				)
+			);
+		}),
 	},
 	designCards: {
 		sortedByRarity: publicProcedure
