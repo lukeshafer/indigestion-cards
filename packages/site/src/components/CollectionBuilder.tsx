@@ -8,6 +8,7 @@ import type {
 import { trpc } from '@site/lib/client/trpc';
 import {
 	createEffect,
+	createMemo,
 	createResource,
 	createSignal,
 	For,
@@ -23,14 +24,26 @@ import { Checkbox, Fieldset } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { FULL_ART_ID } from '@site/constants';
 import { createStore, produce, reconcile } from 'solid-js/store';
+import CardList from './CardList';
+import { getCardSearcher } from '@site/lib/client/utils';
 
 export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
 	const [state, setState] = createStore({
-		type: 'rule' as 'set' | 'rule',
+		type: 'set' as 'set' | 'rule',
 		rules: {} as CollectionRules,
 		cards: [] as CollectionCards,
 		previewCards: [] as Array<CardInstance>,
 	});
+
+	createEffect(
+		on(
+			() => state.type,
+			type => {
+				if (type === 'set') setState('rules', {});
+				else if (type === 'rule') setState('cards', []);
+			}
+		)
+	);
 
 	createEffect(
 		on(
@@ -87,9 +100,9 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 				Rules
 			</label>
 			<div
-				class="grid"
+				class="lg:grid"
 				style={{
-					'grid-template-columns': '1fr 40rem',
+					'grid-template-columns': 'auto auto',
 				}}>
 				<Switch>
 					<Match when={state.type === 'set'}>
@@ -137,7 +150,7 @@ const CollectionCardsPreviewList: Component<{
 			<h2 id="collection-preview-title" class="text-center text-xl">
 				Collection Preview
 			</h2>
-			<ul class="flex h-fit w-full flex-wrap gap-4 m-4">
+			<ul class="m-4 flex h-fit w-full flex-wrap gap-4">
 				<Suspense fallback={<p>Loading</p>}>
 					<For
 						each={props.cards}
@@ -168,34 +181,34 @@ const SetCollectionBuilder: Component<{
 	addCardId: (card: string) => void;
 	removeCardId: (card: string) => void;
 }> = props => {
+	const [searchText, setSearchText] = createSignal('');
+	const searcher = createMemo(() => getCardSearcher(props.userCards));
+	const cards = () => (searchText() ? searcher()(searchText()) : props.userCards);
+
 	return (
-		<div>
-			<form>
-				<fieldset>
-					<legend class="my-4 text-center text-xl">Cards</legend>
-					<div class="flex flex-wrap gap-4">
-						<For each={props.userCards}>
-							{card => (
-								<CardCheckbox
-									checked={props.selectedCards.includes(card.instanceId)}
-									name="cards"
-									value={card.instanceId}
-									onInput={e => {
-										if (e.currentTarget.checked)
-											props.addCardId(card.instanceId);
-										else props.removeCardId(card.instanceId);
-									}}>
-									<InstanceCard card={card} />
-									{
-										//<p class="text-center">{card.cardName}</p>
-									}
-								</CardCheckbox>
-							)}
-						</For>
-					</div>
-				</fieldset>
-			</form>
-		</div>
+		<fieldset class="max-w-3xl grid">
+			<legend class="my-4 text-center text-xl">Cards</legend>
+			<div class="flex flex-wrap gap-4">
+				<CardList.Search setSearchText={setSearchText} />
+				<CardList.List cards={cards()} scale={0.5}>
+					{card => (
+						<CardCheckbox
+							checked={props.selectedCards.includes(card.instanceId)}
+							name="cards"
+							value={card.instanceId}
+							onInput={e => {
+								if (e.currentTarget.checked) props.addCardId(card.instanceId);
+								else props.removeCardId(card.instanceId);
+							}}>
+							<InstanceCard card={card} />
+							{
+								//<p class="text-center">{card.cardName}</p>
+							}
+						</CardCheckbox>
+					)}
+				</CardList.List>
+			</div>
+		</fieldset>
 	);
 };
 
@@ -318,7 +331,7 @@ const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Se
 };
 
 const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
-	const [isVisible, setIsVisible] = createSignal(false);
+	const [isEnabled, setIsEnabled] = createSignal(false);
 	const rarities: Array<[id: string, name: string]> = [
 		[FULL_ART_ID, 'Full Art'],
 		['pink', 'Pink'],
@@ -330,28 +343,45 @@ const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
 	];
 
 	return (
-		<div>
-			<Checkbox
-				name="includeRarityIds"
-				label="By rarity"
-				setValue={setIsVisible}
-				value={isVisible()}
-			/>
-			<Show when={isVisible()}>
-				<Fieldset legend="Rarities">
-					<div class="grid gap-2">
-						<For each={rarities}>
-							{([rarityId, rarityName]) => (
-								<label class="flex gap-2">
-									<input type="checkbox" name={props.name} value={rarityId} />
-									{rarityName}
-								</label>
-							)}
-						</For>
-					</div>
-				</Fieldset>
-			</Show>
-		</div>
+		<Fieldset legend="Rarities">
+			<label class="flex gap-2">
+				<input
+					type="radio"
+					name="rarities-enabled"
+					value="false"
+					checked={!isEnabled()}
+					onChange={e => setIsEnabled(!e.currentTarget.checked)}
+				/>
+				Any rarity
+			</label>
+			<label class="flex gap-2">
+				<input
+					type="radio"
+					name="rarities-enabled"
+					value="true"
+					checked={isEnabled()}
+					onChange={e => setIsEnabled(e.currentTarget.checked)}
+				/>
+				Specific rarity
+			</label>
+			<div class="ml-4 grid gap-2">
+				<For each={rarities}>
+					{([rarityId, rarityName]) => (
+						<label
+							class="flex gap-2 data-[disabled=true]:opacity-50"
+							data-disabled={!isEnabled()}>
+							<input
+								type="checkbox"
+								name={props.name}
+								value={rarityId}
+								disabled={!isEnabled()}
+							/>
+							{rarityName}
+						</label>
+					)}
+				</For>
+			</div>
+		</Fieldset>
 	);
 };
 

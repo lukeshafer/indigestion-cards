@@ -1,5 +1,11 @@
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@site/constants';
-import { type JSX, type Component, type ParentComponent, type FlowComponent } from 'solid-js';
+import {
+	type JSX,
+	type Component,
+	type ParentComponent,
+	type FlowComponent,
+	onMount,
+} from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { Dynamic, Portal } from 'solid-js/web';
 import { checkAreAnimationsDisabled } from '@site/lib/client/utils';
@@ -154,6 +160,10 @@ export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = p
 	</TiltEffectWrapper>
 );
 
+function clamp(min: number, target: number, max: number) {
+	return Math.max(min, Math.min(target, max));
+}
+
 export const TiltEffectWrapper: ParentComponent<{
 	angleMultiplier?: number;
 	transformOrigin?: string;
@@ -199,6 +209,26 @@ export const TiltEffectWrapper: ParentComponent<{
 			requestAnimationFrame(animate);
 		}
 	}
+
+	onMount(() => {
+		wrapperEl!.addEventListener('touchmove', e => {
+			const bounds = wrapperEl!.getBoundingClientRect();
+			const touches = e.touches[0];
+			if (!bounds || !touches) return;
+			e.preventDefault();
+
+			targetRotateX = clamp(
+				-bounds.x / 2,
+				Math.floor(((touches.clientX - bounds.x) / bounds.width - 0.5) * 100),
+				bounds.x / 2
+			);
+			targetRotateY = clamp(
+				-bounds.y / 2,
+				Math.floor((0.5 - (touches.clientY - bounds.y) / bounds.height) * 100),
+				bounds.y / 2
+			);
+		});
+	});
 	return (
 		<div
 			ref={wrapperEl!}
@@ -221,19 +251,6 @@ export const TiltEffectWrapper: ParentComponent<{
 				canStop = true;
 				targetRotateY = 0;
 				targetRotateX = 0;
-			}}
-			onTouchMove={e => {
-				const bounds = e.currentTarget.getBoundingClientRect();
-				const touches = e.touches[0];
-				if (!bounds || !touches) return;
-				e.preventDefault();
-
-				targetRotateX = Math.floor(
-					(0.5 - (touches.clientX - bounds.x) / bounds.width) * 100
-				);
-				targetRotateY = Math.floor(
-					((touches.clientY - bounds.y) / bounds.height - 0.5) * 100
-				);
 			}}
 			onMouseMove={e => {
 				const bounds = e.currentTarget.getBoundingClientRect();
@@ -276,6 +293,33 @@ export const ShineMouseEffect: Component = () => {
 	return (
 		<div
 			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-color-dodge transition-opacity group-hover:opacity-100"
+			onTouchStart={e => {
+				if (checkAreAnimationsDisabled()) {
+					e.currentTarget.classList.remove('opacity-100');
+					return;
+				} else {
+					e.currentTarget.classList.add('opacity-100');
+				}
+			}}
+			onTouchEnd={e => {
+				console.log('touch end');
+				e.currentTarget.classList.remove('opacity-100');
+			}}
+			onTouchMove={e => {
+				if (checkAreAnimationsDisabled()) {
+					e.currentTarget.classList.remove('group-hover:opacity-100');
+					return;
+				} else {
+					e.currentTarget.classList.add('group-hover:opacity-100');
+				}
+
+				const touches = e.touches[0];
+				const bounds = e.currentTarget.getBoundingClientRect();
+				setState({
+					x: -(touches.clientX - bounds.x - SIZE * 8),
+					y: -(touches.clientY - bounds.y - SIZE * 8),
+				});
+			}}
 			onMouseMove={e => {
 				if (checkAreAnimationsDisabled()) {
 					e.currentTarget.classList.remove('group-hover:opacity-100');
