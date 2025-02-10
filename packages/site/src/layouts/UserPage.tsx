@@ -51,6 +51,9 @@ export const UserPage: Component<{
 			/>
 
 			<div class="scrollbar-narrow h-full w-full md:overflow-scroll md:overflow-x-hidden">
+        {
+          //<pre>{JSON.stringify(props.user.collections, null, 2)}</pre>
+        }
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
 						<details>

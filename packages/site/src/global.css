@@ -426,4 +426,8 @@ body.disable-animations * {
 	html.dark .scrollbar-brand::-webkit-scrollbar-thumb {
 		--custom-scrollbar-color: theme('colors.brand.dark');
 	}
+
+  .debug-outline {
+    outline: 1px solid lime !important;
+  }
 }

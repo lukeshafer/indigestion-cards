@@ -30,6 +30,7 @@ export const createCollection = defineAction({
 				)
 		),
 	async handler(input, context) {
+		console.log('Attempting to create collection');
 		let user = context.locals.user;
 		if (!user) {
 			throw new ActionError({ code: 'UNAUTHORIZED' });
@@ -43,15 +44,15 @@ export const createCollection = defineAction({
 					collectionName: input.collectionName,
 					userId: user.properties.userId,
 					collectionCards: input.collectionCards,
-				}).catch(
-					error =>
-						({
-							success: false,
-							message: error?.message
-								? String(error.message)
-								: 'An unknown error occurred.',
-						}) as const
-				);
+				}).catch(error => {
+					console.error(error);
+					return {
+						success: false,
+						message: error?.message
+							? String(error.message)
+							: 'An unknown error occurred.',
+					} as const;
+				});
 				break;
 			}
 			case 'rule': {
@@ -59,15 +60,15 @@ export const createCollection = defineAction({
 					userId: user.properties.userId,
 					collectionName: input.collectionName,
 					collectionRules: input.collectionRules,
-				}).catch(
-					error =>
-						({
-							success: false,
-							message: error?.message
-								? String(error.message)
-								: 'An unknown error occurred.',
-						}) as const
-				);
+				}).catch(error => {
+					console.error(error);
+					return {
+						success: false,
+						message: error?.message
+							? String(error.message)
+							: 'An unknown error occurred.',
+					} as const;
+				});
 			}
 		}
 
@@ -86,7 +87,10 @@ export const createCollection = defineAction({
 			}
 		}
 
-		return { collectionId: result.data.collection.collectionId };
+		return {
+			collectionId: result.data.collection?.collectionId,
+			username: user.properties.username,
+		};
 	},
 });
 

@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { db } from '../db';
 import type { CardInstance, Collection } from '../db.types';
 import { getUser } from './user';
@@ -13,21 +14,22 @@ export async function createSetCollection(args: {
 	}
 	const { user } = verifyResult.data;
 
+	const newCollection: Collection = {
+		collectionId: randomUUID(),
+		collectionName: args.collectionName,
+		cards: args.collectionCards,
+		collectionType: 'set',
+	};
+
 	let result = await db.entities.Users.patch({ userId: user.userId })
 		.append({
-			collections: [
-				{
-					collectionName: args.collectionName,
-					cards: args.collectionCards,
-					collectionType: 'set',
-				},
-			],
+			collections: [newCollection],
 		})
 		.go();
 
 	return {
 		success: true,
-		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+		data: { user: result.data, collection: newCollection },
 	} as const;
 }
 
@@ -42,21 +44,22 @@ export async function createRuleCollection(args: {
 	}
 	const { user } = verifyResult.data;
 
+	const newCollection: Collection = {
+		collectionId: randomUUID(),
+		collectionName: args.collectionName,
+		rules: args.collectionRules,
+		collectionType: 'rule',
+	};
+
 	let result = await db.entities.Users.patch({ userId: user.userId })
 		.append({
-			collections: [
-				{
-					collectionName: args.collectionName,
-					rules: args.collectionRules,
-					collectionType: 'set',
-				},
-			],
+			collections: [newCollection],
 		})
 		.go();
 
 	return {
 		success: true,
-		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+		data: { user: result.data, collection: newCollection },
 	} as const;
 }
 
@@ -130,19 +133,19 @@ export async function getSetCollectionCards(args: {
 	cards: Collection['cards'];
 }): Promise<Array<CardInstance>> {
 	const cardIds = args.cards ?? [];
-  if (cardIds.length === 0) return []
+	if (cardIds.length === 0) return [];
 
 	const result = await db.entities.CardInstances.query
 		.byUser({ username: args.username })
 		.where((attr, op) => cardIds.map(id => op.eq(attr.instanceId, id)).join(' OR '))
 		.go({ pages: 'all' });
 
-	return result.data.slice().sort((a,b) => {
-    let aIndex = cardIds.findIndex(c => c === a.instanceId);
-    let bIndex = cardIds.findIndex(c => c === b.instanceId);
+	return result.data.slice().sort((a, b) => {
+		let aIndex = cardIds.findIndex(c => c === a.instanceId);
+		let bIndex = cardIds.findIndex(c => c === b.instanceId);
 
-    return aIndex - bIndex;
-  });
+		return aIndex - bIndex;
+	});
 }
 
 export async function getRuleCollectionCards(args: {
@@ -150,10 +153,10 @@ export async function getRuleCollectionCards(args: {
 	userId: string;
 	rules: Collection['rules'];
 }): Promise<Array<CardInstance>> {
-  if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
-    console.log("Empty rules, returning empty array");
-    return [];
-  }
+	if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
+		console.log('Empty rules, returning empty array');
+		return [];
+	}
 
 	const {
 		cardDesignIds,
@@ -171,8 +174,15 @@ export async function getRuleCollectionCards(args: {
 		.where((attr, op) => {
 			let conditions: Array<string> = [];
 
+			const cardOrSeasonConditions = [];
 			if (cardDesignIds) {
-				conditions.push(cardDesignIds.map(id => op.eq(attr.designId, id)).join(' OR '));
+				cardOrSeasonConditions.push(...cardDesignIds.map(id => op.eq(attr.designId, id)));
+			}
+			if (seasonIds) {
+				cardOrSeasonConditions.push(...seasonIds.map(id => op.eq(attr.seasonId, id)));
+			}
+			if (cardOrSeasonConditions.length) {
+				conditions.push(cardOrSeasonConditions.join(' OR '));
 			}
 
 			if (stamps) {
@@ -189,20 +199,18 @@ export async function getRuleCollectionCards(args: {
 				conditions.push(rarityIds.map(ids => op.begins(attr.rarityId, ids)).join(' OR '));
 			}
 
-			if (seasonIds) {
-				conditions.push(seasonIds.map(id => op.eq(attr.seasonId, id)).join(' OR '));
-			}
-
 			if (mintedByIds) {
 				conditions.push(mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR '));
 			}
 
-      if (cardNumbers) {
-				conditions.push(cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR '));
-      }
+			if (cardNumbers) {
+				conditions.push(
+					cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
+				);
+			}
 
-      const conditionString = `(${conditions.join(') AND (')})`;
-      console.log({conditionString})
+			const conditionString = `(${conditions.join(') AND (')})`;
+			console.log({ conditionString });
 
 			return conditionString;
 		})

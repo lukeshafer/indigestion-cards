@@ -20,12 +20,13 @@ import {
 	type Component,
 	type ParentComponent,
 } from 'solid-js';
-import { Checkbox, Fieldset } from '@site/components/Form';
+import { Checkbox, Fieldset, SubmitButton, TextInput } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
-import { FULL_ART_ID } from '@site/constants';
+import { FULL_ART_ID, routes } from '@site/constants';
 import { createStore, produce, reconcile } from 'solid-js/store';
 import CardList from './CardList';
 import { getCardSearcher } from '@site/lib/client/utils';
+import { actions } from 'astro:actions';
 
 export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
 	const [state, setState] = createStore({
@@ -33,6 +34,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 		rules: {} as CollectionRules,
 		cards: [] as CollectionCards,
 		previewCards: [] as Array<CardInstance>,
+		collectionName: '',
 	});
 
 	createEffect(
@@ -78,32 +80,36 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 	);
 
 	return (
-		<>
-			<label class="flex gap-2">
-				<input
-					type="radio"
-					name="collectionType"
-					value="set"
-					checked={state.type === 'set'}
-					onChange={() => setState('type', 'set')}
-				/>
-				Set
-			</label>
-			<label class="flex gap-2">
-				<input
-					type="radio"
-					name="collectionType"
-					value="rule"
-					checked={state.type === 'rule'}
-					onChange={() => setState('type', 'rule')}
-				/>
-				Rules
-			</label>
-			<div
-				class="lg:grid"
-				style={{
-					'grid-template-columns': 'auto auto',
-				}}>
+		<div class="grid gap-y-8 lg:grid-cols-[60%_40%]">
+			<div class="grid h-fit gap-8">
+				<fieldset class="flex justify-center">
+					<label
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+						data-checked={state.type === 'set'}>
+						<input
+							type="radio"
+							name="collectionType"
+							value="set"
+							class="sr-only"
+							checked={state.type === 'set'}
+							onChange={() => setState('type', 'set')}
+						/>
+						<p>Standard Collection</p>
+					</label>
+					<label
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+						data-checked={state.type === 'rule'}>
+						<input
+							type="radio"
+							name="collectionType"
+							value="rule"
+							class="sr-only"
+							checked={state.type === 'rule'}
+							onChange={() => setState('type', 'rule')}
+						/>
+						<p>Advanced Collection</p>
+					</label>
+				</fieldset>
 				<Switch>
 					<Match when={state.type === 'set'}>
 						<SetCollectionBuilder
@@ -135,9 +141,41 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 						<RuleCollectionBuilder setRules={rules => setState('rules', rules)} />
 					</Match>
 				</Switch>
+			</div>
+			<div class="grid h-fit gap-4 px-4">
+				<div class="max-w-72">
+					<TextInput
+						name="collectionName"
+						label="Collection Name"
+						setValue={v => setState('collectionName', v)}
+					/>
+				</div>
+				<SubmitButton
+					onClick={() => {
+						actions.collections
+							.createCollection({
+								collectionName: state.collectionName,
+								collectionType: state.type,
+								collectionRules: state.type === 'rule' ? state.rules : {},
+								collectionCards: state.type === 'set' ? state.cards : [],
+							})
+							.then(result => {
+								if (result.error) {
+									// TODO: handle the error
+									console.error(result.error);
+								} else {
+									location.assign(
+										`${routes.USERS}/${result.data.username}?alert=Successfully%20created%20collection`
+									);
+								}
+							});
+					}}
+					disabled={state.previewCards.length === 0 || state.collectionName.length === 0}>
+					Save Collection
+				</SubmitButton>
 				<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
 			</div>
-		</>
+		</div>
 	);
 };
 
@@ -146,16 +184,18 @@ const CollectionCardsPreviewList: Component<{
 	type: 'set' | 'rule';
 }> = props => {
 	return (
-		<section aria-labelledby="collection-preview-title">
-			<h2 id="collection-preview-title" class="text-center text-xl">
-				Collection Preview
+		<section aria-labelledby="collection-preview-title" class="mt-8">
+			<h2 id="collection-preview-title" class="text-xl">
+				Preview
 			</h2>
-			<ul class="m-4 flex h-fit w-full flex-wrap gap-4">
+			<ul
+				class="grid h-fit w-full flex-wrap justify-center gap-4 p-4"
+				style={{ 'grid-template-columns': 'repeat(auto-fill, minmax(8rem, 1fr))' }}>
 				<Suspense fallback={<p>Loading</p>}>
 					<For
 						each={props.cards}
 						fallback={
-							<p class="my-8 w-full text-center opacity-50">
+							<p class="col-span-full my-8 w-full text-center opacity-50">
 								{props.type === 'set'
 									? 'Collection is empty.'
 									: 'Please select a filter to preview your collection.'}
@@ -186,29 +226,26 @@ const SetCollectionBuilder: Component<{
 	const cards = () => (searchText() ? searcher()(searchText()) : props.userCards);
 
 	return (
-		<fieldset class="max-w-3xl grid">
-			<legend class="my-4 text-center text-xl">Cards</legend>
-			<div class="flex flex-wrap gap-4">
-				<CardList.Search setSearchText={setSearchText} />
-				<CardList.List cards={cards()} scale={0.5}>
-					{card => (
-						<CardCheckbox
-							checked={props.selectedCards.includes(card.instanceId)}
-							name="cards"
-							value={card.instanceId}
-							onInput={e => {
-								if (e.currentTarget.checked) props.addCardId(card.instanceId);
-								else props.removeCardId(card.instanceId);
-							}}>
-							<InstanceCard card={card} />
-							{
-								//<p class="text-center">{card.cardName}</p>
-							}
-						</CardCheckbox>
-					)}
-				</CardList.List>
-			</div>
-		</fieldset>
+		<div class="flex flex-wrap gap-4">
+			<CardList.Search setSearchText={setSearchText} />
+			<CardList.List cards={cards()} scale={0.5}>
+				{card => (
+					<CardCheckbox
+						checked={props.selectedCards.includes(card.instanceId)}
+						name="cards"
+						value={card.instanceId}
+						onInput={e => {
+							if (e.currentTarget.checked) props.addCardId(card.instanceId);
+							else props.removeCardId(card.instanceId);
+						}}>
+						<InstanceCard card={card} />
+						{
+							//<p class="text-center">{card.cardName}</p>
+						}
+					</CardCheckbox>
+				)}
+			</CardList.List>
+		</div>
 	);
 };
 
@@ -216,48 +253,48 @@ const RuleCollectionBuilder: Component<{
 	setRules: (rules: CollectionRules) => void;
 }> = props => {
 	return (
-		<div>
-			<form
-				class="grid gap-2"
-				onChange={e => {
-					let form = e.currentTarget;
-					let formData = new FormData(form);
+		<form
+			class="grid h-fit gap-2"
+			onSubmit={e => e.preventDefault()}
+			onChange={e => {
+				let form = e.currentTarget;
+				let formData = new FormData(form);
 
-					let designIds = formData.getAll('designIds').map(String);
-					let seasonIds = formData.getAll('seasonIds').map(String);
-					let isShitStamped = formData.get('isShitStamped') === 'on';
-					let rarityIds = formData.getAll('rarityIds').map(String);
-					let isMinter = formData.get('isMinter');
-					props.setRules({
-						cardDesignIds: designIds.length ? designIds : undefined,
-						seasonIds: seasonIds.length ? seasonIds : undefined,
-						stamps: isShitStamped ? ['shit-pack'] : undefined,
-						rarityIds: rarityIds.length ? rarityIds : undefined,
-						mintedByIds: undefined,
-						isMinter:
-							isMinter === 'true' ? true : isMinter === 'false' ? false : undefined,
-						cardNumbers: undefined,
-					});
-				}}>
-				<RuleCollectionBuilderDesignInput name="designIds" />
+				let designIds = formData.getAll('designIds').map(String);
+				let seasonIds = formData.getAll('seasonIds').map(String);
+				let isShitStamped = formData.get('isShitStamped') === 'on';
+				let rarityIds = formData.getAll('rarityIds').map(String);
+				let isMinter = formData.get('isMinter');
+				props.setRules({
+					cardDesignIds: designIds.length ? designIds : undefined,
+					seasonIds: seasonIds.length ? seasonIds : undefined,
+					stamps: isShitStamped ? ['shit-pack'] : undefined,
+					rarityIds: rarityIds.length ? rarityIds : undefined,
+					mintedByIds: undefined,
+					isMinter: isMinter === 'true' ? true : isMinter === 'false' ? false : undefined,
+					cardNumbers: undefined,
+				});
+			}}>
+			<RuleCollectionBuilderDesignInput name="designIds" />
+			<Fieldset legend="Stamped">
 				<Checkbox name="isShitStamped" label="Shit pack stamps only?" />
-				<RuleCollectionBuilderRarityInput name="rarityIds" />
-				<Fieldset legend="Minted by">
-					<label class="flex gap-2">
-						<input type="radio" name="isMinter" value="" checked />
-						Anyone
-					</label>
-					<label class="flex gap-2">
-						<input type="radio" name="isMinter" value="true" />
-						Me
-					</label>
-					<label class="flex gap-2">
-						<input type="radio" name="isMinter" value="false" />
-						Anyone besides me
-					</label>
-				</Fieldset>
-			</form>
-		</div>
+			</Fieldset>
+			<RuleCollectionBuilderRarityInput name="rarityIds" />
+			<Fieldset legend="Minted by">
+				<label class="flex gap-2">
+					<input type="radio" name="isMinter" value="" checked />
+					Anyone
+				</label>
+				<label class="flex gap-2">
+					<input type="radio" name="isMinter" value="true" />
+					Me
+				</label>
+				<label class="flex gap-2">
+					<input type="radio" name="isMinter" value="false" />
+					Anyone besides me
+				</label>
+			</Fieldset>
+		</form>
 	);
 };
 
@@ -277,26 +314,27 @@ const RuleCollectionBuilderDesignInput: Component<{ name: string }> = () => {
 	);
 
 	return (
-		<div>
-			<Suspense fallback="Loading...">
-				<Fieldset legend="Cards">
-					<div class="grid gap-4">
-						<For each={seasons()}>
-							{([, { season, cards }]) => (
+		<Suspense fallback="Loading...">
+			<Fieldset legend="Card Designs">
+				<ul class="grid gap-8">
+					<For each={seasons()}>
+						{([, { season, cards }]) => (
+							<li class="overflow-x-hidden rounded-lg bg-gray-100 px-4 py-2 dark:bg-gray-900">
 								<SeasonCheckboxAndDesigns cards={cards} season={season} />
-							)}
-						</For>
-					</div>
-				</Fieldset>
-			</Suspense>
-		</div>
+							</li>
+						)}
+					</For>
+				</ul>
+			</Fieldset>
+		</Suspense>
 	);
 };
 
 const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Season }> = props => {
 	const [seasonChecked, setSeasonChecked] = createSignal(false);
 	return (
-		<div class="max-w-3xl">
+		<div>
+			<p class="text-lg">{props.season.seasonName}</p>
 			<label class="flex gap-2">
 				<input
 					type="checkbox"
@@ -304,10 +342,10 @@ const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Se
 					value={props.season.seasonId}
 					onInput={e => setSeasonChecked(e.currentTarget.checked)}
 				/>
-				{props.season.seasonName}
+				All {props.season.seasonName} cards
 			</label>
 			<div
-				class="scrollbar-narrow relative flex gap-4 overflow-x-scroll bg-gray-100 p-3 py-4 data-[disabled=true]:overflow-x-hidden dark:bg-gray-900"
+				class="scrollbar-narrow relative flex w-full gap-4 overflow-x-scroll p-3 py-4 data-[disabled=true]:overflow-x-hidden"
 				data-disabled={seasonChecked()}>
 				<For each={props.cards}>
 					{design => (
