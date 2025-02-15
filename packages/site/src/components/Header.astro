@@ -8,6 +8,7 @@ import { Show } from 'solid-js';
 import TradeNotificationCount from './TradeNotificationCount';
 import { getAllPacks } from '@core/lib/pack';
 import ButtonCount from './ButtonCount';
+import { HeaderPackCount } from './HeaderPackCount';
 
 export interface Props {
 	logo?: keyof typeof logos;
@@ -59,7 +60,7 @@ const logos = {
 				Astro.locals.session?.type === 'admin' ? (
 					<HeaderLink href={routes.OPEN_PACKS} title="Open Packs">
 						Open Packs
-						<ButtonCount>{packCount}</ButtonCount>
+						<HeaderPackCount initialPackCount={packCount} client:load />
 					</HeaderLink>
 				) : null
 			}

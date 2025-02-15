@@ -11,7 +11,12 @@ import {
 	searchDesignCards,
 	searchUserCards,
 } from '@core/lib/card';
-import { getAllPacks, getPacksByUsername, hidePackCards } from '@core/lib/pack';
+import {
+	getAllPacks,
+	getPacksByUsername,
+	hidePackCards,
+	sendPacksUpdatedEvent,
+} from '@core/lib/pack';
 import { getAllUsers, getUserAndOpenedCardInstances, searchUsers } from '@core/lib/user';
 import {
 	getCollectionCards,
@@ -140,6 +145,9 @@ export const appRouter = t.router({
 	},
 	packs: {
 		all: adminProcedure.query(async () => await getAllPacks()),
+		packCount: adminProcedure.query(
+			async () => await getAllPacks().then(packs => packs.length)
+		),
 		byUser: authedProcedure
 			.input(z.object({ username: z.string() }))
 			.query(
@@ -148,6 +156,7 @@ export const appRouter = t.router({
 						packs.map(hidePackCards)
 					)
 			),
+		sendPacksUpdatedEvent: adminProcedure.mutation(async () => await sendPacksUpdatedEvent()),
 	},
 	collections: {
 		cards: authedProcedure.input(z.object({ collectionId: z.string() })).query(

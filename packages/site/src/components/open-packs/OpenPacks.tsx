@@ -186,6 +186,7 @@ function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPa
 		// 	save the pack id to
 		// 		local storage
 		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
+    trpc.packs.sendPacksUpdatedEvent.mutate()
 	});
 
 	createEffect(() => {
