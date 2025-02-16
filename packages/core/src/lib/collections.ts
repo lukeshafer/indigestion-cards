@@ -1,5 +1,5 @@
 import { db } from '../db';
-import type { CardInstance, Collection } from '../db.types';
+import type { CardInstance, Collection, User } from '../db.types';
 import { getUser } from './user';
 
 export async function createSetCollection(args: {
@@ -111,17 +111,20 @@ export async function getCollectionCards(args: { userId: string; collectionId: s
 		case 'set':
 			return {
 				success: true,
-				data: getSetCollectionCards({ cards: collection.cards, username: user.username }),
-			};
+				data: await getSetCollectionCards({
+					cards: collection.cards,
+					username: user.username,
+				}),
+			} as const;
 		case 'rule':
 			return {
 				success: true,
-				data: getRuleCollectionCards({
+				data: await getRuleCollectionCards({
 					rules: collection.rules,
 					username: user.username,
 					userId: user.userId,
 				}),
-			};
+			} as const;
 	}
 }
 
@@ -130,19 +133,19 @@ export async function getSetCollectionCards(args: {
 	cards: Collection['cards'];
 }): Promise<Array<CardInstance>> {
 	const cardIds = args.cards ?? [];
-  if (cardIds.length === 0) return []
+	if (cardIds.length === 0) return [];
 
 	const result = await db.entities.CardInstances.query
 		.byUser({ username: args.username })
 		.where((attr, op) => cardIds.map(id => op.eq(attr.instanceId, id)).join(' OR '))
 		.go({ pages: 'all' });
 
-	return result.data.slice().sort((a,b) => {
-    let aIndex = cardIds.findIndex(c => c === a.instanceId);
-    let bIndex = cardIds.findIndex(c => c === b.instanceId);
+	return result.data.slice().sort((a, b) => {
+		let aIndex = cardIds.findIndex(c => c === a.instanceId);
+		let bIndex = cardIds.findIndex(c => c === b.instanceId);
 
-    return aIndex - bIndex;
-  });
+		return aIndex - bIndex;
+	});
 }
 
 export async function getRuleCollectionCards(args: {
@@ -150,10 +153,10 @@ export async function getRuleCollectionCards(args: {
 	userId: string;
 	rules: Collection['rules'];
 }): Promise<Array<CardInstance>> {
-  if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
-    console.log("Empty rules, returning empty array");
-    return [];
-  }
+	if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
+		console.log('Empty rules, returning empty array');
+		return [];
+	}
 
 	const {
 		cardDesignIds,
@@ -197,12 +200,14 @@ export async function getRuleCollectionCards(args: {
 				conditions.push(mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR '));
 			}
 
-      if (cardNumbers) {
-				conditions.push(cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR '));
-      }
+			if (cardNumbers) {
+				conditions.push(
+					cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
+				);
+			}
 
-      const conditionString = `(${conditions.join(') AND (')})`;
-      console.log({conditionString})
+			const conditionString = `(${conditions.join(') AND (')})`;
+			console.log({ conditionString });
 
 			return conditionString;
 		})

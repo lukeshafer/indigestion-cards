@@ -4,6 +4,8 @@ import { getUserByUserName } from '@core/lib/user';
 import type { User } from '@core/types';
 import { routeNames, routes } from '@site/constants';
 import Page from '@site/layouts/Page.astro';
+import { CollectionPage } from '@site/layouts/CollectionPage';
+import { getCollectionCards } from '@core/lib/collections';
 
 const { username, collectionId } = Astro.params;
 
@@ -32,6 +34,12 @@ const collection = user.collections?.find(c => c.collectionId === collectionId);
 if (!collection) {
 	return Astro.redirect(`${routes.USERS}/${username}?alert=Collection not found.&type=error`);
 }
+
+const cards = await getCollectionCards({ userId: user.userId, collectionId: collection.collectionId });
+
+if (!cards.success) {
+	return Astro.redirect(`${routes.USERS}/${username}?alert=Collection not found.&type=error`);
+}
 ---
 
 <Page
@@ -42,5 +50,12 @@ if (!collection) {
 		{ label: user.username, href: `${routes.USERS}/${username}` },
 		{ label: collection.collectionName },
 	]}>
-  {collection.collectionName}
+	<CollectionPage
+		user={user}
+		twitchData={twitchData}
+		isLoggedInUser={Astro.locals.user?.properties.userId === user.userId}
+		cards={cards.data}
+		collection={collection}
+		client:load
+	/>
 </Page>
