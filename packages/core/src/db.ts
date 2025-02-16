@@ -835,7 +835,16 @@ const CollectionAttributes = {
 		},
 		collectionName: { type: 'string', required: true },
 		collectionType: { type: ['rule', 'set'] as const, required: true },
-		cards: { type: 'list', items: { type: 'string' } },
+		cards: {
+			type: 'list',
+			items: {
+				type: 'map',
+				properties: {
+					designId: { type: 'string', required: true },
+					instanceId: { type: 'string', required: true },
+				},
+			},
+		},
 		rules: {
 			type: 'map',
 			properties: {

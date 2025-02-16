@@ -52,9 +52,10 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 			() => ({
 				type: state.type,
 				rules: { ...state.rules },
-				cards: [...state.cards],
+				cards: [...state.cards.map(card => ({ ...card }))],
 			}),
 			({ type, rules, cards }) => {
+				console.log('fetching preview cards', Date.now());
 				switch (type) {
 					case 'set':
 						if (cards.length === 0) {
@@ -116,12 +117,23 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 							userCards={props.cards}
 							selectedCards={state.cards}
 							addCardId={instanceId => {
-								if (state.cards.includes(instanceId)) return;
-								setState('cards', state.cards.length, instanceId);
+								if (state.cards.some(card => card.instanceId === instanceId))
+									return;
+
+								const card = props.cards.find(
+									card => card.instanceId === instanceId
+								);
+
+								if (!card) return;
+
+								setState('cards', state.cards.length, {
+									designId: card.designId,
+									instanceId: card.instanceId,
+								});
 							}}
 							removeCardId={instanceId => {
 								let indexes = state.cards.reduce((indexes, value, index) => {
-									if (value === instanceId) {
+									if (value.instanceId === instanceId) {
 										return [...indexes, index];
 									} else return indexes;
 								}, [] as Array<number>);
@@ -217,7 +229,7 @@ const CollectionCardsPreviewList: Component<{
 
 const SetCollectionBuilder: Component<{
 	userCards: Array<CardInstance>;
-	selectedCards: Array<string>;
+	selectedCards: CollectionCards;
 	addCardId: (card: string) => void;
 	removeCardId: (card: string) => void;
 }> = props => {
@@ -231,7 +243,9 @@ const SetCollectionBuilder: Component<{
 			<CardList.List cards={cards()} scale={0.5}>
 				{card => (
 					<CardCheckbox
-						checked={props.selectedCards.includes(card.instanceId)}
+						checked={props.selectedCards.some(
+							selectedCard => selectedCard.instanceId === card.instanceId
+						)}
 						name="cards"
 						value={card.instanceId}
 						onInput={e => {

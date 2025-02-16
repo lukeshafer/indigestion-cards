@@ -11,7 +11,12 @@ export const createCollection = defineAction({
 			z
 				.object({
 					collectionType: z.literal('set'),
-					collectionCards: z.array(z.string()),
+					collectionCards: z.array(
+						z.object({
+							designId: z.string(),
+							instanceId: z.string(),
+						})
+					),
 				})
 				.or(
 					z.object({

@@ -35,7 +35,10 @@ if (!collection) {
 	return Astro.redirect(`${routes.USERS}/${username}?alert=Collection not found.&type=error`);
 }
 
-const cards = await getCollectionCards({ userId: user.userId, collectionId: collection.collectionId });
+const cards = await getCollectionCards({
+	userId: user.userId,
+	collectionId: collection.collectionId,
+});
 
 if (!cards.success) {
 	return Astro.redirect(`${routes.USERS}/${username}?alert=Collection not found.&type=error`);

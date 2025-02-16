@@ -51,9 +51,6 @@ export const UserPage: Component<{
 			/>
 
 			<div class="scrollbar-narrow h-full w-full md:overflow-scroll md:overflow-x-hidden">
-        {
-          //<pre>{JSON.stringify(props.user.collections, null, 2)}</pre>
-        }
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
 						<details>
@@ -73,13 +70,13 @@ export const UserPage: Component<{
 				<ul>
 					<For each={props.user.collections}>
 						{collection => (
-              <li class="mb-2">
-                <a
-                  class="underline"
-                  href={`${routes.USERS}/${props.user.username.toLowerCase()}/collections/${collection.collectionId}`}>
-                  {collection.collectionName}
-                </a>
-              </li>
+							<li class="mb-2">
+								<a
+									class="underline"
+									href={`${routes.USERS}/${props.user.username.toLowerCase()}/collections/${collection.collectionId}`}>
+									{collection.collectionName}
+								</a>
+							</li>
 						)}
 					</For>
 				</ul>
@@ -126,23 +123,32 @@ const UserIdentitySection: Component<{
 					{props.username}
 				</h1>
 
-				<Show when={props.lookingFor}>
-					{lookingFor => (
+				<Switch>
+					<Match when={props.lookingFor}>
+						{lookingFor => (
+							<UserLookingFor
+								userId={props.userId}
+								initialLookingFor={lookingFor()}
+								isLoggedInUser={props.isLoggedInUser}
+							/>
+						)}
+					</Match>
+					<Match when={!props.lookingFor && props.isLoggedInUser}>
 						<UserLookingFor
 							userId={props.userId}
-							initialLookingFor={lookingFor()}
+							initialLookingFor={''}
 							isLoggedInUser={props.isLoggedInUser}
 						/>
-					)}
-				</Show>
+					</Match>
+				</Switch>
 
-				<div class="col-start-2">
-					<Show when={!props.isLoggedInUser}>
+				<Show when={!props.isLoggedInUser}>
+					<div class="col-start-2">
 						<Anchor href={`${routes.TRADES}/new?receiverUsername=${props.username}`}>
 							New Trade
 						</Anchor>
-					</Show>
-				</div>
+					</div>
+				</Show>
 			</section>
 
 			<Show when={props.pinnedCard}>
@@ -163,7 +169,7 @@ const UserLookingFor: Component<{
 	return (
 		<p
 			data-open={isOpen()}
-			class="relative col-start-2 grid max-h-32 max-w-80 gap-0 self-start overflow-hidden break-words pb-8 transition-all data-[open=true]:max-h-max">
+			class="relative col-start-2 grid max-h-32 max-w-64 gap-0 self-start overflow-hidden break-words pb-2 transition-all data-[open=true]:max-h-max data-[open=true]:pb-8">
 			<span class="flex gap-2 text-sm font-normal italic opacity-80">
 				I'm looking for
 				<Show when={props.isLoggedInUser && !isEditing()}>
@@ -236,12 +242,12 @@ const UserPinnedCard: Component<{
 	username: string;
 }> = props => {
 	return (
-		<div class="relative w-fit origin-top-left rotate-0 p-12">
-      <p>Pinned Card</p>
+		<div class="relative w-fit pt-8">
+			<p class="text-center text-gray-500">Pinned</p>
 			<a
 				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
-				class="outline-brand-main group inline-block origin-[7rem_1rem] transition-transform ease-out hover:-rotate-0">
-				<CardEls.TiltEffectWrapper transformOrigin="7rem 1rem" angleMultiplier={0.2}>
+				class="outline-brand-main group inline-block origin-[7rem_1rem] transition-transform ease-out">
+				<CardEls.TiltEffectWrapper angleMultiplier={1.5}>
 					<CardEls.GlowOnHover focusOnly color={props.card.rarityColor} />
 					<CardEls.Card
 						lazy={false}
@@ -279,41 +285,6 @@ const UserPinnedCard: Component<{
 		</div>
 	);
 };
-
-//const Pin: Component = () => {
-//	return (
-//		<div class="h-12 w-12 drop-shadow-[-3px_2px_5px_#000f]">
-//			<svg
-//				class="fill-brand-main dark:fill-brand-main"
-//				version="1.1"
-//				id="Capa_1"
-//				xmlns="http://www.w3.org/2000/svg"
-//				width="100%"
-//				height="100%"
-//				viewBox="0 0 340.001 340.001">
-//				<g>
-//					<g>
-//						<path
-//							class="fill-brand-100"
-//							d="M2.69,320.439c-3.768,4.305-3.553,10.796,0.494,14.842l1.535,1.536c4.047,4.046,10.537,4.262,14.842,0.493l105.377-92.199
-//			l-30.049-30.049L2.69,320.439z"
-//						/>
-//						<path
-//							d="M339.481,119.739c-0.359-1.118-9.269-27.873-50.31-68.912C248.133,9.788,221.377,0.878,220.262,0.52
-//			c-3.879-1.244-8.127-0.217-11.008,2.664l-40.963,40.963c-4.242,4.243-4.242,11.125,0,15.369l4.533,4.534L65.086,147.171
-//			c-2.473,1.909-4.006,4.79-4.207,7.908c-0.199,3.118,0.953,6.172,3.162,8.381l41.225,41.226l30.051,30.051l41.225,41.226
-//			c2.211,2.209,5.266,3.361,8.381,3.161c3.119-0.201,6-1.732,7.91-4.207l83.119-107.738l4.535,4.533
-//			c4.239,4.244,11.123,4.244,15.367,0l40.963-40.962C339.698,127.866,340.726,123.618,339.481,119.739z M187.751,109.478
-//			l-66.539,56.51c-4.346,3.691-10.75,3.372-14.713-0.589c-0.209-0.209-0.412-0.429-0.607-0.659
-//			c-3.883-4.574-3.324-11.434,1.25-15.318l66.537-56.509c4.574-3.886,11.428-3.333,15.318,1.249
-//			C192.882,98.735,192.322,105.595,187.751,109.478z"
-//						/>
-//					</g>
-//				</g>
-//			</svg>
-//		</div>
-//	);
-//};
 
 const UserCardList: Component<{
 	initialCards: CardInstance[];

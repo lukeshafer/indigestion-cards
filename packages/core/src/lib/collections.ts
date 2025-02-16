@@ -1,12 +1,12 @@
 import { randomUUID } from 'crypto';
 import { db } from '../db';
-import type { CardInstance, Collection, User } from '../db.types';
+import type { CardInstance, Collection, CollectionCards, CollectionRules } from '../db.types';
 import { getUser } from './user';
 
 export async function createSetCollection(args: {
 	userId: string;
 	collectionName: string;
-	collectionCards: Array<string>;
+	collectionCards: CollectionCards;
 }) {
 	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
@@ -36,7 +36,7 @@ export async function createSetCollection(args: {
 export async function createRuleCollection(args: {
 	userId: string;
 	collectionName: string;
-	collectionRules: NonNullable<Collection['rules']>;
+	collectionRules: CollectionRules;
 }) {
 	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
@@ -116,7 +116,7 @@ export async function getCollectionCards(args: { userId: string; collectionId: s
 				success: true,
 				data: await getSetCollectionCards({
 					cards: collection.cards,
-					username: user.username,
+					userId: user.userId,
 				}),
 			} as const;
 		case 'rule':
@@ -132,23 +132,27 @@ export async function getCollectionCards(args: { userId: string; collectionId: s
 }
 
 export async function getSetCollectionCards(args: {
-	username: string;
+	userId: string;
 	cards: Collection['cards'];
 }): Promise<Array<CardInstance>> {
 	const cardIds = args.cards ?? [];
 	if (cardIds.length === 0) return [];
 
-	const result = await db.entities.CardInstances.query
-		.byUser({ username: args.username })
-		.where((attr, op) => cardIds.map(id => op.eq(attr.instanceId, id)).join(' OR '))
-		.go({ pages: 'all' });
+	const result = await db.entities.CardInstances.get(
+		cardIds.map(card => ({
+			designId: card.designId,
+			instanceId: card.instanceId,
+		}))
+	).go();
 
-	return result.data.slice().sort((a, b) => {
-		let aIndex = cardIds.findIndex(c => c === a.instanceId);
-		let bIndex = cardIds.findIndex(c => c === b.instanceId);
+	return result.data
+		.filter(card => card.userId === args.userId)
+		.sort((a, b) => {
+			let aIndex = cardIds.findIndex(c => c.instanceId === a.instanceId);
+			let bIndex = cardIds.findIndex(c => c.instanceId === b.instanceId);
 
-		return aIndex - bIndex;
-	});
+			return aIndex - bIndex;
+		});
 }
 
 export async function getRuleCollectionCards(args: {
@@ -161,63 +165,115 @@ export async function getRuleCollectionCards(args: {
 		return [];
 	}
 
-	const {
-		cardDesignIds,
-		stamps,
-		isMinter,
-		rarityIds,
-		seasonIds,
-		mintedByIds,
-		cardNumbers,
-		//tags, //TODO:
-	} = args.rules ?? {};
+	const result = await db.entities.CardInstances.query
+		.byUser({ username: args.username })
+		.where(buildCollectionCondition({ rules: args.rules, userId: args.userId }))
+		.go({ pages: 'all' });
+
+	return result.data;
+}
+
+type CardInstanceWhereCallback = Parameters<
+	ReturnType<typeof db.entities.CardInstances.query.byUser>['where']
+>[0];
+
+const buildCollectionCondition =
+	(args: { rules: CollectionRules; userId: string }): CardInstanceWhereCallback =>
+	(attr, op) => {
+		let conditions: Array<string> = [];
+
+		const cardOrSeasonConditions = [];
+		if (args.rules.cardDesignIds) {
+			cardOrSeasonConditions.push(
+				...args.rules.cardDesignIds.map(id => op.eq(attr.designId, id))
+			);
+		}
+		if (args.rules.seasonIds) {
+			cardOrSeasonConditions.push(
+				...args.rules.seasonIds.map(id => op.eq(attr.seasonId, id))
+			);
+		}
+		if (cardOrSeasonConditions.length) {
+			conditions.push(cardOrSeasonConditions.join(' OR '));
+		}
+
+		if (args.rules.stamps) {
+			conditions.push(
+				args.rules.stamps.map(stamp => op.contains(attr.stamps, stamp)).join(' OR ')
+			);
+		}
+
+		if (args.rules.isMinter === true) {
+			conditions.push(op.eq(attr.minterId, args.userId));
+		} else if (args.rules.isMinter === false) {
+			conditions.push(op.ne(attr.minterId, args.userId));
+		}
+
+		if (args.rules.rarityIds) {
+			conditions.push(
+				args.rules.rarityIds.map(ids => op.begins(attr.rarityId, ids)).join(' OR ')
+			);
+		}
+
+		if (args.rules.mintedByIds) {
+			conditions.push(
+				args.rules.mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR ')
+			);
+		}
+
+		if (args.rules.cardNumbers) {
+			conditions.push(
+				args.rules.cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
+			);
+		}
+
+		const conditionString = `(${conditions.join(') AND (')})`;
+		console.log({ conditionString });
+
+		return conditionString;
+	};
+
+export async function getCollectionPreviewCards(args: { userId: string; collectionId: string }) {
+	const collectionResult = await getCollection(args);
+	if (collectionResult.success === false) return collectionResult;
+
+	const { collection, user } = collectionResult.data;
+
+	switch (collection.collectionType) {
+		case 'set':
+			return {
+				success: true,
+				data: await getSetCollectionCards({
+					cards: collection.cards?.slice(0, 3),
+					userId: user.userId,
+				}),
+			} as const;
+		case 'rule':
+			return {
+				success: true,
+				data: await getRuleCollectionPreviewCards({
+					rules: collection.rules,
+					username: user.username,
+					userId: user.userId,
+				}),
+			} as const;
+	}
+}
+
+async function getRuleCollectionPreviewCards(args: {
+	username: string;
+	userId: string;
+	rules: Collection['rules'];
+}): Promise<Array<CardInstance>> {
+	if (!args.rules || Object.values(args.rules).filter(v => v !== null).length === 0) {
+		console.log('Empty rules, returning empty array');
+		return [];
+	}
 
 	const result = await db.entities.CardInstances.query
 		.byUser({ username: args.username })
-		.where((attr, op) => {
-			let conditions: Array<string> = [];
-
-			const cardOrSeasonConditions = [];
-			if (cardDesignIds) {
-				cardOrSeasonConditions.push(...cardDesignIds.map(id => op.eq(attr.designId, id)));
-			}
-			if (seasonIds) {
-				cardOrSeasonConditions.push(...seasonIds.map(id => op.eq(attr.seasonId, id)));
-			}
-			if (cardOrSeasonConditions.length) {
-				conditions.push(cardOrSeasonConditions.join(' OR '));
-			}
-
-			if (stamps) {
-				conditions.push(stamps.map(stamp => op.contains(attr.stamps, stamp)).join(' OR '));
-			}
-
-			if (isMinter === true) {
-				conditions.push(op.eq(attr.minterId, args.userId));
-			} else if (isMinter === false) {
-				conditions.push(op.ne(attr.minterId, args.userId));
-			}
-
-			if (rarityIds) {
-				conditions.push(rarityIds.map(ids => op.begins(attr.rarityId, ids)).join(' OR '));
-			}
-
-			if (mintedByIds) {
-				conditions.push(mintedByIds.map(id => op.eq(attr.minterId, id)).join(' OR '));
-			}
-
-			if (cardNumbers) {
-				conditions.push(
-					cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
-				);
-			}
-
-			const conditionString = `(${conditions.join(') AND (')})`;
-			console.log({ conditionString });
-
-			return conditionString;
-		})
-		.go({ pages: 'all' });
+		.where(buildCollectionCondition({ rules: args.rules, userId: args.userId }))
+		.go({ limit: 3 });
 
 	return result.data;
 }

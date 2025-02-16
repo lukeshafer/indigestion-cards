@@ -169,12 +169,17 @@ export const appRouter = t.router({
 		mockLoadCardsSet: adminProcedure
 			.input(
 				z.object({
-					cards: z.array(z.string()),
+					cards: z.array(
+						z.object({
+							designId: z.string(),
+							instanceId: z.string(),
+						})
+					),
 				})
 			)
 			.query(async ({ input, ctx }) => {
 				const data = await getSetCollectionCards({
-					username: ctx.session.properties.username,
+					userId: ctx.session.properties.userId,
 					cards: input.cards,
 				});
 
