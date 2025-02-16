@@ -20,7 +20,7 @@ import {
 import { trpc } from '@site/lib/client/trpc';
 import { routes, USER_API } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
-import type { CardInstance, User } from '@core/types';
+import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
@@ -35,6 +35,7 @@ export const UserPage: Component<{
 	isLoggedInUser: boolean;
 	packs: Array<PackCardsHidden>;
 	cards: Array<CardInstance>;
+	collectionData: Array<{ collection: Collection; cards: Array<CardInstance> }>;
 	pinnedCard?: User['pinnedCard'];
 	cursor: string | null;
 	initialFilters: Filters;
@@ -67,23 +68,37 @@ export const UserPage: Component<{
 					</section>
 				</Show>
 
-				<ul>
-					<For each={props.user.collections}>
-						{collection => (
-							<li class="mb-2">
-								<a
-									class="underline"
-									href={`${routes.USERS}/${props.user.username.toLowerCase()}/collections/${collection.collectionId}`}>
-									{collection.collectionName}
-								</a>
-							</li>
-						)}
-					</For>
-				</ul>
+				<Show when={props.collectionData.length || props.isLoggedInUser}>
+          <section class="mb-10">
+            <header class="grid place-items-center mb-6">
+              <h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
+                Collections
+              </h2>
+              <Show when={props.isLoggedInUser}>
+                <Anchor href="/collections/new">Create new</Anchor>
+              </Show>
+            </header>
+            <ul
+              class="grid justify-center"
+              style={{ 'grid-template-columns': `repeat(auto-fill, 15rem)` }}>
+              <For each={props.collectionData}>
+                {({ collection, cards }) => (
+                  <li class="mb-2">
+                    <UserCollectionListItem
+                      user={props.user}
+                      collection={collection}
+                      previewCards={cards}
+                    />
+                  </li>
+                )}
+              </For>
+            </ul>
+          </section>
+				</Show>
 
 				<section class="my-4 gap-4 text-left">
 					<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
-						Cards
+						All Cards
 					</h2>
 					<UserCardList
 						initialCards={props.cards}
@@ -283,6 +298,82 @@ const UserPinnedCard: Component<{
 				</CardEls.TiltEffectWrapper>
 			</a>
 		</div>
+	);
+};
+
+const UserCollectionListItem: Component<{
+	user: User;
+	collection: Collection;
+	previewCards: Array<CardInstance>;
+}> = props => {
+	const firstCard = () => props.previewCards.at(0);
+	const secondCard = () => props.previewCards.at(1);
+	const thirdCard = () => props.previewCards.at(2);
+
+	return (
+		<a
+			class="group grid w-60 place-items-center"
+			href={`${routes.USERS}/${props.user.username.toLowerCase()}/collections/${props.collection.collectionId}`}>
+			<div class="relative mx-6 my-4 w-fit px-8 transition-all group-hover:px-9">
+				<div class="absolute bottom-0 right-0 z-10 rotate-12 shadow-xl shadow-black">
+					<Show when={firstCard()}>
+						{card => <UserCollectionListItemPreviewCard card={card()} />}
+					</Show>
+				</div>
+				<div class="bottom-0 shadow-xl shadow-black brightness-75">
+					<Show when={secondCard()}>
+						{card => <UserCollectionListItemPreviewCard card={card()} />}
+					</Show>
+				</div>
+				<div class="absolute bottom-0 left-0 -z-10 -rotate-12 brightness-50">
+					<Show when={thirdCard()}>
+						{card => <UserCollectionListItemPreviewCard card={card()} />}
+					</Show>
+				</div>
+			</div>
+			<h3 class="z-10 text-lg font-semibold">{props.collection.collectionName}</h3>
+		</a>
+	);
+};
+
+const UserCollectionListItemPreviewCard: Component<{
+	card: {
+		cardName: string;
+		designId: string;
+		rarityId: string;
+		instanceId: string;
+		rarityColor: string;
+		cardNumber: number;
+		totalOfType: number;
+		stamps?: Array<string>;
+	};
+}> = props => {
+	return (
+		<CardEls.Card
+			lazy={false}
+			scale={0.4}
+			alt={props.card.cardName}
+			imgSrc={cardUtils.getCardImageUrl(props.card)}
+			viewTransitionName={`card-${props.card.instanceId}`}
+			background={
+				cardUtils.checkIsFullArt(props.card.rarityId)
+					? FULL_ART_BACKGROUND_CSS
+					: props.card.rarityColor
+			}>
+			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+			</Show>
+			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+				<CardEls.CardNumber
+					color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+					{cardUtils.formatCardNumber(props.card)}
+				</CardEls.CardNumber>
+			</Show>
+			<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+				<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+			</Show>
+		</CardEls.Card>
 	);
 };
 
