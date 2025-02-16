@@ -70,6 +70,20 @@ export const UserPage: Component<{
 					</section>
 				</Show>
 
+				<ul>
+					<For each={props.user.collections}>
+						{collection => (
+              <li class="mb-2">
+                <a
+                  class="underline"
+                  href={`${routes.USERS}/${props.user.username.toLowerCase()}/collections/${collection.collectionId}`}>
+                  {collection.collectionName}
+                </a>
+              </li>
+						)}
+					</For>
+				</ul>
+
 				<section class="my-4 gap-4 text-left">
 					<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
 						Cards
