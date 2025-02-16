@@ -828,8 +828,12 @@ const UserLogins = new Entity(
 const CollectionAttributes = {
 	type: 'map',
 	properties: {
+		collectionId: {
+			type: 'string',
+			required: true,
+			default: () => randomUUID(),
+		},
 		collectionName: { type: 'string', required: true },
-		collectionId: { type: 'string', required: true, readOnly: true, default: randomUUID },
 		collectionType: { type: ['rule', 'set'] as const, required: true },
 		cards: { type: 'list', items: { type: 'string' } },
 		rules: {

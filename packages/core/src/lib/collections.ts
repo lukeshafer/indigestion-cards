@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { db } from '../db';
 import type { CardInstance, Collection, User } from '../db.types';
 import { getUser } from './user';
@@ -13,21 +14,22 @@ export async function createSetCollection(args: {
 	}
 	const { user } = verifyResult.data;
 
+	const newCollection: Collection = {
+		collectionId: randomUUID(),
+		collectionName: args.collectionName,
+		cards: args.collectionCards,
+		collectionType: 'set',
+	};
+
 	let result = await db.entities.Users.patch({ userId: user.userId })
 		.append({
-			collections: [
-				{
-					collectionName: args.collectionName,
-					cards: args.collectionCards,
-					collectionType: 'set',
-				},
-			],
+			collections: [newCollection],
 		})
 		.go();
 
 	return {
 		success: true,
-		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+		data: { user: result.data, collection: newCollection },
 	} as const;
 }
 
@@ -42,21 +44,22 @@ export async function createRuleCollection(args: {
 	}
 	const { user } = verifyResult.data;
 
+	const newCollection: Collection = {
+		collectionId: randomUUID(),
+		collectionName: args.collectionName,
+		rules: args.collectionRules,
+		collectionType: 'rule',
+	};
+
 	let result = await db.entities.Users.patch({ userId: user.userId })
 		.append({
-			collections: [
-				{
-					collectionName: args.collectionName,
-					rules: args.collectionRules,
-					collectionType: 'set',
-				},
-			],
+			collections: [newCollection],
 		})
 		.go();
 
 	return {
 		success: true,
-		data: { user: result.data, collection: result.data.collections!.at(-1)! },
+		data: { user: result.data, collection: newCollection },
 	} as const;
 }
 
@@ -174,8 +177,15 @@ export async function getRuleCollectionCards(args: {
 		.where((attr, op) => {
 			let conditions: Array<string> = [];
 
+			const cardOrSeasonConditions = [];
 			if (cardDesignIds) {
-				conditions.push(cardDesignIds.map(id => op.eq(attr.designId, id)).join(' OR '));
+				cardOrSeasonConditions.push(...cardDesignIds.map(id => op.eq(attr.designId, id)));
+			}
+			if (seasonIds) {
+				cardOrSeasonConditions.push(...seasonIds.map(id => op.eq(attr.seasonId, id)));
+			}
+			if (cardOrSeasonConditions.length) {
+				conditions.push(cardOrSeasonConditions.join(' OR '));
 			}
 
 			if (stamps) {
@@ -190,10 +200,6 @@ export async function getRuleCollectionCards(args: {
 
 			if (rarityIds) {
 				conditions.push(rarityIds.map(ids => op.begins(attr.rarityId, ids)).join(' OR '));
-			}
-
-			if (seasonIds) {
-				conditions.push(seasonIds.map(id => op.eq(attr.seasonId, id)).join(' OR '));
 			}
 
 			if (mintedByIds) {
