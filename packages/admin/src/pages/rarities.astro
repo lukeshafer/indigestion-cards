@@ -15,7 +15,7 @@ const rarities = await getAllRarities();
 		<PageTitle>Rarities</PageTitle>
 		<Anchor href={routes.ADMIN.CREATE.RARITY}>Add New Rarity</Anchor>
 	</PageHeader>
-	<div class="mx-auto max-w-2xl">
+	<div class="mx-auto">
 		<RarityTable {rarities} />
 	</div>
 </Page>
