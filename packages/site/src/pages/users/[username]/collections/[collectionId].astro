@@ -4,7 +4,7 @@ import { getUserByUserName } from '@core/lib/user';
 import type { User } from '@core/types';
 import { routeNames, routes } from '@site/constants';
 import Page from '@site/layouts/Page.astro';
-import { CollectionPage } from '@site/layouts/CollectionPage';
+import { UserCollectionPage } from '@site/layouts/UserCollectionPage';
 import { getCollectionCards } from '@core/lib/collections';
 
 const { username, collectionId } = Astro.params;
@@ -53,7 +53,7 @@ if (!cards.success) {
 		{ label: user.username, href: `${routes.USERS}/${username}` },
 		{ label: collection.collectionName },
 	]}>
-	<CollectionPage
+	<UserCollectionPage
 		user={user}
 		twitchData={twitchData}
 		isLoggedInUser={Astro.locals.user?.properties.userId === user.userId}

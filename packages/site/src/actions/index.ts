@@ -1,7 +1,7 @@
-import { createCollection } from './collections';
+import { createCollection, deleteCollectionAction } from './collections';
 import { setIsLocked } from './packs';
 
 export const server = {
 	packs: { setIsLocked },
-	collections: { createCollection },
+	collections: { createCollection, deleteCollection: deleteCollectionAction },
 };

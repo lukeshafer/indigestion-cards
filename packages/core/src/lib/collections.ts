@@ -270,10 +270,24 @@ async function getRuleCollectionPreviewCards(args: {
 		return [];
 	}
 
+	const conditionFn = buildCollectionCondition({ rules: args.rules, userId: args.userId });
+
 	const result = await db.entities.CardInstances.query
 		.byUser({ username: args.username })
-		.where(buildCollectionCondition({ rules: args.rules, userId: args.userId }))
-		.go({ limit: 3 });
+		.where(conditionFn)
+		.go();
 
-	return result.data;
+	let { cursor, data: cards } = result;
+
+	while (cards.length < 3 && cursor != null) {
+		const newResult = await db.entities.CardInstances.query
+			.byUser({ username: args.username })
+			.where(conditionFn)
+			.go({ cursor });
+
+		cards.push(...newResult.data);
+		cursor = newResult.cursor;
+	}
+
+	return cards.slice(0, 3);
 }
