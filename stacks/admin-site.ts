@@ -1,6 +1,6 @@
 import { StackContext, AstroSite, use } from 'sst/constructs';
 import { Database } from './database';
-import { API } from './api';
+//import { API } from './api';
 import { DataRecoveryBucket, DesignBucket } from './bucket';
 import { Auth } from './auth';
 import { ConfigStack } from './config';
@@ -9,7 +9,7 @@ import { getHostedZone, getDomainName } from './constants';
 
 export function AdminSite({ app, stack }: StackContext) {
 	const table = use(Database);
-	const { adminApi, twitchApi } = use(API);
+	//const { adminApi, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { dataRecoveryBucket } = use(DataRecoveryBucket);
 	const { siteAuth } = use(Auth);
@@ -28,8 +28,8 @@ export function AdminSite({ app, stack }: StackContext) {
 		},
 		bind: [
 			table,
-			adminApi,
-			twitchApi,
+			//adminApi,
+			//twitchApi,
 			frameBucket,
 			cardDesignBucket,
 			frameDraftBucket,
