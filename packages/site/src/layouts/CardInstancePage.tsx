@@ -1,12 +1,7 @@
 import { createEffect, createSignal, Match, Show, Switch, For, type Component } from 'solid-js';
 import { Anchor, Heading, PageTitle } from '@site/components/text';
-import type { CardInstance, User } from '@core/types';
-import {
-	CardEls,
-	CardPreview,
-	cardUtils,
-	FULL_ART_BACKGROUND_CSS,
-} from '@site/components/Card';
+import type { CardDesign, CardInstance, User } from '@core/types';
+import { CardEls, CardPreview, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { useViewTransition } from '@site/lib/client/utils';
 import { routes, USER_API } from '@site/constants';
 import { createTable, TableEls } from '@site/components/Table';
@@ -14,6 +9,7 @@ import { Form, SubmitButton } from '@site/components/Form';
 
 export const CardInstancePage: Component<{
 	card: CardInstance;
+	design: CardDesign;
 	user?: User;
 	isTradeable: boolean;
 }> = props => {
@@ -54,7 +50,7 @@ export const CardInstancePage: Component<{
 				</Match>
 			</Switch>
 
-			<CardInstanceInfo card={props.card} />
+			<CardInstanceInfo card={props.card} design={props.design} />
 			<Show when={props.card.tradeHistory}>
 				{tradeHistory => <CardTradeHistory history={tradeHistory()} />}
 			</Show>
@@ -118,7 +114,7 @@ const PreviewableCard: Component<{ card: CardInstance }> = props => {
 	);
 };
 
-const CardInstanceInfo: Component<{ card: CardInstance }> = props => {
+const CardInstanceInfo: Component<{ card: CardInstance; design: CardDesign }> = props => {
 	const openDate = () => formatOpenDateString(props.card.openedAt);
 
 	return (
@@ -134,6 +130,10 @@ const CardInstanceInfo: Component<{ card: CardInstance }> = props => {
 					{props.card.cardName}
 				</a>
 			</p>
+      <p>
+				<b>Artist: </b>
+				{props.design.artist}
+      </p>
 			<p>
 				<b>Card Number: </b>
 				{props.card.cardNumber}

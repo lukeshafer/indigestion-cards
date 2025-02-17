@@ -1,6 +1,6 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import { getCardInstanceByUsername } from '@core/lib/card';
+import { getCardInstanceByUsername, getCardDesignAndInstanceByUserAndInstanceID } from '@core/lib/card';
 import { getUser } from '@core/lib/user';
 import { routeNames, routes } from '@site/constants';
 import { CardInstancePage } from '@site/layouts/CardInstancePage';
@@ -21,12 +21,12 @@ if (!instanceId) {
 	return Astro.redirect(routes.DESIGNS + '?alert=No instance id provided');
 }
 
-const instance = await getCardInstanceByUsername({ username, instanceId });
-if (!instance) {
+const { card, design } = await getCardDesignAndInstanceByUserAndInstanceID({ username, instanceId });
+if (!card || !design) {
 	return Astro.redirect(`${routes.USERS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
-if (!instance.openedAt && Astro.locals.session?.type !== 'admin') {
+if (!card.openedAt && Astro.locals.session?.type !== 'admin') {
 	return Astro.redirect(`${routes.USERS}?alert=Card not found: ${instanceId}&type=error`);
 }
 
@@ -34,18 +34,19 @@ const user = session?.properties.userId ? await getUser(session.properties.userI
 ---
 
 <Page
-	title={`${instance.cardName}, ${instance.rarityName} #${instance.cardNumber}`}
+	title={`${card.cardName}, ${card.rarityName} #${card.cardNumber}`}
 	class="flex flex-col gap-6"
 	pageType="public"
 	breadcrumbs={[
 		{ label: routeNames.USER, href: routes.USERS },
 		{ label: username, href: `${routes.USERS}/${username}` },
-		{ label: `${instance.rarityName} #${instance.cardNumber}` },
+		{ label: `${card.rarityName} #${card.cardNumber}` },
 	]}>
 	<CardInstancePage
-		card={instance}
+		card={card}
+    design={design}
 		user={user ?? undefined}
-		isTradeable={checkIsCardTradeable(instance)}
+		isTradeable={checkIsCardTradeable(card)}
 		client:load
 	/>
 </Page>
