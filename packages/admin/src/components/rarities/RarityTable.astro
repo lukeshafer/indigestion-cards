@@ -23,6 +23,7 @@ const { rarities } = Astro.props;
 		<SortTableColumn name="count" showOnBreakpoint="sm" type="number" startDescending>
 			Default Count
 		</SortTableColumn>
+		<SortTableColumn name="color" showOnBreakpoint="md">Color</SortTableColumn>
 		<SortTableColumn name="actions" sort={false}>Actions</SortTableColumn>
 	</SortTableHead>
 	<SortTableBody>
@@ -32,6 +33,7 @@ const { rarities } = Astro.props;
 					<SortTableCell column="id" value={rarityId} />
 					<SortTableCell column="name" value={rarityName} />
 					<SortTableCell column="count" value={defaultCount} showOnBreakpoint="sm" />
+					<SortTableCell column="color" value={rarityColor} showOnBreakpoint="md" />
 					<SortTableCell column="actions" value="">
 						<div class="grid gap-2">
 							<DeleteRarityButton {rarityId} {frameUrl} client:idle />
