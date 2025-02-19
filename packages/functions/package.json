@@ -14,6 +14,8 @@
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.723.0",
     "@aws-sdk/client-s3": "^3.723.0",
+    "@hono/valibot-validator": "^0.5.2",
+    "hono": "^4.7.2",
     "openid-client": "^5.7.1",
     "sharp": "^0.33.5",
     "zod": "^3.24.1"

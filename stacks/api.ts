@@ -1,4 +1,4 @@
-import { StackContext, Api, use } from 'sst/constructs';
+import { StackContext, Api, use, Function } from 'sst/constructs';
 import { Database } from './database';
 import { Events } from './events';
 import { DesignBucket } from './bucket';
@@ -35,6 +35,29 @@ export function API({ app, stack }: StackContext) {
 				runtime: 'nodejs18.x',
 			},
 		},
+	});
+
+	const siteApi = new Function(stack, 'SiteApi', {
+		handler: 'packages/functions/src/site-api/index.handler',
+		url: true,
+				bind: [
+					config.TWITCH_CLIENT_ID,
+					config.TWITCH_CLIENT_SECRET,
+					config.TWITCH_TOKENS_PARAM,
+					config.STREAMER_USER_ID,
+					table,
+					eventBus,
+					frameBucket,
+					cardDesignBucket,
+					cardDraftBucket,
+					frameDraftBucket,
+					siteAuth,
+					twitchApi,
+					wsApi,
+					wsConnectionsTable,
+				],
+				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
+				runtime: 'nodejs22.x',
 	});
 
 	const adminApi = new Api(stack, 'AdminApi', {
@@ -142,7 +165,8 @@ export function API({ app, stack }: StackContext) {
 	stack.addOutputs({
 		ApiEndpoint: adminApi.url,
 		TwitchApiEndpoint: twitchApi.url,
+		SiteApi: siteApi.url,
 	});
 
-	return { adminApi, twitchApi };
+	return { adminApi, twitchApi, siteApi };
 }
