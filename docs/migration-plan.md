@@ -9,3 +9,6 @@ From the docs:
 > 3. Then for your prod stage, follow the steps below and make the import, domain, and subscriber changes.
 > 4. Once the prod version of your v3 app is running, clean up some of the v2 prod resources.
 
+https://sst.dev/docs/migrate-from-v2#migration-plan
+
+New production stage name: live
