@@ -3,7 +3,11 @@
 /* eslint-disable */
 /* deno-fmt-ignore-file */
 
-/// <reference path="../../sst-env.d.ts" />
+declare module "sst" {
+  export interface Resource {
+  }
+}
+/// <reference path="sst-env.d.ts" />
 
 import "sst"
 export {}

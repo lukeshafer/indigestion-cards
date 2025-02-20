@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "sst bind vitest",
+    "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^18.19.70",
-    "sst": "2.44.0"
+    "sst": "3.9.10"
   },
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.723.0",
