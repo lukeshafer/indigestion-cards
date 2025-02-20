@@ -11,6 +11,7 @@ import { AdminSite } from './stacks/admin-site';
 import { ImageProcessing } from './stacks/image-processing'
 import { Minecraft } from './stacks/minecraft';
 import { WebsocketsAPI } from './stacks/websockets-api';
+import { Frontend } from './stacks/frontend';
 
 export default {
 	config() {
@@ -37,5 +38,6 @@ export default {
       .stack(Minecraft)
 			.stack(Sites)
 			.stack(AdminSite)
+      .stack(Frontend)
 	},
 } satisfies SSTConfig;

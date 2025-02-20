@@ -6,7 +6,7 @@ import containerQueries from '@tailwindcss/container-queries';
 export default {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 	plugins: [typography, containerQueries],
-	darkMode: 'class',
+	//darkMode: 'class', // FIXME: we might want this back to class, but for now this is simpler
 	theme: {
 		extend: {
 			spacing: {

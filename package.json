@@ -20,7 +20,8 @@
     "site:dev:host": "pnpm --filter site run dev:host",
     "site:build": "pnpm --filter site run build",
     "site:astro": "pnpm --filter site run astro",
-    "admin:dev": "pnpm --filter admin run dev"
+    "admin:dev": "pnpm --filter admin run dev",
+    "fe:dev": "pnpm --filter frontend run dev"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
