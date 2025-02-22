@@ -129,7 +129,7 @@ const UserIdentitySection: Component<{
 				class="grid w-fit content-center gap-x-4">
 				<img
 					alt={`${props.username}'s profile image`}
-          style={{"view-transition-name":`${props.userId}-user-profile-image`}}
+					style={{ 'view-transition-name': `${props.userId}-user-profile-image` }}
 					src={props.profileImageUrl}
 					width={IMG_SIZE}
 					height={IMG_SIZE}
@@ -277,7 +277,9 @@ const UserPinnedCard: Component<{
 						}>
 						<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 							<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-							<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+							<CardEls.CardDescription>
+								{props.card.cardDescription}
+							</CardEls.CardDescription>
 						</Show>
 						<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 							<CardEls.CardNumber
@@ -358,6 +360,7 @@ const UserCollectionListItem: Component<{
 const UserCollectionListItemPreviewCard: Component<{
 	card: {
 		cardName: string;
+		cardDescription: string;
 		designId: string;
 		rarityId: string;
 		instanceId: string;
@@ -381,7 +384,7 @@ const UserCollectionListItemPreviewCard: Component<{
 			}>
 			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+				<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
 			</Show>
 			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber
@@ -496,7 +499,7 @@ const UserCardListItem: Component<{
 				}>
 				<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 					<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-					<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+					<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
 				</Show>
 				<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 					<CardEls.CardNumber
