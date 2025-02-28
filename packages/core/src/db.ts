@@ -902,6 +902,7 @@ const Users = new Entity(
 					stamps: { type: 'list', items: { type: 'string' } },
 				},
 			},
+			pinnedMessage: { type: 'string' },
 			collections: {
 				type: 'list',
 				items: CollectionAttributes,

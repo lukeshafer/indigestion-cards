@@ -9,6 +9,6 @@ if (!user) return Astro.redirect('/');
 const data = await getUserAndOpenedCardInstances({ username: user.properties.username });
 ---
 
-<Page title="New collection" pageType="admin">
+<Page title="New collection" pageType="user">
   <CollectionBuilder cards={data?.CardInstances ?? []} client:load />
 </Page>

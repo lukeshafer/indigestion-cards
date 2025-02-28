@@ -85,7 +85,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 			<div class="grid h-fit gap-8">
 				<fieldset class="flex justify-center">
 					<label
-						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold focus-within:outline focus-within:outline-brand-main focus-within:z-10"
 						data-checked={state.type === 'set'}>
 						<input
 							type="radio"
@@ -98,7 +98,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 						<p>Standard Collection</p>
 					</label>
 					<label
-						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold focus-within:outline focus-within:outline-brand-main"
 						data-checked={state.type === 'rule'}>
 						<input
 							type="radio"
