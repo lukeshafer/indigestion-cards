@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/node": "^18.19.70",
     "solid-js": "^1.9.4",
-    "sst": "2.44.0"
+    "sst": "2.47.3"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.723.0",
