@@ -17,7 +17,12 @@ import {
 	hidePackCards,
 	sendPacksUpdatedEvent,
 } from '@core/lib/pack';
-import { getAllUsers, getUserAndOpenedCardInstances, searchUsers } from '@core/lib/user';
+import {
+	getAllUsers,
+	getUserAndOpenedCardInstances,
+	getUserByUserName,
+	searchUsers,
+} from '@core/lib/user';
 import {
 	getCollectionCards,
 	getRuleCollectionCards,
@@ -26,6 +31,8 @@ import {
 import { getAllCardDesigns } from '@core/lib/design';
 import { getAllSeasons } from '@core/lib/season';
 import type { CardDesign } from '@core/types';
+import { getPacksRemaining } from './packs-remaining';
+import { getTrade } from '@core/lib/trades';
 
 const t = initTRPC.context<TRPCContext>().create();
 export const router = t.router;
@@ -70,6 +77,9 @@ export const appRouter = t.router({
 		search: publicProcedure
 			.input(z.object({ searchString: z.string().min(1) }))
 			.query(async ({ input }) => await searchUsers(input)),
+		byUsername: publicProcedure
+			.input(z.object({ username: z.string() }))
+			.query(async ({ input }) => await getUserByUserName(input.username)),
 	},
 	userCards: {
 		sortedByRarity: publicProcedure
@@ -156,6 +166,7 @@ export const appRouter = t.router({
 						packs.map(hidePackCards)
 					)
 			),
+		packsRemaining: authedProcedure.query(async () => await getPacksRemaining()),
 		sendPacksUpdatedEvent: adminProcedure.mutation(async () => await sendPacksUpdatedEvent()),
 	},
 	collections: {
@@ -207,6 +218,11 @@ export const appRouter = t.router({
 
 				return data;
 			}),
+	},
+	trades: {
+		byId: authedProcedure
+			.input(z.object({ tradeId: z.string() }))
+			.query(async ({ input }) => await getTrade(input.tradeId)),
 	},
 });
 

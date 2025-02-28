@@ -50,6 +50,14 @@ let {
 let pageTitle =
 	title !== 'Indigestion Cards' ? title + ' — Indigestion Cards' : 'Indigestion Cards';
 
+let isAllowedToSeePage = session?.type === 'admin' ||
+    (session?.type === 'user' && pageType === 'user') ||
+  pageType === 'public';
+
+if (!isAllowedToSeePage) {
+  return Astro.redirect('/404');
+}
+
 alerts.push(...(alertsProp ?? []));
 ---
 
@@ -96,10 +104,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50"
 		class:list={{ 'disable-animations': disableAnimations }}>
 		{
-			session?.type === 'admin' ||
-			(session?.type === 'user' && pageType === 'user') ||
-			pageType === 'public' ? (
-				<>
+			isAllowedToSeePage ? (
 					<div
 						class="grid h-[100dvh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
 						id="page-layout-wrapper"
@@ -132,7 +137,6 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 							<Footer />
 						</div>
 					</div>
-				</>
 			) : (
 				<script> window.location.href = '/' </script>
 			)

@@ -1,12 +1,12 @@
 import { Show, createResource, onCleanup, onMount } from 'solid-js';
 import ButtonCount from './ButtonCount';
-import { get } from '@site/lib/client/data';
+import { trpc } from '@site/lib/client/trpc';
 
 export default function TradeNotificationCount(props: { username: string }) {
 	const [count, { refetch }] = createResource(
 		() => props.username,
 		async username => {
-			const user = await get('user', [username]);
+			const user = await trpc.users.byUsername.query({ username });
 			return (
 				user?.tradeNotifications?.reduce(
 					(acc, notif) => acc.add(notif.tradeId),
@@ -16,15 +16,15 @@ export default function TradeNotificationCount(props: { username: string }) {
 		}
 	);
 
-  //let interval: NodeJS.Timeout;
+	//let interval: NodeJS.Timeout;
 	onMount(() => {
 		globalThis.addEventListener?.('astro:page-load', refetch);
-    // queueMicrotask(refetch);
-    //interval = setInterval(refetch, 5000);
+		// queueMicrotask(refetch);
+		//interval = setInterval(refetch, 5000);
 	});
 	onCleanup(() => {
 		globalThis.removeEventListener?.('astro:page-load', refetch);
-    //clearInterval(interval);
+		//clearInterval(interval);
 	});
 
 	return (

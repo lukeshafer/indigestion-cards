@@ -177,7 +177,7 @@ const tradeStatus = (() => {
 
 	<trade-fetcher trade-id={trade.tradeId} status={trade.status}></trade-fetcher>
 	<script>
-		import { get } from '@site/lib/client/data';
+		import { trpc } from '@site/lib/client/trpc';
 
 		customElements.define(
 			'trade-fetcher',
@@ -201,7 +201,7 @@ const tradeStatus = (() => {
 				}
 
 				async refreshIfTradeStatusUpdated() {
-					const trade = await get('trades', [this.tradeId]);
+					const trade = await trpc.trades.byId.query({ tradeId: this.tradeId });
 					if (this.status !== trade.status) location.reload();
 				}
 			}

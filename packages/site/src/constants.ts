@@ -1,32 +1,3 @@
-/** Only routes that are accessible without logging in */
-export const PUBLIC_ROUTES = [
-	'/',
-	'/users',
-	'/users/*',
-	'/404',
-	'/admin',
-	'/api/get-all-usernames',
-	'/api/search',
-	'/api/auth/*',
-	'/api/user/*',
-	'/cards',
-	'/cards/*',
-	'/login',
-	'/logout',
-	'/data/usernames',
-	'/trades/*',
-	'/data/*',
-	'/trpc/*',
-	'/trpc',
-	'/_actions',
-	'/_actions/*',
-	'/collections/*',
-	'/collections',
-] as const;
-
-/** Routes that aren't admin only, but require a user login */
-export const USER_ROUTES = ['/trades', '/api/trades', '/api/trades/*'];
-
 /** Admin Api routes */
 const api_paths = {
 	PACK_TYPE: '/pack-type',

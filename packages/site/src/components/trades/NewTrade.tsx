@@ -4,7 +4,6 @@ import { Suspense, createResource, type JSX, Show, createEffect, on, createSigna
 import { Loading, SubmitButton, TextArea, TextInput } from '../Form';
 import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@site/constants';
 import { Heading } from '@site/components/text';
-import { get } from '@site/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@core/lib/site-config';
@@ -70,7 +69,7 @@ export default function NewTrade(props: {
 
 	const [isLoading, setIsLoading] = createSignal(false);
 
-	const [users] = createResource(() => get('usernames'), {
+	const [users] = createResource(() => trpc.users.allUsernames.query(), {
 		ssrLoadFrom: 'initial',
 		initialValue: [],
 	});

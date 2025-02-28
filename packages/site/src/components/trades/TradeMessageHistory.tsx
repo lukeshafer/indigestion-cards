@@ -10,14 +10,14 @@ import {
 	Suspense,
 } from 'solid-js';
 import { SubmitButton, TextInput } from '../Form';
-import { get } from '@site/lib/client/data';
 import { routes } from '@site/constants';
+import { trpc } from '@site/lib/client/trpc';
 
 export default function TradeMessageHistory(props: { trade: Trade; loggedInUserId?: string }) {
 	const [messages, messagesActions] = createResource(
 		() => props.trade.tradeId,
 		async tradeId => {
-			const trade = await get('trades', [tradeId]);
+      const trade = await trpc.trades.byId.query({ tradeId })
 			return trade.messages;
 		},
 		{

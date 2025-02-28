@@ -3,10 +3,9 @@ import Page from '@admin/layouts/Page.astro';
 import { getAllPreorders } from '@core/lib/preorder';
 import { PageHeader, PageTitle } from '@admin/components/text';
 import UsersTable from '@admin/components/user/UsersTable';
+import { getAllUsers } from '@core/lib/user';
 
-import { GET as getUsers } from '@admin/pages/data/users';
-
-const { data: users } = await getUsers();
+const users = await getAllUsers()
 const preorders = await getAllPreorders();
 ---
 
