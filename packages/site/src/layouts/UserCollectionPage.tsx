@@ -41,7 +41,7 @@ export const UserCollectionPage: Component<{
 								const username = props.user.username;
 								const collection = props.collection;
 
-								trpc.collections.deleteCollection
+								trpc.collections.delete
 									.mutate({ collectionId: collection.collectionId })
 									.catch(error => console.error(error))
 									.then(() =>
