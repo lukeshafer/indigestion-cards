@@ -33,6 +33,8 @@ export const Header: Component<{
 	isAdmin?: boolean;
 	currentPage: string;
 }> = props => {
+	const logo = () => props.logo || 'default';
+
 	return (
 		<header class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
 			<div class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
@@ -42,9 +44,9 @@ export const Header: Component<{
 						title="Home"
 						class="mr-4 flex w-fit min-w-[2rem] items-center gap-4">
 						<img
-							src={LOGOS[props.logo || 'default']}
+							src={LOGOS[logo() || 'default']}
 							alt="logo"
-							class={`block w-12 ${props.logo === 'default' ? 'dark:invert' : ''}`}
+							class={`block w-12 ${logo() === 'default' ? 'dark:invert' : ''}`}
 							width="192"
 						/>
 						<div class="font-display hidden flex-1 flex-col pt-1 sm:flex">
