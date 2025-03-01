@@ -63,6 +63,7 @@ export const UserCollectionPage: Component<{
 								href={`${routes.USERS}/${card.username?.toLowerCase()}/${card.instanceId ?? ''}`}
 								class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 								<CardEls.FullAnimatedCardEffect
+                  disableTiltOnTouch
 									glowColor={
 										cardUtils.checkIsFullArt(card.rarityId)
 											? undefined

@@ -40,17 +40,19 @@ export const UserPage: Component<{
 	initialFilters: Filters;
 }> = props => {
 	return (
-		<div class="md:flex md:max-h-[calc(100vh-10rem)]">
-			<UserIdentitySection
-				username={props.user.username}
-				userId={props.user.userId}
-				profileImageUrl={props.twitchData?.profile_image_url ?? ''}
-				pinnedCard={props.user.pinnedCard}
-				lookingFor={props.user.lookingFor}
-				isLoggedInUser={props.isLoggedInUser}
-			/>
+		<div class="md:flex h-fit">
+      <div class="md:h-full">
+        <UserIdentitySection
+          username={props.user.username}
+          userId={props.user.userId}
+          profileImageUrl={props.twitchData?.profile_image_url ?? ''}
+          pinnedCard={props.user.pinnedCard}
+          lookingFor={props.user.lookingFor}
+          isLoggedInUser={props.isLoggedInUser}
+        />
+      </div>
 
-			<div class="scrollbar-narrow h-full w-full md:overflow-scroll md:overflow-x-hidden">
+			<div class="h-full w-full">
 				<Show when={props.packs.length > 0}>
 					<section class="my-4 grid gap-4 text-center">
 						<details>
@@ -122,7 +124,7 @@ const UserIdentitySection: Component<{
 }> = props => {
 	const IMG_SIZE = 100;
 	return (
-		<div class="mx-auto w-fit min-w-96">
+		<div class="md:sticky top-8 mx-auto w-fit min-w-96">
 			<section
 				style={{ 'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)` }}
 				class="grid w-fit content-center gap-x-4">
@@ -257,7 +259,7 @@ const UserPinnedCard: Component<{
 	username: string;
 }> = props => {
 	return (
-		<div class="relative w-fit pt-8">
+		<div class="relative mx-auto w-fit pt-8">
 			<p class="text-center text-gray-500">Pinned</p>
 			<a
 				href={`${routes.USERS}/${props.username}/${props.card.instanceId}`}
@@ -483,6 +485,7 @@ const UserCardListItem: Component<{
 		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
 		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 		<CardEls.FullAnimatedCardEffect
+      disableTiltOnTouch
 			glowColor={
 				cardUtils.checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor
 			}>

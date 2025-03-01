@@ -153,7 +153,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 					</Match>
 				</Switch>
 			</div>
-			<div class="grid h-fit gap-4 px-4">
+			<form class="grid h-fit gap-4 px-4">
 				<div class="max-w-72">
 					<TextInput
 						name="collectionName"
@@ -181,10 +181,12 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 							});
 					}}
 					disabled={state.previewCards.length === 0 || state.collectionName.length === 0}>
-					Save Collection
+          <div class="w-fit">
+            Save Collection
+          </div>
 				</SubmitButton>
 				<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
-			</div>
+			</form>
 		</div>
 	);
 };

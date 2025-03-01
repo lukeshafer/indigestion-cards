@@ -457,7 +457,7 @@ export function SubmitButton(props: {
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
-			class="group"
+			class="group w-fit"
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
@@ -474,7 +474,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void; c
 	return (
 		<button
 			type="submit"
-			class="group"
+			class="group w-fit"
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();

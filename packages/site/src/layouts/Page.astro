@@ -64,7 +64,7 @@ alerts.push(...(alertsProp ?? []));
 <html
 	lang="en"
 	class:list={{ dark: colorTheme === 'dark' }}
-	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
+	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50 scrollbar-narrow">
 	<!--
 Hello beautiful people of the internet!
 
@@ -106,11 +106,11 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		{
 			isAllowedToSeePage ? (
 					<div
-						class="grid h-[100dvh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
+						class="grid h-[100dvh] grid-cols-1 md:grid-cols-[max-content_1fr]"
 						id="page-layout-wrapper"
 						data-api-url={Api.AdminApi.url}>
 						<div
-							class="scrollbar-narrow relative flex flex-col overflow-y-scroll bg-gray-50 md:col-start-2 dark:bg-gray-950"
+							class="scrollbar-narrow relative flex flex-col bg-gray-50 md:col-start-2 dark:bg-gray-950"
 							id="page-scroll-wrapper">
 							{noHeader ? null : <Header {logo} />}
 							<data-lists />

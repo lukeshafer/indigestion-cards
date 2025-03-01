@@ -111,7 +111,7 @@ const DesignInstancesCardListItem: Component<{
 		<a
 			href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}
 			class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-			<FullAnimatedCardEffect glowColor={props.card.rarityColor}>
+			<FullAnimatedCardEffect glowColor={props.card.rarityColor} disableTiltOnTouch>
 				<Card
 					lazy={props.lazy}
 					alt={props.card.cardName}

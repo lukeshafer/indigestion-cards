@@ -152,8 +152,11 @@ export const CardLinkWrapper: ParentComponent<{
 	</a>
 );
 
-export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = props => (
-	<TiltEffectWrapper>
+export const FullAnimatedCardEffect: ParentComponent<{
+	glowColor?: string;
+	disableTiltOnTouch?: boolean;
+}> = props => (
+	<TiltEffectWrapper disableOnTouch={props.disableTiltOnTouch}>
 		<GlowOnHover color={props.glowColor} />
 		{props.children}
 		<ShineMouseEffect />
@@ -167,6 +170,7 @@ function clamp(min: number, target: number, max: number) {
 export const TiltEffectWrapper: ParentComponent<{
 	angleMultiplier?: number;
 	transformOrigin?: string;
+	disableOnTouch?: boolean;
 }> = props => {
 	let canStop = false;
 	let rotateX = 0;
@@ -212,6 +216,7 @@ export const TiltEffectWrapper: ParentComponent<{
 
 	onMount(() => {
 		wrapperEl!.addEventListener('touchmove', e => {
+			if (props.disableOnTouch) return;
 			const bounds = wrapperEl!.getBoundingClientRect();
 			const touches = e.touches[0];
 			if (!bounds || !touches) return;
@@ -239,6 +244,7 @@ export const TiltEffectWrapper: ParentComponent<{
 				requestAnimationFrame(animate);
 			}}
 			onTouchStart={() => {
+				if (props.disableOnTouch) return;
 				canStop = false;
 				requestAnimationFrame(animate);
 			}}
