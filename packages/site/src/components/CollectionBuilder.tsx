@@ -26,7 +26,6 @@ import { FULL_ART_ID, routes } from '@site/constants';
 import { createStore, produce, reconcile } from 'solid-js/store';
 import CardList from './CardList';
 import { getCardSearcher } from '@site/lib/client/utils';
-import { actions } from 'astro:actions';
 
 export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
 	const [state, setState] = createStore({
@@ -85,7 +84,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 			<div class="grid h-fit gap-8">
 				<fieldset class="flex justify-center">
 					<label
-						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold focus-within:outline focus-within:outline-brand-main focus-within:z-10"
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 						data-checked={state.type === 'set'}>
 						<input
 							type="radio"
@@ -98,7 +97,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 						<p>Standard Collection</p>
 					</label>
 					<label
-						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold focus-within:outline focus-within:outline-brand-main"
+						class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 						data-checked={state.type === 'rule'}>
 						<input
 							type="radio"
@@ -164,22 +163,21 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 				</div>
 				<SubmitButton
 					onClick={() => {
-						actions.collections
-							.createCollection({
+						trpc.collections.create
+							.mutate({
 								collectionName: state.collectionName,
 								collectionType: state.type,
 								collectionRules: state.type === 'rule' ? state.rules : {},
 								collectionCards: state.type === 'set' ? state.cards : [],
 							})
+							.catch(error => {
+								// TODO: handle the error
+								console.error(error);
+							})
 							.then(result => {
-								if (result.error) {
-									// TODO: handle the error
-									console.error(result.error);
-								} else {
-									location.assign(
-										`${routes.USERS}/${result.data.username}?alert=Successfully%20created%20collection`
-									);
-								}
+								location.assign(
+									`${routes.USERS}/${result?.username}?alert=Successfully%20created%20collection`
+								);
 							});
 					}}
 					disabled={state.previewCards.length === 0 || state.collectionName.length === 0}>

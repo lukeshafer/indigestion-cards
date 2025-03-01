@@ -292,7 +292,7 @@ export const ShineMouseEffect: Component = () => {
 
 	return (
 		<div
-			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-color-dodge transition-opacity group-hover:opacity-100"
+			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-screen transition-opacity group-hover:opacity-100"
 			onTouchStart={e => {
 				if (checkAreAnimationsDisabled()) {
 					e.currentTarget.classList.remove('opacity-100');
@@ -336,7 +336,7 @@ export const ShineMouseEffect: Component = () => {
 				});
 			}}>
 			<div
-				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-color-dodge"
+				class="duration-800 absolute left-0 top-0 scale-[3]"
 				style={{
 					// good mix-blend options: overlay, color-dodge
 					translate: `${state.x}px ${state.y}px`,

@@ -24,7 +24,6 @@ import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
-import { actions } from 'astro:actions';
 import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
@@ -598,20 +597,18 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 						isLocked={isLocked()}
 						onClick={() => {
 							let newValue = !isLocked();
-							actions.packs
-								.setIsLocked({
+							trpc.packs.setIsLocked
+								.mutate({
 									packId: props.pack.packId,
 									isLocked: newValue,
 								})
-								.then(val => {
-									if (val.error) {
-										setAlertText(
-											'An error occurred while ' +
-												(newValue == true ? 'lock' : 'unlock') +
-												'ing the pack.'
-										);
-										setIsLocked(!newValue);
-									}
+								.catch(() => {
+									setAlertText(
+										'An error occurred while ' +
+											(newValue == true ? 'lock' : 'unlock') +
+											'ing the pack.'
+									);
+									setIsLocked(!newValue);
 								});
 							setIsLocked(newValue);
 						}}
