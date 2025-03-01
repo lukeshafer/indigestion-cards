@@ -84,7 +84,9 @@ const AllDesignsCardListItem: Component<{
 			: props.card.bestRarityFound?.rarityColor;
 
 	const card = (
-		<FullAnimatedCardEffect glowColor={background()} disableTiltOnTouch>
+		<FullAnimatedCardEffect
+			glowColor={checkIsFullArt(rarityId()) ? undefined : background()}
+			disableTiltOnTouch>
 			<Card
 				lazy={props.lazy}
 				scale="var(--card-scale)"

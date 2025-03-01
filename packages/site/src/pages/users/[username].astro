@@ -7,11 +7,11 @@ import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
 import { getUserByLogin } from '@core/lib/twitch';
 import type { CardInstance, Collection, User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
-import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/CardList';
 import { getCollectionPreviewCards } from '@core/lib/collections';
+import  { LOGOS } from '@site/constants'
 
-type Logo = HeaderProps['logo'];
+type Logo = keyof typeof LOGOS | undefined
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {

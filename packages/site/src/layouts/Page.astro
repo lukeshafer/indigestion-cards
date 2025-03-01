@@ -1,13 +1,14 @@
 ---
 import '@site/global.css';
 import '@fontsource-variable/montserrat';
-import { ASSETS } from '@site/constants';
+import { ASSETS, type LOGOS } from '@site/constants';
 import Breadcrumbs, { type Path } from '@site/components/Breadcrumbs';
-import Header, { type Props as HeaderProps } from '@site/components/Header.astro';
+import { Header } from '@site/components/Header';
 import { Footer } from '@site/components/Footer';
 import AlertBox from '@site/components/AlertBox';
 import { Api } from 'sst/node/api';
 import type { Alert } from '@site/lib/client/state';
+import { getUserByLogin } from '@core/lib/twitch';
 
 export interface Props {
 	class?: string;
@@ -16,7 +17,7 @@ export interface Props {
 	alerts?: Alert[];
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
-	logo?: HeaderProps['logo'];
+	logo?: keyof typeof LOGOS
 	title: string;
 	pageType?: 'public' | 'user' | 'admin';
 }
@@ -34,6 +35,8 @@ if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', mess
 
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
+let loggedInUsername = Astro.locals.session?.properties.username || undefined;
+let twitchData = loggedInUsername ? await getUserByLogin(loggedInUsername) : undefined
 
 let {
 	class: className,
@@ -53,10 +56,6 @@ let pageTitle =
 let isAllowedToSeePage = session?.type === 'admin' ||
     (session?.type === 'user' && pageType === 'user') ||
   pageType === 'public';
-
-if (!isAllowedToSeePage) {
-  return Astro.redirect('/404');
-}
 
 alerts.push(...(alertsProp ?? []));
 ---
@@ -112,7 +111,15 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 						<div
 							class="scrollbar-narrow relative flex flex-col bg-gray-50 md:col-start-2 dark:bg-gray-950"
 							id="page-scroll-wrapper">
-							{noHeader ? null : <Header {logo} />}
+              {noHeader ? null : <Header 
+                {logo}
+                {disableAnimations}
+                {loggedInUsername}
+                {twitchData}
+                {isAdmin}
+                currentPage={Astro.url.pathname}
+                client:load
+              />}
 							<data-lists />
 							<AlertBox client:load {alerts} />
 							{hideBreadcrumbs ? null : (
@@ -138,7 +145,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 						</div>
 					</div>
 			) : (
-				<script> window.location.href = '/' </script>
+				<script> window.location.href = '/404' </script>
 			)
 		}
 	</body>
