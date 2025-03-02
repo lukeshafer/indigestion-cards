@@ -19,7 +19,7 @@ export const handler = SiteHandler(
 			ctx.params.pinnedCardId === 'null' || ctx.params.pinnedCardDesignId === 'null';
 
 		await setUserProfile({
-			userId: ctx.params.userId,
+			userId: ctx.session.userId,
 			lookingFor: ctx.params.lookingFor,
       minecraftUsername: ctx.params.minecraftUsername?.toLowerCase(),
 			pinnedCard: deletePinnedCard
