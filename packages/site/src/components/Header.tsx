@@ -1,7 +1,6 @@
 import type { TwitchUser } from '@core/lib/twitch';
 import { authApi, LOGOS, publicApi, routes } from '@site/constants';
-import { trpc } from '@site/lib/client/trpc';
-import { createWSClient } from '@site/lib/ws-client';
+import { trpc, createWSClient } from '@site/client/api';
 import {
 	createEffect,
 	createMemo,

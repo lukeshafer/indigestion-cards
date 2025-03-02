@@ -5,7 +5,7 @@ import type {
 	CollectionCards,
 	Season,
 } from '@core/types';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 import {
 	createEffect,
 	createMemo,
@@ -25,7 +25,7 @@ import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Ca
 import { FULL_ART_ID, routes } from '@site/constants';
 import { createStore, produce, reconcile } from 'solid-js/store';
 import CardList from './CardList';
-import { getCardSearcher } from '@site/lib/client/utils';
+import { getCardSearcher } from '@site/client/search';
 
 export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
 	const [state, setState] = createStore({
@@ -181,9 +181,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 							});
 					}}
 					disabled={state.previewCards.length === 0 || state.collectionName.length === 0}>
-          <div class="w-fit">
-            Save Collection
-          </div>
+					<div class="w-fit">Save Collection</div>
 				</SubmitButton>
 				<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
 			</form>

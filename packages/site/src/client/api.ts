@@ -1,4 +1,15 @@
 import type { MessageType } from '@core/lib/ws';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from '@site/server/api';
+import { resolveLocalPath } from '@site/constants';
+
+export const trpc = createTRPCClient<AppRouter>({
+	links: [
+		httpBatchLink({
+			url: resolveLocalPath('/trpc'),
+		}),
+	],
+});
 
 export function createWSClient(options: {
 	onopen?: WebSocket['onopen'];
@@ -33,6 +44,7 @@ export function createWSClient(options: {
   return ws;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function checkIsKey<T extends Record<any, any>>(key: any, object: T): key is keyof T {
 	return key in object;
 }

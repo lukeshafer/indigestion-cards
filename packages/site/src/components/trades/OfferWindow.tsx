@@ -1,26 +1,9 @@
 import type { TradeCard, TradePack } from '@core/types';
 import { For, Show, type Component } from 'solid-js';
-import {
-	Card,
-	CardDescription,
-	CardName,
-	CardNumber,
-	checkIfCanShowCardText,
-	checkIsFullArt,
-	checkIsLegacyCard,
-	checkIsShitPack,
-	formatCardNumber,
-	FULL_ART_BACKGROUND_CSS,
-	getCardImageUrl,
-	getShitStampPath,
-	GlowOnHover,
-	ShineMouseEffect,
-	ShitStamp,
-	TiltEffectWrapper,
-} from '../Card';
+import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '../Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
-import { transformPackTypeName } from '@site/lib/client/utils';
+import { transformPackTypeName } from '@site/client/utils';
 import { Pack } from '@site/components/Pack';
 
 export default function OfferWindow(props: {
@@ -37,26 +20,26 @@ export default function OfferWindow(props: {
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-card-' + card.instanceId }}>
 						<OfferWindowCard card={card} />
-            <Show when={props.setCards}>
-              <DeleteItemButton
-                title="Remove Card"
-                onClick={() =>
-                  props.setCards?.(
-                    produce(draft => {
-                      let index = draft.findIndex(
-                        c => c.instanceId === card.instanceId
-                      );
-                      while (index !== -1) {
-                        draft.splice(index, 1);
-                        index = draft.findIndex(
-                          c => c.instanceId === card.instanceId
-                        );
-                      }
-                    })
-                  )
-                }
-              />
-            </Show>
+						<Show when={props.setCards}>
+							<DeleteItemButton
+								title="Remove Card"
+								onClick={() =>
+									props.setCards?.(
+										produce(draft => {
+											let index = draft.findIndex(
+												c => c.instanceId === card.instanceId
+											);
+											while (index !== -1) {
+												draft.splice(index, 1);
+												index = draft.findIndex(
+													c => c.instanceId === card.instanceId
+												);
+											}
+										})
+									)
+								}
+							/>
+						</Show>
 					</li>
 				)}
 			</For>
@@ -94,37 +77,36 @@ export default function OfferWindow(props: {
 }
 
 const OfferWindowCard: Component<{ card: TradeCard }> = props => (
-		<a
-			href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}
-			class="group">
-			<TiltEffectWrapper angleMultiplier={0.5}>
-				<GlowOnHover color={props.card.rarityColor} />
-				<Card
-					lazy={false}
-					alt={props.card.cardName}
-					imgSrc={getCardImageUrl(props.card)}
-					viewTransitionName={`card-${props.card.instanceId}`}
-					background={
-						checkIsFullArt(props.card.rarityId)
-							? FULL_ART_BACKGROUND_CSS
-							: props.card.rarityColor
-					}>
-					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-						<CardName>{props.card.cardName}</CardName>
-						<CardDescription>{props.card.cardDescription}</CardDescription>
-					</Show>
-					<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-						<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-							{formatCardNumber(props.card)}
-						</CardNumber>
-					</Show>
-					<Show when={checkIsShitPack(props.card.stamps)}>
-						<ShitStamp src={getShitStampPath(props.card.rarityId)} />
-					</Show>
-				</Card>
-				<ShineMouseEffect />
-			</TiltEffectWrapper>
-		</a>
+	<a href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`} class="group">
+		<CardEls.TiltEffectWrapper angleMultiplier={0.5}>
+			<CardEls.GlowOnHover color={props.card.rarityColor} />
+			<CardEls.Card
+				lazy={false}
+				alt={props.card.cardName}
+				imgSrc={cardUtils.getCardImageUrl(props.card)}
+				viewTransitionName={`card-${props.card.instanceId}`}
+				background={
+					cardUtils.checkIsFullArt(props.card.rarityId)
+						? FULL_ART_BACKGROUND_CSS
+						: props.card.rarityColor
+				}>
+				<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+					<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+					<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
+				</Show>
+				<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+					<CardEls.CardNumber
+						color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+						{cardUtils.formatCardNumber(props.card)}
+					</CardEls.CardNumber>
+				</Show>
+				<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+					<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+				</Show>
+			</CardEls.Card>
+			<CardEls.ShineMouseEffect />
+		</CardEls.TiltEffectWrapper>
+	</a>
 );
 const DeleteItemButton: Component<{
 	title: string;

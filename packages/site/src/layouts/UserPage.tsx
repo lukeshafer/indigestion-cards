@@ -1,11 +1,10 @@
-import {
-	default as CardList,
+import CardList, {
 	filterCards,
 	parseUniqueSeasons,
 	PlaceholderCardList,
 	type Filters,
 } from '@site/components/CardList';
-import { type SortInfo, getSortInfo } from '@site/lib/client/utils';
+import { type SortInfo, getSortInfo } from '@site/client/card-sort';
 import {
 	Show,
 	For,
@@ -17,17 +16,17 @@ import {
 	Switch,
 	Match,
 } from 'solid-js';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 import { routes } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '@site/components/Pack';
-import { transformPackTypeName } from '@site/lib/client/utils';
+import { transformPackTypeName } from '@site/client/utils';
 import { Anchor, DeleteButton, SubmitButton, TextArea } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
-import { pushAlert } from '@site/lib/client/state';
+import { pushAlert } from '@site/client/state';
 
 export const UserPage: Component<{
 	user: User;

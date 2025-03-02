@@ -8,7 +8,7 @@ import {
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { Dynamic, Portal } from 'solid-js/web';
-import { checkAreAnimationsDisabled } from '@site/lib/client/utils';
+import { checkAreAnimationsDisabled } from '@site/client/utils';
 
 export const checkIsFullArt = (rarityId: string): boolean => rarityId === FULL_ART_ID;
 export const checkIsLegacyCard = (rarityId: string) => rarityId === LEGACY_CARD_ID;
@@ -278,7 +278,8 @@ export const TiltEffectWrapper: ParentComponent<{
 
 export const GlowOnHover: Component<{ color?: string; focusOnly?: boolean }> = props => (
 	<div
-		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] group-focus:opacity-100"
+    data-component="GlowOnHover"
+		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] ease-out [--blur:5px] group-focus:opacity-100"
 		classList={{
 			'bg-brand-main dark:bg-brand-light': !props.color,
 			'group-hover:opacity-75': props.focusOnly !== true,
@@ -298,7 +299,7 @@ export const ShineMouseEffect: Component = () => {
 
 	return (
 		<div
-			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-screen transition-opacity group-hover:opacity-100"
+			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-plus-lighter transition-opacity group-hover:opacity-100"
 			onTouchStart={e => {
 				if (checkAreAnimationsDisabled()) {
 					e.currentTarget.classList.remove('opacity-100');
@@ -342,7 +343,7 @@ export const ShineMouseEffect: Component = () => {
 				});
 			}}>
 			<div
-				class="duration-800 absolute left-0 top-0 scale-[3]"
+				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-overlay blur"
 				style={{
 					// good mix-blend options: overlay, color-dodge
 					translate: `${state.x}px ${state.y}px`,
@@ -354,7 +355,7 @@ export const ShineMouseEffect: Component = () => {
 						Math.max(0.4 - Math.abs((state.x + state.y) * 0.75) / 500, 0.01),
 						2
 					),
-					opacity: 1.0,
+					opacity: 0.3,
 					'background-image': `
           radial-gradient(circle, 
             ${RADIAL_GRADIENT_COLOR_INNER} 0%, 

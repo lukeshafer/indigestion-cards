@@ -1,47 +1,22 @@
-import { FULL_ART_ID, LEGACY_CARD_ID, routes } from '@site/constants';
-import type { CardDesign, CardInstance, Trade } from '@core/types';
-import type { RarityRankingRecord } from '@core/lib/site-config';
-import { z } from 'astro/zod';
-import Fuse from 'fuse.js';
+import type { RarityRankingRecord } from "@core/lib/site-config";
+import type { CardDesign, CardInstance } from "@core/types";
+import { FULL_ART_ID, LEGACY_CARD_ID } from "@site/constants";
 
-export const useViewTransition = <T>(cb: () => T) =>
-	document.startViewTransition ? document.startViewTransition(cb) : cb();
-
-export type CardProps = Partial<CardInstance> &
-	Partial<CardDesign> & {
-		rarityName: string;
-		frameUrl: string;
-		imgUrl: string;
-		cardName: string;
-		cardDescription: string;
-		designId: string;
-		cardNumber: number;
-		totalOfType: number;
-		scale?: number | string;
-		instanceId?: string;
-		rarityColor: string;
-		rarityId: string;
-		username?: string;
-	};
-
-export type CardType = CardProps;
-
-export const cardListItemSchema = z.object({
-	rarityName: z.string(),
-	cardName: z.string(),
-	cardDescription: z.string(),
-	designId: z.string(),
-	cardNumber: z.number(),
-	totalOfType: z.number(),
-	rarityId: z.string(),
-	instanceId: z.string().optional(),
-	username: z.string().optional(),
-	openedAt: z.string().optional(),
-	frameUrl: z.string(),
-	imgUrl: z.string(),
-	rarityColor: z.string(),
-}) satisfies z.Schema<CardType>;
-export type CardListItem = z.infer<typeof cardListItemSchema>;
+type CardListItem = {
+	cardName: string;
+	cardDescription: string;
+	designId: string;
+	imgUrl: string;
+	rarityId: string;
+	rarityName: string;
+	frameUrl: string;
+	rarityColor: string;
+	cardNumber: number;
+	totalOfType: number;
+	username?: string | undefined;
+	instanceId?: string | undefined;
+	openedAt?: string | undefined;
+};
 
 export const sortTypes = [
 	{ value: 'rarest', label: 'Most to Least Rare' },
@@ -107,6 +82,7 @@ export function getSortInfo(sortType: SortType): SortInfo {
 		}
 	}
 }
+
 type CardInstanceForSorting =
 	| Pick<CardInstance, 'cardName' | 'totalOfType' | 'cardNumber'>
 	| Pick<CardDesign, 'cardName' | 'bestRarityFound'>;
@@ -208,77 +184,4 @@ function rarestCardSort(a: CardListItem, b: CardListItem, rarityRanking?: Rarity
 	}
 
 	return a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber;
-}
-
-export function formatTradeLink(trade: Trade, reverse = false): string {
-	const params = new URLSearchParams({
-		receiverUsername: reverse ? trade.senderUsername : trade.receiverUsername,
-	});
-
-	trade.requestedCards.forEach(c =>
-		params.append(reverse ? 'offeredCards' : 'requestedCards', c.instanceId)
-	);
-	trade.offeredCards.forEach(c =>
-		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
-	);
-	trade.requestedPacks?.forEach(p =>
-		params.append(reverse ? 'offeredPacks' : 'requestedPacks', p.packId)
-	);
-	trade.offeredPacks?.forEach(p =>
-		params.append(reverse ? 'requestedPacks' : 'offeredPacks', p.packId)
-	);
-
-	return routes.TRADES + '/new?' + params.toString();
-}
-
-export function getCardSearcher<T extends CardDesign | CardInstance>(cards: T[]) {
-	const fuse = new Fuse(cards, {
-		keys: [
-			{
-				name: 'cardName',
-				weight: 5,
-			},
-			{
-				name: 'rarityName',
-				weight: 5,
-			},
-			{
-				name: 'seasonName',
-				weight: 2,
-			},
-			{
-				name: 'cardNumber',
-				weight: 2,
-			},
-			{
-				name: 'username',
-				weight: 1,
-			},
-			{
-				name: 'stamps',
-				weight: 1,
-			},
-		],
-	});
-
-	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
-}
-
-export function transformPackTypeName(name: string): string {
-	const regex = /season(\d*)default/i;
-	const result = name.match(regex);
-	const number = result?.[1];
-
-	if (number) {
-		return `Season ${number}`;
-	}
-
-	return name;
-}
-
-export function checkAreAnimationsDisabled(): boolean {
-	return (
-		window.localStorage.getItem('disableAnimations') === 'true' ||
-		document.body.classList.contains('disable-animations')
-	);
 }

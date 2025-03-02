@@ -12,7 +12,7 @@ import { createStore, produce, reconcile, type SetStoreFunction } from 'solid-js
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, resolveLocalPath } from '@site/constants';
-import { setTotalPackCount } from '@site/lib/client/state';
+import { setTotalPackCount } from '@site/client/state';
 import { Checkbox } from '../Form';
 import {
 	OpenPacksContext,
@@ -24,8 +24,7 @@ import { CardScaleAdjuster } from './CardScaleAdjuster';
 import { PackShowcase } from './PackShowcase';
 import { PackToOpenItem } from './PackToOpenItem';
 import { checkIsShitPack } from '@core/lib/shared';
-import { createWSClient } from '@site/lib/ws-client';
-import { trpc } from '@site/lib/client/trpc';
+import { createWSClient, trpc } from '@site/client/api';
 
 type Props = {
 	packs: PackEntityWithStatus[];

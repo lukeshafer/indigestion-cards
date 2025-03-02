@@ -1,6 +1,6 @@
 import { For, createEffect, onMount } from 'solid-js';
-import { alerts, setAlerts, type Alert } from '@site/lib/client/state';
-import { useViewTransition } from '@site/lib/client/utils';
+import { alerts, setAlerts, type Alert } from '@site/client/state';
+import { useViewTransition } from '@site/client/utils';
 
 export default function AlertBox(props: { alerts: Alert[] }) {
 	setAlerts(props.alerts);

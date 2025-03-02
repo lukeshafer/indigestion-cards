@@ -1,4 +1,4 @@
-import { getSortInfo, type SortInfo } from '@site/lib/client/utils';
+import { getSortInfo, type SortInfo } from '@site/client/card-sort';
 import {
 	Show,
 	Suspense,
@@ -7,27 +7,14 @@ import {
 	type Component,
 	type Setter,
 } from 'solid-js';
-import { trpc } from '@site/lib/client/trpc';
-import CardList, { type Filters, PlaceholderCardList, filterCards } from '@site/components/CardList';
+import { trpc } from '@site/client/api';
+import CardList, {
+	type Filters,
+	PlaceholderCardList,
+	filterCards,
+} from '@site/components/CardList';
 import { routes } from '@site/constants';
-import {
-	Card,
-	getCardImageUrl,
-	checkIsFullArt,
-	FULL_ART_BACKGROUND_CSS,
-	checkIfCanShowCardText,
-	CardName,
-	CardDescription,
-	TiltEffectWrapper,
-	ShineMouseEffect,
-	FullAnimatedCardEffect,
-	checkIsLegacyCard,
-	CardNumber,
-	formatCardNumber,
-	checkIsShitPack,
-	ShitStamp,
-	getShitStampPath,
-} from '@site/components/Card';
+import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import type { CardDesign, CardInstance } from '@core/types';
 
 export const DesignInstancesCardList: Component<{
@@ -111,31 +98,36 @@ const DesignInstancesCardListItem: Component<{
 		<a
 			href={`${routes.INSTANCES}/${props.card.designId}/${props.card.instanceId}`}
 			class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-			<FullAnimatedCardEffect glowColor={props.card.rarityColor} disableTiltOnTouch>
-				<Card
+			<CardEls.FullAnimatedCardEffect glowColor={props.card.rarityColor} disableTiltOnTouch>
+				<CardEls.Card
 					lazy={props.lazy}
 					alt={props.card.cardName}
-					imgSrc={getCardImageUrl(props.card)}
+					imgSrc={cardUtils.getCardImageUrl(props.card)}
 					viewTransitionName={`card-${props.card.instanceId}`}
 					background={
-						checkIsFullArt(props.card.rarityId)
+						cardUtils.checkIsFullArt(props.card.rarityId)
 							? FULL_ART_BACKGROUND_CSS
 							: props.card.rarityColor
 					}>
-					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-						<CardName>{props.card.cardName}</CardName>
-						<CardDescription>{props.card.cardDescription}</CardDescription>
+					<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>
+							{props.card.cardDescription}
+						</CardEls.CardDescription>
 					</Show>
-					<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-						<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-							{formatCardNumber(props.card)}
-						</CardNumber>
+					<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+						<CardEls.CardNumber
+							color={
+								cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'
+							}>
+							{cardUtils.formatCardNumber(props.card)}
+						</CardEls.CardNumber>
 					</Show>
-					<Show when={checkIsShitPack(props.card.stamps)}>
-						<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+					<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+						<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
 					</Show>
-				</Card>
-			</FullAnimatedCardEffect>
+				</CardEls.Card>
+			</CardEls.FullAnimatedCardEffect>
 		</a>
 		<p class="mt-2">
 			Owner:{' '}
@@ -189,26 +181,28 @@ export const DesignHeaderCard: Component<{
 	const rarityId = () => props.design.bestRarityFound?.rarityId ?? '';
 
 	return (
-		<TiltEffectWrapper>
-			<Card
+		<CardEls.TiltEffectWrapper>
+			<CardEls.Card
 				lazy={false}
 				alt={props.design.cardName}
 				viewTransitionName={`design-${props.design.designId}`}
-				imgSrc={getCardImageUrl({
+				imgSrc={cardUtils.getCardImageUrl({
 					designId: props.design.designId,
 					rarityId: rarityId(),
 				})}
 				background={
-					checkIsFullArt(rarityId())
+					cardUtils.checkIsFullArt(rarityId())
 						? FULL_ART_BACKGROUND_CSS
 						: props.design.bestRarityFound?.rarityColor
 				}>
-				<Show when={checkIfCanShowCardText(rarityId())}>
-					<CardName>{props.design.cardName}</CardName>
-					<CardDescription>{props.design.cardDescription}</CardDescription>
+				<Show when={cardUtils.checkIfCanShowCardText(rarityId())}>
+					<CardEls.CardName>{props.design.cardName}</CardEls.CardName>
+					<CardEls.CardDescription>
+						{props.design.cardDescription}
+					</CardEls.CardDescription>
 				</Show>
-			</Card>
-			<ShineMouseEffect />
-		</TiltEffectWrapper>
+			</CardEls.Card>
+			<CardEls.ShineMouseEffect />
+		</CardEls.TiltEffectWrapper>
 	);
 };

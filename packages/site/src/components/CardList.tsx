@@ -276,13 +276,10 @@ export function CardListSearch(props: { setSearchText: (text: string) => void })
 }
 
 // SORT
-import {
-	useViewTransition,
-	type SortType,
-	sortTypes as validSortTypes,
-} from '@site/lib/client/utils';
+import { useViewTransition } from '@site/client/utils';
 import { Select } from '@site/components/Form';
 import type { CardDesign, CardInstance } from '@core/types';
+import { sortTypes as validSortTypes, type SortType } from '@site/client/card-sort';
 
 export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 	sortTypes: T | 'all';

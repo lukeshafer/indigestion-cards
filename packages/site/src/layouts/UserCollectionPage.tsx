@@ -6,7 +6,7 @@ import CardList from '@site/components/CardList';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { routes } from '@site/constants';
 import { DeleteButton } from '@site/components/Form';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 
 const IMG_SIZE = 60;
 export const UserCollectionPage: Component<{

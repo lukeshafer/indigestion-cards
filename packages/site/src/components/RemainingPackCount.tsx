@@ -1,4 +1,4 @@
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 import { createResource, For } from 'solid-js';
 
 export default function RemainingPackCount() {

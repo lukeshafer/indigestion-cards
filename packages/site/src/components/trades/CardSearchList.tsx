@@ -4,7 +4,9 @@ import type { CardInstance, TradeCard } from '@core/types';
 import { Select, TextInput } from '../Form';
 import { produce } from 'solid-js/store';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import { sortCards, sortTypes, type SortType, getCardSearcher } from '@site/lib/client/utils';
+import { sortCards, sortTypes, type SortType } from '@site/client/card-sort';
+import { getCardSearcher } from '@site/client/search';
+
 import {
 	TradeInventoryDetails,
 	TradeInventoryItemCheckbox,
@@ -101,7 +103,9 @@ const CardSearchListItem: Component<{ card: CardInstance }> = props => {
 					}>
 					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
 						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-						<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
+						<CardEls.CardDescription>
+							{props.card.cardDescription}
+						</CardEls.CardDescription>
 					</Show>
 				</CardEls.Card>
 				<ShineMouseEffect />

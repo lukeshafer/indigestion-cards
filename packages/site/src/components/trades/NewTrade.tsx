@@ -7,7 +7,7 @@ import { Heading } from '@site/components/text';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 import PackTradeList from './PackTradeList';
 import { TRPCClientError } from '@trpc/client';
 

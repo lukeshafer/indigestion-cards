@@ -11,13 +11,13 @@ import {
 } from 'solid-js';
 import { SubmitButton, TextInput } from '../Form';
 import { routes } from '@site/constants';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 
 export default function TradeMessageHistory(props: { trade: Trade; loggedInUserId?: string }) {
 	const [messages, messagesActions] = createResource(
 		() => props.trade.tradeId,
 		async tradeId => {
-      const trade = await trpc.trades.byId.query({ tradeId })
+			const trade = await trpc.trades.byId.query({ tradeId });
 			return trade.messages;
 		},
 		{
@@ -60,7 +60,7 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 				{loggedInUserId => (
 					<MessageInput
 						tradeId={props.trade.tradeId}
-						actions={messagesActions}
+						resource={messagesActions}
 						loggedInUserId={loggedInUserId()}
 						messages={messages.latest}
 					/>
@@ -72,13 +72,15 @@ export default function TradeMessageHistory(props: { trade: Trade; loggedInUserI
 
 function MessageInput(props: {
 	tradeId: string;
-	actions: ResourceActions<Trade['messages']>;
+	resource: ResourceActions<Trade['messages']>;
 	loggedInUserId: string;
 	messages: Trade['messages'];
 }) {
 	const messageCount = () => props.messages.filter(m => m.type === 'message').length;
+
 	const MESSAGE_LIMIT = 20;
 	const MESSAGE_LIMIT_WARNING_THRESHOLD = 12;
+
 	return (
 		<Show
 			when={messageCount() < MESSAGE_LIMIT}
@@ -89,16 +91,13 @@ function MessageInput(props: {
 				</p>
 			}>
 			<form
-				method="post"
-				action={`/api/trades/update-trade/${props.tradeId}`}
-				enctype="application/x-www-form-urlencoded"
 				onSubmit={async e => {
 					e.preventDefault();
 					const data = new FormData(e.currentTarget);
 					const message = data.get('message');
 
 					// eslint-disable-next-line
-					props.actions.mutate(msgs =>
+					props.resource.mutate(msgs =>
 						msgs.concat([
 							{
 								message: message?.toString() ?? '',
@@ -110,12 +109,12 @@ function MessageInput(props: {
 
 					e.currentTarget.message.value = '';
 
-					await fetch(e.currentTarget.action, {
-						method: 'post',
-						body: new URLSearchParams(data as unknown as string),
-					});
-
-					props.actions.refetch();
+					await trpc.trades.update
+						.mutate({
+							message: String(message),
+							tradeId: props.tradeId,
+						})
+						.then(props.resource.refetch);
 				}}>
 				<div class="flex w-full gap-1">
 					<TextInput

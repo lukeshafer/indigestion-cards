@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For } from 'solid-js';
 import { Select } from '../Form';
 import { produce } from 'solid-js/store';
-import { transformPackTypeName } from '@site/lib/client/utils';
+import { transformPackTypeName } from '@site/client/utils';
 import {
 	TradeInventoryDetails,
 	TradeInventoryItemCheckbox,

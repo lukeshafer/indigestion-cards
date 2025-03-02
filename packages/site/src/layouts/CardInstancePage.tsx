@@ -2,12 +2,12 @@ import { createEffect, createSignal, Match, Show, Switch, For, type Component } 
 import { Anchor, Heading, PageTitle } from '@site/components/text';
 import type { CardDesign, CardInstance, User } from '@core/types';
 import { CardEls, CardPreview, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
-import { useViewTransition } from '@site/lib/client/utils';
+import { useViewTransition } from '@site/client/utils';
 import { routes,  } from '@site/constants';
 import { createTable, TableEls } from '@site/components/Table';
 import {  SubmitButton } from '@site/components/Form';
-import { trpc } from '@site/lib/client/trpc';
-import { pushAlert } from '@site/lib/client/state';
+import { trpc } from '@site/client/api';
+import { pushAlert } from '@site/client/state';
 
 export const CardInstancePage: Component<{
 	card: CardInstance;

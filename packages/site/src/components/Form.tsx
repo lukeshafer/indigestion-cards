@@ -6,9 +6,9 @@ import {
 	Show,
 	createSignal,
 } from 'solid-js';
-import { setAlerts } from '@site/lib/client/state';
+import { setAlerts } from '@site/client/state';
 import { ASSETS } from '@site/constants';
-import { useViewTransition } from '@site/lib/client/utils';
+import { useViewTransition } from '@site/client/utils';
 import { navigate } from 'astro:transitions/client';
 import { twMerge } from 'tailwind-merge';
 
@@ -249,7 +249,13 @@ export function TextArea(
 ) {
 	return (
 		<InputGroup>
-			<Show when={!props.inputOnly} fallback={<label class="sr-only" for={props.name}>{props.label}</label>}>
+			<Show
+				when={!props.inputOnly}
+				fallback={
+					<label class="sr-only" for={props.name}>
+						{props.label}
+					</label>
+				}>
 				<Label {...props} />
 			</Show>
 			<textarea
@@ -470,7 +476,11 @@ export function SubmitButton(props: {
 	);
 }
 
-export function DeleteButton(props: { children?: string; onClick?: () => void; confirm?: string }) {
+export function DeleteButton(props: {
+	children?: JSX.Element;
+	onClick?: () => void;
+	confirm?: string;
+}) {
 	return (
 		<button
 			type="submit"

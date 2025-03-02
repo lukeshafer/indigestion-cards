@@ -1,7 +1,7 @@
 import type { User } from '@core/types';
 import { DeleteButton, SubmitButton, TextInput } from '@site/components/Form';
-import { pushAlert } from '@site/lib/client/state';
-import { trpc } from '@site/lib/client/trpc';
+import { pushAlert } from '@site/client/state';
+import { trpc } from '@site/client/api';
 import { Show, createSignal, type Setter } from 'solid-js';
 
 export default function UserMinecraftUsername(props: { initialUser: User }) {
