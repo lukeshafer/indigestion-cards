@@ -215,7 +215,7 @@ const CollectionCardsPreviewList: Component<{
 							<li
 								draggable={props.type === 'set'}
 								classList={{ 'cursor-pointer': props.type === 'set' }}>
-								<InstanceCard card={card} />
+								<PreviewCard card={card} />
 							</li>
 						)}
 					</For>
@@ -251,9 +251,6 @@ const SetCollectionBuilder: Component<{
 							else props.removeCardId(card.instanceId);
 						}}>
 						<InstanceCard card={card} />
-						{
-							//<p class="text-center">{card.cardName}</p>
-						}
 					</CardCheckbox>
 				)}
 			</CardList.List>
@@ -447,7 +444,7 @@ const CardCheckbox: ParentComponent<{
 		}
 	) => void;
 }> = props => (
-	<label class="focus-within:outline-brand-main relative grid w-40 cursor-pointer place-items-center opacity-40 focus-within:opacity-75 focus-within:outline has-[:checked]:opacity-100">
+	<label class="focus-within:outline-brand-main relative grid w-fit cursor-pointer place-items-center opacity-40 focus-within:opacity-75 focus-within:outline has-[:checked]:opacity-100">
 		<input
 			onInput={e => props.onInput?.(e)}
 			class="absolute left-4 top-4 z-50 opacity-40 checked:opacity-100"
@@ -489,13 +486,44 @@ const DesignCard: Component<{
 	);
 };
 
-const InstanceCard: Component<{
+const PreviewCard: Component<{
 	card: CardInstance;
 }> = props => {
 	return (
 		<CardEls.Card
 			lazy={false}
 			scale={0.5}
+			alt={props.card.cardName}
+			imgSrc={cardUtils.getCardImageUrl(props.card)}
+			viewTransitionName={`card-${props.card.instanceId}`}
+			background={
+				cardUtils.checkIsFullArt(props.card.rarityId)
+					? FULL_ART_BACKGROUND_CSS
+					: props.card.rarityColor
+			}>
+			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+			</Show>
+			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+				<CardEls.CardNumber
+					color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+					{cardUtils.formatCardNumber(props.card)}
+				</CardEls.CardNumber>
+			</Show>
+			<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+				<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+			</Show>
+		</CardEls.Card>
+	);
+};
+
+const InstanceCard: Component<{
+	card: CardInstance;
+}> = props => {
+	return (
+		<CardEls.Card
+			lazy={false}
 			alt={props.card.cardName}
 			imgSrc={cardUtils.getCardImageUrl(props.card)}
 			viewTransitionName={`card-${props.card.instanceId}`}
