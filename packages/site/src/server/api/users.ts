@@ -19,23 +19,28 @@ export const users = {
 				pinnedCardId: z.string().nullable().optional(),
 				pinnedCardDesignId: z.string().nullable().optional(),
 				minecraftUsername: z.string().optional(),
+				pinnedMessage: z.string().nullable().optional(),
 			})
 		)
 		.mutation(
 			async ({ input, ctx }) =>
-				await setUserProfile({
-					userId: ctx.session.properties.userId,
-					lookingFor: input.lookingFor,
-					minecraftUsername: input.minecraftUsername?.toLowerCase(),
-					pinnedCard:
-						input.pinnedCardId === null || input.pinnedCardDesignId === null
-							? null
-							: input.pinnedCardId && input.pinnedCardDesignId
-								? {
-										designId: input.pinnedCardDesignId,
-										instanceId: input.pinnedCardId,
-									}
-								: undefined,
-				})
+  {
+      const shouldResetPinnedMessage = input.pinnedCardId !== undefined || input.pinnedCardDesignId !== undefined
+      return await setUserProfile({
+        userId: ctx.session.properties.userId,
+        lookingFor: input.lookingFor,
+        minecraftUsername: input.minecraftUsername?.toLowerCase(),
+        pinnedCard:
+        input.pinnedCardId === null || input.pinnedCardDesignId === null
+          ? null
+          : input.pinnedCardId && input.pinnedCardDesignId
+            ? {
+              designId: input.pinnedCardDesignId,
+              instanceId: input.pinnedCardId,
+            }
+            : undefined,
+        pinnedMessage: input.pinnedMessage ?? (shouldResetPinnedMessage ? null : undefined),
+      })
+    }
 		),
 };

@@ -76,8 +76,8 @@ export default function NewTrade(props: {
 		// When receiverUsername changes, reset requestedCards
 		on(
 			() => state.receiverUsername,
-			() => {
-				if (!state.receiverUsername) {
+			receiverUsername => {
+				if (!receiverUsername) {
 					setState('requestedPacks', []);
 					setState('requestedCards', []);
 				}

@@ -33,7 +33,7 @@ export async function searchUsers(args: { searchString: string }): Promise<User[
 			.allUsers({})
 			.where((attr, op) => op.contains(attr.username, args.searchString.toLowerCase()))
 			.go({ pages: 'all' });
-		return data.sort((a,b) => a.username.localeCompare(b.username)) ?? [];
+		return data.sort((a, b) => a.username.localeCompare(b.username)) ?? [];
 	} catch {
 		return [];
 	}
@@ -188,6 +188,7 @@ export async function setUserProfile(args: {
 	lookingFor?: string;
 	pinnedCard?: PinnedCard | null;
 	minecraftUsername?: string;
+	pinnedMessage?: string | null;
 }) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
@@ -225,6 +226,7 @@ export async function setUserProfile(args: {
 		.set({
 			lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor,
 			pinnedCard: card,
+			pinnedMessage: args.pinnedMessage === null ? '' : args.pinnedMessage,
 			minecraftUsername: args.minecraftUsername?.toLowerCase() || user.minecraftUsername,
 		})
 		.go()

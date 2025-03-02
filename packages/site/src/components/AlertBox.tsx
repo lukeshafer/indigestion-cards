@@ -7,12 +7,10 @@ export default function AlertBox(props: { alerts: Alert[] }) {
 	createEffect(() => setAlerts(props.alerts));
 
 	return (
-		<div class="max-w-main fixed top-10 right-10 z-50 mx-auto flex w-full flex-col gap-2">
+		<div class="max-w-main fixed right-10 top-10 z-50 mx-auto flex w-full flex-col gap-2">
 			<ul class="absolute right-0 flex flex-col items-end gap-2 gap-x-5 pt-2">
-				<For each={alerts()}>
-					{(alert, index) => (
-						<Alert index={index()} length={alerts().length} {...alert} />
-					)}
+				<For each={[...alerts]}>
+					{(alert, index) => <Alert index={index()} length={alerts.length} {...alert} />}
 				</For>
 			</ul>
 		</div>
@@ -45,7 +43,7 @@ function Alert(
 
 		// This function is called by a user event, so it does not need to be reactive
 		// eslint-disable-next-line solid/reactivity
-		useViewTransition(() => setAlerts((alerts) => alerts.filter((_, i) => i !== props.index)));
+		useViewTransition(() => setAlerts(alerts => alerts.filter((_, i) => i !== props.index)));
 	};
 
 	onMount(() => {

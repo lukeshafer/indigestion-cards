@@ -23,10 +23,11 @@ import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/client/utils';
-import { Anchor, DeleteButton, SubmitButton, TextArea } from '@site/components/Form';
+import { Anchor, DeleteButton, SubmitButton, TextArea, TextInput } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
 import { pushAlert } from '@site/client/state';
+import { createMutableProp } from '@site/client/reactive';
 
 export const UserPage: Component<{
 	user: User;
@@ -47,6 +48,7 @@ export const UserPage: Component<{
 					userId={props.user.userId}
 					profileImageUrl={props.twitchData?.profile_image_url ?? ''}
 					pinnedCard={props.user.pinnedCard}
+					pinnedMessage={props.user.pinnedMessage}
 					lookingFor={props.user.lookingFor}
 					isLoggedInUser={props.isLoggedInUser}
 				/>
@@ -121,6 +123,7 @@ const UserIdentitySection: Component<{
 	isLoggedInUser: boolean;
 	lookingFor?: string;
 	pinnedCard?: User['pinnedCard'];
+	pinnedMessage?: string;
 }> = props => {
 	const IMG_SIZE = 100;
 	return (
@@ -169,7 +172,14 @@ const UserIdentitySection: Component<{
 			</section>
 
 			<Show when={props.pinnedCard?.instanceId !== '' && props.pinnedCard}>
-				{pinnedCard => <UserPinnedCard card={pinnedCard()} username={props.username} />}
+				{pinnedCard => (
+					<UserPinnedCard
+						card={pinnedCard()}
+						message={props.pinnedMessage ?? ''}
+						username={props.username}
+						isLoggedInUser={props.isLoggedInUser}
+					/>
+				)}
 			</Show>
 		</div>
 	);
@@ -244,7 +254,6 @@ const UserLookingForForm: Component<{
 					.catch(() => pushAlert({ message: 'An error occurred.', type: 'error' }));
 				props.onSubmit(uiValue());
 			}}>
-			<input type="hidden" name="userId" value={props.userId} />
 			<div class="block max-w-80 break-words px-1 text-lg font-normal leading-5">
 				<TextArea
 					inputOnly
@@ -266,6 +275,8 @@ const UserLookingForForm: Component<{
 
 const UserPinnedCard: Component<{
 	card: NonNullable<User['pinnedCard']>;
+	isLoggedInUser: boolean;
+	message: string;
 	username: string;
 }> = props => {
 	return (
@@ -311,7 +322,72 @@ const UserPinnedCard: Component<{
 					<CardEls.ShineMouseEffect />
 				</CardEls.TiltEffectWrapper>
 			</a>
+			<Show when={props.message.length || props.isLoggedInUser}>
+				<UserPinnedMessage message={props.message} isLoggedInUser={props.isLoggedInUser} />
+			</Show>
 		</div>
+	);
+};
+
+const UserPinnedMessage: Component<{
+	message: string;
+	isLoggedInUser: boolean;
+}> = props => {
+	const [message, setMessage] = createMutableProp(() => props.message);
+	const [isEditing, setIsEditing] = createSignal(false);
+	return (
+		<p class="relative col-start-2 grid gap-0 self-start break-words">
+			<Show when={props.isLoggedInUser}>
+				<span class="mx-auto flex gap-2 text-sm font-normal italic opacity-80">
+					Say something about your pinned card
+					<Show when={!isEditing()}>
+						<button title="Edit pinned message" onClick={() => setIsEditing(true)}>
+							<EditIcon size={15} />
+						</button>
+					</Show>
+				</span>
+			</Show>
+			<Switch>
+				<Match when={!isEditing()}>
+					<span class="block max-w-80 break-words text-center font-normal leading-5">
+						{message()}
+					</span>
+				</Match>
+				<Match when={isEditing()}>
+					<form
+						class="grid gap-2"
+						onSubmit={e => {
+							e.preventDefault();
+
+							trpc.users.update
+								.mutate({ pinnedMessage: message() })
+								.then(() =>
+									pushAlert({ message: 'Updated profile.', type: 'success' })
+								)
+								.catch(() =>
+									pushAlert({ message: 'An error occurred.', type: 'error' })
+								);
+
+							setIsEditing(false);
+						}}>
+						<div class="block max-w-80 break-words px-1 text-lg font-normal leading-5">
+							<TextInput
+								inputOnly
+								label="Add a pinned message"
+								name="pinnedMsg"
+								maxLength={100}
+								value={message()}
+								setValue={setMessage}
+							/>
+						</div>
+						<div class="flex items-center gap-2">
+							<SubmitButton>Save</SubmitButton>
+							<DeleteButton onClick={() => setIsEditing(false)}>Cancel</DeleteButton>
+						</div>
+					</form>
+				</Match>
+			</Switch>
+		</p>
 	);
 };
 

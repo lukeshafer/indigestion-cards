@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { produce } from 'solid-js/store';
+import { createStore, produce } from 'solid-js/store';
 import { useViewTransition } from './utils';
 
 export interface Alert {
@@ -7,14 +7,9 @@ export interface Alert {
 	type: 'success' | 'error' | 'warning' | 'info';
 }
 
-export const [alerts, setAlerts] = createSignal<Alert[]>([]);
+export const [alerts, setAlerts] = createStore<Alert[]>([]);
 export function pushAlert(alert: Alert, noViewTransition?: boolean) {
-	const addAlert = () =>
-		setAlerts(
-			produce(alertsDraft => {
-				alertsDraft.unshift(alert);
-			})
-		);
+	const addAlert = () => setAlerts(produce(alertsDraft => alertsDraft.unshift(alert)));
 
 	if (noViewTransition) {
 		addAlert();
