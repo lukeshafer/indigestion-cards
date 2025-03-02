@@ -41,4 +41,11 @@ export const userCards = {
 			(await getUserAndOpenedCardInstances({ username: ctx.session.properties.username }))
 				?.CardInstances ?? []
 	),
+	byUsername: authedProcedure
+		.input(z.object({ username: z.string() }))
+		.query(
+			async ({ input }) =>
+				(await getUserAndOpenedCardInstances({ username: input.username }))
+					?.CardInstances ?? []
+		),
 };

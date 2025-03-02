@@ -1,6 +1,7 @@
 import type { User } from '@core/types';
-import { DeleteButton, Form, SubmitButton, TextInput } from '@site/components/Form';
-import { USER_API } from '@site/constants';
+import { DeleteButton, SubmitButton, TextInput } from '@site/components/Form';
+import { pushAlert } from '@site/lib/client/state';
+import { trpc } from '@site/lib/client/trpc';
 import { Show, createSignal, type Setter } from 'solid-js';
 
 export default function UserMinecraftUsername(props: { initialUser: User }) {
@@ -34,7 +35,17 @@ function EditingForm(props: {
 	userId: string;
 }) {
 	return (
-		<Form action={USER_API.USER} method="patch" onsubmit={() => props.setIsEditing(false)}>
+		<form
+			onSubmit={e => {
+				e.preventDefault();
+				trpc.users.update
+					.mutate({ minecraftUsername: props.username })
+					.then(() =>
+						pushAlert({ message: 'Minecraft username updated.', type: 'success' })
+					)
+					.catch(() => pushAlert({ message: 'An error occurred.', type: 'error' }));
+				props.setIsEditing(false);
+			}}>
 			<input type="hidden" name="userId" value={props.userId} />
 			<TextInput
 				value={props.username}
@@ -47,7 +58,7 @@ function EditingForm(props: {
 				<SubmitButton>Save</SubmitButton>
 				<DeleteButton onClick={() => props.setIsEditing(false)}>Cancel</DeleteButton>
 			</div>
-		</Form>
+		</form>
 	);
 }
 

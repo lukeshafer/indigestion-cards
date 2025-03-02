@@ -37,24 +37,26 @@ export default function OfferWindow(props: {
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-card-' + card.instanceId }}>
 						<OfferWindowCard card={card} />
-						<DeleteItemButton
-							title="Remove Card"
-							onClick={() =>
-								props.setCards?.(
-									produce(draft => {
-										let index = draft.findIndex(
-											c => c.instanceId === card.instanceId
-										);
-										while (index !== -1) {
-											draft.splice(index, 1);
-											index = draft.findIndex(
-												c => c.instanceId === card.instanceId
-											);
-										}
-									})
-								)
-							}
-						/>
+            <Show when={props.setCards}>
+              <DeleteItemButton
+                title="Remove Card"
+                onClick={() =>
+                  props.setCards?.(
+                    produce(draft => {
+                      let index = draft.findIndex(
+                        c => c.instanceId === card.instanceId
+                      );
+                      while (index !== -1) {
+                        draft.splice(index, 1);
+                        index = draft.findIndex(
+                          c => c.instanceId === card.instanceId
+                        );
+                      }
+                    })
+                  )
+                }
+              />
+            </Show>
 					</li>
 				)}
 			</For>

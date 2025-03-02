@@ -4,7 +4,7 @@ import type { RarityRankingRecord } from '@core/lib/site-config';
 import { z } from 'astro/zod';
 import Fuse from 'fuse.js';
 
-export const useViewTransition = (cb: () => unknown) =>
+export const useViewTransition = <T>(cb: () => T) =>
 	document.startViewTransition ? document.startViewTransition(cb) : cb();
 
 export type CardProps = Partial<CardInstance> &

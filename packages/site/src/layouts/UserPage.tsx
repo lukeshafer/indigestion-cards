@@ -18,15 +18,16 @@ import {
 	Match,
 } from 'solid-js';
 import { trpc } from '@site/lib/client/trpc';
-import { routes, USER_API } from '@site/constants';
+import { routes } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/lib/client/utils';
-import { Anchor, DeleteButton, Form, SubmitButton, TextArea } from '@site/components/Form';
+import { Anchor, DeleteButton, SubmitButton, TextArea } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
+import { pushAlert } from '@site/lib/client/state';
 
 export const UserPage: Component<{
 	user: User;
@@ -40,17 +41,17 @@ export const UserPage: Component<{
 	initialFilters: Filters;
 }> = props => {
 	return (
-		<div class="md:flex h-fit">
-      <div class="md:h-full">
-        <UserIdentitySection
-          username={props.user.username}
-          userId={props.user.userId}
-          profileImageUrl={props.twitchData?.profile_image_url ?? ''}
-          pinnedCard={props.user.pinnedCard}
-          lookingFor={props.user.lookingFor}
-          isLoggedInUser={props.isLoggedInUser}
-        />
-      </div>
+		<div class="h-fit md:flex">
+			<div class="md:h-full">
+				<UserIdentitySection
+					username={props.user.username}
+					userId={props.user.userId}
+					profileImageUrl={props.twitchData?.profile_image_url ?? ''}
+					pinnedCard={props.user.pinnedCard}
+					lookingFor={props.user.lookingFor}
+					isLoggedInUser={props.isLoggedInUser}
+				/>
+			</div>
 
 			<div class="h-full w-full">
 				<Show when={props.packs.length > 0}>
@@ -124,7 +125,7 @@ const UserIdentitySection: Component<{
 }> = props => {
 	const IMG_SIZE = 100;
 	return (
-		<div class="md:sticky top-8 mx-auto w-fit min-w-96">
+		<div class="top-8 mx-auto w-fit min-w-96 md:sticky">
 			<section
 				style={{ 'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)` }}
 				class="grid w-fit content-center gap-x-4">
@@ -168,7 +169,7 @@ const UserIdentitySection: Component<{
 				</Show>
 			</section>
 
-			<Show when={props.pinnedCard}>
+			<Show when={props.pinnedCard?.instanceId !== '' && props.pinnedCard}>
 				{pinnedCard => <UserPinnedCard card={pinnedCard()} username={props.username} />}
 			</Show>
 		</div>
@@ -233,9 +234,19 @@ const UserLookingForForm: Component<{
 	const [uiValue, setUIValue] = createSignal(props.initialLookingFor);
 
 	return (
-		<Form action={USER_API.USER} method="patch" onsubmit={() => props.onSubmit(uiValue())}>
+		<form
+			onSubmit={async e => {
+				e.preventDefault();
+				trpc.users.update
+					.mutate({
+						lookingFor: uiValue(),
+					})
+					.then(() => pushAlert({ message: 'Updated profile.', type: 'success' }))
+					.catch(() => pushAlert({ message: 'An error occurred.', type: 'error' }));
+				props.onSubmit(uiValue());
+			}}>
 			<input type="hidden" name="userId" value={props.userId} />
-			<div class="block max-w-80 break-words text-lg font-normal leading-5">
+			<div class="block max-w-80 break-words px-1 text-lg font-normal leading-5">
 				<TextArea
 					inputOnly
 					label="Looking For"
@@ -250,7 +261,7 @@ const UserLookingForForm: Component<{
 				<SubmitButton>Save</SubmitButton>
 				<DeleteButton onClick={() => props.onCancel()}>Cancel</DeleteButton>
 			</div>
-		</Form>
+		</form>
 	);
 };
 
@@ -485,7 +496,7 @@ const UserCardListItem: Component<{
 		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
 		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 		<CardEls.FullAnimatedCardEffect
-      disableTiltOnTouch
+			disableTiltOnTouch
 			glowColor={
 				cardUtils.checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor
 			}>

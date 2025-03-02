@@ -36,21 +36,6 @@ export function resolveLocalPath(path: string) {
 	}
 }
 
-/** User API Routes */
-const user_api_paths = {
-	USER: '/user',
-	TRADE: '/trade',
-	CARD: '/card',
-};
-
-export const USER_API = new Proxy(user_api_paths, {
-	get: (target, prop) => {
-		if (!(prop in target)) return undefined;
-		const path = target[prop as keyof typeof target];
-		return '/api/user' + path;
-	},
-});
-
 /** Public API routes */
 export const publicApi = {
 	GET_ALL_USERNAMES: '/api/get-all-usernames',

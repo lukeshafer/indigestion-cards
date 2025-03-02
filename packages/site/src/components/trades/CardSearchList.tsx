@@ -12,7 +12,7 @@ import {
 	TradeInventoryStickyHeading,
 } from './TradeInventoryList';
 import {
-	Card,
+	CardEls,
 	checkIfCanShowCardText,
 	checkIsFullArt,
 	FULL_ART_BACKGROUND_CSS,
@@ -88,7 +88,7 @@ const CardSearchListItem: Component<{ card: CardInstance }> = props => {
 		<div class="flex w-40 flex-col items-center text-center">
 			<div class="group relative">
 				<GlowOnHover color={props.card.rarityColor}></GlowOnHover>
-				<Card
+				<CardEls.Card
 					lazy={false}
 					scale={0.5}
 					alt={props.card.cardName}
@@ -100,9 +100,10 @@ const CardSearchListItem: Component<{ card: CardInstance }> = props => {
 							: props.card.rarityColor
 					}>
 					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-						<p>f</p>
+						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
 					</Show>
-				</Card>
+				</CardEls.Card>
 				<ShineMouseEffect />
 			</div>
 			<p class="whitespace-break-spaces font-bold">{props.card.cardName}</p>

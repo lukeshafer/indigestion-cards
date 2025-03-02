@@ -3,9 +3,11 @@ import { Anchor, Heading, PageTitle } from '@site/components/text';
 import type { CardDesign, CardInstance, User } from '@core/types';
 import { CardEls, CardPreview, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { useViewTransition } from '@site/lib/client/utils';
-import { routes, USER_API } from '@site/constants';
+import { routes,  } from '@site/constants';
 import { createTable, TableEls } from '@site/components/Table';
-import { Form, SubmitButton } from '@site/components/Form';
+import {  SubmitButton } from '@site/components/Form';
+import { trpc } from '@site/lib/client/trpc';
+import { pushAlert } from '@site/lib/client/state';
 
 export const CardInstancePage: Component<{
 	card: CardInstance;
@@ -130,10 +132,10 @@ const CardInstanceInfo: Component<{ card: CardInstance; design: CardDesign }> = 
 					{props.card.cardName}
 				</a>
 			</p>
-      <p>
+			<p>
 				<b>Artist: </b>
 				{props.design.artist}
-      </p>
+			</p>
 			<p>
 				<b>Card Number: </b>
 				{props.card.cardNumber}
@@ -255,20 +257,29 @@ const PinCardToProfileButton: Component<{
 	const text = () => (isPinned() ? 'Unpin from profile' : 'Pin to profile');
 
 	return (
-		<Form action={USER_API.USER} method="patch" onsuccess={() => setIsPinnedUI(!isPinned())}>
-			<input type="hidden" name="userId" value={props.userId} />
-			<input
-				type="hidden"
-				name="pinnedCardId"
-				value={props.isPinned ? 'null' : props.instanceId}
-			/>
-			<input
-				type="hidden"
-				name="pinnedCardDesignId"
-				value={props.isPinned ? 'null' : props.designId}
-			/>
+		<form
+			onSubmit={async e => {
+				e.preventDefault();
+				await trpc.users.update
+					.mutate({
+						pinnedCardId: props.isPinned ? null : props.instanceId,
+						pinnedCardDesignId: props.isPinned ? null : props.designId,
+					})
+					.catch(() => {
+						pushAlert({
+							message: 'An error occurred while pinning the card.',
+							type: 'error',
+						});
+					});
+
+				setIsPinnedUI(!isPinned());
+				pushAlert({
+					message: 'Updated.',
+					type: 'success',
+				});
+			}}>
 			<SubmitButton>{text()}</SubmitButton>
-		</Form>
+		</form>
 	);
 };
 
