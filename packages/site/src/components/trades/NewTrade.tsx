@@ -187,7 +187,7 @@ export default function NewTrade(props: {
 				<Show when={isLoading()}>
 					<Loading loadingText="Sending your trade" />
 				</Show>
-				<div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
+				<div class="@4xl/main:grid-cols-2 @4xl/main:grid w-full grid-cols-1">
 					<Section heading="Offer">
 						<input type="hidden" name="senderUsername" value={props.username} />
 						<Username>{props.username}</Username>

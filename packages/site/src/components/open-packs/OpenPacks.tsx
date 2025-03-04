@@ -121,7 +121,7 @@ export default function OpenPacks(props: Props) {
 								'opacity-0': state.isHidden,
 							}}
 							class="packs relative flex w-full flex-col"
-							ref={setAutoAnimate}>
+							ref={el => setAutoAnimate(el)}>
 							<For each={state.packs}>
 								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
 							</For>
@@ -185,7 +185,7 @@ function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPa
 		// 	save the pack id to
 		// 		local storage
 		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
-    trpc.packs.sendPacksUpdatedEvent.mutate()
+		trpc.packs.sendPacksUpdatedEvent.mutate();
 	});
 
 	createEffect(() => {
@@ -349,7 +349,7 @@ function checkIsChatters(data: unknown): data is Chatter[] {
 	return (
 		Array.isArray(data) &&
 		data.every(
-			(item) =>
+			item =>
 				typeof item === 'object' &&
 				item !== null &&
 				'user_id' in item &&

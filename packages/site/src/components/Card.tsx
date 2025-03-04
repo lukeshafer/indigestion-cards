@@ -279,7 +279,7 @@ export const TiltEffectWrapper: ParentComponent<{
 export const GlowOnHover: Component<{ color?: string; focusOnly?: boolean }> = props => (
 	<div
     data-component="GlowOnHover"
-		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] ease-out [--blur:5px] group-focus:opacity-100"
+		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] ease-out [--blur:5px] group-focus:opacity-100 transition-all"
 		classList={{
 			'bg-brand-main dark:bg-brand-light': !props.color,
 			'group-hover:opacity-75': props.focusOnly !== true,
