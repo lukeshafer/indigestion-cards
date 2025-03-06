@@ -11,7 +11,7 @@ export default defineConfig({
 		prefetchAll: true,
 	},
 	output: 'server',
-	adapter: aws(),
+	adapter: aws({serverRoutes: ['api/*', 'trades/*', 'trpc/*'],}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {
 		ssr: {
