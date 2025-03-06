@@ -16,6 +16,9 @@ export const checkIsSecret = (rarityId: string) => rarityId === NO_CARDS_OPENED_
 export const checkIfCanShowCardText = (rarityId: string) =>
 	!(checkIsFullArt(rarityId) || checkIsLegacyCard(rarityId) || checkIsSecret(rarityId));
 
+export const checkIsMoment = (card: { seasonId: string }) =>
+	card.seasonId.toLowerCase().startsWith('moment');
+
 export const checkIsShitPack = (stamps?: string[]): boolean =>
 	stamps?.includes('shit-pack') ?? false;
 
@@ -56,6 +59,7 @@ export const cardUtils = {
 	getShitStampPath,
 	getCardImageUrl,
 	formatCardNumber,
+	checkIsMoment,
 };
 
 export type CardComponentProps = {
@@ -278,8 +282,8 @@ export const TiltEffectWrapper: ParentComponent<{
 
 export const GlowOnHover: Component<{ color?: string; focusOnly?: boolean }> = props => (
 	<div
-    data-component="GlowOnHover"
-		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] ease-out [--blur:5px] group-focus:opacity-100 transition-all"
+		data-component="GlowOnHover"
+		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] group-focus:opacity-100"
 		classList={{
 			'bg-brand-main dark:bg-brand-light': !props.color,
 			'group-hover:opacity-75': props.focusOnly !== true,
