@@ -736,42 +736,46 @@ const UserMomentList: Component = () => {
 	onMount(refetch);
 
 	return (
-		<details>
-			<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
-				<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">Moments</h2>
-			</summary>
+		<Suspense>
+			<div class="min-h-12">
+				<Show when={moments.latest.length}>
+					<details>
+						<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
+							<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
+								Moments
+							</h2>
+						</summary>
 
-			<Suspense>
-				<Show when={moments.latest.length} fallback={<p>No moments found.</p>}>
-					<CardList.List cards={moments.latest} scale={0.7}>
-						{card => (
-							<a
-								href={`${routes.USERS}/${card.username}/${card.instanceId}`}
-								class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-								<CardEls.FullAnimatedCardEffect
-									disableTiltOnTouch
-									glowColor={card.rarityColor}>
-									<CardEls.Card
-										lazy={true}
-										alt={card.cardName}
-										imgSrc={cardUtils.getCardImageUrl(card)}
-										viewTransitionName={`card-${card.instanceId}`}
-										background={card.rarityColor}>
-										<CardEls.CardName>{card.cardName}</CardEls.CardName>
-										<CardEls.CardDescription>
-											{card.cardDescription}
-										</CardEls.CardDescription>
-										<CardEls.CardNumber color="black">
-											{cardUtils.formatCardNumber(card)}
-										</CardEls.CardNumber>
-									</CardEls.Card>
-								</CardEls.FullAnimatedCardEffect>
-							</a>
-						)}
-					</CardList.List>
+						<CardList.List cards={moments.latest} scale={0.7}>
+							{card => (
+								<a
+									href={`${routes.USERS}/${card.username}/${card.instanceId}`}
+									class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
+									<CardEls.FullAnimatedCardEffect
+										disableTiltOnTouch
+										glowColor={card.rarityColor}>
+										<CardEls.Card
+											lazy={true}
+											alt={card.cardName}
+											imgSrc={cardUtils.getCardImageUrl(card)}
+											viewTransitionName={`card-${card.instanceId}`}
+											background={card.rarityColor}>
+											<CardEls.CardName>{card.cardName}</CardEls.CardName>
+											<CardEls.CardDescription>
+												{card.cardDescription}
+											</CardEls.CardDescription>
+											<CardEls.CardNumber color="black">
+												{cardUtils.formatCardNumber(card)}
+											</CardEls.CardNumber>
+										</CardEls.Card>
+									</CardEls.FullAnimatedCardEffect>
+								</a>
+							)}
+						</CardList.List>
+					</details>
 				</Show>
-			</Suspense>
-		</details>
+			</div>
+		</Suspense>
 	);
 };
 
