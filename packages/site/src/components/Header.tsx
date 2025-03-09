@@ -36,12 +36,12 @@ export const Header: Component<{
 
 	return (
 		<header class="border-b border-b-gray-300 bg-white dark:border-b-gray-800 dark:bg-gray-950">
-			<div class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-2 text-white md:py-4">
-				<nav class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4">
+			<div class="max-w-main relative mx-auto flex items-center gap-4 px-4 py-1 text-white md:py-3">
+				<nav class="scrollbar-hidden flex flex-1 items-center gap-2 overflow-x-scroll text-black md:gap-4 p-1">
 					<a
 						href="/"
 						title="Home"
-						class="mr-4 flex w-fit min-w-[2rem] items-center gap-4">
+						class="focus-within:outline-brand-main relative m-1 mr-2 flex w-fit min-w-[2rem] items-center gap-4 rounded focus-within:outline focus-within:outline-2">
 						<img
 							src={LOGOS[logo() || 'default']}
 							alt="logo"
@@ -101,7 +101,7 @@ const HeaderLink: ParentComponent<{
 			href={url().pathname + url().search}
 			title={props.title}
 			style={{ 'view-transition-name': `page-header-nav-${props.href}` }}
-			class="relative rounded px-2 py-1 transition-colors"
+			class="focus-within:outline-brand-main relative rounded px-2 py-1 transition-colors focus-within:outline focus-within:outline-2"
 			classList={{
 				'text-brand-main bg-brand-100 dark:bg-brand-dark dark:hover:bg-brand-900 dark:hover:text-brand-main hover:bg-brand-200 hover:text-brand-dark font-bold dark:text-white':
 					props.currentPage.startsWith(props.href),

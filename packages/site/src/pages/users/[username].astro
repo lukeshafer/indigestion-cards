@@ -39,6 +39,7 @@ let { data: CardInstances, cursor } =
 	(await getCardsByUserSortedByRarity({
 		username: id,
 		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
+    excludeMoments: true,
 	})) ?? {};
 let packs = await getPacksByUsername({ username: id }).then(packs => packs.map(hidePackCards));
 

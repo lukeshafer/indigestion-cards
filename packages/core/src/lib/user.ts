@@ -263,3 +263,12 @@ export async function getUserAndCardsByMinecraftUsername(args: { minecraftUserna
 
 	return { user, cards };
 }
+
+export async function getUserMomentCards(args: { username: string }) {
+	const result = await db.collections
+		.UserAndCards({ username: args.username })
+    .where((attr, op) => op.begins(attr.seasonId, 'moments'))
+		.go({ pages: 'all' });
+
+	return result.data.CardInstances;
+}

@@ -135,6 +135,7 @@ export async function getCardsByUserSortedByRarity(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }): Promise<{
 	data: Array<CardInstance>;
 	cursor: string | null;
@@ -146,6 +147,9 @@ export async function getCardsByUserSortedByRarity(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
@@ -158,6 +162,7 @@ export async function getCardsByUserSortedByCardName(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByCardName({ username: options.username })
@@ -166,6 +171,9 @@ export async function getCardsByUserSortedByCardName(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
@@ -175,8 +183,10 @@ export async function getCardsByUserSortedByCardName(options: {
 
 export async function getCardsByUserSortedByOpenDate(options: {
 	username: string;
+  cursor?:string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUser({ username: options.username })
@@ -185,6 +195,9 @@ export async function getCardsByUserSortedByOpenDate(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ pages: 'all' });

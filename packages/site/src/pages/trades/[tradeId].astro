@@ -152,7 +152,7 @@ function formatTradeLink(trade: Trade, reverse = false): string {
 			/>
 		</Show>
 		<Show when={isSender || isReceiver}>
-			<div class="col-span-2 mx-auto w-fit">
+			<div class="col-span-full mx-auto w-fit">
 				<Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
 			</div>
 		</Show>

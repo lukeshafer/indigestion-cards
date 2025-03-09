@@ -6,13 +6,14 @@ import {
 } from '@core/lib/card';
 import { authedProcedure, publicProcedure } from '../router';
 import { z } from 'astro:schema';
-import { getUserAndOpenedCardInstances } from '@core/lib/user';
+import { getUserAndOpenedCardInstances, getUserMomentCards } from '@core/lib/user';
 
 const userCardsInputSchema = z.object({
 	username: z.string(),
 	cursor: z.string().optional(),
 	isReversed: z.boolean().default(false),
 	ignoredIds: z.array(z.string()).optional(),
+	excludeMoments: z.boolean().default(false),
 });
 
 export const userCards = {
@@ -48,4 +49,7 @@ export const userCards = {
 				(await getUserAndOpenedCardInstances({ username: input.username }))
 					?.CardInstances ?? []
 		),
+	moments: publicProcedure
+		.input(z.object({ username: z.string() }))
+		.query(async ({ input }) => await getUserMomentCards(input)),
 };
