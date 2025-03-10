@@ -4,13 +4,15 @@ import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '../Card';
 import { produce } from 'solid-js/store';
 import { routes } from '@site/constants';
 import { transformPackTypeName } from '@site/client/utils';
-import { Pack } from '@site/components/Pack';
+import { Pack, formatPackNumber } from '@site/components/Pack';
+
+type OfferPack = TradePack & { packNumber?: number; packNumberPrefix?: string };
 
 export default function OfferWindow(props: {
 	cards: TradeCard[];
-	packs: TradePack[];
+	packs: OfferPack[];
 	setCards?: (setter: (cards: TradeCard[]) => TradeCard[]) => void;
-	setPacks?: (setter: (cards: TradePack[]) => TradePack[]) => void;
+	setPacks?: (setter: (cards: OfferPack[]) => OfferPack[]) => void;
 }) {
 	return (
 		<ul class="scrollbar-narrow m-4 flex h-[30rem] flex-wrap items-center justify-center gap-2 overflow-y-scroll bg-gray-200 p-2 dark:bg-gray-700">
@@ -48,7 +50,10 @@ export default function OfferWindow(props: {
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-pack-' + pack.packId }}>
-						<Pack name={transformPackTypeName(pack.packTypeName)} />
+						<Pack
+							name={transformPackTypeName(pack.packTypeName)}
+							packNumber={formatPackNumber(pack)}
+						/>
 						<Show when={props.setPacks}>
 							<DeleteItemButton
 								title="Remove Pack"

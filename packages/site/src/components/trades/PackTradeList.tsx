@@ -10,7 +10,7 @@ import {
 } from './TradeInventoryList';
 import type { TradePackUi } from './NewTrade';
 import type { TradePack } from '@core/types';
-import { Pack } from '@site/components/Pack';
+import { formatPackNumber, Pack } from '@site/components/Pack';
 
 export default function PackTradeList(props: {
 	label: string;
@@ -56,7 +56,11 @@ export default function PackTradeList(props: {
 									})
 								)
 							}>
-							<Pack name={transformPackTypeName(pack.packTypeName)} scale={0.5} />
+							<Pack
+								name={transformPackTypeName(pack.packTypeName)}
+								scale={0.5}
+								packNumber={formatPackNumber(pack)}
+							/>
 						</TradeInventoryItemCheckbox>
 					)}
 				</For>
