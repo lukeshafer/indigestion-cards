@@ -653,7 +653,7 @@ const UserPackList: Component = () => {
 	const ctx = useContext(UserPageContext);
 
 	return (
-		<details open>
+		<details>
 			<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
 				<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
 					Packs ({ctx.packs.length})
