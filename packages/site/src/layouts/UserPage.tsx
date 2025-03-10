@@ -24,7 +24,7 @@ import { routes } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
-import { Pack } from '@site/components/Pack';
+import { Pack, formatPackNumber } from '@site/components/Pack';
 import { transformPackTypeName } from '@site/client/utils';
 import { Anchor, DeleteButton, SubmitButton, TextArea, TextInput } from '@site/components/Form';
 import EditIcon from '@site/components/icons/EditIcon';
@@ -78,14 +78,7 @@ export const UserPage: Component<{
 				<div class="h-full w-full">
 					<Show when={props.packs.length > 0}>
 						<section class="my-4 grid gap-4 text-center">
-							<details>
-								<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
-									<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
-										Packs ({props.packs.length})
-									</h2>
-								</summary>
-								<UserPackList />
-							</details>
+							<UserPackList />
 						</section>
 					</Show>
 
@@ -660,17 +653,24 @@ const UserPackList: Component = () => {
 	const ctx = useContext(UserPageContext);
 
 	return (
-		<ul
-			class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] md:gap-x-6"
-			style={{
-				'grid-template-columns':
-					'repeat(auto-fit, minmax(auto, calc(var(--card-scale) * 18rem)))',
-				//'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
-			}}>
-			<For each={ctx.packs}>
-				{pack => <PackListItem pack={pack} canChangeLock={ctx.isLoggedInUser} />}
-			</For>
-		</ul>
+		<details open>
+			<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
+				<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
+					Packs ({ctx.packs.length})
+				</h2>
+			</summary>
+			<ul
+				class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 [--card-scale:0.75] md:gap-x-6"
+				style={{
+					'grid-template-columns':
+						'repeat(auto-fit, minmax(auto, calc(var(--card-scale) * 18rem)))',
+					//'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+				}}>
+				<For each={ctx.packs}>
+					{pack => <PackListItem pack={pack} canChangeLock={ctx.isLoggedInUser} />}
+				</For>
+			</ul>
+		</details>
 	);
 };
 
@@ -680,7 +680,11 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 
 	return (
 		<li class="relative w-fit">
-			<Pack name={transformPackTypeName(props.pack.packTypeName)} scale={0.8} />
+			<Pack
+				name={transformPackTypeName(props.pack.packTypeName)}
+				packNumber={formatPackNumber(props.pack)}
+				scale={0.8}
+			/>
 
 			<Show when={isLocked()}>
 				<div class="absolute inset-0 bg-white/50 dark:bg-black/50">

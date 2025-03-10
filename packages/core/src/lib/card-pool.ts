@@ -125,7 +125,15 @@ export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
 	return possibleCardsList;
 }
 
-export async function getCardPoolFromType(packType: PackDetails['packType']): Promise<CardPool> {
+type CardPoolPackTypeDetails = Pick<
+	PackDetails['packType'],
+	'packTypeCategory' | 'seasonId' | 'designs'
+>;
+
+/**
+ * Retrieves all existing cards (opened or not opened) that match a given pack type.
+ */
+export async function getCardPoolFromType(packType: CardPoolPackTypeDetails): Promise<CardPool> {
 	if (packType.packTypeCategory === 'season') {
 		const seasonId = packType.seasonId;
 		if (!seasonId) throw new Error('SeasonId is required for season packs');

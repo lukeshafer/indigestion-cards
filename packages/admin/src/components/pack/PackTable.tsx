@@ -20,6 +20,10 @@ export default function PackTable(props: { packs: Pack[] }) {
 							label: 'Pack Type',
 						},
 						{
+							name: 'packNumber',
+							label: 'Pack Number',
+						},
+						{
 							name: 'date',
 							label: 'Date',
 						},
@@ -62,6 +66,9 @@ function PackRow(props: Pack) {
 		},
 		get packTypeName() {
 			return props.packTypeName;
+		},
+		get packNumber() {
+			return `${props.packNumberPrefix}-${props.packNumber}`;
 		},
 		get date() {
 			return {
@@ -117,7 +124,7 @@ function Username(props: {
 					setValue={value => props.setUsername(value)}
 				/>
 			) : (
-				props.username ?? 'None'
+				(props.username ?? 'None')
 			)}
 		</>
 	);
