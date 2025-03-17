@@ -32,9 +32,9 @@ export function hidePackCards(pack: Pack): PackCardsHidden {
 	};
 }
 
-export async function getPackById(args: { packId: string }): Promise<Pack> {
-	const result = await db.entities.Packs.query.byPackId(args).go();
-	return result.data[0];
+export async function getPackById(args: { packId: string }): Promise<Pack | null> {
+	const result = await db.entities.Packs.get(args).go();
+	return result.data;
 }
 
 export async function findPackForUser(args: { username: string }) {
@@ -107,6 +107,9 @@ export async function updatePackUser(options: {
 		}));
 
 	const pack = await getPackById({ packId: options.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 
 	const oldUser = pack.userId ? await getUser(pack.userId) : null;
 
@@ -190,6 +193,9 @@ export async function deleteFirstPackForUser(args: {
 
 export async function deletePack(args: { packId: string }) {
 	const pack = await getPackById({ packId: args.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 
 	const user = pack.userId ? await getUser(pack.userId) : null;
 	const openCount = pack.cardDetails.filter(card => card.opened).length;
@@ -335,6 +341,9 @@ export function generatePackId(opts: { userId: string; prefix?: string }): strin
 
 export async function setPackIsLocked(opts: { packId: string; isLocked: boolean }): Promise<void> {
 	const pack = await getPackById({ packId: opts.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 	if (!pack.isLocked && pack.cardDetails.some(card => card.opened)) {
 		console.error('Partially opened pack cannot be locked.');
 		throw new InputValidationError('Partially opened pack cannot be locked.');

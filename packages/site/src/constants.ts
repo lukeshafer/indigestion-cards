@@ -119,3 +119,5 @@ export const NO_CARDS_OPENED_ID = 'no-cards-opened';
 export const SHIT_PACK_RARITY_ID = 'bronze';
 
 export const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
+
+export const INVALID_PACK_ID = "invalid";

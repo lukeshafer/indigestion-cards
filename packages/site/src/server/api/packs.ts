@@ -29,6 +29,13 @@ export const packs = {
 		.mutation(async ({ input, ctx }) => {
 			const pack = await getPackById({ packId: input.packId });
 
+			if (!pack) {
+				throw new TRPCError({
+					code: 'NOT_FOUND',
+					message: 'Pack does not exist.',
+				});
+			}
+
 			if (!pack.userId || pack.userId !== ctx.session.properties.userId) {
 				throw new TRPCError({
 					code: 'UNAUTHORIZED',

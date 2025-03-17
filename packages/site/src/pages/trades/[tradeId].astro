@@ -3,13 +3,13 @@ import { Anchor } from '@site/components/Form';
 import { Heading } from '@site/components/text';
 import OfferWindow from '@site/components/trades/OfferWindow';
 import TradeMessageHistory from '@site/components/trades/TradeMessageHistory';
-import { routeNames, routes } from '@site/constants';
+import { routeNames, routes, INVALID_PACK_ID } from '@site/constants';
 import Page from '@site/layouts/Page.astro';
 import { removeTradeNotification } from '@core/lib/user';
 import { getTrade } from '@core/lib/trades';
 import { Show } from 'solid-js';
 import { TradeForms } from '@site/components/trades/TradeForms';
-import type { Trade } from '@core/types';
+import type { Trade, Pack } from '@core/types';
 import { getPackById } from '@core/lib/pack';
 
 const userId = Astro.locals.session?.properties.userId || undefined;
@@ -27,11 +27,31 @@ if (!trade) {
 const isSender = trade.senderUserId.toLowerCase() === userId?.toLowerCase();
 const isReceiver = trade.receiverUserId.toLowerCase() === userId?.toLowerCase();
 
-const offeredPacks = await Promise.all(
-	trade.offeredPacks?.map(pack => getPackById({ packId: pack.packId })) ?? []
+const offeredPacks: Array<Pack> = await Promise.all(
+	trade.offeredPacks?.map<Promise<Pack>>(async tradePack => {
+		let pack = await getPackById({ packId: tradePack.packId });
+		if (pack == null)
+			return {
+				packId: tradePack.packId,
+				cardDetails: [],
+				packTypeId: INVALID_PACK_ID,
+				packTypeName: 'Pack no longer exists.',
+			};
+		return pack;
+	}) ?? []
 );
-const requestedPacks = await Promise.all(
-	trade.requestedPacks?.map(pack => getPackById({ packId: pack.packId })) ?? []
+const requestedPacks: Array<Pack> = await Promise.all(
+	trade.requestedPacks?.map<Promise<Pack>>(async tradePack => {
+		let pack = await getPackById({ packId: tradePack.packId });
+		if (pack == null)
+			return {
+				packId: tradePack.packId,
+				cardDetails: [],
+				packTypeId: INVALID_PACK_ID,
+				packTypeName: 'Pack no longer exists.',
+			};
+		return pack;
+	}) ?? []
 );
 
 if (

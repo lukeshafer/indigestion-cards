@@ -2,7 +2,7 @@ import type { TradeCard, TradePack } from '@core/types';
 import { For, Show, type Component } from 'solid-js';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '../Card';
 import { produce } from 'solid-js/store';
-import { routes } from '@site/constants';
+import { INVALID_PACK_ID, routes } from '@site/constants';
 import { transformPackTypeName } from '@site/client/utils';
 import { Pack, formatPackNumber } from '@site/components/Pack';
 
@@ -50,10 +50,14 @@ export default function OfferWindow(props: {
 					<li
 						class="relative"
 						style={{ 'view-transition-name': 'offer-window-pack-' + pack.packId }}>
-						<Pack
-							name={transformPackTypeName(pack.packTypeName)}
-							packNumber={formatPackNumber(pack)}
-						/>
+						<Show
+							when={pack.packTypeId !== INVALID_PACK_ID}
+							fallback={'The pack has been opened.'}>
+							<Pack
+								name={transformPackTypeName(pack.packTypeName)}
+								packNumber={formatPackNumber(pack)}
+							/>
+						</Show>
 						<Show when={props.setPacks}>
 							<DeleteItemButton
 								title="Remove Pack"
