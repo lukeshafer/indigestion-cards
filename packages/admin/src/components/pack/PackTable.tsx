@@ -24,6 +24,10 @@ export default function PackTable(props: { packs: Pack[] }) {
 							label: 'Pack Number',
 						},
 						{
+							name: 'locked',
+							label: 'Locked?',
+						},
+						{
 							name: 'date',
 							label: 'Date',
 						},
@@ -69,6 +73,9 @@ function PackRow(props: Pack) {
 		},
 		get packNumber() {
 			return `${props.packNumberPrefix}-${props.packNumber}`;
+		},
+		get locked() {
+			return props.isLocked ? "Locked" : "Unlocked",
 		},
 		get date() {
 			return {
