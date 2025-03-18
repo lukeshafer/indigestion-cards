@@ -75,7 +75,7 @@ function PackRow(props: Pack) {
 			return `${props.packNumberPrefix}-${props.packNumber}`;
 		},
 		get locked() {
-			return props.isLocked ? "Locked" : "Unlocked",
+			return props.isLocked ? "Locked" : "Unlocked";
 		},
 		get date() {
 			return {
