@@ -1,5 +1,5 @@
 import { z } from 'astro:schema';
-import { adminProcedure, authedProcedure } from '../router';
+import { authedProcedure } from '../router';
 import {
 	createRuleCollection,
 	createSetCollection,
@@ -18,7 +18,7 @@ export const collections = {
 				collectionId: input.collectionId,
 			})
 	),
-	mockLoadCardsSet: adminProcedure
+	mockLoadCardsSet: authedProcedure
 		.input(
 			z.object({
 				cards: z.array(
@@ -37,7 +37,7 @@ export const collections = {
 
 			return data;
 		}),
-	mockLoadCardsRule: adminProcedure
+	mockLoadCardsRule: authedProcedure
 		.input(
 			z.object({
 				cardDesignIds: z.array(z.string()).optional(),
