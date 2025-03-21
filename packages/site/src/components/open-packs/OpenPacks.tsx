@@ -12,9 +12,8 @@ import { createStore, produce, reconcile, type SetStoreFunction } from 'solid-js
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, resolveLocalPath } from '@site/constants';
-import { setTotalPackCount } from '@site/lib/client/state';
-import { Checkbox } from '../form/Form';
-import { isChatters, type Chatter } from '@site/lib/client/chatters';
+import { setTotalPackCount } from '@site/client/state';
+import { Checkbox } from '../Form';
 import {
 	OpenPacksContext,
 	type OpenPacksState,
@@ -25,8 +24,7 @@ import { CardScaleAdjuster } from './CardScaleAdjuster';
 import { PackShowcase } from './PackShowcase';
 import { PackToOpenItem } from './PackToOpenItem';
 import { checkIsShitPack } from '@core/lib/shared';
-import { createWSClient } from '@site/lib/ws-client';
-import { trpc } from '@site/lib/client/trpc';
+import { createWSClient, trpc } from '@site/client/api';
 
 type Props = {
 	packs: PackEntityWithStatus[];
@@ -44,7 +42,7 @@ export default function OpenPacks(props: Props) {
 		try {
 			const res = await fetch(resolveLocalPath(API.TWITCH_CHATTERS));
 			const data = await res.json().catch(() => ({}));
-			return isChatters(data) ? data : [];
+			return checkIsChatters(data) ? data : [];
 		} catch {
 			return [];
 		}
@@ -123,7 +121,7 @@ export default function OpenPacks(props: Props) {
 								'opacity-0': state.isHidden,
 							}}
 							class="packs relative flex w-full flex-col"
-							ref={setAutoAnimate}>
+							ref={el => setAutoAnimate(el)}>
 							<For each={state.packs}>
 								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
 							</For>
@@ -187,6 +185,7 @@ function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPa
 		// 	save the pack id to
 		// 		local storage
 		window.localStorage.setItem('activePackId', state.activePack?.packId || '');
+		//trpc.packs.sendPacksUpdatedEvent.mutate();
 	});
 
 	createEffect(() => {
@@ -339,4 +338,26 @@ function mergeStoredListWithCurrentList(
 	}
 
 	return mergedPacks.concat(remainingPacks).concat(lockedPacks);
+}
+
+interface Chatter {
+	user_id: string;
+	user_login: string;
+	user_name: string;
+}
+function checkIsChatters(data: unknown): data is Chatter[] {
+	return (
+		Array.isArray(data) &&
+		data.every(
+			item =>
+				typeof item === 'object' &&
+				item !== null &&
+				'user_id' in item &&
+				'user_login' in item &&
+				'user_name' in item &&
+				typeof item.user_id === 'string' &&
+				typeof item.user_login === 'string' &&
+				typeof item.user_name === 'string'
+		)
+	);
 }

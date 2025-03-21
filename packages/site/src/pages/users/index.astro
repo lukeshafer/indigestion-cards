@@ -1,0 +1,34 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { getAllPreorders } from '@core/lib/preorder';
+import { getAllUsers } from '@core/lib/user';
+import { routeNames } from '@site/constants';
+import { PageHeader, PageTitle } from '@site/components/text';
+import { UsersPage } from '@site/layouts/AllUsersPage';
+
+import { getUserByLogin } from '@core/lib/twitch';
+
+let pageData = (async () => {
+	const users = await getAllUsers();
+	const preorders = await getAllPreorders();
+
+	return Promise.all(
+		users
+			.sort((a, b) => a.username.localeCompare(b.username))
+			.map(async user => ({
+				user: user,
+				twitch: await getUserByLogin(user.username),
+				preorders: preorders.filter(p => p.userId === user.userId),
+			}))
+	);
+})();
+---
+
+<Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
+	<PageHeader>
+		<PageTitle>Users</PageTitle>
+	</PageHeader>
+	<div class="mx-auto">
+		{pageData.then(users => <UsersPage users={users} client:load />)}
+	</div>
+</Page>

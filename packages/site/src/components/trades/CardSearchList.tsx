@@ -1,17 +1,27 @@
 import type { TradeCardUi } from './NewTrade';
-import { createMemo, createSignal, For } from 'solid-js';
-import type { TradeCard } from '@core/types';
-import { Select, TextInput } from '../form/Form';
+import { createMemo, createSignal, For, Show, type Component } from 'solid-js';
+import type { CardInstance, TradeCard } from '@core/types';
+import { Select, TextInput } from '../Form';
 import { produce } from 'solid-js/store';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import { sortCards, sortTypes, type SortType, getCardSearcher } from '@site/lib/client/utils';
+import { sortCards, sortTypes, type SortType } from '@site/client/card-sort';
+import { getCardSearcher } from '@site/client/search';
+
 import {
 	TradeInventoryDetails,
 	TradeInventoryItemCheckbox,
 	TradeInventoryList,
 	TradeInventoryStickyHeading,
 } from './TradeInventoryList';
-import Card from '../cards/Card';
+import {
+	CardEls,
+	checkIfCanShowCardText,
+	checkIsFullArt,
+	FULL_ART_BACKGROUND_CSS,
+	getCardImageUrl,
+	GlowOnHover,
+	ShineMouseEffect,
+} from '../Card';
 
 export default function CardSearchList(props: {
 	label: string;
@@ -66,14 +76,7 @@ export default function CardSearchList(props: {
 									})
 								)
 							}>
-							<div class="flex w-40 flex-col items-center text-center">
-								<Card {...card} scale={0.5} />
-								<p class="whitespace-break-spaces font-bold">{card.cardName}</p>
-								<p>{card.rarityName}</p>
-								<p>
-									{card.cardNumber} / {card.totalOfType}
-								</p>
-							</div>
+							<CardSearchListItem card={card} />
 						</TradeInventoryItemCheckbox>
 					)}
 				</For>
@@ -81,3 +84,37 @@ export default function CardSearchList(props: {
 		</TradeInventoryDetails>
 	);
 }
+
+const CardSearchListItem: Component<{ card: CardInstance }> = props => {
+	return (
+		<div class="flex w-40 flex-col items-center text-center">
+			<div class="group relative">
+				<GlowOnHover color={props.card.rarityColor}></GlowOnHover>
+				<CardEls.Card
+					lazy={false}
+					scale={0.5}
+					alt={props.card.cardName}
+					imgSrc={getCardImageUrl(props.card)}
+					viewTransitionName={undefined}
+					background={
+						checkIsFullArt(props.card.rarityId)
+							? FULL_ART_BACKGROUND_CSS
+							: props.card.rarityColor
+					}>
+					<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>
+							{props.card.cardDescription}
+						</CardEls.CardDescription>
+					</Show>
+				</CardEls.Card>
+				<ShineMouseEffect />
+			</div>
+			<p class="whitespace-break-spaces font-bold">{props.card.cardName}</p>
+			<p>{props.card.rarityName}</p>
+			<p>
+				{props.card.cardNumber} / {props.card.totalOfType}
+			</p>
+		</div>
+	);
+};

@@ -1,42 +1,40 @@
 import { createContext } from 'solid-js';
-/***/
 import type { Pack } from '@core/types';
-/***/
 
 export const OpenPacksContext = createContext<OpenPacksState>({
 	isTesting: undefined,
 	isHidden: false,
-  adminSecret: '',
+	adminSecret: '',
 	packs: [],
 	activePack: null,
 	packsRemaining: 0,
-	setActivePack: () => { },
-	removeNewStampStamp: () => { },
-	setNextPack: () => { },
+	setActivePack: () => {},
+	removeNewStampStamp: () => {},
+	setNextPack: () => {},
 	cardScale: 1,
-	setCardScale: () => { },
+	setCardScale: () => {},
 	previewedCardId: null,
-	setPreviewedCardId: () => { },
-	flipCard: () => { },
+	setPreviewedCardId: () => {},
+	flipCard: () => {},
 	getIsOnline: () => false,
 	listHeight: 0,
 	listHeightString: '0px',
-	setListHeight: () => { },
-	movePackToIndex: () => { },
-  refreshPacks: () => { },
+	setListHeight: () => {},
+	movePackToIndex: () => {},
+	refreshPacks: () => {},
 });
 
 export type PackEntityWithStatus = Pack & {
 	cardDetails: Pack['cardDetails'] &
-	{
-		stamps?: string[];
-	}[];
+		{
+			stamps?: string[];
+		}[];
 };
 
 export type OpenPacksState = {
 	isTesting: boolean | undefined;
 	isHidden: boolean;
-  adminSecret: string;
+	adminSecret: string;
 
 	packs: PackEntityWithStatus[];
 	activePack: PackEntityWithStatus | null;
@@ -60,5 +58,5 @@ export type OpenPacksState = {
 	setListHeight(height: number): void;
 
 	movePackToIndex(fromIndex: number, toIndex: number): void;
-  refreshPacks(): void;
+	refreshPacks(): void;
 };

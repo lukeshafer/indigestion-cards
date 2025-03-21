@@ -37,21 +37,19 @@ const remainingCards = totalPossibleCards - ownedCards;
 const percentageDistributed = Math.round((ownedCards / totalPossibleCards) * 1000) / 10;
 
 const packTypes = await getPackTypesBySeasonId({ seasonId: id });
-const packTypesWithCardPools = (
-	packTypes.map((packType) => {
-		const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
-		const openedPacks = ownedCards / packType.cardCount;
-		const remainingPacks = Math.floor(remainingCards / packType.cardCount);
-		const percentagePacksOpened = Math.round((openedPacks / totalPossiblePacks) * 1000) / 10;
-		return {
-			...packType,
-			totalPossiblePacks,
-			openedPacks,
-			remainingPacks,
-			percentagePacksOpened,
-		};
-	})
-);
+const packTypesWithCardPools = packTypes.map(packType => {
+	const totalPossiblePacks = Math.floor(totalPossibleCards / packType.cardCount);
+	const openedPacks = ownedCards / packType.cardCount;
+	const remainingPacks = Math.floor(remainingCards / packType.cardCount);
+	const percentagePacksOpened = Math.round((openedPacks / totalPossiblePacks) * 1000) / 10;
+	return {
+		...packType,
+		totalPossiblePacks,
+		openedPacks,
+		remainingPacks,
+		percentagePacksOpened,
+	};
+});
 ---
 
 <Page title={season.seasonName} class="flex flex-col gap-4">
@@ -72,12 +70,16 @@ const packTypesWithCardPools = (
 			<b>Percentage distributed:</b>
 			{percentageDistributed}%
 		</p>
+		<p class="ml-4">
+			<b>Next pack number</b>
+			{season.packNumberPrefix ?? ''}-{season.nextPackNumber}
+		</p>
 
 		<div class="ml-4 mt-4">
 			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
 			<ul>
 				{
-					packTypesWithCardPools.map(async (packType) => (
+					packTypesWithCardPools.map(async packType => (
 						<li>
 							<b>{packType.packTypeName}</b>: {packType.totalPossiblePacks} total
 							{packType.totalPossiblePacks === 1 ? 'pack' : 'packs'},{' '}

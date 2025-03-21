@@ -1,0 +1,14 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { CollectionBuilder } from '@site/components/CollectionBuilder';
+import { getUserAndOpenedCardInstances } from '@core/lib/user';
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/');
+
+const data = await getUserAndOpenedCardInstances({ username: user.properties.username });
+---
+
+<Page title="New collection" pageType="user">
+  <CollectionBuilder cards={data?.CardInstances ?? []} client:load />
+</Page>

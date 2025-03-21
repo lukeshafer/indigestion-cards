@@ -2,6 +2,7 @@ import { StackContext, EventBus, Queue, use } from 'sst/constructs';
 import { Database } from './database';
 import { ConfigStack } from './config';
 import { WebsocketsAPI } from './websockets-api';
+import { Duration } from 'aws-cdk-lib/core';
 
 export function Events({ stack }: StackContext) {
 	const table = use(Database);
@@ -24,8 +25,10 @@ export function Events({ stack }: StackContext) {
 	});
 
 	const packQueue = new Queue(stack, 'queue', {
+
 		cdk: {
 			queue: {
+        visibilityTimeout: Duration.seconds(60),
 				deadLetterQueue: {
 					maxReceiveCount: 5,
 					queue: dlq.cdk.queue,

@@ -2,7 +2,7 @@ import type { JSX } from 'solid-js';
 import type { ParentProps } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
-export { Anchor } from '@site/components/form/Form';
+export { Anchor } from '@site/components/Form';
 
 export function PageHeader(props: ParentProps) {
 	return (
@@ -23,7 +23,7 @@ export function PageTitle(
 		<Dynamic
 			{...props}
 			component={props.heading ?? 'h1'}
-			class="font-heading my-2 text-3xl font-bold uppercase text-gray-600 dark:text-gray-300">
+			class="font-display my-2 text-3xl font-bold text-gray-600 dark:text-gray-300">
 			{props.children}
 		</Dynamic>
 	);
@@ -44,7 +44,7 @@ export function Heading(
 		<Dynamic
 			component={props.heading ?? 'h2'}
 			{...props}
-			class="font-heading my-2 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+			class="font-display my-2 text-2xl text-gray-800 dark:text-gray-200">
 			{props.children}
 		</Dynamic>
 	);

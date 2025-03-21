@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For } from 'solid-js';
-import { Select } from '../form/Form';
+import { Select } from '../Form';
 import { produce } from 'solid-js/store';
-import { transformPackTypeName } from '@site/lib/client/utils';
+import { transformPackTypeName } from '@site/client/utils';
 import {
 	TradeInventoryDetails,
 	TradeInventoryItemCheckbox,
@@ -10,7 +10,7 @@ import {
 } from './TradeInventoryList';
 import type { TradePackUi } from './NewTrade';
 import type { TradePack } from '@core/types';
-import { Pack } from '../pack/Pack';
+import { formatPackNumber, Pack } from '@site/components/Pack';
 
 export default function PackTradeList(props: {
 	label: string;
@@ -56,7 +56,11 @@ export default function PackTradeList(props: {
 									})
 								)
 							}>
-							<Pack name={transformPackTypeName(pack.packTypeName)} scale={0.5} />
+							<Pack
+								name={transformPackTypeName(pack.packTypeName)}
+								scale={0.5}
+								packNumber={formatPackNumber(pack)}
+							/>
 						</TradeInventoryItemCheckbox>
 					)}
 				</For>

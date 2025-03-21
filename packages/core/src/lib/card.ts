@@ -1,5 +1,5 @@
 import { db } from '../db';
-import type { CardInstance, SiteConfig } from '../db.types';
+import type { CardDesign, CardInstance, SiteConfig } from '../db.types';
 import { getUser } from './user';
 import { getRarityRankForRarity } from './site-config';
 import Fuse from 'fuse.js';
@@ -25,9 +25,28 @@ export async function deleteCardInstanceById(args: { designId: string; instanceI
 	return result.data;
 }
 
-export async function getCardInstanceById(args: { instanceId: string; designId: string }) {
+export async function getCardInstanceById(args: {
+	instanceId: string;
+	designId: string;
+}): Promise<CardInstance | null> {
 	const result = await db.entities.CardInstances.get(args).go();
 	return result.data;
+}
+
+export async function getCardDesignAndInstance(args: {
+	instanceId: string;
+	designId: string;
+}): Promise<{ card: CardInstance | null; design: CardDesign | null }> {
+	const result = await db.transaction
+		.get(({ CardInstances, CardDesigns }) => [
+			CardInstances.get({ instanceId: args.instanceId, designId: args.designId }).commit(),
+			CardDesigns.get({ designId: args.designId }).commit(),
+		])
+		.go();
+
+	const [card, design] = result.data;
+
+	return { card: card.item, design: design.item };
 }
 
 export async function getCardInstanceByUsername(args: {
@@ -36,6 +55,24 @@ export async function getCardInstanceByUsername(args: {
 }): Promise<CardInstance | undefined> {
 	const result = await db.entities.CardInstances.query.byUser(args).go();
 	return result.data[0];
+}
+
+export async function getCardDesignAndInstanceByUserAndInstanceID(args: {
+	username: string;
+	instanceId: string;
+}): Promise<{ card: CardInstance | null; design: CardDesign | null }> {
+	const result = await db.entities.CardInstances.query.byUser(args).go();
+	const card = result.data.at(0);
+	if (!card) {
+		return {
+			card: null,
+			design: null,
+		};
+	}
+
+	const { data: design } = await db.entities.CardDesigns.get({ designId: card.designId }).go();
+
+	return { card, design };
 }
 
 export async function getCardInstanceByDesignAndRarity(args: {
@@ -98,6 +135,7 @@ export async function getCardsByUserSortedByRarity(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }): Promise<{
 	data: Array<CardInstance>;
 	cursor: string | null;
@@ -109,6 +147,9 @@ export async function getCardsByUserSortedByRarity(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
@@ -121,6 +162,7 @@ export async function getCardsByUserSortedByCardName(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByCardName({ username: options.username })
@@ -129,6 +171,9 @@ export async function getCardsByUserSortedByCardName(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ cursor: options.cursor, count: 30, order: options.isReversed ? 'desc' : 'asc' });
@@ -138,8 +183,10 @@ export async function getCardsByUserSortedByCardName(options: {
 
 export async function getCardsByUserSortedByOpenDate(options: {
 	username: string;
+  cursor?:string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+  excludeMoments?: boolean;
 }) {
 	const results = await db.entities.CardInstances.query
 		.byUser({ username: options.username })
@@ -148,6 +195,9 @@ export async function getCardsByUserSortedByOpenDate(options: {
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
 			}
+      if (options.excludeMoments === true) {
+        conditions.push(op.notContains(attr.seasonId, 'moments'))
+      }
 			return conditions.join(' and ');
 		})
 		.go({ pages: 'all' });

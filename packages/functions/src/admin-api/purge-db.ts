@@ -28,19 +28,20 @@ export const handler = ApiHandler(async () => {
 	}
 
 	const result = await Promise.all([
+		...(await deleteEntity(db.entities.CardDesigns)),
 		...(await deleteEntity(db.entities.CardInstances)),
+		...(await deleteEntity(db.entities.MomentRedemptions)),
 		...(await deleteEntity(db.entities.Packs)),
 		...(await deleteEntity(db.entities.PackTypes)),
-		...(await deleteEntity(db.entities.CardDesigns)),
-		...(await deleteEntity(db.entities.Seasons)),
+		...(await deleteEntity(db.entities.Preorders)),
 		...(await deleteEntity(db.entities.Rarities)),
-		...(await deleteEntity(db.entities.UnmatchedImages)),
-		...(await deleteEntity(db.entities.TwitchEvents)),
+		...(await deleteEntity(db.entities.Seasons)),
+		...(await deleteEntity(db.entities.Trades)),
 		...(await deleteEntity(db.entities.TwitchEventMessageHistory)),
+		...(await deleteEntity(db.entities.TwitchEvents)),
+		...(await deleteEntity(db.entities.UnmatchedImages)),
 		...(await deleteEntity(db.entities.Users)),
-    ...(await deleteEntity(db.entities.UserLogins)),
-    ...(await deleteEntity(db.entities.Trades)),
-    ...(await deleteEntity(db.entities.Preorders)),
+		...(await deleteEntity(db.entities.UserLogins)),
 	]);
 
 	return {
@@ -53,9 +54,9 @@ type EntityName = keyof Omit<(typeof db)['entities'], 'admins'>;
 type Entity = (typeof db)['entities'][EntityName];
 
 async function deleteEntity(entity: Entity) {
-	const entityData = await entity.scan.go();
+	const entityData = await entity.scan.go({ pages: 'all' });
 	const deleteResults = entityData.data.map(
-		async (item) =>
+		async item =>
 			await entity
 				// @ts-expect-error - All entities will have a delete method
 				.delete(item)

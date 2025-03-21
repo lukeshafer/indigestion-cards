@@ -27,6 +27,18 @@ export async function getAllUsers(): Promise<User[]> {
 	}
 }
 
+export async function searchUsers(args: { searchString: string }): Promise<User[]> {
+	try {
+		let { data } = await db.entities.Users.query
+			.allUsers({})
+			.where((attr, op) => op.contains(attr.username, args.searchString.toLowerCase()))
+			.go({ pages: 'all' });
+		return data.sort((a, b) => a.username.localeCompare(b.username)) ?? [];
+	} catch {
+		return [];
+	}
+}
+
 export async function getUserAndCardInstances(args: { username: string }): Promise<{
 	Users: User[];
 	UserLogins: UserLogin[];
@@ -176,6 +188,7 @@ export async function setUserProfile(args: {
 	lookingFor?: string;
 	pinnedCard?: PinnedCard | null;
 	minecraftUsername?: string;
+	pinnedMessage?: string | null;
 }) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
@@ -213,6 +226,7 @@ export async function setUserProfile(args: {
 		.set({
 			lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor,
 			pinnedCard: card,
+			pinnedMessage: args.pinnedMessage === null ? '' : args.pinnedMessage,
 			minecraftUsername: args.minecraftUsername?.toLowerCase() || user.minecraftUsername,
 		})
 		.go()
@@ -248,4 +262,13 @@ export async function getUserAndCardsByMinecraftUsername(args: { minecraftUserna
 	} = await db.collections.UserAndCards(user).go({ pages: 'all' });
 
 	return { user, cards };
+}
+
+export async function getUserMomentCards(args: { username: string }) {
+	const result = await db.collections
+		.UserAndCards({ username: args.username })
+    .where((attr, op) => op.begins(attr.seasonId, 'moments'))
+		.go({ pages: 'all' });
+
+	return result.data.CardInstances;
 }

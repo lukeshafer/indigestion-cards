@@ -1,0 +1,58 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { getCardDesignAndInstance } from '@core/lib/card';
+import { getUser } from '@core/lib/user';
+import { routeNames, routes } from '@site/constants';
+import { CardInstancePage } from '@site/layouts/CardInstancePage';
+import { checkIsCardTradeable } from '@core/lib/trades';
+
+const session = Astro.locals.session;
+
+const slug = Astro.params.instanceSlug;
+if (!slug) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No instance route provided');
+}
+const [designId, instanceId] = slug.split('/');
+
+if (!designId) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
+}
+if (!instanceId) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No instance id provided');
+}
+
+const { card, design } = await getCardDesignAndInstance({ designId, instanceId });
+if (!card || !design) {
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+}
+
+if (!card.openedAt && Astro.locals.session?.type !== 'admin') {
+	return Astro.redirect(`${routes.DESIGNS}?alert=Card not found: ${instanceId}&type=error`);
+}
+
+const user = session?.properties.userId
+	? getUser(session.properties.userId)
+	: Promise.resolve(null);
+---
+
+<Page
+	title={`${card.cardName}, ${card.rarityName} #${card.cardNumber}`}
+	class="flex flex-col gap-6"
+	pageType="public"
+	breadcrumbs={[
+		{ label: routeNames.CARDS, href: routes.DESIGNS },
+		{ label: card.cardName, href: `${routes.DESIGNS}/${designId}` },
+		{ label: `${card.rarityName} #${card.cardNumber}` },
+	]}>
+	{
+		user.then(user => (
+			<CardInstancePage
+				card={card}
+				design={design}
+				user={user ?? undefined}
+				isTradeable={checkIsCardTradeable(card)}
+				client:load
+			/>
+		))
+	}
+</Page>

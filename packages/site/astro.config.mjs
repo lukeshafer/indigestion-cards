@@ -11,9 +11,7 @@ export default defineConfig({
 		prefetchAll: true,
 	},
 	output: 'server',
-	adapter: aws({
-		serverRoutes: ['api/*', 'trades/*', '_actions/*'],
-	}),
+	adapter: aws({serverRoutes: ['api/*', 'trades/*', 'trpc/*'],}),
 	integrations: [tailwind(), solid(), icon()],
 	vite: {
 		ssr: {
@@ -22,5 +20,14 @@ export default defineConfig({
 		optimizeDeps: {
 			exclude: ['sst'],
 		},
+	},
+	redirects: {
+		'/admin/open-packs': '/open-packs',
+		'/card': '/cards',
+		'/card/[designId]': '/cards/[designId]',
+		'/card/[...instanceSlug]': '/cards/[...instanceSlug]',
+		'/user': '/users',
+		'/user/[username]': '/users/[username]',
+		'/user/[...userInstanceSlug]': '/users/[...userInstanceSlug]',
 	},
 });

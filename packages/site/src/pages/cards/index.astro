@@ -1,0 +1,34 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { AllDesignsCardList } from '@site/layouts/AllDesignsPage';
+import { getAllCardDesigns } from '@core/lib/design';
+import { routeNames } from '@site/constants';
+import { PageTitle, PageHeader } from '@site/components/text';
+import { parseFiltersFromSearchParams } from '@site/components/CardList';
+
+const designs = getAllCardDesigns();
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
+---
+
+<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
+	<PageHeader>
+		<PageTitle>All Cards</PageTitle>
+	</PageHeader>
+	{
+		designs.then(designs => (
+			<AllDesignsCardList
+				client:load
+				initialFilters={filters}
+				initialCards={designs.map(card => ({
+					...card,
+					rarityName: card.bestRarityFound?.rarityName ?? '',
+					rarityId: card.bestRarityFound?.rarityId ?? '',
+					frameUrl: card.bestRarityFound?.frameUrl ?? '',
+					rarityColor: card.bestRarityFound?.rarityColor ?? '',
+					totalOfType: card.bestRarityFound?.count ?? 1,
+					cardNumber: 1,
+				}))}
+			/>
+		))
+	}
+</Page>

@@ -33,8 +33,12 @@ export async function deleteSeasonById(id: string) {
 }
 
 export async function createSeason(inputSeason: CreateSeason) {
+	let seasonNumber = inputSeason.seasonId.split('-')[1];
 	try {
-		const result = await db.entities.Seasons.create({ ...inputSeason }).go();
+		const result = await db.entities.Seasons.create({
+			packNumberPrefix: `S${seasonNumber}`,
+			...inputSeason,
+		}).go();
 		return {
 			success: true,
 			data: result.data,

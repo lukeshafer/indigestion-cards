@@ -2,7 +2,7 @@ import type { ParentComponent } from 'solid-js';
 
 export const TradeInventoryDetails: ParentComponent<{ summary: string }> = props => {
 	return (
-		<details class="bg-brand-100 dark:bg-brand-950 scrollbar-narrow scrollbar-brand m-4 max-h-screen overflow-y-scroll">
+		<details class="bg-brand-100 dark:bg-brand-950 scrollbar-narrow scrollbar-brand m-4 max-h-screen overflow-y-scroll cursor-pointer">
 			<summary class="bg-brand-100 dark:bg-brand-950 sticky top-0 z-10 h-14 p-4 text-lg">
 				{props.summary}
 			</summary>

@@ -92,12 +92,6 @@ export function API({ app, stack }: StackContext) {
 			'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
 			// MOMENTS
 			'POST /moment-card': 'packages/functions/src/admin-api/moment-card/post.handler',
-
-			// USER ENDPOINTS
-			// USER
-			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
-			// CARD
-			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
 		},
 		defaults: {
 			function: {

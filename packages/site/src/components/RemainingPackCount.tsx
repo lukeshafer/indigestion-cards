@@ -1,9 +1,9 @@
-import { get } from '@site/lib/client/data';
+import { trpc } from '@site/client/api';
 import { createResource, For } from 'solid-js';
 
 export default function RemainingPackCount() {
 	const [packsRemaining] = createResource(async () =>
-		get('packs-remaining').then(packs =>
+    trpc.packs.packsRemaining.query().then(packs => 
 			packs.filter(pack => {
 				if (pack.possibleCards < 100) return false;
 				if (pack.seasonId.toLowerCase() === 'moments') return false;
@@ -12,7 +12,7 @@ export default function RemainingPackCount() {
 
 				return true;
 			})
-		)
+    )
 	);
 
 	return (
