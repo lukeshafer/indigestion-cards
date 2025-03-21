@@ -10,7 +10,7 @@ import { EventBus } from 'sst/node/event-bus';
 import { getSeasonById } from './season';
 
 export async function getAllPacks(): Promise<Pack[]> {
-	const result = await db.entities.Packs.query.allPacks({}).go();
+	const result = await db.entities.Packs.query.allPacks({}).go({ pages: 'all' });
 	return result.data;
 }
 
