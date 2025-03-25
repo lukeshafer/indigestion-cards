@@ -31,6 +31,7 @@ import EditIcon from '@site/components/icons/EditIcon';
 import type { TwitchUser } from '@core/lib/twitch';
 import { pushAlert } from '@site/client/state';
 import { createMutableProp } from '@site/client/reactive';
+import { formatCollectionViewTransitionId } from '@site/components/Collections';
 
 const UserPageContext = createContext({
 	user: {} as User,
@@ -415,7 +416,12 @@ const UserCollectionListItem: Component<{
 			<div class="relative mx-6 my-4 w-fit px-8 transition-all group-hover:px-9">
 				<div class="absolute bottom-0 right-0 z-10 rotate-12 shadow-xl">
 					<Show when={props.previewCards.length >= 2 && firstCard()}>
-						{card => <UserCollectionListItemPreviewCard card={card()} />}
+						{card => (
+							<UserCollectionListItemPreviewCard
+								card={card()}
+								collectionId={props.collection.collectionId}
+							/>
+						)}
 					</Show>
 				</div>
 				<div
@@ -429,7 +435,12 @@ const UserCollectionListItem: Component<{
 							(props.previewCards.length == 1 && firstCard())
 						}
 						fallback={<div class="card-aspect-ratio relative w-[calc(18em*0.4)]" />}>
-						{card => <UserCollectionListItemPreviewCard card={card()} />}
+						{card => (
+							<UserCollectionListItemPreviewCard
+								card={card()}
+								collectionId={props.collection.collectionId}
+							/>
+						)}
 					</Show>
 				</div>
 				<div
@@ -443,7 +454,12 @@ const UserCollectionListItem: Component<{
 							(props.previewCards.length >= 3 && thirdCard()) ||
 							(props.previewCards.length === 2 && secondCard())
 						}>
-						{card => <UserCollectionListItemPreviewCard card={card()} />}
+						{card => (
+							<UserCollectionListItemPreviewCard
+								card={card()}
+								collectionId={props.collection.collectionId}
+							/>
+						)}
 					</Show>
 				</div>
 			</div>
@@ -464,6 +480,7 @@ const UserCollectionListItemPreviewCard: Component<{
 		totalOfType: number;
 		stamps?: Array<string>;
 	};
+	collectionId: string;
 }> = props => {
 	return (
 		<CardEls.Card
@@ -471,7 +488,10 @@ const UserCollectionListItemPreviewCard: Component<{
 			scale={0.4}
 			alt={props.card.cardName}
 			imgSrc={cardUtils.getCardImageUrl(props.card)}
-			viewTransitionName={`card-${props.card.instanceId}-collection-preview`}
+			viewTransitionName={formatCollectionViewTransitionId({
+				cardId: props.card.instanceId,
+				collectionId: props.collectionId,
+			})}
 			background={
 				cardUtils.checkIsFullArt(props.card.rarityId)
 					? FULL_ART_BACKGROUND_CSS
