@@ -9,8 +9,8 @@ type NumberRange = {
 };
 
 export type SeasonStatistics = {
-	season: Season;
-	cardDesigns: Array<CardDesign>;
+	season: Pick<Season, 'seasonName' | 'seasonId'>;
+	cardDesigns: Array<Pick<CardDesign, 'cardName' | 'designId'>>;
 
 	cardsOpened: number;
 	cardsPossible: NumberRange;
@@ -20,6 +20,7 @@ export type SeasonStatistics = {
 	packsOpened: number;
 	packsUnopened: number;
 	packsRemaining: NumberRange;
+	packsPossible: NumberRange;
 
 	rarities: {
 		fullArt: FullArtStatistics;
@@ -37,12 +38,16 @@ export type RarityStatistics = {
 	cardsPossible: number;
 	cardsRemaining: number;
 	percentageOpened: number;
+
+	background: string;
 };
 
 export type FullArtStatistics = {
 	cardsOpened: number;
 	allOpened: boolean;
 };
+
+const PACK_SIZE = 5;
 
 export async function getSeasonStatistics(seasonId: string): Promise<SeasonStatistics> {
 	const {
@@ -66,18 +71,23 @@ export async function getSeasonStatistics(seasonId: string): Promise<SeasonStati
 		max: cardsOpened.length / cardsPossible.min,
 	};
 
-	const packsOpened = cardsOpened.length / 5;
-	const packsUnopened = (unopenedAndOpenedCardInstances.length - cardsOpened.length) / 5;
+	const packsOpened = cardsOpened.length / PACK_SIZE;
+	const packsUnopened = (unopenedAndOpenedCardInstances.length - cardsOpened.length) / PACK_SIZE;
+	const totalPacksGenerated = packsOpened + packsUnopened;
 	const packsRemaining: NumberRange = {
-		min: Math.floor(cardsRemaining.min / 5),
-		max: Math.floor(cardsRemaining.max / 5),
+		min: Math.floor(cardsRemaining.min / PACK_SIZE) - packsUnopened,
+		max: Math.floor(cardsRemaining.max / PACK_SIZE) - packsUnopened,
+	};
+	const packsPossible: NumberRange = {
+		min: totalPacksGenerated + packsRemaining.min,
+		max: totalPacksGenerated + packsRemaining.max,
 	};
 
 	console.log('Designs', cardDesigns);
 
 	return {
-		season,
-		cardDesigns,
+		season: { seasonName: season.seasonName, seasonId: season.seasonId },
+		cardDesigns: cardDesigns.map(({ cardName, designId }) => ({ cardName, designId })),
 
 		cardsOpened: cardsOpened.length,
 		cardsPossible,
@@ -87,6 +97,7 @@ export async function getSeasonStatistics(seasonId: string): Promise<SeasonStati
 		packsOpened,
 		packsUnopened,
 		packsRemaining,
+		packsPossible,
 
 		rarities: {
 			fullArt: getFullArtStatistics({ cardDesigns, cardsOpened }),
@@ -116,15 +127,13 @@ function getTotalPossibleCardCount(opts: {
 		}
 	}
 
-	return {
-		min:
-			minTotal +
-			opts.cardsOpened.reduce<number>(
-				(count, card) => (card.rarityId.startsWith(FULL_ART_ID) ? count + 1 : count),
-				0
-			),
-		max: minTotal + opts.cardDesigns.length,
-	};
+	let min = minTotal + opts.cardsOpened.reduce<number>(countFullArts, 0);
+	min -= min % PACK_SIZE;
+
+	let max = minTotal + opts.cardDesigns.length;
+	max -= max % PACK_SIZE;
+
+	return { min, max };
 }
 
 function getFullArtStatistics(opts: {
@@ -148,10 +157,12 @@ function getRarityStatistics(opts: {
 
 	let cardsPossible = 0;
 
+	let background = '';
 	for (let design of opts.cardDesigns) {
 		for (let rarity of design.rarityDetails ?? []) {
-			if (rarity.rarityId.startsWith(opts.rarityId)) {
+			if (rarity.rarityId.startsWith(opts.rarityId) && rarity.count > 0) {
 				cardsPossible += rarity.count;
+				background = rarity.rarityColor;
 			}
 		}
 	}
@@ -164,6 +175,8 @@ function getRarityStatistics(opts: {
 		cardsPossible,
 		cardsRemaining,
 		percentageOpened: percentageDistributed,
+
+		background,
 	};
 }
 
@@ -210,3 +223,6 @@ export function getRarityStatsOverviewFromDesignAndInstances(
 
 	return Object.values(rarityStats);
 }
+
+const countFullArts = (count: number, card: CardInstance) =>
+	card.rarityId.startsWith(FULL_ART_ID) ? count + 1 : count;
