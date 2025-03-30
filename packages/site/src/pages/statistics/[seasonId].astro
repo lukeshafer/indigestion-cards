@@ -1,0 +1,17 @@
+---
+import { PageHeader, PageTitle } from '@site/components/text';
+import { StatisticsPage } from '@site/layouts/StatisticsPage';
+import { getSeasonStatistics } from '@core/lib/stats';
+import Page from '@site/layouts/Page.astro';
+import { getSeasonById } from '@core/lib/season';
+
+const seasonId = Astro.params.seasonId!;
+const [season, stats] = await Promise.all([getSeasonById(seasonId), getSeasonStatistics(seasonId)]);
+---
+
+<Page title="Statistics" breadcrumbs={[{ label: 'Statistics' }]} pageType="public">
+	<PageHeader>
+		<PageTitle>Statistics</PageTitle>
+	</PageHeader>
+	<StatisticsPage {season} {stats} client:load />
+</Page>
