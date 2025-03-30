@@ -1,8 +1,10 @@
-import { StackContext, Table, Cron, use } from 'sst/constructs';
+import { StackContext, Table, Cron, use, Bucket } from 'sst/constructs';
 import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
 	const config = use(ConfigStack);
+
+	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
 
 	const table = new Table(stack, 'data', {
 		fields: {
@@ -55,6 +57,15 @@ export function Database({ stack }: StackContext) {
 			gsi7: {
 				partitionKey: 'gsi7pk',
 				sortKey: 'gsi7sk',
+			},
+		},
+	});
+
+	table.addConsumers(stack, {
+		updateStatistics: {
+			function: {
+				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+				bind: [table, dataSummaries],
 			},
 		},
 	});
