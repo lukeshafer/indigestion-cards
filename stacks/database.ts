@@ -62,7 +62,7 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	const STAT_ENTITIES = ['season', 'cardDesign', 'cardInstance', 'pack', 'rarity'];
+	const STAT_ENTITIES = ['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade'];
 	table.addConsumers(stack, {
 		updateStatistics: {
 			filters: [
