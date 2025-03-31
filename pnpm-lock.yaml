@@ -74,7 +74,7 @@ importers:
         specifier: 2.47.3
         version: 2.47.3(@aws-sdk/client-sso-oidc@3.699.0(@aws-sdk/client-sts@3.758.0(aws-crt@1.25.3))(aws-crt@1.25.3))(@jest/transform@29.7.0)(@jest/types@29.6.3)(@types/react@18.3.18)(aws-crt@1.25.3)(babel-jest@29.7.0(@babel/core@7.26.9))(typescript@5.8.2)
       typescript:
-        specifier: ^5.7.2
+        specifier: ^5.8.2
         version: 5.8.2
       typescript-eslint:
         specifier: ^8.19.1

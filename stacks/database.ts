@@ -1,10 +1,13 @@
-import { StackContext, Table, Cron, use } from 'sst/constructs';
+import { StackContext, Table, Cron, use, Bucket } from 'sst/constructs';
 import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
 	const config = use(ConfigStack);
 
+	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
+
 	const table = new Table(stack, 'data', {
+		stream: 'new_image',
 		fields: {
 			pk: 'string',
 			sk: 'string',
@@ -59,6 +62,27 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
+	const STAT_ENTITIES = ['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade'];
+	table.addConsumers(stack, {
+		updateStatistics: {
+			filters: [
+				{
+					dynamodb: {
+						NewImage: {
+							__edb_e__: {
+								S: STAT_ENTITIES,
+							},
+						},
+					},
+				},
+			],
+			function: {
+				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+				bind: [table, dataSummaries],
+			},
+		},
+	});
+
 	new Cron(stack, 'RefreshUsernamesCron', {
 		schedule: 'cron(0 6 * * ? *)',
 		job: {
@@ -97,5 +121,5 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	return table;
+	return { table, dataSummaries };
 }

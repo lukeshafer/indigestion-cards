@@ -16,7 +16,7 @@ import { Database } from './database';
 
 export function ImageProcessing({ app, stack }: StackContext) {
   const { frameBucket, cardDesignBucket } = use(DesignBucket)
-  const db = use(Database)
+  const { table } = use(Database)
 
 	const cardsBucket = new Bucket(stack, 'CardsBucket', {
 		cdk: {
@@ -34,7 +34,7 @@ export function ImageProcessing({ app, stack }: StackContext) {
     },
     defaults: {
       function: {
-        bind: [frameBucket, cardDesignBucket, cardsBucket, adminImageSecret, db]
+        bind: [frameBucket, cardDesignBucket, cardsBucket, adminImageSecret, table]
       }
     }
   })

@@ -10,7 +10,7 @@ import { ImageProcessing } from './image-processing';
 import { WebsocketsAPI } from './websockets-api';
 
 export function Sites({ app, stack }: StackContext) {
-	const table = use(Database);
+	const { table, dataSummaries } = use(Database);
 	const { adminApi, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { siteAuth } = use(Auth);
@@ -49,6 +49,7 @@ export function Sites({ app, stack }: StackContext) {
 			config.DOMAIN_NAME,
 			eventBus,
 			adminImageSecret,
+      dataSummaries,
 		],
 		customDomain:
 			app.mode === 'dev'

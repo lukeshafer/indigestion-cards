@@ -8,7 +8,7 @@ import { Events } from './events';
 import { getHostedZone, getDomainName } from './constants';
 
 export function AdminSite({ app, stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const { adminApi, twitchApi } = use(API);
 	const { frameBucket, cardDesignBucket, frameDraftBucket, cardDraftBucket } = use(DesignBucket);
 	const { dataRecoveryBucket } = use(DataRecoveryBucket);

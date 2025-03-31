@@ -7,6 +7,7 @@ import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Ca
 import { routes } from '@site/constants';
 import { DeleteButton } from '@site/components/Form';
 import { trpc } from '@site/client/api';
+import { formatCollectionViewTransitionId } from '@site/components/Collections';
 
 const IMG_SIZE = 60;
 export const UserCollectionPage: Component<{
@@ -63,7 +64,7 @@ export const UserCollectionPage: Component<{
 								href={`${routes.USERS}/${card.username?.toLowerCase()}/${card.instanceId ?? ''}`}
 								class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 								<CardEls.FullAnimatedCardEffect
-                  disableTiltOnTouch
+									disableTiltOnTouch
 									glowColor={
 										cardUtils.checkIsFullArt(card.rarityId)
 											? undefined
@@ -73,7 +74,10 @@ export const UserCollectionPage: Component<{
 										lazy={index() > 10}
 										alt={card.cardName}
 										imgSrc={cardUtils.getCardImageUrl(card)}
-										viewTransitionName={`card-${card.instanceId}`}
+										viewTransitionName={formatCollectionViewTransitionId({
+											cardId: card.instanceId,
+											collectionId: props.collection.collectionId,
+										})}
 										background={
 											cardUtils.checkIsFullArt(card.rarityId)
 												? FULL_ART_BACKGROUND_CSS

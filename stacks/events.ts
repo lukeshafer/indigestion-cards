@@ -5,7 +5,7 @@ import { WebsocketsAPI } from './websockets-api';
 import { Duration } from 'aws-cdk-lib/core';
 
 export function Events({ stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const config = use(ConfigStack);
 	const { wsApi, wsConnectionsTable } = use(WebsocketsAPI);
 

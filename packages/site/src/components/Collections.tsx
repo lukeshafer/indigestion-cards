@@ -552,3 +552,10 @@ const InstanceCard: Component<{
 function checkAreRulesEmpty(rules: CollectionRules) {
 	return Object.values(rules).filter(v => v !== null).length === 0;
 }
+
+export function formatCollectionViewTransitionId(options: {
+	cardId: string;
+	collectionId: string;
+}): string {
+	return `card-${options.cardId}-collection-${options.collectionId}`;
+}
