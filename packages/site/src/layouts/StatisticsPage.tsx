@@ -1,8 +1,77 @@
 import { For, Show, type Component } from 'solid-js';
-import type { FullArtStatistics, RarityStatistics, SeasonStatistics } from '@core/lib/stats';
+import type {
+	FullArtStatistics,
+	RarityStatistics,
+	SeasonStatistics,
+	SiteStatistics,
+} from '@core/lib/stats';
 import { Heading, PageHeader, PageTitle } from '@site/components/text';
 
-export const StatisticsPage: Component<{ stats: SeasonStatistics }> = props => {
+export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props => {
+	return (
+		<>
+			<PageHeader>
+				<PageTitle>Statistics</PageTitle>
+			</PageHeader>
+			<main class="relative">
+				<section class="grid gap-8 mb-8">
+					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">{props.stats.cardsOpened.toFixed()}</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">cards opened</p>
+						</li>
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">
+								{Math.floor(props.stats.packsOpened).toFixed()}
+							</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">packs opened</p>
+						</li>
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">
+								{Math.ceil(props.stats.packsUnopened).toFixed()}
+							</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">packs unopened</p>
+						</li>
+					</ul>
+
+					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">{props.stats.cardsShitStamped.toFixed()}</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">shit stamps</p>
+						</li>
+
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">{props.stats.cardsTraded.toFixed()}</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">cards traded</p>
+						</li>
+
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">{props.stats.tradesCompleted.toFixed()}</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">trades completed</p>
+						</li>
+					</ul>
+				</section>
+				<nav class="grid gap-4 justify-center place-items-center">
+          <header class="col-span-2">
+            <Heading>Seasons</Heading>
+          </header>
+					<For each={props.stats.seasons}>
+						{({ season }) => (
+							<a
+								class="underline block bg-brand-main p-4 rounded text-xl"
+								href={`/statistics/${season.seasonId}`}
+								title={`View ${season.seasonName} stats`}>
+								{season.seasonName}
+							</a>
+						)}
+					</For>
+				</nav>
+			</main>
+		</>
+	);
+};
+
+export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = props => {
 	const hasRanges = () => props.stats.cardsRemaining.min !== props.stats.cardsRemaining.max;
 
 	return (
@@ -15,43 +84,48 @@ export const StatisticsPage: Component<{ stats: SeasonStatistics }> = props => {
 			</PageHeader>
 			<main class="relative">
 				<section class="grid gap-8">
-					<div class="mx-auto flex w-fit grid-cols-3 place-items-center gap-x-8 gap-y-6">
-						<div class="w-fit rounded p-1 text-center">
+					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">
 								{percentRange(props.stats.percentageOpened)}
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">complete</p>
-						</div>
-						<div class="w-fit rounded p-1 text-center">
+						</li>
+						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsOpened.toFixed()}</p>
-							<div class="mx-auto h-px w-1/2 border-t pb-1">
+							<div class="mx-auto h-px w-1/2 border-t">
 								<p class="sr-only">out of</p>
 							</div>
 							<p class="px-2 text-2xl">
 								<UncertainRange range={props.stats.cardsPossible} />
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards opened</p>
-						</div>
-						<div class="w-fit rounded p-1 text-center">
+						</li>
+						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">
 								{Math.floor(props.stats.packsOpened).toFixed()}
 							</p>
-							<div class="mx-auto h-px w-1/2 border-t pb-1">
+							<div class="mx-auto h-px w-1/2 border-t">
 								<p class="sr-only">out of</p>
 							</div>
 							<p class="px-2 text-2xl">
 								<UncertainRange range={props.stats.packsPossible} />
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">packs opened</p>
-						</div>
-						<div class="w-fit rounded p-1 text-center">
+						</li>
+						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-2xl">
 								{Math.ceil(props.stats.packsUnopened).toFixed()}
 							</p>
 							<p class="text-xs text-gray-800 dark:text-gray-200">packs unopened</p>
-						</div>
-					</div>
+						</li>
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-2xl">{props.stats.cardsShitStamped.toFixed()}</p>
+							<p class="text-xs text-gray-800 dark:text-gray-200">shit stamps</p>
+						</li>
+					</ul>
 				</section>
+
 				<Show when={hasRanges()}>
 					<details class="mx-auto my-4 w-full max-w-80 rounded bg-gray-100 p-1 px-2 text-sm dark:bg-gray-900">
 						<summary class="cursor-pointer py-2 text-center text-gray-800 dark:text-gray-300">

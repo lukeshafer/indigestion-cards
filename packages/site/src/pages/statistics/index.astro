@@ -1,12 +1,11 @@
 ---
 import Page from '@site/layouts/Page.astro';
-import { getAllSeasons } from '@core/lib/season';
+import { getSiteStatistics } from '@core/lib/stats';
+import { SiteStatisticsPage } from '@site/layouts/StatisticsPage';
 
-const seasons = await getAllSeasons();
+const stats = await getSiteStatistics();
 ---
 
 <Page title="Statistics" breadcrumbs={[{ label: 'Statistics' }]} pageType="public">
-	<nav class="flex flex-col gap-2 underline">
-		{seasons.map(s => <a href={`/statistics/${s.seasonId}`}>{s.seasonName}</a>)}
-	</nav>
+	<SiteStatisticsPage stats={stats} />
 </Page>

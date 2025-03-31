@@ -1,5 +1,5 @@
 ---
-import { StatisticsPage } from '@site/layouts/StatisticsPage';
+import { SeasonStatisticsPage } from '@site/layouts/StatisticsPage';
 import { getSeasonStatistics } from '@core/lib/stats';
 import Page from '@site/layouts/Page.astro';
 
@@ -18,5 +18,5 @@ try {
 	title="Statistics"
 	breadcrumbs={[{ label: 'Statistics', href: '/statistics' }, { label: stats.season.seasonName }]}
 	pageType="public">
-	<StatisticsPage {stats} client:load />
+	<SeasonStatisticsPage {stats} client:load />
 </Page>

@@ -1,10 +1,12 @@
 import type { CardDesign, CardInstance } from '../db.types';
 import { FULL_ART_ID } from '../constants';
 import { InputValidationError } from './errors';
-import { getSeasonAndDesignsBySeasonId } from './season';
+import { getAllSeasons, getSeasonAndDesignsBySeasonId } from './season';
 import { z } from 'zod';
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Bucket } from 'sst/node/bucket';
+import { getAllUsers } from './user';
+import { getOutgoingTradesByUserId } from './trades';
 
 const s3 = new S3Client();
 
@@ -21,18 +23,21 @@ const schemas = {
 		});
 	},
 
-	get fullSiteStatistics() {
-		/*
-		 * Other ideas?
-		 * number of trades
-		 * number of shit stamps
-		 */
+	get siteStatistics() {
 		return z.object({
 			cardsOpened: z.number(),
 			cardsShitStamped: z.number(),
+			packsOpened: z.number(),
+			packsUnopened: z.number(),
+			cardsTraded: z.number(),
+
 			tradesCompleted: z.number(),
 			tradesRejected: z.number(),
-			cardsTraded: z.number(),
+			tradesCanceled: z.number(),
+			tradesFailed: z.number(),
+			tradesPending: z.number(),
+
+			seasons: z.array(schemas.seasonStatistics),
 		});
 	},
 
@@ -80,13 +85,13 @@ const schemas = {
 	},
 };
 
+export type SiteStatistics = z.infer<typeof schemas.siteStatistics>;
 export type SeasonStatistics = z.infer<typeof schemas.seasonStatistics>;
 export type RarityStatistics = z.infer<typeof schemas.rarityStatistics>;
 export type FullArtStatistics = z.infer<typeof schemas.fullArtStatistics>;
 
-const PACK_SIZE = 5;
-
 async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatistics> {
+	const PACK_SIZE = seasonId === 'moments' ? 1 : 5;
 	const {
 		Seasons: [season],
 		CardDesigns: cardDesigns,
@@ -99,6 +104,9 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 
 	const cardsOpened = unopenedAndOpenedCardInstances.filter(card => card.openedAt != undefined);
 	const cardsPossible = getTotalPossibleCardCount({ cardDesigns, cardsOpened });
+	// cardsPossible.min -= cardsPossible.min % PACK_SIZE;
+	// cardsPossible.max -= cardsPossible.max % PACK_SIZE;
+
 	const cardsRemaining: NumberRange = {
 		min: cardsPossible.min - cardsOpened.length,
 		max: cardsPossible.max - cardsOpened.length,
@@ -108,7 +116,7 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 		max: cardsOpened.length / cardsPossible.min,
 	};
 
-	const packsOpened = cardsOpened.length / PACK_SIZE;
+	const packsOpened = Math.floor(cardsOpened.length / PACK_SIZE);
 	const packsUnopened = (unopenedAndOpenedCardInstances.length - cardsOpened.length) / PACK_SIZE;
 	const totalPacksGenerated = packsOpened + packsUnopened;
 	const packsRemaining: NumberRange = {
@@ -143,14 +151,72 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 	};
 }
 
+async function generateFullSiteStatistics(): Promise<SiteStatistics> {
+	const seasons = await getAllSeasons();
+
+	const seasonStats = await Promise.all(seasons.map(s => generateSeasonStatistics(s.seasonId)));
+
+	const siteStats: SiteStatistics = {
+		cardsOpened: 0,
+		cardsShitStamped: 0,
+		packsOpened: 0,
+		packsUnopened: 0,
+
+		cardsTraded: 0,
+
+		tradesCompleted: 0,
+		tradesRejected: 0,
+		tradesCanceled: 0,
+		tradesFailed: 0,
+		tradesPending: 0,
+
+		seasons: seasonStats,
+	};
+
+	for (let season of seasonStats) {
+		siteStats.cardsOpened += season.cardsOpened;
+		siteStats.cardsShitStamped += season.cardsShitStamped;
+		siteStats.packsOpened += season.packsOpened;
+		siteStats.packsUnopened += season.packsUnopened;
+	}
+
+	const users = await getAllUsers();
+	const trades = (await Promise.all(users.map(u => getOutgoingTradesByUserId(u.userId)))).flat();
+
+	for (let trade of trades) {
+		switch (trade.status) {
+			case 'rejected':
+				siteStats.tradesRejected += 1;
+				break;
+			case 'completed':
+				siteStats.tradesCompleted += 1;
+				siteStats.cardsTraded += trade.offeredCards.length + trade.requestedCards.length;
+				break;
+			case 'canceled':
+				siteStats.tradesCanceled += 1;
+				break;
+			case 'failed':
+				siteStats.tradesFailed += 1;
+				break;
+			case 'pending':
+				siteStats.tradesPending += 1;
+				break;
+		}
+	}
+
+	return siteStats;
+}
+
 function getTotalPossibleCardCount(opts: {
 	cardDesigns: Array<CardDesign>;
 	cardsOpened: Array<CardInstance>;
 }): NumberRange {
 	let minTotal = 0;
+	let fullArtsPossible = 0;
 	for (let card of opts.cardDesigns) {
 		for (let rarity of card.rarityDetails ?? []) {
 			if (rarity.rarityId.startsWith(FULL_ART_ID)) {
+				fullArtsPossible += rarity.count;
 				// We skip full arts to keep their total counts a mystery
 				continue;
 			}
@@ -159,11 +225,14 @@ function getTotalPossibleCardCount(opts: {
 		}
 	}
 
-	let min = minTotal + opts.cardsOpened.reduce<number>(countFullArts, 0);
-	min -= min % PACK_SIZE;
+	let fullArtsOpened = opts.cardsOpened.reduce<number>(countFullArts, 0);
+	let min = minTotal + fullArtsOpened;
+
+	if (fullArtsOpened === fullArtsPossible) {
+		return { min, max: min }; // if all full arts are open, there is no range
+	}
 
 	let max = minTotal + opts.cardDesigns.length;
-	max -= max % PACK_SIZE;
 
 	return { min, max };
 }
@@ -273,26 +342,44 @@ const countFullArts = (count: number, card: CardInstance) =>
 	card.rarityId.startsWith(FULL_ART_ID) ? count + 1 : count;
 
 const STATISTICS_PREFIX = 'statistics';
+const SEASON_STATS_PREFIX = 'seasons';
+const SITE_STATS_NAME = 'full-site';
 export async function updateSeasonStatistics(seasonId: string): Promise<void> {
 	const statistics = await generateSeasonStatistics(seasonId);
+	await putSeasonStatisticsInS3(seasonId, statistics);
+}
 
+async function putSeasonStatisticsInS3(
+	seasonId: string,
+	statistics: SeasonStatistics
+): Promise<void> {
 	await s3.send(
 		new PutObjectCommand({
 			Bucket: Bucket.DataSummaries.bucketName,
-			Key: `${STATISTICS_PREFIX}/${seasonId}`,
+			Key: `${STATISTICS_PREFIX}/${SEASON_STATS_PREFIX}/${seasonId}`,
+			Body: JSON.stringify(statistics),
+		})
+	);
+}
+
+async function putSiteStatisticsInS3(statistics: SiteStatistics): Promise<void> {
+	await s3.send(
+		new PutObjectCommand({
+			Bucket: Bucket.DataSummaries.bucketName,
+			Key: `${STATISTICS_PREFIX}/${SITE_STATS_NAME}`,
 			Body: JSON.stringify(statistics),
 		})
 	);
 }
 
 export async function getSeasonStatistics(seasonId: string): Promise<SeasonStatistics> {
-	console.log('Fetching statistics from S3');
+	console.log('Attempting to fetch season statistics from S3');
 	let body;
 	try {
 		let object = await s3.send(
 			new GetObjectCommand({
 				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${STATISTICS_PREFIX}/${seasonId}`,
+				Key: `${STATISTICS_PREFIX}/${SEASON_STATS_PREFIX}/${seasonId}`,
 			})
 		);
 		body = await object.Body?.transformToString();
@@ -301,15 +388,9 @@ export async function getSeasonStatistics(seasonId: string): Promise<SeasonStati
 		}
 	} catch (e) {
 		console.error(e);
+		console.log('Unable to locate season statistics. Generating...');
 		let statistics = await generateSeasonStatistics(seasonId);
-
-		await s3.send(
-			new PutObjectCommand({
-				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${STATISTICS_PREFIX}/${seasonId}`,
-				Body: JSON.stringify(statistics),
-			})
-		);
+		await putSeasonStatisticsInS3(seasonId, statistics);
 
 		return statistics;
 	}
@@ -317,15 +398,46 @@ export async function getSeasonStatistics(seasonId: string): Promise<SeasonStati
 	let statistics = schemas.seasonStatistics.safeParse(JSON.parse(body));
 
 	if (statistics.success === false) {
+		console.log('Existing season statistics use invalid schema. Re-generating...');
 		let statistics = await generateSeasonStatistics(seasonId);
 
-		await s3.send(
-			new PutObjectCommand({
+		await putSeasonStatisticsInS3(seasonId, statistics);
+
+		return statistics;
+	}
+
+	return statistics.data;
+}
+
+export async function getSiteStatistics(): Promise<SiteStatistics> {
+	console.log('Attempting to fetch site statistics from S3');
+	let body;
+	try {
+		let object = await s3.send(
+			new GetObjectCommand({
 				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${STATISTICS_PREFIX}/${seasonId}`,
-				Body: JSON.stringify(statistics),
+				Key: `${STATISTICS_PREFIX}/${SITE_STATS_NAME}`,
 			})
 		);
+		body = await object.Body?.transformToString();
+		if (body == undefined) {
+			throw new Error('Body not found.');
+		}
+	} catch (e) {
+		console.error(e);
+		console.log('Unable to locate site statistics. Generating...');
+		let statistics = await generateFullSiteStatistics();
+		await putSiteStatisticsInS3(statistics);
+
+		return statistics;
+	}
+
+	let statistics = schemas.siteStatistics.safeParse(JSON.parse(body));
+
+	if (statistics.success === false) {
+		console.log('Existing site statistics use invalid schema. Re-generating...');
+		let statistics = await generateFullSiteStatistics();
+		await putSiteStatisticsInS3(statistics);
 
 		return statistics;
 	}
