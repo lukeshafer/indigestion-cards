@@ -414,7 +414,7 @@ const UserCollectionListItem: Component<{
 			class="group grid w-60 place-items-center"
 			href={`${routes.USERS}/${ctx.user.username.toLowerCase()}/collections/${props.collection.collectionId}`}>
 			<div class="relative mx-6 my-4 w-fit px-8 transition-all group-hover:px-9">
-				<div class="absolute bottom-0 right-0 z-10 rotate-12 shadow-xl">
+				<div class="absolute bottom-0 left-0 z-10 -rotate-12">
 					<Show when={props.previewCards.length >= 2 && firstCard()}>
 						{card => (
 							<UserCollectionListItemPreviewCard
@@ -444,7 +444,7 @@ const UserCollectionListItem: Component<{
 					</Show>
 				</div>
 				<div
-					class="absolute bottom-0 left-0 -z-10 -rotate-12"
+					class="absolute bottom-0 right-0 -z-10 rotate-12 shadow-xl"
 					classList={{
 						'brightness-75': props.previewCards.length >= 3,
 						'brightness-90': props.previewCards.length === 2,
