@@ -1,10 +1,11 @@
-import { setAdminEnvSession } from '@core/lib/session';
-import type { DynamoDBStreamHandler } from 'aws-lambda';
+import { getAllSeasons } from '@core/lib/season';
+import { updateSeasonStatistics } from '@core/lib/stats';
 
-export const handler: DynamoDBStreamHandler = async e => {
-	setAdminEnvSession('update-statistics-consumer-lambda', 'update-statistics-consumer-lambda');
+export const handler = async () => {
+	console.log('refreshing statistics');
 
-  for (let record of e.Records) {
-    record
-  }
+	const seasons = await getAllSeasons();
+	for (let season of seasons) {
+		await updateSeasonStatistics(season.seasonId);
+	}
 };

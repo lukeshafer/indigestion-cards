@@ -6,7 +6,7 @@ import { Database } from './database';
 
 export function Auth({ stack }: StackContext) {
   const config = use(ConfigStack);
-  const db = use(Database);
+  const { table } = use(Database);
   const { eventBus } = use(Events);
 
   const siteAuth = new SSTAuth(stack, 'AdminSiteAuth', {
@@ -15,7 +15,7 @@ export function Auth({ stack }: StackContext) {
       bind: [
         config.TWITCH_CLIENT_ID,
         config.TWITCH_CLIENT_SECRET,
-        db,
+        table,
         config.STREAMER_USER_ID,
         config.TWITCH_TOKENS_PARAM,
         config.DOMAIN_NAME,

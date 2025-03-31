@@ -5,7 +5,7 @@ import { getHostedZone, getDomainName } from './constants';
 import { ImageProcessing } from './image-processing';
 
 export function Minecraft({ app, stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const { frameBucket, cardDesignBucket } = use(DesignBucket);
 	const { cardCDN } = use(ImageProcessing);
 

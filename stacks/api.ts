@@ -8,7 +8,7 @@ import { API_VERSION, getHostedZone, getDomainName } from './constants';
 import { WebsocketsAPI } from './websockets-api';
 
 export function API({ app, stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const { eventBus } = use(Events);
 	const { frameBucket, cardDesignBucket, cardDraftBucket, frameDraftBucket } = use(DesignBucket);
 	const config = use(ConfigStack);

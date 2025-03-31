@@ -7,6 +7,7 @@ export function Database({ stack }: StackContext) {
 	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
 
 	const table = new Table(stack, 'data', {
+		stream: 'new_image',
 		fields: {
 			pk: 'string',
 			sk: 'string',
@@ -61,8 +62,20 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
+	const STAT_ENTITIES = ['season', 'cardDesign', 'cardInstance', 'pack', 'rarity'];
 	table.addConsumers(stack, {
 		updateStatistics: {
+			filters: [
+				{
+					dynamodb: {
+						NewImage: {
+							__edb_e__: {
+								S: STAT_ENTITIES,
+							},
+						},
+					},
+				},
+			],
 			function: {
 				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
 				bind: [table, dataSummaries],
@@ -108,5 +121,5 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	return table;
+	return { table, dataSummaries };
 }
