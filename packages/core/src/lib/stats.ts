@@ -349,6 +349,11 @@ export async function updateSeasonStatistics(seasonId: string): Promise<void> {
 	await putSeasonStatisticsInS3(seasonId, statistics);
 }
 
+export async function updateSiteStatistics(): Promise<void> {
+	const statistics = await generateFullSiteStatistics();
+	await putSiteStatisticsInS3(statistics);
+}
+
 async function putSeasonStatisticsInS3(
 	seasonId: string,
 	statistics: SeasonStatistics

@@ -1,8 +1,10 @@
 import { getAllSeasons } from '@core/lib/season';
-import { updateSeasonStatistics } from '@core/lib/stats';
+import { updateSeasonStatistics, updateSiteStatistics } from '@core/lib/stats';
 
 export const handler = async () => {
 	console.log('refreshing statistics');
+
+  await updateSiteStatistics();
 
 	const seasons = await getAllSeasons();
 	for (let season of seasons) {
