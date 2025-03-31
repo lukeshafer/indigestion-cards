@@ -108,28 +108,34 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards opened</p>
 						</li>
-						<li class="w-fit rounded p-1 text-center">
-							<p class="px-2 text-3xl">
-								{Math.floor(props.stats.packsOpened).toFixed()}
-							</p>
-							<div class="mx-auto h-px w-1/2 border-t">
-								<p class="sr-only">out of</p>
-							</div>
-							<p class="px-2 text-2xl">
-								<UncertainRange range={props.stats.packsPossible} />
-							</p>
-							<p class="text-sm text-gray-800 dark:text-gray-200">packs opened</p>
-						</li>
-						<li class="w-fit rounded p-1 text-center">
-							<p class="px-2 text-2xl">
-								{Math.ceil(props.stats.packsUnopened).toFixed()}
-							</p>
-							<p class="text-xs text-gray-800 dark:text-gray-200">packs unopened</p>
-						</li>
-						<li class="w-fit rounded p-1 text-center">
-							<p class="px-2 text-2xl">{props.stats.cardsShitStamped.toFixed()}</p>
-							<p class="text-xs text-gray-800 dark:text-gray-200">shit stamps</p>
-						</li>
+						<Show when={props.stats.season.seasonId !== 'moments'}>
+							<li class="w-fit rounded p-1 text-center">
+								<p class="px-2 text-3xl">
+									{Math.floor(props.stats.packsOpened).toFixed()}
+								</p>
+								<div class="mx-auto h-px w-1/2 border-t">
+									<p class="sr-only">out of</p>
+								</div>
+								<p class="px-2 text-2xl">
+									<UncertainRange range={props.stats.packsPossible} />
+								</p>
+								<p class="text-sm text-gray-800 dark:text-gray-200">packs opened</p>
+							</li>
+							<li class="w-fit rounded p-1 text-center">
+								<p class="px-2 text-2xl">
+									{Math.ceil(props.stats.packsUnopened).toFixed()}
+								</p>
+								<p class="text-xs text-gray-800 dark:text-gray-200">
+									packs unopened
+								</p>
+							</li>
+							<li class="w-fit rounded p-1 text-center">
+								<p class="px-2 text-2xl">
+									{props.stats.cardsShitStamped.toFixed()}
+								</p>
+								<p class="text-xs text-gray-800 dark:text-gray-200">shit stamps</p>
+							</li>
+						</Show>
 					</ul>
 				</section>
 
@@ -165,12 +171,22 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 						}>
 						<FullArtStats stats={props.stats.fullArt} />
 					</Show>
-					<For
-						each={props.stats.rarities
-							.slice()
-							.sort((a, b) => a.cardsPossible - b.cardsPossible)}>
-						{rarity => <RarityStats stats={rarity} />}
-					</For>
+					<Show
+						when={props.stats.rarities.length > 1}
+						fallback={
+							props.stats.rarities.length === 1 ? (
+								<div class="col-span-full">
+									<RarityStats stats={props.stats.rarities[0]} />
+								</div>
+							) : undefined
+						}>
+						<For
+							each={props.stats.rarities
+								.slice()
+								.sort((a, b) => a.cardsPossible - b.cardsPossible)}>
+							{rarity => <RarityStats stats={rarity} />}
+						</For>
+					</Show>
 				</section>
 			</main>
 		</>

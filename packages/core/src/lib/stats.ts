@@ -1,5 +1,5 @@
 import type { CardDesign, CardInstance } from '../db.types';
-import { FULL_ART_ID } from '../constants';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '../constants';
 import { InputValidationError } from './errors';
 import { getAllSeasons, getSeasonAndDesignsBySeasonId } from './season';
 import { z } from 'zod';
@@ -92,7 +92,7 @@ export type RarityStatistics = z.infer<typeof schemas.rarityStatistics>;
 export type FullArtStatistics = z.infer<typeof schemas.fullArtStatistics>;
 
 async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatistics> {
-	const PACK_SIZE = seasonId === 'moments' ? 1 : 5;
+	const PACK_SIZE = seasonId === 'moments' ? Infinity : 5;
 	const {
 		Seasons: [season],
 		CardDesigns: cardDesigns,
@@ -105,8 +105,8 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 
 	const cardsOpened = unopenedAndOpenedCardInstances.filter(card => card.openedAt != undefined);
 	const cardsPossible = getTotalPossibleCardCount({ cardDesigns, cardsOpened });
-	// cardsPossible.min -= cardsPossible.min % PACK_SIZE;
-	// cardsPossible.max -= cardsPossible.max % PACK_SIZE;
+  const legacyCards = cardsOpened.filter(c => c.rarityId === LEGACY_CARD_ID)
+  const cardsFromPacks = cardsOpened.length - legacyCards.length;
 
 	const cardsRemaining: NumberRange = {
 		min: cardsPossible.min - cardsOpened.length,
@@ -117,19 +117,24 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 		max: cardsOpened.length / cardsPossible.min,
 	};
 
-	const packsOpened = Math.floor(cardsOpened.length / PACK_SIZE);
-	const packsUnopened = (unopenedAndOpenedCardInstances.length - cardsOpened.length) / PACK_SIZE;
+	const packsOpened = seasonId === 'moments' ? 0 : Math.floor(cardsFromPacks / PACK_SIZE);
+	const packsUnopened =
+		seasonId === 'moments'
+			? 0
+			: (unopenedAndOpenedCardInstances.length - cardsFromPacks) / PACK_SIZE;
 	const totalPacksGenerated = packsOpened + packsUnopened;
-	const packsRemaining: NumberRange = {
-		min: Math.floor(cardsRemaining.min / PACK_SIZE) - packsUnopened,
-		max: Math.floor(cardsRemaining.max / PACK_SIZE) - packsUnopened,
-	};
+	const packsRemaining: NumberRange =
+		seasonId === 'moments'
+			? { min: 0, max: 0 }
+			: {
+					min: Math.floor(cardsRemaining.min / PACK_SIZE) - packsUnopened,
+					max: Math.floor(cardsRemaining.max / PACK_SIZE) - packsUnopened,
+				};
 	const packsPossible: NumberRange = {
 		min: totalPacksGenerated + packsRemaining.min,
 		max: totalPacksGenerated + packsRemaining.max,
 	};
 
-	console.log('Designs', cardDesigns);
 
 	return {
 		season: { seasonName: season.seasonName, seasonId: season.seasonId },
