@@ -343,13 +343,19 @@ const UserPinnedMessage: Component<{
 }> = props => {
 	const [message, setMessage] = createMutableProp(() => props.message);
 	const [isEditing, setIsEditing] = createSignal(false);
+	let prevMessage = '';
 	return (
 		<p class="relative col-start-2 grid gap-0 self-start break-words">
 			<Show when={props.isLoggedInUser}>
 				<span class="mx-auto flex gap-2 text-sm font-normal italic opacity-80">
 					Say something about your pinned card
 					<Show when={!isEditing()}>
-						<button title="Edit pinned message" onClick={() => setIsEditing(true)}>
+						<button
+							title="Edit pinned message"
+							onClick={() => {
+								prevMessage = message();
+								setIsEditing(true);
+							}}>
 							<EditIcon size={15} />
 						</button>
 					</Show>
@@ -383,14 +389,20 @@ const UserPinnedMessage: Component<{
 								inputOnly
 								label="Add a pinned message"
 								name="pinnedMsg"
-								maxLength={100}
+								maxLength={120}
 								value={message()}
 								setValue={setMessage}
 							/>
 						</div>
 						<div class="flex items-center gap-2">
 							<SubmitButton>Save</SubmitButton>
-							<DeleteButton onClick={() => setIsEditing(false)}>Cancel</DeleteButton>
+							<DeleteButton
+								onClick={() => {
+									setMessage(prevMessage);
+									setIsEditing(false);
+								}}>
+								Cancel
+							</DeleteButton>
 						</div>
 					</form>
 				</Match>

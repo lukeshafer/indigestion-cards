@@ -186,6 +186,7 @@ export const TiltEffectWrapper: ParentComponent<{
 	let rotateEl: HTMLDivElement;
 
 	let prevTime = 0;
+
 	function animate(t: number) {
 		if (checkAreAnimationsDisabled()) {
 			return;
@@ -201,9 +202,10 @@ export const TiltEffectWrapper: ParentComponent<{
 			targetRotateY,
 			dt,
 		});
+
 		rotateEl!.style.setProperty(
 			'transform',
-			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
+			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, min(${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg, 60deg))`
 		);
 
 		rotateX = result.rotateX;
@@ -431,7 +433,7 @@ function tiltEffectAnimationFrame(args: {
 		}
 	}
 
-	let rotateDegrees = Math.max(Math.abs(rotateX) + Math.abs(rotateY)) * 0.2;
+	let rotateDegrees = (Math.abs(rotateX) + Math.abs(rotateY)) * 0.2;
 	return { rotateX: roundTo(rotateX, 5), rotateY: roundTo(rotateY, 5), rotateDegrees };
 }
 

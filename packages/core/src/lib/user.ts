@@ -226,7 +226,7 @@ export async function setUserProfile(args: {
 		.set({
 			lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor,
 			pinnedCard: card,
-			pinnedMessage: args.pinnedMessage === null ? '' : args.pinnedMessage,
+			pinnedMessage: args.pinnedMessage === null ? '' : args.pinnedMessage?.slice(0,120),
 			minecraftUsername: args.minecraftUsername?.toLowerCase() || user.minecraftUsername,
 		})
 		.go()
