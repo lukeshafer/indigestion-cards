@@ -220,7 +220,7 @@ const RarityStats: Component<{
 	return (
 		<div
 			style={{ background: props.stats.background }}
-			class="w-fit rounded p-4 text-center text-gray-900">
+			class="w-fit rounded p-4 text-center text-gray-900 bg-gray-50">
 			<h3 class="text-lg font-bold">
 				{props.stats.rarityName[0].toUpperCase() + props.stats.rarityName.slice(1)}
 			</h3>

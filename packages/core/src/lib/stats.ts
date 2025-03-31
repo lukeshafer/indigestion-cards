@@ -286,7 +286,7 @@ function getRarityStatistics(opts: {
 
 					rarityName: rarity.rarityName,
 					rarityId: rarity.rarityId,
-					background: rarity.rarityColor,
+					background: prev?.background ?? rarity.rarityColor,
 				});
 			}
 		}
