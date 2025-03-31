@@ -100,7 +100,7 @@ export function Database({ stack }: StackContext) {
 					config.TWITCH_TOKENS_PARAM,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -116,7 +116,7 @@ export function Database({ stack }: StackContext) {
 					SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
 				},
 				bind: [table],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});

@@ -29,7 +29,7 @@ export function AfterDeployStack({ app, stack }: StackContext) {
 					dataRecoveryBucket,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});

@@ -59,7 +59,7 @@ export function Sites({ app, stack }: StackContext) {
 						hostedZone: hostedZone,
 					},
 		permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-		runtime: 'nodejs18.x',
+		runtime: 'nodejs22.x',
 	});
 
 	stack.addOutputs({

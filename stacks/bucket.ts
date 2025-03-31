@@ -22,7 +22,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		defaults: {
 			function: {
 				bind: [table],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -42,7 +42,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		defaults: {
 			function: {
 				bind: [table],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});

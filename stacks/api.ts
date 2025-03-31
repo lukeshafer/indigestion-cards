@@ -32,7 +32,7 @@ export function API({ app, stack }: StackContext) {
 					eventBus,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -112,7 +112,7 @@ export function API({ app, stack }: StackContext) {
 					wsConnectionsTable,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 		cors: {

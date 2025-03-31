@@ -22,7 +22,7 @@ export function Auth({ stack }: StackContext) {
         eventBus,
       ],
       permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-      runtime: 'nodejs18.x',
+      runtime: 'nodejs22.x',
     },
   });
 

@@ -40,7 +40,7 @@ export function ImageProcessing({ app, stack }: StackContext) {
   })
 
   const redirectCardsEdgeLambda = new experimental.EdgeFunction(stack, "RedirectCardsEdgeLambda", {
-    runtime: Runtime.NODEJS_18_X,
+    runtime: Runtime.NODEJS_22_X,
     handler: "lambda.handler",
     code: Code.fromAsset("packages/functions/src/edge/redirect-to-image-gen"),
     stackId: app.logicalPrefixedName("redirect-cards-edge-lambda"),

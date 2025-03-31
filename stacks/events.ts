@@ -19,7 +19,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'DLQ',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -53,7 +53,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: give-pack-to-user',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 			cdk: {
 				eventSource: {
@@ -73,7 +73,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'trade-DLQ',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -97,7 +97,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: process-trade',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 			cdk: {
 				eventSource: {
@@ -126,7 +126,7 @@ export function Events({ stack }: StackContext) {
 								config.TWITCH_CLIENT_SECRET,
 							],
 							permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-							runtime: 'nodejs18.x',
+							runtime: 'nodejs22.x',
 						},
 					},
 				},
