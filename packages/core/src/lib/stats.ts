@@ -30,6 +30,7 @@ const schemas = {
 			packsOpened: z.number(),
 			packsUnopened: z.number(),
 			cardsTraded: z.number(),
+			packsTraded: z.number(),
 
 			tradesCompleted: z.number(),
 			tradesRejected: z.number(),
@@ -163,6 +164,7 @@ async function generateFullSiteStatistics(): Promise<SiteStatistics> {
 		packsUnopened: 0,
 
 		cardsTraded: 0,
+		packsTraded: 0,
 
 		tradesCompleted: 0,
 		tradesRejected: 0,
@@ -191,6 +193,8 @@ async function generateFullSiteStatistics(): Promise<SiteStatistics> {
 			case 'completed':
 				siteStats.tradesCompleted += 1;
 				siteStats.cardsTraded += trade.offeredCards.length + trade.requestedCards.length;
+				siteStats.packsTraded +=
+					(trade.offeredPacks?.length ?? 0) + (trade.requestedPacks?.length ?? 0);
 				break;
 			case 'canceled':
 				siteStats.tradesCanceled += 1;

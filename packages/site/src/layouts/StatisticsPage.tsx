@@ -14,35 +14,42 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 				<PageTitle>Statistics</PageTitle>
 			</PageHeader>
 			<main class="relative">
-				<section class="grid gap-8 mb-8">
+				<section class="mb-8 grid gap-8">
 					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsOpened.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards opened</p>
 						</li>
+
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">
 								{Math.floor(props.stats.packsOpened).toFixed()}
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">packs opened</p>
 						</li>
+
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">
 								{Math.ceil(props.stats.packsUnopened).toFixed()}
 							</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">packs unopened</p>
 						</li>
-					</ul>
 
-					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsShitStamped.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">shit stamps</p>
 						</li>
+					</ul>
 
+					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsTraded.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards traded</p>
+						</li>
+
+						<li class="w-fit rounded p-1 text-center">
+							<p class="px-2 text-3xl">{props.stats.packsTraded.toFixed()}</p>
+							<p class="text-sm text-gray-800 dark:text-gray-200">packs traded</p>
 						</li>
 
 						<li class="w-fit rounded p-1 text-center">
@@ -51,14 +58,14 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 						</li>
 					</ul>
 				</section>
-				<nav class="grid gap-4 justify-center place-items-center">
-          <header class="col-span-2">
-            <Heading>Seasons</Heading>
-          </header>
+				<nav class="grid place-items-center justify-center gap-4">
+					<header class="col-span-2">
+						<Heading>Seasons</Heading>
+					</header>
 					<For each={props.stats.seasons}>
 						{({ season }) => (
 							<a
-								class="underline block bg-brand-main p-4 rounded text-xl"
+								class="bg-brand-main block rounded p-4 text-xl underline"
 								href={`/statistics/${season.seasonId}`}
 								title={`View ${season.seasonName} stats`}>
 								{season.seasonName}
