@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^18.19.70",
-    "sst": "2.47.3"
+    "sst": "2.48.2"
   },
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.723.0",
