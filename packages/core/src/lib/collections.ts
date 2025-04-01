@@ -29,7 +29,7 @@ export async function createSetCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName,
+		collectionName: args.collectionName.slice(0,50),
 		cards: args.collectionCards,
 		collectionType: 'set',
 	};
@@ -59,7 +59,7 @@ export async function createRuleCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName,
+		collectionName: args.collectionName.slice(0,50),
 		rules: args.collectionRules,
 		collectionType: 'rule',
 	};
