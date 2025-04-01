@@ -79,14 +79,14 @@ export function Database({ stack }: StackContext) {
 			filters: [entityFilter(['cardInstance', 'user', 'preorder', 'trade'])],
 			function: {
 				handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
-				bind: [table, dataSummaries],
+				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
 			},
 		},
 		refreshDesignslist: {
 			filters: [entityFilter(['season', 'cardDesign', 'cardInstance', 'rarity'])],
 			function: {
 				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
-				bind: [table, dataSummaries],
+				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
 			},
 		},
 	});
