@@ -105,8 +105,8 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 
 	const cardsOpened = unopenedAndOpenedCardInstances.filter(card => card.openedAt != undefined);
 	const cardsPossible = getTotalPossibleCardCount({ cardDesigns, cardsOpened });
-  const legacyCards = cardsOpened.filter(c => c.rarityId === LEGACY_CARD_ID)
-  const cardsFromPacks = cardsOpened.length - legacyCards.length;
+	const legacyCards = cardsOpened.filter(c => c.rarityId === LEGACY_CARD_ID);
+	const cardsFromPacks = cardsOpened.length - legacyCards.length;
 
 	const cardsRemaining: NumberRange = {
 		min: cardsPossible.min - cardsOpened.length,
@@ -135,7 +135,6 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 		max: totalPacksGenerated + packsRemaining.max,
 	};
 
-
 	return {
 		season: { seasonName: season.seasonName, seasonId: season.seasonId },
 		cardDesigns: cardDesigns.map(({ cardName, designId }) => ({ cardName, designId })),
@@ -159,6 +158,13 @@ async function generateSeasonStatistics(seasonId: string): Promise<SeasonStatist
 
 async function generateFullSiteStatistics(): Promise<SiteStatistics> {
 	const seasons = await getAllSeasons();
+	seasons.sort((a, b) =>
+		a.seasonId === 'moments'
+			? 1
+			: b.seasonId === 'moments'
+				? -1
+				: a.seasonId.localeCompare(b.seasonId)
+	);
 
 	const seasonStats = await Promise.all(seasons.map(s => generateSeasonStatistics(s.seasonId)));
 

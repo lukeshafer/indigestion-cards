@@ -1,4 +1,4 @@
-import { For, Show, type Component } from 'solid-js';
+import { For, Show, type Component, type ParentComponent } from 'solid-js';
 import type {
 	FullArtStatistics,
 	RarityStatistics,
@@ -15,7 +15,7 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 			</PageHeader>
 			<main class="relative">
 				<section class="mb-8 grid gap-8">
-					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+					<MainStatisticsList>
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsOpened.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards opened</p>
@@ -39,9 +39,9 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 							<p class="px-2 text-3xl">{props.stats.cardsShitStamped.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">shit stamps</p>
 						</li>
-					</ul>
+					</MainStatisticsList>
 
-					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+					<MainStatisticsList>
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsTraded.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">cards traded</p>
@@ -56,7 +56,7 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 							<p class="px-2 text-3xl">{props.stats.tradesCompleted.toFixed()}</p>
 							<p class="text-sm text-gray-800 dark:text-gray-200">trades completed</p>
 						</li>
-					</ul>
+					</MainStatisticsList>
 				</section>
 				<nav class="grid place-items-center justify-center gap-4">
 					<header class="col-span-2">
@@ -65,7 +65,7 @@ export const SiteStatisticsPage: Component<{ stats: SiteStatistics }> = props =>
 					<For each={props.stats.seasons}>
 						{({ season }) => (
 							<a
-								class="bg-brand-main block rounded p-4 text-xl underline"
+								class="bg-brand-light block rounded px-4 py-2 text-xl text-gray-900 underline"
 								href={`/statistics/${season.seasonId}`}
 								title={`View ${season.seasonName} stats`}>
 								{season.seasonName}
@@ -91,7 +91,7 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 			</PageHeader>
 			<main class="relative">
 				<section class="grid gap-8">
-					<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center gap-x-8 gap-y-6">
+					<MainStatisticsList>
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">
 								{percentRange(props.stats.percentageOpened)}
@@ -100,9 +100,7 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 						</li>
 						<li class="w-fit rounded p-1 text-center">
 							<p class="px-2 text-3xl">{props.stats.cardsOpened.toFixed()}</p>
-							<div class="mx-auto h-px w-1/2 border-t">
-								<p class="sr-only">out of</p>
-							</div>
+							<FractionLine />
 							<p class="px-2 text-2xl">
 								<UncertainRange range={props.stats.cardsPossible} />
 							</p>
@@ -113,9 +111,7 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 								<p class="px-2 text-3xl">
 									{Math.floor(props.stats.packsOpened).toFixed()}
 								</p>
-								<div class="mx-auto h-px w-1/2 border-t">
-									<p class="sr-only">out of</p>
-								</div>
+								<FractionLine />
 								<p class="px-2 text-2xl">
 									<UncertainRange range={props.stats.packsPossible} />
 								</p>
@@ -136,22 +132,23 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 								<p class="text-xs text-gray-800 dark:text-gray-200">shit stamps</p>
 							</li>
 						</Show>
-					</ul>
+					</MainStatisticsList>
 				</section>
 
 				<Show when={hasRanges()}>
-					<details class="mx-auto my-4 w-full max-w-80 rounded bg-gray-100 p-1 px-2 text-sm dark:bg-gray-900">
+					<details class="mx-auto my-4 w-full max-w-80 rounded bg-gray-200 p-1 px-2 text-sm dark:bg-gray-800">
 						<summary class="cursor-pointer py-2 text-center text-gray-800 dark:text-gray-300">
-							Why are some of the values not exact?
+							Why do some values end in a plus sign?
 						</summary>
 						<p class="my-2">
 							To keep unrevealed full art cards a secret, any statistics relating to
 							unopened cards are left uncertain.
 						</p>
 						<p>
-							If you see a number ending in '<code>+</code>', the number shown is
-							assuming there are <em>no more full arts to be found</em>, so as not to
-							reveal how many full arts are left.
+							If you see a number ending in{' '}
+							<code class="rounded bg-gray-300 p-1 px-2 dark:bg-gray-700">+</code>,
+							the number is as if there are <em>no more full arts to be found</em>, so
+							as not to reveal how many full arts are left.
 						</p>
 						<p class="my-2">
 							Once all full art cards have been opened this season, this page will
@@ -193,6 +190,12 @@ export const SeasonStatisticsPage: Component<{ stats: SeasonStatistics }> = prop
 	);
 };
 
+const MainStatisticsList: ParentComponent = props => (
+	<ul class="mx-auto flex w-fit grid-cols-3 flex-wrap place-items-center justify-center gap-x-8 gap-y-6">
+		{props.children}
+	</ul>
+);
+
 const FullArtStats: Component<{
 	stats: FullArtStatistics;
 }> = props => {
@@ -220,15 +223,13 @@ const RarityStats: Component<{
 	return (
 		<div
 			style={{ background: props.stats.background }}
-			class="w-fit rounded p-4 text-center text-gray-900 bg-gray-50">
+			class="w-fit rounded bg-gray-50 p-4 text-center text-gray-900">
 			<h3 class="text-lg font-bold">
 				{props.stats.rarityName[0].toUpperCase() + props.stats.rarityName.slice(1)}
 			</h3>
 			<p class="text-xl">
 				<span class="block font-bold">{props.stats.cardsOpened}</span>
-				<span class="mx-auto block h-px w-10 border-t border-current">
-					<span class="sr-only">out of</span>
-				</span>
+				<FractionLine />
 				<span class="block text-lg">{props.stats.cardsPossible}</span>
 				<span class="block text-sm leading-none">
 					card{props.stats.cardsOpened !== 1 ? 's' : ''} opened
@@ -243,6 +244,12 @@ type NumberRange = {
 	min: number;
 	max: number;
 };
+
+const FractionLine: Component = () => (
+	<span class="mx-auto block h-px w-16 border-t border-current">
+		<span class="sr-only">out of</span>
+	</span>
+);
 
 const UncertainRange: Component<{ range: NumberRange }> = props => (
 	<span class="relative">
