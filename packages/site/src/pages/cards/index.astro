@@ -6,7 +6,7 @@ import { routeNames } from '@site/constants';
 import { PageTitle, PageHeader } from '@site/components/text';
 import { parseFiltersFromSearchParams } from '@site/components/CardList';
 
-const data = loadAllDesignsPageData();
+const cards = await loadAllDesignsPageData();
 const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 ---
 
@@ -14,9 +14,6 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 	<PageHeader>
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
-	{
-		data.then(cards => (
-			<AllDesignsCardList client:load initialCards={cards} initialFilters={filters} />
-		))
-	}
+
+	<AllDesignsCardList client:load initialCards={cards} initialFilters={filters} />
 </Page>
