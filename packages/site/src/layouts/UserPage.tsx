@@ -35,7 +35,7 @@ import { formatCollectionViewTransitionId } from '@site/components/Collections';
 
 const UserPageContext = createContext({
 	user: {} as User,
-	isLoggedInUser: false,
+	loggedInUserId: undefined as string | undefined,
 	twitchData: null as TwitchUser | null,
 	packs: [] as Array<PackCardsHidden>,
 	cards: [] as Array<CardInstance>,
@@ -44,7 +44,7 @@ const UserPageContext = createContext({
 export const UserPage: Component<{
 	user: User;
 	twitchData: TwitchUser | null;
-	isLoggedInUser: boolean;
+	loggedInUserId?: string;
 	packs: Array<PackCardsHidden>;
 	cards: Array<CardInstance>;
 	collectionData: Array<{ collection: Collection; cards: Array<CardInstance> }>;
@@ -61,8 +61,8 @@ export const UserPage: Component<{
 				get twitchData() {
 					return props.twitchData;
 				},
-				get isLoggedInUser() {
-					return props.isLoggedInUser;
+				get loggedInUserId() {
+					return props.loggedInUserId;
 				},
 				get packs() {
 					return props.packs;
@@ -87,13 +87,17 @@ export const UserPage: Component<{
 						<UserMomentList />
 					</section>
 
-					<Show when={props.collectionData.length || props.isLoggedInUser}>
+					<Show
+						when={
+							props.collectionData.length ||
+							props.loggedInUserId === props.user.userId
+						}>
 						<section class="mb-10">
 							<header class="mb-6 grid place-items-center">
 								<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
 									Collections
 								</h2>
-								<Show when={props.isLoggedInUser}>
+								<Show when={props.loggedInUserId === props.user.userId}>
 									<Anchor href="/collections/new">Create new</Anchor>
 								</Show>
 							</header>
@@ -152,25 +156,12 @@ const UserIdentitySection: Component = () => {
 				</h1>
 
 				<Switch>
-					<Match when={ctx.user.lookingFor}>
-						{lookingFor => (
-							<UserLookingFor
-								userId={ctx.user.userId}
-								initialLookingFor={lookingFor()}
-								isLoggedInUser={ctx.isLoggedInUser}
-							/>
-						)}
-					</Match>
-					<Match when={!ctx.user.lookingFor && ctx.isLoggedInUser}>
-						<UserLookingFor
-							userId={ctx.user.userId}
-							initialLookingFor={''}
-							isLoggedInUser={ctx.isLoggedInUser}
-						/>
+					<Match when={ctx.user.lookingFor || ctx.loggedInUserId === ctx.user.userId}>
+						<UserLookingFor />
 					</Match>
 				</Switch>
 
-				<Show when={!ctx.isLoggedInUser}>
+				<Show when={ctx.loggedInUserId && ctx.loggedInUserId !== ctx.user.userId}>
 					<div class="col-start-2">
 						<Anchor href={`${routes.TRADES}/new?receiverUsername=${ctx.user.username}`}>
 							New Trade
@@ -185,7 +176,7 @@ const UserIdentitySection: Component = () => {
 						card={pinnedCard()}
 						message={ctx.user.pinnedMessage ?? ''}
 						username={ctx.user.username}
-						isLoggedInUser={ctx.isLoggedInUser}
+						isLoggedInUser={ctx.loggedInUserId === ctx.user.userId}
 					/>
 				)}
 			</Show>
@@ -193,21 +184,19 @@ const UserIdentitySection: Component = () => {
 	);
 };
 
-const UserLookingFor: Component<{
-	userId: string;
-	initialLookingFor: string;
-	isLoggedInUser: boolean;
-}> = props => {
+const UserLookingFor: Component = () => {
+	const ctx = useContext(UserPageContext);
+
 	const [isOpen, setIsOpen] = createSignal(false);
 	const [isEditing, setIsEditing] = createSignal(false);
-	const [lookingFor, setLookingFor] = createSignal(props.initialLookingFor);
+	const [lookingFor, setLookingFor] = createMutableProp(() => ctx.user.lookingFor || '');
 	return (
 		<p
 			data-open={isOpen()}
 			class="relative col-start-2 grid max-h-32 max-w-64 gap-0 self-start overflow-hidden break-words pb-2 transition-all data-[open=true]:max-h-max data-[open=true]:pb-8">
 			<span class="flex gap-2 text-sm font-normal italic opacity-80">
 				I'm looking for
-				<Show when={props.isLoggedInUser && !isEditing()}>
+				<Show when={ctx.loggedInUserId === ctx.user.userId && !isEditing()}>
 					<button title="Edit looking for" onClick={() => setIsEditing(true)}>
 						<EditIcon size={15} />
 					</button>
@@ -228,7 +217,7 @@ const UserLookingFor: Component<{
 				</Match>
 				<Match when={isEditing()}>
 					<UserLookingForForm
-						userId={props.userId}
+						userId={ctx.user.userId}
 						initialLookingFor={lookingFor()}
 						onSubmit={newValue => {
 							setLookingFor(newValue);
@@ -699,7 +688,12 @@ const UserPackList: Component = () => {
 					//'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 				}}>
 				<For each={ctx.packs}>
-					{pack => <PackListItem pack={pack} canChangeLock={ctx.isLoggedInUser} />}
+					{pack => (
+						<PackListItem
+							pack={pack}
+							canChangeLock={ctx.loggedInUserId === ctx.user.userId}
+						/>
+					)}
 				</For>
 			</ul>
 		</details>

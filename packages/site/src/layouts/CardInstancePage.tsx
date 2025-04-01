@@ -18,6 +18,7 @@ export const CardInstancePage: Component<{
 	const isPinned = () => props.user?.pinnedCard?.instanceId === props.card.instanceId;
 	const isOwnedByLoggedInUser = () =>
 		props.user?.userId === props.card.userId && props.user?.userId;
+  console.log(props.user)
 
 	return (
 		<>
@@ -42,7 +43,7 @@ export const CardInstancePage: Component<{
 						</div>
 					)}
 				</Match>
-				<Match when={!isOwnedByLoggedInUser() && props.isTradeable}>
+				<Match when={props.user && !isOwnedByLoggedInUser() && props.isTradeable}>
 					<div class="mx-auto">
 						<Anchor
 							href={`${routes.TRADES}/new?receiverUsername=${props.card.username}&requestedCards=${props.card.instanceId}`}>
