@@ -2,6 +2,8 @@ import { ElectroError } from 'electrodb';
 import type { CardDesign, CardInstance, CreateCardDesign, UpdateCardDesign } from '../db.types';
 import { db } from '../db';
 import type { DBResult } from '../types';
+import { lazy, Summary } from './utils';
+import { z } from 'zod';
 
 export async function getAllCardDesigns(): Promise<Array<CardDesign>> {
 	const results = await db.entities.CardDesigns.query.allCardDesigns({}).go({ pages: 'all' });
@@ -78,7 +80,10 @@ export async function addCardDesignTag(args: {
 	return { success: true, data: result.data };
 }
 
-export async function removeCardDesignTag(args: { designId: string; tag: string }): Promise<DBResult<Partial<CardDesign>>> {
+export async function removeCardDesignTag(args: {
+	designId: string;
+	tag: string;
+}): Promise<DBResult<Partial<CardDesign>>> {
 	const { data: designs } = await db.entities.CardDesigns.query
 		.primary({ designId: args.designId })
 		.go();
@@ -100,4 +105,49 @@ export async function removeCardDesignTag(args: { designId: string; tag: string 
 		.go();
 
 	return { success: true, data: result.data };
+}
+
+export type AllDesignsPageData = typeof allDesignsPageSummary extends Summary<infer T> ? T : never;
+const allDesignsPageSummary = lazy(
+	() =>
+		new Summary({
+			schema: z.array(
+				z.object({
+					cardName: z.string(),
+          cardDescription: z.string(),
+          artist: z.string(),
+					designId: z.string(),
+					seasonId: z.string(),
+          seasonName: z.string(),
+					imgUrl: z.string(),
+					rarityName: z.string(),
+					rarityId: z.string(),
+					frameUrl: z.string(),
+					rarityColor: z.string(),
+					totalOfType: z.number(),
+					cardNumber: z.number(),
+				})
+			),
+			prefix: 'all-designs',
+			loader: async () => {
+				const designs = await getAllCardDesigns();
+				return designs.map(card => ({
+					...card,
+					rarityName: card.bestRarityFound?.rarityName ?? '',
+					rarityId: card.bestRarityFound?.rarityId ?? '',
+					frameUrl: card.bestRarityFound?.frameUrl ?? '',
+					rarityColor: card.bestRarityFound?.rarityColor ?? '',
+					totalOfType: card.bestRarityFound?.count ?? 1,
+					cardNumber: 1,
+				}));
+			},
+		})
+);
+
+export async function loadAllDesignsPageData() {
+	return allDesignsPageSummary.get('data');
+}
+
+export async function refreshAllDesignsPageData() {
+	await allDesignsPageSummary.refresh('data');
 }

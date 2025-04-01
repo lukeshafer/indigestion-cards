@@ -62,22 +62,30 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
-	const STAT_ENTITIES = ['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade'];
+	const entityFilter = (entities: Array<string>) => {
+		return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
+	};
 	table.addConsumers(stack, {
 		updateStatistics: {
 			filters: [
-				{
-					dynamodb: {
-						NewImage: {
-							__edb_e__: {
-								S: STAT_ENTITIES,
-							},
-						},
-					},
-				},
+				entityFilter(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
 			],
 			function: {
 				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+				bind: [table, dataSummaries],
+			},
+		},
+		refreshUserlist: {
+			filters: [entityFilter(['cardInstance', 'user', 'preorder', 'trade'])],
+			function: {
+				handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
+				bind: [table, dataSummaries],
+			},
+		},
+		refreshDesignslist: {
+			filters: [entityFilter(['season', 'cardDesign', 'cardInstance', 'rarity'])],
+			function: {
+				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
 				bind: [table, dataSummaries],
 			},
 		},

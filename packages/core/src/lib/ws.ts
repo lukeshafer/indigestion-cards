@@ -5,11 +5,34 @@ import {
 	ScanCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Table } from 'sst/node/table';
-import { LibraryFn, Unwrap } from './utils';
 import { ApiGatewayManagementApi } from '@aws-sdk/client-apigatewaymanagementapi';
 import { WebSocketApi } from 'sst/node/websocket-api';
+import type { LibraryOutput } from '../session.types';
 
 const dynamoDb = new DynamoDBClient();
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function LibraryFn<CB extends (...args: any[]) => any>(
+	cb: CB
+): (...args: Parameters<CB>) => Promise<LibraryOutput<Awaited<ReturnType<CB>>>> {
+	return async (...args: Parameters<CB>) => {
+		try {
+			return { success: true, data: await cb(...args) };
+		} catch (error) {
+			return { success: false, error };
+		}
+	};
+}
+
+export function Unwrap<Data>(libraryOutput: Promise<LibraryOutput<Data>>): Promise<Data> {
+	return libraryOutput.then(item => {
+		if (item.success) {
+			return item.data;
+		} else {
+			throw item.error;
+		}
+	});
+}
 
 export const addConnection = LibraryFn(async (args: { connectionId: string }) =>
 	dynamoDb.send(

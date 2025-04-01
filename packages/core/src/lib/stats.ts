@@ -3,12 +3,9 @@ import { FULL_ART_ID, LEGACY_CARD_ID } from '../constants';
 import { InputValidationError } from './errors';
 import { getAllSeasons, getSeasonAndDesignsBySeasonId } from './season';
 import { z } from 'zod';
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Bucket } from 'sst/node/bucket';
 import { getAllUsers } from './user';
 import { getOutgoingTradesByUserId } from './trades';
-
-const s3 = new S3Client();
+import { lazy, Summary } from './utils';
 
 type NumberRange = {
 	min: number;
@@ -359,108 +356,30 @@ const countFullArts = (count: number, card: CardInstance) =>
 const STATISTICS_PREFIX = 'statistics';
 const SEASON_STATS_PREFIX = 'seasons';
 const SITE_STATS_NAME = 'full-site';
-export async function updateSeasonStatistics(seasonId: string): Promise<void> {
-	const statistics = await generateSeasonStatistics(seasonId);
-	await putSeasonStatisticsInS3(seasonId, statistics);
-}
 
-export async function updateSiteStatistics(): Promise<void> {
-	const statistics = await generateFullSiteStatistics();
-	await putSiteStatisticsInS3(statistics);
-}
-
-async function putSeasonStatisticsInS3(
-	seasonId: string,
-	statistics: SeasonStatistics
-): Promise<void> {
-	await s3.send(
-		new PutObjectCommand({
-			Bucket: Bucket.DataSummaries.bucketName,
-			Key: `${STATISTICS_PREFIX}/${SEASON_STATS_PREFIX}/${seasonId}`,
-			Body: JSON.stringify(statistics),
-		})
-	);
-}
-
-async function putSiteStatisticsInS3(statistics: SiteStatistics): Promise<void> {
-	await s3.send(
-		new PutObjectCommand({
-			Bucket: Bucket.DataSummaries.bucketName,
-			Key: `${STATISTICS_PREFIX}/${SITE_STATS_NAME}`,
-			Body: JSON.stringify(statistics),
-		})
-	);
-}
-
+const seasonStatistics = new Summary({
+	schema: schemas.seasonStatistics,
+	prefix: `${STATISTICS_PREFIX}/${SEASON_STATS_PREFIX}`,
+	loader: generateSeasonStatistics,
+});
 export async function getSeasonStatistics(seasonId: string): Promise<SeasonStatistics> {
-	console.log('Attempting to fetch season statistics from S3');
-	let body;
-	try {
-		let object = await s3.send(
-			new GetObjectCommand({
-				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${STATISTICS_PREFIX}/${SEASON_STATS_PREFIX}/${seasonId}`,
-			})
-		);
-		body = await object.Body?.transformToString();
-		if (body == undefined) {
-			throw new Error('Body not found.');
-		}
-	} catch (e) {
-		console.error(e);
-		console.log('Unable to locate season statistics. Generating...');
-		let statistics = await generateSeasonStatistics(seasonId);
-		await putSeasonStatisticsInS3(seasonId, statistics);
-
-		return statistics;
-	}
-
-	let statistics = schemas.seasonStatistics.safeParse(JSON.parse(body));
-
-	if (statistics.success === false) {
-		console.log('Existing season statistics use invalid schema. Re-generating...');
-		let statistics = await generateSeasonStatistics(seasonId);
-
-		await putSeasonStatisticsInS3(seasonId, statistics);
-
-		return statistics;
-	}
-
-	return statistics.data;
+	return seasonStatistics.get(seasonId);
+}
+export async function updateSeasonStatistics(seasonId: string): Promise<void> {
+	await seasonStatistics.refresh(seasonId);
 }
 
+const siteStatistics = lazy(
+	() =>
+		new Summary({
+			schema: schemas.siteStatistics,
+			prefix: STATISTICS_PREFIX,
+			loader: generateFullSiteStatistics,
+		})
+);
 export async function getSiteStatistics(): Promise<SiteStatistics> {
-	console.log('Attempting to fetch site statistics from S3');
-	let body;
-	try {
-		let object = await s3.send(
-			new GetObjectCommand({
-				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${STATISTICS_PREFIX}/${SITE_STATS_NAME}`,
-			})
-		);
-		body = await object.Body?.transformToString();
-		if (body == undefined) {
-			throw new Error('Body not found.');
-		}
-	} catch (e) {
-		console.error(e);
-		console.log('Unable to locate site statistics. Generating...');
-		let statistics = await generateFullSiteStatistics();
-		await putSiteStatisticsInS3(statistics);
-
-		return statistics;
-	}
-
-	let statistics = schemas.siteStatistics.safeParse(JSON.parse(body));
-
-	if (statistics.success === false) {
-		console.log('Existing site statistics use invalid schema. Re-generating...');
-		let statistics = await generateFullSiteStatistics();
-		await putSiteStatisticsInS3(statistics);
-
-		return statistics;
-	}
-
-	return statistics.data;
+	return siteStatistics.get(SITE_STATS_NAME);
+}
+export async function updateSiteStatistics(): Promise<void> {
+	await siteStatistics.refresh(SITE_STATS_NAME);
 }

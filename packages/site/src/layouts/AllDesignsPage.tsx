@@ -10,10 +10,10 @@ import { createMemo, createSignal, Show, type Component } from 'solid-js';
 import type { RarityRankingRecord } from '@core/lib/site-config';
 import { routes } from '@site/constants';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
-import type { CardDesign } from '@core/types';
+import type { AllDesignsPageData } from '@core/lib/design';
 
 export const AllDesignsCardList: Component<{
-	initialCards: CardDesign[];
+	initialCards: AllDesignsPageData;
 	rarityRanking?: RarityRankingRecord;
 	initialFilters: Filters;
 }> = props => {
@@ -60,14 +60,14 @@ export const AllDesignsCardList: Component<{
 };
 
 const AllDesignsCardListItem: Component<{
-	card: CardDesign;
+	card: AllDesignsPageData[number];
 	lazy: boolean;
 }> = props => {
-	const rarityId = () => props.card.bestRarityFound?.rarityId ?? '';
+	const rarityId = () => props.card.rarityId
 	const background = () =>
 		cardUtils.checkIsFullArt(rarityId())
 			? FULL_ART_BACKGROUND_CSS
-			: props.card.bestRarityFound?.rarityColor;
+			: props.card.rarityColor;
 
 	const card = (
 		<CardEls.FullAnimatedCardEffect

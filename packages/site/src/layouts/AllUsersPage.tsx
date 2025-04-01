@@ -1,6 +1,4 @@
-import type { Preorder, User } from '@core/types';
 import { For, type Component, type ParentComponent } from 'solid-js';
-import type { TwitchUser } from '@core/lib/twitch';
 import { routes } from '@site/constants';
 import {
 	createTable,
@@ -14,15 +12,10 @@ import {
 } from '@site/components/Table';
 import CardsIcon from '@site/components/icons/CardsIcon';
 import PacksIcon from '@site/components/icons/PacksIcon';
-
-type UserPageRecord = {
-	user: User;
-	twitch?: TwitchUser | null | undefined;
-	preorders: Array<Preorder>;
-};
+import type { AllUserPageData } from '@core/lib/user';
 
 export const UsersPage: Component<{
-	users: Array<UserPageRecord>;
+	users: AllUserPageData;
 }> = props => {
 	const table = createTable(
 		() => ({
