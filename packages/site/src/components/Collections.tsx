@@ -156,6 +156,7 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 			<form class="grid h-fit gap-4 px-4">
 				<div class="max-w-72">
 					<TextInput
+						maxLength="50"
 						name="collectionName"
 						label="Collection Name"
 						setValue={v => setState('collectionName', v)}
