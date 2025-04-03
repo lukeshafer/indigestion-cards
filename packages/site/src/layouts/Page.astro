@@ -1,7 +1,7 @@
 ---
 import '@site/global.css';
 import '@fontsource-variable/montserrat';
-import { ASSETS, type LOGOS } from '@site/constants';
+import { type LOGOS } from '@site/constants';
 import Breadcrumbs, { type Path } from '@site/components/Breadcrumbs';
 import { Header } from '@site/components/Header';
 import { Footer } from '@site/components/Footer';
@@ -73,10 +73,17 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 -->
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/png" href={ASSETS.FAVICON} />
+		<!-- <link rel="icon" type="image/png" href={ASSETS.FAVICON} /> -->
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
     {!disableAnimations && (
     <style>
       @view-transition {

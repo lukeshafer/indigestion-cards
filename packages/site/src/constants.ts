@@ -77,7 +77,7 @@ export const routeNames = {
 } as const;
 
 export const ASSETS = {
-	FAVICON: '/assets/favicon.png',
+	// FAVICON: '/assets/favicon.png',
 	LOGO: '/assets/logo.png',
 	TONGLE: '/assets/lilindpartner.webp',
 	EMOTES: {
