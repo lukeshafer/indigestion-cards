@@ -1,4 +1,12 @@
-import { For, Show, type Component, type JSXElement } from 'solid-js';
+import {
+	createMemo,
+	createSignal,
+	For,
+	Show,
+	type Component,
+	type JSXElement,
+	type Setter,
+} from 'solid-js';
 
 export function CardList<T extends CardDesign | CardInstance>(props: {
 	cards: Array<T>;
@@ -151,17 +159,17 @@ function syncFormDataWithUrlSearchParams(formData: FormData) {
 	window.history.replaceState({}, '', url.toString());
 }
 
-export function filterCards<T extends Pick<CardInstance, 'minterId' | 'userId' | 'seasonId'>>(
-	cards: Array<T>,
-	filters: Filters
-): Array<T> {
+export function filterCards<
+	T extends Partial<Pick<CardInstance, 'minterId' | 'userId' | 'seasonId'>>,
+>(cards: Array<T>, filters: Filters): Array<T> {
 	// console.log('filtering cards', { cards, filters });
 	if (Object.values(filters).every(f => f.size === 0)) return cards;
 
 	return cards.filter(card => {
 		if (filters.seasonIds.size) {
-			const hasValidSeason = checkCardHasValidSeason(card, filters.seasonIds);
-			if (!hasValidSeason) return false;
+			let seasonId = card.seasonId;
+			if (!seasonId) return false;
+			if (!checkCardHasValidSeason({ seasonId }, filters.seasonIds)) return false;
 		}
 
 		if (filters.minterId.size) {
@@ -279,11 +287,13 @@ export function CardListSearch(props: { setSearchText: (text: string) => void })
 import { useViewTransition } from '@site/client/utils';
 import { Select } from '@site/components/Form';
 import type { CardDesign, CardInstance } from '@core/types';
-import { sortTypes as validSortTypes, type SortType } from '@site/client/card-sort';
+import { sortCards, sortTypes as validSortTypes, type SortType } from '@site/client/card-sort';
+import Fuse from 'fuse.js';
 
 export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 	sortTypes: T | 'all';
 	setSort: (value: T[number]) => void;
+	default?: T[number];
 }) {
 	const selectedSortTypes = () =>
 		props.sortTypes === 'all'
@@ -297,6 +307,7 @@ export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 			label="Sort by"
 			setValue={val => useViewTransition(() => props.setSort(val as SortType))}
 			options={selectedSortTypes()}
+			value={props.default}
 		/>
 	);
 }
@@ -320,6 +331,58 @@ export const PlaceholderCardList: Component<{ length?: number; scale?: number }>
 		</For>
 	</ul>
 );
+
+export function createCardList<Card extends CardInstance | CardDesign>(
+	cards: () => Array<Card>,
+	opts?: {
+		default?: {
+			sortType?: SortType;
+			filters?: Filters;
+			searchText?: string;
+		};
+	}
+): [
+	cards: () => Array<Card>,
+	state: {
+		setSortType: Setter<SortType>;
+		setFilters: Setter<Filters>;
+		setSearchText: Setter<string>;
+	},
+] {
+	const [sortType, setSortType] = createSignal<SortType>(opts?.default?.sortType ?? 'rarest');
+	const [filters, setFilters] = createSignal<Filters>(opts?.default?.filters ?? createFilters());
+	const [searchText, setSearchText] = createSignal(opts?.default?.searchText ?? '');
+
+	const filteredCards = createMemo(() => filterCards(cards(), filters()));
+
+	const sortedCards = createMemo(() => {
+		const sortedCards = sortCards({ cards: filteredCards(), sort: sortType() });
+
+		if (searchText().length === 0) {
+			return sortedCards;
+		}
+
+		let searchCards = createCardSearcher(sortedCards);
+		return searchCards(searchText());
+	});
+
+	return [sortedCards, { setSortType, setFilters, setSearchText }];
+}
+
+function createCardSearcher<T extends CardDesign | CardInstance>(cards: T[]) {
+	const fuse = new Fuse(cards, {
+		keys: [
+			{ name: 'cardName', weight: 5 },
+			{ name: 'rarityName', weight: 5 },
+			{ name: 'seasonName', weight: 2 },
+			{ name: 'cardNumber', weight: 2 },
+			{ name: 'username', weight: 1 },
+			{ name: 'stamps', weight: 1 },
+		],
+	});
+
+	return (searchTerm: string) => fuse.search(searchTerm).map(result => result.item);
+}
 
 export default {
 	List: CardList,

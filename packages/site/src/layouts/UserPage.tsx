@@ -4,7 +4,7 @@ import CardList, {
 	PlaceholderCardList,
 	type Filters,
 } from '@site/components/CardList';
-import { type SortInfo, getSortInfo } from '@site/client/card-sort';
+import { type SortInfo } from '@site/client/card-sort';
 import {
 	Show,
 	For,
@@ -555,9 +555,7 @@ const UserCardList: Component<{
 						'open-date-asc',
 						'open-date-desc',
 					]}
-					setSort={sortType => {
-						setSortInfo(getSortInfo(sortType));
-					}}
+					setSort={setSortInfo}
 				/>
 				<CardList.Filter
 					params={{

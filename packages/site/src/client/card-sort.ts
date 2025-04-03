@@ -1,22 +1,6 @@
-import type { RarityRankingRecord } from "@core/lib/site-config";
-import type { CardDesign, CardInstance } from "@core/types";
-import { FULL_ART_ID, LEGACY_CARD_ID } from "@site/constants";
-
-type CardListItem = {
-	cardName: string;
-	cardDescription: string;
-	designId: string;
-	imgUrl: string;
-	rarityId: string;
-	rarityName: string;
-	frameUrl: string;
-	rarityColor: string;
-	cardNumber: number;
-	totalOfType: number;
-	username?: string | undefined;
-	instanceId?: string | undefined;
-	openedAt?: string | undefined;
-};
+import type { RarityRankingRecord } from '@core/lib/site-config';
+import type { CardDesign } from '@core/types';
+import { FULL_ART_ID, LEGACY_CARD_ID } from '@site/constants';
 
 export const sortTypes = [
 	{ value: 'rarest', label: 'Most to Least Rare' },
@@ -83,21 +67,17 @@ export function getSortInfo(sortType: SortType): SortInfo {
 	}
 }
 
-type CardInstanceForSorting =
-	| Pick<CardInstance, 'cardName' | 'totalOfType' | 'cardNumber'>
-	| Pick<CardDesign, 'cardName' | 'bestRarityFound'>;
-export const sortCardsByName =
-	(order: 'asc' | 'desc') => (a: CardInstanceForSorting, b: CardInstanceForSorting) =>
-		a.cardName.localeCompare(b.cardName) ||
-		getTotalOfTypeForSorting(a) - getTotalOfTypeForSorting(b) ||
-		getCardNumberForSorting(a) - getCardNumberForSorting(b) * (order === 'asc' ? 1 : -1);
+type CardInstanceForSorting = {
+	cardName: string;
+	totalOfType?: number;
+	bestRarityFound?: CardDesign['bestRarityFound'];
+	cardNumber?: number;
+	rarityId?: string;
+	openedAt?: string;
+	username?: string;
+};
 
-const getTotalOfTypeForSorting = (card: CardInstanceForSorting): number =>
-	'totalOfType' in card ? card.totalOfType : (card.bestRarityFound?.count ?? 0);
-const getCardNumberForSorting = (card: CardInstanceForSorting): number =>
-	'cardNumber' in card ? card.cardNumber : 0;
-
-export function sortCards<T extends CardListItem>(args: {
+export function sortCards<T extends CardInstanceForSorting>(args: {
 	cards: T[];
 	sort: SortType | (string & {});
 	rarityRanking?: RarityRankingRecord;
@@ -110,15 +90,15 @@ export function sortCards<T extends CardListItem>(args: {
 			return cards.sort(
 				(a, b) =>
 					a.cardName.localeCompare(b.cardName) ||
-					a.totalOfType - b.totalOfType ||
-					+a.cardNumber - +b.cardNumber
+					(a.totalOfType || 0) - (b.totalOfType || 0) ||
+					(a.cardNumber || Infinity) - (b.cardNumber || Infinity)
 			);
 		case 'card-name-desc':
 			return cards.sort(
 				(a, b) =>
 					b.cardName.localeCompare(a.cardName) ||
-					a.totalOfType - b.totalOfType ||
-					+a.cardNumber - +b.cardNumber
+					(a.totalOfType || 0) - (b.totalOfType || 0) ||
+					(a.cardNumber || Infinity) - (b.cardNumber || Infinity)
 			);
 		case 'rarest':
 			return cards.sort((a, b) => rarestCardSort(a, b, args.rarityRanking));
@@ -130,7 +110,7 @@ export function sortCards<T extends CardListItem>(args: {
 					? 0
 					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
 						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+						sortCardNumber(a, b)
 			);
 		case 'open-date-asc':
 			return cards.sort((a, b) =>
@@ -138,7 +118,7 @@ export function sortCards<T extends CardListItem>(args: {
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
 						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+						sortCardNumber(a, b)
 			);
 		case 'owner-asc':
 			return cards.sort((a, b) =>
@@ -146,7 +126,7 @@ export function sortCards<T extends CardListItem>(args: {
 					? 0
 					: a.username.localeCompare(b.username) ||
 						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+						sortCardNumber(a, b)
 			);
 		case 'owner-desc':
 			return cards.sort((a, b) =>
@@ -154,22 +134,26 @@ export function sortCards<T extends CardListItem>(args: {
 					? 0
 					: b.username.localeCompare(a.username) ||
 						a.cardName.localeCompare(b.cardName) ||
-						+a.cardNumber - +b.cardNumber
+						sortCardNumber(a, b)
 			);
 		default:
 			return cards;
 	}
 }
 
-function rarestCardSort(a: CardListItem, b: CardListItem, rarityRanking?: RarityRankingRecord) {
+function rarestCardSort(
+	a: CardInstanceForSorting,
+	b: CardInstanceForSorting,
+	rarityRanking?: RarityRankingRecord
+) {
 	if (rarityRanking) {
-		const aRank = rarityRanking[a.rarityId]?.ranking ?? Infinity;
-		const bRank = rarityRanking[b.rarityId]?.ranking ?? Infinity;
+		const aRank = rarityRanking[a.rarityId ?? -1]?.ranking ?? Infinity;
+		const bRank = rarityRanking[b.rarityId ?? -1]?.ranking ?? Infinity;
 		return aRank - bRank;
 	}
 
 	if (a.totalOfType !== b.totalOfType) {
-		return a.totalOfType - b.totalOfType;
+		return (a.totalOfType || 0) - (b.totalOfType || 0);
 	}
 
 	if (a.rarityId === LEGACY_CARD_ID && b.rarityId !== LEGACY_CARD_ID) {
@@ -183,5 +167,9 @@ function rarestCardSort(a: CardListItem, b: CardListItem, rarityRanking?: Rarity
 		return 1;
 	}
 
-	return a.cardName.localeCompare(b.cardName) || +a.cardNumber - +b.cardNumber;
+	return a.cardName.localeCompare(b.cardName) || sortCardNumber(a, b);
+}
+
+function sortCardNumber(a: CardInstanceForSorting, b: CardInstanceForSorting) {
+	return (a.cardNumber || Infinity) - (b.cardNumber || Infinity);
 }

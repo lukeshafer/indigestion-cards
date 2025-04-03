@@ -1,43 +1,23 @@
-import type {
-	CardDesign,
-	CardInstance,
-	CollectionRules,
-	CollectionCards,
-	Season,
-} from '@core/types';
+import type * as DB from '@core/types';
 import { trpc } from '@site/client/api';
-import {
-	createEffect,
-	createMemo,
-	createResource,
-	createSignal,
-	For,
-	Match,
-	on,
-	Show,
-	Suspense,
-	Switch,
-	type Component,
-	type ParentComponent,
-} from 'solid-js';
+import * as Solid from 'solid-js';
 import { Checkbox, Fieldset, SubmitButton, TextInput } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { FULL_ART_ID, routes } from '@site/constants';
 import { createStore, produce, reconcile } from 'solid-js/store';
-import CardList from './CardList';
-import { getCardSearcher } from '@site/client/search';
+import * as CardList from './CardList';
 
-export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = props => {
+export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> }> = props => {
 	const [state, setState] = createStore({
 		type: 'set' as 'set' | 'rule',
-		rules: {} as CollectionRules,
-		cards: [] as CollectionCards,
-		previewCards: [] as Array<CardInstance>,
+		rules: {} as DB.CollectionRules,
+		cards: [] as DB.CollectionCards,
+		previewCards: [] as Array<DB.CardInstance>,
 		collectionName: '',
 	});
 
-	createEffect(
-		on(
+	Solid.createEffect(
+		Solid.on(
 			() => state.type,
 			type => {
 				if (type === 'set') setState('rules', {});
@@ -46,8 +26,8 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 		)
 	);
 
-	createEffect(
-		on(
+	Solid.createEffect(
+		Solid.on(
 			() => ({
 				type: state.type,
 				rules: { ...state.rules },
@@ -110,8 +90,8 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 						<p>Advanced Collection</p>
 					</label>
 				</fieldset>
-				<Switch>
-					<Match when={state.type === 'set'}>
+				<Solid.Switch>
+					<Solid.Match when={state.type === 'set'}>
 						<SetCollectionBuilder
 							userCards={props.cards}
 							selectedCards={state.cards}
@@ -147,11 +127,11 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 								);
 							}}
 						/>
-					</Match>
-					<Match when={state.type === 'rule'}>
+					</Solid.Match>
+					<Solid.Match when={state.type === 'rule'}>
 						<RuleCollectionBuilder setRules={rules => setState('rules', rules)} />
-					</Match>
-				</Switch>
+					</Solid.Match>
+				</Solid.Switch>
 			</div>
 			<form class="grid h-fit gap-4 px-4">
 				<div class="max-w-72">
@@ -190,8 +170,8 @@ export const CollectionBuilder: Component<{ cards: Array<CardInstance> }> = prop
 	);
 };
 
-const CollectionCardsPreviewList: Component<{
-	cards: Array<CardInstance>;
+const CollectionCardsPreviewList: Solid.Component<{
+	cards: Array<DB.CardInstance>;
 	type: 'set' | 'rule';
 }> = props => {
 	return (
@@ -202,8 +182,8 @@ const CollectionCardsPreviewList: Component<{
 			<ul
 				class="grid h-fit w-full flex-wrap justify-center gap-4 p-4"
 				style={{ 'grid-template-columns': 'repeat(auto-fill, minmax(8rem, 1fr))' }}>
-				<Suspense fallback={<p>Loading</p>}>
-					<For
+				<Solid.Suspense fallback={<p>Loading</p>}>
+					<Solid.For
 						each={props.cards}
 						fallback={
 							<p class="col-span-full my-8 w-full text-center opacity-50">
@@ -219,27 +199,25 @@ const CollectionCardsPreviewList: Component<{
 								<PreviewCard card={card} />
 							</li>
 						)}
-					</For>
-				</Suspense>
+					</Solid.For>
+				</Solid.Suspense>
 			</ul>
 		</section>
 	);
 };
 
-const SetCollectionBuilder: Component<{
-	userCards: Array<CardInstance>;
-	selectedCards: CollectionCards;
+const SetCollectionBuilder: Solid.Component<{
+	userCards: Array<DB.CardInstance>;
+	selectedCards: DB.CollectionCards;
 	addCardId: (card: string) => void;
 	removeCardId: (card: string) => void;
 }> = props => {
-	const [searchText, setSearchText] = createSignal('');
-	const searcher = createMemo(() => getCardSearcher(props.userCards));
-	const cards = () => (searchText() ? searcher()(searchText()) : props.userCards);
+	const [cards, state] = CardList.createCardList(() => props.userCards);
 
 	return (
 		<div class="flex flex-wrap gap-4">
-			<CardList.Search setSearchText={setSearchText} />
-			<CardList.List cards={cards()} scale={0.5}>
+			<CardList.CardListSearch setSearchText={state.setSearchText} />
+			<CardList.CardList cards={cards()} scale={0.5}>
 				{card => (
 					<CardCheckbox
 						checked={props.selectedCards.some(
@@ -254,13 +232,13 @@ const SetCollectionBuilder: Component<{
 						<InstanceCard card={card} />
 					</CardCheckbox>
 				)}
-			</CardList.List>
+			</CardList.CardList>
 		</div>
 	);
 };
 
-const RuleCollectionBuilder: Component<{
-	setRules: (rules: CollectionRules) => void;
+const RuleCollectionBuilder: Solid.Component<{
+	setRules: (rules: DB.CollectionRules) => void;
 }> = props => {
 	return (
 		<form
@@ -308,8 +286,8 @@ const RuleCollectionBuilder: Component<{
 	);
 };
 
-const RuleCollectionBuilderDesignInput: Component<{ name: string }> = () => {
-	const [seasons] = createResource(async () =>
+const RuleCollectionBuilderDesignInput: Solid.Component<{ name: string }> = () => {
+	const [seasons] = Solid.createResource(async () =>
 		trpc.seasons.getAllWithDesigns
 			.query()
 			.then(data =>
@@ -324,24 +302,27 @@ const RuleCollectionBuilderDesignInput: Component<{ name: string }> = () => {
 	);
 
 	return (
-		<Suspense fallback="Loading...">
+		<Solid.Suspense fallback="Loading...">
 			<Fieldset legend="Card Designs">
 				<ul class="grid gap-8">
-					<For each={seasons()}>
+					<Solid.For each={seasons()}>
 						{([, { season, cards }]) => (
 							<li class="overflow-x-hidden rounded-lg bg-gray-100 px-4 py-2 dark:bg-gray-900">
 								<SeasonCheckboxAndDesigns cards={cards} season={season} />
 							</li>
 						)}
-					</For>
+					</Solid.For>
 				</ul>
 			</Fieldset>
-		</Suspense>
+		</Solid.Suspense>
 	);
 };
 
-const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Season }> = props => {
-	const [seasonChecked, setSeasonChecked] = createSignal(false);
+const SeasonCheckboxAndDesigns: Solid.Component<{
+	cards: Array<DB.CardDesign>;
+	season: DB.Season;
+}> = props => {
+	const [seasonChecked, setSeasonChecked] = Solid.createSignal(false);
 	return (
 		<div>
 			<p class="text-lg">{props.season.seasonName}</p>
@@ -357,7 +338,7 @@ const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Se
 			<div
 				class="scrollbar-narrow relative flex w-full gap-4 overflow-x-scroll p-3 py-4 data-[disabled=true]:overflow-x-hidden"
 				data-disabled={seasonChecked()}>
-				<For each={props.cards}>
+				<Solid.For each={props.cards}>
 					{design => (
 						<CardCheckbox
 							name="designIds"
@@ -367,19 +348,19 @@ const SeasonCheckboxAndDesigns: Component<{ cards: Array<CardDesign>; season: Se
 							<DesignCard design={design} />
 						</CardCheckbox>
 					)}
-				</For>
-				<Show when={seasonChecked()}>
+				</Solid.For>
+				<Solid.Show when={seasonChecked()}>
 					<div class="absolute inset-0 grid place-items-center bg-gray-100/75 dark:bg-black/75">
 						<p class="text-3xl">All {props.season.seasonName} cards selected.</p>
 					</div>
-				</Show>
+				</Solid.Show>
 			</div>
 		</div>
 	);
 };
 
-const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
-	const [isEnabled, setIsEnabled] = createSignal(false);
+const RuleCollectionBuilderRarityInput: Solid.Component<{ name: string }> = props => {
+	const [isEnabled, setIsEnabled] = Solid.createSignal(false);
 	const rarities: Array<[id: string, name: string]> = [
 		[FULL_ART_ID, 'Full Art'],
 		['pink', 'Pink'],
@@ -413,7 +394,7 @@ const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
 				Specific rarity
 			</label>
 			<div class="ml-4 grid gap-2">
-				<For each={rarities}>
+				<Solid.For each={rarities}>
 					{([rarityId, rarityName]) => (
 						<label
 							class="flex gap-2 data-[disabled=true]:opacity-50"
@@ -427,13 +408,13 @@ const RuleCollectionBuilderRarityInput: Component<{ name: string }> = props => {
 							{rarityName}
 						</label>
 					)}
-				</For>
+				</Solid.For>
 			</div>
 		</Fieldset>
 	);
 };
 
-const CardCheckbox: ParentComponent<{
+const CardCheckbox: Solid.ParentComponent<{
 	name: string;
 	value: string;
 	checked?: boolean;
@@ -459,8 +440,8 @@ const CardCheckbox: ParentComponent<{
 	</label>
 );
 
-const DesignCard: Component<{
-	design: CardDesign;
+const DesignCard: Solid.Component<{
+	design: DB.CardDesign;
 }> = props => {
 	const rarityId = () => props.design.bestRarityFound?.rarityId ?? '';
 
@@ -479,16 +460,16 @@ const DesignCard: Component<{
 					? FULL_ART_BACKGROUND_CSS
 					: props.design.bestRarityFound?.rarityColor
 			}>
-			<Show when={cardUtils.checkIfCanShowCardText(rarityId())}>
+			<Solid.Show when={cardUtils.checkIfCanShowCardText(rarityId())}>
 				<CardEls.CardName>{props.design.cardName}</CardEls.CardName>
 				<CardEls.CardDescription>{props.design.cardDescription}</CardEls.CardDescription>
-			</Show>
+			</Solid.Show>
 		</CardEls.Card>
 	);
 };
 
-const PreviewCard: Component<{
-	card: CardInstance;
+const PreviewCard: Solid.Component<{
+	card: DB.CardInstance;
 }> = props => {
 	return (
 		<CardEls.Card
@@ -502,25 +483,25 @@ const PreviewCard: Component<{
 					? FULL_ART_BACKGROUND_CSS
 					: props.card.rarityColor
 			}>
-			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+			<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
 				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
-			</Show>
-			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+			</Solid.Show>
+			<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber
 					color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
 					{cardUtils.formatCardNumber(props.card)}
 				</CardEls.CardNumber>
-			</Show>
-			<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+			</Solid.Show>
+			<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
 				<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
-			</Show>
+			</Solid.Show>
 		</CardEls.Card>
 	);
 };
 
-const InstanceCard: Component<{
-	card: CardInstance;
+const InstanceCard: Solid.Component<{
+	card: DB.CardInstance;
 }> = props => {
 	return (
 		<CardEls.Card
@@ -533,24 +514,24 @@ const InstanceCard: Component<{
 					? FULL_ART_BACKGROUND_CSS
 					: props.card.rarityColor
 			}>
-			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+			<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
 				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
-			</Show>
-			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+			</Solid.Show>
+			<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber
 					color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
 					{cardUtils.formatCardNumber(props.card)}
 				</CardEls.CardNumber>
-			</Show>
-			<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+			</Solid.Show>
+			<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
 				<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
-			</Show>
+			</Solid.Show>
 		</CardEls.Card>
 	);
 };
 
-function checkAreRulesEmpty(rules: CollectionRules) {
+function checkAreRulesEmpty(rules: DB.CollectionRules) {
 	return Object.values(rules).filter(v => v !== null).length === 0;
 }
 
