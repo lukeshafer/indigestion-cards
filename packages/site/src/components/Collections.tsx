@@ -443,7 +443,10 @@ const CardCheckbox: Solid.ParentComponent<{
 const DesignCard: Solid.Component<{
 	design: DB.CardDesign;
 }> = props => {
-	const rarityId = () => props.design.bestRarityFound?.rarityId ?? '';
+	const rarityId = () =>
+		props.design.rarityDetails?.slice().sort((a, b) => b.count - a.count)[0].rarityId ??
+		props.design.bestRarityFound?.rarityId ??
+		'';
 
 	return (
 		<CardEls.Card

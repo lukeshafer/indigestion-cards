@@ -18,6 +18,7 @@ import {
 	onMount,
 	createContext,
 	useContext,
+	onCleanup,
 } from 'solid-js';
 import { trpc } from '@site/client/api';
 import { routes } from '@site/constants';
@@ -139,7 +140,9 @@ const UserIdentitySection: Component = () => {
 	const ctx = useContext(UserPageContext);
 
 	return (
-		<div class="top-8 mx-auto w-fit min-w-96 md:sticky">
+		<div
+			class="scrollbar-narrow top-8 mx-auto w-fit min-w-96 overflow-y-scroll pb-4 md:sticky"
+			ref={setupHeightCorrection}>
 			<section
 				style={{ 'grid-template-rows': `repeat(1,${IMG_SIZE / 2}px)` }}
 				class="grid w-fit content-center gap-x-4">
@@ -183,6 +186,35 @@ const UserIdentitySection: Component = () => {
 		</div>
 	);
 };
+
+function setupHeightCorrection(el: HTMLElement) {
+	const initialHeight = el.getBoundingClientRect().height;
+	const adjustElHeight = () => {
+		let domRect = el.getBoundingClientRect();
+
+		if (domRect.bottom > window.innerHeight) {
+			let delta = domRect.bottom - window.innerHeight;
+			el.style.height = `${domRect.height - delta}px`;
+		} else if (domRect.height < initialHeight) {
+			let delta = window.innerHeight - domRect.bottom;
+			let newH = domRect.height + delta;
+
+			if (newH > initialHeight) {
+				el.style.height = '100%';
+			} else {
+				el.style.height = `${newH}px`;
+			}
+		}
+	};
+
+	window.addEventListener('resize', adjustElHeight);
+	window.addEventListener('scroll', adjustElHeight);
+
+	onCleanup(() => {
+		window.removeEventListener('resize', adjustElHeight);
+		window.removeEventListener('scroll', adjustElHeight);
+	});
+}
 
 const UserLookingFor: Component = () => {
 	const ctx = useContext(UserPageContext);
