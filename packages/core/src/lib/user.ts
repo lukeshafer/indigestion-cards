@@ -330,5 +330,5 @@ export async function loadAllUsersPageData(): Promise<AllUserPageData> {
 
 export async function refreshAllUsersPageData(): Promise<void> {
 	const summary = setupAllUsersPageData();
-	await summary.refresh('data');
+	await summary.refresh('all');
 }
