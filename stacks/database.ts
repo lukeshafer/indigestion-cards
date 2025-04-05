@@ -7,7 +7,7 @@ export function Database({ stack }: StackContext) {
 	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
 
 	const table = new Table(stack, 'data', {
-		stream: 'new_image',
+		stream: 'new_and_old_images',
 		fields: {
 			pk: 'string',
 			sk: 'string',
@@ -86,6 +86,13 @@ export function Database({ stack }: StackContext) {
 			filters: [entityFilter(['season', 'cardDesign', 'cardInstance', 'rarity'])],
 			function: {
 				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
+			},
+		},
+		refreshUserCards: {
+			filters: [entityFilter(['user', 'cardInstance', 'trade'])],
+			function: {
+				handler: 'packages/functions/src/table-consumers/refresh-user-cards.handler',
 				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
 			},
 		},

@@ -16,6 +16,7 @@ export function pick<Obj extends Record<any, any>, Keys extends ReadonlyArray<ke
 	return output;
 }
 
+export type InferSummary<S extends Summary<unknown>> = S extends Summary<infer T> ? T : never;
 export class Summary<T> {
 	static #s3: null | S3Client = null;
 	static get s3(): S3Client {
@@ -39,17 +40,28 @@ export class Summary<T> {
 	}
 
 	async refresh(key: string): Promise<T> {
-		let data = this.schema.parse(await this.loader(key));
+		console.log('Retrieving refreshed data');
+    let rawData = await this.loader(key);
+		let result = this.schema.safeParse(rawData);
 
-		await Summary.s3.send(
-			new PutObjectCommand({
-				Bucket: Bucket.DataSummaries.bucketName,
-				Key: `${this.prefix}/${key}`,
-				Body: JSON.stringify(data),
-			})
-		);
+    if (!result.success) {
+      console.log("UH OH!")
+      console.log(result.error.message)
+      throw result.error
+    }
 
-    return data
+		console.log('Putting data in S3');
+		await Summary.s3
+			.send(
+				new PutObjectCommand({
+					Bucket: Bucket.DataSummaries.bucketName,
+					Key: `${this.prefix}/${key}`,
+					Body: JSON.stringify(result.data),
+				})
+			)
+			.then(() => console.log('Put complete.'));
+
+		return data;
 	}
 
 	async get(key: string): Promise<T> {
@@ -70,14 +82,14 @@ export class Summary<T> {
 		} catch (e) {
 			console.error(e);
 			console.log(`Unable to locate ${path}. Generating...`);
-			return this.refresh(key)
+			return await this.refresh(key);
 		}
 
 		let result = this.schema.safeParse(JSON.parse(body));
 
 		if (result.success === false) {
 			console.log(`Existing ${path} uses invalid schema. Re-generating...`);
-			return this.refresh(key);
+			return await this.refresh(key);
 		}
 
 		return result.data;

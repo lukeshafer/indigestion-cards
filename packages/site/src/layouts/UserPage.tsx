@@ -33,6 +33,7 @@ import type { TwitchUser } from '@core/lib/twitch';
 import { pushAlert } from '@site/client/state';
 import { createMutableProp } from '@site/client/reactive';
 import { formatCollectionViewTransitionId } from '@site/components/Collections';
+import type { UserCardsSummaryCard, UserCardsSummaryDesign } from '@core/lib/user';
 
 const UserPageContext = createContext({
 	user: {} as User,
@@ -40,7 +41,10 @@ const UserPageContext = createContext({
 	twitchData: null as TwitchUser | null,
 	packs: [] as Array<PackCardsHidden>,
 	cards: [] as Array<CardInstance>,
+	view: 'season' as UserCardsView,
 });
+
+type UserCardsView = 'all' | 'season';
 
 export const UserPage: Component<{
 	user: User;
@@ -53,6 +57,8 @@ export const UserPage: Component<{
 	cursor: string | null;
 	initialFilters: Filters;
 }> = props => {
+	const [view, setView] = createSignal<UserCardsView>('season');
+
 	return (
 		<UserPageContext.Provider
 			value={{
@@ -70,6 +76,12 @@ export const UserPage: Component<{
 				},
 				get cards() {
 					return props.cards;
+				},
+				get view() {
+					return view();
+				},
+				set view(value) {
+					setView(value);
 				},
 			}}>
 			<div class="h-fit md:flex">
@@ -123,10 +135,18 @@ export const UserPage: Component<{
 						<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
 							{props.collectionData.length ? 'All Cards' : 'Cards'}
 						</h2>
-						<UserCardList
-							initialCursor={props.cursor ?? undefined}
-							initialFilters={props.initialFilters}
-						/>
+						<CardListViewSelector />
+						<Switch>
+							<Match when={view() === 'all'}>
+								<UserCardList
+									initialCursor={props.cursor ?? undefined}
+									initialFilters={props.initialFilters}
+								/>
+							</Match>
+							<Match when={view() === 'season'}>
+								<CardsSeasonViewList />
+							</Match>
+						</Switch>
 					</section>
 				</div>
 			</div>
@@ -899,3 +919,147 @@ const Lock: Component<{ isLocked: boolean }> = props => (
 		<div class="absolute left-1/2 top-1/2 h-2 w-1 -translate-x-1/2 -translate-y-1/2 bg-[--lock-color] transition-all duration-100 ease-in-out"></div>
 	</div>
 );
+
+const CardListViewSelector: Component = () => {
+	const ctx = useContext(UserPageContext);
+
+	return (
+		<fieldset class="flex justify-center">
+			<label
+				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+				data-checked={ctx.view === 'all'}>
+				<input
+					type="radio"
+					name="listView"
+					value="all"
+					class="sr-only"
+					checked={ctx.view === 'all'}
+					onChange={() => (ctx.view = 'all')}
+				/>
+				<p>Standard View</p>
+			</label>
+			<label
+				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+				data-checked={ctx.view === 'season'}>
+				<input
+					type="radio"
+					name="listView"
+					value="season"
+					class="sr-only"
+					checked={ctx.view === 'season'}
+					onChange={() => (ctx.view = 'season')}
+				/>
+				<p>Season View</p>
+			</label>
+		</fieldset>
+	);
+};
+
+const CardsSeasonViewList: Component = () => {
+	const ctx = useContext(UserPageContext);
+
+	const [data, resource] = createResource(
+		() => ctx.user.username,
+		async username => await trpc.userCards.summary.query({ username }),
+		{
+			initialValue: {
+				userId: ctx.user.userId,
+				username: ctx.user.username,
+				seasons: [],
+			},
+			ssrLoadFrom: 'initial',
+		}
+	);
+
+	onMount(() => {
+		resource.refetch();
+	});
+
+	return (
+		<div>
+			<For each={data.latest?.seasons}>
+				{season => (
+					<section class="p-4">
+						<h3 class="font-display p-4 text-center text-2xl font-bold">
+							{season.seasonName}
+						</h3>
+						<ul>
+							<For each={season.designs}>
+								{design => (
+									<li>
+										<Show
+											when={design.cards.at(0)}
+											fallback={
+												<CardsSeasonViewListEmptyItem design={design} />
+											}>
+											{card => (
+												<CardsSeasonViewListItem
+													design={design}
+													card={card()}
+												/>
+											)}
+										</Show>
+									</li>
+								)}
+							</For>
+						</ul>
+					</section>
+				)}
+			</For>
+		</div>
+	);
+};
+
+const CardsSeasonViewListItem: Component<{
+	design: UserCardsSummaryDesign;
+	card: UserCardsSummaryCard;
+}> = props => {
+	return (
+		<div class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
+			<CardEls.FullAnimatedCardEffect
+				disableTiltOnTouch
+				glowColor={
+					cardUtils.checkIsFullArt(props.card.rarityId)
+						? undefined
+						: props.card.rarityColor
+				}>
+				<CardEls.Card
+					lazy={false}
+					alt={props.design.cardName}
+					imgSrc={cardUtils.getCardImageUrl({
+						rarityId: props.card.rarityId,
+						designId: props.design.designId,
+					})}
+					viewTransitionName={`card-${props.card.instanceId}`}
+					background={
+						cardUtils.checkIsFullArt(props.card.rarityId)
+							? FULL_ART_BACKGROUND_CSS
+							: props.card.rarityColor
+					}>
+					<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+						<CardEls.CardName>{props.design.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>
+							{props.design.cardDescription}
+						</CardEls.CardDescription>
+					</Show>
+					<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+						<CardEls.CardNumber
+							color={
+								cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'
+							}>
+							{cardUtils.formatCardNumber(props.card)}
+						</CardEls.CardNumber>
+					</Show>
+					<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+						<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+					</Show>
+				</CardEls.Card>
+			</CardEls.FullAnimatedCardEffect>
+		</div>
+	);
+};
+const CardsSeasonViewListEmptyItem: Component<{
+	design: UserCardsSummaryDesign;
+}> = props => {
+	return <p>{props.design.cardName}</p>;
+};

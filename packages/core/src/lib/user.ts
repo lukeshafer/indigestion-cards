@@ -4,8 +4,11 @@ import type { CardInstance, CreateUser, User, UserLogin } from '../db.types';
 import { getUserByLogin } from '../lib/twitch';
 import { batchUpdateCardUsernames } from './card';
 import { batchUpdatePackUsername } from './pack';
-import { Summary } from './utils';
+import { lazy, Summary, type InferSummary } from './utils';
 import { getAllPreorders } from './preorder';
+import { InputValidationError } from './errors';
+import { getAllCardDesigns } from './design';
+import { getAllSeasons } from './season';
 
 export async function getUser(userId: string) {
 	const user = await db.entities.Users.get({ userId }).go();
@@ -331,4 +334,108 @@ export async function loadAllUsersPageData(): Promise<AllUserPageData> {
 export async function refreshAllUsersPageData(): Promise<void> {
 	const summary = setupAllUsersPageData();
 	await summary.refresh('all');
+}
+
+export type UserCardsSummary = InferSummary<typeof userCardsSummary>;
+export type UserCardsSummarySeason = UserCardsSummary['seasons'][number];
+export type UserCardsSummaryDesign = UserCardsSummarySeason['designs'][number];
+export type UserCardsSummaryCard = UserCardsSummaryDesign['cards'][number];
+const userCardsSummary = lazy(
+	() =>
+		new Summary({
+			prefix: 'user-cards',
+			schema: z.object({
+				userId: z.string(),
+				username: z.string(),
+				seasons: z.array(
+					z.object({
+						seasonId: z.string(),
+						seasonName: z.string(),
+						designs: z.array(
+							z.object({
+								designId: z.string(),
+								cardName: z.string(),
+								cardDescription: z.string(),
+								cards: z.array(
+									z.object({
+										instanceId: z.string(),
+										rarityColor: z.string(),
+										rarityId: z.string(),
+										cardNumber: z.number(),
+										totalOfType: z.number(),
+										stamps: z.array(z.string()).optional(),
+									})
+								),
+							})
+						),
+					})
+				),
+			}),
+			loader: async username => {
+				let seasons = await getAllSeasons();
+				let designs = await getAllCardDesigns();
+
+				let userData = await getUserAndOpenedCardInstances({ username });
+				if (!userData) throw new InputValidationError('User not found.');
+
+				let {
+					Users: [user],
+					CardInstances: cards,
+				} = userData;
+
+				const ownedDesigns = new Map<string, Array<CardInstance>>();
+				for (let card of cards) {
+					let designCards = ownedDesigns.get(card.designId) ?? [];
+					ownedDesigns.set(card.designId, [...designCards, card]);
+				}
+
+				let data = {
+					userId: user.userId,
+					username: user.username,
+					seasons: seasons
+						.map(s => ({
+							seasonId: s.seasonId,
+							seasonName: s.seasonName,
+							designs: designs
+								.filter(d => d.seasonId === s.seasonId)
+								.sort((a, b) => a.cardName.localeCompare(b.cardName))
+								.map(d => ({
+									designId: d.designId,
+									cardName: d.cardName,
+									cardDescription: d.cardDescription,
+									cards: (ownedDesigns.get(d.designId) ?? [])
+										.map(c => ({
+											instanceId: c.instanceId,
+											rarityColor: c.rarityColor,
+											rarityId: c.rarityId,
+											rarityRank: c.rarityRank,
+											cardNumber: c.cardNumber,
+											totalOfType: c.totalOfType,
+											stamps: c.stamps,
+										}))
+										.sort((a, b) => a.rarityRank - b.rarityRank),
+								})),
+						}))
+						.sort((a, b) => {
+							if (a.seasonId === 'moments') {
+								return 1;
+							} else if (b.seasonId === 'moments') {
+								return -1;
+							} else return a.seasonName.localeCompare(b.seasonName);
+						}),
+				};
+
+				console.log(data);
+
+				return data;
+			},
+		})
+);
+
+export async function loadUserCards(username: string): Promise<UserCardsSummary> {
+	return userCardsSummary.get(username);
+}
+
+export async function refreshUserCards(username: string): Promise<void> {
+	await userCardsSummary.refresh(username);
 }
