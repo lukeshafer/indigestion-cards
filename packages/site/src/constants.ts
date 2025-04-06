@@ -1,30 +1,3 @@
-/** Only routes that are accessible without logging in */
-export const PUBLIC_ROUTES = [
-	'/',
-	'/users',
-	'/users/*',
-	'/404',
-	'/admin',
-	'/api/get-all-usernames',
-	'/api/search',
-	'/api/auth/*',
-	'/api/user/*',
-	'/cards',
-	'/cards/*',
-	'/login',
-	'/logout',
-	'/data/usernames',
-	'/trades/*',
-	'/data/*',
-  '/trpc/*',
-  '/trpc',
-  '/_actions',
-  '/_actions/*',
-] as const;
-
-/** Routes that aren't admin only, but require a user login */
-export const USER_ROUTES = ['/trades', '/api/trades', '/api/trades/*'];
-
 /** Admin Api routes */
 const api_paths = {
 	PACK_TYPE: '/pack-type',
@@ -62,21 +35,6 @@ export function resolveLocalPath(path: string) {
 		return `https://${import.meta.env.DOMAIN_NAME}${path}`;
 	}
 }
-
-/** User API Routes */
-const user_api_paths = {
-	USER: '/user',
-	TRADE: '/trade',
-	CARD: '/card',
-};
-
-export const USER_API = new Proxy(user_api_paths, {
-	get: (target, prop) => {
-		if (!(prop in target)) return undefined;
-		const path = target[prop as keyof typeof target];
-		return '/api/user' + path;
-	},
-});
 
 /** Public API routes */
 export const publicApi = {
@@ -119,7 +77,7 @@ export const routeNames = {
 } as const;
 
 export const ASSETS = {
-	FAVICON: '/assets/favicon.png',
+	// FAVICON: '/assets/favicon.png',
 	LOGO: '/assets/logo.png',
 	TONGLE: '/assets/lilindpartner.webp',
 	EMOTES: {
@@ -161,3 +119,5 @@ export const NO_CARDS_OPENED_ID = 'no-cards-opened';
 export const SHIT_PACK_RARITY_ID = 'bronze';
 
 export const UNTRADEABLE_RARITY_IDS = [LEGACY_CARD_ID, 'moments'];
+
+export const INVALID_PACK_ID = "invalid";

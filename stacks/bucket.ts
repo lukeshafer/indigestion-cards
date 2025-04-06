@@ -3,7 +3,7 @@ import { Database } from './database';
 import { getDomainName } from './constants';
 
 export function DesignBucket({ stack, app }: StackContext) {
-	const db = use(Database);
+	const { table } = use(Database);
 	const domainName = getDomainName(stack.stage);
 	const origin = `https://${domainName}`;
 
@@ -21,8 +21,8 @@ export function DesignBucket({ stack, app }: StackContext) {
 		},
 		defaults: {
 			function: {
-				bind: [db],
-				runtime: 'nodejs18.x',
+				bind: [table],
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -41,8 +41,8 @@ export function DesignBucket({ stack, app }: StackContext) {
 		},
 		defaults: {
 			function: {
-				bind: [db],
-				runtime: 'nodejs18.x',
+				bind: [table],
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -56,7 +56,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		],
 		defaults: {
 			function: {
-				bind: [db],
+				bind: [table],
 			},
 		},
 	});
@@ -70,7 +70,7 @@ export function DesignBucket({ stack, app }: StackContext) {
 		],
 		defaults: {
 			function: {
-				bind: [db],
+				bind: [table],
 			},
 		},
 	});

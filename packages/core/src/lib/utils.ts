@@ -1,4 +1,6 @@
-import type { LibraryOutput } from '../session.types';
+import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { Bucket } from 'sst/node/bucket';
+import type { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function pick<Obj extends Record<any, any>, Keys extends ReadonlyArray<keyof Obj>>(
@@ -14,24 +16,82 @@ export function pick<Obj extends Record<any, any>, Keys extends ReadonlyArray<ke
 	return output;
 }
 
-export function LibraryFn<CB extends (...args: any[]) => any>(
-	cb: CB
-): (...args: Parameters<CB>) => Promise<LibraryOutput<Awaited<ReturnType<CB>>>> {
-	return async (...args: Parameters<CB>) => {
-		try {
-			return { success: true, data: await cb(...args) };
-		} catch (error) {
-			return { success: false, error };
+export class Summary<T> {
+	static #s3: null | S3Client = null;
+	static get s3(): S3Client {
+		if (Summary.#s3 == null) {
+			Summary.#s3 = new S3Client();
 		}
-	};
+		return Summary.#s3;
+	}
+
+	prefix: string;
+	schema: z.ZodSchema<T>;
+	loader: (key: string) => Promise<T>;
+	constructor(args: {
+		schema: z.ZodSchema<T>;
+		prefix: string;
+		loader: (key: string) => Promise<T>;
+	}) {
+		this.schema = args.schema;
+		this.prefix = args.prefix;
+		this.loader = args.loader;
+	}
+
+	async refresh(key: string): Promise<T> {
+		let data = this.schema.parse(await this.loader(key));
+
+		await Summary.s3.send(
+			new PutObjectCommand({
+				Bucket: Bucket.DataSummaries.bucketName,
+				Key: `${this.prefix}/${key}`,
+				Body: JSON.stringify(data),
+			})
+		);
+
+    return data
+	}
+
+	async get(key: string): Promise<T> {
+		const path = `${this.prefix}/${key}`;
+		console.log(`Attempting to fetch ${path} from S3`);
+		let body;
+		try {
+			let object = await Summary.s3.send(
+				new GetObjectCommand({
+					Bucket: Bucket.DataSummaries.bucketName,
+					Key: path,
+				})
+			);
+			body = await object.Body?.transformToString();
+			if (body == undefined) {
+				throw new Error('Body not found.');
+			}
+		} catch (e) {
+			console.error(e);
+			console.log(`Unable to locate ${path}. Generating...`);
+			return this.refresh(key)
+		}
+
+		let result = this.schema.safeParse(JSON.parse(body));
+
+		if (result.success === false) {
+			console.log(`Existing ${path} uses invalid schema. Re-generating...`);
+			return this.refresh(key);
+		}
+
+		return result.data;
+	}
 }
 
-export function Unwrap<Data>(libraryOutput: Promise<LibraryOutput<Data>>): Promise<Data> {
-	return libraryOutput.then(item => {
-		if (item.success) {
-			return item.data;
-		} else {
-			throw item.error;
-		}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function lazy<T extends Record<any, any>>(getter: () => T): T {
+	let object: T | null = null;
+
+	return new Proxy<T>({} as T, {
+		get(_, p: keyof T) {
+			if (object == null) object = getter();
+			return object[p];
+		},
 	});
 }

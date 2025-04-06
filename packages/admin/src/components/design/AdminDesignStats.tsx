@@ -1,10 +1,10 @@
 import { Index, createSignal } from 'solid-js';
-import type { RarityStats } from '@core/lib/stats';
+import type { AdminRarityStats } from '@core/lib/stats';
 import Table from '@admin/components/table/Table';
 import { routes } from '@admin/constants';
 import { Checkbox } from '@admin/components/form/Form';
 
-export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[] }) {
+export default function AdminDesignStats(props: { rarityStatsArray: AdminRarityStats[] }) {
 	const [hideUnowned, setHideUnowned] = createSignal(false);
 
 	return (
@@ -24,7 +24,7 @@ export default function AdminDesignStats(props: { rarityStatsArray: RarityStats[
 	);
 }
 
-function RarityStatsTable(props: RarityStats & { hideUnowned: boolean }) {
+function RarityStatsTable(props: AdminRarityStats & { hideUnowned: boolean }) {
 	const rows = () =>
 		props.instances.filter((instance) => !props.hideUnowned || instance?.username);
 

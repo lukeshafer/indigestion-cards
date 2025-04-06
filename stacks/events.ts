@@ -2,9 +2,10 @@ import { StackContext, EventBus, Queue, use } from 'sst/constructs';
 import { Database } from './database';
 import { ConfigStack } from './config';
 import { WebsocketsAPI } from './websockets-api';
+import { Duration } from 'aws-cdk-lib/core';
 
 export function Events({ stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const config = use(ConfigStack);
 	const { wsApi, wsConnectionsTable } = use(WebsocketsAPI);
 
@@ -18,14 +19,16 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'DLQ',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
 
 	const packQueue = new Queue(stack, 'queue', {
+
 		cdk: {
 			queue: {
+        visibilityTimeout: Duration.seconds(60),
 				deadLetterQueue: {
 					maxReceiveCount: 5,
 					queue: dlq.cdk.queue,
@@ -50,7 +53,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: give-pack-to-user',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 			cdk: {
 				eventSource: {
@@ -70,7 +73,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'trade-DLQ',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -94,7 +97,7 @@ export function Events({ stack }: StackContext) {
 					SESSION_USERNAME: 'Event: process-trade',
 					SESSION_TYPE: 'admin',
 				},
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 			cdk: {
 				eventSource: {
@@ -123,7 +126,7 @@ export function Events({ stack }: StackContext) {
 								config.TWITCH_CLIENT_SECRET,
 							],
 							permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-							runtime: 'nodejs18.x',
+							runtime: 'nodejs22.x',
 						},
 					},
 				},

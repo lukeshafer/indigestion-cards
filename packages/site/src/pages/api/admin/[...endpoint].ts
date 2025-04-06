@@ -4,14 +4,10 @@ import { Api } from 'sst/node/api';
 
 // Re-route all API requests to the API server
 export const ALL: APIRoute = async ctx => {
-	const log = (...args: unknown[]) => console.log({
-    endpoint: ctx.params.endpoint,
-  }, ...args);
-
 	const route = `${Api.AdminApi.url}/${ctx.params.endpoint}${ctx.url.search}`;
 	const token = ctx.cookies.get(AUTH_TOKEN);
 
-	log('Fetching from API: ', ctx.params.endpoint);
+	console.log('Fetching from /api/admin: ', ctx.params.endpoint);
 
 	const res = await fetch(route, {
 		body: ctx.request.body ?? undefined,
@@ -24,5 +20,5 @@ export const ALL: APIRoute = async ctx => {
 		duplex: 'half',
 	});
 
-  return res
+	return res;
 };

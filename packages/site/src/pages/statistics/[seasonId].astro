@@ -1,0 +1,22 @@
+---
+import { SeasonStatisticsPage } from '@site/layouts/StatisticsPage';
+import { getSeasonStatistics } from '@core/lib/stats';
+import Page from '@site/layouts/Page.astro';
+
+const seasonId = Astro.params.seasonId!;
+
+let stats;
+try {
+	stats = await getSeasonStatistics(seasonId);
+} catch (e) {
+	console.log(e);
+	return Astro.redirect('/404?alert=Season does not exist.');
+}
+---
+
+<Page
+	title="Statistics"
+	breadcrumbs={[{ label: 'Statistics', href: '/statistics' }, { label: stats.season.seasonName }]}
+	pageType="public">
+	<SeasonStatisticsPage {stats} client:load />
+</Page>

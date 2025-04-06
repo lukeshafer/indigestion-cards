@@ -6,7 +6,8 @@ import CardList from '@site/components/CardList';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { routes } from '@site/constants';
 import { DeleteButton } from '@site/components/Form';
-import { actions } from 'astro:actions';
+import { trpc } from '@site/client/api';
+import { formatCollectionViewTransitionId } from '@site/components/Collections';
 
 const IMG_SIZE = 60;
 export const UserCollectionPage: Component<{
@@ -41,20 +42,14 @@ export const UserCollectionPage: Component<{
 								const username = props.user.username;
 								const collection = props.collection;
 
-								actions.collections
-									.deleteCollection({
-										collectionId: collection.collectionId,
-									})
-									.then(result => {
-										if (result.error) {
-											// TODO: handle the error
-											console.error(result.error);
-										} else {
-											location.assign(
-												`${routes.USERS}/${username}?alert=Successfully%20deleted%20collection%20"${encodeURIComponent(collection.collectionName)}"`
-											);
-										}
-									});
+								trpc.collections.delete
+									.mutate({ collectionId: collection.collectionId })
+									.catch(error => console.error(error))
+									.then(() =>
+										location.assign(
+											`${routes.USERS}/${username}?alert=Successfully%20deleted%20collection%20"${encodeURIComponent(collection.collectionName)}"`
+										)
+									);
 							}}
 							confirm="Are you sure you want to delete this collection? You will not lose any cards, but you will not be able to recover the collection without re-creating it.">
 							Delete collection
@@ -69,6 +64,7 @@ export const UserCollectionPage: Component<{
 								href={`${routes.USERS}/${card.username?.toLowerCase()}/${card.instanceId ?? ''}`}
 								class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 								<CardEls.FullAnimatedCardEffect
+									disableTiltOnTouch
 									glowColor={
 										cardUtils.checkIsFullArt(card.rarityId)
 											? undefined
@@ -78,7 +74,10 @@ export const UserCollectionPage: Component<{
 										lazy={index() > 10}
 										alt={card.cardName}
 										imgSrc={cardUtils.getCardImageUrl(card)}
-										viewTransitionName={`card-${card.instanceId}`}
+										viewTransitionName={formatCollectionViewTransitionId({
+											cardId: card.instanceId,
+											collectionId: props.collection.collectionId,
+										})}
 										background={
 											cardUtils.checkIsFullArt(card.rarityId)
 												? FULL_ART_BACKGROUND_CSS

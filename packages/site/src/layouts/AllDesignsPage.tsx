@@ -1,113 +1,78 @@
-import {
-	CardList,
-	CardListFilter,
-	CardListMenu,
-	CardListSearch,
-	CardListSortDropdown,
-	filterCards,
-	parseUniqueSeasons,
-	type Filters,
-} from '@site/components/CardList';
-import { getCardSearcher, sortCardsByName } from '@site/lib/client/utils';
-import { createMemo, createSignal, Show, type Component } from 'solid-js';
+import * as List from '@site/components/CardList';
+import * as Solid from 'solid-js';
+import * as Card from '@site/components/Card';
 import type { RarityRankingRecord } from '@core/lib/site-config';
+import type { AllDesignsPageData } from '@core/lib/design';
 import { routes } from '@site/constants';
-import {
-	checkIsSecret,
-	Card,
-	FullAnimatedCardEffect,
-	getCardImageUrl,
-	checkIsFullArt,
-	FULL_ART_BACKGROUND_CSS,
-	checkIfCanShowCardText,
-	CardName,
-	CardDescription,
-	CardLinkWrapper,
-} from '@site/components/Card';
-import type { CardDesign } from '@core/types';
 
-export const AllDesignsCardList: Component<{
-	initialCards: CardDesign[];
+export const AllDesignsCardList: Solid.Component<{
+	initialCards: AllDesignsPageData;
 	rarityRanking?: RarityRankingRecord;
-	initialFilters: Filters;
+	initialFilters: List.Filters;
 }> = props => {
-	const [sortOrder, setSortOrder] = createSignal<'asc' | 'desc'>('asc');
-	const [filters, setFilters] = createSignal(props.initialFilters);
-	const [searchText, setSearchText] = createSignal('');
+	const [cards, state] = List.createCardList(() => props.initialCards, {
+		default: { sortType: 'card-name-asc', filters: props.initialFilters },
+	});
 
-	const seasons = () => parseUniqueSeasons(props.initialCards);
-	const filteredCards = () => filterCards(props.initialCards, filters());
-
-	const sortedCards = createMemo(() =>
-		filteredCards().slice().sort(sortCardsByName(sortOrder()))
-	);
-
-	const searcher = createMemo(() => getCardSearcher(sortedCards()));
-
-	const cards = () => (searchText() ? searcher()(searchText()) : sortedCards());
+	const seasons = () => List.parseUniqueSeasons(props.initialCards);
 
 	return (
 		<div>
-			<CardListMenu>
-				<CardListSearch setSearchText={setSearchText} />
-				<CardListSortDropdown
-					sortTypes={['card-name-asc', 'card-name-desc']}
-					setSort={sortType => {
-						if (sortType === 'card-name-desc') {
-							setSortOrder('desc');
-						} else {
-							setSortOrder('asc');
-						}
-					}}
+			<List.CardListMenu>
+				<List.CardListSearch setSearchText={state.setSearchText} />
+				<List.CardListSortDropdown
+					sortTypes={['card-name-asc', 'card-name-desc', 'rarest', 'common']}
+					setSort={state.setSortType}
+					default="card-name-asc"
 				/>
-				<CardListFilter
+				<List.CardListFilter
 					params={{ seasons: seasons() }}
-					setFilters={setFilters}
-					ssrFilters={/*@once*/ props.initialFilters}
+					setFilters={state.setFilters}
+					ssrFilters={props.initialFilters}
 				/>
-			</CardListMenu>
-			<CardList cards={cards()}>
+			</List.CardListMenu>
+			<List.CardList cards={cards()}>
 				{(card, index) => <AllDesignsCardListItem card={card} lazy={index() > 5} />}
-			</CardList>
+			</List.CardList>
 		</div>
 	);
 };
 
-const AllDesignsCardListItem: Component<{
-	card: CardDesign;
+const AllDesignsCardListItem: Solid.Component<{
+	card: AllDesignsPageData[number];
 	lazy: boolean;
 }> = props => {
-	const rarityId = () => props.card.bestRarityFound?.rarityId ?? '';
+	const rarityId = () => props.card.rarityId;
 	const background = () =>
-		checkIsFullArt(rarityId())
-			? FULL_ART_BACKGROUND_CSS
-			: props.card.bestRarityFound?.rarityColor;
+		Card.checkIsFullArt(rarityId()) ? Card.FULL_ART_BACKGROUND_CSS : props.card.rarityColor;
 
 	const card = (
-		<FullAnimatedCardEffect glowColor={background()}>
-			<Card
+		<Card.FullAnimatedCardEffect
+			glowColor={Card.checkIsFullArt(rarityId()) ? undefined : background()}
+			disableTiltOnTouch>
+			<Card.Card
 				lazy={props.lazy}
 				scale="var(--card-scale)"
 				alt={props.card.cardName}
 				viewTransitionName={`design-${props.card.designId}`}
-				imgSrc={getCardImageUrl({
+				imgSrc={Card.getCardImageUrl({
 					designId: props.card.designId,
 					rarityId: rarityId(),
 				})}
 				background={background()}>
-				<Show when={checkIfCanShowCardText(rarityId())}>
-					<CardName>{props.card.cardName}</CardName>
-					<CardDescription>{props.card.cardDescription}</CardDescription>
-				</Show>
-			</Card>
-		</FullAnimatedCardEffect>
+				<Solid.Show when={Card.checkIfCanShowCardText(rarityId())}>
+					<Card.CardName>{props.card.cardName}</Card.CardName>
+					<Card.CardDescription>{props.card.cardDescription}</Card.CardDescription>
+				</Solid.Show>
+			</Card.Card>
+		</Card.FullAnimatedCardEffect>
 	);
 
 	return (
-		<Show when={!checkIsSecret(rarityId())} fallback={card}>
-			<CardLinkWrapper href={`${routes.INSTANCES}/${props.card.designId}`}>
+		<Solid.Show when={!Card.checkIsSecret(rarityId())} fallback={card}>
+			<Card.CardLinkWrapper href={`${routes.INSTANCES}/${props.card.designId}`}>
 				{card}
-			</CardLinkWrapper>
-		</Show>
+			</Card.CardLinkWrapper>
+		</Solid.Show>
 	);
 };

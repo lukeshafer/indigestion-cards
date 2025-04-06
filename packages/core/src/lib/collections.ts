@@ -1,13 +1,26 @@
 import { randomUUID } from 'crypto';
 import { db } from '../db';
-import type { CardInstance, Collection, CollectionCards, CollectionRules } from '../db.types';
+import type { CardInstance, Collection, CollectionCards, CollectionRules, User } from '../db.types';
 import { getUser } from './user';
+
+type Output<T, Message = string> = Promise<
+	| {
+			success: true;
+			data: T;
+			message?: undefined;
+	  }
+	| {
+			success: false;
+			data?: undefined;
+			message: Message;
+	  }
+>;
 
 export async function createSetCollection(args: {
 	userId: string;
 	collectionName: string;
 	collectionCards: CollectionCards;
-}) {
+}): Output<{ user: Partial<User>; collection: Collection }, 'USER_DOES_NOT_EXIST'> {
 	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
 		return verifyResult;
@@ -16,7 +29,7 @@ export async function createSetCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName,
+		collectionName: args.collectionName.slice(0,50),
 		cards: args.collectionCards,
 		collectionType: 'set',
 	};
@@ -37,7 +50,7 @@ export async function createRuleCollection(args: {
 	userId: string;
 	collectionName: string;
 	collectionRules: CollectionRules;
-}) {
+}): Output<{ user: Partial<User>; collection: Collection }, 'USER_DOES_NOT_EXIST'> {
 	const verifyResult = await verifyUser(args);
 	if (!verifyResult.success) {
 		return verifyResult;
@@ -46,7 +59,7 @@ export async function createRuleCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName,
+		collectionName: args.collectionName.slice(0,50),
 		rules: args.collectionRules,
 		collectionType: 'rule',
 	};
@@ -75,7 +88,10 @@ async function verifyUser(args: { userId: string }) {
 	return { success: true, data: { user, existingCollections } } as const;
 }
 
-export async function deleteCollection(args: { userId: string; collectionId: string }) {
+export async function deleteCollection(args: {
+	userId: string;
+	collectionId: string;
+}): Output<Partial<User>, 'USER_DOES_NOT_EXIST'> {
 	const user = await getUser(args.userId);
 	if (!user) {
 		return { success: false, message: 'USER_DOES_NOT_EXIST' } as const;
@@ -91,7 +107,13 @@ export async function deleteCollection(args: { userId: string; collectionId: str
 	return { success: true, data: result.data } as const;
 }
 
-async function getCollection(args: { userId: string; collectionId: string }) {
+async function getCollection(args: {
+	userId: string;
+	collectionId: string;
+}): Output<
+	{ collection: Collection; user: User },
+	'USER_DOES_NOT_EXIST' | 'COLLECTION_DOES_NOT_EXIST'
+> {
 	const user = await getUser(args.userId);
 	if (!user) {
 		return { success: false, message: 'USER_DOES_NOT_EXIST' } as const;
@@ -104,7 +126,10 @@ async function getCollection(args: { userId: string; collectionId: string }) {
 	return { success: true, data: { collection, user } } as const;
 }
 
-export async function getCollectionCards(args: { userId: string; collectionId: string }) {
+export async function getCollectionCards(args: {
+	userId: string;
+	collectionId: string;
+}): Output<Array<CardInstance>, 'USER_DOES_NOT_EXIST' | 'COLLECTION_DOES_NOT_EXIST'> {
 	const collectionResult = await getCollection(args);
 	if (collectionResult.success === false) return collectionResult;
 
@@ -233,7 +258,10 @@ const buildCollectionCondition =
 		return conditionString;
 	};
 
-export async function getCollectionPreviewCards(args: { userId: string; collectionId: string }) {
+export async function getCollectionPreviewCards(args: {
+	userId: string;
+	collectionId: string;
+}): Output<Array<CardInstance>, 'USER_DOES_NOT_EXIST' | 'COLLECTION_DOES_NOT_EXIST'> {
 	const collectionResult = await getCollection(args);
 	if (collectionResult.success === false) return collectionResult;
 

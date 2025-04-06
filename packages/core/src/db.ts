@@ -414,6 +414,8 @@ const Packs = new Entity(
 		model: { entity: 'pack', version: '1', service: DB_SERVICE },
 		attributes: {
 			packId: { type: 'string', required: true },
+			packNumber: { type: 'number' },
+			packNumberPrefix: { type: 'string' },
 			packTypeId: { type: 'string', required: true },
 			packTypeName: { type: 'string', required: true },
 			seasonId: { type: 'string' },
@@ -541,6 +543,8 @@ const Seasons = new Entity(
 			seasonName: { type: 'string', required: true },
 			seasonDescription: { type: 'string' },
 			seasonId: { type: 'string', required: true },
+			nextPackNumber: { type: 'number', default: 0 },
+      packNumberPrefix: { type: 'string' },
 			...auditAttributes('season'),
 		},
 		indexes: {
@@ -902,6 +906,7 @@ const Users = new Entity(
 					stamps: { type: 'list', items: { type: 'string' } },
 				},
 			},
+			pinnedMessage: { type: 'string' },
 			collections: {
 				type: 'list',
 				items: CollectionAttributes,

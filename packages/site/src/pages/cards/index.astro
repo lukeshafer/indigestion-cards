@@ -1,12 +1,12 @@
 ---
 import Page from '@site/layouts/Page.astro';
 import { AllDesignsCardList } from '@site/layouts/AllDesignsPage';
-import { getAllCardDesigns } from '@core/lib/design';
+import { loadAllDesignsPageData } from '@core/lib/design';
 import { routeNames } from '@site/constants';
 import { PageTitle, PageHeader } from '@site/components/text';
 import { parseFiltersFromSearchParams } from '@site/components/CardList';
 
-const designs = getAllCardDesigns();
+const cards = await loadAllDesignsPageData();
 const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 ---
 
@@ -14,21 +14,6 @@ const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 	<PageHeader>
 		<PageTitle>All Cards</PageTitle>
 	</PageHeader>
-	{
-		designs.then(designs => (
-			<AllDesignsCardList
-				client:load
-				initialFilters={filters}
-				initialCards={designs.map(card => ({
-					...card,
-					rarityName: card.bestRarityFound?.rarityName ?? '',
-					rarityId: card.bestRarityFound?.rarityId ?? '',
-					frameUrl: card.bestRarityFound?.frameUrl ?? '',
-					rarityColor: card.bestRarityFound?.rarityColor ?? '',
-					totalOfType: card.bestRarityFound?.count ?? 1,
-					cardNumber: 1,
-				}))}
-			/>
-		))
-	}
+
+	<AllDesignsCardList client:load initialCards={cards} initialFilters={filters} />
 </Page>

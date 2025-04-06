@@ -2,10 +2,12 @@ import { createEffect, createSignal, Match, Show, Switch, For, type Component } 
 import { Anchor, Heading, PageTitle } from '@site/components/text';
 import type { CardDesign, CardInstance, User } from '@core/types';
 import { CardEls, CardPreview, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
-import { useViewTransition } from '@site/lib/client/utils';
-import { routes, USER_API } from '@site/constants';
+import { useViewTransition } from '@site/client/utils';
+import { routes,  } from '@site/constants';
 import { createTable, TableEls } from '@site/components/Table';
-import { Form, SubmitButton } from '@site/components/Form';
+import {  SubmitButton } from '@site/components/Form';
+import { trpc } from '@site/client/api';
+import { pushAlert } from '@site/client/state';
 
 export const CardInstancePage: Component<{
 	card: CardInstance;
@@ -16,6 +18,7 @@ export const CardInstancePage: Component<{
 	const isPinned = () => props.user?.pinnedCard?.instanceId === props.card.instanceId;
 	const isOwnedByLoggedInUser = () =>
 		props.user?.userId === props.card.userId && props.user?.userId;
+  console.log(props.user)
 
 	return (
 		<>
@@ -40,7 +43,7 @@ export const CardInstancePage: Component<{
 						</div>
 					)}
 				</Match>
-				<Match when={!isOwnedByLoggedInUser() && props.isTradeable}>
+				<Match when={props.user && !isOwnedByLoggedInUser() && props.isTradeable}>
 					<div class="mx-auto">
 						<Anchor
 							href={`${routes.TRADES}/new?receiverUsername=${props.card.username}&requestedCards=${props.card.instanceId}`}>
@@ -130,10 +133,10 @@ const CardInstanceInfo: Component<{ card: CardInstance; design: CardDesign }> = 
 					{props.card.cardName}
 				</a>
 			</p>
-      <p>
+			<p>
 				<b>Artist: </b>
 				{props.design.artist}
-      </p>
+			</p>
 			<p>
 				<b>Card Number: </b>
 				{props.card.cardNumber}
@@ -255,20 +258,29 @@ const PinCardToProfileButton: Component<{
 	const text = () => (isPinned() ? 'Unpin from profile' : 'Pin to profile');
 
 	return (
-		<Form action={USER_API.USER} method="patch" onsuccess={() => setIsPinnedUI(!isPinned())}>
-			<input type="hidden" name="userId" value={props.userId} />
-			<input
-				type="hidden"
-				name="pinnedCardId"
-				value={props.isPinned ? 'null' : props.instanceId}
-			/>
-			<input
-				type="hidden"
-				name="pinnedCardDesignId"
-				value={props.isPinned ? 'null' : props.designId}
-			/>
+		<form
+			onSubmit={async e => {
+				e.preventDefault();
+				await trpc.users.update
+					.mutate({
+						pinnedCardId: props.isPinned ? null : props.instanceId,
+						pinnedCardDesignId: props.isPinned ? null : props.designId,
+					})
+					.catch(() => {
+						pushAlert({
+							message: 'An error occurred while pinning the card.',
+							type: 'error',
+						});
+					});
+
+				setIsPinnedUI(!isPinned());
+				pushAlert({
+					message: 'Updated.',
+					type: 'success',
+				});
+			}}>
 			<SubmitButton>{text()}</SubmitButton>
-		</Form>
+		</form>
 	);
 };
 

@@ -8,13 +8,16 @@ import {
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { Dynamic, Portal } from 'solid-js/web';
-import { checkAreAnimationsDisabled } from '@site/lib/client/utils';
+import { checkAreAnimationsDisabled } from '@site/client/utils';
 
 export const checkIsFullArt = (rarityId: string): boolean => rarityId === FULL_ART_ID;
 export const checkIsLegacyCard = (rarityId: string) => rarityId === LEGACY_CARD_ID;
 export const checkIsSecret = (rarityId: string) => rarityId === NO_CARDS_OPENED_ID;
 export const checkIfCanShowCardText = (rarityId: string) =>
 	!(checkIsFullArt(rarityId) || checkIsLegacyCard(rarityId) || checkIsSecret(rarityId));
+
+export const checkIsMoment = (card: { seasonId: string }) =>
+	card.seasonId.toLowerCase().startsWith('moment');
 
 export const checkIsShitPack = (stamps?: string[]): boolean =>
 	stamps?.includes('shit-pack') ?? false;
@@ -56,6 +59,7 @@ export const cardUtils = {
 	getShitStampPath,
 	getCardImageUrl,
 	formatCardNumber,
+	checkIsMoment,
 };
 
 export type CardComponentProps = {
@@ -152,8 +156,11 @@ export const CardLinkWrapper: ParentComponent<{
 	</a>
 );
 
-export const FullAnimatedCardEffect: ParentComponent<{ glowColor?: string }> = props => (
-	<TiltEffectWrapper>
+export const FullAnimatedCardEffect: ParentComponent<{
+	glowColor?: string;
+	disableTiltOnTouch?: boolean;
+}> = props => (
+	<TiltEffectWrapper disableOnTouch={props.disableTiltOnTouch}>
 		<GlowOnHover color={props.glowColor} />
 		{props.children}
 		<ShineMouseEffect />
@@ -167,6 +174,7 @@ function clamp(min: number, target: number, max: number) {
 export const TiltEffectWrapper: ParentComponent<{
 	angleMultiplier?: number;
 	transformOrigin?: string;
+	disableOnTouch?: boolean;
 }> = props => {
 	let canStop = false;
 	let rotateX = 0;
@@ -178,6 +186,7 @@ export const TiltEffectWrapper: ParentComponent<{
 	let rotateEl: HTMLDivElement;
 
 	let prevTime = 0;
+
 	function animate(t: number) {
 		if (checkAreAnimationsDisabled()) {
 			return;
@@ -193,9 +202,10 @@ export const TiltEffectWrapper: ParentComponent<{
 			targetRotateY,
 			dt,
 		});
+
 		rotateEl!.style.setProperty(
 			'transform',
-			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, ${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg)`
+			`rotate3d(${result.rotateY}, ${result.rotateX}, 0, min(${result.rotateDegrees * (props.angleMultiplier ?? 1)}deg, 60deg))`
 		);
 
 		rotateX = result.rotateX;
@@ -212,6 +222,7 @@ export const TiltEffectWrapper: ParentComponent<{
 
 	onMount(() => {
 		wrapperEl!.addEventListener('touchmove', e => {
+			if (props.disableOnTouch) return;
 			const bounds = wrapperEl!.getBoundingClientRect();
 			const touches = e.touches[0];
 			if (!bounds || !touches) return;
@@ -239,6 +250,7 @@ export const TiltEffectWrapper: ParentComponent<{
 				requestAnimationFrame(animate);
 			}}
 			onTouchStart={() => {
+				if (props.disableOnTouch) return;
 				canStop = false;
 				requestAnimationFrame(animate);
 			}}
@@ -272,6 +284,7 @@ export const TiltEffectWrapper: ParentComponent<{
 
 export const GlowOnHover: Component<{ color?: string; focusOnly?: boolean }> = props => (
 	<div
+		data-component="GlowOnHover"
 		class="duration-400 absolute inset-0 h-full w-full origin-center scale-105 opacity-0 shadow blur-[--blur] transition-all ease-out [--blur:5px] group-focus:opacity-100"
 		classList={{
 			'bg-brand-main dark:bg-brand-light': !props.color,
@@ -292,7 +305,7 @@ export const ShineMouseEffect: Component = () => {
 
 	return (
 		<div
-			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-color-dodge transition-opacity group-hover:opacity-100"
+			class="absolute inset-0 h-full w-full overflow-hidden opacity-0 mix-blend-plus-lighter transition-opacity group-hover:opacity-100"
 			onTouchStart={e => {
 				if (checkAreAnimationsDisabled()) {
 					e.currentTarget.classList.remove('opacity-100');
@@ -336,7 +349,7 @@ export const ShineMouseEffect: Component = () => {
 				});
 			}}>
 			<div
-				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-color-dodge"
+				class="duration-800 absolute left-0 top-0 scale-[3] mix-blend-overlay blur"
 				style={{
 					// good mix-blend options: overlay, color-dodge
 					translate: `${state.x}px ${state.y}px`,
@@ -348,7 +361,7 @@ export const ShineMouseEffect: Component = () => {
 						Math.max(0.4 - Math.abs((state.x + state.y) * 0.75) / 500, 0.01),
 						2
 					),
-					opacity: 1.0,
+					opacity: 0.3,
 					'background-image': `
           radial-gradient(circle, 
             ${RADIAL_GRADIENT_COLOR_INNER} 0%, 
@@ -420,7 +433,7 @@ function tiltEffectAnimationFrame(args: {
 		}
 	}
 
-	let rotateDegrees = Math.max(Math.abs(rotateX) + Math.abs(rotateY)) * 0.2;
+	let rotateDegrees = (Math.abs(rotateX) + Math.abs(rotateY)) * 0.2;
 	return { rotateX: roundTo(rotateX, 5), rotateY: roundTo(rotateY, 5), rotateDegrees };
 }
 

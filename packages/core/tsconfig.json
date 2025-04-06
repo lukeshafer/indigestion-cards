@@ -7,11 +7,9 @@
       "es2023",
       "DOM"
     ],
-    //"noUnusedLocals": true,
-    //"noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "strict": true,
-    "verbatimModuleSyntax": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-  },
+    "verbatimModuleSyntax": true
+  }
 }

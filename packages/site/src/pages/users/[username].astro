@@ -7,11 +7,11 @@ import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
 import { getUserByLogin } from '@core/lib/twitch';
 import type { CardInstance, Collection, User } from '@core/types';
 import { routes, routeNames } from '@site/constants';
-import type { Props as HeaderProps } from '@site/components/Header.astro';
 import { parseFiltersFromSearchParams } from '@site/components/CardList';
 import { getCollectionPreviewCards } from '@core/lib/collections';
+import  { LOGOS } from '@site/constants'
 
-type Logo = HeaderProps['logo'];
+type Logo = keyof typeof LOGOS | undefined
 
 const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
 if (redirectCount > 3) {
@@ -39,6 +39,7 @@ let { data: CardInstances, cursor } =
 	(await getCardsByUserSortedByRarity({
 		username: id,
 		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
+    excludeMoments: true,
 	})) ?? {};
 let packs = await getPacksByUsername({ username: id }).then(packs => packs.map(hidePackCards));
 
@@ -46,8 +47,6 @@ const userLogoMap: Record<string, Logo | undefined> = {
 	artifizz: 'tongle',
 };
 const logo = userLogoMap[id];
-
-const isLoggedInUser = Astro.locals.user?.properties.userId === user.userId;
 
 const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
 
@@ -78,7 +77,7 @@ for (let collection of user.collections ?? []) {
 		{packs}
 		cards={CardInstances}
 		{collectionData}
-		{isLoggedInUser}
+    loggedInUserId={Astro.locals.user?.properties.userId}
 		{cursor}
 		initialFilters={filters}
 		client:load

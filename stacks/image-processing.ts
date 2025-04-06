@@ -16,7 +16,7 @@ import { Database } from './database';
 
 export function ImageProcessing({ app, stack }: StackContext) {
   const { frameBucket, cardDesignBucket } = use(DesignBucket)
-  const db = use(Database)
+  const { table } = use(Database)
 
 	const cardsBucket = new Bucket(stack, 'CardsBucket', {
 		cdk: {
@@ -34,13 +34,13 @@ export function ImageProcessing({ app, stack }: StackContext) {
     },
     defaults: {
       function: {
-        bind: [frameBucket, cardDesignBucket, cardsBucket, adminImageSecret, db]
+        bind: [frameBucket, cardDesignBucket, cardsBucket, adminImageSecret, table]
       }
     }
   })
 
   const redirectCardsEdgeLambda = new experimental.EdgeFunction(stack, "RedirectCardsEdgeLambda", {
-    runtime: Runtime.NODEJS_18_X,
+    runtime: Runtime.NODEJS_22_X,
     handler: "lambda.handler",
     code: Code.fromAsset("packages/functions/src/edge/redirect-to-image-gen"),
     stackId: app.logicalPrefixedName("redirect-cards-edge-lambda"),

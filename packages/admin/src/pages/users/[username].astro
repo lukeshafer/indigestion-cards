@@ -5,7 +5,6 @@ import { getUserAndCardInstances, createNewUser } from '@core/lib/user';
 import { getUserByLogin } from '@core/lib/twitch';
 import { getRarityRanking } from '@core/lib/site-config';
 import { routes } from '@admin/constants';
-import AdminOnly from '@admin/components/AdminOnly.astro';
 import { getAllPackTypes } from '@core/lib/pack-type';
 import { Heading } from '@admin/components/text';
 import UserPackForms from '@admin/components/pack/UserPackForms';
@@ -52,7 +51,7 @@ const user = Users[0] || {
 
 const pinnedCard = user.pinnedCard;
 const cardsNotInPack = CardInstances.filter(
-	(card) => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
+	card => !!card.openedAt && card.instanceId !== pinnedCard?.instanceId
 );
 
 const packTypes = await getAllPackTypes();
@@ -62,7 +61,7 @@ const packTypes = await getAllPackTypes();
 	<header class="flex flex-col gap-4 gap-x-8 p-4 sm:flex-row">
 		<img
 			src={twitchData?.profile_image_url}
-      alt=""
+			alt=""
 			width="150"
 			height="150"
 			class="col-start-1 row-span-full h-fit rounded-full"
@@ -73,15 +72,10 @@ const packTypes = await getAllPackTypes();
 				style={{ 'view-transition-name': `${user.username}-username` }}>
 				{user.username}
 			</h1>
-			<AdminOnly>
-				<details>
-					<summary class="-mt-4 text-gray-500 dark:text-gray-400">Admin Stuff</summary>
-					<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
-						<p>User Id: {user.userId}</p>
-						<UserPackForms {user} {packTypes} client:only="solid-js" />
-					</div>
-				</details>
-			</AdminOnly>
+			<div class="rounded bg-gray-100 p-3 dark:bg-gray-800">
+				<p>User Id: {user.userId}</p>
+				<UserPackForms {user} {packTypes} client:only="solid-js" />
+			</div>
 			<ul>
 				<li>
 					<div class="text-gray-800 dark:text-gray-100">
@@ -110,10 +104,10 @@ const packTypes = await getAllPackTypes();
 							pinnedCard.designId === 'lilindheart'
 								? 'lilindheart-hero-card'
 								: pinnedCard.designId === 'lilindcult'
-								? 'lilindcult-hero-card'
-								: pinnedCard.designId === 'ryan-of-the-wild'
-								? 'ryan-of-the-wild-hero-card'
-								: undefined
+									? 'lilindcult-hero-card'
+									: pinnedCard.designId === 'ryan-of-the-wild'
+										? 'ryan-of-the-wild-hero-card'
+										: undefined
 						}
 						href={`${routes.USERS}/${user.username}/${pinnedCard.instanceId}`}>
 						<Card {...pinnedCard} scale="var(--card-scale)" client:only="solid-js" />

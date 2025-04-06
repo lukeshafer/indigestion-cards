@@ -1,8 +1,11 @@
+import { z } from 'zod';
 import { db } from '../db';
 import type { CardInstance, CreateUser, User, UserLogin } from '../db.types';
 import { getUserByLogin } from '../lib/twitch';
 import { batchUpdateCardUsernames } from './card';
 import { batchUpdatePackUsername } from './pack';
+import { Summary } from './utils';
+import { getAllPreorders } from './preorder';
 
 export async function getUser(userId: string) {
 	const user = await db.entities.Users.get({ userId }).go();
@@ -33,7 +36,7 @@ export async function searchUsers(args: { searchString: string }): Promise<User[
 			.allUsers({})
 			.where((attr, op) => op.contains(attr.username, args.searchString.toLowerCase()))
 			.go({ pages: 'all' });
-		return data.sort((a,b) => a.username.localeCompare(b.username)) ?? [];
+		return data.sort((a, b) => a.username.localeCompare(b.username)) ?? [];
 	} catch {
 		return [];
 	}
@@ -188,6 +191,7 @@ export async function setUserProfile(args: {
 	lookingFor?: string;
 	pinnedCard?: PinnedCard | null;
 	minecraftUsername?: string;
+	pinnedMessage?: string | null;
 }) {
 	const user = await getUser(args.userId);
 	if (!user) return null;
@@ -225,6 +229,7 @@ export async function setUserProfile(args: {
 		.set({
 			lookingFor: args.lookingFor?.slice(0, 500) ?? user.lookingFor,
 			pinnedCard: card,
+			pinnedMessage: args.pinnedMessage === null ? '' : args.pinnedMessage?.slice(0, 120),
 			minecraftUsername: args.minecraftUsername?.toLowerCase() || user.minecraftUsername,
 		})
 		.go()
@@ -260,4 +265,70 @@ export async function getUserAndCardsByMinecraftUsername(args: { minecraftUserna
 	} = await db.collections.UserAndCards(user).go({ pages: 'all' });
 
 	return { user, cards };
+}
+
+export async function getUserMomentCards(args: { username: string }) {
+	const result = await db.collections
+		.UserAndCards({ username: args.username })
+		.where((attr, op) => op.begins(attr.seasonId, 'moments'))
+		.go({ pages: 'all' });
+
+	return result.data.CardInstances;
+}
+
+export type AllUserPageData =
+	ReturnType<typeof setupAllUsersPageData> extends Summary<infer T> ? T : never;
+function setupAllUsersPageData() {
+	return new Summary({
+		schema: z.array(
+			z.object({
+				user: z.object({
+					username: z.string(),
+					packCount: z.number(),
+					cardCount: z.number(),
+				}),
+				twitch: z
+					.object({
+						id: z.string(),
+						login: z.string(),
+						display_name: z.string(),
+						profile_image_url: z.string(),
+					})
+					.optional(),
+				preorders: z.array(
+					z.object({
+						userId: z.string(),
+						username: z.string(),
+						preorderId: z.string(),
+					})
+				),
+			})
+		),
+		prefix: 'users',
+		loader: async () => {
+			const users = await getAllUsers();
+			const preorders = await getAllPreorders();
+
+			const data = Promise.all(
+				users
+					.sort((a, b) => a.username.localeCompare(b.username))
+					.map(async user => ({
+						user: user,
+						twitch: await getUserByLogin(user.username),
+						preorders: preorders.filter(p => p.userId === user.userId),
+					}))
+			);
+			return data;
+		},
+	});
+}
+
+export async function loadAllUsersPageData(): Promise<AllUserPageData> {
+	const summary = setupAllUsersPageData();
+	return summary.get('all');
+}
+
+export async function refreshAllUsersPageData(): Promise<void> {
+	const summary = setupAllUsersPageData();
+	await summary.refresh('all');
 }

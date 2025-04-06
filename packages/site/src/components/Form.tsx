@@ -6,9 +6,9 @@ import {
 	Show,
 	createSignal,
 } from 'solid-js';
-import { setAlerts } from '@site/lib/client/state';
+import { setAlerts } from '@site/client/state';
 import { ASSETS } from '@site/constants';
-import { useViewTransition } from '@site/lib/client/utils';
+import { useViewTransition } from '@site/client/utils';
 import { navigate } from 'astro:transitions/client';
 import { twMerge } from 'tailwind-merge';
 
@@ -249,7 +249,13 @@ export function TextArea(
 ) {
 	return (
 		<InputGroup>
-			<Show when={!props.inputOnly} fallback={<label class="sr-only" for={props.name}>{props.label}</label>}>
+			<Show
+				when={!props.inputOnly}
+				fallback={
+					<label class="sr-only" for={props.name}>
+						{props.label}
+					</label>
+				}>
 				<Label {...props} />
 			</Show>
 			<textarea
@@ -457,7 +463,7 @@ export function SubmitButton(props: {
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
-			class="group"
+			class="group w-fit"
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
@@ -470,11 +476,15 @@ export function SubmitButton(props: {
 	);
 }
 
-export function DeleteButton(props: { children?: string; onClick?: () => void; confirm?: string }) {
+export function DeleteButton(props: {
+	children?: JSX.Element;
+	onClick?: () => void;
+	confirm?: string;
+}) {
 	return (
 		<button
 			type="submit"
-			class="group"
+			class="group w-fit"
 			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();

@@ -1,0 +1,11 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { getSiteStatistics } from '@core/lib/stats';
+import { SiteStatisticsPage } from '@site/layouts/StatisticsPage';
+
+const stats = await getSiteStatistics();
+---
+
+<Page title="Statistics" breadcrumbs={[{ label: 'Statistics' }]} pageType="public">
+	<SiteStatisticsPage stats={stats} />
+</Page>
