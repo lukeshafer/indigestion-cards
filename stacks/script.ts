@@ -5,7 +5,7 @@ import { DataRecoveryBucket } from './bucket';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
 export function AfterDeployStack({ app, stack }: StackContext) {
-	const db = use(Database);
+	const { table } = use(Database);
 	const config = use(ConfigStack);
 	const { dataRecoveryBucket } = use(DataRecoveryBucket);
 
@@ -21,7 +21,7 @@ export function AfterDeployStack({ app, stack }: StackContext) {
 					BACKUP_TABLE_NAME: app.mode === 'dev' ? 'dev mode' : backupTableName,
 				},
 				bind: [
-					db,
+					table,
 					config.TWITCH_CLIENT_ID,
 					config.TWITCH_CLIENT_SECRET,
 					config.TWITCH_TOKENS_PARAM,
@@ -29,7 +29,7 @@ export function AfterDeployStack({ app, stack }: StackContext) {
 					dataRecoveryBucket,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});

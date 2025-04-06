@@ -8,7 +8,7 @@ import { API_VERSION, getHostedZone, getDomainName } from './constants';
 import { WebsocketsAPI } from './websockets-api';
 
 export function API({ app, stack }: StackContext) {
-	const table = use(Database);
+	const { table } = use(Database);
 	const { eventBus } = use(Events);
 	const { frameBucket, cardDesignBucket, cardDraftBucket, frameDraftBucket } = use(DesignBucket);
 	const config = use(ConfigStack);
@@ -32,7 +32,7 @@ export function API({ app, stack }: StackContext) {
 					eventBus,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -92,12 +92,6 @@ export function API({ app, stack }: StackContext) {
 			'PATCH /faq': 'packages/functions/src/admin-api/faq/patch.handler',
 			// MOMENTS
 			'POST /moment-card': 'packages/functions/src/admin-api/moment-card/post.handler',
-
-			// USER ENDPOINTS
-			// USER
-			'PATCH /user-api/user': 'packages/functions/src/user-api/user/patch.handler',
-			// CARD
-			'GET /user-api/card': 'packages/functions/src/user-api/card/get.handler',
 		},
 		defaults: {
 			function: {
@@ -118,7 +112,7 @@ export function API({ app, stack }: StackContext) {
 					wsConnectionsTable,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 		cors: {

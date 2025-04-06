@@ -134,6 +134,10 @@ export async function openCardFromPack(args: {
 	const user = await getUser(userId);
 	if (!user) throw new Error('User not found');
 
+	if (!pack) {
+		throw new Error('Pack no longer exists');
+	}
+
 	if (pack.isLocked) {
 		throw new Error('Pack is locked and cannot be modified.');
 	}

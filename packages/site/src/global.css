@@ -5,424 +5,452 @@
 @tailwind utilities;
 
 [x-cloak] {
-	display: none !important;
+  display: none !important;
 }
 
 body.disable-animations * {
-	transition: none !important;
-	animation: none !important;
-	view-transition-name: none !important;
+  transition: none !important;
+  animation: none !important;
+  view-transition-name: none !important;
 }
 
 @layer reset {
-	/*
+
+  /*
 	  1. Use a more-intuitive box-sizing model.
 	*/
-	*,
-	*::before,
-	*::after {
-		box-sizing: border-box;
-	}
-	/*
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /*
 	  2. Remove default margin
 	*/
-	* {
-		margin: 0;
-	}
-	/*
+  * {
+    margin: 0;
+  }
+
+  /*
 	  3. Allow percentage-based heights in the application
 	*/
-	html,
-	body {
-		height: 100%;
-	}
-	/*
+  html,
+  body {
+    height: 100%;
+  }
+
+  /*
 	  Typographic tweaks!
 	  4. Add accessible line-height
 	  5. Improve text rendering
 	*/
-	body {
-		line-height: 1.5;
-		-webkit-font-smoothing: antialiased;
-	}
-	/*
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*
 	  6. Improve media defaults
 	*/
-	img,
-	picture,
-	video,
-	canvas,
-	svg {
-		display: block;
-		max-width: 100%;
-	}
-	/*
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /*
 	  7. Remove built-in form typography styles
 	*/
-	input,
-	button,
-	textarea,
-	select {
-		font: inherit;
-	}
-	/*
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  /*
 	  8. Avoid text overflows
 	*/
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		overflow-wrap: break-word;
-	}
-	/*
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /*
 	  9. Create a root stacking context
 	*/
-	#root,
-	#__next {
-		isolation: isolate;
-	}
+  #root,
+  #__next {
+    isolation: isolate;
+  }
 }
 
 @font-face {
-	font-family: 'Rabbid Highway Sign II';
-	font-style: normal;
-	font-weight: 100 900;
-	font-display: swap;
-	src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignII.otf') format('opentype');
+  font-family: 'Rabbid Highway Sign II';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignII.otf') format('opentype');
 }
 
 @font-face {
-	font-family: 'Rabbid Highway Sign II';
-	font-style: oblique;
-	font-weight: 100 900;
-	font-display: swap;
-	src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignIIObl.otf') format('opentype');
+  font-family: 'Rabbid Highway Sign II';
+  font-style: oblique;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/rabbid_highway_sign_ii/RabbidHighwaySignIIObl.otf') format('opentype');
 }
 
 @layer base {
-	:root {
-		--base-font-sans: 'Montserrat Variable', Montserrat, Avenir, 'Avenir Next LT Pro', Corbel,
-			'URW Gothic', source-sans-pro, sans-serif;
-		--base-font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
-		--font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
-		--font-heading: var(--base-font-sans);
-		--card-aspect-ratio: 312 / 265;
+  :root {
+    --base-font-sans: 'Montserrat Variable', Montserrat, Avenir, 'Avenir Next LT Pro', Corbel,
+      'URW Gothic', source-sans-pro, sans-serif;
+    --base-font-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+    --font-display: 'Rabbid Highway Sign II', var(--base-font-sans);
+    --font-heading: var(--base-font-sans);
+    --card-aspect-ratio: 312 / 265;
 
-		font-family: var(--base-font-sans);
-		font-size: clamp(0.75rem, 1.5vw, 1rem);
+    font-family: var(--base-font-sans);
+    font-size: clamp(0.75rem, 1.5vw, 1rem);
 
-		--brand-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
+    --brand-shadow: 0.08rem 0.08rem 0 rgb(0 0 0 / 18%);
 
-		--spacing-main: 60rem;
-	}
+    --spacing-main: 85rem;
+  }
 
-	:root * {
-		transition:
-			color 50ms ease-in-out,
-			background-color 50ms ease-in-out,
-			border-color 50ms ease-in-out,
-			box-shadow 50ms ease-in-out;
-	}
+  :root * {
+    transition:
+      color 50ms ease-in-out,
+      background-color 50ms ease-in-out,
+      border-color 50ms ease-in-out,
+      box-shadow 50ms ease-in-out;
+  }
 
-	*::selection {
-		background: theme('colors.accent.light');
-		color: #000;
-	}
+  *::selection {
+    background: theme('colors.accent.light');
+    color: #000;
+  }
 }
 
 @keyframes spin {
-	0% {
-		scale: 1;
-		rotate: 0deg;
-	}
-	50% {
-		scale: 1.4;
-	}
-	100% {
-		rotate: 360deg;
-	}
+  0% {
+    scale: 1;
+    rotate: 0deg;
+  }
+
+  50% {
+    scale: 1.4;
+  }
+
+  100% {
+    rotate: 360deg;
+  }
 }
 
 @keyframes shine {
-	0% {
-	}
-	50% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
+  0% {}
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes loading-elipses {
-	0% {
-		content: '';
-	}
-	25% {
-		content: '.';
-	}
-	50% {
-		content: '..';
-	}
-	75% {
-		content: '...';
-	}
-	100% {
-		content: '';
-	}
+  0% {
+    content: '';
+  }
+
+  25% {
+    content: '.';
+  }
+
+  50% {
+    content: '..';
+  }
+
+  75% {
+    content: '...';
+  }
+
+  100% {
+    content: '';
+  }
 }
 
 @keyframes fade-in {
-	from {
-		opacity: 0;
-	}
+  from {
+    opacity: 0;
+  }
 }
 
 @keyframes fade-out {
-	to {
-		opacity: 0;
-	}
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes slide-from-right {
-	from {
-		transform: translateX(90px);
-	}
+  from {
+    transform: translateX(90px);
+  }
 }
 
 @keyframes slide-from-left {
-	from {
-		transform: translateX(-90px);
-	}
+  from {
+    transform: translateX(-90px);
+  }
 }
 
 @keyframes slide-to-left {
-	to {
-		transform: translateX(-90px);
-	}
+  to {
+    transform: translateX(-90px);
+  }
 }
 
 @keyframes slide-to-right {
-	to {
-		transform: translateX(90px);
-	}
+  to {
+    transform: translateX(90px);
+  }
 }
 
 @keyframes grow {
-	from {
-		transform: scaleY(0);
-	}
-	to {
-		transform: scaleY(1);
-	}
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
 }
 
 @keyframes shrink {
-	from {
-		transform: scaleY(1);
-	}
-	to {
-		transform: scaleY(0);
-	}
+  from {
+    transform: scaleY(1);
+  }
+
+  to {
+    transform: scaleY(0);
+  }
 }
 
 @keyframes stamp {
-	0% {
-		scale: 4;
-		opacity: 0%;
-		filter: blur(6px);
-	}
-	100% {
-		scale: 1;
-		opacity: 80%;
-		filter: blur(0px);
-	}
+  0% {
+    scale: 4;
+    opacity: 0%;
+    transform: translateZ(1000px);
+    filter: blur(4px);
+  }
+
+  100% {
+    scale: 1;
+    opacity: 80%;
+    filter: blur(0px);
+  }
 }
 
 @layer components {
-	.slide-forward {
-		view-transition-name: slide-forward;
-	}
+  .slide-forward {
+    view-transition-name: slide-forward;
+  }
 
-	.slide-back {
-		view-transition-name: slide-back;
-	}
+  .slide-back {
+    view-transition-name: slide-back;
+  }
 
-	::view-transition-old(open-packs-title) {
-		animation:
-			180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
-	}
-	::view-transition-new(open-packs-title) {
-		animation:
-			420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
-	}
+  ::view-transition-old(open-packs-title) {
+    animation:
+      180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+  }
 
-	::view-transition-old(slide-forward) {
-		animation:
-			180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
-	}
-	::view-transition-new(slide-forward) {
-		animation:
-			420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
-	}
+  ::view-transition-new(open-packs-title) {
+    animation:
+      420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+  }
 
-	::view-transition-old(slide-back) {
-		animation:
-			180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
-	}
-	::view-transition-new(slide-back) {
-		animation:
-			420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-			600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
-	}
+  ::view-transition-old(slide-forward) {
+    animation:
+      180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+  }
 
-	::view-transition-old(alert-grow-shrink) {
-		transform-origin: top;
-		animation: 500ms cubic-bezier(0.4, 0, 1, 1) both shrink;
-	}
-	::view-transition-new(alert-grow-shrink) {
-		transform-origin: top;
-		animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both grow;
-	}
+  ::view-transition-new(slide-forward) {
+    animation:
+      420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+  }
+
+  ::view-transition-old(slide-back) {
+    animation:
+      180ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
+  }
+
+  ::view-transition-new(slide-back) {
+    animation:
+      420ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
+      600ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
+  }
+
+  ::view-transition-old(alert-grow-shrink) {
+    transform-origin: top;
+    animation: 500ms cubic-bezier(0.4, 0, 1, 1) both shrink;
+  }
+
+  ::view-transition-new(alert-grow-shrink) {
+    transform-origin: top;
+    animation: 420ms cubic-bezier(0, 0, 0.2, 1) 90ms both grow;
+  }
 }
 
 @layer utilities {
-	.shine {
-		position: relative;
-	}
+  .shine {
+    position: relative;
+  }
 
-	.shine::after {
-		content: '';
-		width: 100%;
-		height: 100%;
-		display: block;
-		border-radius: inherit;
-		background-repeat: no-repeat;
-		position: absolute;
-		inset: 0;
-		background-image: linear-gradient(
-			135deg,
-			#fff0 25%,
-			rgba(255, 255, 255, 0.2) 50%,
-			#fff0 75%
-		);
-		background-size: 300%;
-		background-position: 120%;
-	}
+  .shine::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: inherit;
+    background-repeat: no-repeat;
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(135deg,
+        #fff0 25%,
+        rgba(255, 255, 255, 0.2) 50%,
+        #fff0 75%);
+    background-size: 300%;
+    background-position: 120%;
+  }
 
-	.shine:hover::after {
-		transition: background-position 0.3s ease-out;
-		background-position: 0;
-		opacity: 1;
-	}
+  .shine:hover::after {
+    transition: background-position 0.3s ease-out;
+    background-position: 0;
+    opacity: 1;
+  }
 
   .text-shadow-brand {
     text-shadow: var(--brand-shadow);
   }
 
-	.text-outline {
-		text-shadow:
-			1px -1px 1px theme('colors.gray.500'),
+  .text-outline {
+    text-shadow:
+      1px -1px 1px theme('colors.gray.500'),
       -1px 1px 1px theme('colors.gray.500'),
       1px 1px 1px theme('colors.gray.500'),
       -1px -1px 1px theme('colors.gray.500');
-	}
+  }
 
-	.text-outline-dark {
-		text-shadow:
-			1px -1px 1px theme('colors.gray.600'),
+  .text-outline-dark {
+    text-shadow:
+      1px -1px 1px theme('colors.gray.600'),
       -1px 1px 1px theme('colors.gray.600'),
       1px 1px 1px theme('colors.gray.600'),
       -1px -1px 1px theme('colors.gray.600');
-	}
+  }
 
-	.no-text-shadow {
-		text-shadow: none;
-	}
+  .no-text-shadow {
+    text-shadow: none;
+  }
 
-	.brand-shadow {
-		filter: drop-shadow(var(--brand-shadow));
-	}
+  .brand-shadow {
+    filter: drop-shadow(var(--brand-shadow));
+  }
 
-	.brand-box-shadow {
-		box-shadow: var(--brand-shadow);
-	}
+  .brand-box-shadow {
+    box-shadow: var(--brand-shadow);
+  }
 
-	.preserve-3d {
-		transform-style: preserve-3d;
-	}
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
 
-	.flipped {
-		transform: rotateY(180deg);
-	}
+  .flipped {
+    transform: rotateY(180deg);
+  }
 
-	.backface-hidden {
-		backface-visibility: hidden;
-	}
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
 
-	.card-aspect-ratio {
-		aspect-ratio: 77 / 107;
-	}
+  .card-aspect-ratio {
+    aspect-ratio: 77 / 107;
+  }
 
-	.w-card {
-		width: 18rem;
-	}
+  .w-card {
+    width: 18rem;
+  }
 
-	.view-transition-alert {
-		view-transition-name: alert-grow-shrink;
-	}
+  .view-transition-alert {
+    view-transition-name: alert-grow-shrink;
+  }
 
-	.required::after {
-		content: ' *';
-		color: theme('colors.red.600');
-	}
+  .required::after {
+    content: ' *';
+    color: theme('colors.red.600');
+  }
 
-	.visually-hidden {
-		clip: rect(1px, 1px, 1px, 1px);
-		height: 1px;
-		overflow: hidden;
-		position: absolute;
-		white-space: nowrap;
-		width: 1px;
-	}
+  .visually-hidden {
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
 
-	.scrollbar-hidden::-webkit-scrollbar {
-		display: none; /* Chrome, Safari */
-	}
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+  }
 
-	.scrollbar-hidden {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
 
-	.scrollbar-narrow::-webkit-scrollbar {
-		width: 0.5rem;
-		height: 0.5rem;
-	}
+  .scrollbar-narrow::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
 
-	.scrollbar-narrow::-webkit-scrollbar-thumb {
-		background-color: var(--custom-scrollbar-color, theme('colors.gray.400'));
-		cursor: pointer;
-		border-radius: 0.25rem;
-	}
+  .scrollbar-narrow::-webkit-scrollbar-thumb {
+    background-color: var(--custom-scrollbar-color, theme('colors.gray.400'));
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
 
-	html.dark .scrollbar-narrow::-webkit-scrollbar-thumb {
-		--custom-scrollbar-color: theme('colors.gray.600');
-	}
+  html.dark .scrollbar-narrow::-webkit-scrollbar-thumb {
+    --custom-scrollbar-color: theme('colors.gray.600');
+  }
 
-	.scrollbar-brand::-webkit-scrollbar-thumb {
-		--custom-scrollbar-color: theme('colors.brand.main');
-	}
+  .scrollbar-brand::-webkit-scrollbar-thumb {
+    --custom-scrollbar-color: theme('colors.brand.main');
+  }
 
-	html.dark .scrollbar-brand::-webkit-scrollbar-thumb {
-		--custom-scrollbar-color: theme('colors.brand.dark');
-	}
+  html.dark .scrollbar-brand::-webkit-scrollbar-thumb {
+    --custom-scrollbar-color: theme('colors.brand.dark');
+  }
+
+  .debug-outline {
+    outline: 1px solid lime !important;
+  }
 }

@@ -1,0 +1,56 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { getCardDesignById } from '@core/lib/design';
+import { getCardsByDesignSortedByRarity } from '@core/lib/card';
+import { routes, routeNames } from '@site/constants';
+import { Heading, PageTitle } from '@site/components/text';
+import { DesignHeaderCard, DesignInstancesCardList } from '@site/layouts/CardDesignPage';
+import { parseFiltersFromSearchParams } from '@site/components/CardList';
+
+const designId = Astro.params.designId;
+
+if (!designId) {
+	return Astro.redirect(routes.DESIGNS + '?alert=No design id provided');
+}
+
+const design = await getCardDesignById({ designId });
+
+if (!design) {
+	return Astro.redirect(`${routes.DESIGNS}?error=Design ${designId} not found`);
+}
+
+const { data: instances, cursor } = await getCardsByDesignSortedByRarity({ designId });
+
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
+---
+
+<Page
+	title={`${design.cardName} - ${design.seasonName}`}
+	class="flex flex-col gap-9"
+	pageType="public"
+	breadcrumbs={[{ label: routeNames.CARDS, href: routes.DESIGNS }, { label: design.cardName }]}>
+	<header class="flex flex-col items-center gap-4">
+		<PageTitle>{design.cardName}</PageTitle>
+		<DesignHeaderCard {design} client:load />
+		<section class="mx-auto text-lg">
+			<p>
+				<b>Season:{' '}</b>
+				{design.seasonName}
+			</p>
+			<p>
+				<b>Artist:{' '}</b>
+				{design.artist}
+			</p>
+		</section>
+	</header>
+	<section class="flex flex-col text-center">
+		<Heading>Cards Opened</Heading>
+		<DesignInstancesCardList
+			client:load
+			designId={designId}
+			initialCursor={cursor ?? undefined}
+			initialCards={instances}
+			initialFilters={filters}
+		/>
+	</section>
+</Page>

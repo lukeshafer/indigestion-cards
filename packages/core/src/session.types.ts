@@ -37,6 +37,6 @@ export type DBResult<T> =
 			error: string;
 	  };
 
-export type LibraryOutput<T> =
+export type LibraryOutput<T, E = unknown> =
 	| { success: true; data: T; error?: undefined }
-	| { success: false; error: unknown; data?: undefined };
+	| { success: false; error: E; data?: undefined };

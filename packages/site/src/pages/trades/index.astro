@@ -7,7 +7,7 @@ import { PageHeader, PageTitle } from '@site/components/text';
 import { routeNames, routes } from '@site/constants';
 import Page from '@site/layouts/Page.astro';
 import { Anchor } from '@site/components/text';
-import TradesTable from '@site/components/trades/TradesTable.astro';
+import { TradesTable } from '@site/components/trades/TradesTable';
 import { getUser } from '@core/lib/user';
 import type { Trade, User } from '@core/types';
 
@@ -52,13 +52,13 @@ for (const trade of [...trades.outgoing, ...trades.incoming]) {
 
 	<section aria-labelledby="open-trades">
 		<h2 id="open-trades" class="sr-only">Open Trades</h2>
-		<TradesTable trades={pending} {notifications} />
+		<TradesTable trades={pending} {notifications} loggedInUserId={userId} client:load />
 	</section>
 
 	<br />
 
 	<details open={completeNotificationCount > 0}>
 		<summary>Closed Trades</summary>
-		<TradesTable trades={complete} {notifications} />
+		<TradesTable trades={complete} {notifications} loggedInUserId={userId} client:load />
 	</details>
 </Page>

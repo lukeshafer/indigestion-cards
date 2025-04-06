@@ -42,7 +42,7 @@ export async function updateRarity(args: UpdateRarity & { rarityId: string }) {
 	return result.data;
 }
 
-export async function deleteRarityById(id: string): Promise<DBResult<Partial<Rarity>>> {
+export async function deleteRarityById(id: string): Promise<DBResult<Partial<Rarity> | null>> {
 	const allDesigns = await getAllCardDesigns();
 	const designsWithRarity = allDesigns.some(
 		(design) => design.rarityDetails?.some((r) => r.rarityId === id)

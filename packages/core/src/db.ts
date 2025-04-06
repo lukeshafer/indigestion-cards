@@ -1,6 +1,12 @@
 import { Table } from 'sst/node/table';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { type Attribute, type EntityConfiguration, Entity, Service } from 'electrodb';
+import {
+	type Attribute,
+	type EntityConfiguration,
+	type NestedMapAttribute,
+	Entity,
+	Service,
+} from 'electrodb';
 import { randomUUID } from 'crypto';
 import { useSession } from 'sst/node/future/auth';
 
@@ -172,6 +178,7 @@ const CardDesigns = new Entity(
 					},
 				},
 			},
+			tags: { type: 'list', items: { type: 'string' } },
 			...auditAttributes('cardDesign'),
 		},
 		indexes: {
@@ -407,6 +414,8 @@ const Packs = new Entity(
 		model: { entity: 'pack', version: '1', service: DB_SERVICE },
 		attributes: {
 			packId: { type: 'string', required: true },
+			packNumber: { type: 'number' },
+			packNumberPrefix: { type: 'string' },
 			packTypeId: { type: 'string', required: true },
 			packTypeName: { type: 'string', required: true },
 			seasonId: { type: 'string' },
@@ -534,6 +543,8 @@ const Seasons = new Entity(
 			seasonName: { type: 'string', required: true },
 			seasonDescription: { type: 'string' },
 			seasonId: { type: 'string', required: true },
+			nextPackNumber: { type: 'number', default: 0 },
+      packNumberPrefix: { type: 'string' },
 			...auditAttributes('season'),
 		},
 		indexes: {
@@ -818,6 +829,42 @@ const UserLogins = new Entity(
 	dbConfig
 );
 
+const CollectionAttributes = {
+	type: 'map',
+	properties: {
+		collectionId: {
+			type: 'string',
+			required: true,
+			default: () => randomUUID(),
+		},
+		collectionName: { type: 'string', required: true },
+		collectionType: { type: ['rule', 'set'] as const, required: true },
+		cards: {
+			type: 'list',
+			items: {
+				type: 'map',
+				properties: {
+					designId: { type: 'string', required: true },
+					instanceId: { type: 'string', required: true },
+				},
+			},
+		},
+		rules: {
+			type: 'map',
+			properties: {
+				cardDesignIds: { type: 'list', items: { type: 'string' } },
+				cardNumbers: { type: 'list', items: { type: 'number' } },
+				seasonIds: { type: 'list', items: { type: 'string' } },
+				stamps: { type: 'list', items: { type: 'string' } },
+				tags: { type: 'list', items: { type: 'string' } },
+				rarityIds: { type: 'list', items: { type: 'string' } },
+				isMinter: { type: 'boolean' },
+				mintedByIds: { type: 'list', items: { type: 'string' } },
+			},
+		},
+	},
+} satisfies NestedMapAttribute;
+
 const Users = new Entity(
 	{
 		model: { entity: 'user', version: '1', service: DB_SERVICE },
@@ -858,6 +905,11 @@ const Users = new Entity(
 					totalOfType: { type: 'number', required: true },
 					stamps: { type: 'list', items: { type: 'string' } },
 				},
+			},
+			pinnedMessage: { type: 'string' },
+			collections: {
+				type: 'list',
+				items: CollectionAttributes,
 			},
 			...auditAttributes('user'),
 		},

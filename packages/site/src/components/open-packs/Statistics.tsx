@@ -9,7 +9,7 @@ import {
 } from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
 import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
-import { Checkbox } from '../form/Form';
+import { Checkbox } from '../Form';
 
 export function Statistics() {
 	const ctx = useContext(OpenPacksContext);
@@ -37,7 +37,7 @@ export function Statistics() {
 		localStorage.setItem('isShitpackVisible', isShitpackVisible() ? 'true' : 'false');
 	});
 
-	const [resource] = createResource(state, async state => {
+	const [resource] = createResource(state, async (state): Promise<{ shitPackOdds: number }> => {
 		if (!state.totalCardCount || !state.packId) {
 			return { shitPackOdds: 0 };
 		}
@@ -65,11 +65,17 @@ export function Statistics() {
 			res => res.text()
 		);
 
-		const json = JSON.parse(body);
+		try {
+			const json = JSON.parse(body);
 
-		return {
-			shitPackOdds: Number(json.shitPackOdds) || 0,
-		};
+			return {
+				shitPackOdds: Number(json.shitPackOdds) || 0,
+			};
+		} catch {
+			return {
+				shitPackOdds: 0,
+			};
+		}
 	});
 
 	const shitPackOdds = () => resource()?.shitPackOdds || 0;

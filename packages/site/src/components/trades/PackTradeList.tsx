@@ -1,16 +1,11 @@
 import { createMemo, createSignal, For } from 'solid-js';
-import { Select } from '../form/Form';
+import { Select } from '../Form';
 import { produce } from 'solid-js/store';
-import { transformPackTypeName } from '@site/lib/client/utils';
-import {
-	TradeInventoryDetails,
-	TradeInventoryItemCheckbox,
-	TradeInventoryList,
-	TradeInventoryStickyHeading,
-} from './TradeInventoryList';
+import { transformPackTypeName } from '@site/client/utils';
+import * as TradeInventory from './TradeInventoryList';
 import type { TradePackUi } from './NewTrade';
 import type { TradePack } from '@core/types';
-import { Pack } from '../pack/Pack';
+import { formatPackNumber, Pack } from '@site/components/Pack';
 
 export default function PackTradeList(props: {
 	label: string;
@@ -20,11 +15,11 @@ export default function PackTradeList(props: {
 }) {
 	const [sort, setSort] = createSignal<SortType>('oldest');
 
-	const sortedCards = createMemo(() => sortPacks(props.packs, sort()));
+	const sortedPacks = createMemo(() => sortPacks(props.packs, sort()));
 
 	return (
-		<TradeInventoryDetails summary={props.label}>
-			<TradeInventoryStickyHeading>
+		<TradeInventory.TradeInventoryDetails summary={props.label}>
+			<TradeInventory.TradeInventoryStickyHeading>
 				<Select
 					name="sort"
 					label="Sort by"
@@ -36,11 +31,11 @@ export default function PackTradeList(props: {
 					}
 					setValue={val => setSort(val)}
 				/>
-			</TradeInventoryStickyHeading>
-			<TradeInventoryList>
-				<For each={sortedCards()}>
+			</TradeInventory.TradeInventoryStickyHeading>
+			<TradeInventory.TradeInventoryList>
+				<For each={sortedPacks()}>
 					{pack => (
-						<TradeInventoryItemCheckbox
+						<TradeInventory.TradeInventoryItemCheckbox
 							checked={pack.checked || false}
 							value={pack.packId}
 							name={`${props.type}edPacks`}
@@ -56,12 +51,16 @@ export default function PackTradeList(props: {
 									})
 								)
 							}>
-							<Pack name={transformPackTypeName(pack.packTypeName)} scale={0.5} />
-						</TradeInventoryItemCheckbox>
+							<Pack
+								name={transformPackTypeName(pack.packTypeName)}
+								scale={0.5}
+								packNumber={formatPackNumber(pack)}
+							/>
+						</TradeInventory.TradeInventoryItemCheckbox>
 					)}
 				</For>
-			</TradeInventoryList>
-		</TradeInventoryDetails>
+			</TradeInventory.TradeInventoryList>
+		</TradeInventory.TradeInventoryDetails>
 	);
 }
 

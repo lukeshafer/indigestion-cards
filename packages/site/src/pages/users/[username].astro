@@ -1,0 +1,85 @@
+---
+import { UserPage } from '@site/layouts/UserPage';
+import Page from '@site/layouts/Page.astro';
+import { getUserByUserName } from '@core/lib/user';
+import { getCardsByUserSortedByRarity } from '@core/lib/card';
+import { getPacksByUsername, hidePackCards } from '@core/lib/pack';
+import { getUserByLogin } from '@core/lib/twitch';
+import type { CardInstance, Collection, User } from '@core/types';
+import { routes, routeNames } from '@site/constants';
+import { parseFiltersFromSearchParams } from '@site/components/CardList';
+import { getCollectionPreviewCards } from '@core/lib/collections';
+import  { LOGOS } from '@site/constants'
+
+type Logo = keyof typeof LOGOS | undefined
+
+const redirectCount = Number(Astro.url.searchParams.get('redirect')) || 0;
+if (redirectCount > 3) {
+	return Astro.redirect(`${routes.USERS}?alert=Username not found`);
+}
+
+const id = Astro.params.username;
+
+if (!id) {
+	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
+}
+
+const twitchData = (await getUserByLogin(id).catch(() => null)) ?? null;
+
+const user: User = (await getUserByUserName(id)) || {
+	username: id,
+	cardCount: 0,
+	packCount: 0,
+	userId: twitchData?.id ?? '',
+};
+
+const pinnedCard = user.pinnedCard;
+
+let { data: CardInstances, cursor } =
+	(await getCardsByUserSortedByRarity({
+		username: id,
+		ignoredIds: pinnedCard ? [pinnedCard.instanceId] : undefined,
+    excludeMoments: true,
+	})) ?? {};
+let packs = await getPacksByUsername({ username: id }).then(packs => packs.map(hidePackCards));
+
+const userLogoMap: Record<string, Logo | undefined> = {
+	artifizz: 'tongle',
+};
+const logo = userLogoMap[id];
+
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
+
+const collectionData: Array<{
+	collection: Collection;
+	cards: Array<CardInstance>;
+}> = [];
+for (let collection of user.collections ?? []) {
+	const data = await getCollectionPreviewCards({
+		userId: user.userId,
+		collectionId: collection.collectionId,
+	});
+
+	if (!data.success) continue;
+	collectionData.push({ collection, cards: data.data });
+}
+---
+
+<Page
+	title={user.username}
+	{logo}
+	class="flex flex-col gap-4"
+	breadcrumbs={[{ label: routeNames.USER, href: routes.USERS }, { label: user.username }]}
+	pageType="public">
+	<UserPage
+		{user}
+		{twitchData}
+		{packs}
+		cards={CardInstances}
+		{collectionData}
+    loggedInUserId={Astro.locals.user?.properties.userId}
+		{cursor}
+		initialFilters={filters}
+		client:load
+	/>
+</Page>

@@ -1,0 +1,19 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { AllDesignsCardList } from '@site/layouts/AllDesignsPage';
+import { loadAllDesignsPageData } from '@core/lib/design';
+import { routeNames } from '@site/constants';
+import { PageTitle, PageHeader } from '@site/components/text';
+import { parseFiltersFromSearchParams } from '@site/components/CardList';
+
+const cards = await loadAllDesignsPageData();
+const filters = parseFiltersFromSearchParams(Astro.url.searchParams);
+---
+
+<Page title="All Cards" breadcrumbs={[{ label: routeNames.CARDS }]} pageType="public">
+	<PageHeader>
+		<PageTitle>All Cards</PageTitle>
+	</PageHeader>
+
+	<AllDesignsCardList client:load initialCards={cards} initialFilters={filters} />
+</Page>

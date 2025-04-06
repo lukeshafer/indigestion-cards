@@ -14,7 +14,7 @@ export async function generateCard(info: {
 	username?: string;
 	packId: string | undefined;
 	cardPool: CardPool;
-}) {
+}): Promise<CardInstance> {
 	console.log('Generating card: ', { ...info, cardPool: [] });
 	// Steps:
 	// 1. Take all the designs and instances, and generate a list of remaining possible cards that can be generated
@@ -87,7 +87,12 @@ export async function generateCard(info: {
 	return cardDetails;
 }
 
-export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
+export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool): Array<{
+	designId: string;
+	rarityId: string;
+	cardNumber: number;
+	totalOfType: number;
+}> {
 	const { CardDesigns, CardInstances: existingInstances } = cardPool;
 
 	if (CardDesigns.length === 0) {
@@ -125,7 +130,15 @@ export function getRemainingPossibleCardsFromCardPool(cardPool: CardPool) {
 	return possibleCardsList;
 }
 
-export async function getCardPoolFromType(packType: PackDetails['packType']): Promise<CardPool> {
+type CardPoolPackTypeDetails = Pick<
+	PackDetails['packType'],
+	'packTypeCategory' | 'seasonId' | 'designs'
+>;
+
+/**
+ * Retrieves all existing cards (opened or not opened) that match a given pack type.
+ */
+export async function getCardPoolFromType(packType: CardPoolPackTypeDetails): Promise<CardPool> {
 	if (packType.packTypeCategory === 'season') {
 		const seasonId = packType.seasonId;
 		if (!seasonId) throw new Error('SeasonId is required for season packs');
@@ -175,6 +188,6 @@ export function generateInstanceId(opts: {
 	designId: string;
 	rarityId: string;
 	cardNumber: number;
-}) {
+}): `${string}-${string}-${string}-${string}` {
 	return `${opts.seasonId}-${opts.designId}-${opts.rarityId}-${opts.cardNumber}`;
 }

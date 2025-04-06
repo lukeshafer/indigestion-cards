@@ -1,33 +1,54 @@
 import { db } from '../db';
-import type { CardInstance, SiteConfig } from '../db.types';
-import { getUser } from './user';
+import type { CardDesign, CardInstance, SiteConfig } from '../db.types';
+// import { getUser } from './user';
 import { getRarityRankForRarity } from './site-config';
 import Fuse from 'fuse.js';
 
-export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
-	const { data: card } = await db.entities.CardInstances.get(args).go();
-	if (!card) throw new Error('Card not found');
-	const user = card.userId ? await getUser(card.userId) : null;
+// TODO: delete me
+//
+// export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
+// 	const { data: card } = await db.entities.CardInstances.get(args).go();
+// 	if (!card) throw new Error('Card not found');
+// 	const user = card.userId ? await getUser(card.userId) : null;
+//
+// 	if (user) {
+// 		const result = await db.transaction
+// 			.write(({ CardInstances, Users }) => [
+// 				CardInstances.delete(args).commit(),
+// 				Users.patch({ userId: user.userId })
+// 					.set({ cardCount: (user.cardCount || 1) - 1 })
+// 					.commit(),
+// 			])
+// 			.go();
+// 		return result.data;
+// 	}
+//
+// 	const result = await db.entities.CardInstances.delete(args).go();
+// 	return result.data;
+// }
 
-	if (user) {
-		const result = await db.transaction
-			.write(({ CardInstances, Users }) => [
-				CardInstances.delete(args).commit(),
-				Users.patch({ userId: user.userId })
-					.set({ cardCount: (user.cardCount || 1) - 1 })
-					.commit(),
-			])
-			.go();
-		return result.data;
-	}
-
-	const result = await db.entities.CardInstances.delete(args).go();
+export async function getCardInstanceById(args: {
+	instanceId: string;
+	designId: string;
+}): Promise<CardInstance | null> {
+	const result = await db.entities.CardInstances.get(args).go();
 	return result.data;
 }
 
-export async function getCardInstanceById(args: { instanceId: string; designId: string }) {
-	const result = await db.entities.CardInstances.get(args).go();
-	return result.data;
+export async function getCardDesignAndInstance(args: {
+	instanceId: string;
+	designId: string;
+}): Promise<{ card: CardInstance | null; design: CardDesign | null }> {
+	const result = await db.transaction
+		.get(({ CardInstances, CardDesigns }) => [
+			CardInstances.get({ instanceId: args.instanceId, designId: args.designId }).commit(),
+			CardDesigns.get({ designId: args.designId }).commit(),
+		])
+		.go();
+
+	const [card, design] = result.data;
+
+	return { card: card.item, design: design.item };
 }
 
 export async function getCardInstanceByUsername(args: {
@@ -38,10 +59,28 @@ export async function getCardInstanceByUsername(args: {
 	return result.data[0];
 }
 
+export async function getCardDesignAndInstanceByUserAndInstanceID(args: {
+	username: string;
+	instanceId: string;
+}): Promise<{ card: CardInstance | null; design: CardDesign | null }> {
+	const result = await db.entities.CardInstances.query.byUser(args).go();
+	const card = result.data.at(0);
+	if (!card) {
+		return {
+			card: null,
+			design: null,
+		};
+	}
+
+	const { data: design } = await db.entities.CardDesigns.get({ designId: card.designId }).go();
+
+	return { card, design };
+}
+
 export async function getCardInstanceByDesignAndRarity(args: {
 	designId: string;
 	rarityId: string;
-}) {
+}): Promise<Array<CardInstance>> {
 	const result = await db.entities.CardInstances.query
 		.byDesignAndRarity(args)
 		.go({ pages: 'all' });
@@ -53,7 +92,7 @@ export async function getCardInstanceByUsernameDesignRarityCardNumber(args: {
 	designId: string;
 	rarityId: string;
 	cardNumber: string;
-}) {
+}): Promise<CardInstance | null> {
 	const result = await db.entities.CardInstances.query
 		.byDesignAndRarity({ rarityId: args.rarityId, designId: args.designId })
 		.go({ pages: 'all' });
@@ -67,7 +106,10 @@ export async function getCardInstanceByUsernameDesignRarityCardNumber(args: {
 	return card || null;
 }
 
-export async function batchUpdateCardUsernames(args: { oldUsername: string; newUsername: string }) {
+export async function batchUpdateCardUsernames(args: {
+	oldUsername: string;
+	newUsername: string;
+}): Promise<{ unprocessed: Array<{ designId: string; instanceId: string }> }> {
 	const cards = await db.entities.CardInstances.query
 		.byUser({ username: args.oldUsername })
 		.go({ pages: 'all' });
@@ -89,7 +131,7 @@ export async function batchUpdateCardUsernames(args: { oldUsername: string; newU
 	return result;
 }
 
-export async function createCardInstance(card: CardInstance) {
+export async function createCardInstance(card: CardInstance): Promise<{ data: CardInstance }> {
 	return db.entities.CardInstances.create(card).go();
 }
 
@@ -98,6 +140,7 @@ export async function getCardsByUserSortedByRarity(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
+	excludeMoments?: boolean;
 }): Promise<{
 	data: Array<CardInstance>;
 	cursor: string | null;
@@ -108,6 +151,9 @@ export async function getCardsByUserSortedByRarity(options: {
 			const conditions = [op.exists(attr.openedAt)];
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
+			}
+			if (options.excludeMoments === true) {
+				conditions.push(op.notContains(attr.seasonId, 'moments'));
 			}
 			return conditions.join(' and ');
 		})
@@ -121,13 +167,20 @@ export async function getCardsByUserSortedByCardName(options: {
 	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
-}) {
+	excludeMoments?: boolean;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: string | null;
+}> {
 	const results = await db.entities.CardInstances.query
 		.byUserSortedByCardName({ username: options.username })
 		.where((attr, op) => {
 			const conditions = [op.exists(attr.openedAt)];
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
+			}
+			if (options.excludeMoments === true) {
+				conditions.push(op.notContains(attr.seasonId, 'moments'));
 			}
 			return conditions.join(' and ');
 		})
@@ -138,15 +191,23 @@ export async function getCardsByUserSortedByCardName(options: {
 
 export async function getCardsByUserSortedByOpenDate(options: {
 	username: string;
+	cursor?: string;
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
-}) {
+	excludeMoments?: boolean;
+}): Promise<{
+	data: Array<CardInstance>;
+	cursor: string | null;
+}> {
 	const results = await db.entities.CardInstances.query
 		.byUser({ username: options.username })
 		.where((attr, op) => {
 			const conditions = [op.exists(attr.openedAt)];
 			for (const id of options.ignoredIds ?? []) {
 				conditions.push(op.ne(attr.instanceId, id));
+			}
+			if (options.excludeMoments === true) {
+				conditions.push(op.notContains(attr.seasonId, 'moments'));
 			}
 			return conditions.join(' and ');
 		})
@@ -212,7 +273,7 @@ export async function getCardsByDesignSortedByOpenDate(options: {
 
 export async function updateAllCardRarityRanks(
 	newRanking: NonNullable<SiteConfig['rarityRanking']>
-) {
+): Promise<undefined> {
 	let allCards = await db.entities.CardInstances.scan.go({ pages: 'all' });
 
 	const errors = [];
@@ -241,7 +302,7 @@ export async function searchUserCards(options: {
 	sortType: 'rarity' | 'cardName' | 'openDate' | 'owner';
 	isReversed?: boolean;
 	ignoredIds?: Array<string>;
-}) {
+}): Promise<Array<CardInstance>> {
 	switch (options.sortType) {
 		case 'cardName': {
 			const cards = await db.entities.CardInstances.query
@@ -314,7 +375,7 @@ export async function searchDesignCards(options: {
 	return searchCards(options.searchText, cards.data);
 }
 
-function searchCards(searchText: string, cards: Array<CardInstance>) {
+function searchCards(searchText: string, cards: Array<CardInstance>): Array<CardInstance> {
 	const fuse = new Fuse(cards, {
 		keys: [
 			{

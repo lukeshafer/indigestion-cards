@@ -2,7 +2,10 @@ import { ElectroError } from 'electrodb';
 import { db } from '../db';
 import type { Admin } from '../db.types';
 
-export async function createAdminUser(args: { userId: string; username: string }) {
+export async function createAdminUser(args: {
+	userId: string;
+	username: string;
+}): Promise<{ success: false; error: string } | { success: true; data: Admin }> {
 	try {
 		const result = await db.entities.Admins.create(args).go();
 		return { success: true, data: result.data };
@@ -28,7 +31,9 @@ export async function deleteAdminUser(args: {
 	userId: string;
 	username: string;
 	isStreamer: boolean;
-}) {
+}): Promise<
+	{ success: false; error: string } | { success: true; data: { userId: string } | null }
+> {
 	try {
 		const result = await db.entities.Admins.delete(args).go();
 		return { success: true, data: result.data };

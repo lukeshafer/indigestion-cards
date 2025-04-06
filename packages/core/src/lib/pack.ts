@@ -5,9 +5,12 @@ import { checkIfUserExists, createNewUser, getUser } from './user';
 import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
 import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
 import { InputValidationError, PackTypeIsOutOfCardsError } from './errors';
+import { EventBridge } from '@aws-sdk/client-eventbridge';
+import { EventBus } from 'sst/node/event-bus';
+import { getSeasonById } from './season';
 
 export async function getAllPacks(): Promise<Pack[]> {
-	const result = await db.entities.Packs.query.allPacks({}).go();
+	const result = await db.entities.Packs.query.allPacks({}).go({ pages: 'all' });
 	return result.data;
 }
 
@@ -29,9 +32,9 @@ export function hidePackCards(pack: Pack): PackCardsHidden {
 	};
 }
 
-export async function getPackById(args: { packId: string }): Promise<Pack> {
-	const result = await db.entities.Packs.query.byPackId(args).go();
-	return result.data[0];
+export async function getPackById(args: { packId: string }): Promise<Pack | null> {
+	const result = await db.entities.Packs.get(args).go();
+	return result.data;
 }
 
 export async function findPackForUser(args: { username: string }) {
@@ -48,6 +51,7 @@ export async function createPackForNoUser(packDetails: PackDetailsWithoutUser) {
 			count: packDetails.packType.cardCount,
 			cardPool: cardPool,
 			event: packDetails.event,
+			seasonId: packDetails.packType.seasonId,
 			packType: {
 				packTypeId: packDetails.packType.packTypeId,
 				packTypeName: packDetails.packType.packTypeName,
@@ -74,6 +78,7 @@ export async function givePackToUser(packDetails: PackDetails) {
 			count: packDetails.packType.cardCount,
 			cardPool: cardPool,
 			event: packDetails.event,
+			seasonId: packDetails.packType.seasonId,
 			packType: {
 				packTypeId: packDetails.packType.packTypeId,
 				packTypeName: packDetails.packType.packTypeName,
@@ -102,6 +107,9 @@ export async function updatePackUser(options: {
 		}));
 
 	const pack = await getPackById({ packId: options.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 
 	const oldUser = pack.userId ? await getUser(pack.userId) : null;
 
@@ -185,6 +193,9 @@ export async function deleteFirstPackForUser(args: {
 
 export async function deletePack(args: { packId: string }) {
 	const pack = await getPackById({ packId: args.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 
 	const user = pack.userId ? await getUser(pack.userId) : null;
 	const openCount = pack.cardDetails.filter(card => card.opened).length;
@@ -253,6 +264,8 @@ export async function createPack(args: {
 		cards.push(card);
 	}
 
+	const season = args.seasonId ? await getSeasonById(args.seasonId) : null;
+
 	console.log('Creating pack: ', {
 		cards,
 		packId,
@@ -261,7 +274,7 @@ export async function createPack(args: {
 	});
 
 	const result = await db.transaction
-		.write(({ Users, Packs, CardInstances }) => [
+		.write(({ Users, Packs, CardInstances, Seasons }) => [
 			...(user && args.userId && args.username
 				? [
 						Users.patch({ userId: user.userId })
@@ -269,10 +282,15 @@ export async function createPack(args: {
 							.commit(),
 					]
 				: []),
+			...(season
+				? [Seasons.patch({ seasonId: season.seasonId }).add({ nextPackNumber: 1 }).commit()]
+				: []),
 			Packs.create({
 				packId,
 				packTypeId: args.packType.packTypeId,
 				packTypeName: args.packType.packTypeName,
+				packNumber: season?.nextPackNumber,
+				packNumberPrefix: season?.packNumberPrefix,
 				userId: user?.userId,
 				username: user?.username,
 				seasonId: args.seasonId,
@@ -323,6 +341,9 @@ export function generatePackId(opts: { userId: string; prefix?: string }): strin
 
 export async function setPackIsLocked(opts: { packId: string; isLocked: boolean }): Promise<void> {
 	const pack = await getPackById({ packId: opts.packId });
+	if (pack == null) {
+		throw new InputValidationError('Pack no longer exists.');
+	}
 	if (!pack.isLocked && pack.cardDetails.some(card => card.opened)) {
 		console.error('Partially opened pack cannot be locked.');
 		throw new InputValidationError('Partially opened pack cannot be locked.');
@@ -331,21 +352,21 @@ export async function setPackIsLocked(opts: { packId: string; isLocked: boolean 
 	await db.entities.Packs.patch({ packId: opts.packId }).set({ isLocked: opts.isLocked }).go();
 }
 
-import { EventBridge } from '@aws-sdk/client-eventbridge';
-import { EventBus } from 'sst/node/event-bus';
 export async function sendPacksUpdatedEvent(): Promise<void> {
-  console.log("Sending packs updated event.")
+	console.log('Sending packs updated event.');
 	const eventBridge = new EventBridge();
 
-	await eventBridge.putEvents({
-		Entries: [
-			{
-				Source: 'site',
-				DetailType: 'packs.updated',
-        Detail: "{}",
-				EventBusName: EventBus.eventBus.eventBusName,
-			},
-		],
-	}).then(console.log);
-  console.log("Sent packs updated event.")
+	await eventBridge
+		.putEvents({
+			Entries: [
+				{
+					Source: 'site',
+					DetailType: 'packs.updated',
+					Detail: '{}',
+					EventBusName: EventBus.eventBus.eventBusName,
+				},
+			],
+		})
+		.then(console.log);
+	console.log('Sent packs updated event.');
 }

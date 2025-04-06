@@ -1,10 +1,13 @@
-import { StackContext, Table, Cron, use } from 'sst/constructs';
+import { StackContext, Table, Cron, use, Bucket } from 'sst/constructs';
 import { ConfigStack } from './config';
 
 export function Database({ stack }: StackContext) {
 	const config = use(ConfigStack);
 
+	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
+
 	const table = new Table(stack, 'data', {
+		stream: 'new_image',
 		fields: {
 			pk: 'string',
 			sk: 'string',
@@ -59,6 +62,35 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
+	const entityFilter = (entities: Array<string>) => {
+		return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
+	};
+	table.addConsumers(stack, {
+		updateStatistics: {
+			filters: [
+				entityFilter(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
+			],
+			function: {
+				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+				bind: [table, dataSummaries],
+			},
+		},
+		refreshUserlist: {
+			filters: [entityFilter(['cardInstance', 'user', 'preorder', 'trade'])],
+			function: {
+				handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
+				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
+			},
+		},
+		refreshDesignslist: {
+			filters: [entityFilter(['season', 'cardDesign', 'cardInstance', 'rarity'])],
+			function: {
+				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
+			},
+		},
+	});
+
 	new Cron(stack, 'RefreshUsernamesCron', {
 		schedule: 'cron(0 6 * * ? *)',
 		job: {
@@ -76,7 +108,7 @@ export function Database({ stack }: StackContext) {
 					config.TWITCH_TOKENS_PARAM,
 				],
 				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
@@ -92,10 +124,10 @@ export function Database({ stack }: StackContext) {
 					SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
 				},
 				bind: [table],
-				runtime: 'nodejs18.x',
+				runtime: 'nodejs22.x',
 			},
 		},
 	});
 
-	return table;
+	return { table, dataSummaries };
 }

@@ -1,14 +1,16 @@
 ---
-import { DeleteButton, Form, SubmitButton, Anchor } from '@site/components/form/Form';
+import { Anchor } from '@site/components/Form';
 import { Heading } from '@site/components/text';
 import OfferWindow from '@site/components/trades/OfferWindow';
 import TradeMessageHistory from '@site/components/trades/TradeMessageHistory';
-import { routeNames, routes } from '@site/constants';
+import { routeNames, routes, INVALID_PACK_ID } from '@site/constants';
 import Page from '@site/layouts/Page.astro';
 import { removeTradeNotification } from '@core/lib/user';
 import { getTrade } from '@core/lib/trades';
 import { Show } from 'solid-js';
-import { formatTradeLink } from '@site/lib/client/utils';
+import { TradeForms } from '@site/components/trades/TradeForms';
+import type { Trade, Pack } from '@core/types';
+import { getPackById } from '@core/lib/pack';
 
 const userId = Astro.locals.session?.properties.userId || undefined;
 
@@ -24,6 +26,33 @@ if (!trade) {
 
 const isSender = trade.senderUserId.toLowerCase() === userId?.toLowerCase();
 const isReceiver = trade.receiverUserId.toLowerCase() === userId?.toLowerCase();
+
+const offeredPacks: Array<Pack> = await Promise.all(
+	trade.offeredPacks?.map<Promise<Pack>>(async tradePack => {
+		let pack = await getPackById({ packId: tradePack.packId });
+		if (pack == null)
+			return {
+				packId: tradePack.packId,
+				cardDetails: [],
+				packTypeId: INVALID_PACK_ID,
+				packTypeName: 'Pack no longer exists.',
+			};
+		return pack;
+	}) ?? []
+);
+const requestedPacks: Array<Pack> = await Promise.all(
+	trade.requestedPacks?.map<Promise<Pack>>(async tradePack => {
+		let pack = await getPackById({ packId: tradePack.packId });
+		if (pack == null)
+			return {
+				packId: tradePack.packId,
+				cardDetails: [],
+				packTypeId: INVALID_PACK_ID,
+				packTypeName: 'Pack no longer exists.',
+			};
+		return pack;
+	}) ?? []
+);
 
 if (
 	userId &&
@@ -53,6 +82,27 @@ const tradeStatus = (() => {
 			return 'Trade failed';
 	}
 })();
+
+function formatTradeLink(trade: Trade, reverse = false): string {
+	const params = new URLSearchParams({
+		receiverUsername: reverse ? trade.senderUsername : trade.receiverUsername,
+	});
+
+	trade.requestedCards.forEach(c =>
+		params.append(reverse ? 'offeredCards' : 'requestedCards', c.instanceId)
+	);
+	trade.offeredCards.forEach(c =>
+		params.append(reverse ? 'requestedCards' : 'offeredCards', c.instanceId)
+	);
+	trade.requestedPacks?.forEach(p =>
+		params.append(reverse ? 'offeredPacks' : 'requestedPacks', p.packId)
+	);
+	trade.offeredPacks?.forEach(p =>
+		params.append(reverse ? 'requestedPacks' : 'offeredPacks', p.packId)
+	);
+
+	return routes.TRADES + '/new?' + params.toString();
+}
 ---
 
 <Page
@@ -75,7 +125,7 @@ const tradeStatus = (() => {
 			<Heading classList={{ grid: true }}>
 				<span>STATUS</span>
 				<span
-					class="text-xl"
+					class="font-heading text-xl"
 					class:list={{
 						'text-brand-dark dark:text-brand-main':
 							trade.status === 'accepted' || trade.status === 'completed',
@@ -108,76 +158,33 @@ const tradeStatus = (() => {
 			<h2 class="font-heading my-2 text-xl font-semibold text-gray-800 dark:text-gray-200">
 				{isSender ? 'Your offer' : `${trade.senderUsername}'s offer`}
 			</h2>
-			<OfferWindow cards={trade.offeredCards} packs={trade.offeredPacks ?? []} client:load />
+			<OfferWindow cards={trade.offeredCards} packs={offeredPacks} client:load />
 		</div>
 		<div class="text-center">
 			<h2 class="font-heading my-2 text-xl font-semibold text-gray-800 dark:text-gray-200">
 				{isReceiver ? 'Requested from you' : `Requested from ${trade.receiverUsername}`}
 			</h2>
-			<OfferWindow
-				cards={trade.requestedCards}
-				packs={trade.requestedPacks ?? []}
-				client:load
-			/>
+			<OfferWindow cards={trade.requestedCards} packs={requestedPacks} client:load />
 		</div>
 		<TradeMessageHistory {trade} loggedInUserId={userId} client:load />
 		<Show when={trade.status === 'pending'}>
-			<div class="col-span-full justify-self-center">
-				{
-					isSender ? (
-						<Form
-							client:load
-							method="post"
-							enctype="application/x-www-form-urlencoded"
-							action={`/api/trades/update-trade/${trade.tradeId}`}>
-							<input type="hidden" name="status" value="canceled" />
-							<DeleteButton>Cancel offer</DeleteButton>
-						</Form>
-					) : isReceiver ? (
-						<div class="flex flex-wrap justify-center justify-items-center gap-2">
-							<Form
-								client:load
-								method="post"
-								class="w-fit"
-								enctype="application/x-www-form-urlencoded"
-								action={`/api/trades/update-trade/${trade.tradeId}`}>
-								<input type="hidden" name="status" value="accepted" />
-								<SubmitButton
-									confirm="Are you sure you want to accept this trade? Once accepted, the trade is final and cannot be reversed."
-									client:idle>
-									<div class="min-w-[8rem]">Accept offer</div>
-								</SubmitButton>
-							</Form>
-							<Form
-								client:load
-								method="post"
-								class="w-fit"
-								enctype="application/x-www-form-urlencoded"
-								action={`/api/trades/update-trade/${trade.tradeId}`}>
-								<input type="hidden" name="status" value="rejected" />
-								<DeleteButton
-									confirm="Are you sure you want to reject this trade?"
-									client:idle>
-									<div class="min-w-[8rem]">Reject offer</div>
-								</DeleteButton>
-							</Form>
-						</div>
-					) : null
-				}
+			<TradeForms
+				isSender={isSender}
+				isReceiver={isReceiver}
+				tradeId={trade.tradeId}
+				client:load
+			/>
+		</Show>
+		<Show when={isSender || isReceiver}>
+			<div class="col-span-full mx-auto w-fit">
+				<Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
 			</div>
 		</Show>
-		{
-			isSender || isReceiver ? (
-				<div class="col-span-2 mx-auto w-fit">
-					<Anchor href={formatTradeLink(trade, isReceiver)}>Create Similar Trade</Anchor>
-				</div>
-			) : null
-		}
 	</div>
 
 	<trade-fetcher trade-id={trade.tradeId} status={trade.status}></trade-fetcher>
 	<script>
-		import { get } from '@site/lib/client/data';
+		import { trpc } from '@site/client/api';
 
 		customElements.define(
 			'trade-fetcher',
@@ -201,7 +208,7 @@ const tradeStatus = (() => {
 				}
 
 				async refreshIfTradeStatusUpdated() {
-					const trade = await get('trades', [this.tradeId]);
+					const trade = await trpc.trades.byId.query({ tradeId: this.tradeId });
 					if (this.status !== trade.status) location.reload();
 				}
 			}

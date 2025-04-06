@@ -4,12 +4,13 @@
   "type": "module",
   "scripts": {
     "test": "sst bind vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "tscversion": "tsc --version"
   },
   "devDependencies": {
     "@types/node": "^18.19.70",
     "solid-js": "^1.9.4",
-    "sst": "2.44.0"
+    "sst": "2.48.2"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.723.0",

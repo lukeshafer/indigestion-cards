@@ -1,16 +1,15 @@
 import { createStore } from 'solid-js/store';
 import type { TradeCard, CardInstance, PackCardsHidden, TradePack } from '@core/types';
 import { Suspense, createResource, type JSX, Show, createEffect, on, createSignal } from 'solid-js';
-import { Loading, SubmitButton, TextArea, TextInput } from '../form/Form';
-import { USER_API, UNTRADEABLE_RARITY_IDS, resolveLocalPath } from '@site/constants';
+import { Loading, SubmitButton, TextArea, TextInput } from '../Form';
+import { UNTRADEABLE_RARITY_IDS, routes } from '@site/constants';
 import { Heading } from '@site/components/text';
-import { get } from '@site/lib/client/data';
 import CardSearchList from './CardSearchList';
 import OfferWindow from './OfferWindow';
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import { navigate } from 'astro:transitions/client';
-import { trpc } from '@site/lib/client/trpc';
+import { trpc } from '@site/client/api';
 import PackTradeList from './PackTradeList';
+import { TRPCClientError } from '@trpc/client';
 
 type TradeState = {
 	offeredCards: TradeCard[];
@@ -59,9 +58,7 @@ export default function NewTrade(props: {
 				formData.append('requestedCards', card.instanceId)
 			);
 			state.offeredPacks.forEach(pack => formData.append('offeredPacks', pack.packId));
-			state.requestedPacks.forEach(pack =>
-				formData.append('requestedPacks', pack.packId)
-			);
+			state.requestedPacks.forEach(pack => formData.append('requestedPacks', pack.packId));
 
 			// @ts-expect-error - there are no files in this form
 			return new URLSearchParams([...formData.entries()]);
@@ -70,7 +67,7 @@ export default function NewTrade(props: {
 
 	const [isLoading, setIsLoading] = createSignal(false);
 
-	const [users] = createResource(() => get('usernames'), {
+	const [users] = createResource(() => trpc.users.allUsernames.query(), {
 		ssrLoadFrom: 'initial',
 		initialValue: [],
 	});
@@ -79,8 +76,8 @@ export default function NewTrade(props: {
 		// When receiverUsername changes, reset requestedCards
 		on(
 			() => state.receiverUsername,
-			() => {
-				if (!state.receiverUsername) {
+			receiverUsername => {
+				if (!receiverUsername) {
 					setState('requestedPacks', []);
 					setState('requestedCards', []);
 				}
@@ -90,13 +87,7 @@ export default function NewTrade(props: {
 
 	const [receiverCards] = createResource(
 		() => state.receiverUsername,
-		receiverUsername =>
-			fetch(resolveLocalPath(`${USER_API.CARD}?username=${receiverUsername}`), {
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-			}).then(res => res.json() as Promise<CardInstance[]>),
+		receiverUsername => trpc.userCards.byUsername.query({ username: receiverUsername }),
 		{
 			initialValue: props.initialReceiverCards ?? [],
 			ssrLoadFrom: 'initial',
@@ -163,23 +154,29 @@ export default function NewTrade(props: {
 			<form class="sr-only" id="reset-form"></form>
 			<form
 				method="post"
-				action="/api/trades/create-trade"
 				ref={el => setState('form', el)}
 				onSubmit={async e => {
 					e.preventDefault();
+					let receiverUsername = state.receiverUsername;
+					if (!receiverUsername) return;
 					setIsLoading(true);
 					try {
-						const response = await fetch(state.form!.action, {
-							method: 'post',
-							body: state.formDataParams?.toString(),
+						const result = await trpc.trades.create.mutate({
+							offeredCards: state.offeredCards.map(c => c.instanceId),
+							offeredPacks: state.offeredPacks.map(p => p.packId),
+							receiverUsername: receiverUsername,
+							requestedCards: state.requestedCards.map(c => c.instanceId),
+							requestedPacks: state.requestedPacks.map(p => p.packId),
+							message: state.formDataParams?.get('message') ?? undefined,
 						});
 
-						if (response.redirected) {
-							try {
-								await navigate(response.url);
-							} catch {
-								location.assign(response.url);
-							}
+						location.assign(`${routes.TRADES}/${result.tradeId}?alert=Trade Created`);
+					} catch (error) {
+						const params = new URLSearchParams(state.formDataParams);
+						if (error instanceof TRPCClientError) {
+							params.set('alert', error.message);
+							params.set('type', 'error');
+							location.assign(`${routes.TRADES}/new?${params.toString()}`);
 						}
 					} finally {
 						setIsLoading(false);
@@ -190,7 +187,7 @@ export default function NewTrade(props: {
 				<Show when={isLoading()}>
 					<Loading loadingText="Sending your trade" />
 				</Show>
-				<div class="@4xl/main:grid-cols-2 grid w-full grid-cols-1">
+				<div class="@4xl/main:grid-cols-2 @4xl/main:grid w-full grid-cols-1">
 					<Section heading="Offer">
 						<input type="hidden" name="senderUsername" value={props.username} />
 						<Username>{props.username}</Username>

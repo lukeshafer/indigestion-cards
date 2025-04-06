@@ -4,12 +4,9 @@
     "dist"
   ],
   "compilerOptions": {
-    "experimentalDecorators": true,
     "target": "ES2020",
     "allowJs": true,
     "baseUrl": ".",
-    //"noUnusedLocals": true,
-    //"noUnusedParameters": true,
     "paths": {
       "@site/*": [
         "src/*"

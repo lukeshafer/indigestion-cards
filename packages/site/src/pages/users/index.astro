@@ -1,0 +1,18 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { loadAllUsersPageData } from '@core/lib/user';
+import { routeNames } from '@site/constants';
+import { PageHeader, PageTitle } from '@site/components/text';
+import { UsersPage } from '@site/layouts/AllUsersPage';
+
+let users = await loadAllUsersPageData();
+---
+
+<Page title="Users" breadcrumbs={[{ label: routeNames.USER }]} pageType="public">
+	<PageHeader>
+		<PageTitle>Users</PageTitle>
+	</PageHeader>
+	<div class="mx-auto">
+		<UsersPage users={users} client:load />
+	</div>
+</Page>
