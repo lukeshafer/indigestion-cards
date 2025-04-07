@@ -16,5 +16,8 @@ export default $config({
 			},
 		};
 	},
-	async run() {},
+	async run() {
+		await import('./infra/config');
+		await import('./infra/database');
+	},
 });

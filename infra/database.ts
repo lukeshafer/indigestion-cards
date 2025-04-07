@@ -1,6 +1,15 @@
 import { params, twitchClientId, twitchClientSecret } from './config';
 
 export const database = new sst.aws.Dynamo('data', {
+	transform: {
+		table(args, opts) {
+			if ($app.stage === 'luke') {
+				opts.import = 'luke-lil-indigestion-cards-data';
+				return;
+			}
+		},
+	},
+	stream: 'new-and-old-images',
 	fields: {
 		pk: 'string',
 		sk: 'string',

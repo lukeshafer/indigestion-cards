@@ -11,7 +11,7 @@ export function getDomainName(stage: string) {
 }
 
 export function getHostedZone(stage: string) {
-	if (stage === 'luke' || stage === 'luke-dev') return `lksh.dev`;
+	if (stage.startsWith('luke')) return `lksh.dev`;
 
 	return HOSTED_ZONE;
 }
@@ -24,5 +24,5 @@ export const params = new sst.Linkable('CardsParams', {
 	},
 });
 
-export const twitchClientId = new sst.Secret("TWITCH_CLIENT_ID");
-export const twitchClientSecret = new sst.Secret("TWITCH_CLIENT_SECRET");
+export const twitchClientId = new sst.Secret('TWITCH_CLIENT_ID');
+export const twitchClientSecret = new sst.Secret('TWITCH_CLIENT_SECRET');

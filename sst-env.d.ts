@@ -5,6 +5,20 @@
 
 declare module "sst" {
   export interface Resource {
+    "CardsParams": {
+      "DOMAIN_NAME": string
+      "STREAMER_USER_ID": string
+      "TWITCH_TOKENS_PARAM": string
+      "type": "sst.sst.Linkable"
+    }
+    "TWITCH_CLIENT_ID": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "TWITCH_CLIENT_SECRET": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
   }
 }
 /// <reference path="sst-env.d.ts" />
