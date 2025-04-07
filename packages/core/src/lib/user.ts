@@ -318,6 +318,9 @@ function setupAllUsersPageData() {
 						preorders: preorders.filter(p => p.userId === user.userId),
 					}))
 			);
+
+			console.log('All users retrieved.');
+			
 			return data;
 		},
 	});
