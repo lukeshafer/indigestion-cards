@@ -11,6 +11,10 @@ declare module "sst" {
       "TWITCH_TOKENS_PARAM": string
       "type": "sst.sst.Linkable"
     }
+    "DataSummaries": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
     "TWITCH_CLIENT_ID": {
       "type": "sst.sst.Secret"
       "value": string
@@ -18,6 +22,19 @@ declare module "sst" {
     "TWITCH_CLIENT_SECRET": {
       "type": "sst.sst.Secret"
       "value": string
+    }
+    "WebsocketApi": {
+      "managementEndpoint": string
+      "type": "sst.aws.ApiGatewayWebSocket"
+      "url": string
+    }
+    "WebsocketApiConnectionsTable": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "data": {
+      "name": string
+      "type": "sst.aws.Dynamo"
     }
   }
 }

@@ -1,11 +1,28 @@
 import { params, twitchClientId, twitchClientSecret } from './config';
 
+const dataSummaries = new sst.aws.Bucket('DataSummaries', {
+	transform: {
+		bucket(args, opts) {
+			args.forceDestroy = undefined;
+			if ($app.stage === 'luke') {
+				args.bucket = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
+				opts.import = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
+				return;
+			} else {
+				throw new Error(`Database import not setup for stage ${$app.stage}`);
+			}
+		},
+	},
+});
+
 export const database = new sst.aws.Dynamo('data', {
 	transform: {
 		table(args, opts) {
 			if ($app.stage === 'luke') {
 				opts.import = 'luke-lil-indigestion-cards-data';
 				return;
+			} else {
+				throw new Error(`Database import not setup for stage ${$app.stage}`);
 			}
 		},
 	},
@@ -64,6 +81,38 @@ export const database = new sst.aws.Dynamo('data', {
 	},
 });
 
+function filterEntities(entities: Array<string>) {
+	return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
+}
+
+database.subscribe(
+	{
+		handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+		link: [database, dataSummaries],
+	},
+	{
+		filters: [
+			filterEntities(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
+		],
+	}
+);
+
+database.subscribe(
+	{
+		handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
+		link: [database, dataSummaries, params],
+	},
+	{ filters: [filterEntities(['cardInstance', 'user', 'preorder', 'trade'])] }
+);
+
+database.subscribe(
+	{
+		handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+		link: [database, dataSummaries, params],
+	},
+	{ filters: [filterEntities(['season', 'cardDesign', 'cardInstance', 'rarity'])] }
+);
+
 new sst.aws.Cron('RefreshUsernamesCron', {
 	schedule: 'cron(0 6 * * ? *)',
 
@@ -98,3 +147,18 @@ new sst.aws.Cron('RefreshUserCardCountsCron', {
 		runtime: 'nodejs22.x',
 	},
 });
+
+// await import('../packages/core/src/migrations/index').then(M => M.migration());
+
+// let migration = new sst.aws.Function('MigrateDb', {
+// 	handler: 'packages/functions/src/deployment/migrate-db.handler',
+// 	link: [database, params, twitchClientId, twitchClientSecret],
+// 	runtime: 'nodejs22.x',
+// 	permissions: [
+// 		{
+// 			actions: ['ssm:GetParameter', 'ssm:PutParameter'],
+// 			resources: [`*`],
+// 		},
+// 	],
+// });
+//

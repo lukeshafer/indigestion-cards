@@ -19,5 +19,6 @@ export default $config({
 	async run() {
 		await import('./infra/config');
 		await import('./infra/database');
+		await import('./infra/websockets-api');
 	},
 });
