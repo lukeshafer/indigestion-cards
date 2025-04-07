@@ -39,8 +39,13 @@ export class Summary<T> {
 	}
 
 	async refresh(key: string): Promise<T> {
+		console.log(`Refreshing ${this.prefix}/${key}`);
+		const unparsed = await this.loader(key)
+		
+		console.log(`Data retrieved.`);
 		let data = this.schema.parse(await this.loader(key));
-
+		console.log(`Data parsed`)
+		
 		await Summary.s3.send(
 			new PutObjectCommand({
 				Bucket: Bucket.DataSummaries.bucketName,
@@ -49,7 +54,7 @@ export class Summary<T> {
 			})
 		);
 
-    return data
+    		return data
 	}
 
 	async get(key: string): Promise<T> {
@@ -70,7 +75,9 @@ export class Summary<T> {
 		} catch (e) {
 			console.error(e);
 			console.log(`Unable to locate ${path}. Generating...`);
-			return this.refresh(key)
+			const data = await this.refresh(key)
+
+			return data;
 		}
 
 		let result = this.schema.safeParse(JSON.parse(body));
