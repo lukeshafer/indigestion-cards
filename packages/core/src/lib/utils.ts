@@ -40,21 +40,24 @@ export class Summary<T> {
 
 	async refresh(key: string): Promise<T> {
 		console.log(`Refreshing ${this.prefix}/${key}`);
-		const unparsed = await this.loader(key)
-		
+		const unparsed = await this.loader(key);
+
 		console.log(`Data retrieved.`);
-		let data = this.schema.parse(await this.loader(key));
-		console.log(`Data parsed`)
-		
+		let data = this.schema.parse(unparsed);
+		console.log(`Data parsed`);
+
 		await Summary.s3.send(
 			new PutObjectCommand({
 				Bucket: Bucket.DataSummaries.bucketName,
 				Key: `${this.prefix}/${key}`,
 				Body: JSON.stringify(data),
 			})
-		);
+		).catch(e => {
+      console.error(e);
+      console.error("An error occurred while putting object in s3.")
+    });
 
-    		return data
+		return data;
 	}
 
 	async get(key: string): Promise<T> {
@@ -75,7 +78,7 @@ export class Summary<T> {
 		} catch (e) {
 			console.error(e);
 			console.log(`Unable to locate ${path}. Generating...`);
-			const data = await this.refresh(key)
+			const data = await this.refresh(key);
 
 			return data;
 		}
