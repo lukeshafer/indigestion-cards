@@ -7,7 +7,7 @@ export function Database({ stack }: StackContext) {
 	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
 
 	const table = new Table(stack, 'data', {
-		stream: 'new_image',
+		stream: 'new_and_old_images',
 		fields: {
 			pk: 'string',
 			sk: 'string',
