@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { db } from '../db';
 import type { CardInstance, CreateUser, User, UserLogin } from '../db.types';
-import { getUserByLogin } from '../lib/twitch';
+import { getListOfTwitchUsersByIds, getUserByLogin } from '../lib/twitch';
 import { batchUpdateCardUsernames } from './card';
 import { batchUpdatePackUsername } from './pack';
 import { Summary } from './utils';
@@ -309,18 +309,21 @@ function setupAllUsersPageData() {
 			const users = await getAllUsers();
 			const preorders = await getAllPreorders();
 
-			const data = Promise.all(
-				users
-					.sort((a, b) => a.username.localeCompare(b.username))
-					.map(async user => ({
-						user: user,
-						twitch: await getUserByLogin(user.username),
-						preorders: preorders.filter(p => p.userId === user.userId),
-					}))
+			const ids = users.map(user => user.userId);
+			const twitchData = new Map(
+				(await getListOfTwitchUsersByIds(ids)).map(t => [t.id, t] as const)
 			);
 
+			const data = users
+				.sort((a, b) => a.username.localeCompare(b.username))
+				.map(user => ({
+					user: user,
+					twitch: twitchData.get(user.userId) ?? undefined,
+					preorders: preorders.filter(p => p.userId === user.userId),
+				}));
+
 			console.log('All users retrieved.');
-			
+
 			return data;
 		},
 	});
