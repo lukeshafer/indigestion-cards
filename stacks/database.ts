@@ -7,7 +7,7 @@ export function Database({ stack }: StackContext) {
 	const dataSummaries = new Bucket(stack, 'DataSummaries', {});
 
 	const table = new Table(stack, 'data', {
-		stream: 'new_image',
+		stream: 'new_and_old_images',
 		fields: {
 			pk: 'string',
 			sk: 'string',
@@ -73,6 +73,7 @@ export function Database({ stack }: StackContext) {
 			function: {
 				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
 				bind: [table, dataSummaries],
+				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 			},
 		},
 		refreshUserlist: {
@@ -80,6 +81,7 @@ export function Database({ stack }: StackContext) {
 			function: {
 				handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
 				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
+				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 			},
 		},
 		refreshDesignslist: {
@@ -87,6 +89,7 @@ export function Database({ stack }: StackContext) {
 			function: {
 				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
 				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
+				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 			},
 		},
 	});

@@ -94,51 +94,64 @@ export function getHeaders(headers: TwitchRequest['headers']) {
 
 export async function getListOfTwitchUsersByIds(ids: string[]) {
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
-	const fetchUrl = `https://api.twitch.tv/helix/users?id=${ids.join('&id=')}`;
-	let response = await fetch(fetchUrl, {
-		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
-			Authorization: `Bearer ${appAccessToken}`,
-		},
-	});
 
-	if (!response.ok) {
-		if (response.status !== 401) {
-			console.error(response, await response.text(), { ids });
-			throw new Error('Failed to get list of users from Twitch');
-		}
+	const users: Array<{
+		id: string;
+		login: string;
+		display_name: string;
+		profile_image_url: string;
+	}> = [];
+	for (let i = 0; i < ids.length; i += 100) {
+		let batch = ids.slice(i, i + 100);
+		const fetchUrl = `https://api.twitch.tv/helix/users?id=${batch.join('&id=')}`;
 
-		const newToken = await refreshAppAccessToken();
-		response = await fetch(fetchUrl, {
-			method: 'GET',
+		let response = await fetch(fetchUrl, {
 			headers: {
 				'Client-ID': Config.TWITCH_CLIENT_ID,
-				Authorization: `Bearer ${newToken}`,
+				Authorization: `Bearer ${appAccessToken}`,
 			},
 		});
+
+		if (!response.ok) {
+			if (response.status !== 401) {
+				console.error(response, await response.text(), { ids });
+				throw new Error('Failed to get list of users from Twitch');
+			}
+
+			const newToken = await refreshAppAccessToken();
+			response = await fetch(fetchUrl, {
+				method: 'GET',
+				headers: {
+					'Client-ID': Config.TWITCH_CLIENT_ID,
+					Authorization: `Bearer ${newToken}`,
+				},
+			});
+		}
+
+		const json = await response.json();
+
+		const schema = z.object({
+			data: z.array(
+				z.object({
+					id: z.string(),
+					login: z.string(),
+					display_name: z.string(),
+					profile_image_url: z.string(),
+				})
+			),
+		});
+
+		const parsed = schema.safeParse(json);
+
+		if (!parsed.success) {
+			console.error(parsed.error);
+			throw new Error('Failed to parse Twitch response');
+		}
+
+		users.push(...parsed.data.data);
 	}
 
-	const json = await response.json();
-
-	const schema = z.object({
-		data: z.array(
-			z.object({
-				id: z.string(),
-				login: z.string(),
-				display_name: z.string(),
-				profile_image_url: z.string(),
-			})
-		),
-	});
-
-	const parsed = schema.safeParse(json);
-
-	if (!parsed.success) {
-		console.error(parsed.error);
-		throw new Error('Failed to parse Twitch response');
-	}
-
-	return parsed.data.data;
+	return users;
 }
 
 export type TwitchUser = NonNullable<Awaited<ReturnType<typeof getUserByLogin>>>;
