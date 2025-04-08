@@ -1,4 +1,4 @@
-import { params, twitchClientId, twitchClientSecret } from './config';
+import { params, twitchClientId, twitchClientSecret, ssmPermissions } from './config';
 
 const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 	transform: {
@@ -9,13 +9,13 @@ const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 				opts.import = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
 				return;
 			} else {
-				throw new Error(`Database import not setup for stage ${$app.stage}`);
+				throw new Error(`Bucket DataSummaries import not setup for stage ${$app.stage}`);
 			}
 		},
 	},
 });
 
-export const database = new sst.aws.Dynamo('data', {
+export const database = new sst.aws.Dynamo('Database', {
 	transform: {
 		table(args, opts) {
 			if ($app.stage === 'luke') {
@@ -89,6 +89,7 @@ database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/update-statistics.handler',
 		link: [database, dataSummaries],
+		permissions: [ssmPermissions],
 	},
 	{
 		filters: [
@@ -101,6 +102,7 @@ database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
 		link: [database, dataSummaries, params],
+		permissions: [ssmPermissions],
 	},
 	{ filters: [filterEntities(['cardInstance', 'user', 'preorder', 'trade'])] }
 );
@@ -109,6 +111,7 @@ database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
 		link: [database, dataSummaries, params],
+		permissions: [ssmPermissions],
 	},
 	{ filters: [filterEntities(['season', 'cardDesign', 'cardInstance', 'rarity'])] }
 );
@@ -124,12 +127,7 @@ new sst.aws.Cron('RefreshUsernamesCron', {
 			SESSION_USERNAME: 'Refresh Usernames Cron Job',
 		},
 		link: [database, twitchClientSecret, twitchClientId, params],
-		permissions: [
-			{
-				actions: ['ssm:GetParameter', 'ssm:PutParameter'],
-				resources: ['*'],
-			},
-		],
+		permissions: [ssmPermissions],
 		runtime: 'nodejs22.x',
 	},
 });

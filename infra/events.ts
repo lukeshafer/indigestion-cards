@@ -1,5 +1,5 @@
 import { database } from './database';
-import { twitchClientSecret, twitchClientId, params } from './config';
+import { twitchClientSecret, twitchClientId, params, ssmPermissions } from './config';
 import { wsConnectionsTable, wsApi } from './websockets-api';
 
 const packDLQ = new sst.aws.Queue('PackDLQ');
@@ -26,7 +26,7 @@ packQueue.subscribe(
 	{
 		handler: 'packages/functions/src/sqs/give-pack-to-user.handler',
 		link: [database, params, twitchClientId, twitchClientSecret, wsConnectionsTable, wsApi],
-		permissions: [{ actions: ['ssm:GetParameter', 'ssm:PutParameter'], resources: ['*'] }],
+		permissions: [ssmPermissions],
 		runtime: 'nodejs22.x',
 		environment: {
 			SESSION_USER_ID: 'event_give_pack_to_user',
@@ -49,7 +49,7 @@ tradeDLQ.subscribe({
 	runtime: 'nodejs22.x',
 });
 
-const tradeQueue = new sst.aws.Queue('PackQueue', {
+const tradeQueue = new sst.aws.Queue('TradeQueue', {
 	dlq: {
 		retry: 5,
 		queue: tradeDLQ.arn,
@@ -60,7 +60,7 @@ tradeQueue.subscribe(
 	{
 		handler: 'packages/functions/src/sqs/process-trade.handler',
 		link: [database, params, twitchClientId, twitchClientSecret, wsConnectionsTable, wsApi],
-		permissions: [{ actions: ['ssm:GetParameter', 'ssm:PutParameter'], resources: ['*'] }],
+		permissions: [ssmPermissions],
 		runtime: 'nodejs22.x',
 		environment: {
 			SESSION_USER_ID: 'event_process_trade',
@@ -71,6 +71,44 @@ tradeQueue.subscribe(
 	{ batch: { size: 1 } }
 );
 
-const eventBus = new sst.aws.Bus('EventBus')
+export const eventBus = new sst.aws.Bus('EventBus');
 
-// eventBus.subscribe('refresh-channel-point-rewards')
+eventBus.subscribe(
+	'refresh-channel-point-rewards',
+	{
+		handler: 'packages/functions/src/event-bridge/refresh-channel-point-rewards.handler',
+		link: [database, params, twitchClientId, twitchClientSecret],
+		permissions: [ssmPermissions],
+		runtime: 'nodejs22.x',
+	},
+	{
+		pattern: {
+			detailType: ['refresh-channel-point-rewards'],
+		},
+	}
+);
+
+eventBus.subscribeQueue('give-pack-to-user', packQueue, {
+	pattern: {
+		source: ['twitch'],
+		detailType: ['give-pack-to-user'],
+	},
+});
+
+eventBus.subscribeQueue('trade-accepted', tradeQueue, {
+	pattern: {
+		detailType: ['trade-accepted'],
+	},
+});
+
+eventBus.subscribe('moment-redeemed', {
+	handler: 'packages/functions/src/event-bridge/create-moment-redemption.handler',
+	link: [database],
+	runtime: 'nodejs22.x',
+});
+
+eventBus.subscribe('packs-updated', {
+	handler: 'packages/functions/src/event-bridge/packs-updated.handler',
+	link: [wsApi, wsConnectionsTable],
+	runtime: 'nodejs22.x',
+});

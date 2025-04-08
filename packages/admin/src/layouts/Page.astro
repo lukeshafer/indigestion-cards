@@ -4,7 +4,7 @@ import AdminOnly from '@admin/components/AdminOnly.astro';
 import Header from '@admin/components/Header.astro';
 import AlertBox from '@admin/components/AlertBox';
 import { getSiteConfig } from '@core/lib/site-config';
-import { Api } from 'sst/node/api';
+import { Resource } from 'sst';
 import type { Alert } from '@admin/lib/client/state';
 
 export interface Props extends BaseProps {
@@ -41,7 +41,7 @@ alerts.push(...(alertsProp ?? []));
 	<div
 		class="grid h-[100svh] grid-cols-1 overflow-hidden md:grid-cols-[max-content_1fr]"
 		id="page-layout-wrapper"
-		data-api-url={Api.AdminApi.url}>
+		data-api-url={Resource.AdminApi.url}>
 		<div
 			class="relative flex flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-950 md:col-start-2"
 			id="page-scroll-wrapper">

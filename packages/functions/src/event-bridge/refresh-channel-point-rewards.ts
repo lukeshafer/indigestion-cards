@@ -1,4 +1,4 @@
-import { Config } from 'sst/node/config';
+import { Resource } from 'sst';
 import {
 	refreshChannelPointRewards,
 	addMessageToSiteConfig,
@@ -15,16 +15,16 @@ export async function handler() {
 	console.log('Refreshing channel point rewards...');
 	const refreshTokenError =
 		'Twitch Authentication Error. If you are Ryan, please go to "Site Config" and click "Authorize Streamer Permissions" to refresh your token.';
-	const rewards = await getAllChannelPointRewards({ userId: Config.STREAMER_USER_ID }).catch(
-		async e => {
-			console.error('Error getting channel point rewards: ', e);
-			await addMessageToSiteConfig({
-				type: 'error',
-				message: refreshTokenError,
-			});
-			throw e;
-		}
-	);
+	const rewards = await getAllChannelPointRewards({
+		userId: Resource.CardsParams.STREAMER_USER_ID,
+	}).catch(async e => {
+		console.error('Error getting channel point rewards: ', e);
+		await addMessageToSiteConfig({
+			type: 'error',
+			message: refreshTokenError,
+		});
+		throw e;
+	});
 	await refreshChannelPointRewards(rewards);
 
 	await removeMessageFromSiteConfig({ message: refreshTokenError });

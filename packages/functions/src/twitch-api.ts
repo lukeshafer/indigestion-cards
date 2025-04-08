@@ -1,5 +1,5 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
-import { EventBus } from 'sst/node/event-bus';
+import { Resource } from 'sst';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { verifyTwitchRequest, parseRequestBody, MESSAGE_TYPE, getHeaders } from '@core/lib/twitch';
 import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@core/lib/site-config';
@@ -100,7 +100,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 										eventType: body.type,
 									},
 								} satisfies PackDetails),
-								EventBusName: EventBus.eventBus.eventBusName,
+								EventBusName: Resource.EventBus.name,
 							},
 						],
 					})
@@ -158,7 +158,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 								eventType: body.type,
 							},
 						} satisfies PackDetails),
-						EventBusName: EventBus.eventBus.eventBusName,
+						EventBusName: Resource.EventBus.name,
 					},
 				],
 			});
@@ -174,7 +174,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 						Source: 'twitch',
 						DetailType: 'refresh-channel-point-rewards',
 						Detail: JSON.stringify({}),
-						EventBusName: EventBus.eventBus.eventBusName,
+						EventBusName: Resource.EventBus.name,
 					},
 				],
 			});

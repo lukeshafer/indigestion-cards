@@ -1,13 +1,7 @@
 import { addConnection } from '@core/lib/ws';
-import { WebSocketApiHandler } from 'sst/node/websocket-api';
-//import { useSession } from 'sst/node/future/auth';
+import { WebSocketApiHandler } from 'sstv2/node/websocket-api';
 
 export const main = WebSocketApiHandler(async event => {
-	//let session = useSession();
-	//if (session.type !== 'admin') {
-	//	return { statusCode: 401, body: 'Unauthorized.' };
-	//}
-
 	let connectionId = event.requestContext.connectionId;
 	if (!connectionId) {
 		return { statusCode: 400, body: 'Invalid request.' };

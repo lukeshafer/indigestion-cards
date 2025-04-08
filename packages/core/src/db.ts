@@ -1,4 +1,4 @@
-import { Table } from 'sst/node/table';
+import { Resource } from 'sst'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
 	type Attribute,
@@ -11,7 +11,7 @@ import { randomUUID } from 'crypto';
 import { useSession } from 'sst/node/future/auth';
 
 export const dbConfig = {
-	table: Table.data.tableName,
+	table: Resource.Database.name,
 	client: new DynamoDBClient(),
 } satisfies EntityConfiguration;
 

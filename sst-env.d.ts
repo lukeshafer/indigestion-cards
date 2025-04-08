@@ -5,6 +5,18 @@
 
 declare module "sst" {
   export interface Resource {
+    "AdminApi": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "CardDesigns": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "CardDrafts": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
     "CardsParams": {
       "DOMAIN_NAME": string
       "STREAMER_USER_ID": string
@@ -15,6 +27,35 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
+    "Database": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "EventBus": {
+      "arn": string
+      "name": string
+      "type": "sst.aws.Bus"
+    }
+    "FrameDesigns": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "FrameDrafts": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "PackDLQ": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "PackQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "SiteAuth": {
+      "type": "sst.aws.Auth"
+      "url": string
+    }
     "TWITCH_CLIENT_ID": {
       "type": "sst.sst.Secret"
       "value": string
@@ -23,16 +64,24 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "TradeDLQ": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "TradeQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "TwitchAPI": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
     "WebsocketApi": {
       "managementEndpoint": string
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
     }
     "WebsocketApiConnectionsTable": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
-    "data": {
       "name": string
       "type": "sst.aws.Dynamo"
     }

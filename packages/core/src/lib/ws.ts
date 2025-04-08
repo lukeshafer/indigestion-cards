@@ -4,9 +4,8 @@ import {
 	PutItemCommand,
 	ScanCommand,
 } from '@aws-sdk/client-dynamodb';
-import { Table } from 'sst/node/table';
+import { Resource } from 'sst';
 import { ApiGatewayManagementApi } from '@aws-sdk/client-apigatewaymanagementapi';
-import { WebSocketApi } from 'sst/node/websocket-api';
 import type { LibraryOutput } from '../session.types';
 
 const dynamoDb = new DynamoDBClient();
@@ -42,7 +41,7 @@ export const addConnection = LibraryFn(async (args: { connectionId: string }) =>
 					S: args.connectionId,
 				},
 			},
-			TableName: Table.WebsocketApiConnectionsTable.tableName,
+			TableName: Resource.WebsocketApiConnectionsTable.name,
 		})
 	)
 );
@@ -55,14 +54,14 @@ export const removeConnection = LibraryFn((args: { connectionId: string }) =>
 					S: args.connectionId,
 				},
 			},
-			TableName: Table.WebsocketApiConnectionsTable.tableName,
+			TableName: Resource.WebsocketApiConnectionsTable.name,
 		})
 	)
 );
 
 export const getAllConnections = LibraryFn(async () => {
 	const dbResult = await dynamoDb.send(
-		new ScanCommand({ TableName: Table.WebsocketApiConnectionsTable.tableName })
+		new ScanCommand({ TableName: Resource.WebsocketApiConnectionsTable.name })
 	);
 
 	return dbResult.Items?.map(item => ({ id: item.id.S! })) ?? [];
@@ -76,7 +75,7 @@ export const sendMessage = LibraryFn(
 	}) => {
 		const apiG =
 			args.apiGatewayManagementApi ??
-			new ApiGatewayManagementApi({ endpoint: WebSocketApi.WebsocketApi.httpsUrl });
+			new ApiGatewayManagementApi({ endpoint: Resource.WebsocketApi.url });
 
 		try {
 			// Send the message to the given client
@@ -97,7 +96,7 @@ export const sendMessage = LibraryFn(
 
 export const broadcastMessage = LibraryFn(async (args: { messageData: MessageType }) => {
 	const apiGatewayManagementApi = new ApiGatewayManagementApi({
-		endpoint: WebSocketApi.WebsocketApi.httpsUrl,
+		endpoint: Resource.WebsocketApi.url,
 	});
 
 	const connections = await Unwrap(getAllConnections());

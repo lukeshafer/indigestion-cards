@@ -26,3 +26,8 @@ export const params = new sst.Linkable('CardsParams', {
 
 export const twitchClientId = new sst.Secret('TWITCH_CLIENT_ID');
 export const twitchClientSecret = new sst.Secret('TWITCH_CLIENT_SECRET');
+
+export const ssmPermissions = {
+	actions: ['ssm:GetParameter', 'ssm:PutParameter'],
+	resources: ['*'],
+};

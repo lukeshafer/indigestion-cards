@@ -1,6 +1,5 @@
-import { WebSocketApiHandler } from 'sst/node/websocket-api';
+import { WebSocketApiHandler } from 'sstv2/node/websocket-api';
 import { broadcastMessage } from '@core/lib/ws';
-//import { useSession } from 'sst/node/future/auth';
 
 export const main = WebSocketApiHandler(async event => {
 	console.log('REQUEST CONTEXT', {

@@ -1,13 +1,12 @@
 import { S3 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
-import { Config } from 'sst/node/config';
+import { Resource } from 'sst';
 import { getCardInstanceByDesignAndRarity } from '@core/lib/card';
 import { parseS3Url } from '@core/lib/images';
 import { getCardDesignById } from '@core/lib/design';
 import { getRarityById } from '@core/lib/rarity';
 import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
-import { Bucket } from 'sst/node/bucket';
 
 const s3 = new S3({ region: 'us-east-2' });
 const IMG_SIZE = [588, 816] as const;
@@ -68,7 +67,7 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 	if (urls.shouldSave) {
 		const key = `${designId}/${rarityId}.png`;
 		await s3.putObject({
-			Bucket: Bucket.CardsBucket.bucketName,
+			Bucket: Resource.CardsBucket.name,
 			Key: key,
 			Body: combinedBuffer,
 			ContentType: 'image/png',
