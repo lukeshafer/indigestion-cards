@@ -21,7 +21,7 @@ export default {
 	},
 	stacks(app) {
 		if (app.stage !== 'prod') {
-			app.setDefaultRemovalPolicy('destroy');
+			app.setDefaultRemovalPolicy('retain');
 		} else {
 			app.setDefaultRemovalPolicy('retain');
 		}
