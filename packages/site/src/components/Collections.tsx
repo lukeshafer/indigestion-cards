@@ -103,11 +103,8 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 
 	Solid.onMount(() => {
 		window.addEventListener('beforeunload', e => {
-			// Check if any of the input fields are filled
 			if (state.previewCards.length > 0 && !confirm()) {
-				// Cancel the event and show alert that
-				// the unsaved changes would be lost
-				e.preventDefault();
+				// e.preventDefault();
 			}
 		});
 	});
