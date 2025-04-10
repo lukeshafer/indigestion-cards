@@ -70,7 +70,7 @@ export async function updateCardDesign(
 export async function addCardDesignTag(args: {
 	designId: string;
 	tags: Array<string>;
-}): Promise<DBResult<Partial<CardDesign | null>>> {
+}): Promise<DBResult<Partial<CardDesign>>> {
 	const {
 		data: {
 			CardDesigns: [design],
@@ -80,19 +80,25 @@ export async function addCardDesignTag(args: {
 
 	const newTags = design.tags?.concat(...args.tags) ?? args.tags;
 
-	const result = await db.transaction
-		.write(({ CardDesigns, CardInstances }) => [
-			CardDesigns.patch({ designId: args.designId }).set({ tags: newTags }).commit(),
-			...cards.map(c =>
-				CardInstances.patch({ designId: args.designId, instanceId: c.instanceId })
-					.set({ tags: newTags })
-					.commit()
-			),
-		])
+	const designResult = await db.entities.CardDesigns.patch({ designId: args.designId })
+		.set({ tags: newTags })
 		.go();
 
-	let [designResult] = result.data;
-	return { success: true, data: designResult.item };
+	const BATCH_SIZE = 50;
+	for (let i = 0; i < cards.length; i += BATCH_SIZE) {
+		const subset = cards.slice(i, i + BATCH_SIZE);
+		await db.transaction
+			.write(({ CardInstances }) =>
+				subset.map(c =>
+					CardInstances.patch({ designId: c.designId, instanceId: c.instanceId })
+						.set({ tags: newTags })
+						.commit()
+				)
+			)
+			.go();
+	}
+
+	return { success: true, data: designResult.data };
 }
 
 export async function removeCardDesignTag(args: {
@@ -113,20 +119,25 @@ export async function removeCardDesignTag(args: {
 	const newTags = design.tags.slice();
 	newTags.splice(tagIndex, 1);
 
-	const result = await db.transaction
-		.write(({ CardDesigns, CardInstances }) => [
-			CardDesigns.patch({ designId: args.designId }).set({ tags: newTags }).commit(),
-			...cards.map(c =>
-				CardInstances.patch({ designId: args.designId, instanceId: c.instanceId })
-					.set({ tags: newTags })
-					.commit()
-			),
-		])
+	const designResult = await db.entities.CardDesigns.patch({ designId: args.designId })
+		.set({ tags: newTags })
 		.go();
 
-	let [designResult] = result.data;
+	const BATCH_SIZE = 50;
+	for (let i = 0; i < cards.length; i += BATCH_SIZE) {
+		const subset = cards.slice(i, i + BATCH_SIZE);
+		await db.transaction
+			.write(({ CardInstances }) =>
+				subset.map(c =>
+					CardInstances.patch({ designId: c.designId, instanceId: c.instanceId })
+						.set({ tags: newTags })
+						.commit()
+				)
+			)
+			.go();
+	}
 
-	return { success: true, data: designResult.item };
+	return { success: true, data: designResult.data };
 }
 
 export type AllDesignsPageData = typeof allDesignsPageSummary extends Summary<infer T> ? T : never;
