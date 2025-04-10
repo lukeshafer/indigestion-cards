@@ -69,9 +69,13 @@ export const server = {
 				const result = await addCardDesignTag({
 					designId: input.designId,
 					tags: input.tags,
-				});
+				}).catch(e => ({
+					success: false,
+					error: e,
+				}));
 
 				if (!result.success) {
+					console.error(result.error);
 					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR' });
 				}
 
@@ -94,9 +98,13 @@ export const server = {
 				const result = await removeCardDesignTag({
 					designId: input.designId,
 					tag: input.tag,
-				});
+				}).catch(e => ({
+					success: false,
+					error: e,
+				}));
 
 				if (!result.success) {
+          console.error(result.error)
 					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR' });
 				}
 
