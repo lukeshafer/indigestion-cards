@@ -29,7 +29,7 @@ export async function createSetCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName.slice(0,50),
+		collectionName: args.collectionName.slice(0, 50),
 		cards: args.collectionCards,
 		collectionType: 'set',
 	};
@@ -59,7 +59,7 @@ export async function createRuleCollection(args: {
 
 	const newCollection: Collection = {
 		collectionId: randomUUID(),
-		collectionName: args.collectionName.slice(0,50),
+		collectionName: args.collectionName.slice(0, 50),
 		rules: args.collectionRules,
 		collectionType: 'rule',
 	};
@@ -205,7 +205,7 @@ type CardInstanceWhereCallback = Parameters<
 const buildCollectionCondition =
 	(args: { rules: CollectionRules; userId: string }): CardInstanceWhereCallback =>
 	(attr, op) => {
-		let conditions: Array<string> = [];
+		let conditions: Array<string> = [op.gt(attr.openedAt, "0")];
 
 		const cardOrSeasonConditions = [];
 		if (args.rules.cardDesignIds) {
@@ -250,6 +250,10 @@ const buildCollectionCondition =
 			conditions.push(
 				args.rules.cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
 			);
+		}
+
+		if (args.rules.tags) {
+			conditions.push(args.rules.tags.map(tag => op.contains(attr.tags, tag)).join(' OR '));
 		}
 
 		const conditionString = `(${conditions.join(') AND (')})`;

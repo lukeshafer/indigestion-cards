@@ -19,5 +19,7 @@ export const GET: APIRoute = async (ctx) => {
 
   const url = `${Auth.AdminSiteAuth.url}/authorize?${authParams}`;
 
+  console.log(url)
+
   return ctx.redirect(url);
 }

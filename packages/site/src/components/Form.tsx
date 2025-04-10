@@ -282,6 +282,7 @@ export function NumberInput(props: InputProps<number>) {
 			<input
 				id={props.name}
 				name={props.name}
+        disabled={props.disabled}
 				type="number"
 				class={BASE_INPUT_CLASS}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}

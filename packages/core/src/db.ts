@@ -241,6 +241,7 @@ const CardInstances = new Entity(
 			},
 			totalOfType: { type: 'number', required: true },
 			stamps: { type: 'list', items: { type: 'string' } },
+			tags: { type: 'list', items: { type: 'string' } },
 			tradeHistory: {
 				type: 'list',
 				items: {
@@ -544,7 +545,7 @@ const Seasons = new Entity(
 			seasonDescription: { type: 'string' },
 			seasonId: { type: 'string', required: true },
 			nextPackNumber: { type: 'number', default: 0 },
-      packNumberPrefix: { type: 'string' },
+			packNumberPrefix: { type: 'string' },
 			...auditAttributes('season'),
 		},
 		indexes: {
