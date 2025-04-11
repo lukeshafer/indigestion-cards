@@ -613,7 +613,7 @@ const PreviewCard: Solid.Component<{
 			}>
 			<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+				<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
 			</Solid.Show>
 			<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber
@@ -644,7 +644,7 @@ const InstanceCard: Solid.Component<{
 			}>
 			<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-				<CardEls.CardDescription>{props.card.cardName}</CardEls.CardDescription>
+				<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
 			</Solid.Show>
 			<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber

@@ -855,6 +855,7 @@ const CollectionAttributes = {
 			properties: {
 				cardDesignIds: { type: 'list', items: { type: 'string' } },
 				cardNumbers: { type: 'list', items: { type: 'number' } },
+				cardDenominators: { type: 'list', items: { type: 'number' } },
 				seasonIds: { type: 'list', items: { type: 'string' } },
 				stamps: { type: 'list', items: { type: 'string' } },
 				tags: { type: 'list', items: { type: 'string' } },

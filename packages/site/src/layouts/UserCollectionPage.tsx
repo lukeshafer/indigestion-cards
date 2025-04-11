@@ -87,7 +87,7 @@ export const UserCollectionPage: Component<{
 											when={cardUtils.checkIfCanShowCardText(card.rarityId)}>
 											<CardEls.CardName>{card.cardName}</CardEls.CardName>
 											<CardEls.CardDescription>
-												{card.cardName}
+												{card.cardDescription}
 											</CardEls.CardDescription>
 										</Show>
 										<Show when={!cardUtils.checkIsLegacyCard(card.rarityId)}>
