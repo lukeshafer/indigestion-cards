@@ -862,6 +862,7 @@ const CollectionAttributes = {
 				rarityIds: { type: 'list', items: { type: 'string' } },
 				isMinter: { type: 'boolean' },
 				mintedByIds: { type: 'list', items: { type: 'string' } },
+				artists: { type: 'list', items: { type: 'string' } },
 			},
 		},
 	},

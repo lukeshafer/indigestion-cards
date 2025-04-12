@@ -1,6 +1,13 @@
 import { randomUUID } from 'crypto';
 import { db } from '../db';
-import type { CardInstance, Collection, CollectionCards, CollectionRules, User } from '../db.types';
+import type {
+	CardDesign,
+	CardInstance,
+	Collection,
+	CollectionCards,
+	CollectionRules,
+	User,
+} from '../db.types';
 import { getUser } from './user';
 
 type Output<T, Message = string> = Promise<
@@ -195,7 +202,26 @@ export async function getRuleCollectionCards(args: {
 		.where(buildCollectionCondition({ rules: args.rules, userId: args.userId }))
 		.go({ pages: 'all' });
 
-	return result.data;
+	let designMap: Map<string, CardDesign> | null = null;
+	const setupDesignMap = async () => {
+		if (designMap) return;
+		const designIds = new Set(result.data.map(c => c.designId));
+		const designList = await db.entities.CardDesigns.get(
+			Array.from(designIds).map(d => ({ designId: d }))
+		).go();
+		designMap = new Map(designList.data.map(d => [d.designId, d] as const));
+	};
+
+	let data = result.data;
+
+	if (args.rules.artists?.length) {
+		const artists = new Set(args.rules.artists);
+		await setupDesignMap();
+
+		data = data.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+	}
+
+	return data;
 }
 
 type CardInstanceWhereCallback = Parameters<
@@ -205,7 +231,7 @@ type CardInstanceWhereCallback = Parameters<
 const buildCollectionCondition =
 	(args: { rules: CollectionRules; userId: string }): CardInstanceWhereCallback =>
 	(attr, op) => {
-		let conditions: Array<string> = [op.gt(attr.openedAt, "0")];
+		let conditions: Array<string> = [op.gt(attr.openedAt, '0')];
 
 		const cardOrSeasonConditions = [];
 		if (args.rules.cardDesignIds) {
@@ -249,6 +275,14 @@ const buildCollectionCondition =
 		if (args.rules.cardNumbers) {
 			conditions.push(
 				args.rules.cardNumbers.map(number => op.eq(attr.cardNumber, number)).join(' OR ')
+			);
+		}
+
+		if (args.rules.cardDenominators) {
+			conditions.push(
+				args.rules.cardDenominators
+					.map(number => op.eq(attr.totalOfType, number))
+					.join(' OR ')
 			);
 		}
 
@@ -311,6 +345,22 @@ async function getRuleCollectionPreviewCards(args: {
 
 	let { cursor, data: cards } = result;
 
+	let designMap: Map<string, CardDesign> | null = null;
+	const setupDesignMap = async () => {
+		if (designMap !== null) return;
+		const designIds = new Set(result.data.map(c => c.designId));
+		const designList = await db.entities.CardDesigns.get(
+			Array.from(designIds).map(d => ({ designId: d }))
+		).go();
+		designMap = new Map(designList.data.map(d => [d.designId, d] as const));
+	};
+	if (args.rules.artists?.length) {
+		const artists = new Set(args.rules.artists);
+		await setupDesignMap();
+
+		cards = cards.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+	}
+
 	while (cards.length < 3 && cursor != null) {
 		const newResult = await db.entities.CardInstances.query
 			.byUser({ username: args.username })
@@ -319,6 +369,13 @@ async function getRuleCollectionPreviewCards(args: {
 
 		cards.push(...newResult.data);
 		cursor = newResult.cursor;
+
+		if (args.rules.artists?.length) {
+			const artists = new Set(args.rules.artists);
+			await setupDesignMap();
+
+			cards = cards.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+		}
 	}
 
 	return cards.slice(0, 3);

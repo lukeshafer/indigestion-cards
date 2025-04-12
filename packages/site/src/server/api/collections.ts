@@ -10,6 +10,19 @@ import {
 } from '@core/lib/collections';
 import { TRPCError } from '@trpc/server';
 
+const rulesSchema = z.object({
+	cardDesignIds: z.array(z.string()).optional(),
+	cardNumbers: z.array(z.number()).optional(),
+	cardDenominators: z.array(z.number()).optional(),
+	seasonIds: z.array(z.string()).optional(),
+	stamps: z.array(z.string()).optional(),
+	tags: z.array(z.string()).optional(),
+	rarityIds: z.array(z.string()).optional(),
+	isMinter: z.boolean().optional(),
+	mintedByIds: z.array(z.string()).optional(),
+	artists: z.array(z.string()).optional(),
+});
+
 export const collections = {
 	cards: authedProcedure.input(z.object({ collectionId: z.string() })).query(
 		async ({ input, ctx }) =>
@@ -37,28 +50,17 @@ export const collections = {
 
 			return data;
 		}),
-	mockLoadCardsRule: authedProcedure
-		.input(
-			z.object({
-				cardDesignIds: z.array(z.string()).optional(),
-				cardNumerators: z.array(z.string()).optional(),
-				seasonIds: z.array(z.string()).optional(),
-				stamps: z.array(z.string()).optional(),
-				tags: z.array(z.string()).optional(),
-				rarityIds: z.array(z.string()).optional(),
-				isMinter: z.boolean().optional(),
-				mintedByIds: z.array(z.string()).optional(),
-			})
-		)
-		.query(async ({ input, ctx }) => {
-			const data = await getRuleCollectionCards({
-				username: ctx.session.properties.username,
-				userId: ctx.session.properties.userId,
-				rules: input,
-			});
+	mockLoadCardsRule: authedProcedure.input(rulesSchema).query(async ({ input, ctx }) => {
+		console.log(input.cardNumbers);
 
-			return data;
-		}),
+		const data = await getRuleCollectionCards({
+			username: ctx.session.properties.username,
+			userId: ctx.session.properties.userId,
+			rules: input,
+		});
+
+		return data;
+	}),
 	create: authedProcedure
 		.input(
 			z.object({ collectionName: z.string() }).and(
@@ -72,16 +74,7 @@ export const collections = {
 					.or(
 						z.object({
 							collectionType: z.literal('rule'),
-							collectionRules: z.object({
-								cardDesignIds: z.array(z.string()).optional(),
-								cardNumerators: z.array(z.string()).optional(),
-								seasonIds: z.array(z.string()).optional(),
-								stamps: z.array(z.string()).optional(),
-								tags: z.array(z.string()).optional(),
-								rarityIds: z.array(z.string()).optional(),
-								isMinter: z.boolean().optional(),
-								mintedByIds: z.array(z.string()).optional(),
-							}),
+							collectionRules: rulesSchema,
 						})
 					)
 			)
