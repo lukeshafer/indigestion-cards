@@ -16,8 +16,10 @@ const CollectionContext = Solid.createContext<{
 			cards: Array<DB.CardDesign>;
 		}
 	>;
+	moveCardToIndex(fromIndex: number, toIndex: number): void;
 }>({
 	seasons: new Map(),
+	moveCardToIndex() {},
 });
 function useCollectionContext() {
 	return Solid.useContext(CollectionContext);
@@ -25,7 +27,7 @@ function useCollectionContext() {
 
 export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> }> = props => {
 	const [state, setState] = createStore({
-		type: 'rule' as 'set' | 'rule', // FIXME:
+		type: 'set' as 'set' | 'rule',
 		rules: {} as DB.CollectionRules,
 		cards: [] as DB.CollectionCards,
 		previewCards: [] as Array<DB.CardInstance>,
@@ -77,7 +79,7 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 						if (checkAreRulesEmpty(rules)) {
 							setState('previewCards', []);
 						} else {
-              console.log(rules.artists)
+							console.log(rules.artists);
 							trpc.collections.mockLoadCardsRule
 								.query(rules)
 								.then(result => setState('previewCards', reconcile(result)));
@@ -106,19 +108,22 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 		{ initialValue: new Map() }
 	);
 
-	// Solid.onMount(() => {
-	// 	window.addEventListener('beforeunload', e => {
-	// 		if (state.previewCards.length > 0 && !confirm()) {
-	// 			// e.preventDefault();
-	// 		}
-	// 	});
-	// });
-
 	return (
 		<CollectionContext.Provider
 			value={{
 				get seasons() {
 					return seasons.latest;
+				},
+				moveCardToIndex(fromIndex, toIndex) {
+					if (state.type !== 'set') return;
+					if (fromIndex === toIndex) return;
+					setState(
+						'cards',
+						produce(draft => {
+							const draggingCard = draft.splice(fromIndex, 1)[0];
+							draft.splice(toIndex, 0, draggingCard);
+						})
+					);
 				},
 			}}>
 			<div class="grid gap-y-8 lg:grid-cols-[60%_40%]">
@@ -258,6 +263,7 @@ const CollectionCardsPreviewList: Solid.Component<{
 	cards: Array<DB.CardInstance>;
 	type: 'set' | 'rule';
 }> = props => {
+	const ctx = useCollectionContext();
 	return (
 		<section aria-labelledby="collection-preview-title" class="mt-8">
 			<h2 id="collection-preview-title" class="text-xl">
@@ -276,13 +282,45 @@ const CollectionCardsPreviewList: Solid.Component<{
 									: 'Please select a filter to preview your collection.'}
 							</p>
 						}>
-						{card => (
-							<li
-								draggable={props.type === 'set'}
-								classList={{ 'cursor-pointer': props.type === 'set' }}>
-								<PreviewCard card={card} />
-							</li>
-						)}
+						{(card, index) => {
+							const [isDragging, setIsDragging] = Solid.createSignal(false);
+							const [isDragAbove, setIsDragAbove] = Solid.createSignal(false);
+
+							return (
+								<li
+									draggable={props.type === 'set'}
+									onDragStart={e => {
+										setIsDragging(true);
+										if (!e.dataTransfer) return;
+										e.dataTransfer.setData('text', String(index()));
+										e.dataTransfer.effectAllowed = 'move';
+									}}
+									onDragEnd={() => setIsDragging(false)}
+									onDragEnter={e => {
+										e.preventDefault();
+										setIsDragAbove(true);
+									}}
+									onDragOver={e => e.preventDefault()}
+									onDragLeave={() => setIsDragAbove(false)}
+									onDrop={e => {
+										e.preventDefault();
+										setIsDragAbove(false);
+										const fromIndexString = e.dataTransfer?.getData('text');
+										const fromIndex = fromIndexString
+											? parseInt(fromIndexString)
+											: null;
+										if (fromIndex === null) return;
+										ctx.moveCardToIndex(fromIndex, index());
+									}}
+									classList={{
+										'cursor-move': props.type === 'set',
+										'opacity-25': isDragging(),
+										'brightness-75': isDragAbove(),
+									}}>
+									<PreviewCard card={card} />
+								</li>
+							);
+						}}
 					</Solid.For>
 				</Solid.Suspense>
 			</ul>
@@ -351,14 +389,14 @@ const RuleCollectionBuilder: Solid.Component<{
 			rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
 			mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
 			isMinter: rules.isMinter,
-      artists: rules.artists.size ? [...rules.artists] : undefined,
-    });
+			artists: rules.artists.size ? [...rules.artists] : undefined,
+		});
 	});
 
 	return (
 		<RuleContext.Provider value={rules}>
 			<form class="grid h-fit gap-2" onSubmit={e => e.preventDefault()}>
-				<RuleCollectionBuilderDesignInput  />
+				<RuleCollectionBuilderDesignInput />
 				<Fieldset legend="Stamped">
 					<Checkbox
 						name="isShitStamped"
@@ -370,8 +408,8 @@ const RuleCollectionBuilder: Solid.Component<{
 						}
 					/>
 				</Fieldset>
-				<RuleCollectionBuilderRarityInput  />
-				<RuleCollectionBuilderTagInput  />
+				<RuleCollectionBuilderRarityInput />
+				<RuleCollectionBuilderTagInput />
 				<Fieldset legend="Minted by">
 					<label class="flex gap-2">
 						<input
@@ -402,8 +440,8 @@ const RuleCollectionBuilder: Solid.Component<{
 						Anyone besides me
 					</label>
 				</Fieldset>
-				<RuleCollectionBuilderCardNumberInput  />
-				<RuleCollectionBuilderArtistInput  />
+				<RuleCollectionBuilderCardNumberInput />
+				<RuleCollectionBuilderArtistInput />
 			</form>
 		</RuleContext.Provider>
 	);
@@ -523,7 +561,7 @@ const RuleCollectionBuilderRarityInput: Solid.Component = () => {
 							data-disabled={!isEnabled()}>
 							<input
 								type="checkbox"
-								name='rarity-id'
+								name="rarity-id"
 								value={rarityId}
 								checked={rules.rarityIds.has(rarityId)}
 								disabled={!isEnabled()}
