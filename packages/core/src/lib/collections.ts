@@ -9,6 +9,8 @@ import type {
 	User,
 } from '../db.types';
 import { getUser } from './user';
+import { getRarityRanking } from './site-config';
+import { sortCards } from './shared';
 
 type Output<T, Message = string> = Promise<
 	| {
@@ -221,7 +223,12 @@ export async function getRuleCollectionCards(args: {
 		data = data.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
 	}
 
-	return data;
+	if (!args.rules.sort) return data;
+	return sortCards({
+		cards: data,
+		sort: args.rules.sort,
+		rarityRanking: await getRarityRanking(),
+	});
 }
 
 type CardInstanceWhereCallback = Parameters<
@@ -378,5 +385,10 @@ async function getRuleCollectionPreviewCards(args: {
 		}
 	}
 
-	return cards.slice(0, 3);
+	if (!args.rules.sort) return cards.slice(0, 3);
+	return sortCards({
+		cards: cards.slice(0, 3),
+		sort: args.rules.sort,
+		rarityRanking: await getRarityRanking(),
+	});
 }

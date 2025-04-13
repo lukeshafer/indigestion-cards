@@ -1,12 +1,20 @@
 import type * as DB from '@core/types';
 import { trpc } from '@site/client/api';
 import * as Solid from 'solid-js';
-import { Checkbox, Fieldset, NumberInput, SubmitButton, TextInput } from '@site/components/Form';
+import {
+	Checkbox,
+	Fieldset,
+	NumberInput,
+	Select,
+	SubmitButton,
+	TextInput,
+} from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { FULL_ART_ID, routes } from '@site/constants';
 import { createMutable, createStore, produce, reconcile } from 'solid-js/store';
 import { ReactiveSet } from '@solid-primitives/set';
 import * as CardList from './CardList';
+import { sortTypes } from '@core/lib/shared';
 
 const CollectionContext = Solid.createContext<{
 	seasons: Map<
@@ -51,6 +59,7 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 					}
 					setState('rules', reconcile({}));
 				} else if (type === 'rule') {
+					setState('rules', { sort: 'rarest' });
 					setState('cards', []);
 				}
 			}
@@ -252,6 +261,14 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 						}>
 						<div class="w-fit">Save Collection</div>
 					</SubmitButton>
+					<Solid.Show when={state.type === 'rule'}>
+						<Select
+							name="sort"
+							options={sortTypes}
+							value="rarest"
+							setValue={sort => setState('rules', { sort })}
+						/>
+					</Solid.Show>
 					<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
 				</form>
 			</div>
@@ -868,7 +885,7 @@ const InstanceCard: Solid.Component<{
 };
 
 function checkAreRulesEmpty(rules: DB.CollectionRules) {
-	return Object.values(rules).filter(v => v !== null).length === 0;
+	return Object.values(rules).filter(v => v !== null).length === (rules.sort !== null ? 1 : 0);
 }
 
 export function formatCollectionViewTransitionId(options: {

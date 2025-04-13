@@ -853,6 +853,18 @@ const CollectionAttributes = {
 		rules: {
 			type: 'map',
 			properties: {
+				sort: {
+					type: [
+						'rarest',
+						'common',
+						'card-name-asc',
+						'card-name-desc',
+						'open-date-asc',
+						'open-date-desc',
+						'owner-asc',
+						'owner-desc',
+					] as const,
+				},
 				cardDesignIds: { type: 'list', items: { type: 'string' } },
 				cardNumbers: { type: 'list', items: { type: 'number' } },
 				cardDenominators: { type: 'list', items: { type: 'number' } },

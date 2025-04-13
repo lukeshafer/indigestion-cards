@@ -21,6 +21,17 @@ const rulesSchema = z.object({
 	isMinter: z.boolean().optional(),
 	mintedByIds: z.array(z.string()).optional(),
 	artists: z.array(z.string()).optional(),
+
+	sort: z.enum([
+		'rarest',
+		'common',
+		'card-name-asc',
+		'card-name-desc',
+		'open-date-asc',
+		'open-date-desc',
+		'owner-asc',
+		'owner-desc',
+	]).optional(),
 });
 
 export const collections = {
