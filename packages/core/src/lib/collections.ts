@@ -55,6 +55,54 @@ export async function createSetCollection(args: {
 	} as const;
 }
 
+export async function updateSetCollection(args: {
+	userId: string;
+	collectionId: string;
+	collectionName: string;
+	collectionCards: CollectionCards;
+}): Output<{ user: Partial<User>; collection: Collection }, string> {
+	const verifyResult = await verifyUser(args);
+	if (!verifyResult.success) {
+		return verifyResult;
+	}
+	const { user } = verifyResult.data;
+
+	const previousCollectionIndex = user.collections?.findIndex(
+		c => c.collectionId === args.collectionId
+	);
+
+	if (previousCollectionIndex === undefined || previousCollectionIndex === -1) {
+		return {
+			success: false,
+			message: 'COLLECTION_DOES_NOT_EXIST',
+		};
+	}
+
+	const editedCollection: Collection = {
+		collectionId: args.collectionId,
+		collectionName: args.collectionName.slice(0, 50),
+		cards: args.collectionCards,
+		collectionType: 'set',
+	};
+
+	const updatedCollections = user.collections!.toSpliced(
+		previousCollectionIndex,
+		1,
+		editedCollection
+	);
+
+	let result = await db.entities.Users.patch({ userId: user.userId })
+		.set({
+			collections: updatedCollections,
+		})
+		.go();
+
+	return {
+		success: true,
+		data: { user: result.data, collection: editedCollection },
+	} as const;
+}
+
 export async function createRuleCollection(args: {
 	userId: string;
 	collectionName: string;
@@ -82,6 +130,55 @@ export async function createRuleCollection(args: {
 	return {
 		success: true,
 		data: { user: result.data, collection: newCollection },
+	} as const;
+}
+
+export async function updateRuleCollection(args: {
+	collectionId: string;
+	userId: string;
+	collectionName: string;
+	collectionRules: CollectionRules;
+}): Output<
+	{ user: Partial<User>; collection: Collection },
+	'USER_DOES_NOT_EXIST' | 'COLLECTION_DOES_NOT_EXIST'
+> {
+	const verifyResult = await verifyUser(args);
+	if (!verifyResult.success) {
+		return verifyResult;
+	}
+	const { user } = verifyResult.data;
+
+	const previousCollectionIndex = user.collections?.findIndex(
+		c => c.collectionId === args.collectionId
+	);
+
+	if (previousCollectionIndex === undefined || previousCollectionIndex === -1) {
+		return {
+			success: false,
+			message: 'COLLECTION_DOES_NOT_EXIST',
+		};
+	}
+
+	const editedCollection: Collection = {
+		collectionId: args.collectionId,
+		collectionName: args.collectionName.slice(0, 50),
+		rules: args.collectionRules,
+		collectionType: 'rule',
+	};
+
+	const updatedCollections = user.collections!.toSpliced(
+		previousCollectionIndex,
+		1,
+		editedCollection
+	);
+
+	let result = await db.entities.Users.patch({ userId: user.userId })
+		.set({ collections: updatedCollections })
+		.go();
+
+	return {
+		success: true,
+		data: { user: result.data, collection: editedCollection },
 	} as const;
 }
 
@@ -116,7 +213,7 @@ export async function deleteCollection(args: {
 	return { success: true, data: result.data } as const;
 }
 
-async function getCollection(args: {
+export async function getCollection(args: {
 	userId: string;
 	collectionId: string;
 }): Output<

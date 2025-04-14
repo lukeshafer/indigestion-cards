@@ -15,6 +15,7 @@ import { createMutable, createStore, produce, reconcile } from 'solid-js/store';
 import { ReactiveSet } from '@solid-primitives/set';
 import * as CardList from './CardList';
 import { sortTypes } from '@core/lib/shared';
+import { pushAlert } from '@site/client/state';
 
 const CollectionContext = Solid.createContext<{
 	seasons: Map<
@@ -33,13 +34,76 @@ function useCollectionContext() {
 	return Solid.useContext(CollectionContext);
 }
 
-export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> }> = props => {
-	const [state, setState] = createStore({
-		type: 'set' as 'set' | 'rule',
-		rules: {} as DB.CollectionRules,
-		cards: [] as DB.CollectionCards,
-		previewCards: [] as Array<DB.CardInstance>,
-		collectionName: '',
+const RuleContext = Solid.createContext({
+	cardDesignIds: new ReactiveSet<string>(),
+	cardNumber: undefined as number | undefined,
+	cardDenominator: undefined as number | undefined,
+	seasonIds: new ReactiveSet<string>(),
+	stamps: new ReactiveSet<string>(),
+	tags: new ReactiveSet<string>(),
+	rarityIds: new ReactiveSet<string>(),
+	mintedByIds: new ReactiveSet<string>(),
+	isMinter: undefined as boolean | undefined,
+	artists: new ReactiveSet<string>(),
+});
+const useRules = () => Solid.useContext(RuleContext);
+
+type CollectionState = {
+	type: 'set' | 'rule';
+	rules: DB.CollectionRules;
+	cards: DB.CollectionCards;
+	previewCards: Array<DB.CardInstance>;
+	collectionName: string;
+};
+
+type CollectionBuilderProps = {
+	cards: Array<DB.CardInstance>;
+	initialState?: CollectionState;
+} & (
+	| {
+			mode: 'edit';
+			collectionId: string;
+	  }
+	| { mode?: 'create' }
+);
+
+export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props => {
+	const [state, setState] = createStore<CollectionState>(
+		props.initialState ?? {
+			type: 'set' as 'set' | 'rule',
+			rules: {} as DB.CollectionRules,
+			cards: [] as DB.CollectionCards,
+			previewCards: [] as Array<DB.CardInstance>,
+			collectionName: '',
+		}
+	);
+
+	const rules = createMutable({
+		cardDesignIds: new ReactiveSet<string>(props.initialState?.rules.cardDesignIds),
+		cardNumber: props.initialState?.rules.cardNumbers?.[0] ?? undefined,
+		cardDenominator: props.initialState?.rules.cardDenominators?.[0] ?? undefined,
+		seasonIds: new ReactiveSet<string>(props.initialState?.rules.seasonIds),
+		stamps: new ReactiveSet<string>(props.initialState?.rules.stamps),
+		tags: new ReactiveSet<string>(props.initialState?.rules.tags),
+		rarityIds: new ReactiveSet<string>(props.initialState?.rules.rarityIds),
+		mintedByIds: new ReactiveSet<string>(props.initialState?.rules.mintedByIds),
+		isMinter: props.initialState?.rules.isMinter,
+		artists: new ReactiveSet<string>(props.initialState?.rules.artists),
+	});
+
+	Solid.createEffect(() => {
+		setState('rules', {
+			cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
+			cardNumbers: rules.cardNumber ? [rules.cardNumber] : undefined,
+			cardDenominators: rules.cardDenominator ? [rules.cardDenominator] : undefined,
+			seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
+			stamps: rules.stamps.size ? [...rules.stamps] : undefined,
+			tags: rules.tags.size ? [...rules.tags] : undefined,
+			rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
+			mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
+			isMinter: rules.isMinter,
+			artists: rules.artists.size ? [...rules.artists] : undefined,
+		});
 	});
 
 	Solid.createEffect(
@@ -135,143 +199,180 @@ export const CollectionBuilder: Solid.Component<{ cards: Array<DB.CardInstance> 
 					);
 				},
 			}}>
-			<div class="grid gap-y-8 lg:grid-cols-[60%_40%]">
-				<div class="grid h-fit gap-8">
-					<fieldset class="flex justify-center">
-						<label
-							class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
-							data-checked={state.type === 'set'}>
-							<input
-								type="radio"
-								name="collectionType"
-								value="set"
-								class="sr-only"
-								checked={state.type === 'set'}
-								onChange={() => {
-									if (state.type === 'set') return;
-									if (
-										state.previewCards.length === 0 ||
-										confirm(
-											'Are you sure you want to change type? Cards selected by filter will transfer.'
+			<RuleContext.Provider value={rules}>
+				<div class="grid gap-y-8 lg:grid-cols-[60%_40%]">
+					<div class="grid h-fit gap-8">
+						<fieldset class="flex justify-center">
+							<label
+								class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+								data-checked={state.type === 'set'}>
+								<input
+									type="radio"
+									name="collectionType"
+									value="set"
+									class="sr-only"
+									checked={state.type === 'set'}
+									onChange={() => {
+										if (state.type === 'set') return;
+										if (
+											state.previewCards.length === 0 ||
+											confirm(
+												'Are you sure you want to change type? Cards selected by filter will transfer.'
+											)
+										) {
+											setState('type', 'set');
+										}
+									}}
+								/>
+								<p>Standard Collection</p>
+							</label>
+							<label
+								class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+								data-checked={state.type === 'rule'}>
+								<input
+									type="radio"
+									name="collectionType"
+									value="rule"
+									class="sr-only"
+									checked={state.type === 'rule'}
+									onChange={() => {
+										if (state.type === 'rule') return;
+										if (
+											state.previewCards.length === 0 ||
+											confirm(
+												'Are you sure you want to change type? You will start over with no cards selected.'
+											)
+										) {
+											setState('type', 'rule');
+										}
+									}}
+								/>
+								<p>Advanced Collection</p>
+							</label>
+						</fieldset>
+						<Solid.Switch>
+							<Solid.Match when={state.type === 'set'}>
+								<SetCollectionBuilder
+									userCards={props.cards}
+									selectedCards={state.cards}
+									addCardId={instanceId => {
+										if (
+											state.cards.some(card => card.instanceId === instanceId)
 										)
-									) {
-										setState('type', 'set');
-									}
-								}}
-							/>
-							<p>Standard Collection</p>
-						</label>
-						<label
-							class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
-							data-checked={state.type === 'rule'}>
-							<input
-								type="radio"
-								name="collectionType"
-								value="rule"
-								class="sr-only"
-								checked={state.type === 'rule'}
-								onChange={() => {
-									if (state.type === 'rule') return;
-									if (
-										state.previewCards.length === 0 ||
-										confirm(
-											'Are you sure you want to change type? You will start over with no cards selected.'
-										)
-									) {
-										setState('type', 'rule');
-									}
-								}}
-							/>
-							<p>Advanced Collection</p>
-						</label>
-					</fieldset>
-					<Solid.Switch>
-						<Solid.Match when={state.type === 'set'}>
-							<SetCollectionBuilder
-								userCards={props.cards}
-								selectedCards={state.cards}
-								addCardId={instanceId => {
-									if (state.cards.some(card => card.instanceId === instanceId))
-										return;
+											return;
 
-									const card = props.cards.find(
-										card => card.instanceId === instanceId
-									);
+										const card = props.cards.find(
+											card => card.instanceId === instanceId
+										);
 
-									if (!card) return;
+										if (!card) return;
 
-									setState('cards', state.cards.length, {
-										designId: card.designId,
-										instanceId: card.instanceId,
-									});
-								}}
-								removeCardId={instanceId => {
-									let indexes = state.cards.reduce((indexes, value, index) => {
-										if (value.instanceId === instanceId) {
-											return [...indexes, index];
-										} else return indexes;
-									}, [] as Array<number>);
+										setState('cards', state.cards.length, {
+											designId: card.designId,
+											instanceId: card.instanceId,
+										});
+									}}
+									removeCardId={instanceId => {
+										let indexes = state.cards.reduce(
+											(indexes, value, index) => {
+												if (value.instanceId === instanceId) {
+													return [...indexes, index];
+												} else return indexes;
+											},
+											[] as Array<number>
+										);
 
-									if (indexes.length === 0) return;
+										if (indexes.length === 0) return;
 
-									setState(
-										'cards',
-										produce(draft =>
-											indexes.forEach(index => draft.splice(index, 1))
-										)
-									);
-								}}
-							/>
-						</Solid.Match>
-						<Solid.Match when={state.type === 'rule'}>
-							<RuleCollectionBuilder setRules={rules => setState('rules', rules)} />
-						</Solid.Match>
-					</Solid.Switch>
-				</div>
-				<form class="grid h-fit gap-4 px-4">
-					<div class="max-w-72">
-						<TextInput
-							maxLength="50"
-							name="collectionName"
-							label="Collection Name"
-							setValue={v => setState('collectionName', v)}
-						/>
+										setState(
+											'cards',
+											produce(draft =>
+												indexes.forEach(index => draft.splice(index, 1))
+											)
+										);
+									}}
+								/>
+							</Solid.Match>
+							<Solid.Match when={state.type === 'rule'}>
+								<RuleCollectionBuilder />
+							</Solid.Match>
+						</Solid.Switch>
 					</div>
-					<SubmitButton
-						onClick={() => {
-							trpc.collections.create
-								.mutate({
-									collectionName: state.collectionName,
-									collectionType: state.type,
-									collectionRules: state.type === 'rule' ? state.rules : {},
-									collectionCards: state.type === 'set' ? state.cards : [],
-								})
-								.catch(error => {
-									// TODO: handle the error
-									console.error(error);
-								})
-								.then(result => {
-									location.assign(
-										`${routes.USERS}/${result?.username}?alert=Successfully%20created%20collection`
-									);
-								});
-						}}
-						disabled={
-							state.previewCards.length === 0 || state.collectionName.length === 0
-						}>
-						<div class="w-fit">Save Collection</div>
-					</SubmitButton>
-					<Solid.Show when={state.type === 'rule'}>
-						<Select
-							name="sort"
-							options={sortTypes}
-							value="rarest"
-							setValue={sort => setState('rules', { sort })}
-						/>
-					</Solid.Show>
-					<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
-				</form>
-			</div>
+					<form
+						class="grid h-fit gap-4 px-4"
+						onSubmit={e => {
+							e.preventDefault();
+							if (!props.mode || props.mode === 'create') {
+								trpc.collections.create
+									.mutate({
+										collectionName: state.collectionName,
+										collectionType: state.type,
+										collectionRules: state.type === 'rule' ? state.rules : {},
+										collectionCards: state.type === 'set' ? state.cards : [],
+									})
+									.catch(error => {
+										pushAlert({
+											type: 'error',
+											message: error?.message || 'An unknown error occurred.',
+										});
+										console.error(error);
+									})
+									.then(result => {
+										location.assign(
+											`${routes.USERS}/${result?.username}?alert=Successfully%20created%20collection`
+										);
+									});
+							} else if (props.mode === 'edit') {
+								trpc.collections.update
+									.mutate({
+										collectionId: props.collectionId,
+										collectionName: state.collectionName,
+										collectionType: state.type,
+										collectionRules: state.type === 'rule' ? state.rules : {},
+										collectionCards: state.type === 'set' ? state.cards : [],
+									})
+									.catch(error => {
+										pushAlert({
+											type: 'error',
+											message: error?.message || 'An unknown error occurred.',
+										});
+										console.error(error);
+									})
+									.then(result => {
+										console.log("updated", result);
+										location.assign(
+											`${routes.USERS}/${result?.username}?alert=Successfully%20updated%20collection`
+										);
+									});
+							}
+						}}>
+						<div class="max-w-72">
+							<TextInput
+								maxLength="50"
+								value={state.collectionName}
+								name="collectionName"
+								label="Collection Name"
+								setValue={v => setState('collectionName', v)}
+							/>
+						</div>
+						<SubmitButton
+							disabled={
+								state.previewCards.length === 0 || state.collectionName.length === 0
+							}>
+							<div class="w-fit">Save Collection</div>
+						</SubmitButton>
+						<Solid.Show when={state.type === 'rule'}>
+							<Select
+								name="sort"
+								options={sortTypes}
+								value="rarest"
+								setValue={sort => setState('rules', { sort })}
+							/>
+						</Solid.Show>
+						<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
+					</form>
+				</div>
+			</RuleContext.Provider>
 		</CollectionContext.Provider>
 	);
 };
@@ -376,91 +477,59 @@ const SetCollectionBuilder: Solid.Component<{
 	);
 };
 
-const RuleContext = Solid.createContext({
-	cardDesignIds: new ReactiveSet<string>(),
-	cardNumbers: new ReactiveSet<number>(),
-	cardDenominators: new ReactiveSet<number>(),
-	seasonIds: new ReactiveSet<string>(),
-	stamps: new ReactiveSet<string>(),
-	tags: new ReactiveSet<string>(),
-	rarityIds: new ReactiveSet<string>(),
-	mintedByIds: new ReactiveSet<string>(),
-	isMinter: undefined as boolean | undefined,
-	artists: new ReactiveSet<string>(),
-});
-const useRules = () => Solid.useContext(RuleContext);
-
-const RuleCollectionBuilder: Solid.Component<{
-	setRules: (rules: DB.CollectionRules) => void;
-}> = props => {
-	const rules = createMutable(RuleContext.defaultValue);
-
-	Solid.createEffect(() => {
-		props.setRules({
-			cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
-			cardNumbers: rules.cardNumbers.size ? [...rules.cardNumbers] : undefined,
-			cardDenominators: rules.cardDenominators.size ? [...rules.cardDenominators] : undefined,
-			seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
-			stamps: rules.stamps.size ? [...rules.stamps] : undefined,
-			tags: rules.tags.size ? [...rules.tags] : undefined,
-			rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
-			mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
-			isMinter: rules.isMinter,
-			artists: rules.artists.size ? [...rules.artists] : undefined,
-		});
-	});
+const RuleCollectionBuilder: Solid.Component = () => {
+	const rules = useRules();
 
 	return (
-		<RuleContext.Provider value={rules}>
-			<form class="grid h-fit gap-2" onSubmit={e => e.preventDefault()}>
-				<RuleCollectionBuilderDesignInput />
-				<Fieldset legend="Stamped">
-					<Checkbox
-						name="isShitStamped"
-						label="Shit pack stamps only?"
-						setValue={checked =>
-							checked
-								? rules.stamps.add('shit-stamp')
-								: rules.stamps.delete('shit-stamp')
-						}
+		<form class="grid h-fit gap-2" onSubmit={e => e.preventDefault()}>
+			<RuleCollectionBuilderDesignInput />
+			<Fieldset legend="Stamped">
+				<Checkbox
+					name="isShitStamped"
+					label="Shit pack stamps only?"
+					value={rules.stamps.has('shit-stamp')}
+					setValue={checked =>
+						checked ? rules.stamps.add('shit-stamp') : rules.stamps.delete('shit-stamp')
+					}
+				/>
+			</Fieldset>
+			<RuleCollectionBuilderRarityInput />
+			<RuleCollectionBuilderTagInput />
+			<Fieldset legend="Minted by">
+				<label class="flex gap-2">
+					<input
+						type="radio"
+						name="isMinter"
+						value=""
+						checked={rules.isMinter === undefined}
+						onInput={() => (rules.isMinter = undefined)}
 					/>
-				</Fieldset>
-				<RuleCollectionBuilderRarityInput />
-				<RuleCollectionBuilderTagInput />
-				<Fieldset legend="Minted by">
-					<label class="flex gap-2">
-						<input
-							type="radio"
-							name="isMinter"
-							value=""
-							checked
-							onInput={() => (rules.isMinter = undefined)}
-						/>
-						Anyone
-					</label>
-					<label class="flex gap-2">
-						<input
-							type="radio"
-							name="isMinter"
-							value="true"
-							onInput={() => (rules.isMinter = true)}
-						/>
-						Me
-					</label>
-					<label class="flex gap-2">
-						<input
-							type="radio"
-							name="isMinter"
-							value="false"
-							onInput={() => (rules.isMinter = false)}
-						/>
-						Anyone besides me
-					</label>
-				</Fieldset>
-				<RuleCollectionBuilderCardNumberInput />
-				<RuleCollectionBuilderArtistInput />
-			</form>
-		</RuleContext.Provider>
+					Anyone
+				</label>
+				<label class="flex gap-2">
+					<input
+						type="radio"
+						name="isMinter"
+						value="true"
+						checked={rules.isMinter === true}
+						onInput={() => (rules.isMinter = true)}
+					/>
+					Me
+				</label>
+				<label class="flex gap-2">
+					<input
+						type="radio"
+						name="isMinter"
+						value="false"
+						checked={rules.isMinter === false}
+						onInput={() => (rules.isMinter = false)}
+					/>
+					Anyone besides me
+				</label>
+			</Fieldset>
+			<RuleCollectionBuilderCardNumberInput />
+			<RuleCollectionBuilderArtistInput />
+		</form>
 	);
 };
 
@@ -533,7 +602,7 @@ const SeasonCheckboxAndDesigns: Solid.Component<{
 
 const RuleCollectionBuilderRarityInput: Solid.Component = () => {
 	const rules = useRules();
-	const [isEnabled, setIsEnabled] = Solid.createSignal(false);
+	const [isEnabled, setIsEnabled] = Solid.createSignal(rules.rarityIds.size > 0);
 	const rarities: Array<[id: string, name: string]> = [
 		[FULL_ART_ID, 'Full Art'],
 		['pink', 'Pink'],
@@ -551,7 +620,7 @@ const RuleCollectionBuilderRarityInput: Solid.Component = () => {
 					type="radio"
 					name="rarities-enabled"
 					value="false"
-					checked
+					checked={rules.rarityIds.size === 0}
 					onChange={e => {
 						if (e.currentTarget.checked) {
 							Solid.batch(() => rarities.map(([id]) => rules.rarityIds.delete(id)));
@@ -566,6 +635,7 @@ const RuleCollectionBuilderRarityInput: Solid.Component = () => {
 					type="radio"
 					name="rarities-enabled"
 					value="true"
+					checked={rules.rarityIds.size > 0}
 					onChange={e => setIsEnabled(e.currentTarget.checked)}
 				/>
 				Specific rarity
@@ -615,6 +685,7 @@ const RuleCollectionBuilderTagInput: Solid.Component = () => {
 								type="checkbox"
 								name="tags"
 								value={tag}
+								checked={rules.tags.has(tag)}
 								onInput={e =>
 									e.currentTarget.checked
 										? rules.tags.add(tag)
@@ -631,9 +702,14 @@ const RuleCollectionBuilderTagInput: Solid.Component = () => {
 };
 
 const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
-	const [isNumberEnabled, setIsNumberEnabled] = Solid.createSignal(false);
-	const [isDenominatorEnabled, setIsDenominatorEnabled] = Solid.createSignal(false);
 	const rules = useRules();
+
+	const [isNumberEnabled, setIsNumberEnabled] = Solid.createSignal(
+		rules.cardNumber !== undefined
+	);
+	const [isDenominatorEnabled, setIsDenominatorEnabled] = Solid.createSignal(
+		rules.cardDenominator !== undefined
+	);
 
 	return (
 		<Fieldset legend="Card Number">
@@ -645,10 +721,10 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							type="radio"
 							name="useCardNumber"
 							value="false"
-							checked
+							checked={rules.cardNumber === undefined}
 							onChange={e => {
 								setIsNumberEnabled(!e.currentTarget.checked);
-								rules.cardNumbers.clear();
+								rules.cardNumber = undefined;
 							}}
 						/>
 						Any
@@ -658,6 +734,7 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							type="radio"
 							name="useCardNumber"
 							value="true"
+							checked={rules.cardNumber !== undefined}
 							onChange={e => setIsNumberEnabled(e.currentTarget.checked)}
 						/>
 						<span class="sr-only">Specific Number</span>
@@ -669,16 +746,11 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							inputOnly
 							min={0}
 							step={1}
-							value={isNumberEnabled() ? 0 : undefined}
+							value={isNumberEnabled() ? rules.cardNumber : undefined}
 							name="cardNumber"
 							label="Value"
 							disabled={!isNumberEnabled()}
-							setValue={e => {
-								Solid.batch(() => {
-									rules.cardNumbers.clear();
-									rules.cardNumbers.add(parseInt(e));
-								});
-							}}
+							setValue={v => (rules.cardNumber = parseInt(v))}
 						/>
 					</div>
 				</li>
@@ -689,10 +761,10 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							type="radio"
 							name="useCardDenominator"
 							value="false"
-							checked
+							checked={rules.cardDenominator === undefined}
 							onChange={e => {
 								setIsDenominatorEnabled(!e.currentTarget.checked);
-								rules.cardDenominators.clear();
+								rules.cardDenominator = undefined;
 							}}
 						/>
 						Any
@@ -702,6 +774,7 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							type="radio"
 							name="useCardDenominator"
 							value="true"
+							checked={rules.cardDenominator !== undefined}
 							onChange={e => setIsDenominatorEnabled(e.currentTarget.checked)}
 						/>
 						<span class="sr-only">Specific Number</span>
@@ -713,16 +786,11 @@ const RuleCollectionBuilderCardNumberInput: Solid.Component = () => {
 							inputOnly
 							min={0}
 							step={1}
-							value={isDenominatorEnabled() ? 0 : undefined}
+							value={isDenominatorEnabled() ? rules.cardDenominator : undefined}
 							name="card-denominator"
 							label="Value"
 							disabled={!isDenominatorEnabled()}
-							setValue={e => {
-								Solid.batch(() => {
-									rules.cardDenominators.clear();
-									rules.cardDenominators.add(parseInt(e));
-								});
-							}}
+							setValue={v => (rules.cardNumber = parseInt(v))}
 						/>
 					</div>
 				</li>
@@ -743,19 +811,20 @@ const RuleCollectionBuilderArtistInput: Solid.Component = () => {
 		<Solid.Show when={artists.size}>
 			<Fieldset legend="Artists">
 				<Solid.For each={[...artists]}>
-					{tag => (
+					{artist => (
 						<label class="flex gap-2 data-[disabled=true]:opacity-50">
 							<input
 								type="checkbox"
 								name="tags"
-								value={tag}
+								value={artist}
+								checked={rules.artists.has(artist)}
 								onInput={e =>
 									e.currentTarget.checked
-										? rules.artists.add(tag)
-										: rules.artists.delete(tag)
+										? rules.artists.add(artist)
+										: rules.artists.delete(artist)
 								}
 							/>
-							{tag}
+							{artist}
 						</label>
 					)}
 				</Solid.For>
