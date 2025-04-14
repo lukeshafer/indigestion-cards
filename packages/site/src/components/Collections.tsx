@@ -98,7 +98,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 		artists: new ReactiveSet<string>(props.initialState?.rules.artists),
 	});
 
-	const [previewCards] = Solid.createResource(
+	const [previewCards, { refetch: refetchPreviewCards}] = Solid.createResource(
 		() => ({
 			type: state.type,
 			cards: [...state.cards],
@@ -123,8 +123,10 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 					break;
 			}
 		},
-		{ initialValue: [] }
+		{ initialValue: [], ssrLoadFrom: 'initial' }
 	);
+
+  Solid.onMount(() => refetchPreviewCards())
 
 	Solid.createEffect(
 		Solid.on(
