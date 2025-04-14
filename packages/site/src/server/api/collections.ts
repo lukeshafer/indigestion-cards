@@ -10,6 +10,7 @@ const rulesSchema = z.object({
 	seasonIds: z.array(z.string()).optional(),
 	stamps: z.array(z.string()).optional(),
 	tags: z.array(z.string()).optional(),
+	games: z.array(z.string()).optional(),
 	rarityIds: z.array(z.string()).optional(),
 	isMinter: z.boolean().optional(),
 	mintedByIds: z.array(z.string()).optional(),

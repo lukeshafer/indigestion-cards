@@ -391,7 +391,17 @@ const buildCollectionCondition =
 		}
 
 		if (args.rules.tags) {
-			conditions.push(args.rules.tags.map(tag => op.contains(attr.tags, tag)).join(' OR '));
+			conditions.push(
+				args.rules.tags
+					.map(tag => op.contains(attr.tags, tag) 
+            // checking if game is a tag as well, since tags were previously used for games
+            + ' OR ' + op.eq(attr.game, tag))
+					.join(' OR ')
+			);
+		}
+
+		if (args.rules.games) {
+			conditions.push(args.rules.games.map(game => op.eq(attr.game, game)).join(' OR '));
 		}
 
 		const conditionString = `(${conditions.join(') AND (')})`;

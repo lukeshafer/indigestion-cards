@@ -35,6 +35,7 @@ const RuleContext = Solid.createContext({
 	seasonIds: new ReactiveSet<string>(),
 	stamps: new ReactiveSet<string>(),
 	tags: new ReactiveSet<string>(),
+	games: new ReactiveSet<string>(),
 	rarityIds: new ReactiveSet<string>(),
 	mintedByIds: new ReactiveSet<string>(),
 	isMinter: undefined as boolean | undefined,
@@ -69,6 +70,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 		seasonIds: new ReactiveSet<string>(props.initialState?.rules.seasonIds ?? []),
 		stamps: new ReactiveSet<string>(props.initialState?.rules.stamps ?? []),
 		tags: new ReactiveSet<string>(props.initialState?.rules.tags ?? []),
+		games: new ReactiveSet<string>(props.initialState?.rules.games ?? []),
 		rarityIds: new ReactiveSet<string>(props.initialState?.rules.rarityIds ?? []),
 		mintedByIds: new ReactiveSet<string>(props.initialState?.rules.mintedByIds ?? []),
 		isMinter: props.initialState?.rules.isMinter,
@@ -83,6 +85,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 		seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
 		stamps: rules.stamps.size ? [...rules.stamps] : undefined,
 		tags: rules.tags.size ? [...rules.tags] : undefined,
+		games: rules.games.size ? [...rules.games] : undefined,
 		rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
 		mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
 		isMinter: rules.isMinter,
@@ -349,7 +352,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 						</SubmitButton>
 						<Solid.Show when={state.type === 'rule'}>
 							<Select
-                label="Sort by"
+								label="Sort by"
 								name="sort"
 								options={sortTypes}
 								value="rarest"
@@ -486,6 +489,7 @@ const RuleCollectionBuilder: Solid.Component = () => {
 			</Fieldset>
 			<RuleCollectionBuilderRarityInput />
 			<RuleCollectionBuilderTagInput />
+			<RuleCollectionBuilderGameInput />
 			<Fieldset legend="Minted by">
 				<label class="flex gap-2">
 					<input
@@ -684,6 +688,43 @@ const RuleCollectionBuilderTagInput: Solid.Component = () => {
 								}
 							/>
 							{tag}
+						</label>
+					)}
+				</Solid.For>
+			</Fieldset>
+		</Solid.Show>
+	);
+};
+
+const RuleCollectionBuilderGameInput: Solid.Component = () => {
+	const rules = useRules();
+	const ctx = useCollectionContext();
+
+	const games = new ReactiveSet<string>(
+		Array.from(ctx.seasons.values())
+			.flatMap(s => s.cards.flatMap(c => c.game))
+			.filter(v => v !== undefined)
+	);
+	games.delete('');
+
+	return (
+		<Solid.Show when={games.size}>
+			<Fieldset legend="Games">
+				<Solid.For each={[...games]}>
+					{game => (
+						<label class="flex gap-2 data-[disabled=true]:opacity-50">
+							<input
+								type="checkbox"
+								name="games"
+								value={game}
+								checked={rules.games.has(game)}
+								onInput={e =>
+									e.currentTarget.checked
+										? rules.games.add(game)
+										: rules.games.delete(game)
+								}
+							/>
+							{game}
 						</label>
 					)}
 				</Solid.For>
