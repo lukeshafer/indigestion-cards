@@ -3,6 +3,7 @@ import * as Solid from 'solid-js';
 import * as SolidStore from 'solid-js/store';
 import * as Form from '@admin/components/form/Form';
 import { actions } from 'astro:actions';
+import { setAlerts } from '@admin/lib/client/state';
 
 export const DesignTags: Solid.Component<{
 	design: DB.CardDesign;
@@ -55,6 +56,26 @@ export const DesignTags: Solid.Component<{
 				}}>
 				<Form.TextInput label="Tag" inputOnly name="newTagName" />
 				<Form.SubmitButton>Add Tag</Form.SubmitButton>
+			</form>
+
+			<form
+				class="grid place-items-center gap-y-2"
+				onSubmit={async e => {
+					e.preventDefault();
+					await actions.designs
+						.setGame({
+							designId: props.design.designId,
+							game: e.currentTarget.game.value,
+						})
+						.then(() => {
+							setAlerts(alerts => [
+								{ type: 'success', message: 'Updated game.' },
+								...alerts,
+							]);
+						});
+				}}>
+				<Form.TextInput value={props.design.game} label="Game" name="game" />
+				<Form.SubmitButton>Update game</Form.SubmitButton>
 			</form>
 		</div>
 	);

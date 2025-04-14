@@ -55,4 +55,5 @@ export type CreateUser = CreateEntityItem<typeof db.entities.Users>;
 
 export type Collection = NonNullable<User['collections']>[number]
 export type CollectionRules = NonNullable<Collection['rules']>
+export type CollectionRulesSort = NonNullable<CollectionRules['sort']>
 export type CollectionCards = NonNullable<Collection['cards']>

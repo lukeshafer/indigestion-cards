@@ -1,7 +1,16 @@
 import { randomUUID } from 'crypto';
 import { db } from '../db';
-import type { CardInstance, Collection, CollectionCards, CollectionRules, User } from '../db.types';
+import type {
+	CardDesign,
+	CardInstance,
+	Collection,
+	CollectionCards,
+	CollectionRules,
+	User,
+} from '../db.types';
 import { getUser } from './user';
+import { getRarityRanking } from './site-config';
+import { sortCards } from './shared';
 
 type Output<T, Message = string> = Promise<
 	| {
@@ -46,6 +55,54 @@ export async function createSetCollection(args: {
 	} as const;
 }
 
+export async function updateSetCollection(args: {
+	userId: string;
+	collectionId: string;
+	collectionName: string;
+	collectionCards: CollectionCards;
+}): Output<{ user: Partial<User>; collection: Collection }, string> {
+	const verifyResult = await verifyUser(args);
+	if (!verifyResult.success) {
+		return verifyResult;
+	}
+	const { user } = verifyResult.data;
+
+	const previousCollectionIndex = user.collections?.findIndex(
+		c => c.collectionId === args.collectionId
+	);
+
+	if (previousCollectionIndex === undefined || previousCollectionIndex === -1) {
+		return {
+			success: false,
+			message: 'COLLECTION_DOES_NOT_EXIST',
+		};
+	}
+
+	const editedCollection: Collection = {
+		collectionId: args.collectionId,
+		collectionName: args.collectionName.slice(0, 50),
+		cards: args.collectionCards,
+		collectionType: 'set',
+	};
+
+	const updatedCollections = user.collections!.toSpliced(
+		previousCollectionIndex,
+		1,
+		editedCollection
+	);
+
+	let result = await db.entities.Users.patch({ userId: user.userId })
+		.set({
+			collections: updatedCollections,
+		})
+		.go();
+
+	return {
+		success: true,
+		data: { user: result.data, collection: editedCollection },
+	} as const;
+}
+
 export async function createRuleCollection(args: {
 	userId: string;
 	collectionName: string;
@@ -73,6 +130,55 @@ export async function createRuleCollection(args: {
 	return {
 		success: true,
 		data: { user: result.data, collection: newCollection },
+	} as const;
+}
+
+export async function updateRuleCollection(args: {
+	collectionId: string;
+	userId: string;
+	collectionName: string;
+	collectionRules: CollectionRules;
+}): Output<
+	{ user: Partial<User>; collection: Collection },
+	'USER_DOES_NOT_EXIST' | 'COLLECTION_DOES_NOT_EXIST'
+> {
+	const verifyResult = await verifyUser(args);
+	if (!verifyResult.success) {
+		return verifyResult;
+	}
+	const { user } = verifyResult.data;
+
+	const previousCollectionIndex = user.collections?.findIndex(
+		c => c.collectionId === args.collectionId
+	);
+
+	if (previousCollectionIndex === undefined || previousCollectionIndex === -1) {
+		return {
+			success: false,
+			message: 'COLLECTION_DOES_NOT_EXIST',
+		};
+	}
+
+	const editedCollection: Collection = {
+		collectionId: args.collectionId,
+		collectionName: args.collectionName.slice(0, 50),
+		rules: args.collectionRules,
+		collectionType: 'rule',
+	};
+
+	const updatedCollections = user.collections!.toSpliced(
+		previousCollectionIndex,
+		1,
+		editedCollection
+	);
+
+	let result = await db.entities.Users.patch({ userId: user.userId })
+		.set({ collections: updatedCollections })
+		.go();
+
+	return {
+		success: true,
+		data: { user: result.data, collection: editedCollection },
 	} as const;
 }
 
@@ -107,7 +213,7 @@ export async function deleteCollection(args: {
 	return { success: true, data: result.data } as const;
 }
 
-async function getCollection(args: {
+export async function getCollection(args: {
 	userId: string;
 	collectionId: string;
 }): Output<
@@ -195,7 +301,31 @@ export async function getRuleCollectionCards(args: {
 		.where(buildCollectionCondition({ rules: args.rules, userId: args.userId }))
 		.go({ pages: 'all' });
 
-	return result.data;
+	let designMap: Map<string, CardDesign> | null = null;
+	const setupDesignMap = async () => {
+		if (designMap) return;
+		const designIds = new Set(result.data.map(c => c.designId));
+		const designList = await db.entities.CardDesigns.get(
+			Array.from(designIds).map(d => ({ designId: d }))
+		).go();
+		designMap = new Map(designList.data.map(d => [d.designId, d] as const));
+	};
+
+	let data = result.data;
+
+	if (args.rules.artists?.length) {
+		const artists = new Set(args.rules.artists);
+		await setupDesignMap();
+
+		data = data.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+	}
+
+	if (!args.rules.sort) return data;
+	return sortCards({
+		cards: data,
+		sort: args.rules.sort,
+		rarityRanking: await getRarityRanking(),
+	});
 }
 
 type CardInstanceWhereCallback = Parameters<
@@ -205,7 +335,7 @@ type CardInstanceWhereCallback = Parameters<
 const buildCollectionCondition =
 	(args: { rules: CollectionRules; userId: string }): CardInstanceWhereCallback =>
 	(attr, op) => {
-		let conditions: Array<string> = [op.gt(attr.openedAt, "0")];
+		let conditions: Array<string> = [op.gt(attr.openedAt, '0')];
 
 		const cardOrSeasonConditions = [];
 		if (args.rules.cardDesignIds) {
@@ -252,8 +382,26 @@ const buildCollectionCondition =
 			);
 		}
 
+		if (args.rules.cardDenominators) {
+			conditions.push(
+				args.rules.cardDenominators
+					.map(number => op.eq(attr.totalOfType, number))
+					.join(' OR ')
+			);
+		}
+
 		if (args.rules.tags) {
-			conditions.push(args.rules.tags.map(tag => op.contains(attr.tags, tag)).join(' OR '));
+			conditions.push(
+				args.rules.tags
+					.map(tag => op.contains(attr.tags, tag) 
+            // checking if game is a tag as well, since tags were previously used for games
+            + ' OR ' + op.eq(attr.game, tag))
+					.join(' OR ')
+			);
+		}
+
+		if (args.rules.games) {
+			conditions.push(args.rules.games.map(game => op.eq(attr.game, game)).join(' OR '));
 		}
 
 		const conditionString = `(${conditions.join(') AND (')})`;
@@ -311,6 +459,22 @@ async function getRuleCollectionPreviewCards(args: {
 
 	let { cursor, data: cards } = result;
 
+	let designMap: Map<string, CardDesign> | null = null;
+	const setupDesignMap = async () => {
+		if (designMap !== null) return;
+		const designIds = new Set(result.data.map(c => c.designId));
+		const designList = await db.entities.CardDesigns.get(
+			Array.from(designIds).map(d => ({ designId: d }))
+		).go();
+		designMap = new Map(designList.data.map(d => [d.designId, d] as const));
+	};
+	if (args.rules.artists?.length) {
+		const artists = new Set(args.rules.artists);
+		await setupDesignMap();
+
+		cards = cards.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+	}
+
 	while (cards.length < 3 && cursor != null) {
 		const newResult = await db.entities.CardInstances.query
 			.byUser({ username: args.username })
@@ -319,7 +483,19 @@ async function getRuleCollectionPreviewCards(args: {
 
 		cards.push(...newResult.data);
 		cursor = newResult.cursor;
+
+		if (args.rules.artists?.length) {
+			const artists = new Set(args.rules.artists);
+			await setupDesignMap();
+
+			cards = cards.filter(c => artists.has(designMap?.get(c.designId)?.artist ?? ''));
+		}
 	}
 
-	return cards.slice(0, 3);
+	if (!args.rules.sort) return cards.slice(0, 3);
+	return sortCards({
+		cards: cards.slice(0, 3),
+		sort: args.rules.sort,
+		rarityRanking: await getRarityRanking(),
+	});
 }

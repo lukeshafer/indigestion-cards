@@ -140,6 +140,35 @@ export async function removeCardDesignTag(args: {
 	return { success: true, data: designResult.data };
 }
 
+export async function setCardDesignGame(args: {
+	designId: string;
+	game: string;
+}): Promise<DBResult<Partial<CardDesign>>> {
+	const {
+		data: { CardInstances: cards },
+	} = await db.collections.DesignAndCards({ designId: args.designId }).go({ pages: 'all' });
+
+	const designResult = await db.entities.CardDesigns.patch({ designId: args.designId })
+		.set({ game: args.game })
+		.go();
+
+	const BATCH_SIZE = 50;
+	for (let i = 0; i < cards.length; i += BATCH_SIZE) {
+		const subset = cards.slice(i, i + BATCH_SIZE);
+		await db.transaction
+			.write(({ CardInstances }) =>
+				subset.map(c =>
+					CardInstances.patch({ designId: c.designId, instanceId: c.instanceId })
+						.set({ game: args.game })
+						.commit()
+				)
+			)
+			.go();
+	}
+
+	return { success: true, data: designResult.data };
+}
+
 export type AllDesignsPageData = typeof allDesignsPageSummary extends Summary<infer T> ? T : never;
 const allDesignsPageSummary = lazy(
 	() =>
