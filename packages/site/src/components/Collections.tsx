@@ -11,30 +11,24 @@ import {
 } from '@site/components/Form';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { FULL_ART_ID, routes } from '@site/constants';
-import { createMutable, createStore, produce, reconcile } from 'solid-js/store';
+import { createMutable, createStore, produce } from 'solid-js/store';
 import { ReactiveSet } from '@solid-primitives/set';
 import * as CardList from './CardList';
 import { sortTypes } from '@core/lib/shared';
 import { pushAlert } from '@site/client/state';
 
 const CollectionContext = Solid.createContext<{
-	seasons: Map<
-		string,
-		{
-			season: DB.Season;
-			cards: Array<DB.CardDesign>;
-		}
-	>;
+	seasons: Map<string, { season: DB.Season; cards: Array<DB.CardDesign> }>;
 	moveCardToIndex(fromIndex: number, toIndex: number): void;
-}>({
-	seasons: new Map(),
-	moveCardToIndex() {},
-});
+}>({ seasons: new Map(), moveCardToIndex() {} });
+
 function useCollectionContext() {
 	return Solid.useContext(CollectionContext);
 }
 
+type Rules = typeof RuleContext.defaultValue;
 const RuleContext = Solid.createContext({
+	sort: 'rarest' as DB.CollectionRulesSort,
 	cardDesignIds: new ReactiveSet<string>(),
 	cardNumber: undefined as number | undefined,
 	cardDenominator: undefined as number | undefined,
@@ -52,7 +46,6 @@ type CollectionState = {
 	type: 'set' | 'rule';
 	rules: DB.CollectionRules;
 	cards: DB.CollectionCards;
-	previewCards: Array<DB.CardInstance>;
 	collectionName: string;
 };
 
@@ -71,14 +64,28 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 	const [state, setState] = createStore<CollectionState>(
 		props.initialState ?? {
 			type: 'set' as 'set' | 'rule',
-			rules: {} as DB.CollectionRules,
+			get rules() {
+				return {
+					sort: rules.sort,
+					cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
+					cardNumbers: rules.cardNumber ? [rules.cardNumber] : undefined,
+					cardDenominators: rules.cardDenominator ? [rules.cardDenominator] : undefined,
+					seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
+					stamps: rules.stamps.size ? [...rules.stamps] : undefined,
+					tags: rules.tags.size ? [...rules.tags] : undefined,
+					rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
+					mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
+					isMinter: rules.isMinter,
+					artists: rules.artists.size ? [...rules.artists] : undefined,
+				};
+			},
 			cards: [] as DB.CollectionCards,
-			previewCards: [] as Array<DB.CardInstance>,
 			collectionName: '',
 		}
 	);
 
-	const rules = createMutable({
+	const rules = createMutable<Rules>({
+		sort: props.initialState?.rules.sort ?? 'rarest',
 		cardDesignIds: new ReactiveSet<string>(props.initialState?.rules.cardDesignIds),
 		cardNumber: props.initialState?.rules.cardNumbers?.[0] ?? undefined,
 		cardDenominator: props.initialState?.rules.cardDenominators?.[0] ?? undefined,
@@ -91,73 +98,51 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 		artists: new ReactiveSet<string>(props.initialState?.rules.artists),
 	});
 
-	Solid.createEffect(() => {
-		setState('rules', {
-			cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
-			cardNumbers: rules.cardNumber ? [rules.cardNumber] : undefined,
-			cardDenominators: rules.cardDenominator ? [rules.cardDenominator] : undefined,
-			seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
-			stamps: rules.stamps.size ? [...rules.stamps] : undefined,
-			tags: rules.tags.size ? [...rules.tags] : undefined,
-			rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
-			mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
-			isMinter: rules.isMinter,
-			artists: rules.artists.size ? [...rules.artists] : undefined,
-		});
-	});
+	const [previewCards] = Solid.createResource(
+		() => ({
+			type: state.type,
+			cards: [...state.cards],
+			rules: state.rules,
+		}),
+		async ({ type, cards, rules }) => {
+			console.log(rules);
+			switch (type) {
+				case 'set':
+					if (cards.length === 0) {
+						return [];
+					} else {
+						return trpc.collections.mockLoadCardsSet.query({ cards });
+					}
+					break;
+				case 'rule':
+					if (checkAreRulesEmpty(rules)) {
+						return [];
+					} else {
+						return trpc.collections.mockLoadCardsRule.query(rules);
+					}
+					break;
+			}
+		},
+		{ initialValue: [] }
+	);
 
 	Solid.createEffect(
 		Solid.on(
 			() => state.type,
 			type => {
 				if (type === 'set') {
-					let previewCards = state.previewCards;
-					if (previewCards.length > 0) {
+					let preview = previewCards.latest;
+					if (preview.length > 0) {
 						setState(
 							'cards',
-							previewCards.map(c => ({
+							preview.map(c => ({
 								designId: c.designId,
 								instanceId: c.instanceId,
 							}))
 						);
 					}
-					setState('rules', reconcile({}));
 				} else if (type === 'rule') {
-					setState('rules', { sort: 'rarest' });
 					setState('cards', []);
-				}
-			}
-		)
-	);
-
-	Solid.createEffect(
-		Solid.on(
-			() => ({
-				type: state.type,
-				rules: { ...state.rules },
-				cards: [...state.cards.map(card => ({ ...card }))],
-			}),
-			({ type, rules, cards }) => {
-				switch (type) {
-					case 'set':
-						if (cards.length === 0) {
-							setState('previewCards', []);
-						} else {
-							trpc.collections.mockLoadCardsSet
-								.query({ cards })
-								.then(result => setState('previewCards', reconcile(result)));
-						}
-						break;
-					case 'rule':
-						if (checkAreRulesEmpty(rules)) {
-							setState('previewCards', []);
-						} else {
-							console.log(rules.artists);
-							trpc.collections.mockLoadCardsRule
-								.query(rules)
-								.then(result => setState('previewCards', reconcile(result)));
-						}
-						break;
 				}
 			}
 		)
@@ -215,7 +200,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 									onChange={() => {
 										if (state.type === 'set') return;
 										if (
-											state.previewCards.length === 0 ||
+											previewCards.latest.length === 0 ||
 											confirm(
 												'Are you sure you want to change type? Cards selected by filter will transfer.'
 											)
@@ -238,7 +223,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 									onChange={() => {
 										if (state.type === 'rule') return;
 										if (
-											state.previewCards.length === 0 ||
+											previewCards.latest.length === 0 ||
 											confirm(
 												'Are you sure you want to change type? You will start over with no cards selected.'
 											)
@@ -339,7 +324,6 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 										console.error(error);
 									})
 									.then(result => {
-										console.log("updated", result);
 										location.assign(
 											`${routes.USERS}/${result?.username}?alert=Successfully%20updated%20collection`
 										);
@@ -357,7 +341,8 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 						</div>
 						<SubmitButton
 							disabled={
-								state.previewCards.length === 0 || state.collectionName.length === 0
+								previewCards.latest.length === 0 ||
+								state.collectionName.length === 0
 							}>
 							<div class="w-fit">Save Collection</div>
 						</SubmitButton>
@@ -366,10 +351,14 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 								name="sort"
 								options={sortTypes}
 								value="rarest"
-								setValue={sort => setState('rules', { sort })}
+								setValue={sort =>
+									// eslint-disable-next-line solid/reactivity -- createMutable properties can be reassigned.
+									(rules.sort = sort)
+								}
 							/>
 						</Solid.Show>
-						<CollectionCardsPreviewList cards={state.previewCards} type={state.type} />
+
+						<CollectionCardsPreviewList cards={previewCards.latest} type={state.type} />
 					</form>
 				</div>
 			</RuleContext.Provider>
@@ -954,7 +943,10 @@ const InstanceCard: Solid.Component<{
 };
 
 function checkAreRulesEmpty(rules: DB.CollectionRules) {
-	return Object.values(rules).filter(v => v !== null).length === (rules.sort !== null ? 1 : 0);
+	return (
+		Object.values(rules).filter(v => v !== undefined).length ===
+		(rules.sort !== undefined ? 1 : 0)
+	);
 }
 
 export function formatCollectionViewTransitionId(options: {
