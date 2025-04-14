@@ -53,15 +53,18 @@ export const JusticeForSocks = () => {
 					</p>
 
 					<div class="ml-4">
-						<blockquote cite="https://www.youtube.com/watch?v=IIgMlTd0tuY&t=1611s">
+						<blockquote cite="https://www.youtube.com/watch?v=IIgMlTd0tuY&t=1608s">
 							<p>Ah crap.</p>
 						</blockquote>
-						<p>
-							-{' '}
-							<cite>
-								Ryan upon hearing that Socks will be taken into the stable's care.
-							</cite>
-						</p>
+						-{' '}
+						<cite>
+							Ryan{' '}
+							<a
+								href="https://www.youtube.com/watch?v=IIgMlTd0tuY&t=1608s"
+								target="_blank">
+								upon hearing that Socks will be taken into the stable's care.
+							</a>
+						</cite>
 					</div>
 
 					<p>
@@ -69,7 +72,7 @@ export const JusticeForSocks = () => {
 						for <strong>47 hours, 5 minutes, and 8 seconds</strong> (at least based on
 						episode times). Though this doesn't account for things like pausing the
 						game, loading times, and fast-forwarding time via resting, this number
-						translates to roughly 588 in-game days (as one day in-game is 288 real-life
+						translates to roughly 588 in-game days (one day in-game = 288 real-life
 						seconds). Even if we only use half that number to account for the various
 						things that can freeze time, this means Socks was left in that spot for
 						MONTHS, all alone, surrounded by monsters, waiting for Ryan to return.
@@ -79,7 +82,7 @@ export const JusticeForSocks = () => {
 
 			<p>
 				If you too are appalled by Ryan's mistreatment of Socks, you can show your support
-				of the sweet horse by updating your "looking for" message or pinned card message to
+				for the sweet horse by updating your "looking for" message or pinned card message to
 				include the text "#justiceForSocks". If your profile includes that text and you have
 				a pack, your name will have a lovely horse icon on Ryan's pack list, making your
 				support loud and clear until Ryan provides the justice we seek.
