@@ -1,6 +1,12 @@
 import { z } from 'astro:schema';
-import { authedProcedure, publicProcedure } from '../router';
-import { getAllUsers, getUserByUserName, searchUsers, setUserProfile } from '@core/lib/user';
+import { adminProcedure, authedProcedure, publicProcedure } from '../router';
+import {
+	checkIfUserHasSocks,
+	getAllUsers,
+	getUserByUserName,
+	searchUsers,
+	setUserProfile,
+} from '@core/lib/user';
 
 export const users = {
 	allUsernames: publicProcedure.query(async () =>
@@ -12,6 +18,10 @@ export const users = {
 	byUsername: publicProcedure
 		.input(z.object({ username: z.string() }))
 		.query(async ({ input }) => await getUserByUserName(input.username)),
+	horseSupporters: adminProcedure.query(
+		async () =>
+			await getAllUsers().then(users => users.filter(checkIfUserHasSocks).map(u => u.userId))
+	),
 	update: authedProcedure
 		.input(
 			z.object({
@@ -22,25 +32,23 @@ export const users = {
 				pinnedMessage: z.string().nullable().optional(),
 			})
 		)
-		.mutation(
-			async ({ input, ctx }) =>
-  {
-      const shouldResetPinnedMessage = input.pinnedCardId !== undefined || input.pinnedCardDesignId !== undefined
-      return await setUserProfile({
-        userId: ctx.session.properties.userId,
-        lookingFor: input.lookingFor,
-        minecraftUsername: input.minecraftUsername?.toLowerCase(),
-        pinnedCard:
-        input.pinnedCardId === null || input.pinnedCardDesignId === null
-          ? null
-          : input.pinnedCardId && input.pinnedCardDesignId
-            ? {
-              designId: input.pinnedCardDesignId,
-              instanceId: input.pinnedCardId,
-            }
-            : undefined,
-        pinnedMessage: input.pinnedMessage ?? (shouldResetPinnedMessage ? null : undefined),
-      })
-    }
-		),
+		.mutation(async ({ input, ctx }) => {
+			const shouldResetPinnedMessage =
+				input.pinnedCardId !== undefined || input.pinnedCardDesignId !== undefined;
+			return await setUserProfile({
+				userId: ctx.session.properties.userId,
+				lookingFor: input.lookingFor,
+				minecraftUsername: input.minecraftUsername?.toLowerCase(),
+				pinnedCard:
+					input.pinnedCardId === null || input.pinnedCardDesignId === null
+						? null
+						: input.pinnedCardId && input.pinnedCardDesignId
+							? {
+									designId: input.pinnedCardDesignId,
+									instanceId: input.pinnedCardId,
+								}
+							: undefined,
+				pinnedMessage: input.pinnedMessage ?? (shouldResetPinnedMessage ? null : undefined),
+			});
+		}),
 };

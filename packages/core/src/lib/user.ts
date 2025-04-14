@@ -338,3 +338,10 @@ export async function refreshAllUsersPageData(): Promise<void> {
 	const summary = setupAllUsersPageData();
 	await summary.refresh('all');
 }
+
+export function checkIfUserHasSocks(user: User | null | undefined): boolean {
+	if (user?.lookingFor?.toLowerCase().includes('justiceforsocks')) return true;
+	if (user?.pinnedMessage?.toLowerCase().includes('justiceforsocks')) return true;
+
+	return false;
+}
