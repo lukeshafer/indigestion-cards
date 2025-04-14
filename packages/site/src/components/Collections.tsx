@@ -61,51 +61,50 @@ type CollectionBuilderProps = {
 );
 
 export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props => {
-	const [state, setState] = createStore<CollectionState>(
-		props.initialState ?? {
-			type: 'set' as 'set' | 'rule',
-			get rules() {
-				return {
-					sort: rules.sort,
-					cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
-					cardNumbers: rules.cardNumber ? [rules.cardNumber] : undefined,
-					cardDenominators: rules.cardDenominator ? [rules.cardDenominator] : undefined,
-					seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
-					stamps: rules.stamps.size ? [...rules.stamps] : undefined,
-					tags: rules.tags.size ? [...rules.tags] : undefined,
-					rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
-					mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
-					isMinter: rules.isMinter,
-					artists: rules.artists.size ? [...rules.artists] : undefined,
-				};
-			},
-			cards: [] as DB.CollectionCards,
-			collectionName: '',
-		}
-	);
-
 	const rules = createMutable<Rules>({
 		sort: props.initialState?.rules.sort ?? 'rarest',
-		cardDesignIds: new ReactiveSet<string>(props.initialState?.rules.cardDesignIds),
+		cardDesignIds: new ReactiveSet<string>(props.initialState?.rules.cardDesignIds ?? []),
 		cardNumber: props.initialState?.rules.cardNumbers?.[0] ?? undefined,
 		cardDenominator: props.initialState?.rules.cardDenominators?.[0] ?? undefined,
-		seasonIds: new ReactiveSet<string>(props.initialState?.rules.seasonIds),
-		stamps: new ReactiveSet<string>(props.initialState?.rules.stamps),
-		tags: new ReactiveSet<string>(props.initialState?.rules.tags),
-		rarityIds: new ReactiveSet<string>(props.initialState?.rules.rarityIds),
-		mintedByIds: new ReactiveSet<string>(props.initialState?.rules.mintedByIds),
+		seasonIds: new ReactiveSet<string>(props.initialState?.rules.seasonIds ?? []),
+		stamps: new ReactiveSet<string>(props.initialState?.rules.stamps ?? []),
+		tags: new ReactiveSet<string>(props.initialState?.rules.tags ?? []),
+		rarityIds: new ReactiveSet<string>(props.initialState?.rules.rarityIds ?? []),
+		mintedByIds: new ReactiveSet<string>(props.initialState?.rules.mintedByIds ?? []),
 		isMinter: props.initialState?.rules.isMinter,
-		artists: new ReactiveSet<string>(props.initialState?.rules.artists),
+		artists: new ReactiveSet<string>(props.initialState?.rules.artists ?? []),
 	});
 
-	const [previewCards, { refetch: refetchPreviewCards}] = Solid.createResource(
+	const rulesForDB = Solid.createMemo(() => ({
+		sort: rules.sort,
+		cardDesignIds: rules.cardDesignIds.size ? [...rules.cardDesignIds] : undefined,
+		cardNumbers: rules.cardNumber ? [rules.cardNumber] : undefined,
+		cardDenominators: rules.cardDenominator ? [rules.cardDenominator] : undefined,
+		seasonIds: rules.seasonIds.size ? [...rules.seasonIds] : undefined,
+		stamps: rules.stamps.size ? [...rules.stamps] : undefined,
+		tags: rules.tags.size ? [...rules.tags] : undefined,
+		rarityIds: rules.rarityIds.size ? [...rules.rarityIds] : undefined,
+		mintedByIds: rules.mintedByIds.size ? [...rules.mintedByIds] : undefined,
+		isMinter: rules.isMinter,
+		artists: rules.artists.size ? [...rules.artists] : undefined,
+	}));
+
+	const [state, setState] = createStore<CollectionState>({
+		type: props.initialState?.type ?? 'set',
+		get rules() {
+			return rulesForDB();
+		},
+		cards: props.initialState?.cards ?? [],
+		collectionName: props.initialState?.collectionName ?? '',
+	});
+
+	const [previewCards, { refetch: refetchPreviewCards }] = Solid.createResource(
 		() => ({
 			type: state.type,
 			cards: [...state.cards],
 			rules: state.rules,
 		}),
 		async ({ type, cards, rules }) => {
-			console.log(rules);
 			switch (type) {
 				case 'set':
 					if (cards.length === 0) {
@@ -126,7 +125,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 		{ initialValue: [], ssrLoadFrom: 'initial' }
 	);
 
-  Solid.onMount(() => refetchPreviewCards())
+	Solid.onMount(() => refetchPreviewCards());
 
 	Solid.createEffect(
 		Solid.on(
@@ -350,6 +349,7 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 						</SubmitButton>
 						<Solid.Show when={state.type === 'rule'}>
 							<Select
+                label="Sort by"
 								name="sort"
 								options={sortTypes}
 								value="rarest"
