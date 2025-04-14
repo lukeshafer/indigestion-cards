@@ -88,7 +88,7 @@ export const JusticeForSocks = () => {
 				support loud and clear until Ryan provides the justice we seek.
 			</p>
 
-			<p>- Luke</p>
+			<p>- snailyLuke</p>
 		</div>
 	);
 };
