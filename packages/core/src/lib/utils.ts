@@ -40,26 +40,23 @@ export class Summary<T> {
 	}
 
 	async refresh(key: string): Promise<T> {
-		console.log('Retrieving refreshed data');
-    let rawData = await this.loader(key);
-		let result = this.schema.safeParse(rawData);
+		console.log(`Refreshing ${this.prefix}/${key}`);
+		const unparsed = await this.loader(key);
 
-    if (!result.success) {
-      console.log("UH OH!")
-      console.log(result.error.message)
-      throw result.error
-    }
+		console.log(`Data retrieved.`);
+		let data = this.schema.parse(unparsed);
+		console.log(`Data parsed`);
 
-		console.log('Putting data in S3');
-		await Summary.s3
-			.send(
-				new PutObjectCommand({
-					Bucket: Bucket.DataSummaries.bucketName,
-					Key: `${this.prefix}/${key}`,
-					Body: JSON.stringify(result.data),
-				})
-			)
-			.then(() => console.log('Put complete.'));
+		await Summary.s3.send(
+			new PutObjectCommand({
+				Bucket: Bucket.DataSummaries.bucketName,
+				Key: `${this.prefix}/${key}`,
+				Body: JSON.stringify(data),
+			})
+		).catch(e => {
+      console.error(e);
+      console.error("An error occurred while putting object in s3.")
+    });
 
 		return data;
 	}
@@ -82,7 +79,9 @@ export class Summary<T> {
 		} catch (e) {
 			console.error(e);
 			console.log(`Unable to locate ${path}. Generating...`);
-			return await this.refresh(key);
+			const data = await this.refresh(key);
+
+			return data;
 		}
 
 		let result = this.schema.safeParse(JSON.parse(body));

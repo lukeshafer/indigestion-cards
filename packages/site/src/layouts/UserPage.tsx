@@ -244,8 +244,8 @@ const UserLookingFor: Component = () => {
 	const [lookingFor, setLookingFor] = createMutableProp(() => ctx.user.lookingFor || '');
 	return (
 		<p
-			data-open={isOpen()}
-			class="relative col-start-2 grid max-h-32 max-w-64 gap-0 self-start overflow-hidden break-words pb-2 transition-all data-[open=true]:max-h-max data-[open=true]:pb-8">
+			data-open={isOpen() || isEditing()}
+			class="relative col-start-2 grid max-h-64 max-w-64 gap-0 self-start overflow-hidden break-words pb-2 transition-all data-[open=true]:max-h-max data-[open=true]:pb-8">
 			<span class="flex gap-2 text-sm font-normal italic opacity-80">
 				I'm looking for
 				<Show when={ctx.loggedInUserId === ctx.user.userId && !isEditing()}>
@@ -259,9 +259,9 @@ const UserLookingFor: Component = () => {
 					<span class="block max-w-80 break-words text-lg font-normal leading-5">
 						{lookingFor()}
 					</span>
-					<Show when={lookingFor().length > 40}>
+					<Show when={lookingFor().length > 250}>
 						<button
-							class="absolute bottom-0 h-8 w-full bg-gray-900/70 bg-gradient-to-t from-gray-900 to-gray-900/0"
+							class="absolute bottom-0 h-8 w-full bg-gray-100/70 bg-gradient-to-t from-gray-100 to-gray-100/0 dark:bg-gray-900/70 dark:from-gray-900 dark:to-gray-900/0"
 							onClick={() => setIsOpen(v => !v)}>
 							Show {isOpen() ? 'less' : 'more'}
 						</button>
@@ -311,7 +311,7 @@ const UserLookingForForm: Component<{
 					value={uiValue()}
 					maxLength={500}
 					setValue={setUIValue}
-					height="2rem"
+					height="6rem"
 				/>
 			</div>
 			<div class="flex items-center gap-2">

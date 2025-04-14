@@ -352,9 +352,12 @@ export async function setPackIsLocked(opts: { packId: string; isLocked: boolean 
 	await db.entities.Packs.patch({ packId: opts.packId }).set({ isLocked: opts.isLocked }).go();
 }
 
+let eventBridge: EventBridge | null = null;
 export async function sendPacksUpdatedEvent(): Promise<void> {
 	console.log('Sending packs updated event.');
-	const eventBridge = new EventBridge();
+	if (eventBridge === null) {
+		eventBridge = new EventBridge();
+	}
 
 	await eventBridge
 		.putEvents({
@@ -369,4 +372,31 @@ export async function sendPacksUpdatedEvent(): Promise<void> {
 		})
 		.then(console.log);
 	console.log('Sent packs updated event.');
+}
+
+type PackEventInput = Omit<PackDetails, 'packCount'>;
+
+export async function sendGivePackEvents(events: Array<PackEventInput>): Promise<void> {
+	console.log('Sending create packs event.');
+	if (eventBridge === null) {
+		eventBridge = new EventBridge();
+	}
+
+	await eventBridge
+		.putEvents({
+			Entries: events.map(d => ({
+				EventBusName: EventBus.eventBus.eventBusName,
+				Source: 'twitch',
+				DetailType: 'give-pack-to-user',
+				Detail: JSON.stringify({
+					userId: d.userId,
+					username: d.username,
+					packCount: 1,
+					packType: d.packType,
+					event: d.event,
+				} satisfies PackDetails),
+			})),
+		})
+		.then(console.log);
+	console.log('Sent create packs event.');
 }

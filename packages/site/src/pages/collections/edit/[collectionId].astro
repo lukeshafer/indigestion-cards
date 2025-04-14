@@ -1,0 +1,37 @@
+---
+import Page from '@site/layouts/Page.astro';
+import { CollectionBuilder } from '@site/components/Collections';
+import { getUserAndOpenedCardInstances } from '@core/lib/user';
+import { getCollection } from '@core/lib/collections';
+import { routes } from '@site/constants';
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/');
+
+const { collectionId } = Astro.params;
+if (!collectionId) return Astro.redirect(routes.USERS + '/' + user.properties.username);
+
+const data = await getUserAndOpenedCardInstances({ username: user.properties.username });
+const existingCollection = await getCollection({ collectionId, userId: user.properties.userId });
+
+if (!existingCollection.data)
+	return Astro.redirect(
+		routes.USERS + '/' + user.properties.username + '?alert=Collection not found.'
+	);
+const collection = existingCollection.data.collection;
+---
+
+<Page title="Edit collection" pageType="user">
+	<CollectionBuilder
+		cards={data?.CardInstances ?? []}
+		mode="edit"
+		{collectionId}
+		initialState={{
+			collectionName: collection.collectionName,
+			type: collection.collectionType,
+			cards: collection.cards ?? [],
+			rules: collection.rules ?? {},
+		}}
+		client:load
+	/>
+</Page>

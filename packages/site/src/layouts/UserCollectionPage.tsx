@@ -5,7 +5,7 @@ import { Show, type Component } from 'solid-js';
 import CardList from '@site/components/CardList';
 import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
 import { routes } from '@site/constants';
-import { DeleteButton } from '@site/components/Form';
+import { Anchor, DeleteButton } from '@site/components/Form';
 import { trpc } from '@site/client/api';
 import { formatCollectionViewTransitionId } from '@site/components/Collections';
 
@@ -36,7 +36,10 @@ export const UserCollectionPage: Component<{
 			<section class="">
 				<header class="my-6 text-center">
 					<PageTitle>{props.collection.collectionName}</PageTitle>
-					<Show when={props.isLoggedInUser}>
+					<Show when={props.isLoggedInUser}><div class="flex gap-4 flex-wrap justify-center">
+						<Anchor href={`/collections/edit/${props.collection.collectionId}`}>
+							Edit
+						</Anchor>
 						<DeleteButton
 							onClick={() => {
 								const username = props.user.username;
@@ -52,9 +55,9 @@ export const UserCollectionPage: Component<{
 									);
 							}}
 							confirm="Are you sure you want to delete this collection? You will not lose any cards, but you will not be able to recover the collection without re-creating it.">
-							Delete collection
+							Delete
 						</DeleteButton>
-					</Show>
+					</div></Show>
 				</header>
 
 				<main>
@@ -87,7 +90,7 @@ export const UserCollectionPage: Component<{
 											when={cardUtils.checkIfCanShowCardText(card.rarityId)}>
 											<CardEls.CardName>{card.cardName}</CardEls.CardName>
 											<CardEls.CardDescription>
-												{card.cardName}
+												{card.cardDescription}
 											</CardEls.CardDescription>
 										</Show>
 										<Show when={!cardUtils.checkIsLegacyCard(card.rarityId)}>
