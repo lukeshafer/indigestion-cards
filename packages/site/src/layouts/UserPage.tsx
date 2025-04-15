@@ -1021,7 +1021,7 @@ const CardsSeasonViewListItem: Solid.Component<{
 							'z-index': -index(),
 							'transition-delay': `${50 * (index() + 1)}ms`,
 
-							'--pos': `-${6 * (index() + 1)}px`,
+							'--pos': `-${4 * (index() + 1)}px`,
 							top: 'var(--pos)',
 							right: 'var(--pos)',
 
