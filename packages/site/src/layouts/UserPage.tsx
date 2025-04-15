@@ -971,17 +971,17 @@ const CardsSeasonViewList: Solid.Component = () => {
 		<Solid.Suspense
 			fallback={
 				<div class="py-8">
-					<PlaceholderCardList scale={0.8} length={12} />
+					<PlaceholderCardList scale={0.7} length={12} />
 				</div>
 			}>
 			<div>
 				<Solid.For each={data().seasons}>
 					{season => (
-						<section class="p-4">
+						<section class="py-4">
 							<h3 class="font-display p-4 text-center text-2xl font-bold my-4">
 								{season.seasonName}
 							</h3>
-							<CardList.List cards={season.designs} scale={0.8}>
+							<CardList.List cards={season.designs} scale={0.7}>
 								{design => (
 									<li>
 										<Solid.Switch>
@@ -1025,9 +1025,9 @@ const CardsSeasonViewListItem: Solid.Component<{
 							top: 'var(--pos)',
 							right: 'var(--pos)',
 
-							'--level': 0.8 - index() * 0.2,
-							opacity: 'var(--level)',
-							filter: `brightness(var(--level))`,
+							'--level': 0.9 - index() * 0.1,
+							// opacity: 'var(--level)',
+							filter: `brightness(var(--level)) saturate(var(--level))`,
 						}}>
 						<CardInstanceComponent card={{ ...props.design, ...card }} lazy={true} />
 					</div>

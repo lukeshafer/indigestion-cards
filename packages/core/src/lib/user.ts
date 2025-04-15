@@ -7,7 +7,7 @@ import { batchUpdatePackUsername } from './pack';
 import { lazy, Summary, type InferSummary } from './utils';
 import { getAllPreorders } from './preorder';
 import { InputValidationError } from './errors';
-import { NO_CARDS_OPENED_ID } from '../constants';
+import { LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '../constants';
 
 export async function getUser(userId: string) {
 	const user = await db.entities.Users.get({ userId }).go();
@@ -341,44 +341,50 @@ export async function refreshAllUsersPageData(): Promise<void> {
 	await summary.refresh('all');
 }
 
-export type UserCardsSummary = InferSummary<typeof userCardsSummary>;
+export type UserCardsSummary = InferSummary<typeof userCardsSummary>['data'];
 export type UserCardsSummarySeason = UserCardsSummary['seasons'][number];
 export type UserCardsSummaryDesign = UserCardsSummarySeason['designs'][number];
 export type UserCardsSummaryCard = UserCardsSummaryDesign['cards'][number];
+
+const CARDS_SUMMARY_VERSION = 1
 const userCardsSummary = lazy(
 	() =>
 		new Summary({
 			prefix: 'user-cards',
 			schema: z.object({
-				userId: z.string(),
-				username: z.string(),
-				seasons: z.array(
-					z.object({
-						seasonId: z.string(),
-						seasonName: z.string(),
-						designs: z.array(
-							z.object({
-								designId: z.string(),
-								cardName: z.string(),
-								cardDescription: z.string(),
-								cards: z.array(
-									z.object({
-										instanceId: z.string(),
-										rarityColor: z.string(),
-										rarityId: z.string(),
-										cardNumber: z.number(),
-										totalOfType: z.number(),
-										stamps: z.array(z.string()).optional(),
-									})
-								),
-							})
-						),
-					})
-				),
+				version: z.literal(CARDS_SUMMARY_VERSION),
+				data: z.object({
+					userId: z.string(),
+					username: z.string(),
+					seasons: z.array(
+						z.object({
+							seasonId: z.string(),
+							seasonName: z.string(),
+							designs: z.array(
+								z.object({
+									designId: z.string(),
+									cardName: z.string(),
+									cardDescription: z.string(),
+									cards: z.array(
+										z.object({
+											instanceId: z.string(),
+											rarityColor: z.string(),
+											rarityId: z.string(),
+											cardNumber: z.number(),
+											totalOfType: z.number(),
+											stamps: z.array(z.string()).optional(),
+										})
+									),
+								})
+							),
+						})
+					),
+				}),
 			}),
 			loader: async username => {
 				let { data: seasons } = await db.entities.Seasons.query
 					.allSeasons({})
+          .where((attr, op) => op.ne(attr.seasonId, 'moments'))
 					.go({ pages: 'all', attributes: ['seasonId', 'seasonName'] });
 				let { data: designs } = await db.entities.CardDesigns.query.allCardDesigns({}).go({
 					pages: 'all',
@@ -389,6 +395,7 @@ const userCardsSummary = lazy(
 						'cardName',
 						'cardDescription',
 						'bestRarityFound',
+						'rarityDetails',
 					],
 				});
 
@@ -424,21 +431,19 @@ const userCardsSummary = lazy(
 							seasonId: s.seasonId,
 							seasonName: s.seasonName,
 							designs: designs
-								.filter(d => d.seasonId === s.seasonId)
+								.filter(
+									d =>
+										d.seasonId === s.seasonId &&
+										!d.rarityDetails?.some(
+											r => r.rarityId === LEGACY_CARD_ID
+										) &&
+										d.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID
+								)
 								.sort((a, b) => a.cardName.localeCompare(b.cardName))
 								.map(d => ({
-									designId:
-										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
-											? '?????'
-											: d.designId,
-									cardName:
-										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
-											? '?????'
-											: d.cardName,
-									cardDescription:
-										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
-											? '?????'
-											: d.cardDescription,
+									designId: d.designId,
+									cardName: d.cardName,
+									cardDescription: d.cardDescription,
 									cards: (ownedDesigns.get(d.designId) ?? [])
 										.map(c => ({
 											instanceId: c.instanceId,
@@ -463,13 +468,16 @@ const userCardsSummary = lazy(
 
 				console.log(data);
 
-				return data;
+				return {
+					version: CARDS_SUMMARY_VERSION as typeof CARDS_SUMMARY_VERSION,
+					data,
+				};
 			},
 		})
 );
 
 export async function loadUserCards(username: string): Promise<UserCardsSummary> {
-	return userCardsSummary.get(username);
+	return userCardsSummary.get(username).then(s => s.data);
 }
 
 export async function refreshUserCards(username: string): Promise<void> {
