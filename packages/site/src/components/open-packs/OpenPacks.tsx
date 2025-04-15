@@ -48,6 +48,13 @@ export default function OpenPacks(props: Props) {
 		}
 	});
 
+	const [horseSupporters, { refetch: refetchHorseSupporters }] = createResource(
+		async () => {
+			return new Set(await trpc.users.horseSupporters.query());
+		},
+		{ initialValue: new Set() }
+	);
+
 	const [state, setState] = createState(props, chatters);
 
 	onMount(() => {
@@ -68,6 +75,12 @@ export default function OpenPacks(props: Props) {
 			}
 		}
 		setTimeout(refreshChattersTimeout, 60000);
+
+		function refreshHorseTimeout() {
+			refetchHorseSupporters();
+			setTimeout(refreshHorseTimeout, 5000);
+		}
+		setTimeout(refreshHorseTimeout, 5000);
 
 		setState('isHidden', false);
 
@@ -123,7 +136,17 @@ export default function OpenPacks(props: Props) {
 							class="packs relative flex w-full flex-col"
 							ref={el => setAutoAnimate(el)}>
 							<For each={state.packs}>
-								{(pack, index) => <PackToOpenItem index={index()} pack={pack} />}
+								{(pack, index) => (
+									<PackToOpenItem
+										index={index()}
+										pack={pack}
+										horse={
+											pack.userId
+												? horseSupporters.latest.has(pack.userId)
+												: false
+										}
+									/>
+								)}
 							</For>
 							<div class="font-display -mx-2 mr-2 h-[1.75em] w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic" />
 						</ul>

@@ -17,7 +17,7 @@ export interface Props {
 	alerts?: Alert[];
 	'no-header'?: boolean;
 	'hide-breadcrumbs'?: boolean;
-	logo?: keyof typeof LOGOS
+	logo?: keyof typeof LOGOS;
 	title: string;
 	pageType?: 'public' | 'user' | 'admin';
 }
@@ -36,7 +36,7 @@ if (alert) alerts.push({ type: alertType === 'error' ? 'error' : 'success', mess
 const disableAnimations = Astro.cookies.get('disable-animations')?.boolean() ?? false;
 const colorTheme = Astro.cookies.get('theme')?.value ?? 'light';
 let loggedInUsername = Astro.locals.session?.properties.username || undefined;
-let twitchData = loggedInUsername ? await getUserByLogin(loggedInUsername) : undefined
+let twitchData = loggedInUsername ? await getUserByLogin(loggedInUsername) : undefined;
 
 let {
 	class: className,
@@ -53,9 +53,10 @@ let {
 let pageTitle =
 	title !== 'Indigestion Cards' ? title + ' — Indigestion Cards' : 'Indigestion Cards';
 
-let isAllowedToSeePage = session?.type === 'admin' ||
-    (session?.type === 'user' && pageType === 'user') ||
-  pageType === 'public';
+let isAllowedToSeePage =
+	session?.type === 'admin' ||
+	(session?.type === 'user' && pageType === 'user') ||
+	pageType === 'public';
 
 alerts.push(...(alertsProp ?? []));
 ---
@@ -63,7 +64,7 @@ alerts.push(...(alertsProp ?? []));
 <html
 	lang="en"
 	class:list={{ dark: colorTheme === 'dark' }}
-	class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50 scrollbar-narrow">
+	class="scrollbar-narrow bg-gray-50 text-gray-950 dark:bg-gray-950 dark:font-medium dark:text-gray-50">
 	<!--
 Hello beautiful people of the internet!
 
@@ -77,13 +78,17 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={colorTheme === 'dark' ? '#030712' : '#ffffff'} />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/favicon/site.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/favicon/site.webmanifest">
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+		<link rel="manifest" href="/favicon/site.webmanifest" /><link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="/apple-touch-icon.png"
+		/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+		<link rel="manifest" href="/favicon/site.webmanifest" />
     {!disableAnimations && (
     <style>
       @view-transition {
@@ -111,6 +116,15 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 		class:list={{ 'disable-animations': disableAnimations }}>
 		{
 			isAllowedToSeePage ? (
+				<>
+					<div class="bg-brand-light dark:bg-brand-dark flex w-full gap-3 justify-center text-sm">
+      <p>
+        #justiceForSocks
+      </p>
+						<a class="underline" href="/misc/justice-for-socks">
+              Read more
+						</a>
+					</div>
 					<div
 						class="grid h-[100dvh] grid-cols-1 md:grid-cols-[max-content_1fr]"
 						id="page-layout-wrapper"
@@ -118,15 +132,17 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 						<div
 							class="scrollbar-narrow relative flex flex-col bg-gray-50 md:col-start-2 dark:bg-gray-950"
 							id="page-scroll-wrapper">
-              {noHeader ? null : <Header 
-                {logo}
-                {disableAnimations}
-                {loggedInUsername}
-                {twitchData}
-                {isAdmin}
-                currentPage={Astro.url.pathname}
-                client:load
-              />}
+							{noHeader ? null : (
+								<Header
+									{logo}
+									{disableAnimations}
+									{loggedInUsername}
+									{twitchData}
+									{isAdmin}
+									currentPage={Astro.url.pathname}
+									client:load
+								/>
+							)}
 							<data-lists />
 							<AlertBox client:load {alerts} />
 							{hideBreadcrumbs ? null : (
@@ -151,6 +167,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 							<Footer />
 						</div>
 					</div>
+				</>
 			) : (
 				<script> window.location.href = '/404' </script>
 			)

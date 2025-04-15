@@ -445,3 +445,10 @@ export async function loadUserCards(username: string): Promise<UserCardsSummary>
 export async function refreshUserCards(username: string): Promise<void> {
 	await userCardsSummary.refresh(username);
 }
+
+export function checkIfUserHasSocks(user: User | null | undefined): boolean {
+	if (user?.lookingFor?.toLowerCase().includes('justiceforsocks')) return true;
+	if (user?.pinnedMessage?.toLowerCase().includes('justiceforsocks')) return true;
+
+	return false;
+}
