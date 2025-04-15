@@ -7,8 +7,7 @@ import { batchUpdatePackUsername } from './pack';
 import { lazy, Summary, type InferSummary } from './utils';
 import { getAllPreorders } from './preorder';
 import { InputValidationError } from './errors';
-import { getAllCardDesigns } from './design';
-import { getAllSeasons } from './season';
+import { NO_CARDS_OPENED_ID } from '../constants';
 
 export async function getUser(userId: string) {
 	const user = await db.entities.Users.get({ userId }).go();
@@ -351,6 +350,7 @@ const userCardsSummary = lazy(
 		new Summary({
 			prefix: 'user-cards',
 			schema: z.object({
+        version: z.literal(3),
 				userId: z.string(),
 				username: z.string(),
 				seasons: z.array(
@@ -378,10 +378,32 @@ const userCardsSummary = lazy(
 				),
 			}),
 			loader: async username => {
-				let seasons = await getAllSeasons();
-				let designs = await getAllCardDesigns();
+				let { data: seasons } = await db.entities.Seasons.query
+					.allSeasons({})
+					.go({ pages: 'all', attributes: ['seasonId', 'seasonName'] });
+				let { data: designs } = await db.entities.CardDesigns.query.allCardDesigns({}).go({
+					pages: 'all',
+					attributes: [
+						'designId',
+						'seasonName',
+						'seasonId',
+						'cardName',
+						'cardDescription',
+						'bestRarityFound',
+					],
+				});
 
-				let userData = await getUserAndOpenedCardInstances({ username });
+				let userData = await db.collections
+					.UserAndCards({ username: username })
+					.where(
+						(attr, ops) =>
+							`${ops.field('__edb_e__')} <> ${ops.escape(db.entities.CardInstances.schema.model.entity)}` +
+							` OR ${ops.exists(attr.openedAt)}`
+					)
+					.go({ pages: 'all' })
+					.then(d => d.data);
+
+				// let userData = await getUserAndOpenedCardInstances({ username });
 				if (!userData) throw new InputValidationError('User not found.');
 
 				let {
@@ -396,6 +418,7 @@ const userCardsSummary = lazy(
 				}
 
 				let data = {
+          version: 3 as const,
 					userId: user.userId,
 					username: user.username,
 					seasons: seasons
@@ -406,9 +429,18 @@ const userCardsSummary = lazy(
 								.filter(d => d.seasonId === s.seasonId)
 								.sort((a, b) => a.cardName.localeCompare(b.cardName))
 								.map(d => ({
-									designId: d.designId,
-									cardName: d.cardName,
-									cardDescription: d.cardDescription,
+									designId:
+										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
+											? '?????'
+											: d.designId,
+									cardName:
+										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
+											? '?????'
+											: d.cardName,
+									cardDescription:
+										d.bestRarityFound?.rarityId === NO_CARDS_OPENED_ID
+											? '?????'
+											: d.cardDescription,
 									cards: (ownedDesigns.get(d.designId) ?? [])
 										.map(c => ({
 											instanceId: c.instanceId,

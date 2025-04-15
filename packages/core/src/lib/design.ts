@@ -22,6 +22,23 @@ export async function getCardDesignAndInstancesById(args: {
 	return result.data;
 }
 
+export async function getCardDesignAndInstancesByIdAndUser(args: {
+	designId: string;
+	username: string;
+}): Promise<{ CardDesigns: Array<CardDesign>; CardInstances: Array<CardInstance> }> {
+	const result = await db.collections
+		.DesignAndCards(args)
+		.where(
+			(attr, ops) =>
+				`${ops.field('__edb_e__')} = ${ops.escape(db.entities.CardDesigns.schema.model.entity)}` +
+				` OR (${ops.eq(attr.username, args.username)} AND ${ops.exists(attr.openedAt)})`
+		)
+		.go({ pages: 'all' });
+
+	console.log('result', result);
+	return result.data;
+}
+
 export async function deleteCardDesignById(args: {
 	designId: string;
 }): Promise<DBResult<{ designId: string } | null>> {

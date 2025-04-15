@@ -8,7 +8,7 @@ import {
 	type Setter,
 } from 'solid-js';
 
-export function CardList<T extends CardDesign | CardInstance>(props: {
+export function CardList<T>(props: {
 	cards: Array<T>;
 	children: (card: T, index: () => number) => JSXElement;
 	scale?: number;
