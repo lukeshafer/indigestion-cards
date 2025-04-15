@@ -450,10 +450,6 @@ function roundTo(input: number, decimals: number) {
 }
 
 export const CardInstanceComponent: Component<{
-	noTilt?: boolean;
-	noGlow?: boolean;
-	noShine?: boolean;
-	disableTiltOnTouch?: boolean;
 	lazy: boolean;
 	card: {
 		rarityId: string;
@@ -468,40 +464,28 @@ export const CardInstanceComponent: Component<{
 	};
 }> = props => {
 	return (
-		<Dynamic
-			component={props.noTilt === true ? 'div' : TiltEffectWrapper}
-			disableOnTouch={props.disableTiltOnTouch}>
-			<Show when={!props.noGlow}>
-				<GlowOnHover
-					color={checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor}
-				/>
+		<Card
+			lazy={props.lazy}
+			alt={props.card.cardName}
+			imgSrc={getCardImageUrl(props.card)}
+			viewTransitionName={`card-${props.card.instanceId}`}
+			background={
+				checkIsFullArt(props.card.rarityId)
+					? FULL_ART_BACKGROUND_CSS
+					: props.card.rarityColor
+			}>
+			<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+				<CardName>{props.card.cardName}</CardName>
+				<CardDescription>{props.card.cardDescription}</CardDescription>
 			</Show>
-			<Card
-				lazy={props.lazy}
-				alt={props.card.cardName}
-				imgSrc={getCardImageUrl(props.card)}
-				viewTransitionName={`card-${props.card.instanceId}`}
-				background={
-					checkIsFullArt(props.card.rarityId)
-						? FULL_ART_BACKGROUND_CSS
-						: props.card.rarityColor
-				}>
-				<Show when={checkIfCanShowCardText(props.card.rarityId)}>
-					<CardName>{props.card.cardName}</CardName>
-					<CardDescription>{props.card.cardDescription}</CardDescription>
-				</Show>
-				<Show when={!checkIsLegacyCard(props.card.rarityId)}>
-					<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-						{formatCardNumber(props.card)}
-					</CardNumber>
-				</Show>
-				<Show when={checkIsShitPack(props.card.stamps)}>
-					<ShitStamp src={getShitStampPath(props.card.rarityId)} />
-				</Show>
-			</Card>
-			<Show when={!props.noShine}>
-				<ShineMouseEffect />
+			<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+				<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+					{formatCardNumber(props.card)}
+				</CardNumber>
 			</Show>
-		</Dynamic>
+			<Show when={checkIsShitPack(props.card.stamps)}>
+				<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+			</Show>
+		</Card>
 	);
 };

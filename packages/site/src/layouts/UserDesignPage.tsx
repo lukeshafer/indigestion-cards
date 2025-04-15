@@ -1,10 +1,15 @@
 import * as Solid from 'solid-js';
 import type * as DB from '@core/types';
 import CardList from '@site/components/CardList';
-import type {TwitchUser} from '@core/lib/twitch';
+import type { TwitchUser } from '@core/lib/twitch';
 import * as Text from '@site/components/text';
 import * as Constants from '@site/constants';
-import { CardInstanceComponent } from '@site/components/Card';
+import {
+	CardInstanceComponent,
+	checkIsFullArt,
+	FULL_ART_BACKGROUND_CSS,
+	FullAnimatedCardEffect,
+} from '@site/components/Card';
 
 const IMG_SIZE = 60;
 export const UserDesignPage: Solid.Component<{
@@ -41,7 +46,14 @@ export const UserDesignPage: Solid.Component<{
 							<a
 								href={`${Constants.routes.USERS}/${card.username?.toLowerCase()}/${card.instanceId ?? ''}`}
 								class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-								<CardInstanceComponent card={card} lazy={index() > 10} />
+								<FullAnimatedCardEffect
+									glowColor={
+										checkIsFullArt(card.rarityId)
+											? FULL_ART_BACKGROUND_CSS
+											: card.rarityColor
+									}>
+									<CardInstanceComponent card={card} lazy={index() > 10} />
+								</FullAnimatedCardEffect>
 							</a>
 						)}
 					</CardList.List>

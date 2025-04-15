@@ -350,7 +350,6 @@ const userCardsSummary = lazy(
 		new Summary({
 			prefix: 'user-cards',
 			schema: z.object({
-        version: z.literal(3),
 				userId: z.string(),
 				username: z.string(),
 				seasons: z.array(
@@ -418,7 +417,6 @@ const userCardsSummary = lazy(
 				}
 
 				let data = {
-          version: 3 as const,
 					userId: user.userId,
 					username: user.username,
 					seasons: seasons

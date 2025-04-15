@@ -8,7 +8,12 @@ import { getSortInfo, type SortInfo } from '@site/client/card-sort';
 import * as Solid from 'solid-js';
 import { trpc } from '@site/client/api';
 import { routes } from '@site/constants';
-import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
+import {
+	CardEls,
+	CardInstanceComponent,
+	cardUtils,
+	FULL_ART_BACKGROUND_CSS,
+} from '@site/components/Card';
 import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack, formatPackNumber } from '@site/components/Pack';
@@ -911,7 +916,7 @@ const CardListViewSelector: Solid.Component = () => {
 	const ctx = Solid.useContext(UserPageContext);
 
 	return (
-		<fieldset class="m-4 flex justify-center">
+		<fieldset class="m-4 flex justify-center data-[hidden]:hidden" data-hidden>
 			<label
 				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 				data-checked={ctx.view === 'all'}>
@@ -973,7 +978,7 @@ const CardsSeasonViewList: Solid.Component = () => {
 				<Solid.For each={data().seasons}>
 					{season => (
 						<section class="p-4">
-							<h3 class="font-display p-4 text-center text-2xl font-bold">
+							<h3 class="font-display p-4 text-center text-2xl font-bold my-4">
 								{season.seasonName}
 							</h3>
 							<CardList.List cards={season.designs} scale={0.8}>
@@ -1001,45 +1006,41 @@ const CardsSeasonViewList: Solid.Component = () => {
 const CardsSeasonViewListItem: Solid.Component<{
 	design: UserCardsSummaryDesign;
 }> = props => {
-  const ctx = Solid.useContext(UserPageContext)
+	const ctx = Solid.useContext(UserPageContext);
 	const card = Solid.createMemo(() => props.design.cards[0]);
 
 	return (
 		<a
 			href={`${routes.USERS}/${ctx.user.username}/designs/${props.design.designId}`}
 			class="outline-brand-main group relative inline-block transition-transform">
-			<CardEls.GlowOnHover
-				color={cardUtils.checkIsFullArt(card().rarityId) ? undefined : card().rarityColor}
-			/>
-			<CardEls.Card
-				lazy={false}
-				alt={props.design.cardName}
-				imgSrc={cardUtils.getCardImageUrl({
-					rarityId: card().rarityId,
-					designId: props.design.designId,
-				})}
-				viewTransitionName={`card-${card().instanceId}`}
-				background={
-					cardUtils.checkIsFullArt(card().rarityId)
-						? FULL_ART_BACKGROUND_CSS
-						: card().rarityColor
-				}>
-				<Solid.Show when={cardUtils.checkIfCanShowCardText(card().rarityId)}>
-					<CardEls.CardName>{props.design.cardName}</CardEls.CardName>
-					<CardEls.CardDescription>
-						{props.design.cardDescription}
-					</CardEls.CardDescription>
-				</Solid.Show>
-				<Solid.Show when={!cardUtils.checkIsLegacyCard(card().rarityId)}>
-					<CardEls.CardNumber
-						color={cardUtils.checkIsFullArt(card().rarityId) ? 'white' : 'black'}>
-						{cardUtils.formatCardNumber(card())}
-					</CardEls.CardNumber>
-				</Solid.Show>
-				<Solid.Show when={cardUtils.checkIsShitPack(card().stamps)}>
-					<CardEls.ShitStamp src={cardUtils.getShitStampPath(card().rarityId)} />
-				</Solid.Show>
-			</CardEls.Card>
+			<Solid.For each={props.design.cards.slice(1, 5)}>
+				{(card, index) => (
+					<div
+						class="absolute transition-transform group-hover:-translate-y-4 ease-out"
+						style={{
+							'z-index': -index(),
+							'transition-delay': `${50 * (index() + 1)}ms`,
+
+							'--pos': `-${6 * (index() + 1)}px`,
+							top: 'var(--pos)',
+							right: 'var(--pos)',
+
+							'--level': 0.8 - index() * 0.2,
+							opacity: 'var(--level)',
+							filter: `brightness(var(--level))`,
+						}}>
+						<CardInstanceComponent card={{ ...props.design, ...card }} lazy={true} />
+					</div>
+				)}
+			</Solid.For>
+			<div class="transition-transform group-hover:-translate-y-4 ease-out">
+				<CardEls.GlowOnHover
+					color={
+						cardUtils.checkIsFullArt(card().rarityId) ? undefined : card().rarityColor
+					}
+				/>
+				<CardInstanceComponent card={{ ...props.design, ...card() }} lazy={false} />
+			</div>
 		</a>
 	);
 };
