@@ -320,6 +320,7 @@ const UserPinnedCard: Solid.Component<{
 	message: string;
 	username: string;
 }> = props => {
+	const ctx = Solid.useContext(UserPageContext);
 	return (
 		<div class="relative mx-auto w-fit pt-8">
 			<p class="text-center text-gray-500">Pinned</p>
@@ -332,7 +333,7 @@ const UserPinnedCard: Solid.Component<{
 						lazy={false}
 						alt={props.card.cardName}
 						imgSrc={cardUtils.getCardImageUrl(props.card)}
-						viewTransitionName={`card-${props.card.instanceId}`}
+						viewTransitionName={ctx.view === "season" ? undefined : `card-${props.card.instanceId}`}
 						background={
 							cardUtils.checkIsFullArt(props.card.rarityId)
 								? FULL_ART_BACKGROUND_CSS
@@ -636,8 +637,9 @@ const UserCardList: Solid.Component<{
 const UserCardListItem: Solid.Component<{
 	card: CardInstance;
 	lazy: boolean;
-}> = props => (
-	<a
+}> = props => {
+	const ctx = Solid.useContext(UserPageContext);
+	return <a
 		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
 		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
 		<CardEls.FullAnimatedCardEffect
@@ -649,7 +651,7 @@ const UserCardListItem: Solid.Component<{
 				lazy={props.lazy}
 				alt={props.card.cardName}
 				imgSrc={cardUtils.getCardImageUrl(props.card)}
-				viewTransitionName={`card-${props.card.instanceId}`}
+				viewTransitionName={ctx.view === "season" ? undefined : `card-${props.card.instanceId}`}
 				background={
 					cardUtils.checkIsFullArt(props.card.rarityId)
 						? FULL_ART_BACKGROUND_CSS
@@ -671,7 +673,7 @@ const UserCardListItem: Solid.Component<{
 			</CardEls.Card>
 		</CardEls.FullAnimatedCardEffect>
 	</a>
-);
+};
 
 async function queryCards(opts: {
 	sortInfo: SortInfo;
@@ -1058,7 +1060,7 @@ const CardsSeasonViewListItem: Solid.Component<{
 					/>
 					<CardInstanceComponent
 						viewTransitionName={
-							ctx.user.pinnedCard?.instanceId === card().instanceId ? null : undefined
+							ctx.view === 'all' || ctx.user.pinnedCard?.instanceId === card().instanceId ? null : undefined
 						}
 						card={{ ...props.design, ...card() }}
 						lazy={false}
