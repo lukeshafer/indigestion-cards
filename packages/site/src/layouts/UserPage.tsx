@@ -333,7 +333,9 @@ const UserPinnedCard: Solid.Component<{
 						lazy={false}
 						alt={props.card.cardName}
 						imgSrc={cardUtils.getCardImageUrl(props.card)}
-						viewTransitionName={ctx.view === "season" ? undefined : `card-${props.card.instanceId}`}
+						viewTransitionName={
+							ctx.view === 'season' ? undefined : `card-${props.card.instanceId}`
+						}
 						background={
 							cardUtils.checkIsFullArt(props.card.rarityId)
 								? FULL_ART_BACKGROUND_CSS
@@ -639,40 +641,50 @@ const UserCardListItem: Solid.Component<{
 	lazy: boolean;
 }> = props => {
 	const ctx = Solid.useContext(UserPageContext);
-	return <a
-		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
-		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-		<CardEls.FullAnimatedCardEffect
-			disableTiltOnTouch
-			glowColor={
-				cardUtils.checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor
-			}>
-			<CardEls.Card
-				lazy={props.lazy}
-				alt={props.card.cardName}
-				imgSrc={cardUtils.getCardImageUrl(props.card)}
-				viewTransitionName={ctx.view === "season" ? undefined : `card-${props.card.instanceId}`}
-				background={
+	return (
+		<a
+			href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
+			class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
+			<CardEls.FullAnimatedCardEffect
+				disableTiltOnTouch
+				glowColor={
 					cardUtils.checkIsFullArt(props.card.rarityId)
-						? FULL_ART_BACKGROUND_CSS
+						? undefined
 						: props.card.rarityColor
 				}>
-				<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
-					<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-					<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
-				</Solid.Show>
-				<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
-					<CardEls.CardNumber
-						color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-						{cardUtils.formatCardNumber(props.card)}
-					</CardEls.CardNumber>
-				</Solid.Show>
-				<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
-					<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
-				</Solid.Show>
-			</CardEls.Card>
-		</CardEls.FullAnimatedCardEffect>
-	</a>
+				<CardEls.Card
+					lazy={props.lazy}
+					alt={props.card.cardName}
+					imgSrc={cardUtils.getCardImageUrl(props.card)}
+					viewTransitionName={
+						ctx.view === 'season' ? undefined : `card-${props.card.instanceId}`
+					}
+					background={
+						cardUtils.checkIsFullArt(props.card.rarityId)
+							? FULL_ART_BACKGROUND_CSS
+							: props.card.rarityColor
+					}>
+					<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>
+							{props.card.cardDescription}
+						</CardEls.CardDescription>
+					</Solid.Show>
+					<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+						<CardEls.CardNumber
+							color={
+								cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'
+							}>
+							{cardUtils.formatCardNumber(props.card)}
+						</CardEls.CardNumber>
+					</Solid.Show>
+					<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+						<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+					</Solid.Show>
+				</CardEls.Card>
+			</CardEls.FullAnimatedCardEffect>
+		</a>
+	);
 };
 
 async function queryCards(opts: {
@@ -918,10 +930,7 @@ const CardListViewSelector: Solid.Component = () => {
 	const ctx = Solid.useContext(UserPageContext);
 
 	return (
-		<fieldset
-			class="m-4 flex justify-center data-[hidden]:hidden"
-			id="userListView"
-			data-hidden>
+		<fieldset class="m-4 flex justify-center">
 			<label
 				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 				data-checked={ctx.view === 'all'}>
@@ -1060,7 +1069,10 @@ const CardsSeasonViewListItem: Solid.Component<{
 					/>
 					<CardInstanceComponent
 						viewTransitionName={
-							ctx.view === 'all' || ctx.user.pinnedCard?.instanceId === card().instanceId ? null : undefined
+							ctx.view === 'all' ||
+							ctx.user.pinnedCard?.instanceId === card().instanceId
+								? null
+								: undefined
 						}
 						card={{ ...props.design, ...card() }}
 						lazy={false}
