@@ -978,20 +978,13 @@ const CardsSeasonViewList: Solid.Component = () => {
 				<Solid.For each={data().seasons}>
 					{season => (
 						<section class="py-4">
-							<h3 class="font-display p-4 text-center text-2xl font-bold my-4">
+							<h3 class="font-display my-4 p-4 text-center text-2xl font-bold">
 								{season.seasonName}
 							</h3>
 							<CardList.List cards={season.designs} scale={0.7}>
 								{design => (
 									<li>
-										<Solid.Switch>
-											<Solid.Match when={design.cards.length > 0}>
-												<CardsSeasonViewListItem design={design} />
-											</Solid.Match>
-											<Solid.Match when={design.cards.length === 0}>
-												<CardsSeasonViewListEmptyItem design={design} />
-											</Solid.Match>
-										</Solid.Switch>
+										<CardsSeasonViewListItem design={design} />
 									</li>
 								)}
 							</CardList.List>
@@ -1010,56 +1003,62 @@ const CardsSeasonViewListItem: Solid.Component<{
 	const card = Solid.createMemo(() => props.design.cards[0]);
 
 	return (
-		<a
-			href={`${routes.USERS}/${ctx.user.username}/designs/${props.design.designId}`}
-			class="outline-brand-main group relative inline-block transition-transform">
-			<Solid.For each={props.design.cards.slice(1, 5)}>
-				{(card, index) => (
-					<div
-						class="absolute transition-transform group-hover:-translate-y-4 ease-out"
-						style={{
-							'z-index': -index(),
-							'transition-delay': `${50 * (index() + 1)}ms`,
-
-							'--pos': `-${4 * (index() + 1)}px`,
-							top: 'var(--pos)',
-							right: 'var(--pos)',
-
-							'--level': 0.9 - index() * 0.1,
-							// opacity: 'var(--level)',
-							filter: `brightness(var(--level)) saturate(var(--level))`,
-						}}>
-						<CardInstanceComponent card={{ ...props.design, ...card }} lazy={true} />
-					</div>
-				)}
-			</Solid.For>
-			<div class="transition-transform group-hover:-translate-y-4 ease-out">
-				<CardEls.GlowOnHover
-					color={
-						cardUtils.checkIsFullArt(card().rarityId) ? undefined : card().rarityColor
-					}
-				/>
-				<CardInstanceComponent card={{ ...props.design, ...card() }} lazy={false} />
-			</div>
-		</a>
-	);
-};
-const CardsSeasonViewListEmptyItem: Solid.Component<{
-	design: UserCardsSummaryDesign;
-}> = props => {
-	return (
-		<div class="group relative inline-block transition-transform">
-			<CardEls.Card
-				noShadow
-				lazy={false}
-				alt={props.design.cardName}
-				imgSrc={null}
-				viewTransitionName={undefined}
-				background={undefined}>
-				<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600">
-					{props.design.cardName}
+		<Solid.Show
+			when={props.design.cards.length > 0}
+			fallback={
+				<div class="group relative inline-block transition-transform">
+					<CardEls.Card
+						noShadow
+						lazy={false}
+						alt={props.design.cardName}
+						imgSrc={null}
+						viewTransitionName={undefined}
+						background={undefined}>
+						<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600">
+							{props.design.cardName}
+						</div>
+					</CardEls.Card>
 				</div>
-			</CardEls.Card>
-		</div>
+			}>
+			<a
+				href={`${routes.USERS}/${ctx.user.username}/designs/${props.design.designId}`}
+				class="outline-brand-main group relative inline-block transition-transform">
+				<Solid.For each={props.design.cards.slice(1, 5)}>
+					{(card, index) => (
+						<div
+							class="absolute transition-transform ease-out group-hover:-translate-y-4"
+							style={{
+								'z-index': -index(),
+								'transition-delay': `${50 * (index() + 1)}ms`,
+
+								'--pos': `-${4 * (index() + 1)}px`,
+								top: 'var(--pos)',
+								right: 'var(--pos)',
+
+								'--level': 0.9 - index() * 0.1,
+								filter: `brightness(var(--level)) saturate(var(--level))`,
+							}}>
+							<CardInstanceComponent
+								card={{ ...props.design, ...card }}
+								lazy={true}
+							/>
+						</div>
+					)}
+				</Solid.For>
+				<div class="transition-transform ease-out group-hover:-translate-y-4">
+					<CardEls.GlowOnHover
+						color={
+							cardUtils.checkIsFullArt(card().rarityId)
+								? undefined
+								: card().rarityColor
+						}
+					/>
+					<CardInstanceComponent card={{ ...props.design, ...card() }} lazy={false} />
+				</div>
+				<div class="bg-brand-main text-shadow-brand absolute bottom-0 right-0 grid h-8 w-8 translate-x-1/2 translate-y-1/2 place-items-center rounded-full font-bold text-white">
+					{props.design.cards.length}
+				</div>
+			</a>
+		</Solid.Show>
 	);
 };
