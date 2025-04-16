@@ -450,6 +450,7 @@ function roundTo(input: number, decimals: number) {
 }
 
 export const CardInstanceComponent: Component<{
+	viewTransitionName?: string | null;
 	lazy: boolean;
 	card: {
 		rarityId: string;
@@ -468,7 +469,11 @@ export const CardInstanceComponent: Component<{
 			lazy={props.lazy}
 			alt={props.card.cardName}
 			imgSrc={getCardImageUrl(props.card)}
-			viewTransitionName={`card-${props.card.instanceId}`}
+			viewTransitionName={
+				props.viewTransitionName === null
+					? undefined
+					: (props.viewTransitionName ?? `card-${props.card.instanceId}`)
+			}
 			background={
 				checkIsFullArt(props.card.rarityId)
 					? FULL_ART_BACKGROUND_CSS
