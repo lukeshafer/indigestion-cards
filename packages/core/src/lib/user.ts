@@ -346,7 +346,7 @@ export type UserCardsSummarySeason = UserCardsSummary['seasons'][number];
 export type UserCardsSummaryDesign = UserCardsSummarySeason['designs'][number];
 export type UserCardsSummaryCard = UserCardsSummaryDesign['cards'][number];
 
-const CARDS_SUMMARY_VERSION = 1
+const CARDS_SUMMARY_VERSION = 2
 const userCardsSummary = lazy(
 	() =>
 		new Summary({
@@ -457,6 +457,7 @@ const userCardsSummary = lazy(
 										.sort((a, b) => a.rarityRank - b.rarityRank),
 								})),
 						}))
+            .filter(s => s.designs.length > 0)
 						.sort((a, b) => {
 							if (a.seasonId === 'moments') {
 								return 1;
