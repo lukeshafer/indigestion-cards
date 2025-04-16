@@ -27,11 +27,11 @@ export const JusticeForSocks = () => {
 					<p>
 						In episode 80, Ryan searches for a Stalhorse, an undead skeletal horse
 						ridden by Stalkoblins, a different skeletal monster of the Zelda world. In a
-						fight against the Stalkoblins in the Hebra region, Ryan is knocked off Socks
-						by an attack. He does not get on Socks again that episode, leaving the poor
-						horse out in the cold, snowy region of Hebra, in favor of a Stalhorse (to be
-						clear, I mean no disrespect to the Stalhorse, which is a misunderstood
-						creature in itself, and to which Ryan DID show respect).
+						fight against the Stalkoblins in the Tabantha Tundra, Ryan is knocked off
+						Socks by an attack. He does not get on Socks again that episode, leaving the
+						poor horse out in the cold, snowy region of Hebra, in favor of a Stalhorse
+						(to be clear, I mean no disrespect to the Stalhorse, which is a
+						misunderstood creature in itself, and to which Ryan DID show respect).
 					</p>
 
 					<p>
@@ -39,7 +39,7 @@ export const JusticeForSocks = () => {
 						clothes or consume a food item or potion to grant cold resistance -
 						something horse's are not able to do in this game. Ryan found Socks as a
 						wild horse in the Necluda region near the Ash Swamp -- an area with a much
-						different climate to the Hebra region, meaning the poor horse is not even
+						different climate to the Tabantha TUNDRA, meaning the poor horse is not even
 						acclimated to the cold temperature.
 					</p>
 
@@ -53,7 +53,9 @@ export const JusticeForSocks = () => {
 					</p>
 
 					<div class="ml-4">
-						<blockquote cite="https://www.youtube.com/watch?v=IIgMlTd0tuY&t=1608s">
+						<blockquote
+							cite="https://www.youtube.com/watch?v=IIgMlTd0tuY&t=1608s"
+							class="dark:text-gray-100">
 							<p>Ah crap.</p>
 						</blockquote>
 						-{' '}

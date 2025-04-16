@@ -916,7 +916,7 @@ const CardListViewSelector: Solid.Component = () => {
 	const ctx = Solid.useContext(UserPageContext);
 
 	return (
-		<fieldset class="m-4 flex justify-center data-[hidden]:hidden" data-hidden>
+		<fieldset class="m-4 flex justify-center data-[hidden]:hidden" id="userListView" data-hidden>
 			<label
 				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 				data-checked={ctx.view === 'all'}>
