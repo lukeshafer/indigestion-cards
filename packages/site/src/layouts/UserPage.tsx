@@ -916,7 +916,10 @@ const CardListViewSelector: Solid.Component = () => {
 	const ctx = Solid.useContext(UserPageContext);
 
 	return (
-		<fieldset class="m-4 flex justify-center data-[hidden]:hidden" id="userListView" data-hidden>
+		<fieldset
+			class="m-4 flex justify-center data-[hidden]:hidden"
+			id="userListView"
+			data-hidden>
 			<label
 				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
 				data-checked={ctx.view === 'all'}>
@@ -1014,7 +1017,7 @@ const CardsSeasonViewListItem: Solid.Component<{
 						imgSrc={null}
 						viewTransitionName={undefined}
 						background={undefined}>
-						<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600 text-center">
+						<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-center text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600">
 							{props.design.cardName}
 						</div>
 					</CardEls.Card>
@@ -1053,7 +1056,14 @@ const CardsSeasonViewListItem: Solid.Component<{
 								: card().rarityColor
 						}
 					/>
-					<CardInstanceComponent card={{ ...props.design, ...card() }} lazy={false} />
+					<CardInstanceComponent
+						viewTransitionName={
+							ctx.user.pinnedCard?.instanceId === card().instanceId ? null : undefined
+						}
+						card={{ ...props.design, ...card() }}
+						lazy={false}
+					/>
+					<CardEls.ShineMouseEffect />
 				</div>
 				<div class="bg-brand-main text-shadow-brand absolute bottom-0 right-0 grid h-8 w-8 translate-x-1/2 translate-y-1/2 place-items-center rounded-full font-bold text-white">
 					{props.design.cards.length}
