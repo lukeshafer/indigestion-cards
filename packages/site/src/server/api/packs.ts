@@ -13,7 +13,7 @@ import { TRPCError } from '@trpc/server';
 
 export const packs = {
 	all: adminProcedure.query(async () => await getAllPacks()),
-	packCount: adminProcedure.query(async () => await getAllPacks().then(packs => packs.length)),
+	packCount: adminProcedure.query(async () => await getAllPacks().then(packs => packs.filter(p => !p.isLocked).length)),
 	byUser: authedProcedure
 		.input(z.object({ username: z.string() }))
 		.query(
