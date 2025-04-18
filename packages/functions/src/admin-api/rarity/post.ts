@@ -1,9 +1,8 @@
-import { Bucket } from 'sst/node/bucket';
-
 import { SiteHandler } from '@core/lib/api';
 import { createRarity } from '@core/lib/rarity';
 import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
 import { moveImageBetweenBuckets, createS3Url } from '@core/lib/images';
+import { Resource } from 'sst';
 
 export const handler = SiteHandler(
 	{
@@ -27,7 +26,7 @@ export const handler = SiteHandler(
 			return { statusCode: 400, body: 'Default count must be greater than 0' };
 
 		const frameUrl = createS3Url({
-			bucket: Bucket.FrameDesigns.bucketName,
+			bucket: Resource.FrameDesigns.name,
 			key: params.imageKey!,
 		});
 
@@ -40,9 +39,9 @@ export const handler = SiteHandler(
 			};
 
 		await moveImageBetweenBuckets({
-			sourceBucket: Bucket.FrameDrafts.bucketName,
+			sourceBucket: Resource.FrameDrafts.name,
 			key: params.imageKey,
-			destinationBucket: Bucket.FrameDesigns.bucketName,
+			destinationBucket: Resource.FrameDesigns.name,
 		});
 		await deleteUnmatchedDesignImage({ imageId: params.imageKey, unmatchedImageType: 'frame' });
 

@@ -1,7 +1,7 @@
 import { SiteHandler } from '@core/lib/api';
 import { S3 } from '@aws-sdk/client-s3';
 import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
-import { Bucket } from 'sst/node/bucket';
+import { Resource } from 'sst';
 
 export const handler = SiteHandler(
 	{
@@ -22,8 +22,8 @@ export const handler = SiteHandler(
 		}
 
 		const bucketName = {
-			cardDesign: Bucket.CardDrafts.bucketName,
-			frame: Bucket.FrameDrafts.bucketName,
+			cardDesign: Resource.CardDrafts.name,
+			frame: Resource.FrameDrafts.name,
 		}[type];
 
 		const s3 = new S3();

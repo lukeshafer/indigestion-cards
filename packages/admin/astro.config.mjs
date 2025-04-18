@@ -9,10 +9,11 @@ import icon from 'astro-icon';
 // https://astro.build/config
 export default defineConfig({
 	output: 'server',
-	adapter: aws({
-		serverRoutes: ['api/*', 'admin-users', 'pack-types', 'pack-types/*', '_actions/*'],
-	}),
+	adapter: aws(),
 	integrations: [tailwind(), solid(), icon()],
+  server: {
+    port: 4322,
+  },
 	vite: {
 		ssr: {
 			external: ['electrodb'],

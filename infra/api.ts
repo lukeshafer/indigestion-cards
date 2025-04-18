@@ -2,7 +2,7 @@ import { auth } from './auth';
 import { cardDesignBucket, cardDraftBucket, frameDesignBucket, frameDraftBucket } from './buckets';
 import {
 	API_VERSION,
-	getDomainName,
+	domainName,
 	params,
 	ssmPermissions,
 	twitchClientId,
@@ -12,9 +12,7 @@ import { database } from './database';
 import { eventBus } from './events';
 import { wsApi, wsConnectionsTable } from './websockets-api';
 
-const baseDomain = getDomainName($app.stage);
-
-const twitchApi = new sst.aws.ApiGatewayV2('TwitchAPI');
+export const twitchApi = new sst.aws.ApiGatewayV2('TwitchAPI');
 
 twitchApi.route('$default', {
 	handler: 'packages/functions/src/twitch-api.handler',
@@ -23,20 +21,20 @@ twitchApi.route('$default', {
 	runtime: 'nodejs22.x',
 });
 
-const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
+export const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
 	cors: {
 		allowHeaders: ['content-type', 'authorization'],
 		allowMethods: ['DELETE', 'POST', 'GET', 'PATCH'],
 		allowOrigins:
 			$dev == true
 				? ['http://localhost:4321', 'http://localhost:4322']
-				: [`https://${baseDomain}`],
+				: [`https://${domainName}`],
 	},
 	domain:
 		$dev === true
 			? undefined
 			: {
-					name: `api.${baseDomain}`,
+					name: `api.${domainName}`,
 					path: API_VERSION,
 				},
 	transform: {

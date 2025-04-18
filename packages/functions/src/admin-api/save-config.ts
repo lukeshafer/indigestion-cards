@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { useSession } from 'sst/node/future/auth';
-import { ApiHandler, useJsonBody } from 'sst/node/api';
+import { ApiHandler, useJsonBody } from 'sstv2/node/api';
 import { updateBatchTwitchEvents } from '@core/lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@core/constants';
 import { setAdminEnvSession } from '@core/lib/session';

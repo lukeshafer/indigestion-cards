@@ -1,4 +1,4 @@
-import { ApiHandler, useFormData } from 'sst/node/api';
+import { ApiHandler, useFormData } from 'sstv2/node/api';
 import { useSession } from 'sst/node/future/auth';
 import { setAdminEnvSession } from './session';
 

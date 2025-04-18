@@ -1,8 +1,8 @@
-import { Config } from 'sst/node/config';
 import crypto from 'crypto';
 import { bodySchema, type TwitchBody, customRewardResponse } from './twitch-schemas';
 import { SSM } from '@aws-sdk/client-ssm';
 import { z } from 'zod';
+import { Resource } from 'sst';
 
 const ssm = new SSM();
 
@@ -43,7 +43,7 @@ export function parseRequestBody(request: unknown): TwitchBody {
 
 export function verifyTwitchRequest(request: TwitchRequest) {
 	try {
-		const secret = Config.TWITCH_CLIENT_SECRET;
+		const secret = Resource.TWITCH_CLIENT_SECRET.value;
 		const message = getHmacMessage(request);
 		const hmac = getHmac(secret, message);
 
@@ -107,7 +107,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 
 		let response = await fetch(fetchUrl, {
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${appAccessToken}`,
 			},
 		});
@@ -122,7 +122,7 @@ export async function getListOfTwitchUsersByIds(ids: string[]) {
 			response = await fetch(fetchUrl, {
 				method: 'GET',
 				headers: {
-					'Client-ID': Config.TWITCH_CLIENT_ID,
+					'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 					Authorization: `Bearer ${newToken}`,
 				},
 			});
@@ -161,7 +161,7 @@ export async function getUserByLogin(login: string) {
 	const fetchUrl = `https://api.twitch.tv/helix/users?login=${login}`;
 	let response = await fetch(fetchUrl, {
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${appAccessToken}`,
 		},
 	});
@@ -177,7 +177,7 @@ export async function getUserByLogin(login: string) {
 		response = await fetch(fetchUrl, {
 			method: 'GET',
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken}`,
 			},
 		});
@@ -225,7 +225,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 	url.searchParams.set('broadcaster_id', args.userId);
 	let twitchResponse = await fetch(url.toString(), {
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${streamer_access_token}`,
 		},
 	});
@@ -241,7 +241,7 @@ export async function getAllChannelPointRewards(args: { userId: string }) {
 		});
 		twitchResponse = await fetch(url.toString(), {
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken.access_token}`,
 			},
 		});
@@ -315,7 +315,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 	let response = await fetch(subscriptionsUrl, {
 		method: 'POST',
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${appAccessToken}`,
 			'Content-Type': 'application/json',
 		},
@@ -326,7 +326,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 			transport: {
 				method: 'webhook',
 				callback: event.callback,
-				secret: Config.TWITCH_CLIENT_SECRET,
+				secret: Resource.TWITCH_CLIENT_SECRET.value,
 			},
 		}),
 	});
@@ -342,7 +342,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 		response = await fetch(subscriptionsUrl, {
 			method: 'POST',
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken}`,
 				'Content-Type': 'application/json',
 			},
@@ -353,7 +353,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 				transport: {
 					method: 'webhook',
 					callback: event.callback,
-					secret: Config.TWITCH_CLIENT_SECRET,
+					secret: Resource.TWITCH_CLIENT_SECRET.value,
 				},
 			}),
 		});
@@ -409,8 +409,8 @@ export async function getUserAccessToken(args: { code: string; redirect_uri: str
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		body: new URLSearchParams({
-			client_id: Config.TWITCH_CLIENT_ID,
-			client_secret: Config.TWITCH_CLIENT_SECRET,
+			client_id: Resource.TWITCH_CLIENT_ID.value,
+			client_secret: Resource.TWITCH_CLIENT_SECRET.value,
 			code: args.code,
 			grant_type: 'authorization_code',
 			redirect_uri: args.redirect_uri,
@@ -425,8 +425,8 @@ async function refreshUserAccessToken(args: { refresh_token: string }) {
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		body: new URLSearchParams({
-			client_id: Config.TWITCH_CLIENT_ID,
-			client_secret: Config.TWITCH_CLIENT_SECRET,
+			client_id: Resource.TWITCH_CLIENT_ID.value,
+			client_secret: Resource.TWITCH_CLIENT_SECRET.value,
 			refresh_token: args.refresh_token,
 			grant_type: 'refresh_token',
 		}).toString(),
@@ -470,7 +470,7 @@ export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>
 	};
 
 	await ssm.putParameter({
-		Name: Config.TWITCH_TOKENS_PARAM,
+		Name: Resource.CardsParams.TWITCH_TOKENS_PARAM,
 		Value: JSON.stringify(newTokens),
 		Type: 'SecureString',
 		Overwrite: true,
@@ -480,7 +480,7 @@ export async function setTwitchTokens(args: Partial<z.infer<typeof twitchTokens>
 export async function getTwitchTokens() {
 	const secret = await ssm
 		.getParameter({
-			Name: Config.TWITCH_TOKENS_PARAM,
+			Name: Resource.CardsParams.TWITCH_TOKENS_PARAM,
 			WithDecryption: true,
 		})
 		.then(p => p.Parameter?.Value)
@@ -491,7 +491,7 @@ export async function getTwitchTokens() {
 		return result;
 	} catch (error) {
 		await ssm.putParameter({
-			Name: Config.TWITCH_TOKENS_PARAM,
+			Name: Resource.CardsParams.TWITCH_TOKENS_PARAM,
 			Type: 'SecureString',
 			Value: JSON.stringify({
 				app_access_token: '',
@@ -517,8 +517,8 @@ async function getNewAppAccessToken() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		body: new URLSearchParams({
-			client_id: Config.TWITCH_CLIENT_ID,
-			client_secret: Config.TWITCH_CLIENT_SECRET,
+			client_id: Resource.TWITCH_CLIENT_ID.value,
+			client_secret: Resource.TWITCH_CLIENT_SECRET.value,
 			grant_type: 'client_credentials',
 		}).toString(),
 	});
@@ -539,11 +539,11 @@ async function getNewAppAccessToken() {
 export async function getActiveTwitchEventSubscriptions() {
 	const appAccessToken = (await getTwitchTokens()).app_access_token;
 	const fetchUrl = new URL('https://api.twitch.tv/helix/eventsub/subscriptions');
-	fetchUrl.searchParams.append('user_id', Config.STREAMER_USER_ID);
+	fetchUrl.searchParams.append('user_id', Resource.CardsParams.STREAMER_USER_ID);
 	let response = await fetch(fetchUrl.toString(), {
 		method: 'GET',
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${appAccessToken}`,
 		},
 	});
@@ -558,7 +558,7 @@ export async function getActiveTwitchEventSubscriptions() {
 		response = await fetch(fetchUrl.toString(), {
 			method: 'GET',
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken}`,
 			},
 		});
@@ -613,7 +613,7 @@ export async function deleteTwitchEventSubscription(id: string) {
 	return fetch(fetchUrl.toString(), {
 		method: 'DELETE',
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${appAccessToken}`,
 		},
 	}).then(async res => {
@@ -627,7 +627,7 @@ export async function deleteTwitchEventSubscription(id: string) {
 		const newResponse = await fetch(fetchUrl.toString(), {
 			method: 'DELETE',
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken}`,
 			},
 		});
@@ -646,13 +646,13 @@ export async function getTwitchChatters(
 ): Promise<z.infer<typeof chattersSchema>['data']> {
 	const { streamer_access_token, streamer_refresh_token } = await getTwitchTokens();
 	const fetchUrl = new URL('https://api.twitch.tv/helix/chat/chatters');
-	fetchUrl.searchParams.append('broadcaster_id', Config.STREAMER_USER_ID);
-	fetchUrl.searchParams.append('moderator_id', Config.STREAMER_USER_ID);
+	fetchUrl.searchParams.append('broadcaster_id', Resource.CardsParams.STREAMER_USER_ID);
+	fetchUrl.searchParams.append('moderator_id', Resource.CardsParams.STREAMER_USER_ID);
 	if (cursor) fetchUrl.searchParams.append('after', cursor);
 	let response = await fetch(fetchUrl.toString(), {
 		method: 'GET',
 		headers: {
-			'Client-ID': Config.TWITCH_CLIENT_ID,
+			'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 			Authorization: `Bearer ${streamer_access_token}`,
 		},
 	});
@@ -667,7 +667,7 @@ export async function getTwitchChatters(
 		response = await fetch(fetchUrl.toString(), {
 			method: 'GET',
 			headers: {
-				'Client-ID': Config.TWITCH_CLIENT_ID,
+				'Client-ID': Resource.TWITCH_CLIENT_ID.value,
 				Authorization: `Bearer ${newToken.access_token}`,
 			},
 		});

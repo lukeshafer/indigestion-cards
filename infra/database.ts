@@ -1,12 +1,14 @@
 import { params, twitchClientId, twitchClientSecret, ssmPermissions } from './config';
 
-const dataSummaries = new sst.aws.Bucket('DataSummaries', {
+export const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 	transform: {
 		bucket(args, opts) {
 			args.forceDestroy = undefined;
 			if ($app.stage === 'luke') {
 				args.bucket = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
 				opts.import = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
+				return;
+			} else if ($app.stage === 'luke-v3') {
 				return;
 			} else {
 				throw new Error(`Bucket DataSummaries import not setup for stage ${$app.stage}`);
@@ -20,6 +22,8 @@ export const database = new sst.aws.Dynamo('Database', {
 		table(args, opts) {
 			if ($app.stage === 'luke') {
 				opts.import = 'luke-lil-indigestion-cards-data';
+				return;
+			} else if ($app.stage === 'luke-v3') {
 				return;
 			} else {
 				throw new Error(`Database import not setup for stage ${$app.stage}`);
@@ -110,6 +114,15 @@ database.subscribe(
 database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+		link: [database, dataSummaries, params],
+		permissions: [ssmPermissions],
+	},
+	{ filters: [filterEntities(['season', 'cardDesign', 'cardInstance', 'rarity'])] }
+);
+
+database.subscribe(
+	{
+		handler: 'packages/functions/src/table-consumers/refresh-user-cards.handler',
 		link: [database, dataSummaries, params],
 		permissions: [ssmPermissions],
 	},

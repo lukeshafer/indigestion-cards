@@ -1,6 +1,4 @@
-import { Api, ApiHandler } from 'sst/node/api';
-import { Config } from 'sst/node/config';
-import { EventBus } from 'sst/node/event-bus';
+import { ApiHandler } from 'sstv2/node/api';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
 	subscribeToTwitchEvent,
@@ -12,6 +10,7 @@ import {
 } from '@core/lib/twitch';
 import { setAdminEnvSession } from '@core/lib/session';
 import { useSession } from 'sst/node/future/auth';
+import { Resource } from 'sst';
 
 export const handler = ApiHandler(async () => {
 	const session = useSession();
@@ -31,9 +30,9 @@ export const handler = ApiHandler(async () => {
 			exists: false,
 			details: {
 				type: SUBSCRIPTION_TYPE.GIFT_SUB,
-				callback: `${Api.twitchApi.url}`,
+				callback: `${Resource.TwitchAPI.url}`,
 				condition: {
-					broadcaster_user_id: Config.STREAMER_USER_ID,
+					broadcaster_user_id: Resource.CardsParams.STREAMER_USER_ID,
 				},
 			},
 		},
@@ -41,9 +40,9 @@ export const handler = ApiHandler(async () => {
 			exists: false,
 			details: {
 				type: SUBSCRIPTION_TYPE.REDEEM_REWARD,
-				callback: `${Api.twitchApi.url}`,
+				callback: `${Resource.TwitchAPI.url}`,
 				condition: {
-					broadcaster_user_id: Config.STREAMER_USER_ID,
+					broadcaster_user_id: Resource.CardsParams.STREAMER_USER_ID,
 				},
 			},
 		},
@@ -51,9 +50,9 @@ export const handler = ApiHandler(async () => {
 			exists: false,
 			details: {
 				type: SUBSCRIPTION_TYPE.ADD_REWARD,
-				callback: `${Api.twitchApi.url}`,
+				callback: `${Resource.TwitchAPI.url}`,
 				condition: {
-					broadcaster_user_id: Config.STREAMER_USER_ID,
+					broadcaster_user_id: Resource.CardsParams.STREAMER_USER_ID,
 				},
 			},
 		},
@@ -61,9 +60,9 @@ export const handler = ApiHandler(async () => {
 			exists: false,
 			details: {
 				type: SUBSCRIPTION_TYPE.UPDATE_REWARD,
-				callback: `${Api.twitchApi.url}`,
+				callback: `${Resource.TwitchAPI.url}`,
 				condition: {
-					broadcaster_user_id: Config.STREAMER_USER_ID,
+					broadcaster_user_id: Resource.CardsParams.STREAMER_USER_ID,
 				},
 			},
 		},
@@ -71,9 +70,9 @@ export const handler = ApiHandler(async () => {
 			exists: false,
 			details: {
 				type: SUBSCRIPTION_TYPE.REMOVE_REWARD,
-				callback: `${Api.twitchApi.url}`,
+				callback: `${Resource.TwitchAPI.url}`,
 				condition: {
-					broadcaster_user_id: Config.STREAMER_USER_ID,
+					broadcaster_user_id: Resource.CardsParams.STREAMER_USER_ID,
 				},
 			},
 		},
@@ -85,7 +84,7 @@ export const handler = ApiHandler(async () => {
 			return;
 		}
 		const details = subDetails[sub.type];
-		if (details && sub.transport.callback === Api.twitchApi.url) details.exists = true;
+		if (details && sub.transport.callback === Resource.TwitchAPI.url) details.exists = true;
 	});
 
 	const promises = Object.entries(subDetails).map(([, details]) => {
@@ -102,7 +101,7 @@ export const handler = ApiHandler(async () => {
 				Source: 'site',
 				DetailType: 'refresh-channel-point-rewards',
 				Detail: JSON.stringify({}),
-				EventBusName: EventBus.eventBus.eventBusName,
+				EventBusName: Resource.EventBus.name,
 			},
 		],
 	});

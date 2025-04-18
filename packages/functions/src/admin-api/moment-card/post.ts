@@ -3,14 +3,11 @@ import { createCardInstance } from '@core/lib/card';
 import { generateInstanceId } from '@core/lib/card-pool';
 import { createCardDesign, deleteCardDesignById } from '@core/lib/design';
 import { createS3Url, moveImageBetweenBuckets } from '@core/lib/images';
-import {
-	deleteMomentRedemption,
-	momentInputSchemas,
-} from '@core/lib/moments';
+import { deleteMomentRedemption, momentInputSchemas } from '@core/lib/moments';
 import { generatePackId } from '@core/lib/pack';
 import { getRarityRankForRarity } from '@core/lib/site-config';
 import { deleteUnmatchedDesignImage } from '@core/lib/unmatched-image';
-import { Bucket } from 'sst/node/bucket';
+import { Resource } from 'sst';
 
 export const handler = SiteHandler(
 	{
@@ -39,7 +36,7 @@ export const handler = SiteHandler(
 		};
 
 		const newUrl = createS3Url({
-			bucket: Bucket.CardDesigns.bucketName,
+			bucket: Resource.CardDesigns.name,
 			key: params.imageKey,
 		});
 
@@ -60,9 +57,9 @@ export const handler = SiteHandler(
 
 		try {
 			await moveImageBetweenBuckets({
-				sourceBucket: Bucket.CardDrafts.bucketName,
+				sourceBucket: Resource.CardDrafts.name,
 				key: params.imageKey,
-				destinationBucket: Bucket.CardDesigns.bucketName,
+				destinationBucket: Resource.CardDesigns.name,
 			});
 		} catch (e) {
 			console.error(e);
@@ -102,7 +99,7 @@ export const handler = SiteHandler(
 					rarityId: rarity.rarityId,
 					frameUrl: rarity.frameUrl,
 					rarityName: rarity.rarityName,
-          rarityRank: await getRarityRankForRarity(rarity),
+					rarityRank: await getRarityRankForRarity(rarity),
 					rarityColor: rarity.rarityColor,
 					totalOfType: rarity.count,
 					packId: generatePackId({ userId: user.userId, prefix: 'moment-' }),

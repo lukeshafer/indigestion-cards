@@ -1,5 +1,5 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Bucket } from 'sst/node/bucket';
+import { Resource } from 'sst';
 import type { z } from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,7 +49,7 @@ export class Summary<T> {
 
 		await Summary.s3.send(
 			new PutObjectCommand({
-				Bucket: Bucket.DataSummaries.bucketName,
+				Bucket: Resource.DataSummaries.name,
 				Key: `${this.prefix}/${key}`,
 				Body: JSON.stringify(data),
 			})
@@ -68,7 +68,7 @@ export class Summary<T> {
 		try {
 			let object = await Summary.s3.send(
 				new GetObjectCommand({
-					Bucket: Bucket.DataSummaries.bucketName,
+					Bucket: Resource.DataSummaries.name,
 					Key: path,
 				})
 			);

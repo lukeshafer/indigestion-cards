@@ -6,8 +6,8 @@ import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
 import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
 import { InputValidationError, PackTypeIsOutOfCardsError } from './errors';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
-import { EventBus } from 'sst/node/event-bus';
 import { getSeasonById } from './season';
+import { Resource } from 'sst';
 
 export async function getAllPacks(): Promise<Pack[]> {
 	const result = await db.entities.Packs.query.allPacks({}).go({ pages: 'all' });
@@ -366,7 +366,7 @@ export async function sendPacksUpdatedEvent(): Promise<void> {
 					Source: 'site',
 					DetailType: 'packs.updated',
 					Detail: '{}',
-					EventBusName: EventBus.eventBus.eventBusName,
+					EventBusName: Resource.EventBus.name,
 				},
 			],
 		})
@@ -385,7 +385,7 @@ export async function sendGivePackEvents(events: Array<PackEventInput>): Promise
 	await eventBridge
 		.putEvents({
 			Entries: events.map(d => ({
-				EventBusName: EventBus.eventBus.eventBusName,
+				EventBusName: Resource.EventBus.name,
 				Source: 'twitch',
 				DetailType: 'give-pack-to-user',
 				Detail: JSON.stringify({

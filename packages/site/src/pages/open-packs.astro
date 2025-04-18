@@ -3,7 +3,7 @@ import Page from '@site/layouts/Page.astro';
 import OpenPacksPage from '@site/components/open-packs/OpenPacks';
 import { getAllPacks } from '@core/lib/pack';
 import { Header } from '@site/components/Header';
-import { Config } from 'sst/node/config';
+import { Resource } from 'sst';
 import { getUserByLogin } from '@core/lib/twitch';
 
 const allPacks = await getAllPacks();
@@ -24,7 +24,7 @@ const twitchData = loggedInUsername ? await getUserByLogin(loggedInUsername) : u
 		canTest={process.env.SST_STAGE === 'dev' || process.env.SST_STAGE === 'luke'}
 		startMargin={startMargin ? parseInt(startMargin) : undefined}
 		startCardScale={startCardScale ? Number(startCardScale) : undefined}
-		adminSecret={Config.AdminImageSecret}
+		adminSecret={Resource.AdminImageSecret.value}
 		client:only="solid-js">
 		<Header
 			{disableAnimations}

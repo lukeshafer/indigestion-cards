@@ -1,4 +1,4 @@
-import { useQueryParam } from 'sst/node/api';
+import { useQueryParam } from 'sstv2/node/api';
 import { SiteHandler } from '@core/lib/api';
 import { getUser } from '@core/lib/user';
 import { getAllPacks } from '@core/lib/pack';

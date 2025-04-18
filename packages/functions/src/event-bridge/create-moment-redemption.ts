@@ -1,4 +1,4 @@
-import { EventHandler } from 'sst/node/event-bus';
+import { EventHandler } from 'sstv2/node/event-bus';
 import { Moment } from '@core/events/moments';
 import { createMomentRedemption } from '@core/lib/moments';
 import { setAdminEnvSession } from '@core/lib/session';

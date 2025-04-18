@@ -6,9 +6,9 @@ import Breadcrumbs, { type Path } from '@site/components/Breadcrumbs';
 import { Header } from '@site/components/Header';
 import { Footer } from '@site/components/Footer';
 import AlertBox from '@site/components/AlertBox';
-import { Api } from 'sst/node/api';
 import type { Alert } from '@site/client/state';
 import { getUserByLogin } from '@core/lib/twitch';
+import { Resource } from 'sst';
 
 export interface Props {
 	class?: string;
@@ -128,7 +128,7 @@ If you have any questions or concerns, please reach out to me, snailyLuke, on Di
 					<div
 						class="grid h-[100dvh] grid-cols-1 md:grid-cols-[max-content_1fr]"
 						id="page-layout-wrapper"
-						data-api-url={Api.AdminApi.url}>
+      data-api-url={Resource.AdminApi.url}>
 						<div
 							class="scrollbar-narrow relative flex flex-col bg-gray-50 md:col-start-2 dark:bg-gray-950"
 							id="page-scroll-wrapper">

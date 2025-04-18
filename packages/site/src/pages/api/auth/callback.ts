@@ -1,8 +1,7 @@
 import { AUTH_TOKEN } from '@site/constants';
 import type { APIContext } from 'astro';
-import { Config } from 'sst/node/config';
-import { Auth } from 'sst/node/future/auth';
-import { Session } from 'sst/node/future/auth';
+import { Resource } from 'sst';
+import { Session, Auth } from 'sst/node/future/auth';
 
 export async function GET(ctx: APIContext) {
 	const code = ctx.url.searchParams.get('code');
@@ -11,7 +10,7 @@ export async function GET(ctx: APIContext) {
 	}
 
 	const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'main';
-	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Config.DOMAIN_NAME;
+	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Resource.CardsParams.DOMAIN_NAME;
 	//console.log({ client_id, origin })
 
 	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {

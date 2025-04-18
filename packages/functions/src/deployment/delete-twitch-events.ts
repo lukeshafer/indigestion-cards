@@ -1,8 +1,8 @@
-import { Api } from 'sst/node/api';
 import {
 	getActiveTwitchEventSubscriptions,
 	deleteTwitchEventSubscription,
 } from '@core/lib/twitch';
+import { Resource } from 'sst';
 
 export async function handler() {
 	const activeSubscriptions = await getActiveTwitchEventSubscriptions();
@@ -10,7 +10,7 @@ export async function handler() {
 
 	const promiseList = activeSubscriptions.map(
 		async (subscription) =>
-			subscription.transport.callback.includes(Api.twitchApi.url)
+			subscription.transport.callback.includes(Resource.TwitchAPI.url)
 				? deleteTwitchEventSubscription(subscription.id)
 				: null // Don't delete subscriptions from other environments
 	);

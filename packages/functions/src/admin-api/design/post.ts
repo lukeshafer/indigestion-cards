@@ -4,9 +4,9 @@ import { getAllRarities } from '@core/lib/rarity';
 import { createCardDesign, deleteCardDesignById } from '@core/lib/design';
 import { moveImageBetweenBuckets, createS3Url } from '@core/lib/images';
 import { NO_CARDS_OPENED_ID } from '@core/constants';
-import { Bucket } from 'sst/node/bucket';
 import { FULL_ART_ID, LEGACY_CARD_ID } from '@core/constants';
-import { useFormValue } from 'sst/node/api';
+import { useFormValue } from 'sstv2/node/api';
+import { Resource } from 'sst';
 
 export const handler = SiteHandler(
 	{
@@ -56,7 +56,7 @@ export const handler = SiteHandler(
 
 		const { seasonId, seasonName } = JSON.parse(params.season);
 
-		const newUrl = createS3Url({ bucket: Bucket.CardDesigns.bucketName, key: params.imageKey });
+		const newUrl = createS3Url({ bucket: Resource.CardDesigns.name, key: params.imageKey });
 
 		const result = await createCardDesign({
 			seasonId,
@@ -80,9 +80,9 @@ export const handler = SiteHandler(
 
 		try {
 			await moveImageBetweenBuckets({
-				sourceBucket: Bucket.CardDrafts.bucketName,
+				sourceBucket: Resource.CardDrafts.name,
 				key: params.imageKey,
-				destinationBucket: Bucket.CardDesigns.bucketName,
+				destinationBucket: Resource.CardDesigns.name,
 			});
 		} catch (e) {
 			console.error(e);

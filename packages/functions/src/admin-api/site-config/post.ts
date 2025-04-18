@@ -1,4 +1,4 @@
-import { useFormData } from 'sst/node/api';
+import { useFormData } from 'sstv2/node/api';
 import { z } from 'zod';
 
 import { validateSearchParams, SiteHandler } from '@core/lib/api';

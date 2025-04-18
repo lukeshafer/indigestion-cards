@@ -17,6 +17,10 @@ export default $config({
 		};
 	},
 	async run() {
+		if ($app.stage !== 'luke-v3') {
+			throw new Error("Must use stage 'luke-v3'");
+		}
+
 		await import('./infra/config');
 		await import('./infra/database');
 		await import('./infra/websockets-api');
@@ -24,5 +28,9 @@ export default $config({
 		await import('./infra/auth');
 		await import('./infra/buckets');
 		await import('./infra/api');
+    await import('./infra/image-processing');
+    await import('./infra/minecraft');
+    await import('./infra/site');
+    await import('./infra/admin-site');
 	},
 });

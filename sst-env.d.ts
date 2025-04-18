@@ -9,6 +9,18 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "AdminImageSecret": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "AdminSite": {
+      "type": "sst.aws.Astro"
+      "url": string
+    }
+    "CardCDN": {
+      "type": "sst.aws.Router"
+      "url": string
+    }
     "CardDesigns": {
       "name": string
       "type": "sst.aws.Bucket"
@@ -17,11 +29,19 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
+    "CardsBucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
     "CardsParams": {
       "DOMAIN_NAME": string
       "STREAMER_USER_ID": string
       "TWITCH_TOKENS_PARAM": string
       "type": "sst.sst.Linkable"
+    }
+    "CardsSite": {
+      "type": "sst.aws.Astro"
+      "url": string
     }
     "DataSummaries": {
       "name": string
@@ -43,6 +63,14 @@ declare module "sst" {
     "FrameDrafts": {
       "name": string
       "type": "sst.aws.Bucket"
+    }
+    "GenerateImageApi": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "MinecraftApi": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
     }
     "PackDLQ": {
       "type": "sst.aws.Queue"

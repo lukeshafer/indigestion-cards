@@ -2,7 +2,8 @@ const DOMAIN_NAME = 'indigestioncards.com';
 const HOSTED_ZONE = 'indigestioncards.com';
 export const API_VERSION = 'v1';
 
-export function getDomainName(stage: string) {
+export const domainName = getDomainName($app.stage);
+function getDomainName(stage: string) {
 	if (stage.startsWith('luke')) return `${stage}.indigestioncards.lksh.dev`;
 
 	if (stage === 'prod') return DOMAIN_NAME;
@@ -10,7 +11,8 @@ export function getDomainName(stage: string) {
 	return `${stage}.env.${DOMAIN_NAME}`;
 }
 
-export function getHostedZone(stage: string) {
+export const hostedZone = getHostedZone($app.stage);
+function getHostedZone(stage: string) {
 	if (stage.startsWith('luke')) return `lksh.dev`;
 
 	return HOSTED_ZONE;

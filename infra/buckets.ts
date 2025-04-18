@@ -1,7 +1,7 @@
-import { getDomainName } from './config';
+import { domainName } from './config';
 import { database } from './database';
 
-const origin = $dev === true ? 'http://localhost:4322' : `https://${getDomainName($app.stage)}`;
+const origin = $dev === true ? 'http://localhost:4322' : `https://${domainName}`;
 
 export const cardDraftBucket = new sst.aws.Bucket('CardDrafts', {
 	cors: {
@@ -19,6 +19,8 @@ export const cardDraftBucket = new sst.aws.Bucket('CardDrafts', {
 					opts.import = 'luke-lil-indigestion-car-carddraftsbucket9d9632ed-1ovckttx266wv';
 					return;
 				}
+				case 'luke-v3':
+					return;
 				default:
 					throw new Error(`Bucket CardDrafts import not setup for stage ${$app.stage}`);
 			}
@@ -55,6 +57,8 @@ export const frameDraftBucket = new sst.aws.Bucket('FrameDrafts', {
 					opts.import = 'luke-lil-indigestion-car-framedraftsbucketc501c32-1blqubr7mthk';
 					return;
 				}
+				case 'luke-v3':
+					return;
 				default:
 					throw new Error(`Bucket FrameDrafts import not setup for stage ${$app.stage}`);
 			}
@@ -91,6 +95,8 @@ export const cardDesignBucket = new sst.aws.Bucket('CardDesigns', {
 					opts.import = 'luke-lil-indigestion-car-carddesignsbucketd131504-1rjv2tsi9rm2p';
 					return;
 				}
+				case 'luke-v3':
+					return;
 				default:
 					throw new Error(`Bucket FrameDrafts import not setup for stage ${$app.stage}`);
 			}
@@ -114,6 +120,8 @@ export const frameDesignBucket = new sst.aws.Bucket('FrameDesigns', {
 					opts.import = 'luke-lil-indigestion-car-framedesignsbucket5220be-1agd7xj3rv4b4';
 					return;
 				}
+				case 'luke-v3':
+					return;
 				default:
 					throw new Error(`Bucket FrameDrafts import not setup for stage ${$app.stage}`);
 			}
