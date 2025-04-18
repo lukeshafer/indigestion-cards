@@ -5,12 +5,12 @@ import CardList from '@admin/components/cards/CardList';
 import { getCardDesignAndInstancesById } from '@core/lib/design';
 import { getRarityRanking, getSiteConfig } from '@core/lib/site-config';
 import { LEGACY_CARD_ID, ASSETS, routes } from '@admin/constants';
-import AdminOnly from '@admin/components/AdminOnly.astro';
 import { PageTitle } from '@admin/components/text';
 import AdminDesignStats from '@admin/components/design/AdminDesignStats';
 import DesignOverviewTable from '@admin/components/design/DesignOverviewTable';
 import DeleteDesignButton from '@admin/components/design/DeleteDesignButton';
 import EditDesignForm from '@admin/components/design/EditDesignForm';
+import { DesignTags } from '@admin/components/design/DesignTags';
 import { Heading } from '@admin/components/text';
 import { getRarityStatsOverviewFromDesignAndInstances } from '@core/lib/stats';
 
@@ -69,9 +69,10 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 				{design.artist}
 			</p>
 		</section>
-		<AdminOnly>
-			<EditDesignForm {...design} client:load />
-		</AdminOnly>
+
+    <EditDesignForm {...design} client:load />
+    <DesignTags {design} client:load />
+
 	</header>
 	<section class="flex flex-col text-center">
 		<Heading>Cards Opened</Heading>
@@ -83,20 +84,20 @@ const openedInstances = instances.filter((instance) => instance.openedAt);
 			rarityRanking={rarityRanking}
 		/>
 	</section>
-	<AdminOnly>
-		<details>
-			<summary class="font-heading text-xl">Stats for Admins</summary>
-			<p class="font-bold text-red-600">
-				This section is only visible to admins: not for stream!
-			</p>
-			<div class="my-4 flex flex-col gap-8">
-				<section class="grid text-lg">
-					<Heading>Stats Overview</Heading>
-					<DesignOverviewTable {rarityStatsArray} client:load />
-				</section>
-				<AdminDesignStats {rarityStatsArray} client:load />
-			</div>
-		</details>
-		<DeleteDesignButton {...design} client:load />
-	</AdminOnly>
+
+  <details>
+    <summary class="font-heading text-xl">Stats for Admins</summary>
+    <p class="font-bold text-red-600">
+      This section is only visible to admins: not for stream!
+    </p>
+    <div class="my-4 flex flex-col gap-8">
+      <section class="grid text-lg">
+        <Heading>Stats Overview</Heading>
+        <DesignOverviewTable {rarityStatsArray} client:load />
+      </section>
+      <AdminDesignStats {rarityStatsArray} client:load />
+    </div>
+  </details>
+  <DeleteDesignButton {...design} client:load />
+
 </Page>

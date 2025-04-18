@@ -2,7 +2,7 @@ import { createSignal, createUniqueId, Show, useContext } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
 import LockIcon from '../icons/LockIcon';
 
-export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatus }) {
+export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatus; horse?: boolean }) {
 	const state = useContext(OpenPacksContext);
 
 	const isActive = () => props.pack.packId === state.activePack?.packId;
@@ -40,8 +40,8 @@ export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatu
 			}}>
 			<button
 				title={isOnline() ? 'Online' : 'Offline'}
-        disabled={isLocked()}
-				class="font-display -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 dark:text-gray-300"
+				disabled={isLocked()}
+				class="font-display relative -mx-2 mr-2 w-fit min-w-[calc(100%+1rem)] gap-2 whitespace-nowrap px-1 pt-1 text-left italic text-gray-600 dark:text-gray-300"
 				classList={{
 					'hover:bg-gray-300 hover:text-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-2':
 						!isLocked(),
@@ -54,7 +54,7 @@ export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatu
 				}}
 				onClick={() => (isLocked() ? null : state.setActivePack(props.pack))}>
 				<span
-					class="mb-1 mr-2 inline-block h-2 w-2"
+					class="relative mb-1 mr-2 inline-block h-2 w-2"
 					classList={{
 						'rounded-full': !isLocked(),
 						'bg-brand-main': !isLocked() && isOnline(),
@@ -66,6 +66,13 @@ export function PackToOpenItem(props: { index: number; pack: PackEntityWithStatu
 						</div>
 					</Show>
 				</span>
+				<Show when={props.horse}>
+					<img
+						src="/assets/sad_horse.png"
+						data-online={isOnline()}
+						class="rounded-full absolute top-[20%] left-0 h-3/5 bg-gray-400 data-[online=false]:opacity-80 data-[online=false]:grayscale data-[online=true]:bg-brand-light"
+					/>
+				</Show>
 				{props.pack.username}
 			</button>
 		</li>

@@ -1,0 +1,59 @@
+---
+import { getCardDesignAndInstancesByIdAndUser } from '@core/lib/design';
+import { getUserByLogin } from '@core/lib/twitch';
+import { getUserByUserName } from '@core/lib/user';
+import type { User } from '@core/types';
+import { routeNames, routes } from '@site/constants';
+import Page from '@site/layouts/Page.astro';
+import { UserDesignPage } from '@site/layouts/UserDesignPage';
+
+const { username, designId } = Astro.params;
+if (!username || !designId) {
+	return Astro.redirect(`${routes.USERS}?alert=Username is required`);
+}
+
+const twitchDataPromise = getUserByLogin(username)
+	.catch(() => null)
+	.then(data => data ?? null);
+
+const userPromise: Promise<User> = getUserByUserName(username).then(
+	user =>
+		user ?? {
+			username,
+			cardCount: 0,
+			packCount: 0,
+			userId: '',
+		}
+);
+
+const cardsPromise = await getCardDesignAndInstancesByIdAndUser({ designId, username });
+
+const [
+	twitchData,
+	user,
+	{
+		CardDesigns: [design],
+		CardInstances: cards,
+	},
+] = await Promise.all([twitchDataPromise, userPromise, cardsPromise]);
+
+console.log(design)
+---
+
+<Page
+	title=`${design.cardName} | ${user.username}`
+	pageType="public"
+	breadcrumbs={[
+		{ label: routeNames.USER, href: routes.USERS },
+		{ label: user.username, href: `${routes.USERS}/${username}` },
+		{ label: design.cardName },
+	]}>
+	<UserDesignPage
+		user={user}
+		twitchData={twitchData}
+		isLoggedInUser={Astro.locals.user?.properties.userId === user.userId}
+    design={design}
+		cards={cards}
+		client:load
+	/>
+</Page>

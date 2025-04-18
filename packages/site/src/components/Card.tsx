@@ -5,6 +5,7 @@ import {
 	type ParentComponent,
 	type FlowComponent,
 	onMount,
+	Show,
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { Dynamic, Portal } from 'solid-js/web';
@@ -65,25 +66,31 @@ export const cardUtils = {
 export type CardComponentProps = {
 	alt: string;
 	lazy: boolean;
-	imgSrc: string;
+	imgSrc: string | null;
 	scale?: number | string;
 	background: string | undefined;
 	viewTransitionName: string | undefined;
+	noShadow?: boolean;
 };
 export const Card: ParentComponent<CardComponentProps> = props => (
 	<div style={{ 'font-size': `calc(1rem * ${props.scale ?? 'var(--card-scale, 1)'})` }}>
 		<article
-			class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left shadow-xl shadow-black/25"
+			class="card-wrapper card-aspect-ratio relative w-[18em] bg-cover text-left shadow-xl shadow-black/25 data-[noshadow=true]:shadow-none"
+			data-noshadow={props.noShadow === true}
 			style={{
 				background: props.background,
 				'view-transition-name': props.viewTransitionName,
 			}}>
-			<img
-				src={props.imgSrc}
-				alt={props.alt}
-				loading={props.lazy ? 'lazy' : undefined}
-				class="absolute inset-0"
-			/>
+			<Show when={props.imgSrc}>
+				{src => (
+					<img
+						src={src()}
+						alt={props.alt}
+						loading={props.lazy ? 'lazy' : undefined}
+						class="absolute inset-0"
+					/>
+				)}
+			</Show>
 			{props.children}
 		</article>
 	</div>
@@ -441,3 +448,49 @@ function roundTo(input: number, decimals: number) {
 	const multiplyAmount = Math.pow(10, decimals);
 	return Math.round(input * multiplyAmount) / multiplyAmount;
 }
+
+export const CardInstanceComponent: Component<{
+	viewTransitionName?: string | null;
+	lazy: boolean;
+	card: {
+		rarityId: string;
+		rarityColor: string;
+		cardName: string;
+		cardDescription: string;
+		instanceId: string;
+		designId: string;
+		cardNumber: number;
+		totalOfType: number;
+		stamps?: Array<string>;
+	};
+}> = props => {
+	return (
+		<Card
+			lazy={props.lazy}
+			alt={props.card.cardName}
+			imgSrc={getCardImageUrl(props.card)}
+			viewTransitionName={
+				props.viewTransitionName === null
+					? undefined
+					: (props.viewTransitionName ?? `card-${props.card.instanceId}`)
+			}
+			background={
+				checkIsFullArt(props.card.rarityId)
+					? FULL_ART_BACKGROUND_CSS
+					: props.card.rarityColor
+			}>
+			<Show when={checkIfCanShowCardText(props.card.rarityId)}>
+				<CardName>{props.card.cardName}</CardName>
+				<CardDescription>{props.card.cardDescription}</CardDescription>
+			</Show>
+			<Show when={!checkIsLegacyCard(props.card.rarityId)}>
+				<CardNumber color={checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
+					{formatCardNumber(props.card)}
+				</CardNumber>
+			</Show>
+			<Show when={checkIsShitPack(props.card.stamps)}>
+				<ShitStamp src={getShitStampPath(props.card.rarityId)} />
+			</Show>
+		</Card>
+	);
+};

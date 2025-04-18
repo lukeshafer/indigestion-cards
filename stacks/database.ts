@@ -62,6 +62,16 @@ export function Database({ stack }: StackContext) {
 		},
 	});
 
+	table.bind([
+		table,
+		dataSummaries,
+		config.TWITCH_TOKENS_PARAM,
+		config.TWITCH_CLIENT_ID,
+		config.TWITCH_CLIENT_SECRET,
+	]);
+
+	table.attachPermissions(['ssm:GetParameter', 'ssm:PutParameter']);
+
 	const entityFilter = (entities: Array<string>) => {
 		return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
 	};
@@ -70,26 +80,21 @@ export function Database({ stack }: StackContext) {
 			filters: [
 				entityFilter(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
 			],
-			function: {
-				handler: 'packages/functions/src/table-consumers/update-statistics.handler',
-				bind: [table, dataSummaries],
-				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-			},
+			function: 'packages/functions/src/table-consumers/update-statistics.handler',
 		},
 		refreshUserlist: {
 			filters: [entityFilter(['cardInstance', 'user', 'preorder', 'trade'])],
-			function: {
-				handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
-				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
-				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
-			},
+			function: 'packages/functions/src/table-consumers/refresh-user-list.handler',
 		},
 		refreshDesignslist: {
 			filters: [entityFilter(['season', 'cardDesign', 'cardInstance', 'rarity'])],
+			function: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+		},
+		refreshUserCards: {
+			filters: [entityFilter(['user', 'cardInstance', 'trade'])],
 			function: {
-				handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
+				handler: 'packages/functions/src/table-consumers/refresh-user-cards.handler',
 				bind: [table, dataSummaries, config.TWITCH_TOKENS_PARAM],
-				permissions: ['ssm:GetParameter', 'ssm:PutParameter'],
 			},
 		},
 	});

@@ -16,6 +16,7 @@ export function pick<Obj extends Record<any, any>, Keys extends ReadonlyArray<ke
 	return output;
 }
 
+export type InferSummary<S extends Summary<unknown>> = S extends Summary<infer T> ? T : never;
 export class Summary<T> {
 	static #s3: null | S3Client = null;
 	static get s3(): S3Client {
@@ -87,7 +88,7 @@ export class Summary<T> {
 
 		if (result.success === false) {
 			console.log(`Existing ${path} uses invalid schema. Re-generating...`);
-			return this.refresh(key);
+			return await this.refresh(key);
 		}
 
 		return result.data;

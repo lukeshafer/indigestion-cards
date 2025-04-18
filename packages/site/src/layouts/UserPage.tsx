@@ -5,24 +5,15 @@ import CardList, {
 	type Filters,
 } from '@site/components/CardList';
 import { getSortInfo, type SortInfo } from '@site/client/card-sort';
-import {
-	Show,
-	For,
-	Suspense,
-	createResource,
-	createSignal,
-	type Component,
-	type Setter,
-	Switch,
-	Match,
-	onMount,
-	createContext,
-	useContext,
-	onCleanup,
-} from 'solid-js';
+import * as Solid from 'solid-js';
 import { trpc } from '@site/client/api';
 import { routes } from '@site/constants';
-import { CardEls, cardUtils, FULL_ART_BACKGROUND_CSS } from '@site/components/Card';
+import {
+	CardEls,
+	CardInstanceComponent,
+	cardUtils,
+	FULL_ART_BACKGROUND_CSS,
+} from '@site/components/Card';
 import type { CardInstance, Collection, User } from '@core/types';
 import type { PackCardsHidden } from '@core/types';
 import { Pack, formatPackNumber } from '@site/components/Pack';
@@ -33,16 +24,20 @@ import type { TwitchUser } from '@core/lib/twitch';
 import { pushAlert } from '@site/client/state';
 import { createMutableProp } from '@site/client/reactive';
 import { formatCollectionViewTransitionId } from '@site/components/Collections';
+import type { UserCardsSummaryDesign } from '@core/lib/user';
 
-const UserPageContext = createContext({
+const UserPageContext = Solid.createContext({
 	user: {} as User,
 	loggedInUserId: undefined as string | undefined,
 	twitchData: null as TwitchUser | null,
 	packs: [] as Array<PackCardsHidden>,
 	cards: [] as Array<CardInstance>,
+	view: 'all' as UserCardsView,
 });
 
-export const UserPage: Component<{
+type UserCardsView = 'all' | 'season';
+
+export const UserPage: Solid.Component<{
 	user: User;
 	twitchData: TwitchUser | null;
 	loggedInUserId?: string;
@@ -53,6 +48,8 @@ export const UserPage: Component<{
 	cursor: string | null;
 	initialFilters: Filters;
 }> = props => {
+	const [view, setView] = Solid.createSignal<UserCardsView>('all');
+
 	return (
 		<UserPageContext.Provider
 			value={{
@@ -71,6 +68,12 @@ export const UserPage: Component<{
 				get cards() {
 					return props.cards;
 				},
+				get view() {
+					return view();
+				},
+				set view(value) {
+					setView(value);
+				},
 			}}>
 			<div class="h-fit md:flex">
 				<div class="md:h-full">
@@ -78,17 +81,17 @@ export const UserPage: Component<{
 				</div>
 
 				<div class="h-full w-full">
-					<Show when={props.packs.length > 0}>
+					<Solid.Show when={props.packs.length > 0}>
 						<section class="my-4 grid gap-4 text-center">
 							<UserPackList />
 						</section>
-					</Show>
+					</Solid.Show>
 
 					<section class="my-4 grid gap-4 text-center">
 						<UserMomentList />
 					</section>
 
-					<Show
+					<Solid.Show
 						when={
 							props.collectionData.length ||
 							props.loggedInUserId === props.user.userId
@@ -98,14 +101,14 @@ export const UserPage: Component<{
 								<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
 									Collections
 								</h2>
-								<Show when={props.loggedInUserId === props.user.userId}>
+								<Solid.Show when={props.loggedInUserId === props.user.userId}>
 									<Anchor href="/collections/new">Create new</Anchor>
-								</Show>
+								</Solid.Show>
 							</header>
 							<ul
 								class="grid justify-center"
 								style={{ 'grid-template-columns': `repeat(auto-fill, 15rem)` }}>
-								<For each={props.collectionData}>
+								<Solid.For each={props.collectionData}>
 									{({ collection, cards }) => (
 										<li class="mb-2">
 											<UserCollectionListItem
@@ -114,19 +117,27 @@ export const UserPage: Component<{
 											/>
 										</li>
 									)}
-								</For>
+								</Solid.For>
 							</ul>
 						</section>
-					</Show>
+					</Solid.Show>
 
 					<section class="my-4 gap-4 text-left">
 						<h2 class="font-display my-2 text-center text-4xl text-gray-800 dark:text-gray-200">
-							{props.collectionData.length ? 'All Cards' : 'Cards'}
+							Cards
 						</h2>
-						<UserCardList
-							initialCursor={props.cursor ?? undefined}
-							initialFilters={props.initialFilters}
-						/>
+						<CardListViewSelector />
+						<Solid.Switch>
+							<Solid.Match when={view() === 'all'}>
+								<UserCardList
+									initialCursor={props.cursor ?? undefined}
+									initialFilters={props.initialFilters}
+								/>
+							</Solid.Match>
+							<Solid.Match when={view() === 'season'}>
+								<CardsSeasonViewList />
+							</Solid.Match>
+						</Solid.Switch>
 					</section>
 				</div>
 			</div>
@@ -134,10 +145,10 @@ export const UserPage: Component<{
 	);
 };
 
-const UserIdentitySection: Component = () => {
+const UserIdentitySection: Solid.Component = () => {
 	const IMG_SIZE = 100;
 
-	const ctx = useContext(UserPageContext);
+	const ctx = Solid.useContext(UserPageContext);
 
 	return (
 		<div
@@ -158,22 +169,23 @@ const UserIdentitySection: Component = () => {
 					{ctx.user.username}
 				</h1>
 
-				<Switch>
-					<Match when={ctx.user.lookingFor || ctx.loggedInUserId === ctx.user.userId}>
+				<Solid.Switch>
+					<Solid.Match
+						when={ctx.user.lookingFor || ctx.loggedInUserId === ctx.user.userId}>
 						<UserLookingFor />
-					</Match>
-				</Switch>
+					</Solid.Match>
+				</Solid.Switch>
 
-				<Show when={ctx.loggedInUserId && ctx.loggedInUserId !== ctx.user.userId}>
+				<Solid.Show when={ctx.loggedInUserId && ctx.loggedInUserId !== ctx.user.userId}>
 					<div class="col-start-2">
 						<Anchor href={`${routes.TRADES}/new?receiverUsername=${ctx.user.username}`}>
 							New Trade
 						</Anchor>
 					</div>
-				</Show>
+				</Solid.Show>
 			</section>
 
-			<Show when={ctx.user.pinnedCard?.instanceId !== '' && ctx.user.pinnedCard}>
+			<Solid.Show when={ctx.user.pinnedCard?.instanceId !== '' && ctx.user.pinnedCard}>
 				{pinnedCard => (
 					<UserPinnedCard
 						card={pinnedCard()}
@@ -182,7 +194,7 @@ const UserIdentitySection: Component = () => {
 						isLoggedInUser={ctx.loggedInUserId === ctx.user.userId}
 					/>
 				)}
-			</Show>
+			</Solid.Show>
 		</div>
 	);
 };
@@ -210,17 +222,17 @@ function setupHeightCorrection(el: HTMLElement) {
 	window.addEventListener('resize', adjustElHeight);
 	window.addEventListener('scroll', adjustElHeight);
 
-	onCleanup(() => {
+	Solid.onCleanup(() => {
 		window.removeEventListener('resize', adjustElHeight);
 		window.removeEventListener('scroll', adjustElHeight);
 	});
 }
 
-const UserLookingFor: Component = () => {
-	const ctx = useContext(UserPageContext);
+const UserLookingFor: Solid.Component = () => {
+	const ctx = Solid.useContext(UserPageContext);
 
-	const [isOpen, setIsOpen] = createSignal(false);
-	const [isEditing, setIsEditing] = createSignal(false);
+	const [isOpen, setIsOpen] = Solid.createSignal(false);
+	const [isEditing, setIsEditing] = Solid.createSignal(false);
 	const [lookingFor, setLookingFor] = createMutableProp(() => ctx.user.lookingFor || '');
 	return (
 		<p
@@ -228,26 +240,26 @@ const UserLookingFor: Component = () => {
 			class="relative col-start-2 grid max-h-64 max-w-64 gap-0 self-start overflow-hidden break-words pb-2 transition-all data-[open=true]:max-h-max data-[open=true]:pb-8">
 			<span class="flex gap-2 text-sm font-normal italic opacity-80">
 				I'm looking for
-				<Show when={ctx.loggedInUserId === ctx.user.userId && !isEditing()}>
+				<Solid.Show when={ctx.loggedInUserId === ctx.user.userId && !isEditing()}>
 					<button title="Edit looking for" onClick={() => setIsEditing(true)}>
 						<EditIcon size={15} />
 					</button>
-				</Show>
+				</Solid.Show>
 			</span>
-			<Switch>
-				<Match when={!isEditing()}>
+			<Solid.Switch>
+				<Solid.Match when={!isEditing()}>
 					<span class="block max-w-80 break-words text-lg font-normal leading-5">
 						{lookingFor()}
 					</span>
-					<Show when={lookingFor().length > 250}>
+					<Solid.Show when={lookingFor().length > 250}>
 						<button
 							class="absolute bottom-0 h-8 w-full bg-gray-100/70 bg-gradient-to-t from-gray-100 to-gray-100/0 dark:bg-gray-900/70 dark:from-gray-900 dark:to-gray-900/0"
 							onClick={() => setIsOpen(v => !v)}>
 							Show {isOpen() ? 'less' : 'more'}
 						</button>
-					</Show>
-				</Match>
-				<Match when={isEditing()}>
+					</Solid.Show>
+				</Solid.Match>
+				<Solid.Match when={isEditing()}>
 					<UserLookingForForm
 						userId={ctx.user.userId}
 						initialLookingFor={lookingFor()}
@@ -257,19 +269,19 @@ const UserLookingFor: Component = () => {
 						}}
 						onCancel={() => setIsEditing(false)}
 					/>
-				</Match>
-			</Switch>
+				</Solid.Match>
+			</Solid.Switch>
 		</p>
 	);
 };
 
-const UserLookingForForm: Component<{
+const UserLookingForForm: Solid.Component<{
 	userId: string;
 	initialLookingFor: string;
 	onSubmit: (value: string) => void;
 	onCancel: () => void;
 }> = props => {
-	const [uiValue, setUIValue] = createSignal(props.initialLookingFor);
+	const [uiValue, setUIValue] = Solid.createSignal(props.initialLookingFor);
 
 	return (
 		<form
@@ -302,12 +314,13 @@ const UserLookingForForm: Component<{
 	);
 };
 
-const UserPinnedCard: Component<{
+const UserPinnedCard: Solid.Component<{
 	card: NonNullable<User['pinnedCard']>;
 	isLoggedInUser: boolean;
 	message: string;
 	username: string;
 }> = props => {
+	const ctx = Solid.useContext(UserPageContext);
 	return (
 		<div class="relative mx-auto w-fit pt-8">
 			<p class="text-center text-gray-500">Pinned</p>
@@ -320,19 +333,21 @@ const UserPinnedCard: Component<{
 						lazy={false}
 						alt={props.card.cardName}
 						imgSrc={cardUtils.getCardImageUrl(props.card)}
-						viewTransitionName={`card-${props.card.instanceId}`}
+						viewTransitionName={
+							ctx.view === 'season' ? undefined : `card-${props.card.instanceId}`
+						}
 						background={
 							cardUtils.checkIsFullArt(props.card.rarityId)
 								? FULL_ART_BACKGROUND_CSS
 								: props.card.rarityColor
 						}>
-						<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+						<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 							<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
 							<CardEls.CardDescription>
 								{props.card.cardDescription}
 							</CardEls.CardDescription>
-						</Show>
-						<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+						</Solid.Show>
+						<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 							<CardEls.CardNumber
 								color={
 									cardUtils.checkIsFullArt(props.card.rarityId)
@@ -341,36 +356,36 @@ const UserPinnedCard: Component<{
 								}>
 								{cardUtils.formatCardNumber(props.card)}
 							</CardEls.CardNumber>
-						</Show>
-						<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+						</Solid.Show>
+						<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
 							<CardEls.ShitStamp
 								src={cardUtils.getShitStampPath(props.card.rarityId)}
 							/>
-						</Show>
+						</Solid.Show>
 					</CardEls.Card>
 					<CardEls.ShineMouseEffect />
 				</CardEls.TiltEffectWrapper>
 			</a>
-			<Show when={props.message.length || props.isLoggedInUser}>
+			<Solid.Show when={props.message.length || props.isLoggedInUser}>
 				<UserPinnedMessage message={props.message} isLoggedInUser={props.isLoggedInUser} />
-			</Show>
+			</Solid.Show>
 		</div>
 	);
 };
 
-const UserPinnedMessage: Component<{
+const UserPinnedMessage: Solid.Component<{
 	message: string;
 	isLoggedInUser: boolean;
 }> = props => {
 	const [message, setMessage] = createMutableProp(() => props.message);
-	const [isEditing, setIsEditing] = createSignal(false);
+	const [isEditing, setIsEditing] = Solid.createSignal(false);
 	let prevMessage = '';
 	return (
 		<p class="relative col-start-2 grid gap-0 self-start break-words">
-			<Show when={props.isLoggedInUser}>
+			<Solid.Show when={props.isLoggedInUser}>
 				<span class="mx-auto flex gap-2 text-sm font-normal italic opacity-80">
 					Say something about your pinned card
-					<Show when={!isEditing()}>
+					<Solid.Show when={!isEditing()}>
 						<button
 							title="Edit pinned message"
 							onClick={() => {
@@ -379,16 +394,16 @@ const UserPinnedMessage: Component<{
 							}}>
 							<EditIcon size={15} />
 						</button>
-					</Show>
+					</Solid.Show>
 				</span>
-			</Show>
-			<Switch>
-				<Match when={!isEditing()}>
+			</Solid.Show>
+			<Solid.Switch>
+				<Solid.Match when={!isEditing()}>
 					<span class="block max-w-80 break-words text-center font-normal leading-5">
 						{message()}
 					</span>
-				</Match>
-				<Match when={isEditing()}>
+				</Solid.Match>
+				<Solid.Match when={isEditing()}>
 					<form
 						class="grid gap-2"
 						onSubmit={e => {
@@ -426,17 +441,17 @@ const UserPinnedMessage: Component<{
 							</DeleteButton>
 						</div>
 					</form>
-				</Match>
-			</Switch>
+				</Solid.Match>
+			</Solid.Switch>
 		</p>
 	);
 };
 
-const UserCollectionListItem: Component<{
+const UserCollectionListItem: Solid.Component<{
 	collection: Collection;
 	previewCards: Array<CardInstance>;
 }> = props => {
-	const ctx = useContext(UserPageContext);
+	const ctx = Solid.useContext(UserPageContext);
 
 	const firstCard = () => props.previewCards.at(0);
 	const secondCard = () => props.previewCards.at(1);
@@ -448,21 +463,21 @@ const UserCollectionListItem: Component<{
 			href={`${routes.USERS}/${ctx.user.username.toLowerCase()}/collections/${props.collection.collectionId}`}>
 			<div class="relative mx-6 my-4 w-fit px-8 transition-all group-hover:px-9">
 				<div class="absolute bottom-0 left-0 z-10 -rotate-12">
-					<Show when={props.previewCards.length >= 2 && firstCard()}>
+					<Solid.Show when={props.previewCards.length >= 2 && firstCard()}>
 						{card => (
 							<UserCollectionListItemPreviewCard
 								card={card()}
 								collectionId={props.collection.collectionId}
 							/>
 						)}
-					</Show>
+					</Solid.Show>
 				</div>
 				<div
 					classList={{
 						'brightness-100': props.previewCards.length == 1,
 						'brightness-90 shadow-xl': props.previewCards.length >= 3,
 					}}>
-					<Show
+					<Solid.Show
 						when={
 							(props.previewCards.length >= 3 && secondCard()) ||
 							(props.previewCards.length == 1 && firstCard())
@@ -474,7 +489,7 @@ const UserCollectionListItem: Component<{
 								collectionId={props.collection.collectionId}
 							/>
 						)}
-					</Show>
+					</Solid.Show>
 				</div>
 				<div
 					class="absolute bottom-0 right-0 -z-10 rotate-12 shadow-xl"
@@ -482,7 +497,7 @@ const UserCollectionListItem: Component<{
 						'brightness-75': props.previewCards.length >= 3,
 						'brightness-90': props.previewCards.length === 2,
 					}}>
-					<Show
+					<Solid.Show
 						when={
 							(props.previewCards.length >= 3 && thirdCard()) ||
 							(props.previewCards.length === 2 && secondCard())
@@ -493,7 +508,7 @@ const UserCollectionListItem: Component<{
 								collectionId={props.collection.collectionId}
 							/>
 						)}
-					</Show>
+					</Solid.Show>
 				</div>
 			</div>
 			<h3 class="z-10 text-lg font-semibold">{props.collection.collectionName}</h3>
@@ -501,7 +516,7 @@ const UserCollectionListItem: Component<{
 	);
 };
 
-const UserCollectionListItemPreviewCard: Component<{
+const UserCollectionListItemPreviewCard: Solid.Component<{
 	card: {
 		cardName: string;
 		cardDescription: string;
@@ -530,38 +545,38 @@ const UserCollectionListItemPreviewCard: Component<{
 					? FULL_ART_BACKGROUND_CSS
 					: props.card.rarityColor
 			}>
-			<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+			<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
 				<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
 				<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
-			</Show>
-			<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+			</Solid.Show>
+			<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
 				<CardEls.CardNumber
 					color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
 					{cardUtils.formatCardNumber(props.card)}
 				</CardEls.CardNumber>
-			</Show>
-			<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+			</Solid.Show>
+			<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
 				<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
-			</Show>
+			</Solid.Show>
 		</CardEls.Card>
 	);
 };
 
-const UserCardList: Component<{
+const UserCardList: Solid.Component<{
 	initialFilters: Filters;
 	initialCursor?: string;
 }> = props => {
-	const ctx = useContext(UserPageContext);
+	const ctx = Solid.useContext(UserPageContext);
 
-	const [nextCursor, setNextCursor] = createSignal(props.initialCursor ?? null);
-	const [sortInfo, setSortInfo] = createSignal<SortInfo>({
+	const [nextCursor, setNextCursor] = Solid.createSignal(props.initialCursor ?? null);
+	const [sortInfo, setSortInfo] = Solid.createSignal<SortInfo>({
 		by: 'rarity',
 		isReversed: false,
 	});
-	const [filters, setFilters] = createSignal(props.initialFilters);
-	const [searchText, setSearchText] = createSignal('');
+	const [filters, setFilters] = Solid.createSignal(props.initialFilters);
+	const [searchText, setSearchText] = Solid.createSignal('');
 
-	const [cardsResource, { mutate: mutateCards }] = createResource(
+	const [cardsResource, { mutate: mutateCards }] = Solid.createResource(
 		() => ({
 			sortInfo: sortInfo(),
 			username: ctx.user.username,
@@ -598,11 +613,11 @@ const UserCardList: Component<{
 					ssrFilters={/*@once*/ props.initialFilters}
 				/>
 			</CardList.Menu>
-			<Suspense fallback={<PlaceholderCardList scale={0.7} length={12} />}>
+			<Solid.Suspense fallback={<PlaceholderCardList scale={0.7} length={12} />}>
 				<CardList.List cards={filteredCards() ?? []} scale={0.7}>
 					{(card, index) => <UserCardListItem card={card} lazy={index() > 10} />}
 				</CardList.List>
-				<Show when={nextCursor() && !searchText()}>
+				<Solid.Show when={nextCursor() && !searchText()}>
 					<CardList.LoadButton
 						load={() =>
 							queryCards({
@@ -615,58 +630,69 @@ const UserCardList: Component<{
 						}>
 						Load more cards
 					</CardList.LoadButton>
-				</Show>
-			</Suspense>
+				</Solid.Show>
+			</Solid.Suspense>
 		</div>
 	);
 };
 
-const UserCardListItem: Component<{
+const UserCardListItem: Solid.Component<{
 	card: CardInstance;
 	lazy: boolean;
-}> = props => (
-	<a
-		href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
-		class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
-		<CardEls.FullAnimatedCardEffect
-			disableTiltOnTouch
-			glowColor={
-				cardUtils.checkIsFullArt(props.card.rarityId) ? undefined : props.card.rarityColor
-			}>
-			<CardEls.Card
-				lazy={props.lazy}
-				alt={props.card.cardName}
-				imgSrc={cardUtils.getCardImageUrl(props.card)}
-				viewTransitionName={`card-${props.card.instanceId}`}
-				background={
+}> = props => {
+	const ctx = Solid.useContext(UserPageContext);
+	return (
+		<a
+			href={`${routes.USERS}/${props.card.username}/${props.card.instanceId ?? ''}`}
+			class="outline-brand-main group inline-block transition-transform hover:-translate-y-2">
+			<CardEls.FullAnimatedCardEffect
+				disableTiltOnTouch
+				glowColor={
 					cardUtils.checkIsFullArt(props.card.rarityId)
-						? FULL_ART_BACKGROUND_CSS
+						? undefined
 						: props.card.rarityColor
 				}>
-				<Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
-					<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
-					<CardEls.CardDescription>{props.card.cardDescription}</CardEls.CardDescription>
-				</Show>
-				<Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
-					<CardEls.CardNumber
-						color={cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'}>
-						{cardUtils.formatCardNumber(props.card)}
-					</CardEls.CardNumber>
-				</Show>
-				<Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
-					<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
-				</Show>
-			</CardEls.Card>
-		</CardEls.FullAnimatedCardEffect>
-	</a>
-);
+				<CardEls.Card
+					lazy={props.lazy}
+					alt={props.card.cardName}
+					imgSrc={cardUtils.getCardImageUrl(props.card)}
+					viewTransitionName={
+						ctx.view === 'season' ? undefined : `card-${props.card.instanceId}`
+					}
+					background={
+						cardUtils.checkIsFullArt(props.card.rarityId)
+							? FULL_ART_BACKGROUND_CSS
+							: props.card.rarityColor
+					}>
+					<Solid.Show when={cardUtils.checkIfCanShowCardText(props.card.rarityId)}>
+						<CardEls.CardName>{props.card.cardName}</CardEls.CardName>
+						<CardEls.CardDescription>
+							{props.card.cardDescription}
+						</CardEls.CardDescription>
+					</Solid.Show>
+					<Solid.Show when={!cardUtils.checkIsLegacyCard(props.card.rarityId)}>
+						<CardEls.CardNumber
+							color={
+								cardUtils.checkIsFullArt(props.card.rarityId) ? 'white' : 'black'
+							}>
+							{cardUtils.formatCardNumber(props.card)}
+						</CardEls.CardNumber>
+					</Solid.Show>
+					<Solid.Show when={cardUtils.checkIsShitPack(props.card.stamps)}>
+						<CardEls.ShitStamp src={cardUtils.getShitStampPath(props.card.rarityId)} />
+					</Solid.Show>
+				</CardEls.Card>
+			</CardEls.FullAnimatedCardEffect>
+		</a>
+	);
+};
 
 async function queryCards(opts: {
 	sortInfo: SortInfo;
 	username: string;
 	cursor?: string;
 	pinnedCardId?: string;
-	setNextCursor: Setter<string | null>;
+	setNextCursor: Solid.Setter<string | null>;
 	searchText: string;
 }): Promise<Array<CardInstance>> {
 	if (opts.searchText.length > 0) {
@@ -700,8 +726,8 @@ async function queryCards(opts: {
 	return result.data;
 }
 
-const UserPackList: Component = () => {
-	const ctx = useContext(UserPageContext);
+const UserPackList: Solid.Component = () => {
+	const ctx = Solid.useContext(UserPageContext);
 
 	return (
 		<details>
@@ -717,22 +743,22 @@ const UserPackList: Component = () => {
 						'repeat(auto-fit, minmax(auto, calc(var(--card-scale) * 18rem)))',
 					//'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
 				}}>
-				<For each={ctx.packs}>
+				<Solid.For each={ctx.packs}>
 					{pack => (
 						<PackListItem
 							pack={pack}
 							canChangeLock={ctx.loggedInUserId === ctx.user.userId}
 						/>
 					)}
-				</For>
+				</Solid.For>
 			</ul>
 		</details>
 	);
 };
 
-const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }> = props => {
+const PackListItem: Solid.Component<{ pack: PackCardsHidden; canChangeLock: boolean }> = props => {
 	const [isLocked, setIsLocked] = createMutableProp(() => props.pack.isLocked || false);
-	const [alertText, setAlertText] = createSignal<string | false>(false);
+	const [alertText, setAlertText] = Solid.createSignal<string | false>(false);
 
 	return (
 		<li class="relative w-fit">
@@ -742,19 +768,19 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 				scale={0.8}
 			/>
 
-			<Show when={isLocked()}>
+			<Solid.Show when={isLocked()}>
 				<div class="absolute inset-0 bg-white/50 dark:bg-black/50">
 					<p class="my-14">
 						<span class="block text-xl">Locked.</span>Cannot be opened.
 					</p>
 				</div>
-			</Show>
-			<Show when={alertText()}>
+			</Solid.Show>
+			<Solid.Show when={alertText()}>
 				{message => (
 					<ErrorAlert text={message()} hide={() => setAlertText(false)}></ErrorAlert>
 				)}
-			</Show>
-			<Show when={props.canChangeLock}>
+			</Solid.Show>
+			<Solid.Show when={props.canChangeLock}>
 				<div class="absolute left-2 top-7">
 					<LockButton
 						isLocked={isLocked()}
@@ -777,15 +803,15 @@ const PackListItem: Component<{ pack: PackCardsHidden; canChangeLock: boolean }>
 						}}
 					/>
 				</div>
-			</Show>
+			</Solid.Show>
 		</li>
 	);
 };
 
-const UserMomentList: Component = () => {
-	const ctx = useContext(UserPageContext);
+const UserMomentList: Solid.Component = () => {
+	const ctx = Solid.useContext(UserPageContext);
 
-	const [moments, { refetch }] = createResource<Array<CardInstance>>(
+	const [moments, { refetch }] = Solid.createResource<Array<CardInstance>>(
 		() => trpc.userCards.moments.query({ username: ctx.user.username }),
 		{
 			initialValue: [],
@@ -793,12 +819,12 @@ const UserMomentList: Component = () => {
 		}
 	);
 
-	onMount(refetch);
+	Solid.onMount(refetch);
 
 	return (
-		<Suspense>
+		<Solid.Suspense>
 			<div class="min-h-12">
-				<Show when={moments.latest.length}>
+				<Solid.Show when={moments.latest.length}>
 					<details>
 						<summary class="ml-16 cursor-pointer py-2 text-left text-xl">
 							<h2 class="font-display my-2 inline text-gray-800 dark:text-gray-200">
@@ -833,13 +859,13 @@ const UserMomentList: Component = () => {
 							)}
 						</CardList.List>
 					</details>
-				</Show>
+				</Solid.Show>
 			</div>
-		</Suspense>
+		</Solid.Suspense>
 	);
 };
 
-const ErrorAlert: Component<{
+const ErrorAlert: Solid.Component<{
 	hide: () => void;
 	text: string;
 }> = props => {
@@ -862,9 +888,9 @@ const ErrorAlert: Component<{
 	);
 };
 
-const LockButton: Component<{ isLocked: boolean; onClick: () => void }> = props => {
-	const [mouseDown, setMouseDown] = createSignal(false);
-	const [isHovering, setIsHovering] = createSignal(false);
+const LockButton: Solid.Component<{ isLocked: boolean; onClick: () => void }> = props => {
+	const [mouseDown, setMouseDown] = Solid.createSignal(false);
+	const [isHovering, setIsHovering] = Solid.createSignal(false);
 
 	return (
 		<div class="flex gap-3">
@@ -891,7 +917,7 @@ const LockButton: Component<{ isLocked: boolean; onClick: () => void }> = props 
 	);
 };
 
-const Lock: Component<{ isLocked: boolean }> = props => (
+const Lock: Solid.Component<{ isLocked: boolean }> = props => (
 	<div
 		class="group relative block h-6 w-7 cursor-pointer rounded border-2 border-[--lock-color] transition-all duration-100 ease-in-out [--lock-color:black] data-[unlocked=true]:rotate-12 data-[unlocked=true]:hover:rotate-3 dark:[--lock-color:white]"
 		data-unlocked={!props.isLocked}>
@@ -899,3 +925,164 @@ const Lock: Component<{ isLocked: boolean }> = props => (
 		<div class="absolute left-1/2 top-1/2 h-2 w-1 -translate-x-1/2 -translate-y-1/2 bg-[--lock-color] transition-all duration-100 ease-in-out"></div>
 	</div>
 );
+
+const CardListViewSelector: Solid.Component = () => {
+	const ctx = Solid.useContext(UserPageContext);
+
+	return (
+		<fieldset class="m-4 flex justify-center">
+			<label
+				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-end gap-2 rounded-l-full bg-gray-200 px-2 text-right font-light text-gray-500 focus-within:z-10 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+				data-checked={ctx.view === 'all'}>
+				<input
+					type="radio"
+					name="listView"
+					value="all"
+					class="sr-only"
+					checked={ctx.view === 'all'}
+					onChange={() => (ctx.view = 'all')}
+				/>
+				<p>Standard View</p>
+			</label>
+			<label
+				class="data-[checked=true]:bg-brand-light dark:data-[checked=true]:bg-brand-main focus-within:outline-brand-main flex w-full max-w-60 cursor-pointer justify-start gap-2 rounded-r-full bg-gray-200 px-2 font-light text-gray-500 focus-within:outline data-[checked=true]:font-semibold data-[checked=true]:text-black dark:bg-gray-800 dark:font-light dark:data-[checked=true]:font-semibold"
+				data-checked={ctx.view === 'season'}>
+				<input
+					type="radio"
+					name="listView"
+					value="season"
+					class="sr-only"
+					checked={ctx.view === 'season'}
+					onChange={() => (ctx.view = 'season')}
+				/>
+				<p>Collector View</p>
+			</label>
+		</fieldset>
+	);
+};
+
+const CardsSeasonViewList: Solid.Component = () => {
+	const ctx = Solid.useContext(UserPageContext);
+
+	const [data, resource] = Solid.createResource(
+		() => ctx.user.username,
+		async username => await trpc.userCards.summary.query({ username }),
+		{
+			initialValue: {
+				userId: ctx.user.userId,
+				username: ctx.user.username,
+				seasons: [],
+			},
+			ssrLoadFrom: 'initial',
+		}
+	);
+
+	Solid.onMount(() => {
+		resource.refetch();
+	});
+
+	return (
+		<Solid.Suspense
+			fallback={
+				<div class="py-8">
+					<PlaceholderCardList scale={0.7} length={12} />
+				</div>
+			}>
+			<div>
+				<Solid.For each={data().seasons}>
+					{season => (
+						<section class="py-4">
+							<h3 class="font-display my-4 p-4 text-center text-2xl font-bold">
+								{season.seasonName}
+							</h3>
+							<CardList.List cards={season.designs} scale={0.7}>
+								{design => (
+									<li>
+										<CardsSeasonViewListItem design={design} />
+									</li>
+								)}
+							</CardList.List>
+						</section>
+					)}
+				</Solid.For>
+			</div>
+		</Solid.Suspense>
+	);
+};
+
+const CardsSeasonViewListItem: Solid.Component<{
+	design: UserCardsSummaryDesign;
+}> = props => {
+	const ctx = Solid.useContext(UserPageContext);
+	const card = Solid.createMemo(() => props.design.cards[0]);
+
+	return (
+		<Solid.Show
+			when={props.design.cards.length > 0}
+			fallback={
+				<div class="group relative inline-block transition-transform">
+					<CardEls.Card
+						noShadow
+						lazy={false}
+						alt={props.design.cardName}
+						imgSrc={null}
+						viewTransitionName={undefined}
+						background={undefined}>
+						<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-center text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600">
+							{props.design.cardName}
+						</div>
+					</CardEls.Card>
+				</div>
+			}>
+			<a
+				href={`${routes.USERS}/${ctx.user.username}/designs/${props.design.designId}`}
+				class="outline-brand-main group relative inline-block transition-transform">
+				<Solid.For each={props.design.cards.slice(1, 5)}>
+					{(card, index) => (
+						<div
+							class="absolute transition-transform ease-out group-hover:-translate-y-4"
+							style={{
+								'z-index': -index(),
+								'transition-delay': `${50 * (index() + 1)}ms`,
+
+								'--pos': `-${4 * (index() + 1)}px`,
+								top: 'var(--pos)',
+								right: 'var(--pos)',
+
+								'--level': 0.9 - index() * 0.1,
+								filter: `brightness(var(--level)) saturate(var(--level))`,
+							}}>
+							<CardInstanceComponent
+								card={{ ...props.design, ...card }}
+								lazy={true}
+							/>
+						</div>
+					)}
+				</Solid.For>
+				<div class="transition-transform ease-out group-hover:-translate-y-4">
+					<CardEls.GlowOnHover
+						color={
+							cardUtils.checkIsFullArt(card().rarityId)
+								? undefined
+								: card().rarityColor
+						}
+					/>
+					<CardInstanceComponent
+						viewTransitionName={
+							ctx.view === 'all' ||
+							ctx.user.pinnedCard?.instanceId === card().instanceId
+								? null
+								: undefined
+						}
+						card={{ ...props.design, ...card() }}
+						lazy={false}
+					/>
+					<CardEls.ShineMouseEffect />
+				</div>
+				<div class="bg-brand-main text-shadow-brand absolute bottom-0 right-0 grid h-8 w-8 translate-x-1/2 translate-y-1/2 place-items-center rounded-full font-bold text-white">
+					{props.design.cards.length}
+				</div>
+			</a>
+		</Solid.Show>
+	);
+};

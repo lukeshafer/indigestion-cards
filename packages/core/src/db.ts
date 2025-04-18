@@ -179,6 +179,7 @@ const CardDesigns = new Entity(
 				},
 			},
 			tags: { type: 'list', items: { type: 'string' } },
+			game: { type: 'string' },
 			...auditAttributes('cardDesign'),
 		},
 		indexes: {
@@ -241,6 +242,8 @@ const CardInstances = new Entity(
 			},
 			totalOfType: { type: 'number', required: true },
 			stamps: { type: 'list', items: { type: 'string' } },
+			tags: { type: 'list', items: { type: 'string' } },
+			game: { type: 'string' },
 			tradeHistory: {
 				type: 'list',
 				items: {
@@ -544,7 +547,7 @@ const Seasons = new Entity(
 			seasonDescription: { type: 'string' },
 			seasonId: { type: 'string', required: true },
 			nextPackNumber: { type: 'number', default: 0 },
-      packNumberPrefix: { type: 'string' },
+			packNumberPrefix: { type: 'string' },
 			...auditAttributes('season'),
 		},
 		indexes: {
@@ -852,14 +855,29 @@ const CollectionAttributes = {
 		rules: {
 			type: 'map',
 			properties: {
+				sort: {
+					type: [
+						'rarest',
+						'common',
+						'card-name-asc',
+						'card-name-desc',
+						'open-date-asc',
+						'open-date-desc',
+						'owner-asc',
+						'owner-desc',
+					] as const,
+				},
 				cardDesignIds: { type: 'list', items: { type: 'string' } },
 				cardNumbers: { type: 'list', items: { type: 'number' } },
+				cardDenominators: { type: 'list', items: { type: 'number' } },
 				seasonIds: { type: 'list', items: { type: 'string' } },
 				stamps: { type: 'list', items: { type: 'string' } },
 				tags: { type: 'list', items: { type: 'string' } },
+				games: { type: 'list', items: { type: 'string' } },
 				rarityIds: { type: 'list', items: { type: 'string' } },
 				isMinter: { type: 'boolean' },
 				mintedByIds: { type: 'list', items: { type: 'string' } },
+				artists: { type: 'list', items: { type: 'string' } },
 			},
 		},
 	},

@@ -42,4 +42,10 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	else return ctx.redirect('/login' + ctx.url.search);
 };
 
-export const onRequest = sequence(auth, transformMethod);
+const logMiddleware: MiddlewareHandler = async (ctx, next) => {
+	console.log(`[${ctx.request.method} |  ${ctx.url.pathname}]`);
+	console.log(`Session type: ${ctx.locals.session?.type}`);
+	return next();
+};
+
+export const onRequest = sequence(auth, transformMethod, logMiddleware);

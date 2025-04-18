@@ -1,5 +1,5 @@
 import type { RarityRankingRecord } from '@core/lib/site-config';
-import type { CardDesign } from '@core/types';
+import type { CardDesign, CollectionRulesSort } from '@core/types';
 import { FULL_ART_ID, LEGACY_CARD_ID } from '@site/constants';
 
 export const sortTypes = [
@@ -11,7 +11,7 @@ export const sortTypes = [
 	{ value: 'open-date-asc', label: 'Date Opened (Oldest to Newest)' },
 	{ value: 'owner-asc', label: 'Owner (A-Z)' },
 	{ value: 'owner-desc', label: 'Owner (Z-A)' },
-] as const;
+] as const satisfies Array<{ value: CollectionRulesSort; label: string }>;
 
 export type SortType = (typeof sortTypes)[number]['value'];
 

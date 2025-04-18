@@ -278,10 +278,20 @@ export function TextArea(
 export function NumberInput(props: InputProps<number>) {
 	return (
 		<InputGroup>
-			<Label {...props} />
+			<Show
+				when={!props.inputOnly}
+				fallback={
+					<label class="sr-only" for={props.name}>
+						{props.label}
+					</label>
+				}>
+				<Label {...props} />
+			</Show>
 			<input
+        {...props}
 				id={props.name}
 				name={props.name}
+        disabled={props.disabled}
 				type="number"
 				class={BASE_INPUT_CLASS}
 				classList={{ 'bg-gray-100': props.readOnly, 'bg-white': !props.readOnly }}
