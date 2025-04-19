@@ -20,12 +20,23 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	const accessToken = ctx.cookies.get(COOKIE.ACCESS);
 	const refreshToken = ctx.cookies.get(COOKIE.REFRESH);
 
-	if (!accessToken) {
+	function notAuthorized() {
+		console.log('unauthorized!');
+
 		ctx.locals.session = null;
 		ctx.cookies.delete(COOKIE.ACCESS);
 		ctx.cookies.delete(COOKIE.REFRESH);
 
+		if (ctx.url.pathname === '/login' || ctx.url.pathname.startsWith('/api/auth/')) {
+      console.log("on an allowed page")
+			return next();
+		}
 		return ctx.redirect('/login' + ctx.url.search);
+	}
+
+	if (!accessToken) {
+		console.log('No access token');
+		return notAuthorized();
 	}
 
 	const verified = await client.verify(subjects, accessToken.value, {
@@ -33,11 +44,8 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	});
 
 	if (verified.err) {
-		ctx.locals.session = null;
-		ctx.cookies.delete(COOKIE.ACCESS);
-		ctx.cookies.delete(COOKIE.REFRESH);
-
-		return ctx.redirect('/login' + ctx.url.search);
+		console.log('Verified error.');
+		return notAuthorized();
 	}
 
 	if (verified.tokens) {
@@ -57,28 +65,19 @@ const auth: MiddlewareHandler = async (ctx, next) => {
 	ctx.locals.session = session;
 
 	if (session.type !== 'admin') {
-		ctx.locals.session = null;
-		ctx.cookies.delete(COOKIE.ACCESS);
-		ctx.cookies.delete(COOKIE.REFRESH);
-
-		return ctx.redirect('/login' + ctx.url.search);
+		console.log('Not an admin.');
+		return notAuthorized();
 	}
 
 	const adminUser = await getAdminUserById(session?.properties.userId ?? '');
 	if (!adminUser) {
-		ctx.locals.session = null;
-		ctx.cookies.delete(COOKIE.ACCESS);
-		ctx.cookies.delete(COOKIE.REFRESH);
-
-		return ctx.redirect('/login' + ctx.url.search);
+		console.log('No admin found');
+		return notAuthorized();
 	}
 
+  console.log('logged in!')
 	setAdminEnvSession(adminUser.username, adminUser.userId);
-	if (ctx.url.pathname === '/login') return ctx.redirect('/');
-
-	if (ctx.url.pathname === '/login' || ctx.url.pathname.startsWith('/api/auth/')) return next();
-
-	return ctx.redirect('/login' + ctx.url.search);
+	return next();
 };
 
 const logMiddleware: MiddlewareHandler = async (ctx, next) => {
