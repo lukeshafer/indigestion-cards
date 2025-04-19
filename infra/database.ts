@@ -92,7 +92,7 @@ function filterEntities(entities: Array<string>) {
 database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/update-statistics.handler',
-		link: [database, dataSummaries],
+		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
 		permissions: [ssmPermissions],
 	},
 	{
@@ -105,7 +105,7 @@ database.subscribe(
 database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-user-list.handler',
-		link: [database, dataSummaries, params],
+		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
 		permissions: [ssmPermissions],
 	},
 	{ filters: [filterEntities(['cardInstance', 'user', 'preorder', 'trade'])] }
@@ -114,7 +114,7 @@ database.subscribe(
 database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-designs-list.handler',
-		link: [database, dataSummaries, params],
+		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
 		permissions: [ssmPermissions],
 	},
 	{ filters: [filterEntities(['season', 'cardDesign', 'cardInstance', 'rarity'])] }
@@ -123,7 +123,7 @@ database.subscribe(
 database.subscribe(
 	{
 		handler: 'packages/functions/src/table-consumers/refresh-user-cards.handler',
-		link: [database, dataSummaries, params],
+		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
 		permissions: [ssmPermissions],
 	},
 	{ filters: [filterEntities(['season', 'cardDesign', 'cardInstance', 'rarity'])] }

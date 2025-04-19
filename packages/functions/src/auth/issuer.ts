@@ -1,6 +1,7 @@
 import { issuer } from '@openauthjs/openauth';
 import { handle } from 'hono/aws-lambda';
 import { subjects } from '@core/lib/auth';
+import { decode } from 'hono/jwt';
 import { TwitchProvider } from '@openauthjs/openauth/provider/twitch';
 import { Resource } from 'sst';
 import { setAdminEnvSession } from '@core/lib/session';
@@ -46,16 +47,18 @@ const app = issuer({
 				return false;
 		}
 	},
-	async success(response, value, request) {
+	async success(response, value) {
 		setAdminEnvSession('AuthIssuer', 'createNewUserLogin');
 		console.log('Authorizing user...');
 
+		const { payload: claims } = decode(value.tokenset.raw.id_token);
+
+		const userId = claims.sub;
+		if (typeof userId !== 'string') {
+			return response.subject('public', {});
+		}
+
 		if (value.provider === 'twitch') {
-			console.log({ input: value.tokenset.raw, request });
-			const userId = value.tokenset.raw.sub;
-
-			if (!userId) throw new Error('oh fucke!');
-
 			const adminUser = await getAdminUserById(userId);
 			const userLogin = await getUserLoginById(userId);
 			const userProfile = await getUser(userId);
@@ -96,7 +99,6 @@ const app = issuer({
 		}
 
 		if (value.provider === 'twitchStreamer') {
-			const userId = value.tokenset.raw.sub;
 			const adminUser = await getAdminUserById(userId);
 
 			if (!adminUser || userId !== Resource.CardsParams.STREAMER_USER_ID) {
