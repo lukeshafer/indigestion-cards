@@ -1,25 +1,12 @@
-import { ApiHandler, useFormData } from 'sstv2/node/api';
-import { useSession } from 'sst/node/future/auth';
+import { ApiHandler, useCookie, useFormData } from 'sstv2/node/api';
 import { setAdminEnvSession } from './session';
-
-declare module 'sst/node/future/auth' {
-	export interface SessionTypes {
-		user: {
-			userId: string;
-			username: string;
-		};
-		admin: {
-			userId: string;
-			username: string;
-		};
-	}
-}
+import { COOKIE, useSession } from './auth';
 
 type SchemaType = keyof Types;
 
 export type Schema = {
 	[key: string]: SchemaType;
-}
+};
 
 export type ParsedOutput<SchemaToCheck extends Schema> = {
 	[key in keyof SchemaToCheck]: Types[SchemaToCheck[key]];
@@ -27,13 +14,13 @@ export type ParsedOutput<SchemaToCheck extends Schema> = {
 
 type Result<SchemaToCheck extends Schema> =
 	| {
-		success: true;
-		value: ParsedOutput<SchemaToCheck>;
-	}
+			success: true;
+			value: ParsedOutput<SchemaToCheck>;
+	  }
 	| {
-		success: false;
-		errors: string[];
-	};
+			success: false;
+			errors: string[];
+	  };
 
 function useValidateFormData<SchemaToCheck extends Schema>(
 	schema: SchemaToCheck
@@ -48,9 +35,9 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 	params: URLSearchParams | string,
 	schema: SchemaToCheck
 ): Result<SchemaToCheck> {
-  if (typeof params === "string") {
-    params = new URLSearchParams(params);
-  }
+	if (typeof params === 'string') {
+		params = new URLSearchParams(params);
+	}
 
 	console.log('Validating search params', { params, schema });
 	const result: Record<string, Types[SchemaType] | undefined> = {};
@@ -66,7 +53,7 @@ export function validateSearchParams<SchemaToCheck extends Schema>(
 
 		try {
 			result[key] = parseType(value, type);
-		} catch (e) {
+		} catch {
 			errors.push(`Invalid ${key}.`);
 		}
 	}
@@ -110,7 +97,7 @@ function parseType<TypeToCheck extends SchemaType>(
 
 	if (isArray) {
 		// @ts-expect-error - this is fine
-		return value.map((v) => parseType([v], type)) as Types[TypeToCheck];
+		return value.map(v => parseType([v], type)) as Types[TypeToCheck];
 	}
 
 	switch (type) {
@@ -130,16 +117,15 @@ type Callback = Parameters<typeof ApiHandler>[0];
 type SiteHandlerContext<T extends Schema, A extends AuthorizationType> = Parameters<Callback>[1] & {
 	params: ParsedOutput<T>;
 	session: A extends 'public'
-	? undefined
-	: {
-		userId: string;
-		username: string;
-	};
+		? undefined
+		: {
+				userId: string;
+				username: string;
+			};
 };
 
 type AuthorizationType = 'public' | 'user' | 'admin';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type SiteHandlerCallback<S extends Schema = {}, A extends AuthorizationType = 'public'> = (
 	evt: Parameters<Callback>[0],
 	ctx: SiteHandlerContext<S, A>
@@ -170,8 +156,12 @@ export function SiteHandler<T extends Schema, A extends AuthorizationType>(
 
 	return ApiHandler(async (evt, ctxOrig) => {
 		const ctx = ctxOrig as SiteHandlerContext<T, A>;
+
 		if (authorizationType !== 'public') {
-			const session = useSession();
+      const session = await useSession({
+        access: useCookie(COOKIE.ACCESS),
+        refresh: useCookie(COOKIE.REFRESH)
+      })
 
 			if (
 				!authorizationMap[authorizationType].includes(session.type) ||

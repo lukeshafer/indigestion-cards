@@ -1,10 +1,14 @@
-import { ApiHandler, useFormValue } from 'sstv2/node/api';
-import { useSession } from 'sst/node/future/auth';
+import { ApiHandler, useCookie, useFormValue } from 'sstv2/node/api';
 import { db } from '../../../core/src/db';
 import { setAdminEnvSession } from '@core/lib/session';
+import { COOKIE, useSession } from '@core/lib/auth';
 
 export const handler = ApiHandler(async () => {
-	const session = useSession();
+	const session = await useSession({
+    access: useCookie(COOKIE.ACCESS),
+    refresh: useCookie(COOKIE.REFRESH),
+  });
+
 	if (session.type !== 'admin') {
 		return {
 			statusCode: 401,

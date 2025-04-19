@@ -1,7 +1,6 @@
-import { AUTH_TOKEN } from '@site/constants';
-import type { APIContext } from 'astro';
+import { COOKIE, client } from '@core/lib/auth';
+import type { APIContext, AstroCookieSetOptions } from 'astro';
 import { Resource } from 'sst';
-import { Session, Auth } from 'sst/node/future/auth';
 
 export async function GET(ctx: APIContext) {
 	const code = ctx.url.searchParams.get('code');
@@ -9,44 +8,25 @@ export async function GET(ctx: APIContext) {
 		throw new Error('Code missing');
 	}
 
-	const client_id = ctx.url.host.startsWith('localhost:') ? 'local' : 'main';
-	const origin = client_id === 'local' ? ctx.url.origin : 'https://' + Resource.CardsParams.DOMAIN_NAME;
-	//console.log({ client_id, origin })
+	const origin =
+		ctx.url.host.startsWith('localhost:') ? ctx.url.origin : 'https://' + Resource.CardsParams.DOMAIN_NAME;
 
-	const response = await fetch(Auth.AdminSiteAuth.url + '/token', {
-		method: 'POST',
-		body: new URLSearchParams({
-			grant_type: 'authorization_code',
-			client_id,
-			code,
-			redirect_uri: `${origin}${ctx.url.pathname}`,
-		}),
-	})
-		.then(r => r.text())
-		.then(r => {
-			//console.log(r);
-			return JSON.parse(r);
-		})
-		.catch(err => {
-			console.error('An error occurred parsing the JSON.', { err });
-		});
+	const exchanged = await client.exchange(code, `${origin}${ctx.url.pathname}`);
 
-	if (!response.access_token) {
-		throw new Error('No access token');
+	if (exchanged.err) {
+		throw exchanged.err;
 	}
 
-	const session = Session.verify(response.access_token);
+	const COOKIE_OPTIONS = {
+		httpOnly: true,
+		sameSite: 'lax',
+		path: '/',
+		expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // one year from now
+		secure: ctx.url.host !== 'localhost:',
+	} as const satisfies AstroCookieSetOptions;
 
-	if (session.type === 'admin' || session.type === 'user') {
-		ctx.cookies.set(AUTH_TOKEN, response.access_token, {
-			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: ctx.url.host !== 'localhost:',
-			path: '/',
-		});
+	ctx.cookies.set(COOKIE.ACCESS, exchanged.tokens.access, COOKIE_OPTIONS);
+	ctx.cookies.set(COOKIE.REFRESH, exchanged.tokens.refresh, COOKIE_OPTIONS);
 
-		return ctx.redirect(`/?alert=Logged in!`, 302);
-	}
-	return ctx.redirect(`/?alert=Not an authorized user.&type=error`, 302);
+	return ctx.redirect(`/?alert=Logged in!`, 302);
 }

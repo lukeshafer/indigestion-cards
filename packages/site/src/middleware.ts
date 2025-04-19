@@ -1,9 +1,7 @@
-import type { MiddlewareHandler } from 'astro';
+import type { AstroCookieSetOptions, MiddlewareHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { getAdminUserById } from '@core/lib/admin-user';
-import { AUTH_TOKEN } from './constants';
-import { Session as SSTSession } from 'sst/node/future/auth';
-import type { Session } from '@core/types';
+import { client, COOKIE, subjects } from '@core/lib/auth';
 import { getSiteConfig } from '@core/lib/site-config';
 
 const transformMethod: MiddlewareHandler = async (ctx, next) => {
@@ -19,35 +17,74 @@ const transformMethod: MiddlewareHandler = async (ctx, next) => {
 };
 
 const auth: MiddlewareHandler = async (ctx, next) => {
-	const cookie = ctx.cookies.get(AUTH_TOKEN);
+	const accessToken = ctx.cookies.get(COOKIE.ACCESS);
+	const refreshToken = ctx.cookies.get(COOKIE.REFRESH);
 
-	// @ts-expect-error - cookie string is a fine input for this function
-	const session: Session = SSTSession.verify(cookie?.value ?? '');
-	ctx.locals.session = session;
-	//console.log({ session });
-
-	if ((session.properties.version || 0) < 2) {
+	if (!accessToken) {
 		ctx.locals.session = null;
-		ctx.cookies.delete(AUTH_TOKEN);
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return next();
 	}
+
+	const verified = await client.verify(subjects, accessToken.value, {
+		refresh: refreshToken?.value,
+	});
+
+	if (verified.err) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return next();
+	}
+
+	if (verified.tokens) {
+		const COOKIE_OPTIONS = {
+			httpOnly: true,
+			sameSite: 'lax',
+			path: '/',
+			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // one year from now
+			secure: ctx.url.host !== 'localhost:',
+		} as const satisfies AstroCookieSetOptions;
+
+		ctx.cookies.set(COOKIE.ACCESS, verified.tokens.access, COOKIE_OPTIONS);
+		ctx.cookies.set(COOKIE.REFRESH, verified.tokens.refresh, COOKIE_OPTIONS);
+	}
+
+	const session = verified.subject;
+	ctx.locals.session = session;
+
+	if (session.type === 'public') {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return next();
+	}
+
+	process.env.SESSION_USER_ID = session.properties.userId;
+	process.env.SESSION_USERNAME = session.properties.username;
+	process.env.SESSION_TYPE = session.type;
+
+	ctx.locals.user = session;
 
 	if (session.type === 'admin') {
 		const adminUser = await getAdminUserById(session?.properties.userId ?? '');
 		if (!adminUser) {
 			ctx.locals.session = null;
-			ctx.cookies.delete(AUTH_TOKEN);
+			ctx.locals.user = null;
+			ctx.locals.admin = null;
+			ctx.cookies.delete(COOKIE.ACCESS);
+			ctx.cookies.delete(COOKIE.REFRESH);
+
+			return next();
 		}
+		ctx.locals.admin = session;
+	} else {
+		ctx.locals.admin = null;
 	}
-
-	process.env.SESSION_USER_ID = session?.properties.userId ?? undefined;
-	process.env.SESSION_USERNAME = session?.properties.username ?? undefined;
-	process.env.SESSION_TYPE = session?.type ?? undefined;
-
-	ctx.locals.admin = ctx.locals.session?.type === 'admin' ? ctx.locals.session : null;
-	ctx.locals.user =
-		ctx.locals.session?.type === 'user' || ctx.locals.session?.type === 'admin'
-			? ctx.locals.session
-			: null;
 
 	return next();
 };

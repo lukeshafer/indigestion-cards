@@ -1,10 +1,8 @@
-import type { MiddlewareHandler } from 'astro';
+import type { AstroCookieSetOptions, MiddlewareHandler } from 'astro';
 import { sequence } from 'astro/middleware';
 import { getAdminUserById } from '@core/lib/admin-user';
-import { AUTH_TOKEN } from './constants';
-import { Session as SSTSession } from 'sst/node/future/auth';
-import type { Session } from '@core/types';
 import { setAdminEnvSession } from '@core/lib/session';
+import { client, COOKIE, subjects } from '@core/lib/auth';
 
 const transformMethod: MiddlewareHandler = async (ctx, next) => {
 	const formMethod = ctx.url.searchParams.get('formmethod');
@@ -19,27 +17,68 @@ const transformMethod: MiddlewareHandler = async (ctx, next) => {
 };
 
 const auth: MiddlewareHandler = async (ctx, next) => {
-	const cookie = ctx.cookies.get(AUTH_TOKEN);
+	const accessToken = ctx.cookies.get(COOKIE.ACCESS);
+	const refreshToken = ctx.cookies.get(COOKIE.REFRESH);
 
-	// @ts-expect-error - cookie string is a fine input for this function
-	const session: Session = SSTSession.verify(cookie?.value ?? '');
-	ctx.locals.session = session;
+	if (!accessToken) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
 
-	if (session.type === 'admin') {
-		const adminUser = await getAdminUserById(session?.properties.userId ?? '');
-		if (!adminUser) {
-			ctx.locals.session = null;
-			ctx.cookies.delete(AUTH_TOKEN);
-		} else {
-			setAdminEnvSession(adminUser.username, adminUser.userId);
-			if (ctx.url.pathname === '/login') return ctx.redirect('/');
-			return next();
-		}
+		return ctx.redirect('/login' + ctx.url.search);
 	}
 
-	console.log(ctx.url.pathname);
+	const verified = await client.verify(subjects, accessToken.value, {
+		refresh: refreshToken?.value,
+	});
+
+	if (verified.err) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return ctx.redirect('/login' + ctx.url.search);
+	}
+
+	if (verified.tokens) {
+		const COOKIE_OPTIONS = {
+			httpOnly: true,
+			sameSite: 'lax',
+			path: '/',
+			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // one year from now
+			secure: ctx.url.host !== 'localhost:',
+		} as const satisfies AstroCookieSetOptions;
+
+		ctx.cookies.set(COOKIE.ACCESS, verified.tokens.access, COOKIE_OPTIONS);
+		ctx.cookies.set(COOKIE.REFRESH, verified.tokens.refresh, COOKIE_OPTIONS);
+	}
+
+	const session = verified.subject;
+	ctx.locals.session = session;
+
+	if (session.type !== 'admin') {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return ctx.redirect('/login' + ctx.url.search);
+	}
+
+	const adminUser = await getAdminUserById(session?.properties.userId ?? '');
+	if (!adminUser) {
+		ctx.locals.session = null;
+		ctx.cookies.delete(COOKIE.ACCESS);
+		ctx.cookies.delete(COOKIE.REFRESH);
+
+		return ctx.redirect('/login' + ctx.url.search);
+	}
+
+	setAdminEnvSession(adminUser.username, adminUser.userId);
+	if (ctx.url.pathname === '/login') return ctx.redirect('/');
+
 	if (ctx.url.pathname === '/login' || ctx.url.pathname.startsWith('/api/auth/')) return next();
-	else return ctx.redirect('/login' + ctx.url.search);
+
+	return ctx.redirect('/login' + ctx.url.search);
 };
 
 const logMiddleware: MiddlewareHandler = async (ctx, next) => {

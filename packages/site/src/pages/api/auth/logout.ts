@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { COOKIE } from '@core/lib/auth';
 import { AUTH_TOKEN } from '@site/constants';
 
 export const POST: APIRoute = async (ctx) => {
@@ -12,6 +13,8 @@ export const POST: APIRoute = async (ctx) => {
 	}
 
 	ctx.cookies.delete(AUTH_TOKEN, { path: '/' });
+	ctx.cookies.delete(COOKIE.ACCESS, { path: '/' });
+	ctx.cookies.delete(COOKIE.REFRESH, { path: '/' });
 
 	return ctx.redirect('/?alert=Logged%20out!', 302);
 };

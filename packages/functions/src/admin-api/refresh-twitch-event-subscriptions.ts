@@ -1,4 +1,4 @@
-import { ApiHandler } from 'sstv2/node/api';
+import { ApiHandler, useCookie } from 'sstv2/node/api';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import {
 	subscribeToTwitchEvent,
@@ -9,11 +9,14 @@ import {
 	type TwitchEvent,
 } from '@core/lib/twitch';
 import { setAdminEnvSession } from '@core/lib/session';
-import { useSession } from 'sst/node/future/auth';
 import { Resource } from 'sst';
+import { COOKIE, useSession } from '@core/lib/auth';
 
 export const handler = ApiHandler(async () => {
-	const session = useSession();
+	const session = await useSession({
+    access: useCookie(COOKIE.ACCESS),
+    refresh: useCookie(COOKIE.REFRESH),
+  });
 	if (session.type !== 'admin')
 		return {
 			statusCode: 401,

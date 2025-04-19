@@ -8,7 +8,6 @@ import {
 	Service,
 } from 'electrodb';
 import { randomUUID } from 'crypto';
-import { useSession } from 'sst/node/future/auth';
 
 export const dbConfig = {
 	table: Resource.Database.name,
@@ -42,34 +41,10 @@ export const auditAttributes = (entityName: string) =>
 			watch: '*',
 			// set current timestamp when updated
 			set: (_, i) => {
-				// add to audit log
-				if (
-					!process.env.SESSION_USER_ID ||
-					(process.env.SESSION_TYPE !== 'admin' && process.env.SESSION_TYPE !== 'user') ||
-					!process.env.SESSION_USERNAME
-				) {
-					try {
-						const session = useSession();
-						if (
-							(session.type === 'user' || session.type === 'admin') &&
-							session.properties.userId
-						) {
-							process.env.SESSION_USER_ID = session.properties.userId;
-							process.env.SESSION_USERNAME =
-								session.properties.username || session.properties.userId;
-						} else {
-							throw new Error();
-						}
-					} catch (error) {
-						console.error(error);
-						throw new Error('Username and ID are required in process.env');
-					}
-				}
-
 				try {
 					audits
 						.put({
-							entity: entityName,
+              entity: entityName,
 							username: process.env.SESSION_USERNAME,
 							userId: process.env.SESSION_USER_ID,
 							item: JSON.stringify(i),

@@ -1,6 +1,6 @@
 import { issuer } from '@openauthjs/openauth';
 import { handle } from 'hono/aws-lambda';
-import { subjects } from './subjects';
+import { subjects } from '@core/lib/auth';
 import { TwitchProvider } from '@openauthjs/openauth/provider/twitch';
 import { Resource } from 'sst';
 import { setAdminEnvSession } from '@core/lib/session';
@@ -33,27 +33,29 @@ const app = issuer({
 		}),
 	},
 	async allow(input) {
-		const adminUrl = 'https://admin.' + Resource.CardsParams.DOMAIN_NAME;
-		const mainUrl = 'https://admin.' + Resource.CardsParams.DOMAIN_NAME;
+		const validURLs = [
+			'https://admin.' + Resource.CardsParams.DOMAIN_NAME,
+			'https://' + Resource.CardsParams.DOMAIN_NAME,
+			'http://localhost:',
+		] as const;
 
 		switch (input.clientID) {
-			case 'local':
-				return true;
 			case 'main':
-				return input.redirectURI.startsWith(mainUrl);
-			case 'admin':
-				return input.redirectURI.startsWith(adminUrl);
+				return validURLs.some(url => input.redirectURI.startsWith(url));
 			default:
 				return false;
 		}
 	},
-	async success(response, input) {
+	async success(response, value, request) {
 		setAdminEnvSession('AuthIssuer', 'createNewUserLogin');
 		console.log('Authorizing user...');
 
-		if (input.provider === 'twitch') {
-      console.log({tokensetraw: input.tokenset.raw})
-			const userId = input.tokenset.raw.sub;
+		if (value.provider === 'twitch') {
+			console.log({ input: value.tokenset.raw, request });
+			const userId = value.tokenset.raw.sub;
+
+			if (!userId) throw new Error('oh fucke!');
+
 			const adminUser = await getAdminUserById(userId);
 			const userLogin = await getUserLoginById(userId);
 			const userProfile = await getUser(userId);
@@ -93,18 +95,18 @@ const app = issuer({
 			});
 		}
 
-		if (input.provider === 'twitchStreamer') {
-			const userId = input.tokenset.raw.sub;
+		if (value.provider === 'twitchStreamer') {
+			const userId = value.tokenset.raw.sub;
 			const adminUser = await getAdminUserById(userId);
 
 			if (!adminUser || userId !== Resource.CardsParams.STREAMER_USER_ID) {
 				return response.subject('public', {});
 			}
 
-			if (input.tokenset.access && input.tokenset.refresh) {
+			if (value.tokenset.access && value.tokenset.refresh) {
 				await setTwitchTokens({
-					streamer_access_token: input.tokenset.access,
-					streamer_refresh_token: input.tokenset.refresh,
+					streamer_access_token: value.tokenset.access,
+					streamer_refresh_token: value.tokenset.refresh,
 				});
 			}
 

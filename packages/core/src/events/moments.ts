@@ -1,8 +1,9 @@
-import { ZodValidator, createEventBuilder } from 'sst/node/event-bus';
+import { Resource } from 'sst';
+import { ZodValidator, createEventBuilder } from 'sstv2/node/event-bus';
 import { z } from 'zod';
 
 const event = createEventBuilder({
-	bus: 'eventBus',
+	bus: Resource.EventBus.name,
 	validator: ZodValidator,
 });
 
