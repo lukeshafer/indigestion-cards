@@ -66,6 +66,7 @@
     }
   },
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.787.0",
     "sst": "3.9.10"
   }
 }

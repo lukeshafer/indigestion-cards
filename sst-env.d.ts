@@ -68,6 +68,10 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "MigrateDb": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "MinecraftApi": {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
@@ -79,6 +83,10 @@ declare module "sst" {
     "PackQueue": {
       "type": "sst.aws.Queue"
       "url": string
+    }
+    "SeedDb": {
+      "name": string
+      "type": "sst.aws.Function"
     }
     "SiteAuth": {
       "type": "sst.aws.Auth"

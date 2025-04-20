@@ -161,15 +161,37 @@ new sst.aws.Cron('RefreshUserCardCountsCron', {
 
 // await import('../packages/core/src/migrations/index').then(M => M.migration());
 
-// let migration = new sst.aws.Function('MigrateDb', {
-// 	handler: 'packages/functions/src/deployment/migrate-db.handler',
-// 	link: [database, params, twitchClientId, twitchClientSecret],
-// 	runtime: 'nodejs22.x',
-// 	permissions: [
-// 		{
-// 			actions: ['ssm:GetParameter', 'ssm:PutParameter'],
-// 			resources: [`*`],
-// 		},
-// 	],
-// });
-//
+let seedDB = new sst.aws.Function('SeedDb', {
+	handler: 'packages/functions/src/deployment/seed-db.handler',
+	link: [database, params, twitchClientId, twitchClientSecret],
+	runtime: 'nodejs22.x',
+	permissions: [
+		{
+			actions: ['ssm:GetParameter', 'ssm:PutParameter'],
+			resources: [`*`],
+		},
+	],
+});
+
+let migration = new sst.aws.Function('MigrateDb', {
+	handler: 'packages/functions/src/deployment/migrate-db.handler',
+	link: [database, params, twitchClientId, twitchClientSecret],
+	runtime: 'nodejs22.x',
+	permissions: [
+		{
+			actions: ['ssm:GetParameter', 'ssm:PutParameter'],
+			resources: [`*`],
+		},
+	],
+});
+
+$resolve([seedDB.name, migration.name]).apply(async ([seedDBName, migrationName]) => {
+	const lambda = await import('@aws-sdk/client-lambda').then(
+		({ Lambda }) => new Lambda({ region: 'us-east-2' })
+	);
+
+	console.log('Invoking migration lambdas');
+
+	await lambda.invoke({ FunctionName: seedDBName });
+	await lambda.invoke({ FunctionName: migrationName });
+});
