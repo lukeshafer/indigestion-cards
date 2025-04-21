@@ -1,4 +1,5 @@
 import { cardDesignBucket, frameDesignBucket } from './buckets';
+import { imports } from './config';
 import { database } from './database';
 
 const cardsBucket = new sst.aws.Bucket('CardsBucket', {
@@ -8,8 +9,8 @@ const cardsBucket = new sst.aws.Bucket('CardsBucket', {
 
 			switch ($app.stage) {
 				case 'luke': {
-					args.bucket = 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-ev0utsrxziac';
-					opts.import = 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-ev0utsrxziac';
+					args.bucket = imports.luke.cardsCDNBucketName;
+					opts.import = imports.luke.cardsCDNBucketName;
 					return;
 				}
 				case 'luke-v3':
@@ -32,9 +33,6 @@ generateImageApi.route('GET /cards/{designId}/{rarityId}', {
 
 let js = String.raw;
 export const cardCDN = new sst.aws.Router('CardCDN', {
-  transform: {
-
-  },
 	routes: {
 		'/': {
 			bucket: cardsBucket,

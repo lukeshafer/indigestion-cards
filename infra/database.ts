@@ -1,17 +1,21 @@
-import { params, twitchClientId, twitchClientSecret, ssmPermissions } from './config';
+import { params, twitchClientId, twitchClientSecret, ssmPermissions, imports } from './config';
 
 export const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 	transform: {
 		bucket(args, opts) {
 			args.forceDestroy = undefined;
-			if ($app.stage === 'luke') {
-				args.bucket = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
-				opts.import = 'luke-lil-indigestion-card-datasummariesbucket424a2-fn3boh27zeyc';
-				return;
-			} else if ($app.stage === 'luke-v3') {
-				return;
-			} else {
-				throw new Error(`Bucket DataSummaries import not setup for stage ${$app.stage}`);
+			switch ($app.stage) {
+				case 'luke': {
+					args.bucket = imports.luke.dataSummariesBucketName;
+					opts.import = imports.luke.dataSummariesBucketName;
+					return;
+				}
+				case 'luke-v3':
+					return;
+				default:
+					throw new Error(
+						`Bucket DataSummaries import not setup for stage ${$app.stage}`
+					);
 			}
 		},
 	},
@@ -20,13 +24,15 @@ export const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 export const database = new sst.aws.Dynamo('Database', {
 	transform: {
 		table(args, opts) {
-			if ($app.stage === 'luke') {
-				opts.import = 'luke-lil-indigestion-cards-data';
-				return;
-			} else if ($app.stage === 'luke-v3') {
-				return;
-			} else {
-				throw new Error(`Database import not setup for stage ${$app.stage}`);
+			switch ($app.stage) {
+				case 'luke':
+					opts.import = imports.luke.dynamoTableName;
+          args.name = imports.luke.dynamoTableName;
+					return;
+				case 'luke-v3':
+					return;
+				default:
+					throw new Error(`Database import not setup for stage ${$app.stage}`);
 			}
 		},
 	},

@@ -1,4 +1,4 @@
-import { domainName } from './config';
+import { domainName, imports } from './config';
 import { database } from './database';
 
 const origin = $dev === true ? 'http://localhost:4322' : `https://${domainName}`;
@@ -15,8 +15,8 @@ export const cardDraftBucket = new sst.aws.Bucket('CardDrafts', {
 
 			switch ($app.stage) {
 				case 'luke': {
-					args.bucket = 'luke-lil-indigestion-car-carddraftsbucket9d9632ed-1ovckttx266wv';
-					opts.import = 'luke-lil-indigestion-car-carddraftsbucket9d9632ed-1ovckttx266wv';
+					args.bucket = imports.luke.cardDraftsBucketName;
+					opts.import = imports.luke.cardDraftsBucketName;
 					return;
 				}
 				case 'luke-v3':
@@ -53,8 +53,8 @@ export const frameDraftBucket = new sst.aws.Bucket('FrameDrafts', {
 
 			switch ($app.stage) {
 				case 'luke': {
-					args.bucket = 'luke-lil-indigestion-car-framedraftsbucketc501c32-1blqubr7mthk';
-					opts.import = 'luke-lil-indigestion-car-framedraftsbucketc501c32-1blqubr7mthk';
+					args.bucket = imports.luke.frameDraftsBucketName;
+					opts.import = imports.luke.frameDraftsBucketName;
 					return;
 				}
 				case 'luke-v3':
@@ -91,8 +91,8 @@ export const cardDesignBucket = new sst.aws.Bucket('CardDesigns', {
 
 			switch ($app.stage) {
 				case 'luke': {
-					args.bucket = 'luke-lil-indigestion-car-carddesignsbucketd131504-1rjv2tsi9rm2p';
-					opts.import = 'luke-lil-indigestion-car-carddesignsbucketd131504-1rjv2tsi9rm2p';
+					args.bucket = imports.luke.cardDesignsBucketName;
+					opts.import = imports.luke.cardDesignsBucketName;
 					return;
 				}
 				case 'luke-v3':
@@ -116,8 +116,8 @@ export const frameDesignBucket = new sst.aws.Bucket('FrameDesigns', {
 
 			switch ($app.stage) {
 				case 'luke': {
-					args.bucket = 'luke-lil-indigestion-car-framedesignsbucket5220be-1agd7xj3rv4b4';
-					opts.import = 'luke-lil-indigestion-car-framedesignsbucket5220be-1agd7xj3rv4b4';
+					args.bucket = imports.luke.frameDesignsBucketName;
+					opts.import = imports.luke.frameDesignsBucketName;
 					return;
 				}
 				case 'luke-v3':

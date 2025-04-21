@@ -17,7 +17,7 @@ export default $config({
 		};
 	},
 	async run() {
-		if ($app.stage !== 'luke-v3') {
+		if ($app.stage !== 'luke-v3' && $app.stage !== 'luke') {
 			throw new Error("Must use stage 'luke-v3'");
 		}
 
