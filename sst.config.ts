@@ -20,10 +20,10 @@ export default {
 		};
 	},
 	stacks(app) {
-		if (app.stage !== 'prod') {
+		if (app.stage === 'prod' || app.stage === 'dev') {
 			app.setDefaultRemovalPolicy('retain');
 		} else {
-			app.setDefaultRemovalPolicy('retain');
+			app.setDefaultRemovalPolicy('destroy');
 		}
 
 		app.stack(ConfigStack)
