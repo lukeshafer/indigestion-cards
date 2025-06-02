@@ -17,8 +17,8 @@ export default $config({
 		};
 	},
 	async run() {
-		if ($app.stage !== 'luke-v3' && $app.stage !== 'luke') {
-			throw new Error("Must use stage 'luke-v3'");
+		if (!$app.stage.startsWith('luke')) {
+			throw new Error("Stage name must start with 'luke'");
 		}
 
 		await import('./infra/config');
@@ -28,9 +28,9 @@ export default $config({
 		await import('./infra/auth');
 		await import('./infra/buckets');
 		await import('./infra/api');
-    await import('./infra/image-processing');
-    await import('./infra/minecraft');
-    await import('./infra/site');
-    await import('./infra/admin-site');
+		await import('./infra/image-processing');
+		await import('./infra/minecraft');
+		await import('./infra/site');
+		await import('./infra/admin-site');
 	},
 });

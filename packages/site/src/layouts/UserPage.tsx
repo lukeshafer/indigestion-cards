@@ -1029,7 +1029,7 @@ const CardsSeasonViewListItem: Solid.Component<{
 						viewTransitionName={undefined}
 						background={undefined}>
 						<div class="grid h-full w-full place-items-center border-8 border-dashed border-gray-400 text-center text-xl text-gray-400 dark:border-gray-600 dark:text-gray-600">
-							{props.design.cardName}
+							<a class="hover:underline" href={`${routes.INSTANCES}/${props.design.designId}`}>{props.design.cardName}</a>
 						</div>
 					</CardEls.Card>
 				</div>

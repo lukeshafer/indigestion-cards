@@ -25,10 +25,9 @@ export function Events({ stack }: StackContext) {
 	});
 
 	const packQueue = new Queue(stack, 'queue', {
-
 		cdk: {
 			queue: {
-        visibilityTimeout: Duration.seconds(60),
+				visibilityTimeout: Duration.seconds(60),
 				deadLetterQueue: {
 					maxReceiveCount: 5,
 					queue: dlq.cdk.queue,
@@ -37,7 +36,7 @@ export function Events({ stack }: StackContext) {
 		},
 		consumer: {
 			function: {
-        timeout: "60 seconds",
+				timeout: '60 seconds',
 				bind: [
 					table,
 					config.TWITCH_CLIENT_ID,
