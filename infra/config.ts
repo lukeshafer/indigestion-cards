@@ -35,23 +35,17 @@ export const ssmPermissions = {
 };
 
 type DataImportNames = {
-	dataSummariesBucketName: string;
 	dynamoTableName: string;
 	cardsCDNBucketName: string;
 	cardDesignsBucketName: string;
-	cardDraftsBucketName: string;
 	frameDesignsBucketName: string;
-	frameDraftsBucketName: string;
 };
 
 export const imports = {
 	luke: {
-		dataSummariesBucketName: 'luke-lil-indigestion-card-datasummariesbucket424a2-fobxq3hfcz8o',
 		dynamoTableName: 'luke-lil-indigestion-cards-data',
 		cardsCDNBucketName: 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-xcet76xih2fc',
-		cardDesignsBucketName: 'luke-lil-indigestion-card-carddesignsbucketd131504-gh1nozxtmr8p',
-		cardDraftsBucketName: 'luke-lil-indigestion-card-carddraftsbucket9d9632ed-30rodddjco49',
-		frameDesignsBucketName: 'luke-lil-indigestion-card-framedesignsbucket5220be-chxcqctcaxlo',
-		frameDraftsBucketName: 'luke-lil-indigestion-card-framedraftsbucketc501c32-go2aaqksjmcu',
+		cardDesignsBucketName: 'luke-lil-indigestion-card-carddesignsbucketd131504-ywrschnjx14a',
+		frameDesignsBucketName: 'luke-lil-indigestion-card-framedesignsbucket5220be-xfppctbwkl9a',
 	},
 } satisfies Record<string, DataImportNames>;

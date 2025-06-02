@@ -2,21 +2,8 @@ import { params, twitchClientId, twitchClientSecret, ssmPermissions, imports } f
 
 export const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 	transform: {
-		bucket(args, opts) {
+		bucket(args) {
 			args.forceDestroy = undefined;
-			switch ($app.stage) {
-				case 'luke': {
-					args.bucket = imports.luke.dataSummariesBucketName;
-					opts.import = imports.luke.dataSummariesBucketName;
-					return;
-				}
-				case 'luke-v3':
-					return;
-				default:
-					throw new Error(
-						`Bucket DataSummaries import not setup for stage ${$app.stage}`
-					);
-			}
 		},
 	},
 });
@@ -27,7 +14,7 @@ export const database = new sst.aws.Dynamo('Database', {
 			switch ($app.stage) {
 				case 'luke':
 					opts.import = imports.luke.dynamoTableName;
-          args.name = imports.luke.dynamoTableName;
+					args.name = imports.luke.dynamoTableName;
 					return;
 				case 'luke-v3':
 					return;

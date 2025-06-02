@@ -10,20 +10,8 @@ export const cardDraftBucket = new sst.aws.Bucket('CardDrafts', {
 	},
 
 	transform: {
-		bucket(args, opts) {
+		bucket(args) {
 			args.forceDestroy = undefined;
-
-			switch ($app.stage) {
-				case 'luke': {
-					args.bucket = imports.luke.cardDraftsBucketName;
-					opts.import = imports.luke.cardDraftsBucketName;
-					return;
-				}
-				case 'luke-v3':
-					return;
-				default:
-					throw new Error(`Bucket CardDrafts import not setup for stage ${$app.stage}`);
-			}
 		},
 	},
 });
@@ -48,20 +36,8 @@ export const frameDraftBucket = new sst.aws.Bucket('FrameDrafts', {
 	},
 
 	transform: {
-		bucket(args, opts) {
+		bucket(args) {
 			args.forceDestroy = undefined;
-
-			switch ($app.stage) {
-				case 'luke': {
-					args.bucket = imports.luke.frameDraftsBucketName;
-					opts.import = imports.luke.frameDraftsBucketName;
-					return;
-				}
-				case 'luke-v3':
-					return;
-				default:
-					throw new Error(`Bucket FrameDrafts import not setup for stage ${$app.stage}`);
-			}
 		},
 	},
 });
