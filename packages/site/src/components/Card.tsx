@@ -40,9 +40,13 @@ export function getCardImageUrl(args: {
 }): string {
 	if (checkIsSecret(args.rarityId)) return ASSETS.CARDS.CARD_BACK;
 
-	const url = new URL(`https://${import.meta.env.PUBLIC_CARD_CDN_URL}`);
+	console.log('cdn url', import.meta.env.PUBLIC_CARD_CDN_URL);
+
+	const url = new URL(import.meta.env.PUBLIC_CARD_CDN_URL);
 	url.pathname = `/${args.designId}/${args.rarityId}.png`;
 	if (args.adminSecret) url.searchParams.set('adminsecret', args.adminSecret);
+
+	console.log(url.toString());
 
 	return url.toString();
 }

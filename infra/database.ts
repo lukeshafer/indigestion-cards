@@ -82,18 +82,18 @@ function filterEntities(entities: Array<string>) {
 	return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
 }
 
-database.subscribe(
-	{
-		handler: 'packages/functions/src/table-consumers/update-statistics.handler',
-		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
-		permissions: [ssmPermissions],
-	},
-	{
-		filters: [
-			filterEntities(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
-		],
-	}
-);
+// database.subscribe(
+// 	{
+// 		handler: 'packages/functions/src/table-consumers/update-statistics.handler',
+// 		link: [database, dataSummaries, twitchClientId, twitchClientSecret, params],
+// 		permissions: [ssmPermissions],
+// 	},
+// 	{
+// 		filters: [
+// 			filterEntities(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
+// 		],
+// 	}
+// );
 
 database.subscribe(
 	{

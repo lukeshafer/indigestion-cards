@@ -4,6 +4,7 @@ import {
 	API_VERSION,
 	domainName,
 	params,
+	resolveDomain,
 	ssmPermissions,
 	twitchClientId,
 	twitchClientSecret,
@@ -30,13 +31,7 @@ export const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
 				? ['http://localhost:4321', 'http://localhost:4322']
 				: [`https://${domainName}`],
 	},
-	domain:
-		$dev === true
-			? undefined
-			: {
-					name: `api.${domainName}`,
-					path: API_VERSION,
-				},
+	domain: resolveDomain(`api.${domainName}`, API_VERSION),
 	transform: {
 		route: {
 			handler(args) {

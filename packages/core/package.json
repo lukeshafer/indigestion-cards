@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/node": "^18.19.70",
     "solid-js": "^1.9.4",
-    "sst": "3.9.10"
+    "sst": "3.17.6"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.723.0",
@@ -22,6 +22,7 @@
     "electrodb": "^2.15.0",
     "fuse.js": "^7.0.0",
     "node-fetch": "^3.3.2",
+    "sstv2": "npm:sst@^2",
     "zod": "^3.24.1"
   }
 }

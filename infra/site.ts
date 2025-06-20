@@ -1,6 +1,13 @@
-import { domainName, params, ssmPermissions, twitchClientId, twitchClientSecret } from './config';
+import {
+	domainName,
+	params,
+	resolveDomain,
+	ssmPermissions,
+	twitchClientId,
+	twitchClientSecret,
+} from './config';
 import { database, dataSummaries } from './database';
-import { adminImageSecret, cardCDN } from './image-processing';
+import { adminImageSecret, cardsCDN } from './image-processing';
 import { wsApi } from './websockets-api';
 import { adminApi, twitchApi } from './api';
 import { cardDesignBucket, cardDraftBucket, frameDesignBucket, frameDraftBucket } from './buckets';
@@ -10,16 +17,15 @@ import { eventBus } from './events';
 export const site = new sst.aws.Astro('CardsSite', {
 	path: 'packages/site',
 	environment: {
-		PUBLIC_CARD_CDN_URL: cardCDN.url,
+		PUBLIC_CARD_CDN_URL: $interpolate`https://${cardsCDN.domainName}`,
 		DOMAIN_NAME: $dev ? 'localhost:4321' : domainName,
 		PUBLIC_WS_URL: wsApi.url,
 	},
-  permissions: [ssmPermissions],
-  server: {
-    runtime: 'nodejs22.x'
-  },
-	domain: $dev ? undefined : domainName,
-	// dev: { title: 'Main Site' },
+	permissions: [ssmPermissions],
+	server: {
+		runtime: 'nodejs22.x',
+	},
+	domain: resolveDomain(domainName),
 	link: [
 		database,
 		adminApi,

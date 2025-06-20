@@ -21,16 +21,43 @@ export default $config({
 			throw new Error("Stage name must start with 'luke'");
 		}
 
-		await import('./infra/config');
-		await import('./infra/database');
-		await import('./infra/websockets-api');
-		await import('./infra/events');
-		await import('./infra/auth');
-		await import('./infra/buckets');
-		await import('./infra/api');
-		await import('./infra/image-processing');
-		await import('./infra/minecraft');
-		await import('./infra/site');
-		await import('./infra/admin-site');
+		await Promise.all([
+			// no deps
+			import('./infra/websockets-api'),
+			import('./infra/config'),
+		]);
+
+		await Promise.all([
+			// needs config
+			import('./infra/database'),
+		]);
+
+		const [imageProcessing] = await Promise.all([
+			// needs database
+			import('./infra/image-processing'),
+			import('./infra/events'),
+			import('./infra/buckets'),
+		]);
+
+		await Promise.all([
+			// needs events / image-processing
+			import('./infra/auth'),
+			import('./infra/minecraft'),
+		]);
+
+		await Promise.all([
+			// needs auth
+			import('./infra/api'),
+		]);
+
+		await Promise.all([
+			// needs api
+			import('./infra/site'),
+			import('./infra/admin-site'),
+		]);
+
+    return {
+      CardsCDN: $interpolate`https://${imageProcessing.cardsCDN.domainName}/`
+    }
 	},
 });

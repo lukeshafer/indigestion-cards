@@ -11,6 +11,23 @@ function getDomainName(stage: string) {
 	return `${stage}.env.${DOMAIN_NAME}`;
 }
 
+const readyStages = new Set(['luke']);
+export const resolveDomain = (domain: string, path?: string) =>
+	$dev === true
+		? undefined
+		: readyStages.has($app.stage)
+			? path
+				? {
+						name: domain,
+						dns: sst.aws.dns({ override: true }),
+						path,
+					}
+				: {
+						name: domain,
+						dns: sst.aws.dns({ override: true }),
+					}
+			: undefined;
+
 export const hostedZone = getHostedZone($app.stage);
 function getHostedZone(stage: string) {
 	if (stage.startsWith('luke')) return `lksh.dev`;
@@ -44,7 +61,7 @@ type DataImportNames = {
 export const imports = {
 	luke: {
 		dynamoTableName: 'luke-lil-indigestion-cards-data',
-		cardsCDNBucketName: 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-xcet76xih2fc',
+		cardsCDNBucketName: 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-slxjuzmuvra4',
 		cardDesignsBucketName: 'luke-lil-indigestion-card-carddesignsbucketd131504-ywrschnjx14a',
 		frameDesignsBucketName: 'luke-lil-indigestion-card-framedesignsbucket5220be-xfppctbwkl9a',
 	},
