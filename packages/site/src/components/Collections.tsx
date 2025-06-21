@@ -115,14 +115,12 @@ export const CollectionBuilder: Solid.Component<CollectionBuilderProps> = props 
 					} else {
 						return trpc.collections.mockLoadCardsSet.query({ cards });
 					}
-					break;
 				case 'rule':
 					if (checkAreRulesEmpty(rules)) {
 						return [];
 					} else {
 						return trpc.collections.mockLoadCardsRule.query(rules);
 					}
-					break;
 			}
 		},
 		{ initialValue: [], ssrLoadFrom: 'initial' }

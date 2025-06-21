@@ -5,7 +5,6 @@ import { Select } from '../form/Form';
 import type { CardInstance, CardDesign } from '@core/types';
 import { useViewTransition } from '@admin/lib/client/utils';
 import type { Session } from '@admin/env';
-import { css } from '@acab/ecsstatic';
 import type { RarityRankingRecord } from '../site-config/RarityRanking';
 
 type CardType = Parameters<typeof Card>[0] & Partial<CardInstance> & Partial<CardDesign>;
@@ -23,11 +22,6 @@ const sortTypes = [
 
 type SortType = (typeof sortTypes)[number]['value'];
 
-const cardListStyles = css`
-	grid-template-columns: repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr));
-	--card-scale: 0.5;
-`;
-
 export default function CardList(props: {
 	cards: CardType[];
 	showUsernames?: boolean;
@@ -39,7 +33,7 @@ export default function CardList(props: {
 }) {
 	const allowedSortTypes = () =>
 		props.sortOnlyBy?.length
-			? sortTypes.filter((type) => props.sortOnlyBy?.includes(type.value))
+			? sortTypes.filter(type => props.sortOnlyBy?.includes(type.value))
 			: sortTypes.slice();
 	// eslint-disable-next-line solid/reactivity
 	const [sort, setSort] = createSignal<string>(allowedSortTypes()[0].value);
@@ -54,17 +48,21 @@ export default function CardList(props: {
 					<Select
 						name="sort"
 						label="Sort by"
-						setValue={(val) => useViewTransition(() => setSort(val))}
+						setValue={val => useViewTransition(() => setSort(val))}
 						options={allowedSortTypes()}
 					/>
 				</div>
 			)}
 			<ul
 				class="grid w-full justify-center justify-items-center gap-x-2 gap-y-14 px-3 md:gap-x-6"
-				classList={{ [cardListStyles]: true }}>
+				style={{
+					'--card-scale': '0.5',
+					'grid-template-columns':
+						'repeat(auto-fill, minmax(calc(var(--card-scale) * 18rem), 1fr))',
+				}}>
 				<Show when={sortedCards().length > 0} fallback={<p>No cards found</p>}>
 					<For each={sortedCards()}>
-						{(card) => (
+						{card => (
 							<div class="w-fit">
 								{card.bestRarityFound?.rarityId !== NO_CARDS_OPENED_ID ||
 								props.sessionType === 'admin' ? (
@@ -76,10 +74,10 @@ export default function CardList(props: {
 												props.isUserPage && card.username
 													? `${routes.USERS}/${card.username}/${
 															card.instanceId ?? ''
-													  } `
+														} `
 													: `${routes.INSTANCES}/${card.designId}/${
 															card.instanceId ?? ''
-													  }`
+														}`
 											}>
 											<Card {...card} scale="var(--card-scale)" />
 											<p>{card.cardName}</p>
@@ -143,32 +141,32 @@ function sortCards(args: {
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime() ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+						a.cardName.localeCompare(b.cardName) ||
+						+a.cardNumber - +b.cardNumber
 			);
 		case 'open-date-asc':
 			return cards.sort((a, b) =>
 				!(a.openedAt && b.openedAt)
 					? 0
 					: new Date(a.openedAt).getTime() - new Date(b.openedAt).getTime() ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+						a.cardName.localeCompare(b.cardName) ||
+						+a.cardNumber - +b.cardNumber
 			);
 		case 'owner-asc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: a.username.localeCompare(b.username) ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+						a.cardName.localeCompare(b.cardName) ||
+						+a.cardNumber - +b.cardNumber
 			);
 		case 'owner-desc':
 			return cards.sort((a, b) =>
 				!(a.username && b.username)
 					? 0
 					: b.username.localeCompare(a.username) ||
-					  a.cardName.localeCompare(b.cardName) ||
-					  +a.cardNumber - +b.cardNumber
+						a.cardName.localeCompare(b.cardName) ||
+						+a.cardNumber - +b.cardNumber
 			);
 		default:
 			return cards;

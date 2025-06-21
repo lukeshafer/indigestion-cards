@@ -1,4 +1,4 @@
-import { Resource } from 'sst'
+import { Resource } from 'sst';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
 	type Attribute,
@@ -27,71 +27,11 @@ export const twitchEventTypes = [
 
 export const packEventTypes = [...twitchEventTypes, 'admin-site'] as const;
 
-export const auditAttributes = (entityName: string) =>
+export const dateAttributes = () =>
 	({
-		createdAt: {
-			type: 'number',
-			default: () => Date.now(),
-			// cannot be modified after created
-			readOnly: true,
-		},
-		updatedAt: {
-			type: 'number',
-			// watch for changes to any attribute
-			watch: '*',
-			// set current timestamp when updated
-			set: (_, i) => {
-				try {
-					audits
-						.put({
-              entity: entityName,
-							username: process.env.SESSION_USERNAME,
-							userId: process.env.SESSION_USER_ID,
-							item: JSON.stringify(i),
-						})
-						.go();
-				} catch (error) {
-					console.error({
-						message: 'An error occurred while saving the audit.',
-						error,
-					});
-
-					// TODO: send to a queue to try again
-				}
-
-				return Date.now();
-			},
-			readOnly: true,
-		},
+		createdAt: { type: 'number', default: () => Date.now(), readOnly: true },
+		updatedAt: { type: 'number', watch: '*', set: () => Date.now(), readOnly: true },
 	}) satisfies Record<string, Attribute>;
-
-const audits = new Entity(
-	{
-		model: { entity: 'audit', version: '1', service: DB_SERVICE },
-		attributes: {
-			entity: { type: 'string', required: true },
-			item: { type: 'string', required: true },
-			userId: { type: 'string', required: true },
-			username: { type: 'string', required: true },
-			timestamp: {
-				type: 'string',
-				default: () => `${new Date().toISOString()}---${Date.now()}`,
-			},
-		},
-		indexes: {
-			byEntity: {
-				pk: { field: 'pk', composite: ['entity'] },
-				sk: { field: 'sk', composite: ['userId', 'username', 'timestamp'] },
-			},
-			byUserId: {
-				index: 'gsi1',
-				pk: { field: 'gsi1pk', composite: ['userId'] },
-				sk: { field: 'gsi1sk', composite: ['entity', 'username', 'timestamp'] },
-			},
-		},
-	},
-	dbConfig
-);
 
 const Admins = new Entity(
 	{
@@ -100,7 +40,7 @@ const Admins = new Entity(
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
 			isStreamer: { type: 'boolean', required: true, default: false },
-			...auditAttributes('admin'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -155,7 +95,7 @@ const CardDesigns = new Entity(
 			},
 			tags: { type: 'list', items: { type: 'string' } },
 			game: { type: 'string' },
-			...auditAttributes('cardDesign'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -238,7 +178,7 @@ const CardInstances = new Entity(
 					},
 				},
 			},
-			...auditAttributes('cardInstance'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -322,7 +262,7 @@ const MomentRedemptions = new Entity(
 			},
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			...auditAttributes('momentRedemption'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -365,7 +305,7 @@ const PackTypes = new Entity(
 					},
 				},
 			},
-			...auditAttributes('packType'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -428,7 +368,7 @@ const Packs = new Entity(
 					},
 				},
 			},
-			...auditAttributes('pack'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -464,7 +404,7 @@ const Preorders = new Entity(
 			preorderId: { type: 'string', required: true, default: randomUUID },
 			userId: { type: 'string', required: true },
 			username: { type: 'string', required: true },
-			...auditAttributes('preorder'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -497,7 +437,7 @@ const Rarities = new Entity(
 			frameUrl: { type: 'string', required: true },
 			defaultCount: { type: 'number', required: true },
 			rarityColor: { type: 'string', required: true },
-			...auditAttributes('rarity'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -523,7 +463,7 @@ const Seasons = new Entity(
 			seasonId: { type: 'string', required: true },
 			nextPackNumber: { type: 'number', default: 0 },
 			packNumberPrefix: { type: 'string' },
-			...auditAttributes('season'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -589,7 +529,7 @@ const SiteConfig = new Entity(
 			},
 			tradingIsEnabled: { type: 'boolean' },
 			faq: { type: 'string' },
-			...auditAttributes('siteConfig'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -693,7 +633,7 @@ const Trades = new Entity(
 					}
 				},
 			},
-			...auditAttributes('trade'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -721,7 +661,7 @@ const TwitchEventMessageHistory = new Entity(
 		attributes: {
 			message_id: { type: 'string', required: true },
 			message_timestamp: { type: 'string', required: true },
-			...auditAttributes('twitchEventMessageHistory'),
+			...dateAttributes(),
 		},
 		indexes: {
 			byMessageId: {
@@ -745,7 +685,7 @@ const TwitchEvents = new Entity(
 			cost: { type: 'number' },
 			isEnabled: { type: 'boolean' },
 			isPaused: { type: 'boolean' },
-			...auditAttributes('twitchEvents'),
+			...dateAttributes(),
 		},
 		indexes: {
 			byEventId: {
@@ -764,7 +704,7 @@ const UnmatchedImages = new Entity(
 			imageId: { type: 'string', required: true },
 			url: { type: 'string', required: true },
 			unmatchedImageType: { type: ['cardDesign', 'frame'] as const, required: true },
-			...auditAttributes('unmatchedImage'),
+			...dateAttributes(),
 		},
 		indexes: {
 			byType: {
@@ -783,7 +723,7 @@ const UserLogins = new Entity(
 			userId: { type: 'string', required: true, label: 'userId' },
 			username: { type: 'string', required: true },
 			hasProfile: { type: 'boolean' },
-			...auditAttributes('userLogin'),
+			...dateAttributes(),
 		},
 		indexes: {
 			primary: {
@@ -904,7 +844,7 @@ const Users = new Entity(
 				type: 'list',
 				items: CollectionAttributes,
 			},
-			...auditAttributes('user'),
+			...dateAttributes(),
 		},
 		indexes: {
 			byId: {

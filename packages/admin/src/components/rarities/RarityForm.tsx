@@ -2,7 +2,6 @@ import { API, routes } from '@admin/constants';
 import { Form, TextInput, IdInput, SubmitButton, NumberInput } from '@admin/components/form/Form';
 import { createSignal } from 'solid-js';
 import DeleteImageButton from '../image/DeleteImageButton';
-import { css } from '@acab/ecsstatic';
 
 export default function RarityForm(props: { imgUrl: string; key: string; bucket: string }) {
 	const [rarityName, setRarityName] = createSignal('');
@@ -10,16 +9,16 @@ export default function RarityForm(props: { imgUrl: string; key: string; bucket:
 	const frameWithoutPropertyOrSemicolon = () =>
 		frameBg().replace('background:', '').replaceAll(';', '');
 
-	const imgCss = css`
-		background: var(--frameBg, transparent);
-	`;
 	return (
 		<div class="flex max-w-4xl flex-col gap-8 pt-8">
 			<div>
 				<img
 					src={props.imgUrl}
-					style={{ '--frameBg': `${frameWithoutPropertyOrSemicolon()}` }}
-					class={`mb-4 h-auto w-60 object-contain ${imgCss}`}
+					style={{
+						'--frameBg': `${frameWithoutPropertyOrSemicolon()}`,
+						background: 'var(--frameBg, transparent)',
+					}}
+					class="mb-4 h-auto w-60 object-contain"
 					id="rarity-frame-preview"
 				/>
 				<DeleteImageButton key={props.key} type="frame" />

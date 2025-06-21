@@ -57,7 +57,7 @@ export default $config({
 		]);
 
     return {
-      CardsCDN: $interpolate`https://${imageProcessing.cardsCDN.domainName}/`
+      CardsCDN: $interpolate`https://${imageProcessing.cardsCDN.domainName}`
     }
 	},
 });

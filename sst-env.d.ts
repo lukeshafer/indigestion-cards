@@ -17,10 +17,6 @@ declare module "sst" {
       "type": "sst.aws.Astro"
       "url": string
     }
-    "CardCDNRouter": {
-      "type": "sst.aws.Router"
-      "url": string
-    }
     "CardDesigns": {
       "name": string
       "type": "sst.aws.Bucket"

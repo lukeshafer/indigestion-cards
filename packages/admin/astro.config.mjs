@@ -3,7 +3,6 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import aws from 'astro-sst';
 import solid from '@astrojs/solid-js';
-import { ecsstatic } from '@acab/ecsstatic/vite';
 import icon from 'astro-icon';
 
 // https://astro.build/config
@@ -11,9 +10,9 @@ export default defineConfig({
 	output: 'server',
 	adapter: aws(),
 	integrations: [tailwind(), solid(), icon()],
-  server: {
-    port: 4322,
-  },
+	server: {
+		port: 4322,
+	},
 	vite: {
 		ssr: {
 			external: ['electrodb'],
@@ -21,6 +20,5 @@ export default defineConfig({
 		optimizeDeps: {
 			exclude: ['sst'],
 		},
-		plugins: [ecsstatic()],
 	},
 });

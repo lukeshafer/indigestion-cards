@@ -1,6 +1,5 @@
 import { ASSETS, FULL_ART_ID, LEGACY_CARD_ID, NO_CARDS_OPENED_ID } from '@admin/constants';
 import type { CardInstance } from '@core/types';
-import { css } from '@acab/ecsstatic';
 import { Show } from 'solid-js';
 
 interface Props extends Partial<CardInstance> {
@@ -18,11 +17,6 @@ interface Props extends Partial<CardInstance> {
 	rarityId: string;
 	username?: string;
 }
-
-const stampAnimationStyles = css`
-	animation: stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards;
-	transform-origin: center;
-`;
 
 export default function Card(props: Props) {
 	const isFullArt = () => props.rarityId === FULL_ART_ID;
@@ -73,8 +67,13 @@ export default function Card(props: Props) {
 					<div class="absolute left-[52%] top-1/2 block w-[15em] -translate-x-1/2 -translate-y-1/2 rotate-12">
 						<img
 							src={ASSETS.CARDS.SHIT_PACK}
+							style={{
+								animation: props.stamps?.includes('new-stamp')
+									? 'stamp 500ms cubic-bezier(0.44, 1.34, 0.37, 0.99) forwards'
+									: undefined,
+							}}
 							classList={{
-								[stampAnimationStyles]: props.stamps?.includes('new-stamp'),
+								'origin-center': props.stamps?.includes('new-stamp'),
 								'opacity-80': !props.stamps?.includes('new-stamp'),
 							}}
 							width="350"

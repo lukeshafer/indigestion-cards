@@ -110,7 +110,7 @@ async function getImageUrls({
 			frameUrl: card.frameUrl,
 			shouldSave: true,
 		};
-	else if (adminSecret !== Config.AdminImageSecret) return null;
+	else if (adminSecret !== Resource.AdminImageSecret.value) return null;
 
 	const [design, rarity] = await Promise.all([
 		getCardDesignById({ designId }),
