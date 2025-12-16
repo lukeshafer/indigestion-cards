@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^18.19.70",
-    "sst": "3.17.6"
+    "sst": "3.17.24"
   },
   "dependencies": {
     "@aws-sdk/client-eventbridge": "^3.723.0",
@@ -17,9 +17,9 @@
     "@openauthjs/openauth": "^0.4.3",
     "hono": "^4.7.5",
     "openid-client": "^5.7.1",
-    "sharp": "^0.33.5",
+    "sharp": "^0.34.5",
+    "sstv2": "npm:sst@^2",
     "valibot": "^1.0.0",
-    "zod": "^3.24.1",
-    "sstv2": "npm:sst@^2"
+    "zod": "^3.24.1"
   }
 }

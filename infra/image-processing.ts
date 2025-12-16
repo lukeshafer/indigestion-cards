@@ -30,6 +30,8 @@ generateImageApi.route('GET /cards/{designId}/{rarityId}', {
 	handler: 'packages/functions/src/image-api.handler',
 	link: [frameDesignBucket, cardDesignBucket, cardsBucket, adminImageSecret, database],
 	runtime: 'nodejs22.x',
+	nodejs: { install: ['sharp'] },
+	memory: '2048 MB',
 });
 
 const cardsEdgeFunctionProvider = new aws.Provider('CardsEdgeFunctionProvider', {

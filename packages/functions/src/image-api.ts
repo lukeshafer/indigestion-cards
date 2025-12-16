@@ -1,6 +1,7 @@
+import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+
 import { S3 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
-import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { Resource } from 'sst';
 import { getCardInstanceByDesignAndRarity } from '@core/lib/card';
 import { parseS3Url } from '@core/lib/images';
@@ -74,8 +75,8 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 		});
 		console.debug('Created new image', key);
 	} else {
-    console.log('Not saving image')
-  }
+		console.log('Not saving image');
+	}
 
 	return {
 		headers: {
