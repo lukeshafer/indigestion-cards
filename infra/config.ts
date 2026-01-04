@@ -11,7 +11,7 @@ function getDomainName(stage: string) {
 	return `${stage}.env.${DOMAIN_NAME}`;
 }
 
-const readyStages = new Set(['luke']);
+const readyStages = new Set(['luke', 'dev']); // only add to this list if the stage has been deployed once
 export const resolveDomain = (domain: string, path?: string) =>
 	$dev === true
 		? undefined
@@ -58,11 +58,25 @@ type DataImportNames = {
 	frameDesignsBucketName: string;
 };
 
-export const imports = {
+const importConfig: Record<string | symbol, Partial<DataImportNames>> = {
 	luke: {
 		dynamoTableName: 'luke-lil-indigestion-cards-data',
 		cardsCDNBucketName: 'luke-lil-indigestion-cards-ima-cardsbucketbe9f1931-slxjuzmuvra4',
 		cardDesignsBucketName: 'luke-lil-indigestion-card-carddesignsbucketd131504-ywrschnjx14a',
 		frameDesignsBucketName: 'luke-lil-indigestion-card-framedesignsbucket5220be-xfppctbwkl9a',
 	},
-} satisfies Record<string, DataImportNames>;
+	dev: {
+		dynamoTableName: 'dev-lil-indigestion-cards-data',
+		cardsCDNBucketName: 'dev-lil-indigestion-cards-imag-cardsbucketbe9f1931-gv0bjocqddci',
+		cardDesignsBucketName: 'dev-lil-indigestion-card-carddesignsbucketd131504-1ql88qc8da5q2',
+		frameDesignsBucketName: 'dev-lil-indigestion-card-framedesignsbucket5220be-1m9o3fre3hm8j',
+	},
+} satisfies Record<string, DataImportNames>; // yes both the type declaration AND satisfies are intentional
+
+const bypassedStages = new Set('luke-v3');
+if (!($app.stage in importConfig) && !bypassedStages.has($app.stage)) {
+	throw new Error(
+		`Stage ${$app.stage} is not ready for deployment. Setup imports in infra/config.ts`
+	);
+}
+export const imports = importConfig[$app.stage] ?? {};

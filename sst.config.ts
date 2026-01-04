@@ -2,6 +2,8 @@
 
 const PROD_STAGE = 'live';
 
+const indiProfileStages = new Set(['prod', 'live', 'dev', 'qa']);
+
 export default $config({
 	app(input) {
 		return {
@@ -12,15 +14,12 @@ export default $config({
 			providers: {
 				aws: {
 					region: 'us-east-2',
+					profile: indiProfileStages.has(input.stage) ? 'indigestion' : 'default',
 				},
 			},
 		};
 	},
 	async run() {
-		if (!$app.stage.startsWith('luke')) {
-			throw new Error("Stage name must start with 'luke'");
-		}
-
 		await Promise.all([
 			// no deps
 			import('./infra/websockets-api'),
@@ -56,8 +55,8 @@ export default $config({
 			import('./infra/admin-site'),
 		]);
 
-    return {
-      CardsCDN: $interpolate`https://${imageProcessing.cardsCDN.domainName}`
-    }
+		return {
+			CardsCDN: $interpolate`https://${imageProcessing.cardsCDN.domainName}`,
+		};
 	},
 });

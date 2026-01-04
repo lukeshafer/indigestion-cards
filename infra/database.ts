@@ -11,16 +11,8 @@ export const dataSummaries = new sst.aws.Bucket('DataSummaries', {
 export const database = new sst.aws.Dynamo('Database', {
 	transform: {
 		table(args, opts) {
-			switch ($app.stage) {
-				case 'luke':
-					opts.import = imports.luke.dynamoTableName;
-					args.name = imports.luke.dynamoTableName;
-					return;
-				case 'luke-v3':
-					return;
-				default:
-					throw new Error(`Database import not setup for stage ${$app.stage}`);
-			}
+			opts.import = imports.dynamoTableName;
+			args.name = imports.dynamoTableName;
 		},
 	},
 	stream: 'new-and-old-images',

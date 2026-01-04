@@ -3,22 +3,12 @@ import { imports } from './config';
 import { database } from './database';
 
 const cardsBucket = new sst.aws.Bucket('CardsBucket', {
-	access: 'cloudfront',
+	access: 'public',
 	transform: {
 		bucket(args, opts) {
 			args.forceDestroy = undefined;
-
-			switch ($app.stage) {
-				case 'luke': {
-					args.bucket = imports.luke.cardsCDNBucketName;
-					opts.import = imports.luke.cardsCDNBucketName;
-					return;
-				}
-				case 'luke-v3':
-					return;
-				default:
-					throw new Error(`Bucket CardsBucket import not setup for stage ${$app.stage}`);
-			}
+			args.bucket = imports.cardsCDNBucketName;
+			opts.import = imports.cardsCDNBucketName;
 		},
 	},
 });

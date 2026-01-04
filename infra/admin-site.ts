@@ -13,12 +13,8 @@ import { database, dataSummaries } from './database';
 import { eventBus } from './events';
 import { adminImageSecret } from './image-processing';
 
-// TODO: maybe can delete this line and references to the restore table
-const backupTableName = 'prod-indigestion-cards-restore-20240511-203500';
-
 export const adminSite = new sst.aws.Astro('AdminSite', {
 	path: 'packages/admin',
-	environment: { BACKUP_TABLE_NAME: backupTableName },
 	permissions: [ssmPermissions],
 	domain: resolveDomain(`admin.${domainName}`),
 	server: { runtime: 'nodejs22.x' },
