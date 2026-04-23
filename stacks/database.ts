@@ -76,12 +76,12 @@ export function Database({ stack }: StackContext) {
 		return { dynamodb: { NewImage: { __edb_e__: { S: entities } } } };
 	};
 	table.addConsumers(stack, {
-		updateStatistics: {
-			filters: [
-				entityFilter(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
-			],
-			function: 'packages/functions/src/table-consumers/update-statistics.handler',
-		},
+		// updateStatistics: {
+		// 	filters: [
+		// 		entityFilter(['season', 'cardDesign', 'cardInstance', 'pack', 'rarity', 'trade']),
+		// 	],
+		// 	function: 'packages/functions/src/table-consumers/update-statistics.handler',
+		// },
 		refreshUserlist: {
 			filters: [entityFilter(['cardInstance', 'user', 'preorder', 'trade'])],
 			function: 'packages/functions/src/table-consumers/refresh-user-list.handler',
