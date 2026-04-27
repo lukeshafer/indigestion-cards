@@ -39,7 +39,7 @@
     "globals": "^15.14.0",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "sst": "3.17.24",
+    "sst": "4.10.1",
     "sstv2": "npm:sst@^2",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.19.1"
@@ -68,6 +68,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.787.0",
-    "sst": "3.17.24"
+    "sst": "4.10.1"
   }
 }

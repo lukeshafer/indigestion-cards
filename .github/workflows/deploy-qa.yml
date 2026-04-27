@@ -1,9 +1,10 @@
 name: Deploy QA
 
-on:
-    push:
-        branches:
-            - qa
+on: workflow_dispatch
+# on:
+#     push:
+#         branches:
+            # - qa
 
 jobs:
     deploy-qa:
