@@ -23,7 +23,7 @@ export const site = new sst.aws.Astro('CardsSite', {
 	},
 	permissions: [ssmPermissions],
 	server: {
-		runtime: 'nodejs22.x',
+		runtime: 'nodejs24.x',
 	},
 	domain: resolveDomain(domainName),
 	link: [

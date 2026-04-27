@@ -126,7 +126,7 @@ new sst.aws.Cron('RefreshUsernamesCron', {
 		},
 		link: [database, twitchClientSecret, twitchClientId, params],
 		permissions: [ssmPermissions],
-		runtime: 'nodejs22.x',
+		runtime: 'nodejs24.x',
 	},
 });
 
@@ -140,7 +140,7 @@ new sst.aws.Cron('RefreshUserCardCountsCron', {
 			SESSION_USERNAME: 'Refresh User Card Counts Cron Job',
 		},
 		link: [database],
-		runtime: 'nodejs22.x',
+		runtime: 'nodejs24.x',
 	},
 });
 
@@ -149,7 +149,7 @@ new sst.aws.Cron('RefreshUserCardCountsCron', {
 let seedDB = new sst.aws.Function('SeedDb', {
 	handler: 'packages/functions/src/deployment/seed-db.handler',
 	link: [database, params, twitchClientId, twitchClientSecret],
-	runtime: 'nodejs22.x',
+	runtime: 'nodejs24.x',
 	permissions: [
 		{
 			actions: ['ssm:GetParameter', 'ssm:PutParameter'],
@@ -161,7 +161,7 @@ let seedDB = new sst.aws.Function('SeedDb', {
 let migration = new sst.aws.Function('MigrateDb', {
 	handler: 'packages/functions/src/deployment/migrate-db.handler',
 	link: [database, params, twitchClientId, twitchClientSecret],
-	runtime: 'nodejs22.x',
+	runtime: 'nodejs24.x',
 	permissions: [
 		{
 			actions: ['ssm:GetParameter', 'ssm:PutParameter'],

@@ -23,7 +23,7 @@ cardDraftBucket.notify({
 			function: {
 				handler: 'packages/functions/src/s3/handle-image-upload.handler',
 				link: [database],
-				runtime: 'nodejs22.x',
+				runtime: 'nodejs24.x',
 			},
 		},
 	],
@@ -49,7 +49,7 @@ frameDraftBucket.notify({
 			function: {
 				handler: 'packages/functions/src/s3/handle-frame-upload.handler',
 				link: [database],
-				runtime: 'nodejs22.x',
+				runtime: 'nodejs24.x',
 			},
 		},
 	],

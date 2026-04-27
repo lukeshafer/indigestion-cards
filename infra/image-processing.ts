@@ -19,7 +19,7 @@ const generateImageApi = new sst.aws.ApiGatewayV2('GenerateImageApi');
 generateImageApi.route('GET /cards/{designId}/{rarityId}', {
 	handler: 'packages/functions/src/image-api.handler',
 	link: [frameDesignBucket, cardDesignBucket, cardsBucket, adminImageSecret, database],
-	runtime: 'nodejs22.x',
+	runtime: 'nodejs24.x',
 	nodejs: { install: ['sharp'] },
 	memory: '2048 MB',
 });

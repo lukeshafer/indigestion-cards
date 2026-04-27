@@ -19,7 +19,7 @@ twitchApi.route('$default', {
 	handler: 'packages/functions/src/twitch-api.handler',
 	link: [params, twitchClientId, twitchClientSecret, database, eventBus],
 	permissions: [ssmPermissions],
-	runtime: 'nodejs22.x',
+	runtime: 'nodejs24.x',
 });
 
 export const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
@@ -52,7 +52,7 @@ export const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
 				];
 
 				args.permissions = [ssmPermissions];
-				args.runtime = 'nodejs22.x';
+				args.runtime = 'nodejs24.x';
 			},
 		},
 	},

@@ -17,7 +17,7 @@ export const adminSite = new sst.aws.Astro('AdminSite', {
 	path: 'packages/admin',
 	permissions: [ssmPermissions],
 	domain: resolveDomain(`admin.${domainName}`),
-	server: { runtime: 'nodejs22.x' },
+	server: { runtime: 'nodejs24.x' },
 	dev: { title: 'Admin Site' },
 	link: [
 		database,

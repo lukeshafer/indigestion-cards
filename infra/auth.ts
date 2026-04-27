@@ -7,6 +7,6 @@ export const auth = new sst.aws.Auth('SiteAuth', {
 		handler: 'packages/functions/src/auth/issuer.handler',
 		link: [params, database, twitchClientSecret, twitchClientId, eventBus],
 		permissions: [ssmPermissions],
-		runtime: 'nodejs22.x',
+		runtime: 'nodejs24.x',
 	},
 });
