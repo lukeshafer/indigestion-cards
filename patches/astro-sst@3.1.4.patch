@@ -1,0 +1,36 @@
+diff --git a/dist/entrypoint.js b/dist/entrypoint.js
+index dedb206e4f16572da83ecc736912c51f685d0d76..a90d3a861b4bca09f49bfd3881ee82fe7e549b3f 100644
+--- a/dist/entrypoint.js
++++ b/dist/entrypoint.js
+@@ -1,8 +1,7 @@
+ import fs from "fs/promises";
+-import { NodeApp, applyPolyfills } from "astro/app/node";
++import { NodeApp } from "astro/app/node";
+ import { convertFrom, convertTo } from "./lib/event-mapper.js";
+ import { debug } from "./lib/logger.js";
+-applyPolyfills();
+ function createRequest(internalEvent) {
+     const requestUrl = internalEvent.url;
+     const requestProps = {
+diff --git a/src/entrypoint.ts b/src/entrypoint.ts
+index 31cb52639b6446046fe68f1782c9841130864a64..b52f18429edf65c3ca32bba31cf26ce5a893cd12 100644
+--- a/src/entrypoint.ts
++++ b/src/entrypoint.ts
+@@ -6,7 +6,7 @@ import type {
+   Callback,
+   Context,
+ } from "aws-lambda";
+-import { NodeApp, applyPolyfills } from "astro/app/node";
++import { NodeApp } from "astro/app/node";
+ import type { IntegrationConfig } from "./lib/build-meta";
+ import { InternalEvent, convertFrom, convertTo } from "./lib/event-mapper.js";
+ import { debug } from "./lib/logger.js";
+@@ -19,8 +19,6 @@ type RequestHandler = (
+   callback?: Callback
+ ) => void | Promise<void>;
+ 
+-applyPolyfills();
+-
+ declare global {
+   const awslambda: {
+     streamifyResponse(handler: RequestHandler): RequestHandler;

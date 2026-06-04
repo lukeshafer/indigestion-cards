@@ -25,7 +25,7 @@ Migration steps:
     * Note that v3 doesn't need the profile -- this is handled in the infra source code based on stage name.
 5. **Deploy** to correct stage and account.
 6. At `dev.twitch.tv`, add the SiteAuth output url to the proper app.
-6. In the AWS console, navigate to `API Gateway > Custom domain names` and delete the api and minecraft api domain names (wait about a minute between each domain to avoid being throttled).
-7. Navigate to the same v2 version of the app used previously (e.g. `../test-repos/indigestion-cards-sst-v2/`), checkout the branch `v2-no-domains` and run `pnpm sst deploy --stage [STAGE] --profile [PROFILE]`.
-8. Update the `readyStages` set to include the stage in question.
-9. Deploy again!
+7. In the AWS console, navigate to `API Gateway > Custom domain names` and delete the api and minecraft api domain names (wait about a minute between each domain to avoid being throttled).
+8. Navigate to the same v2 version of the app used previously (e.g. `../test-repos/indigestion-cards-sst-v2/`), checkout the branch `v2-no-domains` and run `pnpm sst deploy --stage [STAGE] --profile [PROFILE]`.
+9. Update the `readyStages` set to include the stage in question.
+10. Deploy again!

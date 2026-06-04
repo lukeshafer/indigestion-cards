@@ -2,6 +2,7 @@
 
 const PROD_STAGE = 'live';
 
+// Stages deployed on the official account
 const indiProfileStages = new Set(['prod', 'live', 'dev', 'qa']);
 
 export default $config({
