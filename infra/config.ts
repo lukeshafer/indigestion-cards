@@ -11,7 +11,7 @@ function getDomainName(stage: string) {
 	return `${stage}.env.${DOMAIN_NAME}`;
 }
 
-const readyStages = new Set(['luke', 'dev', 'qa']); // only add to this list if the stage has been deployed once
+const readyStages = new Set(['luke', 'dev', 'qa', 'live']); // only add to this list if the stage has been deployed once
 export const resolveDomain = (domain: string, path?: string) =>
 	$dev === true
 		? undefined
@@ -71,12 +71,18 @@ const importConfig: Record<string | symbol, Partial<DataImportNames>> = {
 		cardDesignsBucketName: 'dev-lil-indigestion-card-carddesignsbucketd131504-1ql88qc8da5q2',
 		frameDesignsBucketName: 'dev-lil-indigestion-card-framedesignsbucket5220be-1m9o3fre3hm8j',
 	},
-  qa: {
+	qa: {
 		dynamoTableName: 'qa-lil-indigestion-cards-data',
-		cardsCDNBucketName: "qa-lil-indigestion-cards-image-cardsbucketbe9f1931-cgkpxfkgm1qf",
-		cardDesignsBucketName: "qa-lil-indigestion-cards-carddesignsbucketd131504-ezw7h1yxmsv7",
-		frameDesignsBucketName: "qa-lil-indigestion-cards-framedesignsbucket5220be-101amzlsrniq4",
-  }
+		cardsCDNBucketName: 'qa-lil-indigestion-cards-image-cardsbucketbe9f1931-cgkpxfkgm1qf',
+		cardDesignsBucketName: 'qa-lil-indigestion-cards-carddesignsbucketd131504-ezw7h1yxmsv7',
+		frameDesignsBucketName: 'qa-lil-indigestion-cards-framedesignsbucket5220be-101amzlsrniq4',
+	},
+	live: {
+		dynamoTableName: 'prod-lil-indigestion-cards-data',
+		cardsCDNBucketName: 'prod-lil-indigestion-cards-ima-cardsbucketbe9f1931-hjqo1nd8hje4',
+		cardDesignsBucketName: 'prod-lil-indigestion-car-carddesignsbucketd131504-lnl4o6hdolf6',
+		frameDesignsBucketName: 'prod-lil-indigestion-car-framedesignsbucket5220be-1jxydqkwt47q6',
+	},
 } satisfies Record<string, DataImportNames>; // yes both the type declaration AND satisfies are intentional
 
 const bypassedStages = new Set('luke-v3');
