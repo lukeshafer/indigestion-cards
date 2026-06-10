@@ -29,8 +29,8 @@
     "sharp": "^0.34.5",
     "solid-js": "^1.9.12",
     "solid-markdown": "^2.1.1",
-    "sst": "4.12.2",
-    "sstv2": "npm:sst@^2",
+    "sst": "4.15.2",
+    "sstv2": "npm:sst@^2.49.8",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17"
   },
