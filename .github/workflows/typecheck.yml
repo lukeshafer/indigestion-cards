@@ -1,34 +1,37 @@
 name: Check TS Types
 on: push
 jobs:
-    typecheck:
-        runs-on: ubuntu-latest
+  typecheck:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 24
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 24
 
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v4.0.0
-              with:
-                  version: 9.12.3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+        with:
+          version: 11.5.2
 
-            - name: Install dependencies
-              run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-            - name: Build SST App
-              run: pnpm run build
+      - name: Build SST App
+        run: pnpm run build
 
-            - name: 'Check Types: Core'
-              run: pnpm run core:check
+      - name: "Check Types: Core"
+        run: pnpm run core:check
 
-            - name: 'Check Types: Functions'
-              run: pnpm run functions:check
+      - name: "Check Types: Functions"
+        run: pnpm run functions:check
 
-            - name: 'Check Types: Site'
-              run: pnpm run site:check
+      - name: "Check Types: Site"
+        run: pnpm run site:check
+
+      - name: "Check Types: Admin Site"
+        run: pnpm run admin:check
