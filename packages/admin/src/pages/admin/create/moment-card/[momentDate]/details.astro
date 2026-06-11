@@ -18,14 +18,6 @@ if (!bucket || !key) {
 const imgUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
 const seasons = await getAllSeasons();
 const rarities = await getAllRarities();
-// const config = await getSiteConfig();
-// const baseRarity = config?.baseRarity ??
-// 	rarities[0] ?? {
-// 		rarityId: 'default',
-// 		rarityName: 'Default',
-// 		rarityColor: '#fff',
-// 		frameUrl: ASSETS.CARDS.DEFAULT_BASE_RARITY,
-// 	};
 
 const { momentDate } = Astro.params;
 const redemptions = await getMomentRedemptionsForDate(momentDate!);

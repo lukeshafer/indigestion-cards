@@ -5,9 +5,9 @@ import { COOKIE, useSession } from '@core/lib/auth';
 
 export const handler = ApiHandler(async () => {
 	const session = await useSession({
-    access: useCookie(COOKIE.ACCESS),
-    refresh: useCookie(COOKIE.REFRESH),
-  });
+		access: useCookie(COOKIE.ACCESS),
+		refresh: useCookie(COOKIE.REFRESH),
+	});
 
 	if (session.type !== 'admin') {
 		return {
@@ -58,8 +58,10 @@ type EntityName = keyof Omit<(typeof db)['entities'], 'admins'>;
 type Entity = (typeof db)['entities'][EntityName];
 
 async function deleteEntity(entity: Entity) {
+	// @ts-expect-error - Entity Type is funky :(
 	const entityData = await entity.scan.go({ pages: 'all' });
 	const deleteResults = entityData.data.map(
+		// @ts-expect-error - inherited from above
 		async item =>
 			await entity
 				// @ts-expect-error - All entities will have a delete method

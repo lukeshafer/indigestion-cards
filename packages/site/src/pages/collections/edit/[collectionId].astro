@@ -9,15 +9,18 @@ const user = Astro.locals.user;
 if (!user) return Astro.redirect('/');
 
 const { collectionId } = Astro.params;
-if (!collectionId) return Astro.redirect(routes.USERS + '/' + user.properties.username);
+if (!collectionId) {
+	return Astro.redirect(routes.USERS + '/' + user.properties.username);
+}
 
 const data = await getUserAndOpenedCardInstances({ username: user.properties.username });
 const existingCollection = await getCollection({ collectionId, userId: user.properties.userId });
 
-if (!existingCollection.data)
+if (!existingCollection.data) {
 	return Astro.redirect(
 		routes.USERS + '/' + user.properties.username + '?alert=Collection not found.'
 	);
+}
 const collection = existingCollection.data.collection;
 ---
 

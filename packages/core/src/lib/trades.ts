@@ -17,7 +17,6 @@ import type {
 	Trade,
 	TradeCard,
 	TradePack,
-	UpdateTrade,
 	User,
 } from '../db.types';
 import { getPacksByUsername } from './pack';
@@ -185,42 +184,9 @@ export async function getAllTradesForUser(userId: string) {
 	return { outgoing, incoming };
 }
 
-export async function getSentTradeById(args: { tradeId: string; senderUserId: string }) {
-	const result = await db.entities.Trades.query
-		.bySenderId({ tradeId: args.tradeId, senderUserId: args.senderUserId })
-		.go();
-	return result.data[0];
-}
-
-export async function getReceivedTradeById(args: { tradeId: string; receiverUserId: string }) {
-	const result = await db.entities.Trades.query
-		.byReceiverId({ tradeId: args.tradeId, receiverUserId: args.receiverUserId })
-		.go();
-	return result.data[0];
-}
-
 export async function getTrade(tradeId: string) {
 	const result = await db.entities.Trades.query.primary({ tradeId }).go();
 	return result.data[0];
-}
-
-export async function updateTrade(tradeId: string, updates: UpdateTrade, userId?: string) {
-	const set = db.entities.Trades.patch({ tradeId }).set(updates);
-	const status = updates.status;
-	const result = status
-		? set
-				.append({
-					messages: [
-						{
-							type: 'status-update',
-							message: status,
-							userId: userId ?? '',
-						},
-					],
-				})
-				.go()
-		: set.go();
-	return result;
 }
 
 export async function updateTradeStatus({

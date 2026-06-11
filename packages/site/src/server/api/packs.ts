@@ -7,7 +7,7 @@ import {
 	setPackIsLocked,
 } from '@core/lib/pack';
 import { adminProcedure, authedProcedure } from '../router';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { getAllCardDesigns, getCardDesignAndInstancesById } from '@core/lib/design';
 import { TRPCError } from '@trpc/server';
 

@@ -76,25 +76,25 @@ export async function getUserAndOpenedCardInstances(args: { username: string }):
 	};
 }
 
-export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
-	User: User;
-	UserLogin: UserLogin;
-	Card: CardInstance;
-} | null> {
-	try {
-		const data = await db.collections.UserAndCards({ username: args.username }).go();
-		const card = data.data.CardInstances.find(card => card.instanceId === args.instanceId);
-		if (!card) throw new Error('Card not found');
-		return {
-			User: data.data.Users[0],
-			UserLogin: data.data.UserLogins[0],
-			Card: card,
-		};
-	} catch {
-		console.error('Error while retrieving user and card instance data for user', args.username);
-		return null;
-	}
-}
+// export async function getUserAndCard(args: { username: string; instanceId: string }): Promise<{
+// 	User: User;
+// 	UserLogin: UserLogin;
+// 	Card: CardInstance;
+// } | null> {
+// 	try {
+// 		const data = await db.collections.UserAndCards({ username: args.username }).go();
+// 		const card = data.data.CardInstances.find(card => card.instanceId === args.instanceId);
+// 		if (!card) throw new Error('Card not found');
+// 		return {
+// 			User: data.data.Users[0],
+// 			UserLogin: data.data.UserLogins[0],
+// 			Card: card,
+// 		};
+// 	} catch {
+// 		console.error('Error while retrieving user and card instance data for user', args.username);
+// 		return null;
+// 	}
+// }
 
 export async function createNewUser(args: CreateUser) {
 	// make sure this username isn't already in use
@@ -180,9 +180,9 @@ export async function checkIfUserExists(userId: string): Promise<boolean> {
 	return getUser(userId).then(user => !!user);
 }
 
-export async function checkIfUsernameExists(userName: string) {
-	return getUserByUserName(userName);
-}
+// export async function checkIfUsernameExists(userName: string) {
+// 	return getUserByUserName(userName);
+// }
 
 type PinnedCard = {
 	instanceId: string;

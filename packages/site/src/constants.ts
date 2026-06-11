@@ -38,7 +38,7 @@ export function resolveLocalPath(path: string) {
 
 /** Public API routes */
 export const publicApi = {
-	GET_ALL_USERNAMES: '/api/get-all-usernames',
+	// GET_ALL_USERNAMES: '/api/get-all-usernames',
 	SEARCH: '/api/search',
 } as const;
 

@@ -12,7 +12,7 @@ import { createStore, produce, reconcile, type SetStoreFunction } from 'solid-js
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
 import { API, resolveLocalPath } from '@site/constants';
-import { setTotalPackCount } from '@site/client/state';
+// import { setTotalPackCount } from '@site/client/state';
 import { Checkbox } from '../Form';
 import {
 	OpenPacksContext,
@@ -186,7 +186,7 @@ function useSideEffects(state: OpenPacksState, setState: SetStoreFunction<OpenPa
 						draft.splice(index, 1);
 					})
 				);
-				setTotalPackCount(val => val - 1);
+				// setTotalPackCount(val => val - 1);
 			});
 		}
 	});

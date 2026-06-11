@@ -70,7 +70,7 @@ export async function openCardFromPack(args: {
 			c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 		);
 
-		const deletePack = newCardDetails.every(c => c.opened);
+		const shouldDeletePack = newCardDetails.every(c => c.opened);
 
 		const userId = instance.userId;
 		const user = userId ? await getUser(userId) : null;
@@ -85,7 +85,7 @@ export async function openCardFromPack(args: {
 
 		await db.transaction
 			.write(({ Packs, Users, CardDesigns }) => [
-				deletePack
+				shouldDeletePack
 					? Packs.delete({ packId: args.packId }).commit()
 					: Packs.patch({ packId: args.packId })
 							.set({ cardDetails: newCardDetails })
@@ -95,7 +95,7 @@ export async function openCardFromPack(args: {
 							Users.patch({ userId: user.userId })
 								.set({
 									cardCount: (user.cardCount ?? 0) + 1,
-									packCount: deletePack
+									packCount: shouldDeletePack
 										? (user.packCount ?? 1) - 1
 										: user.packCount,
 								})
@@ -145,8 +145,8 @@ export async function openCardFromPack(args: {
 	const newCardDetails = pack.cardDetails?.map(c =>
 		c.instanceId !== args.instanceId ? c : { ...c, opened: true }
 	);
-	const deletePack = newCardDetails.every(c => c.opened);
-	const isShitPack = deletePack === true && checkIsShitPack(newCardDetails) === true;
+	const shouldDeletePack = newCardDetails.every(c => c.opened);
+	const isShitPack = shouldDeletePack === true && checkIsShitPack(newCardDetails) === true;
 
 	const updateRarity = checkIsRarityBetter(
 		{ rarityId: instance.rarityId, count: instance.totalOfType },
@@ -170,10 +170,10 @@ export async function openCardFromPack(args: {
 			Users.patch({ userId })
 				.set({
 					cardCount: (user.cardCount ?? 0) + 1,
-					packCount: deletePack ? (user.packCount ?? 1) - 1 : user.packCount,
+					packCount: shouldDeletePack ? (user.packCount ?? 1) - 1 : user.packCount,
 				})
 				.commit(),
-			deletePack
+			shouldDeletePack
 				? Packs.delete({ packId: packId }).commit()
 				: Packs.patch({ packId: packId }).set({ cardDetails: newCardDetails }).commit(),
 			...(updateRarity

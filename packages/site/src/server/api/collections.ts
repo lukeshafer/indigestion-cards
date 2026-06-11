@@ -1,4 +1,4 @@
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { authedProcedure } from '../router';
 import * as Collections from '@core/lib/collections';
 import { TRPCError } from '@trpc/server';

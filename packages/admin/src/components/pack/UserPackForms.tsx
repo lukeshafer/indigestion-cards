@@ -1,6 +1,6 @@
 import { Form, Select, SubmitButton, DeleteButton } from '@admin/components/form/Form';
 import { API } from '@admin/constants';
-import { setTotalPackCount } from '@admin/lib/client/state';
+// import { setTotalPackCount } from '@admin/lib/client/state';
 import type { PackType, User } from '@core/types';
 import { createResource } from 'solid-js';
 
@@ -14,7 +14,7 @@ export default function UserPackForms(props: { packTypes: PackType[]; user: User
 	});
 
 	const refreshPackCounts = () => {
-		setTotalPackCount((count) => count - 1);
+		// setTotalPackCount((count) => count - 1);
 		refetch();
 	};
 

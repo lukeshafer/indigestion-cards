@@ -378,7 +378,7 @@ export async function subscribeToTwitchEvent(event: TwitchEvent) {
 				status: z.string(),
 				type: z.string(),
 				version: z.string(),
-				condition: z.record(z.any()),
+				condition: z.record(z.string(), z.any()),
 				created_at: z.string(),
 				transport: z.object({
 					method: z.string(),
@@ -582,7 +582,7 @@ export async function getActiveTwitchEventSubscriptions() {
 					'channel.channel_points_custom_reward.update',
 					'channel.channel_points_custom_reward.remove',
 				]),
-				condition: z.record(z.string().or(z.number())),
+				condition: z.record(z.string(), z.string().or(z.number())),
 				transport: z.object({
 					method: z.string(),
 					callback: z.string(),

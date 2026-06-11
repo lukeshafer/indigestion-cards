@@ -6,7 +6,7 @@ import { getTwitchEventById, checkIsDuplicateTwitchEventMessage } from '@core/li
 import { getPackTypeById } from '@core/lib/pack-type';
 import { MOMENT_REDEMPTION_PACK_TYPE_ID, TWITCH_GIFT_SUB_ID } from '@core/constants';
 import { setAdminEnvSession } from '@core/lib/session';
-import { Moment } from '@core/events/moments';
+import { sendMomentEvent } from '@core/events/moments';
 import type { PackDetails } from '@core/lib/entity-schemas';
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
@@ -134,10 +134,10 @@ export const handler: APIGatewayProxyHandlerV2 = async event => {
 
 			if (reward.packTypeId === MOMENT_REDEMPTION_PACK_TYPE_ID) {
 				console.log(`Moment redeemed by ${body.event.user_name}`);
-				await Moment.Redeemed.publish({
+        await sendMomentEvent({
 					userId: body.event.user_id,
 					username: body.event.user_name,
-				});
+        })
 				break;
 			}
 

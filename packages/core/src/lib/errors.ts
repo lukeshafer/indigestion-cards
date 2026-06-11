@@ -12,18 +12,6 @@ export class PackTypeIsOutOfCardsError extends Error {
 	}
 }
 
-export class HTTPError extends Error {
-	status: number;
-	originalMessage: string;
-
-	constructor(status: number, message: string) {
-		super(`${status}: ${message}`);
-		this.name = 'HTTPError';
-		this.status = status;
-		this.originalMessage = message;
-	}
-}
-
 export class NotFoundError extends Error {
 	constructor(message: string) {
 		super(message);

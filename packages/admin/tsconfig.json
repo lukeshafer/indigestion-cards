@@ -10,12 +10,11 @@
       "ES2022"
     ],
     "allowJs": true,
-    "baseUrl": ".",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
       "@admin/*": [
-        "src/*"
+        "./src/*"
       ],
       "@core/lib/*": [
         "../core/src/lib/*"

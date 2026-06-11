@@ -1,5 +1,5 @@
 import type { ChannelPointReward } from './twitch';
-import { db, twitchEventTypes } from '../db';
+import { db, /*twitchEventTypes*/ } from '../db';
 import type {
 	CreateSiteConfig,
 	CreateTwitchEvent,
@@ -30,11 +30,11 @@ export async function getTwitchEventById(args: { eventId: string }) {
 	return result.data[0];
 }
 
-export function checkIsValidTwitchEventType(
-	eventType: string
-): eventType is (typeof twitchEventTypes)[number] {
-	return twitchEventTypes.some(type => type === eventType);
-}
+// export function checkIsValidTwitchEventType(
+// 	eventType: string
+// ): eventType is (typeof twitchEventTypes)[number] {
+// 	return twitchEventTypes.some(type => type === eventType);
+// }
 
 export async function refreshChannelPointRewards(newRewards: ChannelPointReward[]) {
 	const existingRewards = await db.entities.TwitchEvents.query
@@ -178,10 +178,10 @@ export function getRarityRanking(siteConfig?: SiteConfig) {
 	return transformRarityRanking(siteConfig);
 }
 
-export async function getFaq() {
-	const result = await getSiteConfig();
-	return result.faq;
-}
+// export async function getFaq() {
+// 	const result = await getSiteConfig();
+// 	return result.faq;
+// }
 
 export async function updateFaq(content: string) {
 	const siteConfig = await getSiteConfig();

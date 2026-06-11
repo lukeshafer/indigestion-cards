@@ -41,9 +41,9 @@ export async function deletePreorder(preorder: Preorder) {
 	return result.data;
 }
 
-export async function getPreordersByUser(args: { username: string }) {
-	console.log('Getting preorders by user', args);
-
-	const result = await db.entities.Preorders.query.byUser(args).go();
-	return result.data;
-}
+// export async function getPreordersByUser(args: { username: string }) {
+// 	console.log('Getting preorders by user', args);
+//
+// 	const result = await db.entities.Preorders.query.byUser(args).go();
+// 	return result.data;
+// }

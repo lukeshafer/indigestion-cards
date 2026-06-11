@@ -5,8 +5,6 @@ import Page from '@admin/layouts/Page.astro';
 import { getPackTypeById } from '@core/lib/pack-type';
 import { getCardPoolFromType } from '@core/lib/card-pool';
 import Table from '@admin/components/table/Table';
-import { actions } from 'astro:actions';
-import { SubmitButton, TextInput } from '@admin/components/form/Form';
 import { RenamePackTypeForm } from '@admin/components/pack-type/RenamePackTypeForm';
 
 const packTypeId = Astro.params.packTypeId;
@@ -31,15 +29,6 @@ const cardPool = await getCardPoolFromType(packType);
 		initialPackTypeName={packType.packTypeName}
 		client:load
 	/>
-	<!--<form method="post" action={actions.packTypes.renamePackType} class="my-4">-->
-	<!--	<input type="hidden" name="packTypeId" value={packType.packTypeId} />-->
-	<!--	<div class="my-2 flex w-fit gap-2">-->
-	<!--		<TextInput label="Update name" name="packTypeName" value={packType.packTypeName} />-->
-	<!--		<div class="self-end">-->
-	<!--			<SubmitButton>Rename</SubmitButton>-->
-	<!--		</div>-->
-	<!--	</div>-->
-	<!--</form>-->
 	<section aria-label="Card Pool" class="mx-auto mt-4 flex max-w-2xl flex-col gap-4">
 		<Heading>Card Pool</Heading>
 		<Table

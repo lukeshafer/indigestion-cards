@@ -1,4 +1,3 @@
-import { createSignal } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import { useViewTransition } from './utils';
 
@@ -18,6 +17,3 @@ export function pushAlert(alert: Alert, noViewTransition?: boolean) {
 		useViewTransition(addAlert);
 	}
 }
-
-export const [totalPackCount, setTotalPackCount] = createSignal(0);
-export const [addingAdminUser, setAddingAdminUser] = createSignal(false);

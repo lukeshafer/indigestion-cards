@@ -5,7 +5,7 @@ import {
 	searchUserCards,
 } from '@core/lib/card';
 import { authedProcedure, publicProcedure } from '../router';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { getUserAndOpenedCardInstances, getUserMomentCards, loadUserCards } from '@core/lib/user';
 
 const userCardsInputSchema = z.object({

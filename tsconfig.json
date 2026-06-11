@@ -2,7 +2,8 @@
   "extends": "@tsconfig/node24/tsconfig.json",
   "exclude": [
     "packages",
-    "stacks"
+    "stacks",
+    ".sst"
   ],
   "compilerOptions": {
     //"noUnusedLocals": true,

@@ -191,42 +191,42 @@ export async function deleteFirstPackForUser(args: {
 	}
 }
 
-export async function deletePack(args: { packId: string }) {
-	const pack = await getPackById({ packId: args.packId });
-	if (pack == null) {
-		throw new InputValidationError('Pack no longer exists.');
-	}
-
-	const user = pack.userId ? await getUser(pack.userId) : null;
-	const openCount = pack.cardDetails.filter(card => card.opened).length;
-
-	const result = await db.transaction
-		.write(({ Users, CardInstances, Packs }) => [
-			Packs.delete({ packId: args.packId }).commit(),
-			...(pack.userId && user
-				? [
-						Users.patch({ userId: pack.userId })
-							// if packCount is null OR 0, set it to 0, otherwise subtract 1
-							.set({
-								packCount: (user?.packCount || 1) - 1,
-								cardCount: user?.cardCount ? user.cardCount - openCount : 0,
-							})
-							.commit(),
-					]
-				: []),
-			...(pack.cardDetails?.map(card =>
-				CardInstances.delete({
-					designId: card.designId,
-					instanceId: card.instanceId,
-				}).commit()
-			) ?? []),
-		])
-		.go();
-
-	if (result.canceled) throw new Error('Error deleting pack');
-
-	return result.data[0].item;
-}
+// export async function deletePack(args: { packId: string }) {
+// 	const pack = await getPackById({ packId: args.packId });
+// 	if (pack == null) {
+// 		throw new InputValidationError('Pack no longer exists.');
+// 	}
+//
+// 	const user = pack.userId ? await getUser(pack.userId) : null;
+// 	const openCount = pack.cardDetails.filter(card => card.opened).length;
+//
+// 	const result = await db.transaction
+// 		.write(({ Users, CardInstances, Packs }) => [
+// 			Packs.delete({ packId: args.packId }).commit(),
+// 			...(pack.userId && user
+// 				? [
+// 						Users.patch({ userId: pack.userId })
+// 							// if packCount is null OR 0, set it to 0, otherwise subtract 1
+// 							.set({
+// 								packCount: (user?.packCount || 1) - 1,
+// 								cardCount: user?.cardCount ? user.cardCount - openCount : 0,
+// 							})
+// 							.commit(),
+// 					]
+// 				: []),
+// 			...(pack.cardDetails?.map(card =>
+// 				CardInstances.delete({
+// 					designId: card.designId,
+// 					instanceId: card.instanceId,
+// 				}).commit()
+// 			) ?? []),
+// 		])
+// 		.go();
+//
+// 	if (result.canceled) throw new Error('Error deleting pack');
+//
+// 	return result.data[0].item;
+// }
 
 export async function createPack(args: {
 	userId?: string;

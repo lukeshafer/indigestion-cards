@@ -4,29 +4,6 @@ import type { CardDesign, CardInstance, SiteConfig } from '../db.types';
 import { getRarityRankForRarity } from './site-config';
 import Fuse from 'fuse.js';
 
-// TODO: delete me
-//
-// export async function deleteCardInstanceById(args: { designId: string; instanceId: string }) {
-// 	const { data: card } = await db.entities.CardInstances.get(args).go();
-// 	if (!card) throw new Error('Card not found');
-// 	const user = card.userId ? await getUser(card.userId) : null;
-//
-// 	if (user) {
-// 		const result = await db.transaction
-// 			.write(({ CardInstances, Users }) => [
-// 				CardInstances.delete(args).commit(),
-// 				Users.patch({ userId: user.userId })
-// 					.set({ cardCount: (user.cardCount || 1) - 1 })
-// 					.commit(),
-// 			])
-// 			.go();
-// 		return result.data;
-// 	}
-//
-// 	const result = await db.entities.CardInstances.delete(args).go();
-// 	return result.data;
-// }
-
 export async function getCardInstanceById(args: {
 	instanceId: string;
 	designId: string;

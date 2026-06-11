@@ -1,4 +1,4 @@
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { adminProcedure, authedProcedure, publicProcedure } from '../router';
 import {
 	checkIfUserHasSocks,
