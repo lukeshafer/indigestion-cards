@@ -34,6 +34,7 @@ const app = issuer({
 		}),
 	},
 	async allow(input) {
+    console.log("Allow called", input)
 		const validURLs = [
 			'https://admin.' + Resource.CardsParams.DOMAIN_NAME,
 			'https://' + Resource.CardsParams.DOMAIN_NAME,

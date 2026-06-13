@@ -11,7 +11,6 @@ export async function moveImageBetweenBuckets(args: {
 		Bucket: args.destinationBucket,
 		CopySource: encodeURI(`${args.sourceBucket}/${args.key}`),
 		Key: args.key,
-		ACL: 'public-read',
 	});
 
 	await s3.deleteObject({

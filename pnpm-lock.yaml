@@ -147,7 +147,7 @@ importers:
         version: 0.7.3(prettier-plugin-astro@0.14.1)(prettier@3.8.3)
       sstv2:
         specifier: npm:sst@^2.49.8
-        version: sst@2.49.8(@aws-cdk/cli-plugin-contract@2.179.0)(@aws-sdk/client-sso-oidc@3.699.0(@aws-sdk/client-sts@3.699.0(aws-crt@1.31.0))(aws-crt@1.31.0))(@types/react@18.3.23)(aws-crt@1.31.0)
+        version: sst@2.49.8(@aws-cdk/cli-plugin-contract@2.179.0)(@aws-sdk/client-sso-oidc@3.699.0(@aws-sdk/client-sts@3.821.0(aws-crt@1.31.0))(aws-crt@1.31.0))(@types/react@18.3.23)(aws-crt@1.31.0)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -163,6 +163,9 @@ importers:
       '@astrojs/tailwind':
         specifier: ^6.0.2
         version: 6.0.2(astro@6.4.5(@types/node@24.13.1)(aws4fetch@1.0.20)(jiti@1.21.7)(rollup@4.60.2)(yaml@2.8.3))(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@24.13.1)(typescript@6.0.3)))(ts-node@10.9.2(@types/node@24.13.1)(typescript@6.0.3))
+      '@aws-sdk/client-eventbridge':
+        specifier: ^3.1037.0
+        version: 3.1037.0(aws-crt@1.31.0)
       '@fontsource-variable/montserrat':
         specifier: ^5.2.8
         version: 5.2.8
@@ -201,7 +204,7 @@ importers:
         version: 4.15.2(aws-crt@1.31.0)
       sstv2:
         specifier: npm:sst@^2.49.8
-        version: sst@2.49.8(@aws-cdk/cli-plugin-contract@2.179.0)(@aws-sdk/client-sso-oidc@3.699.0(@aws-sdk/client-sts@3.821.0(aws-crt@1.31.0))(aws-crt@1.31.0))(@types/react@18.3.23)(aws-crt@1.31.0)
+        version: sst@2.49.8(@aws-cdk/cli-plugin-contract@2.179.0)(@aws-sdk/client-sso-oidc@3.699.0(@aws-sdk/client-sts@3.699.0(aws-crt@1.31.0))(aws-crt@1.31.0))(@types/react@18.3.23)(aws-crt@1.31.0)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
@@ -9813,7 +9816,7 @@ snapshots:
       '@smithy/smithy-client': 3.7.0
       '@smithy/types': 3.7.2
       '@smithy/util-middleware': 3.0.11
-      fast-xml-parser: 4.5.6
+      fast-xml-parser: 5.7.1
       tslib: 2.8.1
 
   '@aws-sdk/core@3.821.0':

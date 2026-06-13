@@ -4,6 +4,7 @@ import { database } from './database';
 const origin = $dev === true ? 'http://localhost:4322' : `https://${domainName}`;
 
 export const cardDraftBucket = new sst.aws.Bucket('CardDrafts', {
+	access: 'public',
 	cors: {
 		allowMethods: ['POST', 'GET'],
 		allowOrigins: [origin],
@@ -30,6 +31,7 @@ cardDraftBucket.notify({
 });
 
 export const frameDraftBucket = new sst.aws.Bucket('FrameDrafts', {
+	access: 'public',
 	cors: {
 		allowMethods: ['POST', 'GET'],
 		allowOrigins: [origin],
@@ -56,6 +58,7 @@ frameDraftBucket.notify({
 });
 
 export const cardDesignBucket = new sst.aws.Bucket('CardDesigns', {
+	access: 'public',
 	cors: {
 		allowMethods: ['POST', 'GET'],
 		allowOrigins: [origin],
@@ -71,6 +74,7 @@ export const cardDesignBucket = new sst.aws.Bucket('CardDesigns', {
 });
 
 export const frameDesignBucket = new sst.aws.Bucket('FrameDesigns', {
+	access: 'public',
 	cors: {
 		allowMethods: ['POST', 'GET'],
 		allowOrigins: [origin],

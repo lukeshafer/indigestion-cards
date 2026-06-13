@@ -58,47 +58,8 @@ export const adminApi = new sst.aws.ApiGatewayV2('AdminApi', {
 	},
 });
 
-adminApi.route('POST /pack-type', 'packages/functions/src/admin-api/pack-type/post.handler');
-adminApi.route('DELETE /pack-type', 'packages/functions/src/admin-api/pack-type/delete.handler');
-adminApi.route('POST /season', 'packages/functions/src/admin-api/season/post.handler');
-adminApi.route('DELETE /season', 'packages/functions/src/admin-api/season/delete.handler');
-adminApi.route('PATCH /season', 'packages/functions/src/admin-api/season/patch.handler');
-adminApi.route('POST /rarity', 'packages/functions/src/admin-api/rarity/post.handler');
-adminApi.route('DELETE /rarity', 'packages/functions/src/admin-api/rarity/delete.handler');
-adminApi.route('POST /admin-user', 'packages/functions/src/admin-api/admin-user/post.handler');
-adminApi.route('DELETE /admin-user', 'packages/functions/src/admin-api/admin-user/delete.handler');
-adminApi.route('GET /admin-user', 'packages/functions/src/admin-api/admin-user/get.handler');
-adminApi.route('POST /pack', 'packages/functions/src/admin-api/pack/post.handler');
-adminApi.route('PATCH /pack', 'packages/functions/src/admin-api/pack/patch.handler');
-adminApi.route('DELETE /pack', 'packages/functions/src/admin-api/pack/delete.handler');
-adminApi.route('PATCH /card', 'packages/functions/src/admin-api/card/patch.handler');
-adminApi.route('POST /design', 'packages/functions/src/admin-api/design/post.handler');
-adminApi.route('PATCH /design', 'packages/functions/src/admin-api/design/patch.handler');
-adminApi.route('DELETE /design', 'packages/functions/src/admin-api/design/delete.handler');
-adminApi.route('POST /site-config', 'packages/functions/src/admin-api/site-config/post.handler');
-adminApi.route(
-	'DELETE /unmatched-image',
-	'packages/functions/src/admin-api/unmatched-image/delete.handler'
-);
-adminApi.route('GET /pack-count', 'packages/functions/src/admin-api/pack-count/get.handler');
-adminApi.route(
-	'POST /refresh-twitch-event-subscriptions',
-	'packages/functions/src/admin-api/refresh-twitch-event-subscriptions.handler'
-);
-adminApi.route('POST /save-config', 'packages/functions/src/admin-api/save-config.handler');
 adminApi.route('GET /stats', 'packages/functions/src/admin-api/stats.handler');
 adminApi.route(
 	'GET /twitch/chatters',
 	'packages/functions/src/admin-api/twitch/chatters/get.handler'
 );
-adminApi.route('POST /preorder', 'packages/functions/src/admin-api/preorder/post.handler');
-adminApi.route(
-	'POST /convert-all-preorders-to-pack',
-	'packages/functions/src/admin-api/convert-all-preorders-to-pack/post.handler'
-);
-adminApi.route('PATCH /faq', 'packages/functions/src/admin-api/faq/patch.handler');
-adminApi.route('POST /moment-card', 'packages/functions/src/admin-api/moment-card/post.handler');
-
-if ($dev === true && $app.stage !== 'prod' && $app.stage !== 'live') {
-	adminApi.route('POST /purge-db', 'packages/functions/src/admin-api/purge-db.handler');
-}

@@ -1,7 +1,7 @@
 import type { APIRoute, AstroCookieSetOptions } from 'astro';
 import { authApi } from '@site/constants';
 import { Resource } from 'sst';
-import { COOKIE, client,  subjects } from '@core/lib/auth';
+import { COOKIE, client, subjects } from '@core/lib/auth';
 
 export const GET: APIRoute = async ctx => {
 	const accessToken = ctx.cookies.get(COOKIE.ACCESS);
@@ -29,10 +29,9 @@ export const GET: APIRoute = async ctx => {
 	}
 
 	const isAdmin = ctx.locals.session?.type === 'admin';
-	const redirectURI =
-ctx.url.host.startsWith('localhost:')
-			? ctx.url.origin + authApi.CALLBACK
-			: 'https://' + Resource.CardsParams.DOMAIN_NAME + authApi.CALLBACK;
+	const redirectURI = ctx.url.host.startsWith('localhost:')
+		? ctx.url.origin + authApi.CALLBACK
+		: 'https://' + Resource.CardsParams.DOMAIN_NAME + authApi.CALLBACK;
 
 	const result = await client.authorize(redirectURI, 'code', {
 		provider: isAdmin ? 'twitchStreamer' : 'twitch',

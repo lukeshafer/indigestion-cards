@@ -24,6 +24,9 @@
       ],
       "@core/constants": [
         "../core/src/constants"
+      ],
+      "@core/db": [
+        "../core/src/db"
       ]
     },
     "jsx": "preserve",

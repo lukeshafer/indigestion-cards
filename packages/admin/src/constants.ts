@@ -1,22 +1,19 @@
 /** Admin Api routes */
 const api_paths = {
-	PACK_TYPE: '/pack-type',
-	SEASON: '/season',
-	RARITY: '/rarity',
 	ADMIN_USER: '/admin-user',
-	PACK: '/pack',
-	CARD: '/card',
-	DESIGN: '/design',
-	SITE_CONFIG: '/site-config',
-	UNMATCHED_IMAGE: '/unmatched-image',
-	PACK_COUNT: '/pack-count',
-	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
-	STATS: '/stats',
-	TWITCH_CHATTERS: '/twitch/chatters',
-	PREORDER: '/preorder',
 	CONVERT_PREORDERS: '/convert-all-preorders-to-pack',
+	DESIGN: '/design',
 	FAQ: '/faq',
 	MOMENT_CARD: '/moment-card',
+	PACK: '/pack',
+	PACK_COUNT: '/pack-count',
+	PACK_TYPE: '/pack-type',
+	PREORDER: '/preorder',
+	RARITY: '/rarity',
+	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
+	SEASON: '/season',
+	SITE_CONFIG: '/site-config',
+	UNMATCHED_IMAGE: '/unmatched-image',
 };
 
 export const API = new Proxy(api_paths, {

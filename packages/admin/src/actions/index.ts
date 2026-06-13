@@ -2,8 +2,10 @@ import { sendGivePackEvents } from '@core/lib/pack';
 import { getPackTypeById, updatePackTypeName } from '@core/lib/pack-type';
 import { getUserByLogin } from '@core/lib/twitch';
 import { addCardDesignTag, removeCardDesignTag, setCardDesignGame } from '@core/lib/design';
-import { ActionError, defineAction } from 'astro:actions';
+import { ActionError, defineAction, type ActionAPIContext } from 'astro:actions';
 import { z } from 'astro/zod';
+import type { Session } from '@core/types';
+import { createAdminUser, deleteAdminUser } from '@core/lib/admin-user';
 
 export const server = {
 	packs: {
@@ -13,12 +15,7 @@ export const server = {
 				packTypeId: z.string(),
 			}),
 			handler: async (input, context) => {
-				if (context.locals.session?.type !== 'admin') {
-					throw new ActionError({
-						code: 'UNAUTHORIZED',
-						message: 'You must be an administrator to perform this action.',
-					});
-				}
+				adminOnly(context);
 
 				const packType = await getPackTypeById({ packTypeId: input.packTypeId });
 
@@ -59,12 +56,7 @@ export const server = {
 				tags: z.array(z.string()),
 			}),
 			handler: async (input, context) => {
-				if (context.locals.session?.type !== 'admin') {
-					throw new ActionError({
-						code: 'UNAUTHORIZED',
-						message: 'You must be an administrator to perform this action.',
-					});
-				}
+				adminOnly(context);
 
 				const result = await addCardDesignTag({
 					designId: input.designId,
@@ -88,12 +80,7 @@ export const server = {
 				tag: z.string(),
 			}),
 			handler: async (input, context) => {
-				if (context.locals.session?.type !== 'admin') {
-					throw new ActionError({
-						code: 'UNAUTHORIZED',
-						message: 'You must be an administrator to perform this action.',
-					});
-				}
+				adminOnly(context);
 
 				const result = await removeCardDesignTag({
 					designId: input.designId,
@@ -104,25 +91,20 @@ export const server = {
 				}));
 
 				if (!result.success) {
-          console.error(result.error)
+					console.error(result.error);
 					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR' });
 				}
 
 				return;
 			},
 		}),
-    setGame: defineAction({
-      input: z.object({
-        designId: z.string(),
-        game: z.string(),
-      }),
-      handler: async (input, context) => {
-				if (context.locals.session?.type !== 'admin') {
-					throw new ActionError({
-						code: 'UNAUTHORIZED',
-						message: 'You must be an administrator to perform this action.',
-					});
-				}
+		setGame: defineAction({
+			input: z.object({
+				designId: z.string(),
+				game: z.string(),
+			}),
+			handler: async (input, context) => {
+				adminOnly(context);
 
 				const result = await setCardDesignGame({
 					designId: input.designId,
@@ -133,13 +115,13 @@ export const server = {
 				}));
 
 				if (!result.success) {
-          console.error(result.error)
+					console.error(result.error);
 					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR' });
 				}
 
 				return;
-      }
-    }),
+			},
+		}),
 	},
 	packTypes: {
 		renamePackType: defineAction({
@@ -149,12 +131,7 @@ export const server = {
 			}),
 			handler: async (input, context) => {
 				//console.debug("Server action handler: packTypes.renamePackType")
-				if (context.locals.session?.type !== 'admin') {
-					throw new ActionError({
-						code: 'UNAUTHORIZED',
-						message: 'You must be an administrator to perform this action.',
-					});
-				}
+				adminOnly(context);
 
 				await updatePackTypeName(input).catch(err => {
 					console.error(err);
@@ -163,4 +140,52 @@ export const server = {
 			},
 		}),
 	},
+	adminUsers: {
+		create: defineAction({
+			input: z.object({ username: z.string() }),
+			handler: async ({ username }, ctx) => {
+				adminOnly(ctx);
+				const user = await getUserByLogin(username);
+				if (!user)
+					throw new ActionError({
+						code: 'NOT_FOUND',
+						message: `User ${username} is not a valid Twitch user}`,
+					});
+
+				const result = await createAdminUser({
+					userId: user.id,
+					username: user.display_name,
+				});
+
+				if (!result.success) {
+					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: result.error });
+				}
+
+				return;
+			},
+		}),
+		deleteUser: defineAction({
+			input: z.object({ userId: z.string(), username: z.string(), isStreamer: z.boolean() }),
+			handler: async (input, ctx) => {
+				adminOnly(ctx);
+				console.log(`Deleting user ${input.username} (${input.userId})`);
+				const result = await deleteAdminUser(input);
+
+				if (!result.success) {
+					throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: result.error });
+				}
+
+				return;
+			},
+		}),
+	},
 };
+
+function adminOnly(context: ActionAPIContext) {
+	if (context.locals.session?.type !== 'admin') {
+		throw new ActionError({
+			code: 'UNAUTHORIZED',
+			message: 'You must be an administrator to perform this action.',
+		});
+	}
+}

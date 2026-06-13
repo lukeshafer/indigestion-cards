@@ -15,7 +15,6 @@ const presigned = await createPresignedPost(s3, {
   Bucket: Resource.CardDrafts.name,
 	Key: crypto.randomBytes(20).toString('hex') + '.jpg',
 	Fields: {
-		acl: 'public-read',
 		success_action_redirect:
 			Astro.url.origin + routes.ADMIN.CREATE.MOMENT_CARD + `/${momentDate}/details`,
 	},

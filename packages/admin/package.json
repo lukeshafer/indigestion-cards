@@ -14,6 +14,7 @@
   "dependencies": {
     "@astrojs/solid-js": "^6.0.1",
     "@astrojs/tailwind": "^6.0.2",
+    "@aws-sdk/client-eventbridge": "^3.1037.0",
     "@fontsource-variable/montserrat": "^5.2.8",
     "@formkit/auto-animate": "^0.9.0",
     "@iconify-json/mdi": "^1.2.3",

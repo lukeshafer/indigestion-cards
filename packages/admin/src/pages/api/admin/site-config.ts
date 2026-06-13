@@ -1,19 +1,19 @@
-import { useFormData } from 'sstv2/node/api';
+import { validateSearchParams } from '@core/lib/api';
 import { z } from 'zod';
-
-import { validateSearchParams, SiteHandler } from '@core/lib/api';
 import { TWITCH_GIFT_SUB_ID } from '@core/constants';
 import type { SiteConfig } from '@core/types';
 import { updateBatchTwitchEvents, updateSiteConfig } from '@core/lib/site-config';
 import { updateAllCardRarityRanks } from '@core/lib/card';
+import type { APIRoute } from 'astro';
 
 type RarityRanking = NonNullable<SiteConfig['rarityRanking']>;
 
-export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
-  const params = useFormData();
-  const rarity = new URLSearchParams(params?.get('base-rarity') ?? '');
+export const POST: APIRoute = async (ctx) => {
+  const formData = await ctx.request.formData();
 
-  const validationResult = validateSearchParams(rarity, {
+  const rarityRaw = new URLSearchParams(formData.get('base-rarity') as string ?? '');
+
+  const validationResult = validateSearchParams(rarityRaw, {
     rarityId: 'string',
     rarityName: 'string',
     frameUrl: 'string',
@@ -21,16 +21,17 @@ export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
   });
 
   if (!validationResult.success)
-    return { statusCode: 400, body: validationResult.errors.join(' ') };
+    return new Response(validationResult.errors.join(' '), { status: 400 });
+
   const rarityObject = validationResult.value;
 
   type Event = Parameters<typeof updateBatchTwitchEvents>[0][number];
 
   const events: Event[] = [];
-  params?.forEach((value, key) => {
+  formData.forEach((value, key) => {
     if (key.startsWith('event-type-')) {
       const eventId = key.replace('event-type-', '');
-      const { packTypeId, packTypeName } = parseEventValue(value);
+      const { packTypeId, packTypeName } = parseEventValue(value as string);
       const event = {
         eventId,
         eventType:
@@ -44,10 +45,8 @@ export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
     }
   });
 
-  const rarityRanking = parseRanking(params?.get('rarityRanking') ?? '{}');
-  console.log({ rarityRanking });
-
-  const tradingIsEnabled = typeof params?.get('tradingIsEnabled') === 'string';
+  const rarityRanking = parseRanking(formData.get('rarityRanking') as string ?? '{}');
+  const tradingIsEnabled = typeof formData.get('tradingIsEnabled') === 'string';
 
   const siteConfig = updateSiteConfig({
     baseRarity: rarityObject,
@@ -56,12 +55,12 @@ export const handler = SiteHandler({ authorizationType: 'admin' }, async () => {
     tradingIsEnabled,
   });
   const batchTwitchEvents = updateBatchTwitchEvents(events);
-  const updatedCardsPromise = updateAllCardRarityRanks(rarityRanking)
+  const updatedCardsPromise = updateAllCardRarityRanks(rarityRanking);
 
   await Promise.all([siteConfig, batchTwitchEvents, updatedCardsPromise]);
 
-  return { statusCode: 200, body: 'Site config saved.' };
-});
+  return new Response('Site config saved.', { status: 200 });
+};
 
 function parseEventValue(value: string): {
   packTypeId: string | undefined;
