@@ -6,10 +6,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "AdminApi": {
-      "type": "sst.aws.ApiGatewayV2"
-      "url": string
-    }
     "AdminImageSecret": {
       "type": "sst.sst.Secret"
       "value": string

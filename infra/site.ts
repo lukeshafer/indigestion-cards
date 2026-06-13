@@ -9,7 +9,7 @@ import {
 import { database, dataSummaries } from './database';
 import { adminImageSecret, cardsCDN } from './image-processing';
 import { wsApi } from './websockets-api';
-import { adminApi, twitchApi } from './api';
+import { twitchApi } from './api';
 import { cardDesignBucket, cardDraftBucket, frameDesignBucket, frameDraftBucket } from './buckets';
 import { auth } from './auth';
 import { eventBus } from './events';
@@ -28,7 +28,6 @@ export const site = new sst.aws.Astro('CardsSite', {
 	domain: resolveDomain(domainName),
 	link: [
 		database,
-		adminApi,
 		twitchApi,
 		frameDesignBucket,
 		cardDesignBucket,

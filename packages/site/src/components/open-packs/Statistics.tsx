@@ -8,7 +8,8 @@ import {
 	useContext,
 } from 'solid-js';
 import { OpenPacksContext } from './OpenPacksContext';
-import { API, ASSETS, SHIT_PACK_RARITY_ID, resolveLocalPath } from '@site/constants';
+import { ASSETS, SHIT_PACK_RARITY_ID } from '@site/constants';
+import { trpc } from '@site/client/api';
 import { Checkbox } from '../Form';
 
 export function Statistics() {
@@ -43,39 +44,20 @@ export function Statistics() {
 		}
 
 		if (state.cardsOpened?.some(card => card.rarityId !== state.cardsOpened?.[0]?.rarityId))
-			// can't be a shit pack if any opened cards are not bronze
 			return { shitPackOdds: 0 };
 
 		if (state.cardsOpenedCount === state.totalCardCount)
-			// returning a timeout to make sure the card is flipped before we see this number (for suspense)
 			return new Promise<{ shitPackOdds: number }>(res =>
 				setTimeout(() => res({ shitPackOdds: 1 }), 500)
 			);
 
-		const searchParams = new URLSearchParams({
-			remainingCardCount: (state.totalCardCount - state.cardsOpenedCount).toString(),
+		const result = await trpc.statistics.shitPackOdds.query({
+			remainingCardCount: state.totalCardCount - state.cardsOpenedCount,
 			packTypeId: state.packTypeId || '0',
+			...(state.firstCardOpened ? { rarityId: state.firstCardOpened.rarityId } : {}),
 		});
 
-		if (state.firstCardOpened) {
-			searchParams.set('rarityId', state.firstCardOpened.rarityId);
-		}
-
-		const body = await fetch(resolveLocalPath(API.STATS + `?${searchParams.toString()}`)).then(
-			res => res.text()
-		);
-
-		try {
-			const json = JSON.parse(body);
-
-			return {
-				shitPackOdds: Number(json.shitPackOdds) || 0,
-			};
-		} catch {
-			return {
-				shitPackOdds: 0,
-			};
-		}
+		return { shitPackOdds: Number(result.shitPackOdds) || 0 };
 	});
 
 	const shitPackOdds = () => resource()?.shitPackOdds || 0;

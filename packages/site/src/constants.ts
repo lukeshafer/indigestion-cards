@@ -1,31 +1,3 @@
-/** Admin Api routes */
-const api_paths = {
-	PACK_TYPE: '/pack-type',
-	SEASON: '/season',
-	RARITY: '/rarity',
-	ADMIN_USER: '/admin-user',
-	PACK: '/pack',
-	CARD: '/card',
-	OPEN_CARD: '/open-card',
-	DESIGN: '/design',
-	SITE_CONFIG: '/site-config',
-	UNMATCHED_IMAGE: '/unmatched-image',
-	PACK_COUNT: '/pack-count',
-	REFRESH_TWITCH_EVENTS: '/refresh-twitch-event-subscriptions',
-	STATS: '/stats',
-	TWITCH_CHATTERS: '/twitch/chatters',
-	PREORDER: '/preorder',
-	CONVERT_PREORDERS: '/convert-all-preorders-to-pack',
-};
-
-export const API = new Proxy(api_paths, {
-	get: (target, prop) => {
-		if (!(prop in target)) return undefined;
-		const path = target[prop as keyof typeof target];
-		return '/api/admin' + path;
-	},
-});
-
 export function resolveLocalPath(path: string) {
 	if (!import.meta.env.SSR) {
 		return path;

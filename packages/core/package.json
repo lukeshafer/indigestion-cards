@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "@types/node": "^24",
-    "solid-js": "^1.9.12",
     "sst": "4.15.2"
   },
   "dependencies": {
@@ -21,7 +20,6 @@
     "@openauthjs/openauth": "^0.4.3",
     "electrodb": "^3.7.5",
     "fuse.js": "^7.3.0",
-    "node-fetch": "^3.3.2",
     "sstv2": "npm:sst@^2.49.8",
     "zod": "^4.3.6"
   }

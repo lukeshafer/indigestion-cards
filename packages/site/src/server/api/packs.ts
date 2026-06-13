@@ -9,6 +9,7 @@ import {
 import { adminProcedure, authedProcedure } from '../router';
 import { z } from 'astro/zod';
 import { getAllCardDesigns, getCardDesignAndInstancesById } from '@core/lib/design';
+import { openCardFromPack } from '@core/lib/open-pack';
 import { TRPCError } from '@trpc/server';
 
 export const packs = {
@@ -52,6 +53,22 @@ export const packs = {
 			});
 
 			await sendPacksUpdatedEvent();
+		}),
+	openCard: adminProcedure
+		.input(z.object({
+			instanceId: z.string(),
+			designId: z.string(),
+			packId: z.string(),
+		}))
+		.mutation(async ({ input }) => {
+			const result = await openCardFromPack(input);
+			if (!result.success) {
+				throw new TRPCError({
+					code: 'BAD_REQUEST',
+					message: result.error,
+				});
+			}
+			return result;
 		}),
 };
 

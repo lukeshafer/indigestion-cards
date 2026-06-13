@@ -16,6 +16,7 @@ export default defineConfig({
 	vite: {
 		ssr: {
 			external: ['electrodb'],
+			noExternal: ['@formkit/auto-animate', 'fuse.js'],
 		},
 		optimizeDeps: {
 			exclude: ['sst'],

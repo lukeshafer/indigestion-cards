@@ -18,6 +18,9 @@
       ],
       "@core/types": [
         "../core/src/types"
+      ],
+      "@core/constants": [
+        "../core/src/constants"
       ]
     },
     "jsx": "preserve",

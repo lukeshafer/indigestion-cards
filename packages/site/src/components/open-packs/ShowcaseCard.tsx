@@ -1,6 +1,7 @@
 import { createSignal, Show, useContext, type Component } from 'solid-js';
 import { OpenPacksContext, type PackEntityWithStatus } from './OpenPacksContext';
-import { API, ASSETS } from '@site/constants';
+import { ASSETS } from '@site/constants';
+import { trpc } from '@site/client/api';
 import {
 	Card,
 	CardDescription,
@@ -34,21 +35,17 @@ export function ShowcaseCard(props: {
 		setFlipped(true);
 		state.flipCard(props.card.instanceId);
 
-		const body = new URLSearchParams({
-			instanceId: props.card.instanceId,
-			designId: props.card.designId,
-			packId: props.packId,
-		}).toString();
-
 		if (state.isTesting) {
-			console.log('Card flipped: ', body);
+			console.log('Card flipped: ', {
+				instanceId: props.card.instanceId,
+				designId: props.card.designId,
+				packId: props.packId,
+			});
 		} else {
-			await fetch(API.OPEN_CARD, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body,
+			await trpc.packs.openCard.mutate({
+				instanceId: props.card.instanceId,
+				designId: props.card.designId,
+				packId: props.packId,
 			});
 		}
 	};

@@ -11,7 +11,6 @@ import {
 import { createStore, produce, reconcile, type SetStoreFunction } from 'solid-js/store';
 import { createAutoAnimate } from '@formkit/auto-animate/solid';
 
-import { API, resolveLocalPath } from '@site/constants';
 // import { setTotalPackCount } from '@site/client/state';
 import { Checkbox } from '../Form';
 import {
@@ -40,9 +39,7 @@ export default function OpenPacks(props: Props) {
 
 	const [chatters, { refetch: refetchChatters }] = createResource(async () => {
 		try {
-			const res = await fetch(resolveLocalPath(API.TWITCH_CHATTERS));
-			const data = await res.json().catch(() => ({}));
-			return checkIsChatters(data) ? data : [];
+			return await trpc.twitch.chatters.query();
 		} catch {
 			return [];
 		}
@@ -367,20 +364,4 @@ interface Chatter {
 	user_id: string;
 	user_login: string;
 	user_name: string;
-}
-function checkIsChatters(data: unknown): data is Chatter[] {
-	return (
-		Array.isArray(data) &&
-		data.every(
-			item =>
-				typeof item === 'object' &&
-				item !== null &&
-				'user_id' in item &&
-				'user_login' in item &&
-				'user_name' in item &&
-				typeof item.user_id === 'string' &&
-				typeof item.user_login === 'string' &&
-				typeof item.user_name === 'string'
-		)
-	);
 }

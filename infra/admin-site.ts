@@ -1,4 +1,4 @@
-import { adminApi, twitchApi } from './api';
+import { twitchApi } from './api';
 import { auth } from './auth';
 import { cardDesignBucket, cardDraftBucket, frameDesignBucket, frameDraftBucket } from './buckets';
 import {
@@ -21,7 +21,6 @@ export const adminSite = new sst.aws.Astro('AdminSite', {
 	dev: { title: 'Admin Site' },
 	link: [
 		database,
-		adminApi,
 		twitchApi,
 		frameDesignBucket,
 		cardDesignBucket,

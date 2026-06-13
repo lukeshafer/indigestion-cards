@@ -9,6 +9,7 @@ import { designCards } from './api/design-cards';
 import { packs } from './api/packs';
 import { trades } from './api/trades';
 import { statistics } from './api/statistics';
+import { twitch } from './api/twitch';
 
 export const appRouter = router({
 	users,
@@ -20,6 +21,7 @@ export const appRouter = router({
 	collections,
 	trades,
 	statistics,
+	twitch,
 });
 
 export type AppRouter = typeof appRouter;
