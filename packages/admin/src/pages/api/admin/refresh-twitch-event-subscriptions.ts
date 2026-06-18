@@ -66,14 +66,14 @@ export const POST: APIRoute = async () => {
     },
   };
 
-  activeSubscriptions.forEach(async (sub) => {
-    if (sub.status !== 'enabled') {
+  for (const sub of activeSubscriptions) {
+    if (sub.status !== 'enabled' || sub.transport.callback !== Resource.TwitchAPI.url) {
       await deleteTwitchEventSubscription(sub.id);
-      return;
+      continue;
     }
     const details = subDetails[sub.type];
     if (details && sub.transport.callback === Resource.TwitchAPI.url) details.exists = true;
-  });
+  }
 
   const promises = Object.entries(subDetails).map(([, details]) => {
     if (!details || details.exists) return Promise.resolve(null);
