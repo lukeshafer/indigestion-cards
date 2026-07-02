@@ -8,7 +8,7 @@ export default function RemainingPackCount() {
 				if (pack.possibleCards < 100) return false;
 				if (pack.seasonId.toLowerCase() === 'moments') return false;
 				if (pack.seasonName.toLowerCase() === 'moments') return false;
-				if (pack.remainingCards > 250 || pack.remainingCards < 5) return false;
+				if (pack.remainingCards > 500 || pack.remainingCards < 5) return false;
 
 				return true;
 			})
