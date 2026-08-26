@@ -8,6 +8,11 @@ import { InputValidationError, PackTypeIsOutOfCardsError } from './errors';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { getSeasonById } from './season';
 import { Resource } from 'sst';
+import { getAllCardDesigns, getCardDesignAndInstancesById } from './design';
+import { SSM } from '@aws-sdk/client-ssm';
+import z from 'zod';
+
+const ssm = new SSM();
 
 export async function getAllPacks(): Promise<Pack[]> {
 	const result = await db.entities.Packs.query.allPacks({}).go({ pages: 'all' });
@@ -364,7 +369,7 @@ export async function sendPacksUpdatedEvent(): Promise<void> {
 			Entries: [
 				{
 					Source: 'site',
-					DetailType: 'packs.updated',
+					DetailType: 'packs-updated',
 					Detail: '{}',
 					EventBusName: Resource.EventBus.name,
 				},
@@ -399,4 +404,83 @@ export async function sendGivePackEvents(events: Array<PackEventInput>): Promise
 		})
 		.then(console.log);
 	console.log('Sent create packs event.');
+}
+
+const seasonRemainingCardDetails = z.object({
+	seasonId: z.string(),
+	seasonName: z.string(),
+	ownedCards: z.number(),
+	possibleCards: z.number(),
+	remainingCards: z.number(),
+});
+type SeasonRemainingCardDetails = z.infer<typeof seasonRemainingCardDetails>;
+
+export async function refreshRemainingCardDetails(): Promise<Array<SeasonRemainingCardDetails>> {
+	const designs = await getAllCardDesigns();
+
+	const countsByDesign: SeasonRemainingCardDetails[] = await Promise.all(
+		designs.map(async design => {
+			const { CardInstances: cards } = await getCardDesignAndInstancesById({
+				designId: design.designId,
+			});
+
+			const ownedCards = cards.length;
+			const possibleCards =
+				design.rarityDetails?.reduce((acc, rarity) => {
+					return acc + rarity.count;
+				}, 0) ?? 0;
+			const remainingCards = possibleCards - ownedCards;
+
+			return {
+				seasonId: design.seasonId,
+				seasonName: design.seasonName,
+				ownedCards,
+				possibleCards,
+				remainingCards,
+			};
+		})
+	);
+
+	const countsBySeason = new Map<string, SeasonRemainingCardDetails>();
+	for (let design of countsByDesign) {
+		const prev = countsBySeason.get(design.seasonId);
+		countsBySeason.set(design.seasonId, {
+			seasonId: design.seasonId,
+			seasonName: design.seasonName,
+			ownedCards: design.ownedCards + (prev?.ownedCards ?? 0),
+			possibleCards: design.possibleCards + (prev?.possibleCards ?? 0),
+			remainingCards: design.remainingCards + (prev?.remainingCards ?? 0),
+		});
+	}
+
+	const payload = Array.from(countsBySeason.values()).filter(season => {
+		if (season.possibleCards < 100) return false;
+		if (season.seasonId.toLowerCase() === 'moments') return false;
+		if (season.seasonName.toLowerCase() === 'moments') return false;
+		if (season.remainingCards > 500 || season.remainingCards < 5) return false;
+		else return true;
+	}) satisfies Array<SeasonRemainingCardDetails>;
+
+	await ssm.putParameter({
+		Name: Resource.CardsParams.REMAINING_CARDS_PARAM,
+		Value: JSON.stringify(payload),
+		Type: 'String',
+		Overwrite: true,
+	});
+
+	return payload;
+}
+
+export async function getRemainingCardDetails(): Promise<Array<SeasonRemainingCardDetails>> {
+	try {
+		const result = await ssm.getParameter({ Name: Resource.CardsParams.REMAINING_CARDS_PARAM });
+		const details = z
+			.array(seasonRemainingCardDetails)
+			.parse(JSON.parse(result.Parameter?.Value || '{}'));
+		return details;
+	} catch (error) {
+		console.error(error);
+		const details = await refreshRemainingCardDetails();
+		return details;
+	}
 }
