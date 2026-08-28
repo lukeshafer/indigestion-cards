@@ -69,7 +69,7 @@ export function Form(props: {
 			},
 			body,
 		})
-			.catch((err) => {
+			.catch(err => {
 				console.error(err);
 				throw err;
 			})
@@ -86,10 +86,10 @@ export function Form(props: {
 		console.log({ contentType });
 
 		if (response.ok) {
-			if (!props.noAlert)
+			if (!props.noAlert && !props.successRefresh && !props.successRedirect)
 				useViewTransition(() => {
 					const alertMessage = isHTML ? 'Success!' : responseBody || 'Success!';
-					setAlerts((alerts) => [{ message: alertMessage, type: 'success' }, ...alerts]);
+					setAlerts(alerts => [{ message: alertMessage, type: 'success' }, ...alerts]);
 				});
 			if (props.onsuccess) props.onsuccess();
 			if (props.successRedirect) {
@@ -97,11 +97,15 @@ export function Form(props: {
 				if (responseBody) redirectURL.searchParams.set('alert', responseBody);
 				location.assign(redirectURL.toString());
 			}
-			if (props.successRefresh) location.reload();
+			if (props.successRefresh) {
+				const url = new URL(location.href, location.origin);
+				if (responseBody) url.searchParams.set('alert', responseBody);
+				location.assign(url);
+			}
 		} else {
 			if (!props.noAlert)
 				useViewTransition(() => {
-					setAlerts((alerts) => [
+					setAlerts(alerts => [
 						{
 							message: isHTML
 								? 'There was an error'
@@ -126,7 +130,7 @@ export function Form(props: {
 
 	return (
 		<form
-			ref={(el) => props.ref?.(el)}
+			ref={el => props.ref?.(el)}
 			class="relative flex w-full flex-col items-start gap-6"
 			method={props.method === 'get' ? 'get' : 'post'}
 			action={formAction()}
@@ -162,7 +166,7 @@ function Label(props: { label: string; name: string; required?: boolean }) {
 	return (
 		<label
 			for={props.name}
-			class="font-heading block font-semibold"
+			class="block font-heading font-semibold"
 			classList={{ required: props.required }}>
 			{props.label}
 		</label>
@@ -200,7 +204,7 @@ export function TextInput(props: InputProps<string>) {
 						placeholder={props.placeholder ?? props.label}
 						readOnly={props.readOnly}
 						value={props.value ?? ''}
-						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
 					/>
 				</>
 			) : (
@@ -218,7 +222,7 @@ export function TextInput(props: InputProps<string>) {
 						placeholder={props.placeholder}
 						readOnly={props.readOnly}
 						value={props.value ?? ''}
-						onInput={(e) => props.setValue?.(e.target.value ?? '')}
+						onInput={e => props.setValue?.(e.target.value ?? '')}
 					/>
 				</InputGroup>
 			)}
@@ -240,8 +244,8 @@ export function TextArea(props: InputProps<string> & { height?: string }) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-        children={props.children}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				children={props.children}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -261,7 +265,7 @@ export function NumberInput(props: InputProps<number>) {
 				placeholder={props.placeholder}
 				readOnly={props.readOnly}
 				value={props.value ?? ''}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}
+				onInput={e => props.setValue?.(e.target.value ?? '')}
 			/>
 		</InputGroup>
 	);
@@ -283,7 +287,7 @@ export function IdInput(props: InputProps<string> & { from: string }) {
 			/>
 			<button
 				hidden={!isReadOnly()}
-				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black dark:text-white opacity-50 hover:opacity-100"
+				class="absolute bottom-0 right-0 bg-none p-2 leading-none text-black opacity-50 hover:opacity-100 dark:text-white"
 				onClick={handleEditClick}>
 				Edit
 			</button>
@@ -319,11 +323,7 @@ export function FileInput(props: {
 				id={props.name}
 				name={props.name}
 				type="file"
-				class="focus:border-accent-light focus:ring-accent-light file:text-shadow file:bg-brand-light 
-				file:hover:bg-brand-main file:dark:bg-brand-main file:dark:hover:bg-brand-dark 
-        file:brand-shadow file:text-outline block w-full rounded-none p-1 text-black
-				file:cursor-pointer file:rounded-full file:border-none file:px-4 file:py-2 file:font-bold 
-				file:uppercase file:text-white file:transition-colors focus:outline-none focus:ring-4"
+				class="file:text-shadow file:brand-shadow file:text-outline block w-full rounded-none p-1 text-black file:cursor-pointer file:rounded-full file:border-none file:bg-brand-light file:px-4 file:py-2 file:font-bold file:uppercase file:text-white file:transition-colors file:hover:bg-brand-main focus:border-accent-light focus:outline-none focus:ring-4 focus:ring-accent-light file:dark:bg-brand-main file:dark:hover:bg-brand-dark"
 				required={props.required}
 				accept={props.accept}
 			/>
@@ -351,9 +351,9 @@ export function Select(props: {
 				class={BASE_INPUT_CLASS + ' bg-white'}
 				required={props.required}
 				value={props.value ?? props.options[0]?.value}
-				onInput={(e) => props.setValue?.(e.target.value ?? '')}>
+				onInput={e => props.setValue?.(e.target.value ?? '')}>
 				<For each={props.options}>
-					{(option) => (
+					{option => (
 						<option value={option.value} selected={option.value === props.value}>
 							{option.label}
 						</option>
@@ -377,11 +377,10 @@ export function Checkbox(props: {
 				id={props.name}
 				name={props.name}
 				type="checkbox"
-				class="focus:border-brand-main focus:ring-brand-main inline-block w-auto 
-				rounded-none bg-white p-1 text-black focus:outline-none focus:ring-4"
+				class="inline-block w-auto rounded-none bg-white p-1 text-black focus:border-brand-main focus:outline-none focus:ring-4 focus:ring-brand-main"
 				required={props.required}
 				checked={props.value ?? false}
-				onInput={(e) => props.setValue?.(e.target.checked)}
+				onInput={e => props.setValue?.(e.target.checked)}
 			/>
 			<label
 				for={props.name}
@@ -421,17 +420,17 @@ export function SubmitButton(props: {
 	disabled?: boolean;
 	transitionId?: string;
 	confirm?: string;
-  name?: string;
+	name?: string;
 }) {
 	return (
 		<button
-      name={props.name}
+			name={props.name}
 			type="submit"
 			disabled={props.disabled}
 			style={props.transitionId ? { 'view-transition-name': props.transitionId } : undefined}
 			classList={{ 'cursor-not-allowed opacity-50': props.disabled }}
 			class={`${BUTTON_CLASS} bg-brand-light hover:bg-brand-main dark:bg-brand-main dark:hover:bg-brand-dark`}
-			onClick={(e) => {
+			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}
@@ -447,7 +446,7 @@ export function DeleteButton(props: { children?: string; onClick?: () => void; c
 		<button
 			type="submit"
 			class={`${BUTTON_CLASS} bg-red-400 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-800`}
-			onClick={(e) => {
+			onClick={e => {
 				if (props.confirm !== undefined && !confirm(props.confirm ?? undefined)) {
 					e.preventDefault();
 				}

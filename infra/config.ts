@@ -40,7 +40,7 @@ export const params = new sst.Linkable('CardsParams', {
 		TWITCH_TOKENS_PARAM: `/sst/${$app.name}/${$app.stage}/Secret/TWITCH_TOKENS/value`,
 		STREAMER_USER_ID: '227134852',
 		DOMAIN_NAME: getDomainName($app.stage),
-    REMAINING_CARDS_PARAM: `/${$app.name}/${$app.stage}/Params/REMAINING_CARDS_PARAM/value`
+    REMAINING_PACK_COUNT: `/${$app.name}/${$app.stage}/Params/REMAINING_PACK_COUNT/value`
 	},
 });
 

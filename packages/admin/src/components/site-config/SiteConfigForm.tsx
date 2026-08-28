@@ -1,5 +1,5 @@
 import { Checkbox, Form, Select, SubmitButton } from '@admin/components/form/Form';
-import type { Rarity, PackType, TwitchEvent, } from '@core/types';
+import type { Rarity, PackType, TwitchEvent, Season } from '@core/types';
 import { MOMENT_REDEMPTION_PACK_TYPE_ID } from '@core/constants';
 import { API } from '@admin/constants';
 import { Show, createSignal } from 'solid-js';
@@ -17,7 +17,8 @@ const STATIC_PACK_TYPES: { label: string; value: string }[] = [
 	},
 ];
 
-export default function SiteConfigForm(props: {
+type SiteConfigFormProps = {
+	seasons: Season[];
 	baseRarityValue: string;
 	rarities: Rarity[];
 	twitchEvents: TwitchEvent[];
@@ -25,7 +26,10 @@ export default function SiteConfigForm(props: {
 	giftSubEvent: TwitchEvent;
 	initialRanking: Record<string, RarityRankingRecord[number]>;
 	tradingIsEnabled?: boolean;
-}) {
+	currentSeasonId?: string;
+};
+
+export default function SiteConfigForm(props: SiteConfigFormProps) {
 	const [isEdited, setIsEdited] = createSignal(false);
 	// eslint-disable-next-line solid/reactivity
 	const [rarity, setRarity] = createSignal(props.baseRarityValue);
@@ -62,6 +66,16 @@ export default function SiteConfigForm(props: {
 					label="Enable Trading?"
 					value={props.tradingIsEnabled}
 					setValue={() => setIsEdited(true)}
+				/>
+				<Select
+					name="currentSeasonId"
+					label="Current Season"
+					value={props.currentSeasonId}
+					setValue={() => setIsEdited(true)}
+					options={[
+						{ value: '', label: '' },
+						...props.seasons.map(s => ({ value: s.seasonId, label: s.seasonName })),
+					]}
 				/>
 				<Select
 					name="base-rarity"

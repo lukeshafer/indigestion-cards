@@ -5,7 +5,7 @@ import {
 	hidePackCards,
 	sendPacksUpdatedEvent,
 	setPackIsLocked,
-  getRemainingCardDetails,
+  getRemainingPackCount,
 } from '@core/lib/pack';
 import { adminProcedure, authedProcedure } from '../router';
 import { z } from 'astro/zod';
@@ -25,7 +25,7 @@ export const packs = {
 				)
 		),
 	// packsRemaining: authedProcedure.query(async () => await getPacksRemaining()),
-  seasonsRemainingCards: authedProcedure.query(async () => await getRemainingCardDetails()),
+  remainingPackCount: authedProcedure.query(async () => await getRemainingPackCount()),
 	sendPacksUpdatedEvent: adminProcedure.mutation(async () => await sendPacksUpdatedEvent()),
 	setIsLocked: authedProcedure
 		.input(z.object({ packId: z.string(), isLocked: z.boolean() }))

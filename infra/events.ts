@@ -109,6 +109,7 @@ eventBus.subscribe('moment-redeemed', {
 
 eventBus.subscribe('packs-updated', {
 	handler: 'packages/functions/src/event-bridge/packs-updated.handler',
-	link: [wsApi, wsConnectionsTable],
+	link: [wsApi, wsConnectionsTable, database, params],
+	permissions: [ssmPermissions],
 	runtime: 'nodejs24.x',
 });

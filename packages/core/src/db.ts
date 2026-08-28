@@ -463,6 +463,7 @@ const Seasons = new Entity(
 			seasonId: { type: 'string', required: true },
 			nextPackNumber: { type: 'number', default: 0 },
 			packNumberPrefix: { type: 'string' },
+			defaultPackTypeId: { type: 'string' },
 			...dateAttributes(),
 		},
 		indexes: {
@@ -528,6 +529,7 @@ const SiteConfig = new Entity(
 				},
 			},
 			tradingIsEnabled: { type: 'boolean' },
+			currentSeasonId: { type: 'string' },
 			faq: { type: 'string' },
 			...dateAttributes(),
 		},

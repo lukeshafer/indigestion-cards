@@ -28,7 +28,7 @@ declare module "sst" {
     }
     "CardsParams": {
       "DOMAIN_NAME": string
-      "REMAINING_CARDS_PARAM": string
+      "REMAINING_PACK_COUNT": string
       "STREAMER_USER_ID": string
       "TWITCH_TOKENS_PARAM": string
       "type": "sst.sst.Linkable"

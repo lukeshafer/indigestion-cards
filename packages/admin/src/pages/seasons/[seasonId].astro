@@ -6,6 +6,7 @@ import { getSeasonAndDesignsBySeasonId } from '@core/lib/season';
 import { NO_CARDS_OPENED_ID, routes } from '@admin/constants';
 import { PageTitle, Heading, PageHeader } from '@admin/components/text';
 import DeleteSeasonButton from '@admin/components/seasons/DeleteSeasonButton';
+import SeasonDefaultPackTypeSelector from '@admin/components/seasons/SeasonDefaultPackTypeSelector';
 
 const id = Astro.params.seasonId;
 
@@ -77,6 +78,7 @@ const packTypesWithCardPools = packTypes.map(packType => {
 
 		<div class="ml-4 mt-4">
 			<Heading heading="h3"><span class="text-xl">Pack Types:</span></Heading>
+			<SeasonDefaultPackTypeSelector {packTypes} {season} client:load />
 			<ul>
 				{
 					packTypesWithCardPools.map(async packType => (

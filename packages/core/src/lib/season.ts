@@ -63,12 +63,11 @@ export async function createSeason(inputSeason: CreateSeason) {
 
 export async function updateSeason({
 	seasonId,
-	seasonName,
-	seasonDescription,
+  ...seasonAttributes
 }: UpdateSeason & { seasonId: string }): Promise<DBResult<Partial<Season>>> {
 	try {
 		const result = await db.entities.Seasons.patch({ seasonId })
-			.set({ seasonName, seasonDescription })
+			.set(seasonAttributes)
 			.go();
 		return {
 			success: true,

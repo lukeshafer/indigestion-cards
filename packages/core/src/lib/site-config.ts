@@ -1,24 +1,49 @@
 import type { ChannelPointReward } from './twitch';
-import { db, /*twitchEventTypes*/ } from '../db';
-import type {
-	CreateSiteConfig,
-	CreateTwitchEvent,
-	UpdateTwitchEvent,
-	SiteConfig,
-} from '../db.types';
+import { db /*twitchEventTypes*/ } from '../db';
+import type { CreateTwitchEvent, CreateSiteConfig, SiteConfig } from '../db.types';
 
 export async function updateBatchTwitchEvents(
-	events: (UpdateTwitchEvent & {
+	events: {
 		eventId: string;
 		eventType: CreateTwitchEvent['eventType'];
-	})[]
+		packTypeId: string;
+		packTypeName: string;
+	}[]
 ) {
-	await Promise.all(
-		events.map(async event => {
-			const { eventId, eventType, ...rest } = event;
-			return db.entities.TwitchEvents.patch({ eventId, eventType }).set(rest).go();
-		})
-	);
+	let success = 0;
+	let error = 0;
+	let count = 0;
+
+	for (let event of events) {
+		console.log('processing event', ++count, event.eventId);
+
+		await db.entities.TwitchEvents.patch({ eventId: event.eventId, eventType: event.eventType })
+			.set({
+				packTypeId: event.packTypeId,
+				packTypeName: event.packTypeName,
+			})
+			.go()
+			.then(() => {
+				success++;
+			})
+			.catch(error => {
+				console.error(error);
+				error++;
+			});
+	}
+
+	console.log({ success, error, count });
+
+	if (error > 0) {
+		throw new Error('YIKES!');
+	}
+
+	// await Promise.all(
+	// 	events.map(async event => {
+	// 		const { eventId, eventType, ...rest } = event;
+	// 		return db.entities.TwitchEvents.patch({ eventId, eventType }).set(rest).go();
+	// 	})
+	// );
 }
 
 export async function getTwitchEvents() {
@@ -114,7 +139,6 @@ export async function checkIsDuplicateTwitchEventMessage(args: { message_id: str
 
 	return result.length > 0;
 }
-
 export async function updateSiteConfig(config: CreateSiteConfig) {
 	await db.entities.SiteConfig.upsert(config).go();
 }
@@ -143,9 +167,7 @@ export async function getRarityRankForRarity(
 		rarityRanking = siteConfig.rarityRanking;
 	}
 
-	let matchedRanking = rarityRanking?.find(
-		({ rarityId }) => rarityId === rarity.rarityId
-	);
+	let matchedRanking = rarityRanking?.find(({ rarityId }) => rarityId === rarity.rarityId);
 
 	if (!matchedRanking) {
 		throw Error(`No matched ranking found for rarity ${rarity.rarityId}`);

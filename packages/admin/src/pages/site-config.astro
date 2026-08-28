@@ -4,15 +4,17 @@ import { getAllPackTypes } from '@core/lib/pack-type';
 import { getAllRarities } from '@core/lib/rarity';
 import { getTwitchEvents, getSiteConfig, getRarityRanking } from '@core/lib/site-config';
 import { TWITCH_GIFT_SUB_ID } from '@core/constants';
+import { getAllSeasons } from '@core/lib/season';
 import TwitchLoginButton from '@admin/components/site-config/TwitchLoginButton.astro';
 import SiteConfigForm from '@admin/components/site-config/SiteConfigForm';
 import RefreshTwitchEventsButton from '@admin/components/site-config/RefreshTwitchEventsButton';
 
-const [twitchEvents, packTypes, rarities, siteConfig] = await Promise.all([
+const [twitchEvents, packTypes, rarities, siteConfig, seasons] = await Promise.all([
 	getTwitchEvents(),
 	getAllPackTypes(),
 	getAllRarities(),
 	getSiteConfig(),
+	getAllSeasons(),
 ]);
 
 const baseRarityValue = new URLSearchParams(
@@ -26,8 +28,7 @@ console.log('siteConfig', siteConfig);
 const initialRanking = getRarityRanking(siteConfig);
 
 const giftSubEvent = twitchEvents.data.find(
-	(event) =>
-		event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
+	event => event.eventType === 'channel.subscription.gift' && event.eventId === TWITCH_GIFT_SUB_ID
 ) || {
 	eventId: TWITCH_GIFT_SUB_ID,
 	eventName: '5 Gift Subs',
@@ -35,7 +36,7 @@ const giftSubEvent = twitchEvents.data.find(
 };
 
 const rewards = twitchEvents.data
-	.filter((event) => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
+	.filter(event => event.eventType === 'channel.channel_points_custom_reward_redemption.add')
 	.sort((a, b) => {
 		if (a.packTypeId && !b.packTypeId) return -1;
 		if (!a.packTypeId && b.packTypeId) return 1;
@@ -48,13 +49,15 @@ const rewards = twitchEvents.data
 <Page title="Site Config">
 	<div class="mx-auto my-6 max-w-2xl">
 		<SiteConfigForm
+			{seasons}
 			{rarities}
 			{packTypes}
-      tradingIsEnabled={siteConfig.tradingIsEnabled}
+			tradingIsEnabled={siteConfig.tradingIsEnabled}
 			twitchEvents={rewards}
 			{giftSubEvent}
 			{baseRarityValue}
 			{initialRanking}
+			currentSeasonId={siteConfig.currentSeasonId}
 			client:load
 		/>
 	</div>
@@ -63,7 +66,7 @@ const rewards = twitchEvents.data
 	<ul class="my-4">
 		<h2 class="text-lg">Messages</h2>
 		{
-			siteConfig.messages.map((message) => (
+			siteConfig.messages.map(message => (
 				<li>
 					<p class="font-bold">{message.type}</p>
 					<pre class="whitespace-pre-wrap">{message.message}</pre>

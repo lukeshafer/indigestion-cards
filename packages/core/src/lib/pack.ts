@@ -2,15 +2,21 @@ import { db, packEventTypes } from '../db';
 import type { Pack, CardInstance, PackCardsHidden } from '../db.types';
 import type { DBResult } from '../types';
 import { checkIfUserExists, createNewUser, getUser } from './user';
-import { type CardPool, generateCard, getCardPoolFromType } from './card-pool';
+import {
+	type CardPool,
+	generateCard,
+	getCardPoolFromType,
+	getRemainingPossibleCardsFromCardPool,
+} from './card-pool';
 import type { PackDetails, PackDetailsWithoutUser } from './entity-schemas';
 import { InputValidationError, PackTypeIsOutOfCardsError } from './errors';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { getSeasonById } from './season';
 import { Resource } from 'sst';
-import { getAllCardDesigns, getCardDesignAndInstancesById } from './design';
 import { SSM } from '@aws-sdk/client-ssm';
 import z from 'zod';
+import { getPackTypeById } from './pack-type';
+import { getSiteConfig } from './site-config';
 
 const ssm = new SSM();
 
@@ -406,81 +412,62 @@ export async function sendGivePackEvents(events: Array<PackEventInput>): Promise
 	console.log('Sent create packs event.');
 }
 
-const seasonRemainingCardDetails = z.object({
+const remainingPacksInfo = z.object({
 	seasonId: z.string(),
 	seasonName: z.string(),
-	ownedCards: z.number(),
-	possibleCards: z.number(),
-	remainingCards: z.number(),
+	remainingPacks: z.number(),
 });
-type SeasonRemainingCardDetails = z.infer<typeof seasonRemainingCardDetails>;
+type RemainingPacksInfo = z.infer<typeof remainingPacksInfo>;
 
-export async function refreshRemainingCardDetails(): Promise<Array<SeasonRemainingCardDetails>> {
-	const designs = await getAllCardDesigns();
+async function calculateRemainingPacksForSeason(
+	seasonId: string
+): Promise<RemainingPacksInfo | null> {
+	const season = await getSeasonById(seasonId);
+	const defaultPackTypeId = season?.defaultPackTypeId;
+	if (!defaultPackTypeId) return null;
 
-	const countsByDesign: SeasonRemainingCardDetails[] = await Promise.all(
-		designs.map(async design => {
-			const { CardInstances: cards } = await getCardDesignAndInstancesById({
-				designId: design.designId,
-			});
+	const packType = await getPackTypeById({ packTypeId: defaultPackTypeId });
+	const cardPool = await getCardPoolFromType(packType);
+	const remainingPossibleCards = getRemainingPossibleCardsFromCardPool(cardPool);
 
-			const ownedCards = cards.length;
-			const possibleCards =
-				design.rarityDetails?.reduce((acc, rarity) => {
-					return acc + rarity.count;
-				}, 0) ?? 0;
-			const remainingCards = possibleCards - ownedCards;
+	return {
+		seasonId: season.seasonId,
+		seasonName: season.seasonName,
+		remainingPacks: Math.floor(remainingPossibleCards.length / packType.cardCount),
+	};
+}
 
-			return {
-				seasonId: design.seasonId,
-				seasonName: design.seasonName,
-				ownedCards,
-				possibleCards,
-				remainingCards,
-			};
-		})
-	);
+export async function refreshRemainingPackCount(): Promise<RemainingPacksInfo | null> {
+	const { currentSeasonId } = await getSiteConfig();
+	if (!currentSeasonId) return null;
 
-	const countsBySeason = new Map<string, SeasonRemainingCardDetails>();
-	for (let design of countsByDesign) {
-		const prev = countsBySeason.get(design.seasonId);
-		countsBySeason.set(design.seasonId, {
-			seasonId: design.seasonId,
-			seasonName: design.seasonName,
-			ownedCards: design.ownedCards + (prev?.ownedCards ?? 0),
-			possibleCards: design.possibleCards + (prev?.possibleCards ?? 0),
-			remainingCards: design.remainingCards + (prev?.remainingCards ?? 0),
-		});
-	}
-
-	const payload = Array.from(countsBySeason.values()).filter(season => {
-		if (season.possibleCards < 100) return false;
-		if (season.seasonId.toLowerCase() === 'moments') return false;
-		if (season.seasonName.toLowerCase() === 'moments') return false;
-		if (season.remainingCards > 500 || season.remainingCards < 5) return false;
-		else return true;
-	}) satisfies Array<SeasonRemainingCardDetails>;
+	const packCountInfo = await calculateRemainingPacksForSeason(currentSeasonId);
 
 	await ssm.putParameter({
-		Name: Resource.CardsParams.REMAINING_CARDS_PARAM,
-		Value: JSON.stringify(payload),
+		Name: Resource.CardsParams.REMAINING_PACK_COUNT,
+		Value: JSON.stringify(packCountInfo),
 		Type: 'String',
 		Overwrite: true,
 	});
 
-	return payload;
+	return packCountInfo;
 }
 
-export async function getRemainingCardDetails(): Promise<Array<SeasonRemainingCardDetails>> {
+export async function getRemainingPackCount(): Promise<RemainingPacksInfo | null> {
 	try {
-		const result = await ssm.getParameter({ Name: Resource.CardsParams.REMAINING_CARDS_PARAM });
-		const details = z
-			.array(seasonRemainingCardDetails)
+		const result = await ssm.getParameter({ Name: Resource.CardsParams.REMAINING_PACK_COUNT });
+		let details = remainingPacksInfo
+			.nullable()
 			.parse(JSON.parse(result.Parameter?.Value || '{}'));
+
+    if (details === null) {
+      details = await refreshRemainingPackCount();
+    }
+
 		return details;
 	} catch (error) {
 		console.error(error);
-		const details = await refreshRemainingCardDetails();
+		const details = await refreshRemainingPackCount();
 		return details;
 	}
 }
