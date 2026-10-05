@@ -20,7 +20,7 @@
     "@tailwindcss/container-queries": "^0.1.1",
     "@trpc/client": "11.19.0",
     "@trpc/server": "11.19.0",
-    "astro": "^6.4.3",
+    "astro": "^7.3.5",
     "astro-sst": "^3.1.4",
     "fuse.js": "^7.5.0",
     "solid-js": "^1.9.15",
