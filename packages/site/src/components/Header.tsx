@@ -14,7 +14,7 @@ import {
 	type Component,
 	type ParentComponent,
 } from 'solid-js';
-import { Form, TextInput } from './Form';
+import { TextInput } from './Form';
 import ButtonCount from './ButtonCount';
 import SearchIcon from './icons/SearchIcon';
 import CloseIcon from './icons/CloseIcon';
@@ -190,9 +190,8 @@ const UserSearch: Component = () => {
 				style={{ '--display': isVisible() ? 'block' : 'none' }}
 				class="[display:--display] sm:block">
 				<UserDataList />
-				<Form action={publicApi.SEARCH} method="get">
+				<form action={publicApi.SEARCH} method="get">
 					<TextInput
-						class="pl-8 sm:pl-1"
 						list="usernames"
 						name="username"
 						label="Search Users"
@@ -205,7 +204,7 @@ const UserSearch: Component = () => {
 						<span class="sr-only">Search</span>
 						<SearchIcon size="1.4rem" />
 					</button>
-				</Form>
+				</form>
 			</div>
 		</div>
 	);

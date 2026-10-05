@@ -1,22 +1,22 @@
-import { WebSocketApiHandler } from 'sstv2/node/websocket-api';
-import { broadcastMessage } from '@core/lib/ws';
+import { broadcastMessage } from "@core/lib/ws";
+import type { APIGatewayProxyWebsocketHandlerV2 } from "aws-lambda";
 
-export const main = WebSocketApiHandler(async event => {
-	console.log('REQUEST CONTEXT', {
-		stage: event.requestContext.stage,
-		domainName: event.requestContext.domainName,
-	});
+export const main: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
+  console.log("REQUEST CONTEXT", {
+    stage: event.requestContext.stage,
+    domainName: event.requestContext.domainName,
+  });
 
-	let result = await broadcastMessage({
-		messageData: 'REFRESH_PACKS',
-	});
+  let result = await broadcastMessage({
+    messageData: "REFRESH_PACKS",
+  });
 
-	if (!result.success) {
-		console.error(result.error);
-		return { statusCode: 500, body: 'Internal Server Error' };
-	}
+  if (!result.success) {
+    console.error(result.error);
+    return { statusCode: 500, body: "Internal Server Error" };
+  }
 
-	console.log({ result });
+  console.log({ result });
 
-	return { statusCode: 200, body: 'Message sent' };
-});
+  return { statusCode: 200, body: "Message sent" };
+};

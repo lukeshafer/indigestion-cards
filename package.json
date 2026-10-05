@@ -20,8 +20,7 @@
     "site:build": "pnpm --filter site run build",
     "site:check": "pnpm --filter site run typecheck",
     "site:dev": "pnpm --filter site run dev",
-    "site:dev:host": "pnpm --filter site run dev:host",
-    "sstv2": "sstv2"
+    "site:dev:host": "pnpm --filter site run dev:host"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -39,16 +38,12 @@
     "globals": "^15.15.0",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.3",
-    "sst": "4.15.2",
-    "sstv2": "npm:sst@^2.49.8",
+    "sst": "4.17.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.0"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.1037.0",
-    "sst": "4.15.2"
+    "sst": "4.17.1"
   }
 }

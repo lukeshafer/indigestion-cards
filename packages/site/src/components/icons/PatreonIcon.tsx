@@ -1,19 +1,21 @@
 export default function PatreonIcon(props: {
-	size?: number | string;
-	color?: string;
-	class?: string;
+  size?: number | string;
+  color?: string;
+  class?: string;
 }) {
-	return (
-		<svg
+  return (
+    <svg
       class={props.class}
-			xmlns="http://www.w3.org/2000/svg"
-			width={props.size}
-			height={props.size}
-			viewBox="0 0 24 24">
-			<path
-				fill="currentColor"
-				d="M14.82 2.41c3.96 0 7.18 3.24 7.18 7.21c0 3.96-3.22 7.18-7.18 7.18c-3.97 0-7.21-3.22-7.21-7.18c0-3.97 3.24-7.21 7.21-7.21M2 21.6h3.5V2.41H2z"
-			/>
-		</svg>
-	);
+      xmlns="http://www.w3.org/2000/svg"
+      width={props.size}
+      height={props.size}
+      viewBox="0 0 512 512"
+    >
+      <path d="M0 0h512v512H0z" fill="none" />
+      <path
+        fill="currentColor"
+        d="M489.7 153.8c-.1-65.4-51-119-110.7-138.3C304.8-8.5 207-5 136.1 28.4C50.3 68.9 23.3 157.7 22.3 246.2C21.5 319 28.7 510.6 136.9 512c80.3 1 92.3-102.5 129.5-152.3c26.4-35.5 60.5-45.5 102.4-55.9c72-17.8 121.1-74.7 121-150z"
+      />
+    </svg>
+  );
 }

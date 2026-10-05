@@ -269,11 +269,11 @@ export function CardListSearch(props: { setSearchText: (text: string) => void })
 
 	return (
 		<TextInput
-			class="h-8 self-end"
 			name="search"
 			label="Search cards"
 			type="text"
 			setValue={text => {
+        console.log(text)
 				if (timeout) {
 					clearTimeout(timeout);
 				}
@@ -303,7 +303,6 @@ export function CardListSortDropdown<T extends ReadonlyArray<SortType>>(props: {
 	return (
 		<Select
 			name="sort"
-			class="h-8 self-end p-1"
 			label="Sort by"
 			setValue={val => useViewTransition(() => props.setSort(val as SortType))}
 			options={selectedSortTypes()}
